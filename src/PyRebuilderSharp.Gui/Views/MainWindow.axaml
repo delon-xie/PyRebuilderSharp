@@ -1,0 +1,82 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PyRebuilderSharp.Gui.ViewModels"
+        x:Class="PyRebuilderSharp.Gui.Views.MainWindow"
+        Title="PyRebuilderSharp - Python字节码反编译器"
+        Width="1200"
+        Height="800"
+        WindowStartupLocation="CenterScreen">
+
+  <Grid RowDefinitions="Auto, *, Auto">
+    <!-- 工具栏 -->
+    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8">
+      <Button Command="{Binding OpenFileCommand}" Padding="12,6">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="📂" />
+          <TextBlock Text="打开文件" />
+        </StackPanel>
+      </Button>
+      <Button Command="{Binding SaveResultCommand}" Padding="12,6">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="💾" />
+          <TextBlock Text="保存结果" />
+        </StackPanel>
+      </Button>
+      <TextBlock Text="Python版本:" VerticalAlignment="Center" Margin="16,0,4,0" />
+      <ComboBox SelectedItem="{Binding PythonVersion}" Width="80" />
+    </StackPanel>
+
+    <!-- 主区域: 左侧文件列表 + 右侧源代码 -->
+    <Grid Grid.Row="1" ColumnDefinitions="250, 5, *">
+      <!-- 文件列表 -->
+      <Border BorderBrush="#333" BorderThickness="1" Margin="4">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text=".pyc 文件" FontWeight="Bold"
+                     Margin="8,4" Foreground="#666" />
+          <ListBox ItemsSource="{Binding Files}"
+                   SelectedItem="{Binding SelectedFile}"
+                   BorderThickness="0">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="4">
+                  <TextBlock Text="📄" />
+                  <StackPanel>
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Size}" FontSize="11" Foreground="#888" />
+                  </StackPanel>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+
+      <!-- 分割线 -->
+      <GridSplitter Grid.Column="1" Width="5" Background="#333" />
+
+      <!-- 源码预览 -->
+      <Border Grid.Column="2" BorderBrush="#333" BorderThickness="1" Margin="4">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="反编译结果" FontWeight="Bold"
+                     Margin="8,4" Foreground="#666" />
+          <ScrollViewer>
+            <TextBlock Text="{Binding DecompiledCode}"
+                       FontFamily="Consolas, 'Courier New', monospace"
+                       FontSize="13"
+                       Margin="8"
+                       TextWrapping="NoWrap" />
+          </ScrollViewer>
+        </DockPanel>
+      </Border>
+    </Grid>
+
+    <!-- 状态栏 -->
+    <Border Grid.Row="2" Background="#1a1a1a" BorderBrush="#333" BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="*, Auto">
+        <TextBlock Text="{Binding StatsText}" Margin="8,4" Foreground="#888" />
+        <ProgressBar Grid.Column="1" IsVisible="{Binding IsDecompiling}"
+                     IsIndeterminate="True" Width="120" Height="16" Margin="8,2" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

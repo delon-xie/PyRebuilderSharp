@@ -1,0 +1,43 @@
+.hermes/
+## .NET 核心构建输出
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+
+## Visual Studio 缓存
+.vs/
+*.csproj.user
+*.dbmdl
+*.jfm
+
+## NuGet 包
+packages/
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+
+## macOS
+.DS_Store
+
+## Windows
+Thumbs.db
+Desktop.ini
+
+## 日志
+*.log
+logs/
+
+## 发布输出
+publish/
+PublishProfiles/
+
+## 测试结果
+TestResults/

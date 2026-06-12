@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PyRebuilderSharp.Cli/PyRebuilderSharp.Cli.csproj" />
+    <Project Path="src/PyRebuilderSharp.Core/PyRebuilderSharp.Core.csproj" />
+    <Project Path="src/PyRebuilderSharp.Gui/PyRebuilderSharp.Gui.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PyRebuilderSharp.Tests/PyRebuilderSharp.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+"""Minimal 3.5 test"""
+import subprocess, os
+
+PY35 = os.path.expanduser("~/.pyenv/versions/3.5.10/bin/python")
+COMPILED = os.path.expanduser(
+    "~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled")
+
+# Compile a = 1 with 3.5
+result = subprocess.run([PY35, "-c",
+    "import py_compile; py_compile.compile('/tmp/t1.py', cfile='/tmp/t1.35.pyc', doraise=True)"],
+    capture_output=True, text=True, timeout=10)
+
+# Check if compiled
+r2 = subprocess.run(
+    ["dotnet", "run", "--project", os.path.expanduser("~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli"),
+     "--", "/tmp/t1.35.pyc"],
+    capture_output=True, text=True, timeout=30
+)
+print("STDOUT:", r2.stdout[:200])
+print("STDERR:", r2.stderr[:200])
