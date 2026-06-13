@@ -128,7 +128,19 @@ public class PycReader
 
             // 读取CodeObject的各个字段
             code.ArgCount = br.ReadInt32();
-            if (IsPython38Plus() && !isSimple)
+            if (IsPython311Plus() && !isSimple)
+            {
+                // Python 3.11+ TYPE_CODE: argcount, posonlyargcount, kwonlyargcount, stacksize, flags
+                // （无 nlocals — 由 localsplusnames+kinds 派生）
+                var posOnlyArgCount = br.ReadInt32();
+                code.KwOnlyArgCount = br.ReadInt32();
+                var stacksize = br.ReadInt32();
+                var flags = br.ReadInt32();
+                code.IsGenerator = (flags & 0x20) != 0;
+                code.IsCoroutine = (flags & 0x80) != 0;
+                code.IsAsyncGenerator = (flags & 0xC0) == 0xC0;
+            }
+            else if (IsPython38Plus() && !isSimple)
             {
                 // Python 3.8+: argcount, posonlyargcount, kwonlyargcount, nlocals, stacksize, flags
                 var posOnlyArgCount = br.ReadInt32();
@@ -165,8 +177,15 @@ public class PycReader
             }
 
             // 读取字节码 — 通过 ReadMarshalObject 以正确处理 FLAG_REF
-            var bytecodeObj = ReadMarshalObject(br);
-            byte[]? bcBytes = bytecodeObj as byte[];
+            // v3.11+: TYPE_STRING(0x73) 是字节码（非 TYPE_CODE_SIMPLE），用 ReadRawMarshalBytes
+            byte[]? bcBytes;
+            if (IsPython311Plus())
+                bcBytes = ReadRawMarshalBytes(br);
+            else
+            {
+                var bytecodeObj = ReadMarshalObject(br);
+                bcBytes = bytecodeObj as byte[];
+            }
             if (bcBytes != null)
                 code.Instructions = ParseInstructions(bcBytes);
 
@@ -193,9 +212,16 @@ public class PycReader
             // first line number (int32) — 3.8+ 的字段
             try { code.FirstLineNumber = br.ReadInt32(); } catch { }
 
-            // lnotab — 通过 ReadMarshalObject 以正确处理 FLAG_REF
-            var lnotabObj = ReadMarshalObject(br);
-            byte[]? lnotab = lnotabObj as byte[];
+            // lnotab/linetable — 通过 ReadMarshalObject 以正确处理 FLAG_REF
+            // v3.11+: 用 ReadRawMarshalBytes（避免 TYPE_STRING 被误判为 TYPE_CODE_SIMPLE）
+            byte[]? lnotab;
+            if (IsPython311Plus())
+                lnotab = ReadRawMarshalBytes(br);
+            else
+            {
+                var lnotabObj = ReadMarshalObject(br);
+                lnotab = lnotabObj as byte[];
+            }
             if (lnotab != null)
                 code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions);
 
@@ -824,7 +850,7 @@ public class PycReader
     }
 
     /// <summary>
-    /// 解析 3.11+ 字节码（跳 CACHE 条目）
+    /// 解析 3.11+ 字节码（跳 CACHE 条目 + opcode 映射）
     /// </summary>
     private List<Instruction> ParseInstructions311Plus(byte[] bytecode)
     {
@@ -844,11 +870,8 @@ public class PycReader
                 continue;
             }
 
-            var op = (Models.Bytecode.Opcode)rawOp;
-
-            // 3.11+: RESUME (opcode 90) 与旧版 STORE_NAME 冲突，需要修正
-            if (IsPython311Plus() && rawOp == 90)
-                op = Models.Bytecode.Opcode.RESUME;
+            // Map raw 3.11+/3.12 opcode to our unified enum
+            var op = MapOpcodePy311(rawOp);
 
             // Handle EXTENDED_ARG chain
             if (op == Models.Bytecode.Opcode.EXTENDED_ARG)
@@ -858,25 +881,206 @@ public class PycReader
                 continue;
             }
 
-            // Instructions with arguments: rawOp >= 90 (HAVE_ARGUMENT threshold)
+            // Instructions with arguments: HAVE_ARGUMENT threshold
             int? arg = null;
             if (rawOp >= 90)
                 arg = (extArg << 8) | rawArg;
             extArg = 0;
 
-            // Python 3.10+ 使用 word 偏移 — 3.11+ 沿用此规则
-            // 需要区分绝对值跳转和相对值跳转
-            if (IsWordOffsetVersion() && arg.HasValue && IsJumpInstruction(op))
+            // Python 3.10+ 使用 word 偏移
+            if (IsWordOffsetVersion() && arg.HasValue && IsJumpInstruction311Plus(op))
                 arg = arg.Value * 2;
 
             instructions.Add(new Instruction(offset, op, arg));
 
             // Skip cache entries after this instruction
-            int cacheEntries = GetCacheCount(rawOp);
+            int cacheEntries = GetCacheCount311Plus(rawOp);
             offset += 2 + cacheEntries * 2;
         }
 
         return instructions;
+    }
+
+    /// <summary>
+    /// 将 3.11+/3.12 的原始 opcode 字节值映射到统一 Opcode 枚举。
+    /// 3.11 和 3.12 许多 opcode 值与 3.10 及更早版本不同。
+    /// </summary>
+    private Models.Bytecode.Opcode MapOpcodePy311(byte rawOp)
+    {
+        // 3.12-specific: some opcodes renumbered from 3.11
+        // 3.11: CALL=167, PRECALL=166, RESUME=90, POP_JUMP_IF_{TRUE,FALSE}=111/112
+        // 3.12: CALL=171, no PRECALL, RESUME=151, POP_JUMP_IF_{TRUE,FALSE}=114/115
+        bool is312 = _magicBytes[0] >= 0xA7; // 3.12+
+
+        return rawOp switch
+        {
+            // --- 所有版本一致的 (3.10 和 3.11/12 值相同) ---
+            1 => Models.Bytecode.Opcode.POP_TOP,
+            9 => Models.Bytecode.Opcode.NOP,
+            11 => Models.Bytecode.Opcode.UNARY_NEGATIVE,
+            12 => Models.Bytecode.Opcode.UNARY_NOT,
+            15 => Models.Bytecode.Opcode.UNARY_INVERT,
+            25 => Models.Bytecode.Opcode.BINARY_SUBSCR,
+            60 => Models.Bytecode.Opcode.STORE_SUBSCR,
+            68 => Models.Bytecode.Opcode.GET_ITER,
+            69 => Models.Bytecode.Opcode.GET_YIELD_FROM_ITER,
+            71 => Models.Bytecode.Opcode.LOAD_BUILD_CLASS,
+            83 => Models.Bytecode.Opcode.RETURN_VALUE,
+            85 => Models.Bytecode.Opcode.SETUP_ANNOTATIONS,
+            89 => Models.Bytecode.Opcode.POP_EXCEPT,
+            92 => Models.Bytecode.Opcode.UNPACK_SEQUENCE,
+            93 => Models.Bytecode.Opcode.FOR_ITER,
+            94 => Models.Bytecode.Opcode.UNPACK_EX,
+            95 => Models.Bytecode.Opcode.STORE_ATTR,
+            97 => Models.Bytecode.Opcode.STORE_GLOBAL,
+            100 => Models.Bytecode.Opcode.LOAD_CONST,
+            101 => Models.Bytecode.Opcode.LOAD_NAME,
+            102 => Models.Bytecode.Opcode.BUILD_TUPLE,
+            103 => Models.Bytecode.Opcode.BUILD_LIST,
+            104 => Models.Bytecode.Opcode.BUILD_SET,
+            105 => Models.Bytecode.Opcode.BUILD_MAP,
+            106 => Models.Bytecode.Opcode.LOAD_ATTR,
+            107 => Models.Bytecode.Opcode.COMPARE_OP,
+            108 => Models.Bytecode.Opcode.IMPORT_NAME,
+            109 => Models.Bytecode.Opcode.IMPORT_FROM,
+            110 => Models.Bytecode.Opcode.JUMP_FORWARD,
+            116 => Models.Bytecode.Opcode.LOAD_GLOBAL,
+            117 => Models.Bytecode.Opcode.IS_OP,
+            118 => Models.Bytecode.Opcode.CONTAINS_OP,
+            119 => Models.Bytecode.Opcode.RERAISE,
+            124 => Models.Bytecode.Opcode.LOAD_FAST,
+            125 => Models.Bytecode.Opcode.STORE_FAST,
+            126 => Models.Bytecode.Opcode.DELETE_FAST,
+            130 => Models.Bytecode.Opcode.RAISE_VARARGS,
+            132 => Models.Bytecode.Opcode.MAKE_FUNCTION,
+            133 => Models.Bytecode.Opcode.BUILD_SLICE,
+            140 => Models.Bytecode.Opcode.JUMP_BACKWARD,
+            142 => Models.Bytecode.Opcode.CALL_FUNCTION_EX,
+            144 => Models.Bytecode.Opcode.EXTENDED_ARG,
+
+            // --- 3.11+ 新值 (与 3.10 不同) ---
+            2 => Models.Bytecode.Opcode.PUSH_NULL,
+            3 => Models.Bytecode.Opcode.INTERPRETER_EXIT,
+            4 => Models.Bytecode.Opcode.DUP_TOP,
+            5 => Models.Bytecode.Opcode.DUP_TOP_TWO,
+            99 => Models.Bytecode.Opcode.SWAP,
+            120 => Models.Bytecode.Opcode.COPY,
+            121 => Models.Bytecode.Opcode.RETURN_CONST,  // internal value 190
+            122 => Models.Bytecode.Opcode.BINARY_OP,     // internal value 191
+            123 => Models.Bytecode.Opcode.SEND,
+            127 => Models.Bytecode.Opcode.LOAD_FAST_CHECK,  // internal value 193
+            128 => Models.Bytecode.Opcode.POP_JUMP_IF_NOT_NONE,  // internal value 194
+            129 => Models.Bytecode.Opcode.POP_JUMP_IF_NONE,     // internal value 195
+            134 => Models.Bytecode.Opcode.JUMP_BACKWARD_NO_INTERRUPT,
+            141 => Models.Bytecode.Opcode.LOAD_SUPER_ATTR,
+            143 => Models.Bytecode.Opcode.LOAD_FAST_AND_CLEAR,  // internal value 192
+            149 => Models.Bytecode.Opcode.COPY_FREE_VARS,
+            172 => Models.Bytecode.Opcode.KW_NAMES,
+
+            // --- 3.11 ↔ 3.12 有差异的值 ---
+            90 when is312 => Models.Bytecode.Opcode.STORE_NAME,
+            90 => Models.Bytecode.Opcode.STORE_NAME,  // Both 3.11 and 3.12: 90 = STORE_NAME
+            111 when is312 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,
+            111 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,  // 3.11: same value
+            112 when is312 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,
+            112 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,  // 3.11: same value
+
+            // 3.12 特有的值
+            35 when is312 => Models.Bytecode.Opcode.PUSH_EXC_INFO_312,
+            36 when is312 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,
+            37 when is312 => Models.Bytecode.Opcode.CHECK_EG_MATCH,
+            49 when is312 => Models.Bytecode.Opcode.WITH_EXCEPT_START_312,
+            53 when is312 => Models.Bytecode.Opcode.BEFORE_WITH_312,
+            114 when is312 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,
+            115 when is312 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,
+            151 when is312 => Models.Bytecode.Opcode.RESUME,
+            156 when is312 => Models.Bytecode.Opcode.BUILD_CONST_KEY_MAP,
+            162 when is312 => Models.Bytecode.Opcode.LIST_EXTEND,
+            163 when is312 => Models.Bytecode.Opcode.SET_UPDATE,
+            164 when is312 => Models.Bytecode.Opcode.DICT_MERGE,
+            165 when is312 => Models.Bytecode.Opcode.DICT_UPDATE,
+            171 when is312 => Models.Bytecode.Opcode.CALL,
+            173 when is312 => Models.Bytecode.Opcode.CALL_INTRINSIC_1,
+            174 when is312 => Models.Bytecode.Opcode.CALL_INTRINSIC_2,
+            175 when is312 => Models.Bytecode.Opcode.LOAD_FROM_DICT_OR_GLOBALS,
+            176 when is312 => Models.Bytecode.Opcode.LOAD_FROM_DICT_OR_DEREF,
+
+            // 3.11 特有的值
+            166 when !is312 => Models.Bytecode.Opcode.PRECALL_311,
+            167 when !is312 => Models.Bytecode.Opcode.CALL_311,
+
+            // 3.11: POP_JUMP_IF_* at same values as 3.12 naming
+            114 when !is312 => Models.Bytecode.Opcode.STORE_NAME,   // 3.11: 114 is different
+            115 when !is312 => Models.Bytecode.Opcode.DELETE_NAME,  // 3.11: 115 is different
+
+            // Fallback: treat as raw value (some may be 3.12-specific that we haven't mapped)
+            _ => (Models.Bytecode.Opcode)rawOp,
+        };
+    }
+
+    /// <summary>
+    /// 3.11+ 跳转指令检测（含 JUMP_BACKWARD）。
+    /// </summary>
+    private static bool IsJumpInstruction311Plus(Opcode op) => op switch
+    {
+        Opcode.JUMP_FORWARD or Opcode.JUMP_BACKWARD
+            or Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+            or Opcode.POP_JUMP_IF_NOT_NONE or Opcode.POP_JUMP_IF_NONE
+            or Opcode.FOR_ITER or Opcode.JUMP_BACKWARD_NO_INTERRUPT
+            or Opcode.JUMP_ABSOLUTE or Opcode.JUMP_IF_TRUE_OR_POP
+            or Opcode.JUMP_IF_FALSE_OR_POP => true,
+        _ => false
+    };
+
+    /// <summary>
+    /// 3.11+ 的缓存条目数。
+    /// 区分 3.11 和 3.12（3.12 的缓存配置有变化）。
+    /// </summary>
+    private int GetCacheCount311Plus(byte rawOp)
+    {
+        bool is312 = _magicBytes[0] >= 0xA7;
+        // Simplified: for now use the same table for 3.11 and 3.12
+        // CPython 3.11 _cache_entries is very similar to 3.12
+        return rawOp switch
+        {
+            1 => 0, 2 => 0, 4 => 0, 5 => 0, 9 => 0,
+            11 => 1, 12 => 0, 15 => 0,
+            25 => 0, 26 => 0, 30 => 0,
+            35 => 0, 36 => 0, 37 => 0,
+            40 => 0, 41 => 0, 42 => 0, 43 => 0, 47 => 0,
+            49 => 0, 53 => 0,
+            55 => 0, 56 => 0, 60 => 0, 61 => 0,
+            68 => 0, 69 => 0, 71 => 0, 72 => 0, 73 => 0, 74 => 0, 75 => 0,
+            79 => 0, 80 => 0, 81 => 0, 83 => 0, 84 => 0, 85 => 0, 86 => 0,
+            87 => 0, 88 => 0, 89 => 0,
+            90 => 0,  // STORE_NAME (3.11+), no cache
+            91 => 0, 92 => 1, 93 => 0, 94 => 0, 95 => 0,
+            96 => 0, 97 => 0, 98 => 0, 99 => 0,
+            100 => 1, // LOAD_CONST
+            101 => 4, // LOAD_NAME
+            102 => 4, 103 => 4, 104 => 4, 105 => 4,
+            106 => 4, 107 => 4,
+            108 => 0, 109 => 0, 110 => 0,
+            111 => 0, 112 => 0, 113 => 0, 114 => 0, 115 => 0,
+            116 => 0, // LOAD_GLOBAL
+            117 => 0, 118 => 0, 119 => 0,
+            120 => 0, 121 => 0, 122 => 1, 123 => 1,  // BINARY_OP, UNARY_OP
+            124 => 1, 125 => 1, 126 => 1, 127 => 1,
+            128 => 1, 129 => 1, 130 => 1, 131 => 1, 132 => 1, 133 => 1,
+            134 => 0, 135 => 0, 136 => 0, 137 => 0, 138 => 0, 139 => 0,
+            140 => 0, 141 => 0, 142 => 0, 143 => 1,
+            144 => 0, 145 => 0, 146 => 0, 147 => 0,
+            149 => 0,
+            150 => 0, 151 => 0, 152 => 0,
+            155 => 0, 156 => 0, 157 => 0,
+            162 => 0, 163 => 0, 164 => 0, 165 => 0,
+            166 => (byte)(is312 ? 0 : 3), // 3.11: PRECALL=3 caches; 3.12: no op at 166
+            167 => 0, // CALL_311
+            170 => 0,
+            171 => 4, // CALL (3.11+)
+            172 => 0, 173 => 0, 174 => 0, 175 => 0, 176 => 0,
+            _ => 0,
+        };
     }
 
     /// <summary>

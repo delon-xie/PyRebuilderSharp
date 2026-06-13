@@ -495,32 +495,225 @@ public class StackMachine
                 return null;
             }
 
-            // ---- NOP and safe-to-skip opcodes ----
+            // ---- 3.11+ no-ops (safe to skip) ----
             case Opcode.NOP:
             case Opcode.RESUME:
+            case Opcode.INTERPRETER_EXIT:
+            case Opcode.COPY_FREE_VARS:
+            case Opcode.SETUP_ANNOTATIONS:
+                return null;
+
+            // ---- 3.11+ BINARY_OP (arg 指定操作类型) ----
+            case Opcode.BINARY_OP:
+            {
+                // pop TOS, TOS1 → push BinOp(TOS1, op, TOS)
+                var right = SafePop();
+                var left = SafePop();
+                if (left == null || right == null) return null;
+                var opType = instr.Argument ?? 0;
+                var binOp = MapBinaryOpArg(opType);
+                _exprStack.Push(new BinOp(left, binOp, right));
+                return null;
+            }
+
+            // ---- 3.11+ RETURN_CONST: LOAD_CONST + RETURN_VALUE combined ----
+            case Opcode.RETURN_CONST:
+            {
+                var constIdx = instr.Argument ?? 0;
+                var retConst = _code.Constants.TryGetValue(constIdx, out var cv) ? cv : null;
+                return new Return(new Constant(retConst));
+            }
+
+            // ---- 3.11+ PUSH_NULL: call protocol marker ----
+            case Opcode.PUSH_NULL:
+                // 在 3.11+ 调用协议中，PUSH_NULL 标记"我需要一个函数对象"
+                // 在 AST 层面透明 — 调用时根据栈结构判断
+                _exprStack.Push(new Constant(null));  // sentinel null
+                return null;
+
+            // ---- 3.11+ COPY: duplicate TOS[n] ----
+            case Opcode.COPY:
+            {
+                var depth = instr.Argument ?? 0;
+                // COPY n: duplicate the element n positions below TOS
+                if (depth == 0)
+                {
+                    var top = SafePeek();
+                    if (top != null) _exprStack.Push(top);
+                }
+                else
+                {
+                    // COPY n: push expr_stack[stack_count - 1 - depth]
+                    var arr = _exprStack.ToArray();
+                    Array.Reverse(arr);
+                    int idx = (int)depth;
+                    if (idx >= 0 && idx < arr.Length)
+                        _exprStack.Push(arr[idx]);
+                }
+                return null;
+            }
+
+            // ---- 3.11+ SWAP: swap TOS and TOS1 ----
+            case Opcode.SWAP:
+            {
+                var depth = instr.Argument ?? 0;
+                if (depth <= 1 && _exprStack.Count >= 2)
+                {
+                    var a = _exprStack.Pop();
+                    var b = _exprStack.Pop();
+                    _exprStack.Push(a);
+                    _exprStack.Push(b);
+                }
+                return null;
+            }
+
+            // ---- 3.11+ CALL / CALL_311: new call protocol ----
+            case Opcode.CALL:
+            case Opcode.CALL_311:
+            {
+                var argCount = instr.Argument ?? 0;
+                // In 3.11+: stack = [..., PUSH_NULL?, func, arg0, arg1, ...]
+                // For 3.12: CALL arg = number of positional args
+                // For 3.11: CALL_311 arg = same, PRECALL_311 handled separately
+                var args = new List<Expr>();
+                for (int i = 0; i < argCount && _exprStack.Count > 0; i++)
+                {
+                    var a = SafePop();
+                    if (a != null) args.Insert(0, a);
+                }
+                
+                var func = SafePop();
+                if (func == null) return null;
+                
+                // If TOS is a null sentinel (PUSH_NULL), pop it
+                var peeked = SafePeek();
+                if (peeked is Constant { Value: null })
+                {
+                    _exprStack.Pop(); // discard null sentinel
+                }
+                
+                _exprStack.Push(new Call(func, args, new List<Keyword>()));
+                return null;
+            }
+
+            // ---- 3.11 PRECALL_311: prepare call (3.11 only) ----
+            case Opcode.PRECALL_311:
+            {
+                // PRECALL marks the boundary between args and function on stack.
+                // In 3.11, CALL follows and actually executes.
+                // For decompilation: PRECALL is a no-op because CALL_311 handles the actual args.
+                // The arg is the number of positional args (same as CALL's arg).
+                return null;
+            }
+
+            // ---- 3.11+ KW_NAMES: keyword arg names for CALL ----
+            case Opcode.KW_NAMES:
+            {
+                // KW_NAMES stores keyword argument name tuple index.
+                // The actual keyword values are on the stack after positional args.
+                // For now: skip — keywords are handled via simplifications
+                return null;
+            }
+
+            // ---- 3.11+ LOAD_FAST_AND_CLEAR: load var then clear it (try/except) ----
+            case Opcode.LOAD_FAST_AND_CLEAR:
+            {
+                var varName = GetVarname(instr);
+                _exprStack.Push(new Name(varName, ExpressionContext.Load));
+                return null;
+            }
+
+            // ---- 3.11+ LOAD_FAST_CHECK: like LOAD_FAST with error on unbound ----
+            case Opcode.LOAD_FAST_CHECK:
+            {
+                var checkName = GetVarname(instr);
+                _exprStack.Push(new Name(checkName, ExpressionContext.Load));
+                return null;
+            }
+
+            // ---- 3.11+ SEND: generator send ----
+            case Opcode.SEND:
+            {
+                // SEND pops two: generator, send_value
+                // For AST: treat like yield from
+                var sendValue = SafePop();
+                var genExpr = SafePop();
+                if (genExpr != null)
+                    _exprStack.Push(genExpr);  // SEND pushes result; keep gen for now
+                return null;
+            }
+
+            // ---- 3.11+ POP_JUMP_IF_NOT_NONE / POP_JUMP_IF_NONE ----
+            case Opcode.POP_JUMP_IF_NOT_NONE:
+            case Opcode.POP_JUMP_IF_NONE:
+                // Conditional jumps — handled by BlockScanner/CFG building
+                // Pop the condition for stack hygiene
+                SafePop();
+                return null;
+
+            // ---- 3.12+ BUILD_CONST_KEY_MAP ----
+            case Opcode.BUILD_CONST_KEY_MAP:
+            {
+                // Build map from keys tuple + values
+                // Stack: ..., keys_tuple, value0, value1, ..., valueN-1
+                // where keys_tuple is a tuple constant with N key names
+                var count = instr.Argument ?? 0;
+                var entries = new List<(Expr Key, Expr Value)>();
+                var keysExpr = SafePop();  // keys tuple
+                for (int i = 0; i < count && _exprStack.Count > 0; i++)
+                {
+                    var val = SafePop();
+                    if (val != null && keysExpr != null)
+                    {
+                        // Extract key name from tuple
+                        Expr key;
+                        if (keysExpr is Constant c && c.Value is System.Collections.IList list && i < list.Count)
+                            key = new Constant(list[i]);
+                        else
+                            key = new Constant($"key_{i}");
+                        entries.Insert(0, (key, val));
+                    }
+                }
+                _exprStack.Push(new DictLiteral(entries));
+                return null;
+            }
+
+            // ---- 3.12+ exception/with renumbered opcodes ----
+            case Opcode.BEFORE_WITH_312:
+            case Opcode.WITH_EXCEPT_START_312:
+            case Opcode.PUSH_EXC_INFO_312:
+            case Opcode.CHECK_EXC_MATCH:
+            case Opcode.CHECK_EG_MATCH:
+                return null;
+
+            // ---- 3.5-3.10 opcodes that carry through ----
             case Opcode.YIELD_FROM_PY310:
             case Opcode.YIELD_FROM:
             {
                 // Python 3.5-3.10: YIELD_FROM
-                // 栈: [... iter_expr, initial_send_value(None)]
-                // pop TOS (initial send value, 通常是 None, 丢弃)
-                // pop TOS1 (迭代器表达式)
-                // 输出: yield from <iter_expr>
                 var initialSend = SafePop();  // 丢弃
                 var iterExpr = SafePop();
                 if (iterExpr != null)
                     return new YieldFrom(iterExpr);
                 return null;
             }
+
+            // ---- UNPACK_SEQUENCE: 展开序列到栈 ----
+            case Opcode.UNPACK_SEQUENCE:
+            {
+                // In 3.11+ call protocol, UNPACK_SEQUENCE before CALL is a call-prep
+                // marker; when used for actual unpacking (a, b = ...), it pops the
+                // container. For now, treat as no-op — CALL handles args correctly,
+                // and tuple assignments show the whole tuple instead of unpacking.
+                return null;
+            }
+
             case Opcode.POP_EXCEPT:
-            case Opcode.SETUP_ANNOTATIONS:
             case Opcode.SETUP_FINALLY:
             case Opcode.BEFORE_WITH:
             case Opcode.WITH_EXCEPT_START:
             case Opcode.PUSH_EXC_INFO:
-            case Opcode.PUSH_NULL:
             case Opcode.SETUP_WITH:
-            case Opcode.SEND:
                 return null;
             case Opcode.RAISE_VARARGS:
             {
@@ -672,6 +865,35 @@ public class StackMachine
         var left = _exprStack.Pop();
         _exprStack.Push(new BinOp(left, op, right));
         return null;
+    }
+
+    /// <summary>
+    /// 将 3.11+ BINARY_OP 的参数映射到我们统一的 Operator 枚举。
+    /// CPython 3.11+ _nb_ops 表：
+    ///   0=add, 1=and, 2=floor_div, 3=lshift, 5=mul, 6=mod, 7=or,
+    ///   8=pow, 9=rshift, 10=sub, 11=truediv, 12=xor
+    ///   13-25 = in-place variants
+    /// </summary>
+    private static Operator MapBinaryOpArg(int arg)
+    {
+        return arg switch
+        {
+            0 => Operator.Add,
+            1 => Operator.BitAnd,
+            2 => Operator.FloorDiv,
+            3 => Operator.LShift,
+            5 => Operator.Mul,
+            6 => Operator.Mod,
+            7 => Operator.BitOr,
+            8 => Operator.Pow,
+            9 => Operator.RShift,
+            10 => Operator.Sub,
+            11 => Operator.Div,
+            12 => Operator.BitXor,
+            // In-place (13-25): same operator, mark as in-place if needed
+            >= 13 and <= 25 => MapBinaryOpArg(arg - 13),
+            _ => Operator.Add,
+        };
     }
 
     private string GetName(Instruction instr)

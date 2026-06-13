@@ -415,10 +415,11 @@ public class AstBuilder
         // 勿用 tryBodyCollector（内层块也被标记为 visited → GetStructuredBlockStmts 返回空）
         var tryBodyVisited = new HashSet<BasicBlock> { block };
         var tryStmts = new List<Stmt>();
-        // 1) 当前块中 SETUP_FINALLY 之后的指令
+        // 1) 当前块中 SETUP_FINALLY 之后的指令（到 POP_BLOCK 或 handler 为止）
         var preBodyInstrs = new List<Instruction>();
         for (int i = setupIdx + 1; i < instrs.Count; i++)
         {
+            if (instrs[i].Opcode == Opcode.POP_BLOCK) break;
             if (instrs[i].Offset >= handlerAbs) break;
             preBodyInstrs.Add(instrs[i]);
         }
@@ -720,6 +721,35 @@ public class AstBuilder
 
         var result = new List<Stmt>(beforeTry);
         result.Add(tryNode);
+
+        // 处理当前块中 POP_BLOCK 之后到 handler 之前的指令
+        // (如 LOAD_CONST None + RETURN_VALUE — 函数的隐式返回)
+        // 仅在 try/except（有 handler）时处理，try/finally 时跳过
+        //（try/finally 的 POP_BLOCK 后有 cleanup 胶水代码，不应输出为语句）
+        if (handlers.Count > 0)
+        {
+            bool foundPopBlock = false;
+            var postPopInstrs = new List<Instruction>();
+            for (int i = setupIdx + 1; i < instrs.Count; i++)
+            {
+                if (instrs[i].Opcode == Opcode.POP_BLOCK) { foundPopBlock = true; continue; }
+                if (foundPopBlock && instrs[i].Offset < handlerAbs)
+                    postPopInstrs.Add(instrs[i]);
+            }
+            if (postPopInstrs.Count > 0)
+            {
+                var postMachine = new StackMachine(_codeObject);
+                postMachine.SetLoopHeaders(_loopHeaderOffsets);
+                foreach (var ins in postPopInstrs)
+                {
+                    var stmt = postMachine.Execute(ins);
+                    if (stmt != null) result.Add(stmt);
+                }
+                while (postMachine.HasResults)
+                    result.Add(new ExprStmt(postMachine.PopResult()));
+            }
+        }
+
         // 标记所有 try body 块为 visited，防止外部重新处理
         foreach (var tb in tryBodyCollector)
             visited.Add(tb);
@@ -770,7 +800,7 @@ public class AstBuilder
         foreach (var ins in block.Instructions)
         {
             if (ins.Opcode == Opcode.SETUP_FINALLY && ins.Argument.HasValue)
-                return ins.Offset + 2 + ins.Argument.Value * 2;
+                return ins.Offset + 2 + ins.Argument.Value;
         }
         return null;
     }
