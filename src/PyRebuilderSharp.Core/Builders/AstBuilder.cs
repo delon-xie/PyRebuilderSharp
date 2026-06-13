@@ -426,7 +426,6 @@ public class AstBuilder
         if (preBodyInstrs.Count > 0)
         {
             // 检测嵌套 try/except 块（多个 SETUP_FINALLY/SETUP_EXCEPT 在同一块）
-            // 收集所有 SETUP 指令及其 handler 偏移，按 handler 偏移从小到大处理
             var nestedSetups = new List<(int idx, int handlerRel, int handlerAbs)>();
             for (int i = 0; i < preBodyInstrs.Count; i++)
             {
@@ -440,11 +439,8 @@ public class AstBuilder
             
             if (nestedSetups.Count > 0)
             {
-                // 有嵌套 try — 从内到外递归构建
-                // 找到各 SETUP 之间的指令区域
-                // print/while/for 等语句可能在 SETUP 之间
-                
-                // 处理第一个 SETUP 之前的指令（如果有）
+                // 有嵌套 try — 从内到外构建多层次 try
+                // 先处理第一个 SETUP 之前的指令（如果有）
                 if (nestedSetups[0].idx > 0)
                 {
                     var prefixInstrs = preBodyInstrs.Take(nestedSetups[0].idx).ToList();
@@ -458,13 +454,13 @@ public class AstBuilder
                         tryStmts.Add(new ExprStmt(prefixMachine.PopResult()));
                 }
                 
-                // 从外到内构建 try/except 层次
-                // 最外层 SETUP 的 try body 包含所有内层 SETUP
-                // 所以我们从最外层 SETUP 开始，递归处理内层
+                // 从内到外构建 try 节点
+                List<Stmt>? innerBody = null;
                 for (int level = nestedSetups.Count - 1; level >= 0; level--)
                 {
-                    var (nsIdx, _, _) = nestedSetups[level];
+                    var (nsIdx, _, handlerOffset) = nestedSetups[level];
                     
+                    // 这一层的 try body: level 的 SETUP 之后到下一个 SETUP/POP_BLOCK 的指令
                     int nextSetupIdx = level + 1 < nestedSetups.Count 
                         ? nestedSetups[level + 1].idx 
                         : preBodyInstrs.Count;
@@ -474,16 +470,35 @@ public class AstBuilder
                         .Take(nextSetupIdx - nsIdx - 1)
                         .ToList();
                     
-                    // 用 StackMachine 处理这一层的 body 指令
-                    var levelMachine = new StackMachine(_codeObject);
-                    foreach (var ins in levelBodyInstrs)
+                    var levelBody = new List<Stmt>();
+                    if (innerBody != null)
                     {
-                        var stmt = levelMachine.Execute(ins);
-                        if (stmt != null) tryStmts.Add(stmt);
+                        // 有内层 try → 内层 try 作为本层 body
+                        levelBody.AddRange(innerBody);
                     }
-                    while (levelMachine.HasResults)
-                        tryStmts.Add(new ExprStmt(levelMachine.PopResult()));
+                    
+                    // 处理本层 body 指令（如果有 SETUP 之间的额外指令）
+                    if (levelBodyInstrs.Count > 0 && innerBody == null)
+                    {
+                        var levelMachine = new StackMachine(_codeObject);
+                        foreach (var ins in levelBodyInstrs)
+                        {
+                            var stmt = levelMachine.Execute(ins);
+                            if (stmt != null) levelBody.Add(stmt);
+                        }
+                        while (levelMachine.HasResults)
+                            levelBody.Add(new ExprStmt(levelMachine.PopResult()));
+                    }
+                    
+                    // 本层的 handler: 从 handlerAbs 找 handler 块
+                    var handlerForLevel = ExtractExceptHandlerFromOffset(handlerOffset, block, instrs, setupIdx);
+                    
+                    innerBody = new List<Stmt> { new Try(levelBody, handlerForLevel, null, null) };
                 }
+                
+                // 构建完成：最外层的 innerBody 是所有 try 的根
+                if (innerBody != null)
+                    tryStmts.AddRange(innerBody);
             }
             else
             {
@@ -871,6 +886,17 @@ public class AstBuilder
     }
 
     /// <summary>
+    /// 创建 with 语句的 except handler（用于清理资源，不生成 except 子句）。
+    /// </summary>
+    private List<ExceptHandler> BuildCleanupHandler()
+    {
+        return new List<ExceptHandler>
+        {
+            new ExceptHandler(null, null, new List<Stmt>())
+        };
+    }
+
+    /// <summary>
     /// 获取块中第一个 SETUP_FINALLY 的 handler 绝对偏移。
     /// </summary>
     private int? GetHandlerOffset(BasicBlock block)
@@ -881,6 +907,101 @@ public class AstBuilder
                 return ins.Offset + 2 + ins.Argument.Value;
         }
         return null;
+    }
+
+    /// <summary>
+    /// 从指定偏移提取 except handler 块。
+    /// 用于嵌套 try 处理（多个 SETUP 在同一块时）。
+    /// </summary>
+    private List<ExceptHandler> ExtractExceptHandlerFromOffset(
+        int handlerAbs, BasicBlock currentBlock, List<Instruction> blockInstrs, int setupIdx)
+    {
+        if (_blockByOffset.TryGetValue(handlerAbs, out var handlerEntry))
+        {
+            // 收集 handler 块链
+            var handlerBlocks = new List<BasicBlock>();
+            var visitedIds = new HashSet<int> { handlerEntry.Id };
+            var queue = new Queue<BasicBlock>();
+            queue.Enqueue(handlerEntry);
+            bool pastHandlerPreamble = false;
+            
+            while (queue.Count > 0)
+            {
+                var cur = queue.Dequeue();
+                foreach (var succ in cur.Successors)
+                {
+                    if (succ == null || !visitedIds.Add(succ.Id)) continue;
+                    if (succ.Flags.HasFlag(BlockFlags.LoopHeader)) continue;
+                    
+                    bool isHandlerPart = false;
+                    foreach (var ins in succ.Instructions.Take(3))
+                    {
+                        if (ins.Opcode == Opcode.DUP_TOP || ins.Opcode == Opcode.POP_TOP
+                            || ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_GLOBAL
+                            || ins.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH
+                            || ins.Opcode == Opcode.RERAISE
+                            || ins.Opcode == Opcode.POP_EXCEPT || ins.Opcode == Opcode.END_FINALLY
+                            || ins.Opcode == Opcode.RETURN_VALUE)
+                        { isHandlerPart = true; }
+                    }
+                    if (isHandlerPart || !pastHandlerPreamble)
+                    {
+                        handlerBlocks.Add(succ);
+                        queue.Enqueue(succ);
+                        if (isHandlerPart && !pastHandlerPreamble)
+                        {
+                            bool hasBodyInstr = succ.Instructions.Any(ins =>
+                                ins.Opcode != Opcode.DUP_TOP && ins.Opcode != Opcode.POP_TOP
+                                && ins.Opcode != Opcode.JUMP_IF_NOT_EXC_MATCH
+                                && ins.Opcode != Opcode.LOAD_NAME && ins.Opcode != Opcode.LOAD_GLOBAL
+                                && ins.Opcode != Opcode.RERAISE);
+                            if (hasBodyInstr) pastHandlerPreamble = true;
+                        }
+                    }
+                }
+            }
+            
+            // 提取 handler body 指令
+            var handlerInstrs = new List<Instruction>();
+            bool handlerFound = false, seenBody = false;
+            foreach (var hb in handlerBlocks)
+            {
+                if (handlerFound) break;
+                foreach (var ins in hb.Instructions)
+                {
+                    if (ins.Opcode == Opcode.POP_EXCEPT) { handlerFound = true; break; }
+                    if (ins.Opcode == Opcode.END_FINALLY) { if (seenBody) { handlerFound = true; break; } continue; }
+                    if (!seenBody && ins.Opcode == Opcode.DUP_TOP) continue;
+                    if (!seenBody && ins.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH) continue;
+                    if (!seenBody && ins.Opcode == Opcode.RERAISE) continue;
+                    if (!seenBody && (ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_GLOBAL || ins.Opcode == Opcode.LOAD_FAST)) continue;
+                    if (!seenBody && ins.Opcode == Opcode.POP_TOP) continue;
+                    seenBody = true;
+                    if (ins.Opcode == Opcode.JUMP_FORWARD || ins.Opcode == Opcode.JUMP_ABSOLUTE) continue;
+                    handlerInstrs.Add(ins);
+                }
+            }
+            
+            // 反编译 handler body
+            var handlerBody = new List<Stmt>();
+            if (handlerInstrs.Count > 0)
+            {
+                var handlerMachine = new StackMachine(_codeObject);
+                handlerMachine.SetLoopHeaders(_loopHeaderOffsets);
+                foreach (var ins in handlerInstrs)
+                {
+                    var s = handlerMachine.Execute(ins);
+                    if (s != null) handlerBody.Add(s);
+                }
+            }
+            if (handlerBody.Count == 0)
+                handlerBody.Add(new Pass());
+            
+            return new List<ExceptHandler> { new ExceptHandler(null, null, handlerBody) };
+        }
+        
+        // Fallback: empty except
+        return new List<ExceptHandler> { new ExceptHandler(null, null, new List<Stmt> { new Pass() }) };
     }
 
     private List<Stmt>? BuildWithFromBlock(BasicBlock block, HashSet<BasicBlock> visited)
@@ -1212,6 +1333,9 @@ public class AstBuilder
             var stmts = GetStructuredBlockStmts(bb, visited);
             simpleStmts.AddRange(stmts);
         }
+        // 去除 while 体末尾的冗余 continue（由 JUMP_ABSOLUTE → loop header 产生）
+        while (simpleStmts.Count > 0 && simpleStmts[^1] is Continue)
+            simpleStmts.RemoveAt(simpleStmts.Count - 1);
         return simpleStmts;
     }
 
