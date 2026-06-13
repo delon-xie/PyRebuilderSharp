@@ -143,14 +143,15 @@ public enum Opcode : byte
     YIELD_FROM_PY310 = 72,  // Python 3.10: yield from 重编号为 72
 
     // --- 异常 ---
-    END_FINALLY = 88,
     SETUP_ANNOTATIONS = 85,
+    END_FINALLY = 88,
     POP_EXCEPT = 89,
+    SETUP_EXCEPT = 121,    // Python 3.5-3.7 (3.8+ 中被 JUMP_IF_NOT_EXC_MATCH 替代)
     SETUP_FINALLY = 122,
     RAISE_VARARGS = 130,
     RERAISE = 119,
     PUSH_EXC_INFO = 138,
-    JUMP_IF_NOT_EXC_MATCH = 121,
+    JUMP_IF_NOT_EXC_MATCH = 121, // Python 3.8+ 替代 SETUP_EXCEPT
     SETUP_WITH = 143,
     BEFORE_WITH = 153,
     WITH_EXCEPT_START = 154,

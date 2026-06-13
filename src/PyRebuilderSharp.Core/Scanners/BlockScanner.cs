@@ -57,11 +57,10 @@ public class BlockScanner : IBlockScanner
                     leaders.Add(target.Value);
             }
             // SETUP_FINALLY: 异常处理器入口也要标记为 leader
-            else if (instr.Opcode == Opcode.SETUP_FINALLY)
+            else if (instr.Opcode == Opcode.SETUP_FINALLY || instr.Opcode == Opcode.SETUP_EXCEPT)
             {
                 if (instr.Argument.HasValue)
                 {
-                    // 在 Python 3.8 中 SETUP_FINALLY 偏移量是相对于当前指令后的
                     var handlerOffset = instr.Offset + 2 + instr.Argument.Value;
                     leaders.Add(handlerOffset);
                 }
@@ -139,7 +138,35 @@ public class BlockScanner : IBlockScanner
                 case Opcode.JUMP_ABSOLUTE:
                 case Opcode.JUMP_FORWARD:
                 case Opcode.JUMP_BACKWARD:
-                    AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr)!.Value));
+                    // 扫描块内所有无条件跳转的回边（嵌套循环/嵌套 try 的回边在同一块）
+                    if (lastInstr.Opcode == Opcode.JUMP_ABSOLUTE)
+                    {
+                        foreach (var ins in block.Instructions)
+                        {
+                            if (ins.Opcode == Opcode.JUMP_ABSOLUTE && ins.Argument.HasValue)
+                                AddSuccessor(block, FindBlockByOffset(blocks, ins.Argument.Value));
+                            else if (ins.Opcode == Opcode.JUMP_BACKWARD && ins.Argument.HasValue)
+                            {
+                                var target = ResolveJumpTarget(ins)!.Value;
+                                AddSuccessor(block, FindBlockByOffset(blocks, target));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr)!.Value));
+                    }
+                    // 同时扫描块内中间条件跳转（如 POP_JUMP_IF_FALSE 后有 JUMP_FORWARD）
+                    foreach (var ins in block.Instructions)
+                    {
+                        if (ins.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                            or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                            or Opcode.FOR_ITER)
+                        {
+                            if (ins.Argument.HasValue)
+                                AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(ins)!.Value));
+                        }
+                    }
                     break;
 
                 case Opcode.POP_JUMP_IF_TRUE:

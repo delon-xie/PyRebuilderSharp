@@ -1,6 +1,6 @@
 # PyRebuilderSharp 阶段工作总结报告
 
-**报告日期**: 2026-06-13 | **Version**: Phase 1-3 Complete | **测试基线**: 21/21 ✅
+**报告日期**: 2026-06-13 | **Version**: Phase 3+ | **测试基线**: 22/42 ✅ (+1 try nesting fix)
 
 ---
 
@@ -22,23 +22,24 @@
 |------|------|--------|------|----------|
 | Phase 1 — 单一控制块 | 表达式、顺序代码、if/while/for/try/break/continue | 7/7 (Lv0) | ✅ | StackMachine.cs |
 | Phase 2 — 同类型嵌套 | 循环嵌套、if/elif/else 链、嵌套 try/except | 7/7 (Lv1) | ✅ | AstBuilder.cs |
-| Phase 3 — 混合嵌套 | for-in-if, if-in-try, try-in-for, while-in-if, else clause 检测 | 7/7 (Lv2) | ✅ | AstBuilder.cs (9项修复) |
-| **总计** | **3 层级 × 7 版本 (2.7, 3.5-3.10)** | **21/21** | **✅** | |
+| Phase 3 — 混合嵌套 | for-in-if, if-in-try, try-in-for, while-in-if, else clause 检测 | 7/7 (Lv2) + 1/21 (Lv3) | ✅ | AstBuilder.cs (10项修复) |
 
 ### 1.3 项目规模
 
 ```
-src/ 核心         42 个 .cs 文件, 7,220 SLOC
-tests/ 测试       11 个 .cs 文件,   834 SLOC
-测试数据           127 个 .py 源文件 → 550 个 .pyc 文件
-测试基线           83 pycdc 测试集 × 7 版本 = 581 文件
-```
-
-### 1.4 架构四阶段流水线
-
-```
-.pyc → PycReader (Marshal) → BlockScanner (CFG) → AstBuilder (AST) → PythonCodeGenerator (源码)
-       Phase 1 读取          Phase 2 分块            Phase 3 构建              Phase 4 生成
+-------------------------------------------------------------------------------
+Language           Files    Total    Code  Comment  Blank    C/S  Comp%  Errs
+-------------------------------------------------------------------------------
+C#                    25    7523    6306     413    804   33.9   98.4     31
+XML                    7     348     348       0      0    6.2   27.6      0
+Markdown               3     446     446       0      0    2.0    0.0      0
+Python                 7     278     209      24     45    0.3   84.3      0
+Plain Text             7     145     145       0      0    0.7   24.1      0
+JSON                   1      69      69       0      0    0.3   49.3      0
+YAML                   1       8       8       0      0    0.0    0.0      0
+-------------------------------------------------------------------------------
+Total                 52    8817    7531     437    849   39.7   93.7     31
+-------------------------------------------------------------------------------
 ```
 
 ---
@@ -47,238 +48,169 @@ tests/ 测试       11 个 .cs 文件,   834 SLOC
 
 ### 2.1 逐块兜底策略（核心创新）
 
-这是相比 pycdc 最大的设计差异，也是**本项目最具原创价值的设计决策**。
+**每个基本块独立反编译，失败输出注释块，绝不崩溃。** 这个策略让我们在 Phase 3 的 9 项修复过程中，始终保有 21 个通过测试的基线，不会因为一次修复失败而回归到 0。
 
-**pycdc 的问题**：全局状态 diff 驱动，一个 opcode 解析失败 → 整个函数体废掉，输出空 `pass`。
-
-**PyRebuilderSharp 的做法**：
-```
-基本块 [B1, B2, B3, B4, B5]
-  B1 ✅ → "x = a + b"
-  B2 ✅ → "return x"
-  B3 ❌ → "# [Block #3 Failed] offset=0x0040 Error: Unknown opcode"
-  B4 ✅ → "y = 42"
-  B5 ✅ → "print(y)"
+```python
+# 实际效果：即使 try 嵌套修复前只有 2 层，其他 if/for/while 测试完全不受影响
 ```
 
-**实现机制**：
-- `BlockDecompiler.DecompileBlock()` 每个块独立 try/catch
-- `BlockResult` 统一返回 Success / FallbackAsComment
-- `CommentStmt` AST 节点使注释块与普通代码统一处理
-- 输出格式包含偏移量、错误信息、原始字节码 — 便于调试
+### 2.2 测试驱动开发（TDD）的红利
 
-**效果**：即使部分块失败，整体输出仍包含最大可读代码。这对大型 .pyc 文件的实用价值远超 pycdc 的"全有或全无"模式。
+| 行为 | 结果 |
+|------|------|
+| 写测试先于写实现 | 每次重构都有安全网 |
+| 版本矩阵 × 7 | 一个版本修好了，其他版本一起验证 |
+| AST 比较 vs 文本比较 | 发现 pycdc 测试中的隐式 return None 问题 |
 
-### 2.2 测试驱动开发（TDD）的严格执行
+### 2.3 嵌套 try 修复的混合方法
 
-这是项目**执行层面最值得表扬的地方** — 每次修改前先写测试，每次声称完成前跑验证：
+**根因**：`BuildTryFromBlock` 用 BFS 从块后继收集 try body 块，在第一个 POP_BLOCK 处 BREAK。
+- 嵌套的 SETUP_FINALLY 都在同一块内，handler 区域没有 CFG successor 边
+- BFS 只收集到第一个 POP_BLOCK（最内层的），错过 3+ 层
 
-- **版本矩阵测试**：3 层级 × 7 版本 = 21 个测试，每个版本独立编译 .pyc 文件
-- **AST 语义比较**：对比 `ast.dump()` 输出而非字符串比较，忽略格式差异
-- **pycdc 套件吸收**：83 个 pycdc 测试文件作为长期基线
-- **每次迭代验证**：每个 bug 修复后跑 `dotnet test` 确认 21/21 不退化
+**修复**：替换为混合扫描器 `ProcessTryBodyHybrid`
+- 指令级递归：在当前块中检测内层 SETUP_FINALLY，递归构建 inner Try
+- 块级 BFS：对后继块用 GetStructuredBlockStmts 处理 if/for/while
+- Handler 隔离：`IsBlockInsideHandlerRegion` 过滤 handler 块
+- 6 个新辅助方法：ExtractHandlerInstrs, DecompileHandlerInstrs, DetectIsExceptHandler, ExtractExceptType, FindPastHandlerEnd, FindHandlerEndOffset
 
-### 2.3 文档先于代码
-
-项目从开始就建立文档体系，设计文档在代码之前成型：
-- `Python反编译总体设计.md` — 架构级决策（块隔离、阶段划分）
-- `Python反编译详细设计.md` — 实现级细节（每 Opcode 的栈操作、AST 模型）
-- `pyc-format-reference.md` — 从 CPython 源码推导的 .pyc 格式知识库（Magic Number、Header 布局、FLAG_REF 机制）
-- `Phase1-ControlBlocks-Plan.md` — 17 种控制块的测试计划
-
-**对 AI 辅助开发的启示**：清晰的文档让 AI 在每次对话时快速恢复上下文，不需要重复解释架构。
-
-### 2.4 嵌套循环 StackOverflow 修复（关键发现）
-
-这是 Phase 3 中**技术含量最高的修正**：
-
-**问题**：C# 函数调用 `GetStructuredBlockStmts(bodyBlock, bodyVisited)` 中，`bodyVisited` 是独立新创建的 `HashSet`，内层循环的 body 块不在其中，导致外层循环迭代处理时无限递归。
-
-**修复**：使用 `visited.Remove(bb)` 统一 managed visited 集
-
-```csharp
-// 旧：独立 bodyVisited → 嵌套 StackOverflow
-var bodyVisited = new HashSet<BasicBlock>();
-var stmts = GetStructuredBlockStmts(bodyBlock, bodyVisited);
-
-// 新：同一 visited, Remove+Re-enter → 正确嵌套
-foreach (var bb in bodyBlocks) visited.Remove(bb);
-var stmts = GetStructuredBlockStmts(bodyBlock, visited);
-```
-
-**原理**：`CollectBodyBlocks` 把所有 body 块标记为 visited。先把它们移除，再用同一个 visited 集重入，内层循环自动把自己的 body 块重新标记进去。外层后续迭代正确跳过已处理块。
-
-### 2.5 从 PyRebuild 中提取精华
-
-PyRebuild (Python) 项目失败于性能瓶颈，但其设计思路非常出色，我们选择性地继承：
-- **多引擎顺序兜底** → 简化为单引擎 + 注释兜底（当前阶段）
-- **纯代码块(Block)** 的概念 → 完整继承，作为反编译的最小单位
-- **JSON 中间表示** → 采用 AST record 类型 + 模式匹配
-- **pycdc 测试集** → 完整复制，作为兼容性基线
+**结果**：5 层纯 try 嵌套 ✅ | 混合嵌套仍 WIP
 
 ---
 
-## 三、中间出现的问题 — 经验教训 ⚠️
+## 三、问题与教训 ⚠️
 
-### 3.1 Phase 2 同类型嵌套的 4 个 P0/P1 bug
+### 3.1 本次修复中的"坑"
 
-| Bug | 症状 | 根因 | 修复 |
-|-----|------|------|------|
-| YIELD_FROM opcode 缺失 | `yield from` 认作 `yield` | 3.10 中 YIELD_FROM=72 | 添加字节大小表 |
-| STORE_ATTR 栈顺序反转 | `obj.attr = val` → 反了 | TOS=obj 误作 TOS=val | 交换弹栈顺序 |
-| FLAG_REF 读取缺失 | 3.8+ .pyc 乱码 | CodeObject 字段未走 ReadMarshalObject | 全部统一走 ReadMarshalObject |
-| except handler 误识别 | typed/bare except 区分失败 | DUP_TOP / POP_TOP×3 检测 | 检查 DUP_TOP 指令 |
+| 坑 | 现象 | 修复 |
+|----|------|------|
+| BFS 在 POP_BLOCK 处 break | 只收集到最内层 try 的 POP_BLOCK | 移除 break，改用混合方法 |
+| FindPastHandlerEnd 从 i+1 扫描 | 扫到内层 handler 的 POP_EXCEPT | 改为从 handlerAbs 开始扫描 |
+| 指令级扫描无法处理 if/for/while | 混合嵌套丢失结构 | 增加块级 BFS 作为第三遍 |
 
-### 3.2 Phase 3 混合嵌套的 9 项修复
+### 3.2 已知问题（Phase 3 遗留）
 
-| 问题 | 症状 | 修复 |
-|------|------|------|
-| for-in-if | for 循环被 while 拦截器捕获 | `!isForLoop` 过滤 |
-| try body 为空 | SETUP_FINALLY 只扫当前块 | 按后继遍历收集所有 body 块 |
-| spurious 内层 for | FOR_ITER 走 IsConditionBranch | FOR_ITER 检测前置 |
-| 循环变量 `_` | SafePop() 跨块返回 null | 剥离无效 Assign |
-| 空体缺 `pass` | if/for/try 空体空白 | EmitEmptyBodyPass() |
-| 函数定义重复 | bodyVisited 不同步 | sync afterBranch → visited |
-| while 变 if | BuildRestrictedIfElse 误判 LoopHeader | LoopHeader 检查 |
-| if-in-try 消失 | POP_JUMP_IF_* 在 preBodyInstrs | preBodyInstrs 分支检测 |
-| else 子句丢失 | 无 JUMP_FORWARD skip 时 else 认不出 | Predecessor+终端+BuildBlockOnly 三合一启发式 |
+| 问题 | 影响版本 | 根因 | 难度 |
+|------|---------|------|------|
+| args 为空 | v3.5-3.7 | PycReader marshal 中 kwonlyargcount 偏移 | 🔴 |
+| while-orelse | v3.8-3.9 | while 循环的 else 子句生成 Pass() | ⚠️ |
+| 混合嵌套排序 | v3.10+ | Try 和 If 的 AST 先后顺序 | ⚠️ |
+| AST 解析 | v2.7 | Python 2 语法不被 Python 3 ast.parse 接受 | ❌ 暂缓 |
 
-**教训**：控制块识别是"按特征猜结构"的启发式过程，每个新嵌套模式都需要新增检测规则。这是反编译器最难的地方，但**逐块兜底确保了每次修复都不影响已有功能**。
+### 3.3 设计模式
 
-### 3.3 pycdc 的已知问题（印证我们的设计思路）
+**控制块识别的本质**：反编译器本质是"按特征猜结构"的启发式过程。每个新嵌套模式都需要新的检测规则。Pycdc 有大把 P0/P1 bug 始终修不完的根本原因就在于此。
 
-研究 pycdc 的 BUG 修复报告（2025-07 至 2026-06）发现 8 个正式合并的修复和 5 个本地修改：
-
-**正式修复（Git 提交）**：
-- RAISE_VARARGS bug、空栈保护、循环引用保护、EOF 检查、null dereference
-- Python 3.11+ 异常表支持、SLICE opcodes、JUMP_BACKWARD、CO_ASYNC_GENERATOR
-- FORMAT_VALUE f-string 修复、Long Numeric 表示修复
-
-**本地修改（未合并）**：
-- `ASTMap::m_unpack` 字典解包
-- `ASTCondBlock::m_exceptVar` except as 语法
-- `ASTIterBlock::m_compType` 推导式类型区分
-
-**启示**：pycdc 团队也在不断修复问题，但 C++ 的复杂性使得每次修复都有引入新 bug 的风险。我们选择 C# + record 类型 + 模式匹配，从根本上降低了代码复杂度。
+**我们的应对**：逐块容错机制确保即使某个块猜错了，其他块仍然正确。混合方法将指令级（精准）和块级（结构化）扫描结合，兼顾精确度和完整性。
 
 ---
 
-## 四、执行过程评价
+## 四、技术细节
 
-### 4.1 "AI 驱动开发"的高效模式
-
-本项目完全是在 AI 辅助下完成的，**整个项目 42 个源文件 7,220 SLOC 由 AI 生成，人工审查错误修复**。这种模式的关键成功因素：
-
-1. **文档先行** — 设计文档作为 AI 的"北极星"，每次对话开始时加载，确保 AI 不偏离架构
-2. **测试驱动** — 21 个版本矩阵测试作为"质量门禁"，AI 的每次修改必须通过全部测试
-3. **小步迭代** — 每次只做一件事（一个控制块类型），测试通过后再推进
-4. **记忆系统** — Hermes 的 MEMORY.md 和 Holographic Memory 让跨会话上下文保持
-
-### 4.2 "9 步修复法"的经验
-
-Phase 3 的 9 项修复展示了反编译器开发的典型模式：
+### 4.1 文件结构
 
 ```
-发现失败测试 → 运行验证确认 → 阅读源码理解 → 定位根因 → 
-设计修复方案 → 实施修复 → 运行所有测试确认不退化 → 记录问题 → 进入下一个
-```
-
-这个循环中**最关键的是 "确认不退化" 这一步** — 21 个测试确保每次修复不引入新问题。
-
-### 4.3 值得改进的地方
-
-1. **早期缺少 .pyc 编译矩阵自动化脚本** — 初期手动编译 7 个版本的 .pyc，后来才写了 `compile_pyc_matrix.py`
-2. **C# 异步处理未使用** — `async`/`await` 模式在整个代码库中缺失，后续 GUI 可能需要
-3. **pycdc 基线测试尚未全通** — 420/581 个 pycdc 测试文件因不支持的操作码而失败（预期内，但可以作为进度指标）
-
----
-
-## 五、后续推进计划
-
-### 5.1 Phase 4: 函数/类/模块（P0 优先级）
-
-| 功能 | 描述 | 测试 |
-|------|------|------|
-| `def` 函数定义 | MAKE_FUNCTION + 压栈 = 函数签名的 AST | test_def_base.py |
-| 默认参数 | MAKE_FUNCTION oparg > 0 → pop 默认值元组 | def f(x=10) |
-| `class` 类定义 | LOAD_BUILD_CLASS + CALL_FUNCTION | test_class_base.py |
-| `lambda` | MAKE_FUNCTION 简化版 | test_lambda_base.py |
-| `return` / `yield` | RETURN_VALUE 外的返回形式 | test_yield_base.py |
-| `import` | IMPORT_NAME + STORE | test_import_base.py |
-
-### 5.2 Phase 5: 异常处理增强（P1）
-
-| 功能 | 现状 | 目标 |
-|------|------|------|
-| `with` 语句 | 未实现 | SETUP_WITH + BEFORE_WITH 检测 |
-| typed except | 基础版已实现 | 增强 ExceptHandler.Type/Name 提取 |
-| `raise ... from` | 未实现 | RAISE_VARARGS + CAUSE |
-| `finally` | 未实现 | SETUP_FINALLY + END_FINALLY 配对 |
-
-### 5.3 Phase 6: 高级特性（P2）
-
-- `LOAD_DEREF` / `STORE_DEREF` — 闭包变量的栈机模拟
-- `async def` / `await` — async 函数支持
-- `async for` / `async with` — 异步上下文
-- `match` / `case` — Python 3.10+ 模式匹配（需要 CACHE 条目处理）
-- `while` / `for` 的 `else` 子句 — 当前已部分支持，需要完整测试
-
-### 5.4 GUI 完善（持续）
-
-| 功能 | 优先级 | 状态 |
-|------|--------|------|
-| 语法高亮 (AvaloniaEdit) | P1 | ⏳ |
-| 注释块高亮着色（红色背景） | P1 | ⏳ |
-| 块级成功率统计 | P2 | ⏳ |
-| 批量反编译（文件夹模式） | P2 | ⏳ |
-| Python 版本选择器 | P2 | ⏳ |
-| 源码保存对话框 | P2 | ⏳ |
-
-### 5.5 Python 3.11+（暂缓，P3）
-
-```
-主要障碍：CACHE 条目（1-4B/opcode）、RESUME=90（与 STORE_NAME 冲突）、
-BINARY_OP 统一、异常表替换指令编码。
-目前 3.5-3.10 稳定后再推进。
-```
-
-### 5.6 版本矩阵测试升级
-
-```
-当前: 3 层级 × 7 版本 = 21 测试
-Phase 4 后: 7 层级 × 7 版本 = 49 测试
-完成后: 功能层级 × 7 版本 = ~60 测试
+src/PyRebuilderSharp.Core/
+├── Builders/
+│   ├── AstBuilder.cs       ← Phase 2-3 核心，10 项嵌套修复（本文件）
+│   ├── BlockDecompiler.cs   ← 逐块反编译引擎
+│   └── StackMachine.cs      ← Phase 1 核心，表达式级反编译
+├── Readers/
+│   └── PycReader.cs         ← .pyc 文件读取（v3.5-3.7 已知问题）
+├── Generators/
+│   └── PythonCodeGenerator.cs ← AST → Python 代码
+├── Models/
+│   └── AST/CFG/Bytecode/
+└── Testing/
+    └── PycdcSuiteRunner.cs
 ```
 
 ---
 
-## 六、关键指标仪表板
+## 五、Phase 3 修复清单
 
-```
-📊 项目健康度
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-测试通过率   ■■■■■■■■■■ 21/21 (100%) ✅
-代码质量     ■■■■■■■■■■ 0 error, 0 warning ✅
-文档覆盖率   ■■■■■■■□□□ 4/6 份文档 ⚠️
-GUI 完成度   ■□□□□□□□□□ 基础框架 ✅, 功能缺失
-pycdc 兼容   ■□□□□□□□□□ ~30% 操作码覆盖 ⚠️
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+| # | 修复 | 日期 | 效果 |
+|---|------|------|------|
+| 1 | for-in-if 补全 | 6/12 | for 循环体如果有多个 if/while，补全缺失的结尾体 |
+| 2 | try body 块收集 | 6/12 | 优化 try body 的块收集范围，支持复杂循环嵌套 |
+| 3 | FOR_ITER 检查 | 6/12 | 在 IsConditionBranch 前检查，防止 for 循环被误判为 if |
+| 4 | 移除无效 Assign | 6/12 | BuildForLoop 中 strip 无效的 Assign（如 i=i） |
+| 5 | EmitEmptyBodyPass | 6/12 | 空循环体输出 pass |
+| 6 | afterBranch visited 同步 | 6/12 | function def 块被重复处理的修复 |
+| 7 | while-LoopHeader | 6/12 | while 循环的 LoopHeader 标记问题 |
+| 8 | if-in-try 条件跳转 | 6/12 | try body 中 POP_JUMP_IF_* 的精确检测 |
+| 9 | else 子句检测 | 6/12 | 精确的 else 子句检测规则 |
+| 10 | **嵌套 try 递归修复** | **6/13** | **纯 5 层 try nesting ✅ | 详见下面 |**
 
-📈 代码规模趋势
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Phase 0 (骨架)      ~2,000 SLOC
-Phase 1 (单一)      ~4,500 SLOC  + 4 docs
-Phase 2 (同类型)     ~5,800 SLOC  + 测试
-Phase 3 (混合)       ~7,220 SLOC  + 21 tests ✅
-Phase 4 (函数)       预计 ~9,000 SLOC
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+### 嵌套 try 修复详解
+
+**字节码结构**（depth_5_try, 3.10）：
 ```
+ 4: SETUP_FINALLY to 100   (最外层)
+ 6: SETUP_FINALLY to 82    (第4层)
+ 8: SETUP_FINALLY to 54    (第3层)
+10: SETUP_FINALLY to 38    (第2层)
+12: SETUP_FINALLY to 22    (最内层)
+14: LOAD_CONST 42; 16: STORE_FAST result
+18: POP_BLOCK; 20: JUMP_FORWARD to 34  (跳过最内层 handler)
+22: POP_TOP×3, -1, POP_EXCEPT          (最内层 except: result=-1)
+34: POP_BLOCK; 36: JUMP_FORWARD to 50
+38: POP_TOP×3, -2, POP_EXCEPT          (第2层)
+50: POP_BLOCK; 52: JUMP_FORWARD to 74
+54: POP_TOP×3, -3, POP_EXCEPT          (第3层)
+66: POP_BLOCK×2, RETURN                (第3层清理)
+74: POP_BLOCK×2, RETURN                (第4/5层清理)
+82: POP_TOP×3, -4, POP_EXCEPT          (第4层)
+94: POP_BLOCK, RETURN                  (第4层清理)
+100: POP_TOP×3, -5, POP_EXCEPT         (最外层)
+```
+
+**修复前输出**：
+```python
+try: result = 42
+except: result = -5
+```
+
+**修复后输出**：
+```python
+try:
+    try:
+        try:
+            try:
+                try:
+                    result = 42
+                except:
+                    result = -1
+            except:
+                result = -2
+        ... (3 层) ...
+    except:
+        result = -4
+except:
+    result = -5
+```
+
+---
+
+## 六、测试状态
+
+| 测试方法 | 类型 | 用例数 | 状态 |
+|----------|------|--------|------|
+| Lv0_BasicBlocks | Lv0 | 7 | ✅ |
+| Lv1_SameTypeNesting | Lv1 | 7 | ✅ |
+| Lv2_MixedNesting | Lv2 | 7 | ✅ |
+| Lv3_NestedDepth | Lv3 | 7 | ❌ **1/7** (v3.10 ✅) |
+| Lv3_NestedMixed | Lv3 | 7 | ❌ 0/7 |
+| Lv3_NestedMatrix | Lv3 | 7 | ❌ 0/7 |
+| **总计** | | **42** | **22/22 ✅ / 20 ❌** |
 
 ---
 
 ## 七、总结
 
-**PyRebuilderSharp 从一个实验性的 C# 移植尝试起步**，经过 3 个阶段的迭代，已发展为一个 42 文件、7,220 SLOC 的 Python 字节码反编译器，21 个版本矩阵测试全部通过。
+**PyRebuilderSharp 从一个实验性的 C# 移植尝试起步**，经过 3 个阶段的迭代，已发展为一个 52 文件、8,817 SLOC 的 Python 字节码反编译器，22 个版本矩阵测试通过。
+
+**嵌套 try 修复是 Phase 3 最后的 P1 问题**。混合扫描方法解决了纯 try 嵌套问题，但混合嵌套（try+if/for/while）仍需改进。
 
 **最大的成就不是反编译器的功能——而是确立了一套可复用的反编译器开发方法论**：
 1. **逐块容错** — 让反编译器不再"全有或全无"
@@ -286,6 +218,4 @@ Phase 4 (函数)       预计 ~9,000 SLOC
 3. **文档先行** — 设计文档让 AI 驱动的开发保持方向
 4. **小步迭代** — 每次只做一个控制块类型，测试通过再推进
 
-**最大的教训**：控制块识别是"按特征猜结构"的启发式过程，每个新嵌套模式都意味着新的检测规则。这也是为什么 pycdc 有大把 P0/P1 bug 始终修不完——但我们的逐块兜底机制确保了：**即使某个块猜错了，其他块仍然正确**。
-
-**下一个目标**：进入 Phase 4 — 函数/类/模块，这是从"玩具反编译器"到"实用反编译器"的关键一步。
+**下一个目标**：进入 Phase 4 — 函数/类/模块，这是从"玩具反编译器"到"实用反编译器"的关键一步。同时处理 Lv3 遗留问题：混合嵌套排序、v3.5-3.7 marshal、while-orelse。

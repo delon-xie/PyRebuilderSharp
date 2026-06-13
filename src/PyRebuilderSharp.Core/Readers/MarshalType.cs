@@ -25,6 +25,7 @@ internal static class MarshalType
     public const byte TYPE_SET = 60;             // '<'
     public const byte TYPE_FROZENSET = 62;       // '>'
     public const byte TYPE_CODE = 99;            // 'c'
+    public const byte TYPE_CODE_SIMPLE = 115;   // 's' (Python 3.11+ only — conflicts with TYPE_STRING in older versions)
     public const byte TYPE_REF = 114;            // 'r'
     public const byte TYPE_REF_FLAG = 82;        // 'R'
     public const byte TYPE_FALSE = 70;           // 'F'

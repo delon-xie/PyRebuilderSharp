@@ -112,28 +112,23 @@ public class PycReader
 
     /// <summary>
     /// 读取Marshal格式的CodeObject。
-    /// Python 3.x 格式：argcount, posonlyargcount(3.8+), kwonlyargcount, nlocals, stacksize, flags, ...
-    /// Python 2.7 格式：argcount, nlocals, stacksize, flags, ...
     /// </summary>
-    private CodeObject ReadMarshalCodeObject(BinaryReader br)
+    private CodeObject ReadMarshalCodeObject(BinaryReader br, bool isSimple = false)
     {
         var code = new CodeObject();
         var startPos = br.BaseStream.Position;
+
+        // 设置版本信息
+        code.IsPython38Plus = IsPython38Plus();
 
         try
         {
             if (IsPython27())
                 return ReadMarshalCodeObject27(br);
 
-            // 所有 Python 3.x：TYPE_CODE|FLAG_REF 后有一个 4 字节引用索引需要跳过
-            // 注意：3.5-3.7 有这个字段，3.8+ 可能没有
-            // 通过对字节流分析确认：3.7 需要跳过，3.8+ 不需要
-            if (!IsPython38Plus())
-                br.ReadInt32(); // 跳过 ref_index
-
             // 读取CodeObject的各个字段
             code.ArgCount = br.ReadInt32();
-            if (IsPython38Plus())
+            if (IsPython38Plus() && !isSimple)
             {
                 // Python 3.8+: argcount, posonlyargcount, kwonlyargcount, nlocals, stacksize, flags
                 var posOnlyArgCount = br.ReadInt32();
@@ -145,10 +140,22 @@ public class PycReader
                 code.IsCoroutine = (flags & 0x80) != 0;
                 code.IsAsyncGenerator = (flags & 0xC0) == 0xC0;
             }
+            else if (isSimple)
+            {
+                // TYPE_CODE_SIMPLE: argcount, nlocals, stacksize, flags
+                // （无 posonlyargcount/kwonlyargcount，即使 3.11+ 也是如此）
+                var nlocals = br.ReadInt32();
+                var stacksize = br.ReadInt32();
+                var flags = br.ReadInt32();
+                code.KwOnlyArgCount = 0;
+                code.IsGenerator = (flags & 0x20) != 0;
+                code.IsCoroutine = (flags & 0x80) != 0;
+                code.IsAsyncGenerator = (flags & 0xC0) == 0xC0;
+            }
             else
             {
-                // Python 3.5-3.7: argcount, nlocals, stacksize, flags（无 posOnlyArgCount/kwOnlyArgCount）
-                code.KwOnlyArgCount = 0;
+                // Python 3.5-3.7: argcount, kwonlyargcount, nlocals, stacksize, flags
+                code.KwOnlyArgCount = br.ReadInt32();
                 var nlocals = br.ReadInt32();
                 var stacksize = br.ReadInt32();
                 var flags = br.ReadInt32();
@@ -177,7 +184,13 @@ public class PycReader
             var nameObj = ReadMarshalObject(br);
             code.Name = nameObj?.ToString() ?? "<module>";
 
-            // Python 3.8+: 读取 first line number (int32)
+            // Python 3.11+: 读取 qualname（仅 TYPE_CODE，非 TYPE_CODE_SIMPLE）
+            if (IsPython311Plus() && !isSimple)
+            {
+                try { var _ = ReadMarshalObject(br); } catch { }
+            }
+
+            // first line number (int32) — 3.8+ 的字段
             try { code.FirstLineNumber = br.ReadInt32(); } catch { }
 
             // lnotab — 通过 ReadMarshalObject 以正确处理 FLAG_REF
@@ -186,7 +199,17 @@ public class PycReader
             if (lnotab != null)
                 code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions);
 
-            // Python 3.8 没有异常表字段
+            // Python 3.11+: 读取 co_exceptiontable（仅 TYPE_CODE，非 TYPE_CODE_SIMPLE）
+            if (IsPython311Plus() && !isSimple && br.BaseStream.Position < br.BaseStream.Length)
+            {
+                try
+                {
+                    var excTblObj = ReadMarshalObject(br);
+                    if (excTblObj is byte[] excBytes && excBytes.Length > 0)
+                        code.ExceptionTable = ParseExceptionTable(excBytes);
+                }
+                catch { }
+            }
         }
         catch (EndOfStreamException)
         {
@@ -869,9 +892,8 @@ public class PycReader
         object? result;
         if ((rawType & MarshalType.TYPE_FLAG_REF) != 0)
         {
-            // Flagged for reference: store position, read object, save to ref list
             var refIndex = _refList.Count;
-            _refList.Add(null); // placeholder
+            _refList.Add(null);
             result = ReadMarshalValue(br, type);
             _refList[refIndex] = result;
         }
@@ -909,6 +931,9 @@ public class PycReader
             MarshalType.TYPE_FLOAT => br.ReadDouble(),
             MarshalType.TYPE_BINARY_FLOAT => br.ReadDouble(),
             MarshalType.TYPE_COMPLEX => (br.ReadDouble(), br.ReadDouble()),
+            // 115 = TYPE_CODE_SIMPLE (3.11+) 或 TYPE_STRING (旧版)
+            MarshalType.TYPE_STRING when IsPython311Plus() && !IsPython27()
+                => ReadMarshalCodeObject(br, isSimple: true),
             MarshalType.TYPE_STRING => ReadMarshalBytesDirect(br),
             MarshalType.TYPE_SHORT_ASCII => ReadMarshalShortString(br),
             MarshalType.TYPE_SHORT_ASCII_INTERNED => ReadMarshalShortString(br),
@@ -916,7 +941,7 @@ public class PycReader
             MarshalType.TYPE_ASCII_INTERNED => ReadMarshalLongString(br),
             MarshalType.TYPE_UNICODE => ReadMarshalLongString(br),
             MarshalType.TYPE_SMALL_TUPLE => ReadSmallTuple(br),
-            MarshalType.TYPE_CODE => ReadMarshalCodeObject(br),
+            MarshalType.TYPE_CODE => ReadMarshalCodeObject(br, isSimple: false),
             MarshalType.TYPE_TRUE => true,
             MarshalType.TYPE_FALSE => false,
             MarshalType.TYPE_ELLIPSIS => new object(),
@@ -988,5 +1013,35 @@ public class PycReader
         }
 
         return table;
+    }
+
+    /// <summary>
+    /// 解析 Python 3.10+ co_exceptiontable。
+    /// 每个条目 8 字节（4 个 word offset，每个 2 字节，小端序）：
+    ///   [start(2B)][end(2B)][target(2B)][depth+lasti(2B)]
+    /// word offset → byte offset = word * 2
+    /// </summary>
+    private List<ExceptionTableEntry> ParseExceptionTable(byte[] data)
+    {
+        var entries = new List<ExceptionTableEntry>();
+        for (int i = 0; i + 7 < data.Length; i += 8)
+        {
+            int start = (data[i] | (data[i + 1] << 8)) * 2;
+            int end = (data[i + 2] | (data[i + 3] << 8)) * 2;
+            int target = (data[i + 4] | (data[i + 5] << 8)) * 2;
+            int depthLasti = data[i + 6] | (data[i + 7] << 8);
+            int depth = depthLasti & 0x3;
+            bool lasti = (depthLasti & 0x4) != 0;
+
+            entries.Add(new ExceptionTableEntry
+            {
+                StartOffset = start,
+                EndOffset = end,
+                TargetOffset = target,
+                Depth = depth,
+                Lasti = lasti
+            });
+        }
+        return entries;
     }
 }

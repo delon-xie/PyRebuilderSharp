@@ -37,8 +37,15 @@ public class CodeObject
     public bool IsCoroutine { get; set; }
     public bool IsAsyncGenerator { get; set; }
 
+    // ---- 版本信息 ----
+    /// <summary>Python 3.8+（opcode 121 是 JUMP_IF_NOT_EXC_MATCH 而非 SETUP_EXCEPT）</summary>
+    public bool IsPython38Plus { get; set; }
+
     // ---- 行号表 ----
     public Dictionary<int, int> LineNumberTable { get; set; } = new();
+
+    // ---- 异常表 (Python 3.10+) ----
+    public List<ExceptionTableEntry> ExceptionTable { get; set; } = new();
 
     public override string ToString()
         => $"CodeObject: {Name} ({Instructions.Count} instrs)";

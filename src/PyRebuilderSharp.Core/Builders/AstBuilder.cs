@@ -16,6 +16,7 @@ public class AstBuilder
     private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
     private Dictionary<int, BlockResult> _blockResults = new();
     private HashSet<int> _loopHeaderOffsets = new();
+    private HashSet<int> _phase2CoveredOffsets = new();
 
     /// <summary>
     /// 总基本块数（用于统计）。
@@ -299,14 +300,26 @@ public class AstBuilder
     }
 
     /// <summary>
-    /// 从块中检测 SETUP_FINALLY → try/except 模式并构建 Try AST。
+    /// 从块中检测 SETUP_FINALLY/SETUP_EXCEPT → try/except 模式并构建 Try AST。
+    /// 如果块不包含 SETUP_FINALLY，返回 null。
+    /// </summary>
+    private bool IsTrySetupOpcode(Opcode op, bool isPython38Plus)
+    {
+        if (op == Opcode.SETUP_FINALLY) return true;
+        // SETUP_EXCEPT (121) 仅在 3.5-3.7 有效，3.8+ 是 JUMP_IF_NOT_EXC_MATCH
+        if (!isPython38Plus && op == Opcode.SETUP_EXCEPT) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// 从块中检测 SETUP_FINALLY/SETUP_EXCEPT → try/except 模式并构建 Try AST。
     /// 如果块不包含 SETUP_FINALLY，返回 null。
     /// </summary>
     private List<Stmt>? BuildTryFromBlock(BasicBlock block, HashSet<BasicBlock> visited)
     {
         var instrs = block.Instructions;
-        // 查找 SETUP_FINALLY
-        var setupIdx = instrs.FindIndex(i => i.Opcode == Opcode.SETUP_FINALLY);
+        // 查找 SETUP_FINALLY/SETUP_EXCEPT
+        var setupIdx = instrs.FindIndex(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus));
         if (setupIdx < 0) return null;
 
         // 找到 STORE_NAME（循环变量赋值，应保留）
@@ -341,6 +354,7 @@ public class AstBuilder
         {
             if (succ == null || succ.StartOffset >= handlerAbs || tryBodyCollector.Contains(succ))
                 continue;
+            if (succ.StartOffset < instrs[setupIdx].Offset + 2) continue;
             // 跳过 FOR_ITER 块（属于外层循环）
             if (succ.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
             {
@@ -353,36 +367,21 @@ public class AstBuilder
         {
             var cur = blockQueue.Dequeue();
             if (!tryBodyCollector.Add(cur)) continue;
-            // 遇到 POP_BLOCK 块时停止（try body 结束标志）
-            if (cur.Instructions.Any(i => i.Opcode == Opcode.POP_BLOCK))
-            {
-                tryBodyBlocks.Add(cur);
-                break;
-            }
-            // 跳过 FOR_ITER 块（属于外层循环，不是 try body 的一部分）
-            if (cur.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
-            {
-                // 检查是否为外层循环（非嵌套在 try body 中的内层循环）
-                var forIterEntry = cur.Successors.OrderBy(s => s.StartOffset).FirstOrDefault();
-                if (forIterEntry == block)
-                    continue;
-            }
+            // 跳过 try body 区域以外的块（offset < setup_sf+2 属于外层结构）
+            if (cur.StartOffset < instrs[setupIdx].Offset + 2) continue;
             tryBodyBlocks.Add(cur);
             foreach (var succ in cur.Successors.OrderBy(s => s.StartOffset))
             {
-                // 跳过 FOR_ITER 块：如果 FOR_ITER 的 body entry 是当前 block 本身，
-                // 说明 for-loop 是 OUTER（try 在 for-loop 内），不处理
-                // 排除向内收集（避免收集到 handler 中）
-                if (succ == null) continue;
+                if (succ == null || succ.StartOffset >= handlerAbs || tryBodyCollector.Contains(succ))
+                    continue;
+                if (succ.StartOffset < instrs[setupIdx].Offset + 2) continue;
                 if (succ.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
                 {
-                    var forIterEntry = succ.Successors
-                        .OrderBy(s => s.StartOffset).FirstOrDefault();
-                    if (forIterEntry == block)
+                    var forIterEntry = succ.Successors.OrderBy(s => s.StartOffset).FirstOrDefault();
+                    if (forIterEntry == block || forIterEntry == cur)
                         continue;
                 }
-                if (succ.StartOffset < handlerAbs && !tryBodyCollector.Contains(succ))
-                    blockQueue.Enqueue(succ);
+                blockQueue.Enqueue(succ);
             }
         }
 
@@ -401,25 +400,29 @@ public class AstBuilder
         }
         if (preBodyInstrs.Count > 0)
         {
-            var preMachine = new StackMachine(_codeObject);
-            foreach (var ins in preBodyInstrs)
-            {
-                var stmt = preMachine.Execute(ins);
-                if (stmt != null) tryStmts.Add(stmt);
-            }
-            while (preMachine.HasResults)
-                tryStmts.Add(new ExprStmt(preMachine.PopResult()));
-
             // 检测 if/else 条件跳转：如果当前块末尾是 POP_JUMP_IF_*，
             // 说明 try 体内有 if 条件（条件指令和 SETUP_FINALLY 在同一块）
             var lastPre = preBodyInstrs.LastOrDefault();
-            if (lastPre != default && JumpHelper.IsConditionalJump(lastPre.Opcode) && lastPre.Argument.HasValue)
+            bool hasInlineIf = lastPre != default && JumpHelper.IsConditionalJump(lastPre.Opcode) && lastPre.Argument.HasValue;
+
+            if (hasInlineIf)
             {
-                var cond = preMachine.ExprStackCount > 0 ? preMachine.PopExpr() : null;
+                // 处理 inline if: 排除 POP_JUMP_IF_*（它消费条件，不应在 StackMachine 中执行）
+                var condInstrs = preBodyInstrs.Take(preBodyInstrs.Count - 1).ToList();
+                var condMachine = new StackMachine(_codeObject);
+                foreach (var ins in condInstrs)
+                {
+                    var stmt = condMachine.Execute(ins);
+                    if (stmt != null) tryStmts.Add(stmt);
+                }
+                var cond = condMachine.ExprStackCount > 0 ? condMachine.PopExpr() : null;
+                // 可能还有剩余的结果（如其他表达式）
+                while (condMachine.HasResults)
+                    tryStmts.Add(new ExprStmt(condMachine.PopResult()));
+
                 if (cond != null)
                 {
                     // 条件在栈上，两个后继就是 if/else 分支
-                    // 注意：不用 tryBodyCollector 过滤（后继块可能在收集阶段已加入）
                     var sortedSucc = block.Successors
                         .Where(s => s.StartOffset < handlerAbs)
                         .OrderBy(s => s.StartOffset).ToList();
@@ -427,33 +430,35 @@ public class AstBuilder
                     var ifTrueBlock = sortedSucc.Count >= 1 ? sortedSucc[0] : null;  // fallthrough
                     var ifFalseBlock = sortedSucc.Count >= 2 ? sortedSucc[^1] : null; // jump target
                     
-                    // 处理 true 分支（跳过 POP_BLOCK）
+                    // 使用 GetStructuredBlockStmts 处理分支（支持嵌套控制结构如 for-loop）
                     var trueStmts = new List<Stmt>();
-                    if (ifTrueBlock != null)
+                    if (ifTrueBlock != null && !tryBodyVisited.Contains(ifTrueBlock))
                     {
-                        var beforePop = ifTrueBlock.Instructions.TakeWhile(i => i.Opcode != Opcode.POP_BLOCK).ToList();
-                        if (beforePop.Count > 0)
-                        {
-                            var sm = new StackMachine(_codeObject);
-                            foreach (var ins in beforePop) { var s = sm.Execute(ins); if (s != null) trueStmts.Add(s); }
-                            while (sm.HasResults) trueStmts.Add(new ExprStmt(sm.PopResult()));
-                        }
+                        trueStmts = GetStructuredBlockStmts(ifTrueBlock, tryBodyVisited);
                     }
                     
-                    // 处理 false 分支（跳过 POP_BLOCK）
                     var falseStmts = new List<Stmt>();
-                    if (ifFalseBlock != null)
+                    if (ifFalseBlock != null && !tryBodyVisited.Contains(ifFalseBlock))
                     {
-                        var beforePop = ifFalseBlock.Instructions.TakeWhile(i => i.Opcode != Opcode.POP_BLOCK).ToList();
-                        if (beforePop.Count > 0)
-                        {
-                            var sm2 = new StackMachine(_codeObject);
-                            foreach (var ins in beforePop) { var s = sm2.Execute(ins); if (s != null) falseStmts.Add(s); }
-                            while (sm2.HasResults) falseStmts.Add(new ExprStmt(sm2.PopResult()));
-                        }
+                        falseStmts = GetStructuredBlockStmts(ifFalseBlock, tryBodyVisited);
                     }
                     tryStmts.Add(new If(cond, trueStmts, falseStmts.Count > 0 ? falseStmts : null));
+                    // 标记已处理的 if/else 分支块，防止重复处理
+                    if (ifTrueBlock != null) { tryBodyVisited.Add(ifTrueBlock); visited.Add(ifTrueBlock); }
+                    if (ifFalseBlock != null) { tryBodyVisited.Add(ifFalseBlock); visited.Add(ifFalseBlock); }
                 }
+            }
+            else
+            {
+                // 非 inline if：正常处理所有指令
+                var normalMachine = new StackMachine(_codeObject);
+                foreach (var ins in preBodyInstrs)
+                {
+                    var stmt = normalMachine.Execute(ins);
+                    if (stmt != null) tryStmts.Add(stmt);
+                }
+                while (normalMachine.HasResults)
+                    tryStmts.Add(new ExprStmt(normalMachine.PopResult()));
             }
         }
         // 2) 后继块用 GetStructuredBlockStmts
@@ -473,7 +478,18 @@ public class AstBuilder
             var jfInstr = popBlockBlock.Instructions.FirstOrDefault(
                 i => i.Opcode == Opcode.JUMP_FORWARD);
             if (jfInstr.Argument.HasValue)
-                elseJumpTarget = jfInstr.Offset + 2 + jfInstr.Argument.Value;
+            {
+                var target = jfInstr.Offset + 2 + jfInstr.Argument.Value;
+                // 跳过回边块（v3.10: POP_BLOCK→JUMP_FORWARD 可能跳到 while 回边条件块）
+                if (_blockByOffset.TryGetValue(target, out var targetBlock))
+                {
+                    var lastInTarget = targetBlock.Instructions.LastOrDefault();
+                    if (lastInTarget == default || !JumpHelper.IsConditionalJump(lastInTarget.Opcode)
+                        || !lastInTarget.Argument.HasValue
+                        || lastInTarget.Argument.Value >= targetBlock.StartOffset)
+                        elseJumpTarget = target;
+                }
+            }
         }
 
         // 查找 handler body：从 handlerAbs 偏移处开始的块
@@ -731,12 +747,35 @@ public class AstBuilder
 
     private List<Stmt> BuildWhileLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
-        var testExpr = ExtractCondition(header);
+        // v3.10+: 如果 header 内含 SETUP_FINALLY（try body 在 while 体内），
+        // 则 POP_JUMP 是内层 if 的条件，不是 while 循环的条件。
+        // 此时从 predecessor（while 入口条件块）提取条件。
+        bool hasTryBeforeJump = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus));
+        Expr? testExpr;
+        if (hasTryBeforeJump && header.Predecessors.Count > 0)
+        {
+            // 从 predecessor 提取条件（predecessor 的最后一个指令是 while 入口的 POP_JUMP_IF_FALSE）
+            var pred = header.Predecessors.First();
+            testExpr = ExtractCondition(pred);
+        }
+        else
+        {
+            testExpr = ExtractCondition(header);
+        }
 
         var bodyBlocks = new List<BasicBlock>();
         // body entry = 第一个后继（fallthrough），exit = 第二个后继（jump target）
-        var sortedSucc = header.Successors.OrderBy(s => s.StartOffset).ToList();
-        var bodyEntry = sortedSucc.FirstOrDefault();
+        // 注意：不能按 offset 排序取 FirstOrDefault，因为跳转目标可能比 body 偏移小（v3.8+）
+        // 正确做法：从 header 的 POP_JUMP 指令获取跳转目标偏移，排除该块后余下的就是 body
+        var lastInstr = header.Instructions.LastOrDefault();
+        BasicBlock? bodyEntry = null;
+        if (lastInstr != default && lastInstr.Argument.HasValue)
+        {
+            var jumpTargetOffset = lastInstr.Argument.Value;
+            // body entry = 不是跳转目标的 successor
+            bodyEntry = header.Successors.FirstOrDefault(s => s.StartOffset != jumpTargetOffset);
+        }
+        bodyEntry ??= header.Successors.OrderBy(s => s.StartOffset).FirstOrDefault();
         if (bodyEntry != null)
             CollectBodyBlocks(bodyEntry, header, bodyBlocks, visited);
 
@@ -745,10 +784,22 @@ public class AstBuilder
             visited.Remove(bb);
 
         var bodyStmts = new List<Stmt>();
-        foreach (var bodyBlock in bodyBlocks)
+        // v3.10: header 有 SETUP_FINALLY 时 try body 覆盖 while body
+        if (header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus)))
         {
-            var stmts = GetStructuredBlockStmts(bodyBlock, visited);
-            bodyStmts.AddRange(stmts);
+            var tryResult = BuildTryFromBlock(header, visited);
+            if (tryResult != null)
+            {
+                bodyStmts = tryResult;
+            }
+        }
+        else
+        {
+            foreach (var bodyBlock in bodyBlocks)
+            {
+                var stmts = GetStructuredBlockStmts(bodyBlock, visited);
+                bodyStmts.AddRange(stmts);
+            }
         }
 
         return new List<Stmt> { new While(testExpr, bodyStmts, null) };
@@ -803,6 +854,14 @@ public class AstBuilder
     /// </summary>
     private List<Stmt> BuildWhileLoopBody(BasicBlock header, HashSet<BasicBlock> visited)
     {
+        // v3.10: header 有 SETUP_FINALLY 时用 BuildTryFromBlock 处理
+        if (header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus)))
+        {
+            var tryResult = BuildTryFromBlock(header, visited);
+            if (tryResult != null)
+                return tryResult;
+        }
+
         // 自循环：body 就是 header 自身（Python 3.10 while 布局）
         if (header.Successors.Any(s => s == header))
         {
@@ -928,6 +987,20 @@ public class AstBuilder
 
     private List<Stmt> BuildIfElse(BasicBlock header, HashSet<BasicBlock> visited)
     {
+        // 提取 header 块中条件之前的初始化语句（例如 `result = 0` 和 `if x0 > 0:` 在同一块时）
+        var headerResult = _blockResults.GetValueOrDefault(header.Id);
+        var headerInitStmts = new List<Stmt>();
+        if (headerResult?.Statements != null)
+        {
+            foreach (var s in headerResult.Statements)
+            {
+                // ExprStmt(Compare) 是条件表达式本身，前面的语句是初始化代码
+                if (s is ExprStmt { Value: Compare })
+                    break;
+                headerInitStmts.Add(s);
+            }
+        }
+
         var testExpr = ExtractCondition(header);
         if (header.Instructions.Count == 0) return new List<Stmt>();
         var lastInstr = header.Instructions.Last();
@@ -970,6 +1043,8 @@ public class AstBuilder
             wResult.Add(new While(whileTest, wBody, null));
             if (wAfter != null)
                 wResult.AddRange(wAfter);
+            // 标记 bodyBranch（LoopHeader）为 visited，防止外层 for-loop 重复处理
+            visited.Add(bodyBranch);
             return wResult;
         }
 
@@ -1054,7 +1129,9 @@ public class AstBuilder
             }
             }
 
-        var result = new List<Stmt> { new If(testExpr, bodyStmts, orelse) };
+        var result = new List<Stmt>();
+        result.AddRange(headerInitStmts);
+        result.Add(new If(testExpr, bodyStmts, orelse));
         result.AddRange(tailCode);
         return result;
     }
@@ -1102,9 +1179,13 @@ public class AstBuilder
         visited.Add(block);
 
         // 优先检测是否为循环头（即使在内层循环体中）
+        // 跳过 for-loop 前导块：有 GET_ITER 但无 FOR_ITER → 不是真正的循环头
         if (block.Flags.HasFlag(BlockFlags.LoopHeader))
         {
-            return BuildLoop(block, visited);
+            bool hasForIter = block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
+            bool hasGetIter = block.Instructions.Any(i => i.Opcode == Opcode.GET_ITER);
+            if (!(hasGetIter && !hasForIter))
+                return BuildLoop(block, visited);
         }
 
         // 检测 for-loop 头：FOR_ITER 是条件跳转但不是 if/else，
@@ -1112,6 +1193,13 @@ public class AstBuilder
         if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
         {
             return BuildForLoop(block, visited);
+        }
+
+        // 检测 try/except: 优先于 if/else，因为一个块可能同时有 SETUP_EXCEPT 和 POP_JUMP_IF_FALSE
+        var tryResult = BuildTryFromBlock(block, visited);
+        if (tryResult != null)
+        {
+            return tryResult;
         }
 
         // 检测 if/else 条件分支
@@ -1130,15 +1218,6 @@ public class AstBuilder
                 return stmts;
             }
             return BuildIfElse(block, visited);
-        }
-
-        // 检测 try/except
-        var tryResult = BuildTryFromBlock(block, visited);
-        if (tryResult != null)
-        {
-            // 注意：try builder 不会标记 handler 块为 visited
-            // 由调用方在 tryResult 返回后处理，防止干扰外部作用域的 visited
-            return tryResult;
         }
 
         // 平坦语句
@@ -1331,10 +1410,22 @@ public class AstBuilder
             bodyBlocks.Add(current);
             visited.Add(current);
 
+            // v3.10: 回边条件块（POP_JUMP_IF_TRUE 目标 < 自身偏移）的后继是循环出口，不是 body 的一部分
+            var lastInstr = current.Instructions.LastOrDefault();
+            bool isBackEdgeBlock = lastInstr != default
+                && JumpHelper.IsJump(lastInstr.Opcode)
+                && lastInstr.Argument.HasValue
+                && lastInstr.Argument.Value < current.StartOffset;
+
             foreach (var succ in current.Successors)
             {
                 if (succ != header && !visited.Contains(succ))
+                {
+                    // 回边块的 fallthrough 是循环出口
+                    if (isBackEdgeBlock)
+                        continue;
                     worklist.Enqueue(succ);
+                }
             }
         }
     }
