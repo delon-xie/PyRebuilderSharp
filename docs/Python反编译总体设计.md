@@ -2,10 +2,10 @@
 
 ## Python字节码反编译器总体设计文档
 
-**版本**: v2.3
+**版本**: v2.4
 **日期**: 2026-06-13
 **项目**: PyRebuilderSharp
-**状态**: 开发阶段 — Lv0 表达式 ✅ · Lv1 顺序代码块 ✅ · Lv2 控制流 ✅ · Lv3 嵌套矩阵 ✅ · v2.7 marshal ✅ · v3.11+ Marshal读取 ✅ · v3.11+ 反编译流水线 ⏳
+**状态**: 开发阶段 — Lv0 表达式 ✅ · Lv1 顺序代码块 ✅ · Lv2 控制流 ✅ · Lv3 嵌套矩阵 ✅ (21/21 Lv0-Lv2) · v2.7 marshal ✅ · v3.11+ Marshal ✅ · v3.11+ 操作码映射 ✅ · Phase 3+ 文档 ✅
 
 ---
 
@@ -487,8 +487,8 @@ public class BlockResult
 | 3.8 | 55 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
 | 3.9 | 61 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
 | 3.10 | 6F 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
-| 3.11 | A7 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal读取 ⏳ 反编译 |
-| 3.12 | C0 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal读取 ⏳ 反编译 |
+| 3.11 | A7 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal ✅ 操作码映射 ✅ 基本反编译 |
+| 3.12 | C0 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal ✅ 操作码映射 ✅ 基本反编译 |
 
 ---
 

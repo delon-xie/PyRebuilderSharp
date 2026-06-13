@@ -1372,6 +1372,7 @@ public class PycReader
             MarshalType.TYPE_BINARY_FLOAT => br.ReadDouble(),
             MarshalType.TYPE_COMPLEX => (br.ReadDouble(), br.ReadDouble()),
             MarshalType.TYPE_BINARY_COMPLEX => new double[] { br.ReadDouble(), br.ReadDouble() },
+            MarshalType.TYPE_BYTES => ReadMarshalBytesDirect(br),
             // 115 = TYPE_CODE_SIMPLE (3.11+) 或 TYPE_STRING (旧版)
             MarshalType.TYPE_STRING when IsPython311Plus() && !IsPython27()
                 => ReadMarshalCodeObject(br, isSimple: true),

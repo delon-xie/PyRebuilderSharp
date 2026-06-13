@@ -15,9 +15,10 @@ internal static class MarshalType
     public const byte TYPE_STRING = 115;         // 's'
     public const byte TYPE_SHORT_ASCII = 122;    // 'z'
     public const byte TYPE_SHORT_ASCII_INTERNED = 90;    // 'Z'
-    public const byte TYPE_ASCII = 116;          // 't'
+    public const byte TYPE_ASCII = 97;           // 'a'
     public const byte TYPE_UNICODE = 117;        // 'u'
-    public const byte TYPE_ASCII_INTERNED = 65;  // 'A'
+    public const byte TYPE_ASCII_INTERNED = 116;  // 't'
+    public const byte TYPE_INTERNED = 116;       // alias for TYPE_ASCII_INTERNED (v2.7)
     public const byte TYPE_TUPLE = 40;           // '('
     public const byte TYPE_SMALL_TUPLE = 41;     // ')'
     public const byte TYPE_LIST = 91;            // '['
@@ -29,6 +30,7 @@ internal static class MarshalType
     public const byte TYPE_REF = 114;            // 'r'
     public const byte TYPE_REF_FLAG = 82;        // 'R'
     public const byte TYPE_BINARY_COMPLEX = 121;  // 'y'
+    public const byte TYPE_BYTES = 124;            // '|' (Python 3+)
     public const byte TYPE_FALSE = 70;           // 'F'
     public const byte TYPE_TRUE = 84;            // 'T'
     public const byte TYPE_ELLIPSIS = 46;        // '.'
