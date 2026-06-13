@@ -15,6 +15,8 @@ public class StackMachine
     private readonly CodeObject _code;
     private readonly HashSet<int> _loopHeaderOffsets;
     private bool _isForLoop;
+    // v2.7 print 语句缓冲
+    private readonly List<Expr> _printItems = new();
 
     public StackMachine(CodeObject code)
     {
@@ -338,7 +340,7 @@ public class StackMachine
                 if (top != null) _exprStack.Push(top);
                 return null;
             }
-
+ 
             // ---- 比较 ----
             case Opcode.COMPARE_OP:
             {
@@ -442,6 +444,57 @@ public class StackMachine
             case Opcode.CALL_FUNCTION_EX:
                 return null; // Skip for now
 
+            // ---- Print（Python 2.7）----
+            case Opcode.PRINT_ITEM:
+            {
+                var val = SafePop();
+                if (val != null)
+                    _printItems.Add(val);
+                return null;
+            }
+            case Opcode.PRINT_NEWLINE:
+            {
+                if (_printItems.Count > 0)
+                {
+                    var items = new List<Expr>(_printItems);
+                    _printItems.Clear();
+                    var printCall = new Call(new Name("print", ExpressionContext.Load), items, new());
+                    return new ExprStmt(printCall);
+                }
+                return new ExprStmt(new Call(new Name("print", ExpressionContext.Load), new(), new()));
+            }
+            case Opcode.PRINT_EXPR:
+            {
+                var val = SafePop();
+                if (val != null)
+                    return new ExprStmt(val);
+                return null;
+            }
+            case Opcode.PRINT_ITEM_TO:
+            {
+                // print >> dest, val — 重定向输出到 dest
+                var val = SafePop();
+                var dest = SafePop(); // dest 在 val 下面
+                if (val != null && dest != null)
+                    _printItems.Add(val);
+                if (dest != null)
+                    _printItems.Insert(0, dest); // dest 作为第一个参数（便于print调用）
+                return null;
+            }
+            case Opcode.PRINT_NEWLINE_TO:
+            {
+                // print >> expr — 重定向输出结束，忽略 dest
+                SafePop(); // pop destination
+                if (_printItems.Count > 0)
+                {
+                    var items = new List<Expr>(_printItems);
+                    _printItems.Clear();
+                    var printCall = new Call(new Name("print", ExpressionContext.Load), items, new());
+                    return new ExprStmt(printCall);
+                }
+                return null;
+            }
+
             // ---- NOP and safe-to-skip opcodes ----
             case Opcode.NOP:
             case Opcode.RESUME:
@@ -534,24 +587,34 @@ public class StackMachine
 
             case Opcode.MAKE_FUNCTION:
             {
-                // Python 3.8: 栈顶 → [qualname, code, defaults_tuple...]
-                // Python 3.11+: 栈顶 → [qualname, code, defaults?, kwdefaults?, annotations?, closure?]
-                // 目前仅弹出 qualname 和 code object，跳过其他
-                var qualNameExpr = SafePop(); // 函数限定名（字符串常量）
-                var codeExpr = SafePop();     // 代码对象常量
-
-                string funcName = qualNameExpr switch
-                {
-                    Constant c when c.Value is string s => s,
-                    _ => "<lambda>"
-                };
-
+                // v2.7: 栈顶只有 code object（无 qualname）
+                // v3.3+: 栈顶 → [defaults?, kwdefaults?, annotations?, closure?, qualname, code]
+                string funcName = "<lambda>";
                 CodeObject? childCode = null;
-                if (codeExpr is Constant c2 && c2.Value is CodeObject co)
-                    childCode = co;
 
-                // TODO: 弹出默认参数（oparg > 0 时）
-                // TODO: 弹出闭包（Python 3.11+）
+                if (_code.IsPython27)
+                {
+                    // v2.7: 只有 code object
+                    var codeExpr = SafePop();
+                    if (codeExpr is Constant c && c.Value is CodeObject co)
+                        childCode = co;
+                    funcName = childCode?.Name ?? "<lambda>";
+                }
+                else
+                {
+                    // v3.3+: pop qualname + code
+                    var qualNameExpr = SafePop();
+                    var codeExpr = SafePop();
+
+                    funcName = qualNameExpr switch
+                    {
+                        Constant c when c.Value is string s => s,
+                        _ => "<lambda>"
+                    };
+
+                    if (codeExpr is Constant c2 && c2.Value is CodeObject co)
+                        childCode = co;
+                }
 
                 _exprStack.Push(new FunctionRef(childCode, funcName));
                 return null;

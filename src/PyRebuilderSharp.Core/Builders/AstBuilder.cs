@@ -1569,7 +1569,23 @@ public class AstBuilder
                     continue;
                 }
 
-                // ---- Case 4: Assign(Name, Attribute(module, name)) with import marker → from ... import ----
+                // ---- Case 4: Assign(Name, Call(func, funcRef)) with 1 arg → FunctionDef with decorator ----
+                if (assign.Value is Call decoratorCall && decoratorCall.Args.Count == 1
+                    && decoratorCall.Args[0] is FunctionRef)
+                {
+                    BuildFunctionDefWithDecorators(targetName, decoratorCall, result);
+                    continue;
+                }
+                // ---- Case 4a: Nested decorator: Call(func, Call(func, funcRef)) ----
+                if (assign.Value is Call outerCall && outerCall.Args.Count == 1
+                    && outerCall.Args[0] is Call innerCall && innerCall.Args.Count == 1
+                    && innerCall.Args[0] is FunctionRef)
+                {
+                    BuildFunctionDefWithDecorators(targetName, outerCall, result);
+                    continue;
+                }
+
+                // ---- Case 5: Assign(Name, Attribute(module, name)) with import marker → from ... import ----
                 if (assign.Value is Models.AST.Attribute attr && attr.Value is Name modName 
                     && attr.Ctx == ExpressionContext.Load && attr.IsImportFrom)
                 {
@@ -1585,6 +1601,50 @@ public class AstBuilder
             }
         }
         return result;
+    }
+
+    /// <summary>
+    /// 从 Assign(Name, Call(decorator_chain, FunctionRef)) 中提取 FunctionDef 和装饰器列表。
+    /// </summary>
+    private void BuildFunctionDefWithDecorators(Name targetName, Call call, List<Stmt> result)
+    {
+        // Extract decorator chain from nested Call
+        var decorators = new List<Expr>();
+        var current = call;
+        
+        // Walk the call chain: Call(func1, Call(func2, FunctionRef(...)))
+        while (current.Args.Count >= 1 && current.Args[0] is Call innerCall)
+        {
+            // The outer call's function is a decorator
+            decorators.Add(current.Func);
+            current = innerCall;
+        }
+        
+        // The innermost call's first arg should be FunctionRef
+        if (current.Args.Count >= 1 && current.Args[0] is FunctionRef funcRef)
+        {
+            decorators.Add(current.Func);
+            decorators.Reverse(); // decorators[0] = inner-most, decorators[-1] = outer-most
+            
+            var fnName = funcRef.Name;
+            if (string.IsNullOrEmpty(fnName) || fnName == "<lambda>"
+                && funcRef.Code != null && !string.IsNullOrEmpty(funcRef.Code.Name)
+                && funcRef.Code.Name != "<module>")
+                fnName = funcRef.Code.Name;
+            if (string.IsNullOrEmpty(fnName) || fnName == "<lambda>")
+                fnName = targetName.Id;
+            
+            var cleanName = fnName;
+            var lastDot = fnName.LastIndexOf('.');
+            if (lastDot >= 0) cleanName = fnName[(lastDot + 1)..];
+            
+            var funcDef = BuildFunctionDef(cleanName, funcRef);
+            if (funcDef != null)
+            {
+                // Recreate FunctionDef with decorators
+                result.Add(funcDef with { Decorators = decorators });
+            }
+        }
     }
 
     /// <summary>

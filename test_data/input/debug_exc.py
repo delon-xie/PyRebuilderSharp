@@ -1,0 +1,39 @@
+import sys
+import dis
+import marshal
+import types
+
+f = open(sys.argv[1], 'rb')
+magic = f.read(4)
+print(f"Magic: {magic.hex()}")
+
+# Read header
+flags = int.from_bytes(f.read(4), 'little')
+ts = int.from_bytes(f.read(4), 'little')
+size = int.from_bytes(f.read(4), 'little')
+print(f"Header: flags={flags} ts={ts} size={size}")
+
+# Read marshal
+raw = f.read()
+code = marshal.loads(raw)
+print(f"Code name: {code.co_name}")
+print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
+if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
+    print(f"co_exceptiontable bytes ({len(code.co_exceptiontable)}): {code.co_exceptiontable.hex()}")
+    # Parse
+    et = code.co_exceptiontable
+    for i in range(0, len(et), 8):
+        if i+7 >= len(et): break
+        start = int.from_bytes(et[i:i+2], 'little')
+        end = int.from_bytes(et[i+2:i+4], 'little')
+        target = int.from_bytes(et[i+4:i+6], 'little')
+        dl = int.from_bytes(et[i+6:i+8], 'little')
+        print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
+    
+# Check for nested code objects
+for const in code.co_consts:
+    if isinstance(const, types.CodeType):
+        print(f"\n--- Nested: {const.co_name} ---")
+        print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
+        if hasattr(const, 'co_exceptiontable') and const.co_exceptiontable:
+            print(f"  bytes: {const.co_exceptiontable.hex()}")

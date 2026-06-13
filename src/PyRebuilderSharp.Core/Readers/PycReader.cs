@@ -239,13 +239,12 @@ public class PycReader
             code.IsCoroutine = false;
             code.IsAsyncGenerator = false;
 
-            // 读取字节码 — 通过 ReadMarshalObject 以正确处理 FLAG_REF
-            var bytecodeObj = ReadMarshalObject(br);
-            byte[]? bcBytes = bytecodeObj as byte[];
+            // 读取字节码 — 使用 ReadRawMarshalBytes（v2.7 TYPE_STRING 格式）
+            var bcBytes = ReadRawMarshalBytes(br);
             if (bcBytes != null)
                 code.Instructions = ParseInstructions(bcBytes);
 
-            code.Constants = ReadMarshalDictSafe(br, code);
+            code.Constants = ReadMarshalDictSafe27(br, code);
 
             code.Names = ReadMarshalListSafe27(br)?.Select(x => x?.ToString() ?? "").ToList() ?? new();
             code.Varnames = ReadMarshalListSafe27(br)?.Select(x => x?.ToString() ?? "").ToList() ?? new();
@@ -269,7 +268,7 @@ public class PycReader
     /// <summary>
     /// Python 2.7 安全的 Marshal 列表读取。
     /// 在 2.7 中，names/varnames/freevars/cellvars 是 tuple。
-    /// 同时收集 interned string 用于 TYPE_STRINGREF 解析。
+    /// v2.7 没有 FLAG_REF/TYPE_REF 机制。
     /// </summary>
     private List<object?>? ReadMarshalListSafe27(BinaryReader br)
     {
@@ -277,16 +276,7 @@ public class PycReader
             return null;
         try
         {
-            var rawType = br.ReadByte();
-            var type = rawType; // 2.7 不使用 FLAG_REF
-
-            if (type == MarshalType.TYPE_REF) // 2.7 TYPE_STRINGREF = 0x7a, but for lists handle TYPE_REF
-            {
-                var refIdx = br.ReadInt32();
-                if (refIdx >= 0 && refIdx < _refList.Count && _refList[refIdx] is List<object?> refList)
-                    return refList;
-                return new List<object?>();
-            }
+            var type = br.ReadByte(); // v2.7: 无 FLAG_REF，原始类型字节
 
             // 只接受 tuple 类型
             if (type != MarshalType.TYPE_TUPLE && type != MarshalType.TYPE_SMALL_TUPLE)
@@ -296,29 +286,47 @@ public class PycReader
             var items = new List<object?>();
             for (int i = 0; i < count; i++)
             {
-                items.Add(ReadMarshalValue27(br));
+                try
+                {
+                    items.Add(ReadMarshalValue27(br));
+                }
+                catch
+                {
+                    break;
+                }
             }
             return items;
         }
         catch { return null; }
     }
 
-    /// <summary>
-    /// Python 2.7 marshal 值读取 — 处理 TYPE_INTERNED(0x74) 和 TYPE_STRINGREF(0x7a)。
-    /// </summary>
     private object? ReadMarshalValue27(BinaryReader br)
     {
         var type = br.ReadByte();
+        
+        // Handle TYPE_STRINGREF (0x52 = 'R'): references an interned string by index
+        if (type == 0x52)
+        {
+            var refIdx = br.ReadInt32();
+            if (refIdx >= 0 && refIdx < _internedStrings27.Count)
+                return _internedStrings27[refIdx];
+            return $"strref_{refIdx}";
+        }
+        
         return type switch
         {
             78 => null,             // 'N' TYPE_NONE
             105 => br.ReadInt32(),  // 'i' TYPE_INT
+            108 => br.ReadInt64(),  // 'l' TYPE_LONG
+            102 => double.Parse(System.Text.Encoding.UTF8.GetString(br.ReadBytes(br.ReadInt32()))), // 'f' TYPE_FLOAT
+            103 => br.ReadDouble(), // 'g' TYPE_BINARY_FLOAT
             84 => true,             // 'T' TYPE_TRUE
             70 => false,            // 'F' TYPE_FALSE
             115 or 116 => ReadMarshalString27FromType(br, type), // 's' TYPE_STRING, 't' TYPE_INTERNED
-            122 => ReadStringRef27(br), // 'z' TYPE_STRINGREF
-            40 or 41 => ReadMarshalList27(br, type), // '(' TYPE_TUPLE, ')' TYPE_SMALL_TUPLE
+            122 => ReadStringRef27_7a(br), // 'z' TYPE_STRINGREF (v3.x compat, v2.7 中不出现在此处)
+            40 or 41 or 91 => ReadMarshalList27(br, type), // '(' TYPE_TUPLE, ')' TYPE_SMALL_TUPLE, '[' TYPE_LIST
             46 => new object(),     // '.' TYPE_ELLIPSIS
+            99 => ReadMarshalCodeObject27(br), // 'c' TYPE_CODE (nested functions/lambdas)
             _ => SkipUnknown27(br, type),
         };
     }
@@ -326,6 +334,14 @@ public class PycReader
     private string ReadMarshalString27(BinaryReader br)
     {
         var type = br.ReadByte();
+        // v2.7: 0x52 = TYPE_STRINGREF — reference to previously interned string
+        if (type == 0x52)
+        {
+            var refIdx = br.ReadInt32();
+            if (refIdx >= 0 && refIdx < _internedStrings27.Count)
+                return _internedStrings27[refIdx];
+            return $"strref_{refIdx}";
+        }
         return ReadMarshalString27FromType(br, type);
     }
 
@@ -347,15 +363,16 @@ public class PycReader
         }
         if (type == 122) // 'z' TYPE_STRINGREF
         {
-            return ReadStringRef27(br);
+            return ReadStringRef27_7a(br);
         }
         return "";
     }
 
     /// <summary>
-    /// Python 2.7 TYPE_STRINGREF (0x7a) — 引用之前出现过的 interned string。
+    /// Python 2.7 TYPE_STRINGREF (0x7a) — v3.x 兼容，引用 interned string。
+    /// 纯 v2.7 文件中几乎不出现（v2.7 的 TYPE_STRINGREF 是 0x52）。
     /// </summary>
-    private string ReadStringRef27(BinaryReader br)
+    private string ReadStringRef27_7a(BinaryReader br)
     {
         var idx = br.ReadInt32();
         if (idx >= 0 && idx < _internedStrings27.Count)
@@ -370,6 +387,29 @@ public class PycReader
         for (int i = 0; i < count; i++)
             items.Add(ReadMarshalValue27(br));
         return items;
+    }
+
+    /// <summary>
+    /// Python 2.7 常量表读取 — 使用 ReadMarshalValue27 确保 TYPE_INTERNED/TYPE_STRINGREF 正确处理。
+    /// </summary>
+    private Dictionary<int, object?> ReadMarshalDictSafe27(BinaryReader br, CodeObject? parentCode = null)
+    {
+        if (br.BaseStream.Position >= br.BaseStream.Length)
+            return new();
+        try
+        {
+            var list = ReadMarshalListSafe27(br);
+            if (list == null) return new();
+            var dict = new Dictionary<int, object?>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                dict[i] = list[i];
+                if (list[i] is CodeObject childCode && parentCode != null)
+                    parentCode.ChildCodes.Add(childCode);
+            }
+            return dict;
+        }
+        catch { return new(); }
     }
 
     private object? SkipUnknown27(BinaryReader br, byte type)
@@ -481,7 +521,11 @@ public class PycReader
 
         while (offset < bytecode.Length)
         {
-            var op = (Models.Bytecode.Opcode)bytecode[offset];
+            var rawOp = bytecode[offset];
+            // v2.7: map opcodes 70-89 to v2.7-specific enum values
+            var op = IsPython27() && rawOp is >= 70 and <= 89
+                ? MapOpcode27(rawOp)
+                : (Models.Bytecode.Opcode)rawOp;
             offset += 1;
 
             // Handle EXTENDED_ARG chain
@@ -520,6 +564,32 @@ public class PycReader
         }
 
         return instructions;
+    }
+
+    /// <summary>
+    /// 将 Python 2.7 的原始 opcode 映射到正确的枚举值。
+    /// v2.7 opcodes 70-89 与 v3.x 完全不同：
+    ///   70=PRINT_EXPR, 71=PRINT_ITEM, 72=PRINT_NEWLINE...
+    ///   86=YIELD_VALUE, 87=POP_BLOCK, 88=END_FINALLY, 89=BUILD_CLASS
+    /// </summary>
+    private static Models.Bytecode.Opcode MapOpcode27(byte rawOp)
+    {
+        return rawOp switch
+        {
+            70 => Models.Bytecode.Opcode.PRINT_EXPR,
+            71 => Models.Bytecode.Opcode.PRINT_ITEM,
+            72 => Models.Bytecode.Opcode.PRINT_NEWLINE,
+            73 => Models.Bytecode.Opcode.PRINT_ITEM_TO,
+            74 => Models.Bytecode.Opcode.PRINT_NEWLINE_TO,
+            80 => Models.Bytecode.Opcode.BREAK_LOOP,
+            84 => Models.Bytecode.Opcode.IMPORT_STAR_27,
+            85 => Models.Bytecode.Opcode.EXEC_STMT,
+            86 => Models.Bytecode.Opcode.YIELD_VALUE,
+            87 => Models.Bytecode.Opcode.POP_BLOCK,
+            88 => Models.Bytecode.Opcode.END_FINALLY,
+            89 => Models.Bytecode.Opcode.BUILD_CLASS_27,
+            _ => (Models.Bytecode.Opcode)rawOp,
+        };
     }
 
     /// <summary>
@@ -986,6 +1056,41 @@ public class PycReader
     {
         var len = br.ReadInt32();
         return Encoding.UTF8.GetString(br.ReadBytes(len));
+    }
+
+    /// <summary>
+    /// 从 marshal 流中读取原始字节数据。
+    /// 支持 TYPE_STRING, TYPE_SHORT_ASCII, TYPE_SHORT_ASCII_INTERNED,
+    /// TYPE_ASCII, TYPE_ASCII_INTERNED, TYPE_UNICODE。
+    /// </summary>
+    private byte[]? ReadRawMarshalBytes(BinaryReader br)
+    {
+        var rawType = br.ReadByte();
+        var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
+
+        byte[]? result = type switch
+        {
+            MarshalType.TYPE_SHORT_ASCII_INTERNED or MarshalType.TYPE_SHORT_ASCII
+                => ReadShortStringBytes(br),
+            MarshalType.TYPE_ASCII_INTERNED or MarshalType.TYPE_ASCII
+                or MarshalType.TYPE_STRING or MarshalType.TYPE_UNICODE
+                or 116 // TYPE_INTERNED (v2.7)
+                => ReadLongStringBytes(br),
+            _ => null,
+        };
+        return result;
+    }
+
+    private byte[] ReadShortStringBytes(BinaryReader br)
+    {
+        var len = br.ReadByte();
+        return br.ReadBytes(len);
+    }
+
+    private byte[] ReadLongStringBytes(BinaryReader br)
+    {
+        var len = br.ReadInt32();
+        return br.ReadBytes(len);
     }
 
     private PyTuple ReadSmallTuple(BinaryReader br)
