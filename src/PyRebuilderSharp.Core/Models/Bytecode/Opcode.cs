@@ -136,6 +136,20 @@ public enum Opcode : byte
     RETURN_VALUE = 83,
     YIELD_VALUE = 86,
     POP_BLOCK = 87,         // Python 2.7 + 3.0-3.10；3.11+ 移除
+
+    // --- Python 2.7 特有操作码（使用 200+ 范围避免与 v3.x 冲突）---
+    PRINT_EXPR = 200,        // Python 2.7 only (raw 70)
+    PRINT_ITEM = 201,        // Python 2.7 only (raw 71)
+    PRINT_NEWLINE = 202,     // Python 2.7 only (raw 72)
+    PRINT_ITEM_TO = 203,     // Python 2.7 only (raw 73)
+    PRINT_NEWLINE_TO = 204,  // Python 2.7 only (raw 74)
+    BREAK_LOOP = 205,        // Python 2.7 only (raw 80)
+    CONTINUE_LOOP = 206,     // Python 2.7 only (raw 119)
+    SETUP_LOOP = 207,        // Python 2.7 only (raw 120)
+    SETUP_EXCEPT_27 = 211,   // Python 2.7 only (raw 121, 3.8+ = JUMP_IF_NOT_EXC_MATCH)
+    IMPORT_STAR_27 = 208,    // Python 2.7 only (raw 84)
+    EXEC_STMT = 209,         // Python 2.7 only (raw 85)
+    BUILD_CLASS_27 = 210,    // Python 2.7 only (raw 89, but BUILD_CLASS was removed in 3.x)
     SEND = 123,
 
     // --- Yield from ---
@@ -159,6 +173,7 @@ public enum Opcode : byte
     // --- 函数/类 ---
     LOAD_BUILD_CLASS = 71,
     MAKE_FUNCTION = 132,
+    MAKE_CLOSURE = 134,    // 闭包函数：与MAKE_FUNCTION同但多弹出closure tuple
 
     // --- 特殊 ---
     EXTENDED_ARG = 144,   // 扩展参数

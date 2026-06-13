@@ -226,6 +226,7 @@ public class PycReader
     private CodeObject ReadMarshalCodeObject27(BinaryReader br)
     {
         var code = new CodeObject();
+        code.IsPython27 = true;
         try
         {
             code.ArgCount = br.ReadInt32();

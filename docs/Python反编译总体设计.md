@@ -2,10 +2,10 @@
 
 ## Python字节码反编译器总体设计文档
 
-**版本**: v2.1
+**版本**: v2.3
 **日期**: 2026-06-13
 **项目**: PyRebuilderSharp
-**状态**: 开发阶段 — Lv0 表达式 ✅ · Lv1 顺序代码块 ✅ · Lv2 控制流 ✅ · Lv3 嵌套矩阵 ✅
+**状态**: 开发阶段 — Lv0 表达式 ✅ · Lv1 顺序代码块 ✅ · Lv2 控制流 ✅ · Lv3 嵌套矩阵 ✅ · v2.7 marshal ✅ · v3.11+ Marshal读取 ✅ · v3.11+ 反编译流水线 ⏳
 
 ---
 
@@ -15,7 +15,7 @@
 
 **PyRebuilderSharp** 是一个基于 C#(.NET 10) 的 Python 字节码反编译器，对标 pycdc，以 Avalonia UI 提供跨平台 GUI。核心目标：
 
-- **多版本兼容**: 支持 Python 2.7 + 3.5~3.10（3.11+ 暂缓）
+- **多版本兼容**: 支持 Python 2.7 + 3.5~3.12（marshal读取），完整反编译 3.5~3.10
 - **块级容错**: 每个基本块独立反编译，失败块输出注释兜底，不影响其他块
 - **高还原度**: AST 级语义比较，确保反编译结果等价于原源码
 - **跨平台**: .NET 10 + Avalonia UI → Windows/macOS/Linux
@@ -69,7 +69,233 @@
 
 ---
 
-## 2. 四阶段流水线架构
+## 2. CPython 源码研读 — 理解 .py → .pyc 编译管道
+
+### 2.1 为什么需要研读 CPython 源码
+
+反编译器本质上是编译器的逆过程。要写好反编译器，必须深刻理解编译器的每一步做了什么。CPython 源代码是反编译工作的**权威参考**——任何第三方文档或 pycdc 的实现都可能与真实行为有偏差。
+
+### 2.2 .py → .pyc 编译管道全貌
+
+```
+Python 源码 (.py)
+    │
+    ▼
+┌──────────────────────────────────────────────────┐
+│  Phase A: Lexer (词法分析)                        │
+│  ├── Python/tokenize.c → tokens                  │
+│  └── 将源码字符流 → token 序列                    │
+└──────────────────────┬───────────────────────────┘
+                       ▼
+┌──────────────────────────────────────────────────┐
+│  Phase B: Parser (语法分析)                       │
+│  ├── Parser/pgen.c / Python/ast.c                │
+│  ├── LL(1) 解析器 → CST → AST (mod_ty)           │
+│  └── 输出: mod_ty (Module_ty / Interactive_ty)    │
+└──────────────────────┬───────────────────────────┘
+                       ▼
+┌──────────────────────────────────────────────────┐
+│  Phase C: Compiler (字节码编译器)                  │
+│  ├── Python/compile.c → compiler.c的核心逻辑       │
+│  ├── Python/symtable.c → 符号表分析                │
+│  ├── 三阶段:                                       │
+│  │   ① 符号表构建 (symtable)                       │
+│  │   ② CFG 构建 (basicblock, 非 Python 3.11 的块)  │
+│  │   ③ 汇编 → bytecode 数组                        │
+│  └── 输出: PyCodeObject                            │
+└──────────────────────┬───────────────────────────┘
+                       ▼
+┌──────────────────────────────────────────────────┐
+│  Phase D: Marshal (序列化)                        │
+│  ├── Python/marshal.c                            │
+│  ├── 将 PyCodeObject → 二进制流                    │
+│  ├── 类型编码: TYPE_CODE, TYPE_STRING, TYPE_TUPLE  │
+│  ├── 版本3.4+: FLAG_REF(0x80) + TYPE_REF(0x52)    │
+│  ├── 版本2.7: TYPE_INTERNED(0x74) + TYPE_STRINGREF(0x52)  │
+│  └── 输出: .pyc 二进制文件                          │
+└──────────────────────┬───────────────────────────┘
+                       ▼
+                  .pyc 文件
+```
+
+### 2.3 关键源文件清单与对应关系
+
+| CPython 源文件 | 功能 | 反编译对应模块 |
+|---------------|------|--------------|
+| `Python/compile.c` | 字节码编译器核心 — AST→CFG→bytecode | AstBuilder（逆过程） |
+| `Python/symtable.c` | 符号表 — 变量作用域分析 | CodeObject.Names/Varnames/Freevars/Cellvars |
+| `Python/ast.c` | AST 定义与操作 | AstNode/Expr/Stmt 模型 |
+| `Python/marshal.c` | marshal 序列化/反序列化 | PycReader (ReadMarshalValue/ReadMarshalValue27) |
+| `Python/ceval.c` | 字节码解释器 — ceval 循环 | StackMachine（栈机模拟） |
+| `Include/code.h` | PyCodeObject 结构体定义 | CodeObject 模型 |
+| `Include/opcode.h` | 操作码常量定义 | Opcode 枚举 |
+| `Include/compile.h` | 编译器内部结构（basicblock/CFG） | BasicBlock/BlockFlags |
+| `Lib/importlib/_bootstrap_external.py` | .pyc 文件格式解析 | PycReader header 读取 |
+| `Include/pycache.h` | PEP 552 哈希/时间戳缓存 | .pyc header flags |
+
+### 2.4 Python/compile.c 核心流程（反编译重点）
+
+这是反编译最重要的源文件。理解 compile.c 的编译步骤 = 知道反编译器需要逆推的步骤：
+
+```c
+// compile.c 的核心入口
+static PyCodeObject *
+compiler_mod(struct compiler *c, mod_ty mod)
+{
+    // 1. 符号表分析 — 确定变量作用域
+    //    PySymtable_Build(mod, filename, c->c_future)
+    
+    // 2. 为当前作用域创建编译器单元
+    //    compiler_enter_scope(c, filename, ...)
+    
+    // 3. 根据 AST 节点类型分发
+    switch (mod->kind) {
+    case Module_kind:
+        compiler_body(c, mod->v.Module.body);
+        break;
+    case Interactive_kind:
+        ...
+    }
+    
+    // 4. 生成最终的 PyCodeObject
+    //    compiler_make_instruction(c, ...) 逐个指令
+    //    assemble(c, ...) 汇编 → 字节码数组
+    return compiler_make_return(c);
+}
+```
+
+**编译器的关键内部结构**：
+
+```c
+// basicblock — 基本块（Compiler 内部的 CFG）
+// 这不是运行时的块，而是编译过程中的结构
+typedef struct basicblock {
+    PyObject *b_instr;     // 指令数组
+    struct basicblock *b_next;  // 下一块（线性顺序）
+    struct basicblock *b_prevy; // 前驱（用于 JUMP_IF 等）
+    int b_iused;           // 已使用的指令数
+    int b_ialloc;          // 分配的容量
+    int b_offset;          // 字节码偏移
+    unsigned b_next_addr;  // 下一个指令的地址（跳转目标计算）
+    unsigned b_start_addr; // 块的起始地址
+    int b_label;           // 标签（跳转标记）
+    int b_code;            // 代码类型
+} basicblock;
+
+// compiler 结构 — 编译上下文
+struct compiler {
+    PyObject *c_filename;          // 当前文件名
+    PyObject *c_name;              // 当前代码对象名（"<module>"/函数名）
+    PyObject *c_u?;                // 符号表
+    struct compiler_unit *u;       // 当前编译单元
+    PyObject *c_stack;             // 编译栈
+    Py_ssize_t c_stack_size;       // 栈深度
+    int c_flags;                   // 编译器标志
+    int c_optimize;                // 优化级别（-O）
+    
+    // 指令发出
+    int c_nestlevel;               // 嵌套深度（用于 max_depth）
+};
+```
+
+### 2.5 编译步骤对反编译的启示
+
+| 编译步骤 | 影响 | 反解策略 |
+|---------|------|---------|
+| **符号表分析** 建立作用域链 | names=全局名, varnames=局部名, freevars/cellvars=闭包 | `CodeObject.Names` 全反写回 `Name(Id, Load/Store)`, `VarName` 需判断 Load/Store |
+| **常数折叠** `2+3`→`5` | 运行时看不到 2+3，只看到 `LOAD_CONST 5` | `Constant(5)` 直接输出，无法恢复 `2+3` |
+| **条件表达式折叠** `if x:` → `POP_JUMP_IF_*` | 分支条件消失，只剩跳转 | AstBuilder 通过 jump target 反推 if 条件 |
+| **循环展开** for/while → 跳转图 | 循环体变成有回边的 CFG | ControlFlowScanner 检测回边→识别循环头 |
+| **try 编译** SETUP_FINALLY(3.10-) / ExceptionTable(3.11+) | 异常处理偏移量编码 | BuildTryFromBlock 解析偏移 |
+| **优化级** `-O` 移除 assert/docstring | 反编译输出中 assert/docstring 可能缺失 | 无法恢复（信息丢失） |
+
+### 2.6 compile.c 指令发出机制
+
+反编译器最难的地方——编译器怎么发出指令，反编译器就要怎么逆推：
+
+```c
+// compile.c 发出一条指令
+static int
+compiler_addop(struct compiler *c, int opcode)
+{
+    // 向当前 basicblock 添加一条指令
+    return compiler_addop_i(c, opcode, 0);
+}
+
+static int
+compiler_addop_i(struct compiler *c, int opcode, Py_ssize_t arg)
+{
+    struct basicblock *b;
+    
+    // 获取当前基本块
+    b = compiler_current_block(c);
+    
+    // 向块内添加指令
+    // 如果块满则扩展
+    if (b->b_iused >= b->b_ialloc) {
+        // 扩展指令数组
+    }
+    
+    b->b_instr[b->b_iused].i_opcode = opcode;
+    b->b_instr[b->b_iused].i_oparg = arg;
+    b->b_iused++;
+    
+    // 某些指令会导致块分裂（如 JUMP_ABSOLUTE）
+    compiler_use_next_block(c);  // 可能分裂块
+}
+```
+
+**关键**: 编译器用 **basicblock** 作为指令容器，然后在 **assemble()** 中将这些块拼成连续的字节码数组。反编译器需要反转这个过程——从连续字节码恢复基本块。
+
+### 2.7 marshal.c 版本差异总结（反编译重点）
+
+通过研读 CPython 不同版本的 `Python/marshal.c`，得到的版本差异：
+
+| 特性 | Python 2.7 | Python 3.4-3.7 | Python 3.8-3.10 | Python 3.11+ |
+|------|-----------|---------------|----------------|-------------|
+| **header 大小** | 8B | 12B | 16B | 16B |
+| **code 字段数** | 4 (arg,nl,ss,flags) | 5 (arg,kw,nl,ss,flags) | 6 (+pos) | 5 (-nl,+pos) |
+| **ref 机制** | TYPE_INTERNED + TYPE_STRINGREF(0x52) | FLAG_REF(0x80) + TYPE_REF(0x52) | 同 3.4-3.7 | 同 3.4-3.7 |
+| **refstack** | 无 | 全局 ref list | 同 | 同 |
+| **interned strings** | `p->strings` 列表 | 同 | 同 | 同 |
+| **TYPE_CODE_SIMPLE** | 无 | 无 | 无 | 有(0x73) |
+| **locplus** | varnames+cellvars+freevars 分开 | 同 | 同 | varnames+cellvars+freevars→localsplusnames+kinds |
+
+### 2.8 compile.c 调试方法
+
+编译 .py → 用 `dis` 模块查看字节码：
+```python
+import dis, marshal
+
+# 编译源码
+with open('test.py') as f:
+    code = compile(f.read(), 'test.py', 'exec')
+
+# 查看字节码
+dis.dis(code)
+
+# 查看代码对象的内部结构
+print(f"co_names: {code.co_names}")
+print(f"co_varnames: {code.co_varnames}")
+print(f"co_consts: {code.co_consts}")
+print(f"co_filename: {code.co_filename}")
+print(f"co_name: {code.co_name}")
+```
+
+**查看 CPython 内部结构的变化**：
+```python
+# Python 2.7 vs 3.x 的差异
+# v2.7: co_freevars, co_cellvars 是单独字段
+# v3.11+: co_localsplusnames = varnames + cellvars + freevars
+
+# 查看指令分布
+from collections import Counter
+Counter(instr.opname for instr in dis.get_instructions(code))
+```
+
+---
+
+## 3. 四阶段流水线架构
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -126,7 +352,7 @@
 
 ---
 
-## 3. 解决方案结构
+## 4. 解决方案结构
 
 ```
 PyRebuilderSharp.slnx
@@ -191,9 +417,9 @@ PyRebuilderSharp.slnx
 
 ---
 
-## 4. 核心组件详解
+## 5. 核心组件详解
 
-### 4.1 BlockDecompiler — 逐块反编引擎
+### 5.1 BlockDecompiler — 逐块反编引擎
 
 ```csharp
 // 每个基本块独立反编译，捕获异常→注释兜底
@@ -206,7 +432,7 @@ else
     // result.CommentFallback → "# [Block #{id} Decompilation Failed]..."
 ```
 
-### 4.2 BlockResult — 成功/失败统一返回
+### 5.2 BlockResult — 成功/失败统一返回
 
 ```csharp
 public class BlockResult
@@ -222,7 +448,7 @@ public class BlockResult
 }
 ```
 
-### 4.3 StackMachine — 栈机模拟
+### 5.3 StackMachine — 栈机模拟
 
 | 指令类型 | 处理方式 |
 |---------|---------|
@@ -235,7 +461,7 @@ public class BlockResult
 | COMPARE_OP | 弹栈右→左→Compare |
 | CALL_FUNCTION | 弹栈 args→Call |
 
-### 4.4 AstBuilder — 控制结构识别
+### 5.4 AstBuilder — 控制结构识别
 
 | 控制结构 | 检测方法 | 构建输出 |
 |---------|---------|---------|
@@ -250,40 +476,41 @@ public class BlockResult
 
 ---
 
-## 5. 版本支持矩阵
+## 6. 版本支持矩阵
 
-| 版本 | Magic Number | Header | ref_index | 状态 |
-|------|-------------|--------|-----------|------|
-| 2.7 | 03 F3 0D 0A | 8B | 不读取 | ✅ Lv0-Lv3 |
-| 3.5 | 0D 17 0D 0A | 12B | 跳过 | ✅ Lv0-Lv3 |
-| 3.6 | 0D 33 0D 0A | 12B | 跳过 | ✅ Lv0-Lv3 |
-| 3.7 | 0D 42 0D 0A | 16B | 跳过 | ✅ Lv0-Lv3 |
-| 3.8 | 0D 55 0D 0A | 16B | 读取 | ✅ Lv0-Lv3 |
-| 3.9 | 0D 61 0D 0A | 16B | 读取 | ✅ Lv0-Lv3 |
-| 3.10 | 0D 6F 0D 0A | 16B | 读取 | ✅ Lv0-Lv3 |
-| 3.11+ | 0D A0+ | 16B+CACHE | 读取 | ⏳ 暂缓 |
+| 版本 | Magic Number | Header | 字段数 | 状态 |
+|------|-------------|--------|--------|------|
+| 2.7 | 03 F3 0D 0A | 8B | arg,nl,ss,flags(4) | ✅ Marsahl + Lv0-Lv3 |
+| 3.5 | 17 0D 0D 0A | 12B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 |
+| 3.6 | 33 0D 0D 0A | 12B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 |
+| 3.7 | 42 0D 0D 0A | 16B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 |
+| 3.8 | 55 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
+| 3.9 | 61 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
+| 3.10 | 6F 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
+| 3.11 | A7 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal读取 ⏳ 反编译 |
+| 3.12 | C0 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal读取 ⏳ 反编译 |
 
 ---
 
-## 6. 测试策略
+## 7. 测试策略
 
-### 6.1 版本矩阵测试（核心）
+### 7.1 版本矩阵测试（核心）
 
 ```
 42 tests = 6 层级 × 7 版本
   └─ Lv0_Expressions:  2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅
   └─ Lv1_Sequential:   2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅
   └─ Lv2_ControlFlow:  2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅
-  └─ Lv3_NestedDepth:  2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅  ← 新增
-  └─ Lv3_NestedMixed:  2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅  ← 新增
-  └─ Lv3_NestedMatrix: 2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅  ← 新增
+  └─ Lv3_NestedDepth:  2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅
+  └─ Lv3_NestedMixed:  2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅
+  └─ Lv3_NestedMatrix: 2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10 ✅
 ```
 
 比较方式（按优先级）：
 1. **AST 语义比较**（首选）— `python3 -c "import ast; print(ast.dump(ast.parse(...)))"`
 2. **Token 比较**（回退）— 当 .py 源文件不存在时
 
-### 6.2 编译矩阵
+### 7.2 编译矩阵
 
 `compile_pyc_matrix.py` 使用 pyenv 多版本 Python 编译测试文件：
 ```bash
@@ -295,34 +522,114 @@ done
 
 ---
 
-## 7. 已知限制与计划
+## 8. 当前状态与剩余工作
 
-### 7.1 当前版本的已知问题（P0）
+### 8.1 已完成的里程碑
 
-| 问题 | 影响 | 计划修复 |
+| 层级 | 内容 | 完成日期 |
 |------|------|---------|
-| except handler body 尾部 POP_EXCEPT 处理 | except 体尾部 | Phase 5 细化 |
-| AugAssign 转换（`i = i + 1` → `i += 1`） | 已实现基础模式 | Phase 5 细化 |
+| Lv0 | 表达式（常量/变量/二目/调用/属性/比较/切片） | 2026-06-13 |
+| Lv1 | 顺序代码块（赋值/return/表达式语句） | 2026-06-13 |
+| Lv2 | 控制流（if/while/for/try/break/continue/else） | 2026-06-13 |
+| Lv3 | 嵌套控制块（深度5 + 矩阵对偶 + 混合嵌套） | 2026-06-13 |
+| v2.7 marshal | TYPE_STRINGREF 修复、FLAG_REF 正确禁用 | 2026-06-13 |
+| v3.11+ Marshal | TYPE_CODE/TYPE_CODE_SIMPLE 字段读取、FLAG_REF、CACHE、ExceptionTable | 2026-06-13 |
+| GUI | Avalonia 界面、文件选择、版本检测、块统计、保存 | 2026-06-13 |
 
-### 7.2 下一阶段计划
+### 8.2 剩余的 5 阶段开发计划
+
+```
+当前阶段: Phase 3 (Lv0-Lv3) ✅ → Phase 4 (Lv4-Lv6) → Phase 5 (3.11+) → Phase 6 (GUI) → Phase 7 (完善)
+```
+
+---
+
+## 9. 剩余阶段规划
+
+### 9.1 Phase 4 — 函数/类/生成器（P0 · 当前阶段）
+
+| 层级 | 内容 | 优先级 | 预计文件数 |
+|------|------|--------|----------|
+| **Lv4a** | lambda 表达式完整修复（v2.7 + v3.x） | P0 | 2 测试 |
+| **Lv4b** | def 语句（参数/默认值/返回类型注解） | P0 | 3 测试 |
+| **Lv4c** | class 定义（继承/方法/属性注解） | P0 | 3 测试 |
+| **Lv4d** | 装饰器（@decorator 链） | P0 | 2 测试 |
+| **Lv4e** | Yield / YieldFrom / Generator 函数 | P0 | 2 测试 |
+| **Lv4f** | AugAssign 细化（`i = i + 1` → `i += 1`） | P0 | 1 测试 |
+| **Lv4g** | 模块顶层代码（import/from/global/nonlocal） | P1 | 2 测试 |
+| **Lv4h** | async def / await / async for / async with | P2 | 2 测试 |
+| **Lv4i** | match/case (Python 3.10+) | P2 | 2 测试 |
+
+**关键难点**：
+- lambda 的代码对象在 consts 中作为 TYPE_CODE，需识别为 lambda 表达式而非 def
+- def 需要从 co_consts[co_consts[0]] 获取函数名和默认值
+- class 的字节码通过 BUILD_CLASS + STORE_NAME 识别，body 在另一个 code object
+- yield 导致 code.flags & 0x20 = CO_GENERATOR，需在栈机中支持 YIELD_VALUE
+- async def 有 CO_COROUTINE(0x80) 和 CO_ASYNC_GENERATOR 标志
+
+### 9.2 Phase 5 — 异常处理增强与代码质量（P1）
+
+| 层级 | 内容 | 优先级 | 预计文件数 |
+|------|------|--------|----------|
+| **Lv5a** | except handler body 尾部 POP_EXCEPT 处理细化 | P1 | 2 测试 |
+| **Lv5b** | with 语句（SETUP_WITH/WITH_EXCEPT_START） | P1 | 3 测试 |
+| **Lv5c** | finally 块 | P1 | 2 测试 |
+| **Lv5d** | raise from（链式异常） | P1 | 1 测试 |
+| **Lv5e** | assert 语句 | P1 | 1 测试 |
+| **Lv5f** | AugAssign 全模式覆盖（`*=`/`/=`/`//=`/`%=`/`&=`/`|=`/`^=`/`<<=`/`>>=`/`**=`) | P1 | 1 测试 |
+| **Lv5g** | 死代码消除增强 | P1 | — |
+
+**难点**：
+- with 语句编译为 SETUP_WITH + 调用 __enter__/__exit__，反编译需要识别这一模式
+- finally 在 3.10- 由 SETUP_FINALLY 处理，3.11+ 在 ExceptionTable 中
+- raise X from Y 编译为 3 条指令：LOAD... RAISE_VARARGS(2)，需要判断 from 是否存在
+
+### 9.3 Phase 6 — v3.11+ 完整反编译流水线（P2）
 
 | 层级 | 内容 | 优先级 |
 |------|------|--------|
-| Lv3 | **嵌套控制块（深度5+矩阵对偶）** | **已完成** |
-| Lv4 | 函数/方法（def、lambda、class） | P0 |
-| Lv5 | 异常处理增强（with、finally、raise from） | P1 |
-| Lv6 | 生成器与协程（yield/async/match） | P2 |
-| GUI | 完善 UI（语法高亮、块级注释着色、批量反编译） | P1 |
-| 3.11+ | CACHE 条目、RESUME、BINARY_OP 统一 | P2 |
+| **Lv6a** | v3.11+ 新操作码适配（PUSH_EXC_INFO, PUSH_EXC_HANDLER, PULL_EXC_FROM_INFO, RERAISE, COPY, SWAP, LOAD_LOCALS, SAVE_LOCALS, ...） | P2 |
+| **Lv6b** | ExceptionTable 解析 + try 结构重建 | P2 |
+| **Lv6c** | 无 SETUP_FINALLY 的异常处理 | P2 |
+| **Lv6d** | linetable 解析（替代 lnotab） | P2 |
+| **Lv6e** | CACHE 条目 2.x 倍指令对齐 | P2 |
+| **Lv6f** | v3.11+ 版本矩阵测试 | P2 |
 
-### 7.3 GUI 功能规划
+**难点**：
+- v3.11+ 的 TRY 指令（PUSH_EXC_INFO/PUSH_EXC_HANDLER/RERAISE 等）完全替代了 SETUP_FINALLY
+- ExceptionTable 编码了 try/except/finally 的范围、handler 偏移和类型
+- RESUME 指令（90）与旧版 STORE_NAME(90) 同 opcode 号，需通过 `IsPython311Plus()` 区分
+- 指令数膨胀：CACHE 条目导致字节码阵列变长
 
-- [x]  Avalonia 跨平台窗口
-- [x]  .pyc 文件选择（FilePicker）
-- [x]  反编译流水线执行
-- [ ]  语法高亮（AvaloniaEdit）
-- [ ]  注释块高亮着色（红色背景）
-- [ ]  块级成功率统计
-- [ ]  批量反编译（文件夹模式）
-- [ ]  Python 版本选择
-- [ ]  源码保存
+### 9.4 Phase 7 — GUI 完善（P1）
+
+| 层级 | 内容 | 优先级 |
+|------|------|--------|
+| **Lv7a** | AvaloniaEdit 语法高亮（Python 关键字/字符串/注释） | P1 |
+| **Lv7b** | 注释兜底块着色（灰色背景） | P1 |
+| **Lv7c** | 批量反编译（文件夹模式） | P1 |
+| **Lv7d** | 统计面板（块数/成功率/版本） | P1 |
+| **Lv7e** | 设置页面（默认版本/缩进宽度） | P2 |
+| **Lv7f** | 差异对比视图（反编译 vs 原始） | P2 |
+
+### 9.5 Phase 8 — 持续完善（长期）
+
+| 层级 | 内容 | 优先级 |
+|------|------|--------|
+| **Lv8a** | AST 语义比较自动化（CI） | P1 |
+| **Lv8b** | 性能优化（大文件/多代码对象） | P2 |
+| **Lv8c** | Python 2.7 bytecode 全面支持（SLICE/PRINT/EXEC/RAISE） | P2 |
+| **Lv8d** | Python 3.13+ 新特性适配 | P3 |
+| **Lv8e** | 插件化反编译引擎（支持第三方扩展） | P3 |
+
+---
+
+## 10. 已知问题
+
+| 问题 | 影响 | 计划修复 |
+|------|------|---------|
+| v2.7 lambda 字节码解析 | lambda 表达式识别不准确 | Phase 4 |
+| except handler body 尾部 POP_EXCEPT 处理 | except 体尾部 | Phase 5 |
+| AugAssign 转换不全 | 部分运算符未覆盖 | Phase 5 |
+| v3.11+ 完整反编译流水线 | 3.11+ 全功能 | Phase 6 |
+| v3.11+ linetable/exceptiontable 反编译中未使用 | 3.11+ 调试信息缺失 | Phase 6 |

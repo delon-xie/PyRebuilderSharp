@@ -38,6 +38,8 @@ public class CodeObject
     public bool IsAsyncGenerator { get; set; }
 
     // ---- 版本信息 ----
+    /// <summary>Python 2.7（opcode 布局/MAKE_FUNCTION 值不同）</summary>
+    public bool IsPython27 { get; set; }
     /// <summary>Python 3.8+（opcode 121 是 JUMP_IF_NOT_EXC_MATCH 而非 SETUP_EXCEPT）</summary>
     public bool IsPython38Plus { get; set; }
 

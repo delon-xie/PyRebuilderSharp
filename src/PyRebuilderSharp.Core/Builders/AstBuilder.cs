@@ -1613,7 +1613,10 @@ public class AstBuilder
         body = body.Where(s => s is not Assign a
             || a.Targets.Count != 1
             || a.Targets[0] is not Name n
-            || (n.Id != "__module__" && n.Id != "__qualname__")).ToList();
+            || (n.Id != "__module__" && n.Id != "__qualname__" && n.Id != "__classcell__")).ToList();
+
+        // 过滤 class body 中的 return 语句（class body 无 return）
+        body = body.Where(s => s is not Return).ToList();
 
         return new ClassDef(className, bases, body);
     }
