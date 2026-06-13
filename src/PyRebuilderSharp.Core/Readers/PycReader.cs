@@ -203,8 +203,8 @@ public class PycReader
             var nameObj = ReadMarshalObject(br);
             code.Name = nameObj?.ToString() ?? "<module>";
 
-            // Python 3.11+: 读取 qualname（仅 TYPE_CODE，非 TYPE_CODE_SIMPLE）
-            if (IsPython311Plus() && !isSimple)
+            // qualname (3.11+ 的所有代码对象都有，包括 TYPE_CODE_SIMPLE)
+            if (IsPython311Plus())
             {
                 try { var _ = ReadMarshalObject(br); } catch { }
             }
@@ -225,8 +225,8 @@ public class PycReader
             if (lnotab != null)
                 code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions);
 
-            // Python 3.11+: 读取 co_exceptiontable（仅 TYPE_CODE，非 TYPE_CODE_SIMPLE）
-            if (IsPython311Plus() && !isSimple && br.BaseStream.Position < br.BaseStream.Length)
+            // co_exceptiontable（3.11+ 的所有代码对象都有，包括 TYPE_CODE_SIMPLE）
+            if (IsPython311Plus() && br.BaseStream.Position < br.BaseStream.Length)
             {
                 try
                 {
@@ -1195,15 +1195,85 @@ public class PycReader
 
     private List<string> ReadMarshalObjectAsStrList(BinaryReader br)
     {
-        var obj = ReadMarshalObject(br);
-        if (obj is System.Collections.IList list)
+        var result = new List<string>();
+        try
         {
-            var result = new List<string>(list.Count);
-            foreach (var item in list)
-                result.Add(item?.ToString() ?? "");
-            return result;
+            var rawType = br.ReadByte();
+            var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
+
+            if (type == MarshalType.TYPE_REF)
+            {
+                var idx = br.ReadInt32();
+                if (idx >= 0 && idx < _refList.Count && _refList[idx] is List<string> cached)
+                    return cached;
+                return result;
+            }
+
+            int count;
+            if (type == MarshalType.TYPE_SMALL_TUPLE)
+                count = br.ReadByte();
+            else if (type == MarshalType.TYPE_TUPLE)
+                count = br.ReadInt32();
+            else
+            {
+                // Single string (non-tuple) — read it directly without going through
+                // ReadMarshalValue which would confuse TYPE_STRING(0x73) with TYPE_CODE_SIMPLE
+                var str = ReadMarshalStringValue(br, rawType);
+                if (str != null) result.Add(str);
+                return result;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                var str = ReadMarshalStringValue(br, null);
+                if (str != null) result.Add(str);
+            }
         }
-        return new List<string>();
+        catch { }
+        return result;
+    }
+
+    /// <summary>
+    /// 读取一个 marshal 字符串值。
+    /// 不通过 ReadMarshalValue（避免 TYPE_STRING 0x73 与 TYPE_CODE_SIMPLE 混淆）。
+    /// 如果 preReadType 不为 null，表示类型字节已读。
+    /// </summary>
+    private string? ReadMarshalStringValue(BinaryReader br, byte? preReadType = null)
+    {
+        try
+        {
+            byte rawType;
+            if (preReadType.HasValue)
+                rawType = preReadType.Value;
+            else
+                rawType = br.ReadByte();
+
+            var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
+            return type switch
+            {
+                // TYPE_STRING (0x73) — MUST be handled as string, NOT as TYPE_CODE_SIMPLE
+                MarshalType.TYPE_STRING => ReadLongString(br),
+                MarshalType.TYPE_SHORT_ASCII => ReadShortString(br),
+                MarshalType.TYPE_SHORT_ASCII_INTERNED => ReadShortString(br),
+                MarshalType.TYPE_ASCII => ReadLongString(br),
+                MarshalType.TYPE_ASCII_INTERNED => ReadLongString(br),
+                MarshalType.TYPE_UNICODE => ReadLongString(br),
+                _ => null,
+            };
+        }
+        catch { return null; }
+    }
+
+    private string ReadShortString(BinaryReader br)
+    {
+        var len = br.ReadByte();
+        return Encoding.UTF8.GetString(br.ReadBytes(len));
+    }
+
+    private string ReadLongString(BinaryReader br)
+    {
+        var len = br.ReadInt32();
+        return Encoding.UTF8.GetString(br.ReadBytes(len));
     }
 
     private byte[] ReadMarshalBytes(BinaryReader br)
@@ -1265,32 +1335,43 @@ public class PycReader
         return br.ReadBytes(length);
     }
 
-    private List<object?> ReadMarshalList(BinaryReader br)
+    private List<object?> ReadMarshalList(BinaryReader br, bool typeByteRead = false)
     {
-        var rawType = br.ReadByte();
-        var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
-
-        // Handle TYPE_REF: return previously stored list from ref list
-        if (type == MarshalType.TYPE_REF)
-        {
-            var refIdx = br.ReadInt32();
-            if (refIdx >= 0 && refIdx < _refList.Count && _refList[refIdx] is List<object?> refList)
-                return refList;
-            return new List<object?>();
-        }
-
-        if (type != MarshalType.TYPE_LIST && type != MarshalType.TYPE_TUPLE && type != MarshalType.TYPE_SMALL_TUPLE)
-        {
-            throw new InvalidPycFormatException($"Expected list/tuple, got {rawType}");
-        }
-
         int count;
-        if (type == MarshalType.TYPE_SMALL_TUPLE)
-            count = br.ReadByte();
-        else
-            count = br.ReadInt32();
+        bool isTuple;
+        
+        if (!typeByteRead)
+        {
+            var rawType = br.ReadByte();
+            var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
 
-        bool isTuple = (type == MarshalType.TYPE_TUPLE || type == MarshalType.TYPE_SMALL_TUPLE);
+            // Handle TYPE_REF: return previously stored list from ref list
+            if (type == MarshalType.TYPE_REF)
+            {
+                var refIdx = br.ReadInt32();
+                if (refIdx >= 0 && refIdx < _refList.Count && _refList[refIdx] is List<object?> refList)
+                    return refList;
+                return new List<object?>();
+            }
+
+            if (type != MarshalType.TYPE_LIST && type != MarshalType.TYPE_TUPLE && type != MarshalType.TYPE_SMALL_TUPLE)
+            {
+                throw new InvalidPycFormatException($"Expected list/tuple, got {rawType}");
+            }
+
+            if (type == MarshalType.TYPE_SMALL_TUPLE)
+                count = br.ReadByte();
+            else
+                count = br.ReadInt32();
+
+            isTuple = (type == MarshalType.TYPE_TUPLE || type == MarshalType.TYPE_SMALL_TUPLE);
+        }
+        else
+        {
+            // type byte already consumed by ReadMarshalValue — read count directly
+            count = br.ReadInt32();
+            isTuple = true;
+        }
         var items = isTuple ? new PyTuple() : new List<object?>();
         for (int i = 0; i < count; i++)
         {
@@ -1321,6 +1402,38 @@ public class PycReader
                 dict[i] = list[i];
             }
         }
+        return dict;
+    }
+
+    /// <summary>
+    /// 读取 Python marshal TYPE_DICT (0x7B = '{')。
+    /// 格式：key-value 对 + TYPE_NONE 终止符。
+    /// 类型字节已被 ReadMarshalValue 消费，只需读 key-value 对。
+    /// </summary>
+    private Dictionary<object?, object?> ReadMarshalDictObject(BinaryReader br)
+    {
+        var dict = new Dictionary<object?, object?>();
+        try
+        {
+            while (br.BaseStream.Position < br.BaseStream.Length)
+            {
+                // PEEK next type byte
+                var peekByte = br.ReadByte();
+                br.BaseStream.Position--; // unread
+
+                if ((peekByte & ~MarshalType.TYPE_FLAG_REF) == MarshalType.TYPE_NONE)
+                {
+                    br.ReadByte(); // consume TYPE_NONE
+                    break;
+                }
+
+                var key = ReadMarshalObject(br);
+                var val = ReadMarshalObject(br);
+                if (key != null)
+                    dict[key] = val;
+            }
+        }
+        catch { }
         return dict;
     }
 
@@ -1383,6 +1496,9 @@ public class PycReader
             MarshalType.TYPE_ASCII_INTERNED => ReadMarshalLongString(br),
             MarshalType.TYPE_UNICODE => ReadMarshalLongString(br),
             MarshalType.TYPE_SMALL_TUPLE => ReadSmallTuple(br),
+            MarshalType.TYPE_TUPLE => ReadMarshalList(br, typeByteRead: true),
+            MarshalType.TYPE_LIST => ReadMarshalList(br),
+            MarshalType.TYPE_DICT => ReadMarshalDictObject(br),
             MarshalType.TYPE_CODE => ReadMarshalCodeObject(br, isSimple: false),
             MarshalType.TYPE_TRUE => true,
             MarshalType.TYPE_FALSE => false,
@@ -1447,6 +1563,7 @@ public class PycReader
                 or MarshalType.TYPE_STRING or MarshalType.TYPE_UNICODE
                 or 116 // TYPE_INTERNED (v2.7)
                 => ReadLongStringBytes(br),
+            MarshalType.TYPE_BYTES => ReadLongStringBytes(br),
             _ => null,
         };
         return result;
