@@ -565,7 +565,7 @@ public class StackMachine
                 SafePop(); // fromlist
                 SafePop(); // level
                 var modName = GetName(instr);
-                _exprStack.Push(new Name(modName, ExpressionContext.Load));
+                _exprStack.Push(new Name(modName, ExpressionContext.Load) { IsImport = true });
                 return null;
             }
 
@@ -575,6 +575,13 @@ public class StackMachine
                 var mod = SafePeek();
                 if (mod == null) return null;
                 _exprStack.Push(new AstAttribute(mod, impName, ExpressionContext.Load) { IsImportFrom = true });
+                return null;
+            }
+
+            // Python 2.7: from X import *
+            case Opcode.IMPORT_STAR_27:
+            {
+                // IMPORT_STAR 本身没有栈效果 — 只是标记"所有名字都导入"
                 return null;
             }
 

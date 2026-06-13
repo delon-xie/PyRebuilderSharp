@@ -1562,11 +1562,20 @@ public class AstBuilder
                     continue;
                 }
 
-                // ---- Case 3: Assign(Name, Name) with same name → import ----
-                if (assign.Value is Name valName && valName.Id == targetName.Id)
+                // ---- Case 3: Assign(Name, Name) → import / import ... as ----
+                if (assign.Value is Name valName && valName.IsImport)
                 {
-                    result.Add(new Import(new List<Alias> { new Alias(targetName.Id, null) }));
-                    continue;
+                    if (valName.Id == targetName.Id)
+                    {
+                        result.Add(new Import(new List<Alias> { new Alias(targetName.Id, null) }));
+                        continue;
+                    }
+                    else
+                    {
+                        // import X as Y: Assign(Name(Y, Store), Name(X, Load))
+                        result.Add(new Import(new List<Alias> { new Alias(valName.Id, targetName.Id) }));
+                        continue;
+                    }
                 }
 
                 // ---- Case 4: Assign(Name, Call(func, funcRef)) with 1 arg → FunctionDef with decorator ----
@@ -1585,11 +1594,14 @@ public class AstBuilder
                     continue;
                 }
 
-                // ---- Case 5: Assign(Name, Attribute(module, name)) with import marker → from ... import ----
-                if (assign.Value is Models.AST.Attribute attr && attr.Value is Name modName 
+                // ---- Case 5: Assign(Name, Attribute(module, name)) with import marker → from ... import [as] ----
+                if (assign.Value is Models.AST.Attribute attr && attr.Value is Name modName
                     && attr.Ctx == ExpressionContext.Load && attr.IsImportFrom)
                 {
-                    result.Add(new ImportFrom(modName.Id, new List<Alias> { new Alias(targetName.Id, null) }, 0));
+                    // from X import Y [as Z]
+                    // attr.Attr = original name (Y), targetName.Id = alias (Z) if different
+                    var alias = targetName.Id == attr.Attr ? null : targetName.Id;
+                    result.Add(new ImportFrom(modName.Id, new List<Alias> { new Alias(attr.Attr, alias) }, 0));
                     continue;
                 }
 
@@ -1600,6 +1612,21 @@ public class AstBuilder
                 result.Add(stmt);
             }
         }
+
+        // 过滤 import 后遗留的模块名表达式
+        // from X import Y → IMPORT_NAME + IMPORT_FROM + STORE_NAME + POP_TOP
+        // POP_TOP 产生 ExprStmt(Name("X")) / ExprStmt(Attribute(Name("module"), ...))
+        var importedModules = new HashSet<string>();
+        foreach (var stmt in result)
+        {
+            if (stmt is Import imp)
+                foreach (var a in imp.Names)
+                    importedModules.Add(a.Name);
+            if (stmt is ImportFrom impf)
+                importedModules.Add(impf.Module);
+        }
+        result = result.Where(s => s is not ExprStmt { Value: Name n } || !importedModules.Contains(n.Id)).ToList();
+
         return result;
     }
 

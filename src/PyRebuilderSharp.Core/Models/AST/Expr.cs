@@ -8,7 +8,11 @@ public record Constant(object? Value) : Expr;
 public record Ellipsis() : Expr;
 
 // --- 名称 ---
-public record Name(string Id, ExpressionContext Ctx = ExpressionContext.Load) : Expr;
+public record Name(string Id, ExpressionContext Ctx = ExpressionContext.Load) : Expr
+{
+    /// <summary>标记是否为 IMPORT_NAME 产生（用于 import/from 检测）</summary>
+    public bool IsImport { get; init; }
+}
 
 public enum ExpressionContext { Load, Store, Del, AugLoad, AugStore, Param }
 
