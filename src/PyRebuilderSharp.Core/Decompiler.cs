@@ -2,6 +2,7 @@ using PyRebuilderSharp.Core.Builders;
 using PyRebuilderSharp.Core.Generators;
 using PyRebuilderSharp.Core.Readers;
 using PyRebuilderSharp.Core.Scanners;
+using PyRebuilderSharp.Core.Services;
 
 namespace PyRebuilderSharp.Core;
 
@@ -60,10 +61,17 @@ public class Decompiler
         }
         catch (Exception ex)
         {
+            // 记录崩溃到 ~/.pyrebuilder/crashes/
+            var crashPath = CrashCollector.RecordCrash(
+                new CrashContext { FileName = "anonymous", PythonVersion = "?" },
+                ex, pycData.Length);
+
             var innerMsg = ex.InnerException != null
                 ? $" | Inner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}"
                 : "";
-            sourceCode = $"# Decompilation failed: {ex.GetType().Name}: {ex.Message}{innerMsg}\n# Stack: {ex.StackTrace?.Replace("\n", "\n#  ")}";
+            sourceCode = $"# Decompilation failed: {ex.GetType().Name}: {ex.Message}{innerMsg}\n" +
+                         $"# Crash report: {crashPath ?? "(write failed)"}\n" +
+                         $"# Stack: {ex.StackTrace?.Replace("\n", "\n#  ")}";
         }
 
         var elapsed = DateTime.UtcNow - startTime;

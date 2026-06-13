@@ -1335,7 +1335,7 @@ public class PycReader
         return br.ReadBytes(length);
     }
 
-    private List<object?> ReadMarshalList(BinaryReader br, bool typeByteRead = false)
+    private List<object?> ReadMarshalList(BinaryReader br, bool typeByteRead = false, bool forceList = false)
     {
         int count;
         bool isTuple;
@@ -1370,7 +1370,7 @@ public class PycReader
         {
             // type byte already consumed by ReadMarshalValue — read count directly
             count = br.ReadInt32();
-            isTuple = true;
+            isTuple = !forceList;  // default tuple, forceList → false
         }
         var items = isTuple ? new PyTuple() : new List<object?>();
         for (int i = 0; i < count; i++)
@@ -1497,7 +1497,7 @@ public class PycReader
             MarshalType.TYPE_UNICODE => ReadMarshalLongString(br),
             MarshalType.TYPE_SMALL_TUPLE => ReadSmallTuple(br),
             MarshalType.TYPE_TUPLE => ReadMarshalList(br, typeByteRead: true),
-            MarshalType.TYPE_LIST => ReadMarshalList(br),
+            MarshalType.TYPE_LIST => ReadMarshalList(br, typeByteRead: true, forceList: true),
             MarshalType.TYPE_DICT => ReadMarshalDictObject(br),
             MarshalType.TYPE_CODE => ReadMarshalCodeObject(br, isSimple: false),
             MarshalType.TYPE_TRUE => true,
@@ -1554,6 +1554,14 @@ public class PycReader
     {
         var rawType = br.ReadByte();
         var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
+
+        // Handle FLAG_REF: the 4 bytes after a FLAG_REF type byte are a ref index
+        if ((rawType & MarshalType.TYPE_FLAG_REF) != 0)
+        {
+            // Some type bytes with FLAG_REF have a ref index between type and length
+            // Skip the ref index: it's an int32
+            br.ReadInt32();
+        }
 
         byte[]? result = type switch
         {

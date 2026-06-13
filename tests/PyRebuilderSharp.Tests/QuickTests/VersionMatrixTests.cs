@@ -139,10 +139,6 @@ public class VersionMatrixTests
     {
         var runner = new PycdcSuiteRunner();
         return runner.GetAvailableTests("test_nested_depth_5", onlyModernPython: false)
-            .Where(t => {
-                var v = t.PythonVersion;
-                return v == "2.7" || v == "3.5" || v == "3.6" || v == "3.7" || v == "3.8" || v == "3.9" || v == "3.10";
-            })
             .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
     }
 
@@ -165,10 +161,6 @@ public class VersionMatrixTests
     {
         var runner = new PycdcSuiteRunner();
         return runner.GetAvailableTests("test_nested_mixed_5", onlyModernPython: false)
-            .Where(t => {
-                var v = t.PythonVersion;
-                return v == "2.7" || v == "3.5" || v == "3.6" || v == "3.7" || v == "3.8" || v == "3.9" || v == "3.10";
-            })
             .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
     }
 
@@ -191,10 +183,6 @@ public class VersionMatrixTests
     {
         var runner = new PycdcSuiteRunner();
         return runner.GetAvailableTests("test_nested_matrix", onlyModernPython: false)
-            .Where(t => {
-                var v = t.PythonVersion;
-                return v == "2.7" || v == "3.5" || v == "3.6" || v == "3.7" || v == "3.8" || v == "3.9" || v == "3.10";
-            })
             .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
     }
 }

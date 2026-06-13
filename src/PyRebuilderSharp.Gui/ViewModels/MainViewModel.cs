@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using PyRebuilderSharp.Core;
+using PyRebuilderSharp.Core.Generators;
+using PyRebuilderSharp.Core.Readers;
 using ReactiveUI;
 
 namespace PyRebuilderSharp.Gui.ViewModels;
