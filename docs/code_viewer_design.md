@@ -1,15 +1,34 @@
 # 代码查看器设计文档
 
+**版本**: v2.0
+**日期**: 2026-06-14
+**状态**: Phase 1 ✅ · Phase 2 ⏸️ · Phase 3 📋
+
 ## 概述
 
 PyRebuilderSharp 的代码查看器采用**分阶段迭代**策略，逐步实现从基础显示到高级联动的完整功能。
 
 ---
 
-## Phase 1 — 基础显示（当前）
+## Phase 1 — 基础显示（已完成 ✅）
 
 ### 目标
-左侧文件树 + 右侧 split 双栏（dis | py），代码正常显示，无需锁定滚动。
+左侧文件树 + 右侧 split 双栏（dis | py），VS Code Dark+ 语法高亮。
+
+### 实现
+
+| 功能 | 方案 |
+|:-----|:------|
+| 代码显示 | `SelectableTextBlock` + `Inlines` |
+| 语法高亮 | `PythonSyntaxHighlight`（纯 Inline，0 第三方） |
+| 反汇编 | `DisassemblyGenerator`（自研，不依赖 python3 -m dis） |
+| 文件树 | `TreeView` + `FileTreeNode` 模型 |
+| 拖放 | 支持 .pyc 文件和文件夹递归遍历 |
+| 主题 | VS Code Dark+ 配色（`#1e1e1e` / `#252526` / `#323233`） |
+
+---
+
+## Phase 2 — 锁定滚动同步（📋 后续）
 
 ### 布局
 
