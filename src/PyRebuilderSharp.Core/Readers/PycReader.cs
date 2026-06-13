@@ -450,8 +450,9 @@ public class PycReader
     }
 
     /// <summary>
-    /// Python 2.7 TYPE_SET (0x3c = '&lt;') 或 TYPE_FROZENSET (0x3e = '&gt;')。
+    /// Python TYPE_SET (0x3c = '&lt;') 或 TYPE_FROZENSET (0x3e = '&gt;')。
     /// 格式：count(int32) + count 个 marshal 值。返回 List。
+    /// v2.7 和 v3.x 通用。
     /// </summary>
     private List<object?> ReadMarshalSetOrFrozenset27(BinaryReader br, byte type)
     {
@@ -459,6 +460,18 @@ public class PycReader
         var items = new List<object?>();
         for (int i = 0; i < count; i++)
             items.Add(ReadMarshalValue27(br));
+        return items;
+    }
+
+    /// <summary>
+    /// v3.x 的 TYPE_SET / TYPE_FROZENSET 读取。
+    /// </summary>
+    private List<object?> ReadMarshalSetOrFrozenset(BinaryReader br)
+    {
+        var count = br.ReadInt32();
+        var items = new List<object?>();
+        for (int i = 0; i < count; i++)
+            items.Add(ReadMarshalObject(br));
         return items;
     }
 
@@ -1096,6 +1109,7 @@ public class PycReader
             MarshalType.TYPE_FLOAT => br.ReadDouble(),
             MarshalType.TYPE_BINARY_FLOAT => br.ReadDouble(),
             MarshalType.TYPE_COMPLEX => (br.ReadDouble(), br.ReadDouble()),
+            MarshalType.TYPE_BINARY_COMPLEX => new double[] { br.ReadDouble(), br.ReadDouble() },
             // 115 = TYPE_CODE_SIMPLE (3.11+) 或 TYPE_STRING (旧版)
             MarshalType.TYPE_STRING when IsPython311Plus() && !IsPython27()
                 => ReadMarshalCodeObject(br, isSimple: true),
@@ -1111,8 +1125,8 @@ public class PycReader
             MarshalType.TYPE_FALSE => false,
             MarshalType.TYPE_ELLIPSIS => new object(),
             MarshalType.TYPE_REF => ReadRef(br),
-            MarshalType.TYPE_SET => new List<object?>(), // Skip set content for now
-            MarshalType.TYPE_FROZENSET => new List<object?>(),
+            MarshalType.TYPE_SET => ReadMarshalSetOrFrozenset(br),
+            MarshalType.TYPE_FROZENSET => ReadMarshalSetOrFrozenset(br),
             _ => HandleUnknownMarshalType(br, type),
         };
     }

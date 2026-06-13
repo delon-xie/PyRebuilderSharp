@@ -89,6 +89,9 @@ public class PythonCodeGenerator : ICodeGenerator
             case Raise r:
                 VisitRaise(r);
                 break;
+            case With w:
+                VisitWith(w);
+                break;
             case Assert a:
                 VisitAssert(a);
                 break;
@@ -417,6 +420,31 @@ public class PythonCodeGenerator : ICodeGenerator
     {
         WriteIndent();
         _output.AppendLine("pass");
+    }
+
+    private void VisitWith(With withStmt)
+    {
+        WriteIndent();
+        _output.Append("with ");
+        for (int i = 0; i < withStmt.Items.Count; i++)
+        {
+            if (i > 0) _output.Append(", ");
+            var item = withStmt.Items[i];
+            Visit(item.ContextExpr);
+            if (item.OptionalVars != null)
+            {
+                _output.Append(" as ");
+                Visit(item.OptionalVars);
+            }
+        }
+        _output.AppendLine(":");
+
+        _indentLevel++;
+        foreach (var stmt in withStmt.Body)
+            Visit(stmt);
+        if (withStmt.Body.Count == 0)
+            EmitEmptyBodyPass();
+        _indentLevel--;
     }
 
     private void VisitReturn(Return ret)

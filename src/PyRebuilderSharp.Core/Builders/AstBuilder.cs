@@ -185,6 +185,30 @@ public class AstBuilder
             return stmts;
         }
 
+        // 检测 with 语句 (SETUP_WITH 模式)
+        var withStmts = BuildWithFromBlock(block, visited);
+        if (withStmts != null)
+        {
+            stmts.AddRange(withStmts);
+            // 标记 SETUP_WITH 的 handler 块为 visited
+            var setupIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
+            if (setupIdx >= 0 && block.Instructions[setupIdx].Argument.HasValue)
+            {
+                var handlerAbs = block.Instructions[setupIdx].Offset + 2
+                    + block.Instructions[setupIdx].Argument.Value;
+                var handlerBlocks = new List<BasicBlock>();
+                FindBlocksFromOffset(handlerAbs, handlerBlocks);
+                foreach (var hb in handlerBlocks)
+                    visited.Add(hb);
+            }
+            foreach (var succ in block.Successors)
+            {
+                if (!visited.Contains(succ))
+                    stmts.AddRange(BuildStatements(succ, visited));
+            }
+            return stmts;
+        }
+
         // 检测 try/except (SETUP_FINALLY 模式)
         var tryBodyStmts = BuildTryFromBlock(block, visited);
         if (tryBodyStmts != null)
@@ -471,8 +495,12 @@ public class AstBuilder
                 tryStmts.AddRange(bodyResult);
         }
         // 检查 POP_BLOCK 块之后是否有 JUMP_FORWARD → else body
-        var popBlockBlock = tryBodyBlocks.LastOrDefault(b =>
-            b.Instructions.Any(i => i.Opcode == Opcode.POP_BLOCK));
+        // 优先从 tryBodyBlocks 中找，如果为空则从当前 block 中找
+        var popBlockBlock = tryBodyBlocks.Count > 0
+            ? tryBodyBlocks.LastOrDefault(b =>
+                b.Instructions.Any(i => i.Opcode == Opcode.POP_BLOCK))
+            : block;
+        // 当前块也可能包含 POP_BLOCK + JUMP_FORWARD（try body 在单块内）
         if (popBlockBlock != null)
         {
             var jfInstr = popBlockBlock.Instructions.FirstOrDefault(
@@ -484,9 +512,11 @@ public class AstBuilder
                 if (_blockByOffset.TryGetValue(target, out var targetBlock))
                 {
                     var lastInTarget = targetBlock.Instructions.LastOrDefault();
-                    if (lastInTarget == default || !JumpHelper.IsConditionalJump(lastInTarget.Opcode)
-                        || !lastInTarget.Argument.HasValue
-                        || lastInTarget.Argument.Value >= targetBlock.StartOffset)
+                    bool isBackEdge = lastInTarget != default
+                        && JumpHelper.IsConditionalJump(lastInTarget.Opcode)
+                        && lastInTarget.Argument.HasValue
+                        && lastInTarget.Argument.Value >= targetBlock.StartOffset;
+                    if (!isBackEdge)
                         elseJumpTarget = target;
                 }
             }
@@ -743,6 +773,134 @@ public class AstBuilder
                 return ins.Offset + 2 + ins.Argument.Value * 2;
         }
         return null;
+    }
+
+    private List<Stmt>? BuildWithFromBlock(BasicBlock block, HashSet<BasicBlock> visited)
+    {
+        var instrs = block.Instructions;
+        var setupIdx = instrs.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
+        if (setupIdx < 0) return null;
+
+        // 1. 提取 SETUP_WITH 之前的上下文表达式
+        var preMachine = new StackMachine(_codeObject);
+        var preStmts = new List<Stmt>();
+        for (int i = 0; i < setupIdx; i++)
+        {
+            var stmt = preMachine.Execute(instrs[i]);
+            if (stmt != null) preStmts.Add(stmt);
+        }
+
+        // 在 SETUP_WITH 之前的最终表达式就是上下文管理器
+        Expr? contextExpr = null;
+        while (preMachine.HasResults)
+            contextExpr = preMachine.PopResult();
+        if (contextExpr == null && preMachine.ExprStackCount > 0)
+            contextExpr = preMachine.PopExpr();
+
+        // 2. 提取可选的 as 变量
+        // SETUP_WITH 后是 BEFORE_WITH，然后 STORE_FAST/NAME 或 POP_TOP
+        Expr? optionalVar = null;
+        for (int i = setupIdx + 1; i < instrs.Count; i++)
+        {
+            var op = instrs[i].Opcode;
+            if (op == Opcode.BEFORE_WITH || op == Opcode.SETUP_WITH || op == Opcode.WITH_EXCEPT_START)
+                continue;
+            if (op == Opcode.POP_TOP)
+                break; // 没有 as 变量
+            if ((op == Opcode.STORE_FAST || op == Opcode.STORE_NAME) && instrs[i].Argument.HasValue)
+            {
+                var idx = instrs[i].Argument.Value;
+                string varName;
+                if (op == Opcode.STORE_FAST)
+                    varName = idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}";
+                else
+                    varName = idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}";
+                optionalVar = new Name(varName, ExpressionContext.Store);
+                break;
+            }
+            break;
+        }
+
+        // 3. 提取 body — 当前块内剩余指令 + 后继块
+        var handlerRel = instrs[setupIdx].Argument ?? 0;
+        var handlerAbs = instrs[setupIdx].Offset + 2 + handlerRel * 2;
+
+        // 跳过变量赋值指令找到 body 起始位置
+        int bodyStart = setupIdx + 1;
+        for (; bodyStart < instrs.Count; bodyStart++)
+        {
+            var op = instrs[bodyStart].Opcode;
+            if (op == Opcode.BEFORE_WITH || op == Opcode.WITH_EXCEPT_START)
+                continue;
+            if (op == Opcode.POP_TOP || op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
+                continue;
+            break;
+        }
+
+        // 处理当前块内的 body 指令（到 POP_BLOCK 之前）
+        var bodyStmts = new List<Stmt>();
+        var bodyMachine = new StackMachine(_codeObject);
+        for (int i = bodyStart; i < instrs.Count; i++)
+        {
+            if (instrs[i].Opcode == Opcode.POP_BLOCK)
+                break;
+            if (instrs[i].Opcode == Opcode.RETURN_VALUE && i < instrs.Count - 1)
+                continue; // 跳过 handler 部分的 RETURN_VALUE
+            var stmt = bodyMachine.Execute(instrs[i]);
+            if (stmt != null) bodyStmts.Add(stmt);
+        }
+        while (bodyMachine.HasResults)
+            bodyStmts.Add(new ExprStmt(bodyMachine.PopResult()));
+
+        // 收集后继块作为 body（如 with 体内含循环/分支时）
+        var bodyBlocks = new List<BasicBlock>();
+        var bodyCollector = new HashSet<BasicBlock> { block };
+        var blockQueue = new Queue<BasicBlock>();
+        foreach (var succ in block.Successors.OrderBy(s => s.StartOffset))
+        {
+            if (succ == null || succ.StartOffset >= handlerAbs || bodyCollector.Contains(succ))
+                continue;
+            if (succ.StartOffset < instrs[setupIdx].Offset + 2) continue;
+            blockQueue.Enqueue(succ);
+        }
+        while (blockQueue.Count > 0)
+        {
+            var current = blockQueue.Dequeue();
+            if (current == null || bodyCollector.Contains(current)) continue;
+            if (current.StartOffset >= handlerAbs) continue;
+            bodyCollector.Add(current);
+            bodyBlocks.Add(current);
+            foreach (var succ in current.Successors)
+            {
+                if (succ != null && !bodyCollector.Contains(succ) && succ.StartOffset < handlerAbs)
+                    blockQueue.Enqueue(succ);
+            }
+        }
+
+        // 从 visited 移除以支持递归
+        foreach (var bb in bodyBlocks)
+            visited.Remove(bb);
+
+        // 合并后继块的 body 语句
+        foreach (var bodyBlock in bodyBlocks)
+            bodyStmts.AddRange(GetStructuredBlockStmts(bodyBlock, visited));
+
+        // 构建 With AST
+        var items = new List<WithItem>
+        {
+            new(contextExpr ?? new Name("_", ExpressionContext.Load), optionalVar)
+        };
+        var result = new List<Stmt>();
+        // 前缀语句
+        foreach (var ps in preStmts)
+        {
+            // 过滤掉来自 LOAD_GLOBAL/CALL_FUNCTION 等已经作为上下文表达式的语句
+            if (ps is ExprStmt e && e.Value == contextExpr)
+                continue;
+            result.Add(ps);
+        }
+        result.Add(new With(items, bodyStmts));
+        return result;
     }
 
     private List<Stmt> BuildWhileLoop(BasicBlock header, HashSet<BasicBlock> visited)
