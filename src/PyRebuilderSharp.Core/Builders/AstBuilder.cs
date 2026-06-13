@@ -1855,166 +1855,154 @@ public class AstBuilder
 
     // ===================================================================
     // 后处理：Assign + FunctionRef → FunctionDef
-    // ===================================================================
-
     /// <summary>
-    /// 扫描语句列表，将 Assign(Name, FunctionRef) 转换为真正的 FunctionDef，
-    /// 将 `__build_class__` 模式转换为 ClassDef。
+    /// 后处理函数/类定义（从 Assign + FunctionRef → FunctionDef）。
+    /// 使用显式栈代替递归，防止 StackOverflow。
+    /// 注意：不再重复递归 FunctionDef/ClassDef 的 body，
+    /// 因为 BuildFunctionDef/ExtractClassDef 已完整处理。
     /// </summary>
     private List<Stmt> PostProcessFunctionDefs(List<Stmt> stmts)
     {
         var result = new List<Stmt>(stmts.Count);
-        foreach (var stmt in stmts)
+        var workQueue = new Queue<(List<Stmt> stmts, List<Stmt> result)>();
+        workQueue.Enqueue((stmts, result));
+
+        while (workQueue.Count > 0)
         {
-            // 递归处理嵌套在控制结构中的语句（函数定义可能被 if/while/for/try 嵌套）
-            if (stmt is If ifNode)
-            {
-                var body = PostProcessFunctionDefs(ifNode.Body);
-                var orelse = ifNode.Orelse != null ? PostProcessFunctionDefs(ifNode.Orelse) : null;
-                result.Add(new If(ifNode.Test, body, orelse));
-                continue;
-            }
-            if (stmt is While whileNode)
-            {
-                var body = PostProcessFunctionDefs(whileNode.Body);
-                var orelse = whileNode.Orelse != null ? PostProcessFunctionDefs(whileNode.Orelse) : null;
-                result.Add(new While(whileNode.Test, body, orelse));
-                continue;
-            }
-            if (stmt is For forNode)
-            {
-                var body = PostProcessFunctionDefs(forNode.Body);
-                var orelse = forNode.Orelse != null ? PostProcessFunctionDefs(forNode.Orelse) : null;
-                result.Add(new For(forNode.Target, forNode.Iter, body, orelse));
-                continue;
-            }
-            if (stmt is Try tryNode)
-            {
-                var body = PostProcessFunctionDefs(tryNode.Body);
-                var handlers = tryNode.Handlers.Select(h =>
-                    new ExceptHandler(h.Type, h.Name, PostProcessFunctionDefs(h.Body))).ToList();
-                var orelse = tryNode.Orelse != null ? PostProcessFunctionDefs(tryNode.Orelse) : null;
-                var finalbody = tryNode.Finalbody != null ? PostProcessFunctionDefs(tryNode.Finalbody) : null;
-                result.Add(new Try(body, handlers, orelse, finalbody));
-                continue;
-            }
-            if (stmt is FunctionDef fd)
-            {
-                // 递归处理函数体
-                result.Add(new FunctionDef(fd.Name, fd.Args,
-                    PostProcessFunctionDefs(fd.Body),
-                    fd.Decorators, fd.Returns,
-                    fd.IsGenerator, fd.IsAsync));
-                continue;
-            }
-            if (stmt is ClassDef cd)
-            {
-                result.Add(new ClassDef(cd.Name, cd.Bases,
-                    PostProcessFunctionDefs(cd.Body), cd.Decorators));
-                continue;
-            }
+            var (currentStmts, currentResult) = workQueue.Dequeue();
 
-            // ---- Original transformation logic for top-level stmts ----
-            if (stmt is Assign assign && assign.Targets.Count == 1
-                && assign.Targets[0] is Name targetName)
+            foreach (var stmt in currentStmts)
             {
-                // ---- Case 0: Lambda — Assign + FunctionRef with "<lambda>" name ----
-                if (assign.Value is FunctionRef funcRef1
-                    && (funcRef1.Name == "<lambda>" || funcRef1.Code?.Name == "<lambda>"))
+                if (stmt is If ifNode)
                 {
-                    var lambda = BuildLambda(funcRef1);
-                    if (lambda != null)
-                        result.Add(new Assign(new List<Expr> { new Name(targetName.Id, ExpressionContext.Store) }, lambda));
-                    else
-                        result.Add(stmt);
+                    var newBody = new List<Stmt>();
+                    var newOrelse = ifNode.Orelse != null ? new List<Stmt>() : null;
+                    workQueue.Enqueue((ifNode.Body, newBody));
+                    if (newOrelse != null) workQueue.Enqueue((ifNode.Orelse!, newOrelse));
+                    currentResult.Add(new If(ifNode.Test, newBody, newOrelse));
                     continue;
                 }
-
-                // ---- Case 1: Assign + FunctionRef → FunctionDef ----
-                if (assign.Value is FunctionRef funcRef)
+                if (stmt is While whileNode)
                 {
-                    var fnName = funcRef.Name;
-                    if ((string.IsNullOrEmpty(fnName) || fnName == "<lambda>")
-                        && funcRef.Code != null && !string.IsNullOrEmpty(funcRef.Code.Name)
-                        && funcRef.Code.Name != "<module>" && !funcRef.Code.Name.Contains("module"))
-                        fnName = funcRef.Code.Name;
-                    if (string.IsNullOrEmpty(fnName) || fnName == "<lambda>" || fnName.Contains("code object"))
-                        fnName = targetName.Id;
-
-                    var funcDef = BuildFunctionDef(fnName, funcRef);
-                    if (funcDef != null)
-                        result.Add(funcDef);
-                    else
-                        result.Add(stmt);
+                    var newBody = new List<Stmt>();
+                    var newOrelse = whileNode.Orelse != null ? new List<Stmt>() : null;
+                    workQueue.Enqueue((whileNode.Body, newBody));
+                    if (newOrelse != null) workQueue.Enqueue((whileNode.Orelse!, newOrelse));
+                    currentResult.Add(new While(whileNode.Test, newBody, newOrelse));
                     continue;
                 }
-
-                // ---- Case 2: Assign + Call(__build_class__, ...) → ClassDef ----
-                if (assign.Value is Call call && call.Func is Name callFuncName && callFuncName.Id == "__build_class__")
+                if (stmt is For forNode)
                 {
-                    // 类名来自 STORE_NAME 的目标名（pycdc 格式中 __build_class__ 参数不是类名）
-                    var classDef = ExtractClassDef(call, targetName.Id);
-                    if (classDef != null)
-                        result.Add(classDef);
-                    else
-                        result.Add(stmt);
+                    var newBody = new List<Stmt>();
+                    var newOrelse = forNode.Orelse != null ? new List<Stmt>() : null;
+                    workQueue.Enqueue((forNode.Body, newBody));
+                    if (newOrelse != null) workQueue.Enqueue((forNode.Orelse!, newOrelse));
+                    currentResult.Add(new For(forNode.Target, forNode.Iter, newBody, newOrelse));
                     continue;
                 }
-
-                // ---- Case 3: Assign(Name, Name) → import / import ... as ----
-                if (assign.Value is Name valName && valName.IsImport)
+                if (stmt is Try tryNode)
                 {
-                    if (valName.Id == targetName.Id)
+                    var newBody = new List<Stmt>();
+                    workQueue.Enqueue((tryNode.Body, newBody));
+                    var handlers = tryNode.Handlers.Select(h =>
                     {
-                        result.Add(new Import(new List<Alias> { new Alias(targetName.Id, null) }));
+                        var hBody = new List<Stmt>();
+                        workQueue.Enqueue((h.Body, hBody));
+                        return new ExceptHandler(h.Type, h.Name, hBody);
+                    }).ToList();
+                    var newOrelse = tryNode.Orelse != null ? new List<Stmt>() : null;
+                    if (newOrelse != null) workQueue.Enqueue((tryNode.Orelse!, newOrelse));
+                    var newFinalbody = tryNode.Finalbody != null ? new List<Stmt>() : null;
+                    if (newFinalbody != null) workQueue.Enqueue((tryNode.Finalbody!, newFinalbody));
+                    currentResult.Add(new Try(newBody, handlers, newOrelse, newFinalbody));
+                    continue;
+                }
+                // FunctionDef/ClassDef body already processed by BuildFunctionDef/ExtractClassDef
+                if (stmt is FunctionDef fd)
+                {
+                    currentResult.Add(fd);
+                    continue;
+                }
+                if (stmt is ClassDef cd)
+                {
+                    currentResult.Add(cd);
+                    continue;
+                }
+                if (stmt is Assign assign && assign.Targets.Count == 1
+                    && assign.Targets[0] is Name targetName)
+                {
+                    // Lambda
+                    if (assign.Value is FunctionRef funcRef1
+                        && (funcRef1.Name == "<lambda>" || funcRef1.Code?.Name == "<lambda>"))
+                    {
+                        var lambda = BuildLambda(funcRef1);
+                        if (lambda != null)
+                            currentResult.Add(new Assign(new List<Expr> { new Name(targetName.Id, ExpressionContext.Store) }, lambda));
+                        else
+                            currentResult.Add(stmt);
                         continue;
                     }
-                    else
+                    // FunctionDef
+                    if (assign.Value is FunctionRef funcRef)
                     {
-                        // import X as Y: Assign(Name(Y, Store), Name(X, Load))
-                        result.Add(new Import(new List<Alias> { new Alias(valName.Id, targetName.Id) }));
+                        var fnName = funcRef.Name;
+                        if ((string.IsNullOrEmpty(fnName) || fnName == "<lambda>")
+                            && funcRef.Code != null && !string.IsNullOrEmpty(funcRef.Code.Name)
+                            && funcRef.Code.Name != "<module>" && !funcRef.Code.Name.Contains("module"))
+                            fnName = funcRef.Code.Name;
+                        if (string.IsNullOrEmpty(fnName) || fnName == "<lambda>" || fnName.Contains("code object"))
+                            fnName = targetName.Id;
+                        var funcDef = BuildFunctionDef(fnName, funcRef);
+                        currentResult.Add(funcDef ?? stmt);
                         continue;
                     }
+                    // ClassDef
+                    if (assign.Value is Call call && call.Func is Name callFuncName && callFuncName.Id == "__build_class__")
+                    {
+                        var classDef = ExtractClassDef(call, targetName.Id);
+                        currentResult.Add(classDef ?? stmt);
+                        continue;
+                    }
+                    // import
+                    if (assign.Value is Name valName && valName.IsImport)
+                    {
+                        currentResult.Add(valName.Id == targetName.Id
+                            ? new Import(new List<Alias> { new Alias(targetName.Id, null) })
+                            : new Import(new List<Alias> { new Alias(valName.Id, targetName.Id) }));
+                        continue;
+                    }
+                    // decorator
+                    if (assign.Value is Call decoratorCall && decoratorCall.Args.Count == 1
+                        && decoratorCall.Args[0] is FunctionRef)
+                    {
+                        BuildFunctionDefWithDecorators(targetName, decoratorCall, currentResult);
+                        continue;
+                    }
+                    if (assign.Value is Call outerCall && outerCall.Args.Count == 1
+                        && outerCall.Args[0] is Call innerCall && innerCall.Args.Count == 1
+                        && innerCall.Args[0] is FunctionRef)
+                    {
+                        BuildFunctionDefWithDecorators(targetName, outerCall, currentResult);
+                        continue;
+                    }
+                    // from ... import
+                    if (assign.Value is Models.AST.Attribute attr && attr.Value is Name modName
+                        && attr.Ctx == ExpressionContext.Load && attr.IsImportFrom)
+                    {
+                        var alias = targetName.Id == attr.Attr ? null : targetName.Id;
+                        currentResult.Add(new ImportFrom(modName.Id, new List<Alias> { new Alias(attr.Attr, alias) }, 0));
+                        continue;
+                    }
+                    currentResult.Add(stmt);
                 }
-
-                // ---- Case 4: Assign(Name, Call(func, funcRef)) with 1 arg → FunctionDef with decorator ----
-                if (assign.Value is Call decoratorCall && decoratorCall.Args.Count == 1
-                    && decoratorCall.Args[0] is FunctionRef)
+                else
                 {
-                    BuildFunctionDefWithDecorators(targetName, decoratorCall, result);
-                    continue;
+                    currentResult.Add(stmt);
                 }
-                // ---- Case 4a: Nested decorator: Call(func, Call(func, funcRef)) ----
-                if (assign.Value is Call outerCall && outerCall.Args.Count == 1
-                    && outerCall.Args[0] is Call innerCall && innerCall.Args.Count == 1
-                    && innerCall.Args[0] is FunctionRef)
-                {
-                    BuildFunctionDefWithDecorators(targetName, outerCall, result);
-                    continue;
-                }
-
-                // ---- Case 5: Assign(Name, Attribute(module, name)) with import marker → from ... import [as] ----
-                if (assign.Value is Models.AST.Attribute attr && attr.Value is Name modName
-                    && attr.Ctx == ExpressionContext.Load && attr.IsImportFrom)
-                {
-                    // from X import Y [as Z]
-                    // attr.Attr = original name (Y), targetName.Id = alias (Z) if different
-                    var alias = targetName.Id == attr.Attr ? null : targetName.Id;
-                    result.Add(new ImportFrom(modName.Id, new List<Alias> { new Alias(attr.Attr, alias) }, 0));
-                    continue;
-                }
-
-                result.Add(stmt);
-            }
-            else
-            {
-                result.Add(stmt);
             }
         }
 
         // 过滤 import 后遗留的模块名表达式
-        // from X import Y → IMPORT_NAME + IMPORT_FROM + STORE_NAME + POP_TOP
-        // POP_TOP 产生 ExprStmt(Name("X")) / ExprStmt(Attribute(Name("module"), ...))
         var importedModules = new HashSet<string>();
         foreach (var stmt in result)
         {

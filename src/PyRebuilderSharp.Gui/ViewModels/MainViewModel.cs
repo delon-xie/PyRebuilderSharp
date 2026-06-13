@@ -60,6 +60,10 @@ public class MainViewModel : ViewModelBase
 {
     // 反编译代码变更通知（供View绑定到AvaloniaEdit）
     public event Action<string>? OnCodeChanged;
+    /// <summary>
+    /// 字节码（dis）变更通知。
+    /// </summary>
+    public event Action<string>? OnDisasmChanged;
     private static readonly byte[][] KnownMagics = {
         [0x03, 0xF3, 0x0D, 0x0A],  // 2.7
         [0x17, 0x0D, 0x0D, 0x0A],  // 3.5
@@ -96,18 +100,26 @@ public class MainViewModel : ViewModelBase
         => DetectPythonVersion(filePath);
 
     // -- 文件管理 --
-    public ObservableCollection<FileItem> Files { get; } = new();
+    public ObservableCollection<FileTreeNode> FileTree { get; } = new();
 
-    private FileItem? _selectedFile;
-    public FileItem? SelectedFile
+    private FileTreeNode? _selectedNode;
+    public FileTreeNode? SelectedNode
     {
-        get => _selectedFile;
+        get => _selectedNode;
         set
         {
-            SetProperty(ref _selectedFile, value);
-            if (value != null)
+            System.Console.Error.WriteLine($"[DEBUG] SelectedNode: {value?.Name} path={value?.FullPath}");
+            SetProperty(ref _selectedNode, value);
+            if (value?.FullPath != null && File.Exists(value.FullPath))
                 _ = DecompileFile(value.FullPath);
         }
+    }
+
+    private bool _hasFile;
+    public bool HasFile
+    {
+        get => _hasFile;
+        set => SetProperty(ref _hasFile, value);
     }
 
     // -- 当前文件信息 --
@@ -177,6 +189,7 @@ public class MainViewModel : ViewModelBase
     // -- 命令 --
     public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveResultCommand { get; }
+    public ReactiveCommand<Unit, Unit> DecompileCommand { get; }
 
     // -- 顶层窗口引用（由View设置） --
     public Window? TopLevel { get; set; }
@@ -185,6 +198,7 @@ public class MainViewModel : ViewModelBase
     {
         OpenFileCommand = ReactiveCommand.CreateFromTask(OpenFileAsync);
         SaveResultCommand = ReactiveCommand.CreateFromTask(SaveResultAsync);
+        DecompileCommand = ReactiveCommand.CreateFromTask(DecompileCurrentAsync);
         PythonVersion = "🔍 选择 .pyc 文件开始反编译";
     }
 
@@ -254,41 +268,138 @@ public class MainViewModel : ViewModelBase
 
     private async Task OpenFileAsync()
     {
-        if (TopLevel == null) return;
-
-        var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        if (TopLevel == null)
         {
-            Title = "选择 .pyc 文件",
+            System.Console.Error.WriteLine("[DEBUG] OpenFileAsync: TopLevel is null");
+            StatusText = "❌ TopLevel 未初始化，请重启应用";
+            return;
+        }
+        if (TopLevel.StorageProvider == null)
+        {
+            System.Console.Error.WriteLine("[DEBUG] OpenFileAsync: StorageProvider is null");
+            StatusText = "❌ StorageProvider 不可用";
+            return;
+        }
+
+        // 使用文件选择器，允许选文件夹或 .pyc
+        try
+        {
+            var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "选择 .pyc 文件或文件夹",
             AllowMultiple = true,
             FileTypeFilter = new[]
             {
-                new FilePickerFileType("Python字节码文件")
+                new FilePickerFileType("Python字节码文件 (*.pyc)")
                 {
                     Patterns = new[] { "*.pyc" }
-                }
+                },
+                FilePickerFileTypes.All
             }
         });
 
         foreach (var file in files)
         {
             var localPath = file.Path.LocalPath;
-            var pyVersion = DetectPythonVersion(localPath);
-            Files.Add(new FileItem
-            {
-                Name = Path.GetFileName(file.Name),
-                FullPath = localPath,
-                PythonVersion = $"🐍 {pyVersion}"
-            });
+            System.Console.Error.WriteLine($"[DEBUG] OpenFileAsync: {localPath}");
+            if (localPath.EndsWith(".pyc"))
+                AddFileToTree(localPath);
         }
 
         if (files.Count > 0)
-            SelectedFile = Files.Last();
+        {
+            var lastRoot = FileTree.LastOrDefault();
+            var target = lastRoot?.Children.LastOrDefault() ?? lastRoot;
+            if (target != null) SelectedNode = target;
+        }
+        }
+        catch (Exception ex)
+        {
+            System.Console.Error.WriteLine($"[DEBUG] OpenFileAsync error: {ex.Message}");
+            StatusText = $"❌ 打开失败: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// 添加单个 .pyc 到树根节点。
+    /// </summary>
+    public void AddFileToTree(string filePath)
+    {
+        if (!filePath.EndsWith(".pyc") || !File.Exists(filePath)) return;
+        var fileName = Path.GetFileName(filePath);
+        System.Console.Error.WriteLine($"[DEBUG] AddFileToTree: {fileName}");
+
+        // 去重
+        if (FileTree.Any(n => n.FullPath == filePath)) return;
+
+        FileTree.Add(new FileTreeNode
+        {
+            Name = fileName,
+            FullPath = filePath
+        });
+        HasFile = true;
+        System.Console.Error.WriteLine($"[DEBUG]   added, tree now {FileTree.Count} items");
+    }
+
+    /// <summary>
+    /// 遍历文件夹，将全部 .pyc 按目录层次加入树。
+    /// </summary>
+    public void AddFolderToTree(string folderPath)
+    {
+        if (!Directory.Exists(folderPath)) return;
+        System.Console.Error.WriteLine($"[DEBUG] AddFolderToTree: {folderPath}");
+
+        var pycFiles = Directory.GetFiles(folderPath, "*.pyc", SearchOption.AllDirectories);
+        System.Console.Error.WriteLine($"[DEBUG]   found {pycFiles.Length} .pyc files");
+
+        foreach (var pycPath in pycFiles)
+        {
+            var relativeDir = Path.GetRelativePath(folderPath, Path.GetDirectoryName(pycPath) ?? "");
+            var parts = relativeDir.Split(Path.DirectorySeparatorChar);
+
+            // 在树中查找/创建路径
+            var currentLevel = FileTree;
+            FileTreeNode? parentDir = null;
+            string builtPath = folderPath;
+
+            foreach (var part in parts)
+            {
+                if (string.IsNullOrEmpty(part) || part == ".") continue;
+                builtPath = Path.Combine(builtPath, part);
+
+                var existing = currentLevel.FirstOrDefault(n => n.IsDirectory && n.Name == part);
+                if (existing == null)
+                {
+                    existing = new FileTreeNode { Name = part };
+                    currentLevel.Add(existing);
+                    // 排序：目录在前
+                    var idx = currentLevel.IndexOf(existing);
+                    while (idx > 0 && currentLevel[idx - 1].IsDirectory)
+                        idx--;
+                    if (idx != currentLevel.IndexOf(existing))
+                        currentLevel.Move(currentLevel.IndexOf(existing), idx);
+                }
+                currentLevel = existing.Children;
+                parentDir = existing;
+            }
+
+            // 添加文件节点
+            var fileName = Path.GetFileName(pycPath);
+            if (currentLevel.Any(n => n.FullPath == pycPath)) continue;
+            currentLevel.Add(new FileTreeNode
+            {
+                Name = fileName,
+                FullPath = pycPath
+            });
+        }
+
+        // 如果没有按目录归组的文件，直接加到根
+        if (pycFiles.Length > 0) HasFile = true;
     }
 
     private async Task DecompileFile(string filePath)
     {
         if (!File.Exists(filePath)) return;
-
         IsDecompiling = true;
         StatusText = "⏳ 反编译中...";
         PythonVersion = "⏳ 读取中...";
@@ -304,7 +415,25 @@ public class MainViewModel : ViewModelBase
             var result = await Task.Run(() => decompiler.DecompileWithStats(pycData));
 
             DecompiledCode = result.SourceCode;
-            FormattedCode = PyRebuilderSharp.Gui.Services.PythonSyntaxHighlighter.FormatWithLineNumbers(result.SourceCode);
+            SourceCodeText = result.SourceCode;
+            OnCodeChanged?.Invoke(result.SourceCode);  // 通知 TextEditor
+            System.Console.Error.WriteLine($"[DEBUG] SourceCode length={result.SourceCode.Length}");
+
+            // 生成字节码（dis）
+            try
+            {
+                var reader = new PyRebuilderSharp.Core.Readers.PycReader();
+                var codeObj = await Task.Run(() => reader.Read(pycData));
+                var disasm = PyRebuilderSharp.Core.Generators.DisassemblyGenerator.Generate(codeObj);
+                DisasmText = disasm;
+                OnDisasmChanged?.Invoke(disasm);  // 通知 TextEditor
+                System.Console.Error.WriteLine($"[DEBUG] Disasm length={disasm.Length}");
+            }
+            catch (Exception disEx)
+            {
+                System.Console.Error.WriteLine($"[DEBUG] Disassembly failed: {disEx.Message}");
+                DisasmText = $"# Disassembly error: {disEx.Message}";
+            }
 
             var successRate = result.TotalBlocks > 0
                 ? (double)(result.TotalBlocks - result.FailedBlocks) / result.TotalBlocks * 100
@@ -346,6 +475,39 @@ public class MainViewModel : ViewModelBase
         return count;
     }
 
+    /// <summary>
+    /// 显式触发反编译当前选中的文件（由"▶ 反编译"按钮调用）。
+    /// </summary>
+    private async Task DecompileCurrentAsync()
+    {
+        System.Console.Error.WriteLine($"[DEBUG] DecompileCurrentAsync called");
+        if (SelectedNode?.FullPath != null && File.Exists(SelectedNode.FullPath))
+        {
+            System.Console.Error.WriteLine($"[DEBUG]   decompiling: {SelectedNode.FullPath}");
+            await DecompileFile(SelectedNode.FullPath);
+        }
+        else
+        {
+            System.Console.Error.WriteLine($"[DEBUG]   no file selected");
+            StatusText = "❌ 请先选择文件";
+        }
+    }
+
+    // -- 代码显示（供 View 直接绑定） --
+    private string _sourceCodeText = "";
+    public string SourceCodeText
+    {
+        get => _sourceCodeText;
+        set => SetProperty(ref _sourceCodeText, value);
+    }
+
+    private string _disasmText = "";
+    public string DisasmText
+    {
+        get => _disasmText;
+        set => SetProperty(ref _disasmText, value);
+    }
+
     private async Task SaveResultAsync()
     {
         if (TopLevel == null || string.IsNullOrEmpty(DecompiledCode)) return;
@@ -354,8 +516,8 @@ public class MainViewModel : ViewModelBase
         {
             Title = "保存反编译结果",
             DefaultExtension = ".py",
-            SuggestedFileName = SelectedFile != null
-                ? Path.GetFileNameWithoutExtension(SelectedFile.Name) + "_decompiled.py"
+            SuggestedFileName = SelectedNode != null
+                ? Path.GetFileNameWithoutExtension(SelectedNode.Name) + "_decompiled.py"
                 : "output.py"
         });
 

@@ -3,100 +3,100 @@
         xmlns:vm="clr-namespace:PyRebuilderSharp.Gui.ViewModels"
         x:Class="PyRebuilderSharp.Gui.Views.MainWindow"
         Title="PyRebuilderSharp - Python字节码反编译器"
-        Width="1280"
-        Height="860"
+        Width="1400" Height="900"
         WindowStartupLocation="CenterScreen">
 
   <Grid RowDefinitions="Auto, *, Auto">
-    <!-- 工具栏 -->
-    <Border Background="#1e1e1e" BorderBrush="#333" BorderThickness="0,0,0,1">
-      <StackPanel Orientation="Horizontal" Spacing="6" Margin="10,8">
-        <Button Command="{Binding OpenFileCommand}" Padding="10,5" Background="#2d2d2d"
-                BorderBrush="#444" Foreground="#ddd">
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="📂" />
-            <TextBlock Text="打开 .pyc" />
-          </StackPanel>
+    <Border Background="#323233" BorderThickness="0,0,0,1">
+      <StackPanel Orientation="Horizontal" Spacing="6" Margin="10,6">
+        <Button Command="{Binding OpenFileCommand}" Padding="8,4" Background="#0e639c"
+                BorderThickness="0" Foreground="#fff" CornerRadius="2" Cursor="Hand">
+          <StackPanel Orientation="Horizontal" Spacing="4"><TextBlock Text="📂" /><TextBlock Text="打开" /></StackPanel>
         </Button>
-        <Button Command="{Binding SaveResultCommand}" Padding="10,5" Background="#2d2d2d"
-                BorderBrush="#444" Foreground="#ddd">
-          <StackPanel Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="💾" />
-            <TextBlock Text="保存" />
-          </StackPanel>
+        <Button Command="{Binding SaveResultCommand}" Padding="8,4" Background="#2d2d2d"
+                BorderBrush="#3c3c3c" Foreground="#ccc" BorderThickness="1" CornerRadius="2" Cursor="Hand">
+          <StackPanel Orientation="Horizontal" Spacing="4"><TextBlock Text="💾" /><TextBlock Text="保存" /></StackPanel>
         </Button>
-        <Separator Width="1" Background="#444" Margin="8,2" />
-        <TextBlock Text="{Binding PythonVersion}" VerticalAlignment="Center"
-                   FontSize="12" Foreground="#888" />
-        <TextBlock Text="{Binding StatsText}" VerticalAlignment="Center"
-                   FontSize="12" Foreground="#888" Margin="8,0,0,0" />
+        <Button Command="{Binding DecompileCommand}" Padding="8,4" Background="#2d2d2d"
+                BorderBrush="#3c3c3c" Foreground="#ccc" BorderThickness="1"
+                CornerRadius="2" IsVisible="{Binding HasFile}" Cursor="Hand">
+          <StackPanel Orientation="Horizontal" Spacing="4"><TextBlock Text="▶" /><TextBlock Text="反编译" /></StackPanel>
+        </Button>
+        <Separator Width="1" Background="#3c3c3c" Margin="6,2" />
+        <TextBlock Text="{Binding PythonVersion}" VerticalAlignment="Center" FontSize="12" Foreground="#999" />
+        <TextBlock Text="{Binding StatsText}" VerticalAlignment="Center" FontSize="12" Foreground="#999" Margin="8,0,0,0" />
       </StackPanel>
     </Border>
 
-    <!-- 主区域 -->
     <Grid Grid.Row="1" ColumnDefinitions="280, 4, *">
-      <!-- 文件列表 -->
-      <Border BorderBrush="#333" BorderThickness="0,0,1,0" Margin="0">
+      <!-- 文件树 -->
+      <Border Background="#252526" BorderThickness="0">
         <DockPanel>
-          <TextBlock DockPanel.Dock="Top" Text=".pyc 文件列表" FontWeight="Bold"
-                     Margin="10,8" Foreground="#999" FontSize="13" />
-          <ListBox ItemsSource="{Binding Files}"
-                   SelectedItem="{Binding SelectedFile}"
-                   BorderThickness="0" Background="Transparent">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <Border Margin="4,2" Padding="8,6" CornerRadius="4"
-                        BorderBrush="Transparent" BorderThickness="1">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="📄" FontSize="16" />
-                    <StackPanel>
-                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#ccc" />
-                      <StackPanel Orientation="Horizontal" Spacing="12">
-                        <TextBlock Text="{Binding Size}" FontSize="11" Foreground="#777" />
-                        <TextBlock Text="{Binding PythonVersion}" FontSize="11" Foreground="#777" />
-                      </StackPanel>
+          <TextBlock DockPanel.Dock="Top" Text="📂 字节码文件" FontWeight="SemiBold" Margin="12,10" Foreground="#bbb" FontSize="12" />
+          <ScrollViewer Background="Transparent">
+            <TreeView ItemsSource="{Binding FileTree}" SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+                      BorderThickness="0" Background="Transparent">
+              <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding Children}">
+                  <Border Margin="2,1" Padding="6,4" CornerRadius="2">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock Text="{Binding Icon}" FontSize="13" />
+                      <TextBlock Text="{Binding Name}" Foreground="#ccc" FontSize="12" />
                     </StackPanel>
-                  </StackPanel>
-                </Border>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </DockPanel>
-      </Border>
-
-      <!-- 分割线 -->
-      <GridSplitter Grid.Column="1" Width="4" Background="#2a2a2a" />
-
-      <!-- 反编译结果 -->
-      <Border Grid.Column="2" BorderThickness="0">
-        <DockPanel>
-          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12"
-                      Margin="10,6">
-            <TextBlock Text="{Binding CurrentFileName}" Foreground="#aaa" FontWeight="SemiBold" FontSize="12" />
-            <TextBlock Text="{Binding BlockSummary}" Foreground="#888" FontSize="12" />
-          </StackPanel>
-          <ScrollViewer Background="#1a1a1a" Margin="0">
-            <TextBlock Text="{Binding FormattedCode}"
-                       FontFamily="Consolas, 'Courier New', 'JetBrains Mono', monospace"
-                       FontSize="13"
-                       LineHeight="20"
-                       Margin="12,8"
-                       Foreground="#d4d4d4"
-                       TextWrapping="NoWrap" />
+                  </Border>
+                </TreeDataTemplate>
+              </TreeView.ItemTemplate>
+            </TreeView>
           </ScrollViewer>
         </DockPanel>
       </Border>
+
+      <GridSplitter Grid.Column="1" Width="4" Background="#252526" />
+
+      <!-- 右侧双栏 -->
+      <Grid Grid.Column="2" ColumnDefinitions="*, 4, *" Background="#1e1e1e">
+        <!-- 左：字节码 -->
+        <Border BorderThickness="0">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Background="#2d2d2d" BorderBrush="#3c3c3c" BorderThickness="0,0,0,1" Padding="10,5">
+              <TextBlock Text="🔍 字节码 (dis)" Foreground="#bbb" FontSize="11" />
+            </Border>
+            <ScrollViewer Background="#1e1e1e" HorizontalScrollBarVisibility="Auto">
+              <SelectableTextBlock x:Name="DisasmBlock"
+                FontFamily="Consolas,Menlo,Monaco,'Courier New',monospace"
+                FontSize="12" Foreground="#d4d4d4" LineHeight="18"
+                TextWrapping="NoWrap" Margin="8,4" />
+            </ScrollViewer>
+          </DockPanel>
+        </Border>
+
+        <GridSplitter Grid.Column="1" Width="4" Background="#2d2d2d" />
+
+        <!-- 右：Python 源码 -->
+        <Border Grid.Column="2" BorderThickness="0">
+          <DockPanel>
+            <Border DockPanel.Dock="Top" Background="#2d2d2d" BorderBrush="#3c3c3c" BorderThickness="0,0,0,1" Padding="10,5">
+              <TextBlock Text="{Binding CurrentFileName}" Foreground="#bbb" FontSize="11" />
+            </Border>
+            <ScrollViewer Background="#1e1e1e" HorizontalScrollBarVisibility="Auto">
+              <SelectableTextBlock x:Name="SourceBlock"
+                FontFamily="Consolas,Menlo,Monaco,'Courier New',monospace"
+                FontSize="13" Foreground="#d4d4d4" LineHeight="20"
+                TextWrapping="NoWrap" Margin="8,4" />
+            </ScrollViewer>
+          </DockPanel>
+        </Border>
+      </Grid>
     </Grid>
 
     <!-- 状态栏 -->
-    <Border Grid.Row="2" Background="#1a1a1a" BorderBrush="#2a2a2a" BorderThickness="0,1,0,0">
+    <Border Grid.Row="2" Background="#007acc" BorderThickness="0">
       <Grid ColumnDefinitions="*, Auto">
-        <StackPanel Orientation="Horizontal" Spacing="8" Margin="10,4">
-          <TextBlock Text="{Binding StatusText}" Foreground="#666" FontSize="12" />
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="10,3">
+          <TextBlock Text="{Binding StatusText}" Foreground="#fff" FontSize="12" />
         </StackPanel>
-        <ProgressBar Grid.Column="1" IsVisible="{Binding IsDecompiling}"
-                     IsIndeterminate="True" Width="100" Height="14" Margin="8,2"
-                     Foreground="#4caf50" Background="#333" />
+        <ProgressBar Grid.Column="1" IsVisible="{Binding IsDecompiling}" IsIndeterminate="True"
+                     Width="80" Height="12" Margin="8,2" Foreground="#4ec9b0" Background="#005a9e" />
       </Grid>
     </Border>
   </Grid>

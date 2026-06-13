@@ -17,10 +17,11 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainViewModel(),
-            };
+            // 关键：先构造 Window 再设 DataContext，确保 DataContextChanged 被触发
+            var vm = new MainViewModel();
+            var window = new MainWindow();
+            window.DataContext = vm;
+            desktop.MainWindow = window;
         }
 
         base.OnFrameworkInitializationCompleted();
