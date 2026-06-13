@@ -1382,11 +1382,20 @@ public class AstBuilder
                 if ((instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME)
                     && instr.Argument.HasValue)
                 {
+                    var idx = instr.Argument.Value;
                     string varName;
                     if (instr.Opcode == Opcode.STORE_FAST)
-                        varName = _codeObject.Varnames[instr.Argument.Value];
+                    {
+                        if (idx < 0 || idx >= _codeObject.Varnames.Count)
+                            continue;
+                        varName = _codeObject.Varnames[idx];
+                    }
                     else
-                        varName = _codeObject.Names[instr.Argument.Value];
+                    {
+                        if (idx < 0 || idx >= _codeObject.Names.Count)
+                            continue;
+                        varName = _codeObject.Names[idx];
+                    }
                     return new Name(varName, ExpressionContext.Store);
                 }
             }

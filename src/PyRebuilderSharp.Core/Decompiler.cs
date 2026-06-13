@@ -63,7 +63,7 @@ public class Decompiler
             var innerMsg = ex.InnerException != null
                 ? $" | Inner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}"
                 : "";
-            sourceCode = $"# Decompilation failed: {ex.GetType().Name}: {ex.Message}{innerMsg}";
+            sourceCode = $"# Decompilation failed: {ex.GetType().Name}: {ex.Message}{innerMsg}\n# Stack: {ex.StackTrace?.Replace("\n", "\n#  ")}";
         }
 
         var elapsed = DateTime.UtcNow - startTime;

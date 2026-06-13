@@ -18,4 +18,8 @@
     <ProjectReference Include="..\PyRebuilderSharp.Core\PyRebuilderSharp.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Syntax\Python.xshd" />
+  </ItemGroup>
+
 </Project>

@@ -70,20 +70,18 @@
       <!-- 反编译结果 -->
       <Border Grid.Column="2" BorderThickness="0">
         <DockPanel>
-          <!-- 文件标签 -->
           <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12"
                       Margin="10,6">
             <TextBlock Text="{Binding CurrentFileName}" Foreground="#aaa" FontWeight="SemiBold" FontSize="12" />
             <TextBlock Text="{Binding BlockSummary}" Foreground="#888" FontSize="12" />
           </StackPanel>
-
-          <!-- 源码区域 -->
           <ScrollViewer Background="#1a1a1a" Margin="0">
             <TextBlock Text="{Binding FormattedCode}"
                        FontFamily="Consolas, 'Courier New', 'JetBrains Mono', monospace"
                        FontSize="13"
                        LineHeight="20"
                        Margin="12,8"
+                       Foreground="#d4d4d4"
                        TextWrapping="NoWrap" />
           </ScrollViewer>
         </DockPanel>

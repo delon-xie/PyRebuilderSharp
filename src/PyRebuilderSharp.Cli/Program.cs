@@ -48,13 +48,13 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.GetType().Name}: {ex.Message}");
+            Console.Error.WriteLine($"Stack: {ex.StackTrace}");
             if (ex.InnerException != null)
             {
                 Console.Error.WriteLine($"Inner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
                 Console.Error.WriteLine($"Inner Stack: {ex.InnerException.StackTrace}");
             }
-            Console.Error.WriteLine($"Stack: {ex.StackTrace}");
         }
     }
 }

@@ -586,6 +586,10 @@ public class PythonCodeGenerator : ICodeGenerator
                 case double d:
                     _output.Append(d.ToString("G"));
                     break;
+                case double[] dc when dc.Length == 2:
+                    // Python complex number: real+imagj
+                    _output.Append($"({dc[0]} + {dc[1]}j)");
+                    break;
                 case string s:
                     _output.Append(EscapeString(s));
                     break;

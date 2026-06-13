@@ -58,6 +58,8 @@ public class FileItem
 /// </summary>
 public class MainViewModel : ViewModelBase
 {
+    // 反编译代码变更通知（供View绑定到AvaloniaEdit）
+    public event Action<string>? OnCodeChanged;
     private static readonly byte[][] KnownMagics = {
         [0x03, 0xF3, 0x0D, 0x0A],  // 2.7
         [0x17, 0x0D, 0x0D, 0x0A],  // 3.5
@@ -88,6 +90,10 @@ public class MainViewModel : ViewModelBase
         }
         catch { return "?"; }
     }
+
+    // Public wrapper for drag-drop support in View
+    public static string DetectPythonVersionPublic(string filePath)
+        => DetectPythonVersion(filePath);
 
     // -- 文件管理 --
     public ObservableCollection<FileItem> Files { get; } = new();
@@ -139,7 +145,12 @@ public class MainViewModel : ViewModelBase
     public string DecompiledCode
     {
         get => _decompiledCode;
-        set => SetProperty(ref _decompiledCode, value);
+        set
+        {
+            SetProperty(ref _decompiledCode, value);
+            // 通知 AvaloniaEdit 更新内容（语法高亮由 View 加载）
+            OnCodeChanged?.Invoke(value);
+        }
     }
 
     private string _formattedCode = "";
@@ -293,7 +304,7 @@ public class MainViewModel : ViewModelBase
             var result = await Task.Run(() => decompiler.DecompileWithStats(pycData));
 
             DecompiledCode = result.SourceCode;
-            FormattedCode = FormatCode(result.SourceCode);
+            FormattedCode = PyRebuilderSharp.Gui.Services.PythonSyntaxHighlighter.FormatWithLineNumbers(result.SourceCode);
 
             var successRate = result.TotalBlocks > 0
                 ? (double)(result.TotalBlocks - result.FailedBlocks) / result.TotalBlocks * 100
@@ -313,7 +324,7 @@ public class MainViewModel : ViewModelBase
         catch (Exception ex)
         {
             DecompiledCode = $"# 反编译失败\n# {ex.GetType().Name}: {ex.Message}";
-            FormattedCode = FormatCode(DecompiledCode);
+            FormattedCode = PyRebuilderSharp.Gui.Services.PythonSyntaxHighlighter.FormatWithLineNumbers(DecompiledCode);
             StatusText = $"❌ 失败: {ex.Message}";
             StatsText = "失败";
         }

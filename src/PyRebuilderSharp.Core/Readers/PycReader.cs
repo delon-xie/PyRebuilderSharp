@@ -257,7 +257,7 @@ public class PycReader
             // Python 2.7 有 firstlineno
             try { code.FirstLineNumber = br.ReadInt32(); } catch { }
 
-            var lnotab = ReadMarshalBytesSafe(br);
+            var lnotab = ReadMarshalBytes27(br);
             if (lnotab != null)
                 code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions);
         }
@@ -317,14 +317,17 @@ public class PycReader
         {
             78 => null,             // 'N' TYPE_NONE
             105 => br.ReadInt32(),  // 'i' TYPE_INT
-            108 => br.ReadInt64(),  // 'l' TYPE_LONG
+            108 => ReadMarshalLong27(br), // 'l' TYPE_LONG (v2.7: count + shorts)
             102 => double.Parse(System.Text.Encoding.UTF8.GetString(br.ReadBytes(br.ReadInt32()))), // 'f' TYPE_FLOAT
             103 => br.ReadDouble(), // 'g' TYPE_BINARY_FLOAT
+            121 => new double[] { br.ReadDouble(), br.ReadDouble() }, // 'y' TYPE_BINARY_COMPLEX [real, imag]
             84 => true,             // 'T' TYPE_TRUE
             70 => false,            // 'F' TYPE_FALSE
             115 or 116 => ReadMarshalString27FromType(br, type), // 's' TYPE_STRING, 't' TYPE_INTERNED
+            117 => ReadMarshalUnicode27(br), // 'u' TYPE_UNICODE — Python 2.7 unicode string
             122 => ReadStringRef27_7a(br), // 'z' TYPE_STRINGREF (v3.x compat, v2.7 中不出现在此处)
             40 or 41 or 91 => ReadMarshalList27(br, type), // '(' TYPE_TUPLE, ')' TYPE_SMALL_TUPLE, '[' TYPE_LIST
+            60 or 62 => ReadMarshalSetOrFrozenset27(br, type), // '<' TYPE_SET, '>' TYPE_FROZENSET
             46 => new object(),     // '.' TYPE_ELLIPSIS
             99 => ReadMarshalCodeObject27(br), // 'c' TYPE_CODE (nested functions/lambdas)
             _ => SkipUnknown27(br, type),
@@ -365,7 +368,98 @@ public class PycReader
         {
             return ReadStringRef27_7a(br);
         }
+        if (type == 117) // 'u' TYPE_UNICODE
+        {
+            var len = br.ReadInt32();
+            var bytes = br.ReadBytes(len);
+            return System.Text.Encoding.UTF8.GetString(bytes);
+        }
         return "";
+    }
+
+    /// <summary>
+    /// Python 2.7 TYPE_UNICODE (0x75 = 'u') — UTF-8 encoded unicode string。
+    /// 4字节长度 + UTF-8 内容字节。
+    /// </summary>
+    private string ReadMarshalUnicode27(BinaryReader br)
+    {
+        var len = br.ReadInt32();
+        var bytes = br.ReadBytes(len);
+        return System.Text.Encoding.UTF8.GetString(bytes);
+    }
+
+    /// <summary>
+    /// Python 2.7 lnotab 读取 — 正确处理 TYPE_STRINGREF (0x52)。</summary>
+    private byte[]? ReadMarshalBytes27(BinaryReader br)
+    {
+        if (br.BaseStream.Position >= br.BaseStream.Length)
+            return null;
+        try
+        {
+            var rawType = br.ReadByte();
+            // v2.7 TYPE_STRINGREF (0x52): reference to interned string
+            if (rawType == 0x52)
+            {
+                var refIdx = br.ReadInt32();
+                if (refIdx >= 0 && refIdx < _internedStrings27.Count)
+                {
+                    var interned = _internedStrings27[refIdx];
+                    return System.Text.Encoding.UTF8.GetBytes(interned);
+                }
+                return null;
+            }
+            // v2.7 TYPE_STRING (0x73) or TYPE_INTERNED (116): 4-byte length + data
+            if (rawType == 0x73 || rawType == 116)
+            {
+                var len = br.ReadInt32();
+                return br.ReadBytes(len);
+            }
+            // TYPE_SHORT_ASCII (0x7a): 1-byte length + data
+            if (rawType == 0x7a)
+            {
+                var len = br.ReadByte();
+                return br.ReadBytes(len);
+            }
+            return null;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>
+    /// Python 2.7 TYPE_LONG (0x6c = 'l') — 长整数，格式为 count(int32) + count*2字节的shorts。
+    /// </summary>
+    private object? ReadMarshalLong27(BinaryReader br)
+    {
+        try
+        {
+            var size = br.ReadInt32(); // digit count
+            if (size <= 0 || size > 256) return 0L;
+            var digits = new short[size];
+            for (int i = 0; i < size; i++)
+                digits[i] = br.ReadInt16();
+            // Convert back: Python uses base 2^15 digits
+            long result = 0;
+            for (int i = size - 1; i >= 0; i--)
+                result = (result << 15) + (digits[i] & 0x7FFF);
+            // Last digit sign bit
+            if ((digits[size - 1] & 0x8000) != 0)
+                result = -result;
+            return result;
+        }
+        catch { return 0L; }
+    }
+
+    /// <summary>
+    /// Python 2.7 TYPE_SET (0x3c = '&lt;') 或 TYPE_FROZENSET (0x3e = '&gt;')。
+    /// 格式：count(int32) + count 个 marshal 值。返回 List。
+    /// </summary>
+    private List<object?> ReadMarshalSetOrFrozenset27(BinaryReader br, byte type)
+    {
+        var count = br.ReadInt32();
+        var items = new List<object?>();
+        for (int i = 0; i < count; i++)
+            items.Add(ReadMarshalValue27(br));
+        return items;
     }
 
     /// <summary>
