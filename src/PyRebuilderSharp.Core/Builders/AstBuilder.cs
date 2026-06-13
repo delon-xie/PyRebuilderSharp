@@ -425,10 +425,73 @@ public class AstBuilder
         }
         if (preBodyInstrs.Count > 0)
         {
-            // 检测 if/else 条件跳转：如果当前块末尾是 POP_JUMP_IF_*，
-            // 说明 try 体内有 if 条件（条件指令和 SETUP_FINALLY 在同一块）
-            var lastPre = preBodyInstrs.LastOrDefault();
-            bool hasInlineIf = lastPre != default && JumpHelper.IsConditionalJump(lastPre.Opcode) && lastPre.Argument.HasValue;
+            // 检测嵌套 try/except 块（多个 SETUP_FINALLY/SETUP_EXCEPT 在同一块）
+            // 收集所有 SETUP 指令及其 handler 偏移，按 handler 偏移从小到大处理
+            var nestedSetups = new List<(int idx, int handlerRel, int handlerAbs)>();
+            for (int i = 0; i < preBodyInstrs.Count; i++)
+            {
+                if (IsTrySetupOpcode(preBodyInstrs[i].Opcode, _codeObject.IsPython38Plus))
+                {
+                    var rel = preBodyInstrs[i].Argument ?? 0;
+                    var abs = preBodyInstrs[i].Offset + 2 + rel;
+                    nestedSetups.Add((i, rel, abs));
+                }
+            }
+            
+            if (nestedSetups.Count > 0)
+            {
+                // 有嵌套 try — 从内到外递归构建
+                // 找到各 SETUP 之间的指令区域
+                // print/while/for 等语句可能在 SETUP 之间
+                
+                // 处理第一个 SETUP 之前的指令（如果有）
+                if (nestedSetups[0].idx > 0)
+                {
+                    var prefixInstrs = preBodyInstrs.Take(nestedSetups[0].idx).ToList();
+                    var prefixMachine = new StackMachine(_codeObject);
+                    foreach (var ins in prefixInstrs)
+                    {
+                        var stmt = prefixMachine.Execute(ins);
+                        if (stmt != null) tryStmts.Add(stmt);
+                    }
+                    while (prefixMachine.HasResults)
+                        tryStmts.Add(new ExprStmt(prefixMachine.PopResult()));
+                }
+                
+                // 从外到内构建 try/except 层次
+                // 最外层 SETUP 的 try body 包含所有内层 SETUP
+                // 所以我们从最外层 SETUP 开始，递归处理内层
+                for (int level = nestedSetups.Count - 1; level >= 0; level--)
+                {
+                    var (nsIdx, _, _) = nestedSetups[level];
+                    
+                    int nextSetupIdx = level + 1 < nestedSetups.Count 
+                        ? nestedSetups[level + 1].idx 
+                        : preBodyInstrs.Count;
+                    
+                    var levelBodyInstrs = preBodyInstrs
+                        .Skip(nsIdx + 1)
+                        .Take(nextSetupIdx - nsIdx - 1)
+                        .ToList();
+                    
+                    // 用 StackMachine 处理这一层的 body 指令
+                    var levelMachine = new StackMachine(_codeObject);
+                    foreach (var ins in levelBodyInstrs)
+                    {
+                        var stmt = levelMachine.Execute(ins);
+                        if (stmt != null) tryStmts.Add(stmt);
+                    }
+                    while (levelMachine.HasResults)
+                        tryStmts.Add(new ExprStmt(levelMachine.PopResult()));
+                }
+            }
+            else
+            {
+                // 无嵌套 try — 正常处理（if/else 或纯指令）
+                // 检测 if/else 条件跳转：如果当前块末尾是 POP_JUMP_IF_*，
+                // 说明 try 体内有 if 条件（条件指令和 SETUP_FINALLY 在同一块）
+                var lastPre = preBodyInstrs.LastOrDefault();
+                bool hasInlineIf = lastPre != default && JumpHelper.IsConditionalJump(lastPre.Opcode) && lastPre.Argument.HasValue;
 
             if (hasInlineIf)
             {
@@ -484,6 +547,7 @@ public class AstBuilder
                 }
                 while (normalMachine.HasResults)
                     tryStmts.Add(new ExprStmt(normalMachine.PopResult()));
+                }
             }
         }
         // 2) 后继块用 GetStructuredBlockStmts
@@ -677,8 +741,22 @@ public class AstBuilder
             // 检测 else 子句：try body 的 POP_BLOCK 后 JUMP_FORWARD → else body
             if (elseJumpTarget.HasValue)
             {
+                // else body 在 POP_BLOCK 之后、handler 之前。
+                // 收集 from=elseJumpTarget(=after_all) 是错的，它指向 handler 之后。
+                // 正确做法：从 popBlockBlock 的后继中找 offset < handlerAbs 的块
                 var elseBlocks = new List<BasicBlock>();
-                FindBlocksFromOffset(elseJumpTarget.Value, elseBlocks);
+                // 从 POP_BLOCK 块的后继开始（不在 handler 区域内）
+                foreach (var succ in (popBlockBlock ?? block).Successors)
+                {
+                    if (succ == null || succ.StartOffset >= handlerAbs)
+                        continue;
+                    if (succ.StartOffset < (instrs[setupIdx].Offset + 2))
+                        continue;
+                    // 跳过 handler 入口块
+                    if (succ.Id == (handlerEntryBlock?.Id ?? -1))
+                        continue;
+                    elseBlocks.Add(succ);
+                }
                 if (elseBlocks.Count > 0)
                 {
                     var elseStmts = new List<Stmt>();
@@ -1925,7 +2003,10 @@ public class AstBuilder
         // 2. 递归反编译函数体
         var body = DecompileChildCode(childCode);
 
-        // 3. 去掉函数名中的 qualname 前缀（如 C.foobar → foobar）
+        // 3. 去掉函数体末尾的隐式 return None（由 LOAD_CONST None + RETURN_VALUE 产生）
+        StripTrailingReturnNone(body);
+
+        // 4. 去掉函数名中的 qualname 前缀（如 C.foobar → foobar）
         var cleanName = name;
         var lastDot = name.LastIndexOf('.');
         if (lastDot >= 0) cleanName = name[(lastDot + 1)..];
@@ -1938,6 +2019,54 @@ public class AstBuilder
             IsGenerator: childCode.IsGenerator,
             IsAsync: childCode.IsCoroutine || childCode.IsAsyncGenerator
         );
+    }
+
+    /// <summary>
+    /// 递归去掉控制结构体末尾的隐式 return None。
+    /// </summary>
+    private static void StripTrailingReturnNone(List<Stmt> stmts)
+    {
+        for (int i = stmts.Count - 1; i >= 0; i--)
+        {
+            var s = stmts[i];
+            if (s is Return ret && ret.Value is Constant { Value: null })
+            {
+                stmts.RemoveAt(i);
+            }
+            else if (s is If ifNode)
+            {
+                StripTrailingReturnNone(ifNode.Body);
+                if (ifNode.Orelse != null)
+                    StripTrailingReturnNone(ifNode.Orelse);
+            }
+            else if (s is While w)
+            {
+                StripTrailingReturnNone(w.Body);
+                if (w.Orelse != null)
+                    StripTrailingReturnNone(w.Orelse);
+            }
+            else if (s is For f)
+            {
+                StripTrailingReturnNone(f.Body);
+                if (f.Orelse != null)
+                    StripTrailingReturnNone(f.Orelse);
+            }
+            else if (s is Try t)
+            {
+                StripTrailingReturnNone(t.Body);
+                if (t.Orelse != null)
+                    StripTrailingReturnNone(t.Orelse);
+                if (t.Finalbody != null)
+                    StripTrailingReturnNone(t.Finalbody);
+                foreach (var h in t.Handlers)
+                    StripTrailingReturnNone(h.Body);
+            }
+            else if (s is FunctionDef fd)
+            {
+                StripTrailingReturnNone(fd.Body);
+            }
+            else break;  // non-return statement → stop
+        }
     }
 
     /// <summary>
