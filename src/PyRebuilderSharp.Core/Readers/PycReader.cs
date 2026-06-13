@@ -910,7 +910,7 @@ public class PycReader
         // 3.12-specific: some opcodes renumbered from 3.11
         // 3.11: CALL=167, PRECALL=166, RESUME=90, POP_JUMP_IF_{TRUE,FALSE}=111/112
         // 3.12: CALL=171, no PRECALL, RESUME=151, POP_JUMP_IF_{TRUE,FALSE}=114/115
-        bool is312 = _magicBytes[0] >= 0xA7; // 3.12+
+        bool is312 = _magicBytes[0] >= 0xB0; // 3.12+ (3.11 is 0xA7-0xAF range)
 
         return rawOp switch
         {
@@ -1034,13 +1034,73 @@ public class PycReader
 
     /// <summary>
     /// 3.11+ 的缓存条目数。
-    /// 区分 3.11 和 3.12（3.12 的缓存配置有变化）。
+    /// 3.11 和 3.12 的缓存配置完全不同：
+    /// - 3.11: 自适应字节码初期，只有部分 opcode 有 cache（未特化的 opcode 无 cache）
+    /// - 3.12: 所有 opcode 从初始就有固定 cache 条目
     /// </summary>
     private int GetCacheCount311Plus(byte rawOp)
     {
-        bool is312 = _magicBytes[0] >= 0xA7;
-        // Simplified: for now use the same table for 3.11 and 3.12
-        // CPython 3.11 _cache_entries is very similar to 3.12
+        bool is312 = _magicBytes[0] >= 0xB0;
+        if (is312)
+            return GetCacheCount312(rawOp);
+        else
+            return GetCacheCount311(rawOp);
+    }
+
+    /// <summary>
+    /// 3.11 的缓存条目数（从实际字节码观察得到）。
+    /// 关键差异：LOAD_NAME/LOAD_CONST/STORE_NAME 等基础操作码无 cache。
+    /// </summary>
+    private static int GetCacheCount311(byte rawOp)
+    {
+        return rawOp switch
+        {
+            1 => 0, 2 => 0, 4 => 0, 5 => 0, 9 => 0,
+            11 => 0, 12 => 0, 15 => 0,
+            25 => 0, 30 => 0, 31 => 0,
+            35 => 0, 36 => 0, 37 => 0,
+            40 => 0, 41 => 0, 42 => 0, 43 => 0, 47 => 0,
+            49 => 0, 53 => 0,
+            55 => 0, 56 => 0, 60 => 0, 61 => 0,
+            68 => 0, 69 => 0, 71 => 0, 72 => 0, 73 => 0, 74 => 0, 75 => 0,
+            79 => 0, 80 => 0, 81 => 0, 83 => 0, 84 => 0, 85 => 0, 86 => 0,
+            87 => 0, 88 => 0, 89 => 0,
+            90 => 0, 91 => 0, 92 => 1,  // UNPACK_SEQUENCE
+            93 => 0, 94 => 0, 95 => 0, 96 => 0, 97 => 0, 98 => 0, 99 => 0,
+            100 => 0, // LOAD_CONST (no cache in 3.11)
+            101 => 0, // LOAD_NAME (no cache in 3.11)
+            102 => 0, 103 => 0, 104 => 0, 105 => 0,
+            106 => 0, // LOAD_ATTR (no cache in 3.11)
+            107 => 2, // COMPARE_OP
+            108 => 0, 109 => 0, 110 => 0,
+            111 => 0, 112 => 0, 113 => 0, 114 => 0, 115 => 0,
+            116 => 0, // LOAD_GLOBAL (no cache in 3.11)
+            117 => 0, 118 => 0, 119 => 0,
+            120 => 0, 121 => 0, 122 => 1,  // BINARY_OP
+            123 => 1,  // UNARY_OP
+            124 => 0, 125 => 0, 126 => 0, 127 => 0,
+            128 => 0, 129 => 0, 130 => 0, 131 => 0, 132 => 0, 133 => 0,
+            134 => 0, 135 => 0, 136 => 0, 137 => 0, 138 => 0, 139 => 0,
+            140 => 0, 141 => 0, 142 => 0, 143 => 0,
+            144 => 0, 145 => 0, 146 => 0, 147 => 0,
+            149 => 0,
+            150 => 0, 151 => 0, 152 => 0,
+            155 => 0, 156 => 0, 157 => 0,
+            162 => 0, 163 => 0, 164 => 0, 165 => 0,
+            166 => 0, // PRECALL_311 (doesn't appear in bytecodes, but safe)
+            167 => 0, // CALL_311
+            170 => 0,
+            171 => 4, // CALL
+            172 => 0, 173 => 0, 174 => 0, 175 => 0, 176 => 0,
+            _ => 0,
+        };
+    }
+
+    /// <summary>
+    /// 3.12 的缓存条目数（完整 cache 表）。
+    /// </summary>
+    private static int GetCacheCount312(byte rawOp)
+    {
         return rawOp switch
         {
             1 => 0, 2 => 0, 4 => 0, 5 => 0, 9 => 0,
@@ -1053,8 +1113,7 @@ public class PycReader
             68 => 0, 69 => 0, 71 => 0, 72 => 0, 73 => 0, 74 => 0, 75 => 0,
             79 => 0, 80 => 0, 81 => 0, 83 => 0, 84 => 0, 85 => 0, 86 => 0,
             87 => 0, 88 => 0, 89 => 0,
-            90 => 0,  // STORE_NAME (3.11+), no cache
-            91 => 0, 92 => 1, 93 => 0, 94 => 0, 95 => 0,
+            90 => 0, 91 => 0, 92 => 1, 93 => 0, 94 => 0, 95 => 0,
             96 => 0, 97 => 0, 98 => 0, 99 => 0,
             100 => 1, // LOAD_CONST
             101 => 4, // LOAD_NAME
@@ -1064,7 +1123,7 @@ public class PycReader
             111 => 0, 112 => 0, 113 => 0, 114 => 0, 115 => 0,
             116 => 0, // LOAD_GLOBAL
             117 => 0, 118 => 0, 119 => 0,
-            120 => 0, 121 => 0, 122 => 1, 123 => 1,  // BINARY_OP, UNARY_OP
+            120 => 0, 121 => 0, 122 => 1, 123 => 1,
             124 => 1, 125 => 1, 126 => 1, 127 => 1,
             128 => 1, 129 => 1, 130 => 1, 131 => 1, 132 => 1, 133 => 1,
             134 => 0, 135 => 0, 136 => 0, 137 => 0, 138 => 0, 139 => 0,
@@ -1074,10 +1133,9 @@ public class PycReader
             150 => 0, 151 => 0, 152 => 0,
             155 => 0, 156 => 0, 157 => 0,
             162 => 0, 163 => 0, 164 => 0, 165 => 0,
-            166 => (byte)(is312 ? 0 : 3), // 3.11: PRECALL=3 caches; 3.12: no op at 166
-            167 => 0, // CALL_311
+            166 => 0, 167 => 0,
             170 => 0,
-            171 => 4, // CALL (3.11+)
+            171 => 4, // CALL
             172 => 0, 173 => 0, 174 => 0, 175 => 0, 176 => 0,
             _ => 0,
         };
