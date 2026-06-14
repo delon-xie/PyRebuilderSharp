@@ -101,6 +101,12 @@ public class PythonCodeGenerator : ICodeGenerator
             case Global g:
                 VisitGlobal(g);
                 break;
+            case Match m:
+                VisitMatch(m);
+                break;
+            case CommentBlock cb:
+                // Skip — rendered as part of block
+                break;
             case Nonlocal n:
                 VisitNonlocal(n);
                 break;
@@ -453,6 +459,120 @@ public class PythonCodeGenerator : ICodeGenerator
         if (withStmt.Body.Count == 0)
             EmitEmptyBodyPass();
         _indentLevel--;
+    }
+
+    private void VisitMatch(Match match)
+    {
+        WriteIndent();
+        _output.Append("match ");
+        Visit(match.Subject);
+        _output.AppendLine(":");
+        _indentLevel++;
+        foreach (var mc in match.Cases)
+        {
+            WriteIndent();
+            _output.Append("case ");
+            VisitMatchPattern(mc.Pattern);
+            if (mc.Guard != null)
+            {
+                _output.Append(" if ");
+                Visit(mc.Guard);
+            }
+            _output.AppendLine(":");
+            _indentLevel++;
+            foreach (var stmt in mc.Body)
+                Visit(stmt);
+            if (mc.Body.Count == 0)
+                EmitEmptyBodyPass();
+            _indentLevel--;
+        }
+        _indentLevel--;
+    }
+
+    private void VisitMatchPattern(MatchPattern pattern)
+    {
+        switch (pattern)
+        {
+            case MatchValue mv:
+                Visit(mv.Value);
+                break;
+            case MatchSingleton ms:
+                Visit(ms.Value);
+                break;
+            case MatchWildcard:
+                _output.Append("_");
+                break;
+            case MatchSequence seq:
+                _output.Append("[");
+                for (int i = 0; i < seq.Patterns.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    VisitMatchPattern(seq.Patterns[i]);
+                }
+                if (seq.Rest != null)
+                {
+                    if (seq.Patterns.Count > 0) _output.Append(", ");
+                    _output.Append("*");
+                    VisitMatchPattern(seq.Rest);
+                }
+                _output.Append("]");
+                break;
+            case MatchMapping mm:
+                _output.Append("{");
+                for (int i = 0; i < mm.Keys.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    Visit(mm.Keys[i]);
+                    _output.Append(": ");
+                    VisitMatchPattern(mm.Patterns[i]);
+                }
+                if (mm.Rest != null)
+                {
+                    if (mm.Keys.Count > 0) _output.Append(", ");
+                    _output.Append("**");
+                    VisitMatchPattern(mm.Rest);
+                }
+                _output.Append("}");
+                break;
+            case MatchClass mc:
+                Visit(mc.Cls);
+                _output.Append("(");
+                for (int i = 0; i < mc.Patterns.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    if (mc.KwdNames != null && i >= mc.Patterns.Count - mc.KwdNames.Count)
+                    {
+                        int kwIdx = mc.KwdNames.Count - (mc.Patterns.Count - i);
+                        _output.Append(mc.KwdNames[kwIdx]);
+                        _output.Append("=");
+                    }
+                    VisitMatchPattern(mc.Patterns[i]);
+                }
+                _output.Append(")");
+                break;
+            case MatchAs ma:
+                if (ma.Pattern != null)
+                {
+                    VisitMatchPattern(ma.Pattern);
+                    _output.Append(" as ");
+                }
+                _output.Append(ma.Name ?? "_");
+                break;
+            case MatchOr mo:
+                for (int i = 0; i < mo.Patterns.Count; i++)
+                {
+                    if (i > 0) _output.Append(" | ");
+                    VisitMatchPattern(mo.Patterns[i]);
+                }
+                break;
+            case MatchStar ms:
+                _output.Append("*");
+                _output.Append(ms.Name ?? "_");
+                break;
+            default:
+                _output.Append("# Unknown pattern");
+                break;
+        }
     }
 
     private void VisitReturn(Return ret)

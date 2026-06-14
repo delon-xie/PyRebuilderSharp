@@ -275,6 +275,14 @@ public class AstBuilder
                 stmts.AddRange(try311Stmts);
                 return stmts;
             }
+            
+            // 检测 match/case
+            var matchStmts = BuildMatchFromExceptionTable(block, visited);
+            if (matchStmts != null)
+            {
+                stmts.AddRange(matchStmts);
+                return stmts;
+            }
         }
 
         // 检查是否为条件分支
@@ -382,6 +390,116 @@ public class AstBuilder
     }
 
     private List<BasicBlock> GetAllBlocks() => _allBlocks;
+
+    /// <summary>
+    /// 3.10+: 通过 ExceptionTable 检测 match/case。
+    /// 检测条件: handler 块中包含 MATCH_CLASS/MATCH_SEQUENCE/MATCH_MAPPING/MATCH_KEYS 等操作码。
+    /// </summary>
+    private List<Stmt>? BuildMatchFromExceptionTable(BasicBlock block, HashSet<BasicBlock> visited)
+    {
+        var instrs = block.Instructions;
+        if (instrs.Count == 0) return null;
+
+        // 查找覆盖此块的 ExceptionTable 条目（depth=1 的 handler）
+        var matchEntries = _codeObject.ExceptionTable
+            .Where(e => e.Depth == 1)
+            .ToList();
+        if (matchEntries.Count == 0) return null;
+
+        // 检查 handler 块是否包含 match 操作码
+        var handlerBlock = FindBlockByOffset(matchEntries[0].TargetOffset);
+        if (handlerBlock == null) return null;
+        bool hasMatchOp = handlerBlock.Instructions.Any(i =>
+            i.Opcode == Opcode.MATCH_CLASS_312 ||
+            i.Opcode == Opcode.MATCH_SEQUENCE_312 ||
+            i.Opcode == Opcode.MATCH_MAPPING_312 ||
+            i.Opcode == Opcode.MATCH_KEYS_312);
+        if (!hasMatchOp) return null;
+
+        // 收集 match subject（block 中 MATCH 指令之前的表达式）
+        // match body 的第一个 ExceptionTable 条目的 start 之前是 subject
+        var firstEntry = matchEntries[0];
+        var matchSubject = new Name("subject"); // placeholder
+
+        // 尝试从 block 指令中提取 subject（第一个 LOAD_* 指令）
+        foreach (var ins in block.Instructions)
+        {
+            if (ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_FAST)
+            {
+                var name = ins.Opcode == Opcode.LOAD_FAST
+                    ? _codeObject.Varnames.ElementAtOrDefault(ins.Argument ?? 0)
+                    : _codeObject.Names.ElementAtOrDefault(ins.Argument ?? 0);
+                if (name != null)
+                {
+                    matchSubject = new Name(name);
+                    break;
+                }
+            }
+        }
+
+        // 为每个 handler 条目创建 case
+        var cases = new List<MatchCase>();
+        foreach (var entry in matchEntries)
+        {
+            var hb = FindBlockByOffset(entry.TargetOffset);
+            if (hb == null || visited.Contains(hb)) continue;
+            visited.Add(hb);
+
+            // 解析模式
+            var pattern = ParseMatchPattern(hb);
+
+            // 反编译 case body（从 STORE_NAME 之后到 handler 结束）
+            var caseBody = new List<Stmt>();
+            bool foundStore = false;
+            var cm = new StackMachine(_codeObject);
+            foreach (var ins in hb.Instructions)
+            {
+                if (!foundStore)
+                {
+                    if (ins.Opcode == Opcode.STORE_NAME || ins.Opcode == Opcode.STORE_FAST)
+                        foundStore = true;
+                    continue;
+                }
+                var stmt = cm.Execute(ins);
+                if (stmt != null) caseBody.Add(stmt);
+            }
+            while (cm.HasResults)
+                caseBody.Add(new ExprStmt(cm.PopResult()));
+
+            cases.Add(new MatchCase(pattern, null, caseBody));
+        }
+
+        if (cases.Count == 0) return null;
+        return new List<Stmt> { new Match(matchSubject, cases) };
+    }
+
+    /// <summary>
+    /// 从 handler 块解析 match 模式。
+    /// 当前实现为存根：将 MATCH 操作码前的 LOAD_NAME 作为模式值。
+    /// </summary>
+    private MatchPattern ParseMatchPattern(BasicBlock hb)
+    {
+        // 查找 MATCH 操作码前的 LOAD_NAME（模式类型）
+        for (int i = 0; i < hb.Instructions.Count; i++)
+        {
+            var ins = hb.Instructions[i];
+            if (ins.Opcode == Opcode.MATCH_CLASS_312 ||
+                ins.Opcode == Opcode.MATCH_SEQUENCE_312 ||
+                ins.Opcode == Opcode.MATCH_MAPPING_312)
+            {
+                if (i > 0 && hb.Instructions[i - 1].Opcode == Opcode.LOAD_NAME)
+                {
+                    var name = _codeObject.Names.ElementAtOrDefault(
+                        hb.Instructions[i - 1].Argument ?? 0);
+                    if (name != null)
+                        return new MatchClass(new Name(name), new List<MatchPattern>());
+                }
+                break;
+            }
+        }
+        // 默认 fallback: 通配符
+        return new MatchWildcard();
+    }
 
     /// <summary>
     /// 3.11+: 通过 ExceptionTable 检测 try/except。
