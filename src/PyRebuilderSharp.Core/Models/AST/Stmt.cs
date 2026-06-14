@@ -86,3 +86,40 @@ public record TypeAlias(Expr Name, Expr Value) : Stmt;
 
 // --- 注释块（兜底） ---
 public record CommentBlock(string Comment) : Stmt;
+
+// --- 3.10+ match/case ---
+/// <summary>match 语句</summary>
+public record Match(Expr Subject, List<MatchCase> Cases) : Stmt;
+
+/// <summary>单个 case 分支</summary>
+public record MatchCase(MatchPattern Pattern, Expr? Guard, List<Stmt> Body) : Stmt;
+
+/// <summary>模式基类</summary>
+public abstract record MatchPattern : Stmt;
+
+/// <summary>值模式: case 42:</summary>
+public record MatchValue(Expr Value) : MatchPattern;
+
+/// <summary>单例模式: case True: / case None:</summary>
+public record MatchSingleton(Expr Value) : MatchPattern;
+
+/// <summary>通配符模式: case _:</summary>
+public record MatchWildcard() : MatchPattern;
+
+/// <summary>序列模式: case [a, b, *rest]:</summary>
+public record MatchSequence(List<MatchPattern> Patterns, MatchPattern? Rest = null) : MatchPattern;
+
+/// <summary>映射模式: case {"key": value}:</summary>
+public record MatchMapping(List<Expr> Keys, List<MatchPattern> Patterns, MatchPattern? Rest = null) : MatchPattern;
+
+/// <summary>类模式: case Point(x, y):</summary>
+public record MatchClass(Expr Cls, List<MatchPattern> Patterns, List<string>? KwdNames = null) : MatchPattern;
+
+/// <summary>星号模式: case [first, *rest]:</summary>
+public record MatchStar(string? Name = null) : MatchPattern;
+
+/// <summary>AS 模式: case pattern as name:</summary>
+public record MatchAs(MatchPattern? Pattern, string? Name = null) : MatchPattern;
+
+/// <summary>OR 模式: case 1 | 2 | 3:</summary>
+public record MatchOr(List<MatchPattern> Patterns) : MatchPattern;

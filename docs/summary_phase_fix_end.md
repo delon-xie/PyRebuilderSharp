@@ -82,8 +82,8 @@ CPython 的 `r_object()` 处理所有 code object 字段为通用 marshal 对象
 | `@decorator` | 2.7→3.14 | ✅ |
 | `async def` / `await` | 3.5→3.14 | ✅ |
 | `a, b = ...` 展开赋值 | 2.7→3.14 | ✅ |
-| walrus `:=` | 3.8→3.14 | ✅ 基础检测 / ⚡ 控制流集成待完成 |
-| `except*` | 3.11→3.14 | ✅ codegen 就绪 / ⚡ IsGroup 映射待完成 |
+| walrus `:=` | 3.8→3.14 | ✅ NamedExpr + COPY+STORE 检测 |
+| `except*` | 3.11→3.14 | ✅ `BuildTryFromExceptionTable` + IsGroup 检测 |
 | `match/case` (opcode) | 3.10→3.14 | ⚡ opcode 映射完成，CFG 待重建 |
 | linetable 解析 | 3.11→3.14 | ✅ |
 
@@ -91,11 +91,18 @@ CPython 的 `r_object()` 处理所有 code object 字段为通用 marshal 对象
 
 ## 五、剩余工作
 
-| 项目 | 优先级 | 依赖 |
+### 待完成（1 项）
+
+| 项目 | 优先级 | 说明 |
 |:-----|:-------|:------|
-| `match/case` ExceptionTable CFG 重建 | 🔴 高 | opcode 映射完成，CFG 待重建 |
-| `except*` ExceptionTable → IsGroup 映射 | 🔴 高 | codegen 就绪，handler 集成待完成 |
-| walrus 控制流检测 `COPY+STORE+COMPARE` | 🟢 低 | NamedExpr 基础检测完成 |
-| AST 自动对比验证 | 🟡 中 | 独立工具 |
-| CrashCollector Dashboard | 🟡 中 | Avalonia GUI |
-| 批量反编译模式 | 🟢 低 | CLI 工具 |
+| `match/case` ExceptionTable CFG 重建 + AST | 🔴 高 | 需要 Match/MatchCase/MatchPattern AST 节点 + 代码生成器 + ExceptionTable CFG 集成 |
+
+### 已完成
+
+| 项目 | 优先级 | 完成状态 |
+|:-----|:-------|:---------|
+| `except*` ExceptionTable → IsGroup 映射 | 🔴 高 | ✅ `BuildTryFromExceptionTable` + CHECK_EG_MATCH 检测 |
+| walrus 控制流检测 `COPY+STORE+COMPARE` | 🟢 低 | ✅ NamedExpr + STORE_NAME/FAST 检测 |
+| AST 自动对比验证 | 🟡 中 | ✅ `tools/ast_compare.py` |
+| CrashCollector Dashboard | 🟡 中 | ✅ Avalonia 面板 + 按钮 + 清除 |
+| 批量反编译模式 | 🟢 低 | ✅ CLI `-d <dir>`, `--stats` |

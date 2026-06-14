@@ -4,9 +4,7 @@ using PyRebuilderSharp.Core;
 using PyRebuilderSharp.Core.Generators;
 
 var files = new[] {
-    "/tmp/test_fncall.3.12.pyc",
-    "/tmp/simple_class.3.12.pyc", 
-    "/tmp/test_walrus.3.12.pyc",
+    "/tmp/test_if.3.12.pyc",
 };
 
 foreach (var file in files)

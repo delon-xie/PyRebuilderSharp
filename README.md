@@ -235,22 +235,17 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 
 | 项目 | 说明 |
 |:-----|:------|
-| `match/case` (3.10+) CFG 重建 | ExceptionTable 驱动控制流 |
-| `except*` ExceptionTable → IsGroup 映射 | handler 集成 |
+| `match/case` (3.10+) CFG 重建 + AST | 需要 Match/MatchCase/MatchPattern 节点 + 代码生成器 |
 
-### 🟡 中优先级
+### ✅ 已完成
 
-| 项目 | 说明 |
-|:-----|:------|
-| AST 自动对比验证 | 反编译 vs 原始 .py |
-| CrashCollector Dashboard | GUI 异常面板 |
-
-### 🟢 低优先级
-
-| 项目 | 说明 |
-|:-----|:------|
-| walrus 控制流检测 | if x := expr: 模式 |
-| 批量反编译模式 | 拖入目录批量 ||
+| 项目 | 完成状态 |
+|:-----|:---------|
+| `except*` ExceptionTable → IsGroup 映射 | ✅ `BuildTryFromExceptionTable` + CHECK_EG_MATCH |
+| AST 自动对比验证 | ✅ `tools/ast_compare.py` |
+| CrashCollector Dashboard | ✅ Avalonia 崩溃日志面板 |
+| 批量反编译模式 | ✅ CLI `-d <dir>`, `--stats` |
+| walrus 控制流检测 | ✅ NamedExpr + COPY+STORE ||
 | Benchmark 938/938 | ✅ 0 警告 |
 
 ### ✅ Phase Fix — 7 项 Bug
@@ -273,22 +268,17 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 
 | 项目 | 说明 |
 |:-----|:------|
-| `match/case` (3.10+) CFG 重建 | ExceptionTable 驱动控制流 |
-| `except*` ExceptionTable → IsGroup 映射 | handler 集成 |
+| `match/case` (3.10+) CFG 重建 + AST | 需要 Match/MatchCase/MatchPattern 节点 + 代码生成器 |
 
-### 🟡 中优先级
+### ✅ 已完成
 
-| 项目 | 说明 |
-|:-----|:------|
-| AST 自动对比验证 | 反编译 vs 原始 .py |
-| CrashCollector Dashboard | GUI 异常面板 |
-
-### 🟢 低优先级
-
-| 项目 | 说明 |
-|:-----|:------|
-| walrus 控制流检测 | if x := expr: 模式 |
-| 批量反编译模式 | 拖入目录批量 |
+| 项目 | 完成状态 |
+|:-----|:---------|
+| `except*` ExceptionTable → IsGroup 映射 | ✅ `BuildTryFromExceptionTable` + CHECK_EG_MATCH |
+| AST 自动对比验证 | ✅ `tools/ast_compare.py` |
+| CrashCollector Dashboard | ✅ Avalonia 崩溃日志面板 |
+| 批量反编译模式 | ✅ CLI `-d <dir>`, `--stats` |
+| walrus 控制流检测 | ✅ NamedExpr + COPY+STORE |
 
 ---
 

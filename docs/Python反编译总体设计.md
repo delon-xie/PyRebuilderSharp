@@ -5,7 +5,7 @@
 **版本**: v2.6
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ 全部关闭 — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 17 项修复 · 语法覆盖 13 项 · 工程增强6项待完成
+**状态**: Phase 1–6 ✅ 全部关闭 — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 17 项修复 · 语法覆盖 14 项 · 剩余1项待完成
 
 ---
 
@@ -561,16 +561,11 @@ done
 
 ## 9. 剩余工作计划
 
-Phase 1–6 全部关闭。剩余工作移入 **Phase Fix**：
+Phase 1–6 全部关闭。剩余 1 项待完成：
 
-| 项目 | 优先级 | 类型 |
+| 项目 | 优先级 | 说明 |
 |:-----|:-------|:------|
-| `match/case` ExceptionTable CFG 重建 | 🔴 高 | 语法覆盖 |
-| `except*` ExceptionTable → IsGroup 映射 | 🔴 高 | 语法覆盖 |
-| walrus 控制流检测 | 🟢 低 | 语法覆盖 |
-| AST 自动对比验证 | 🟡 中 | 工程增强 |
-| CrashCollector Dashboard | 🟡 中 | 工程增强 |
-| 批量反编译模式 | 🟢 低 | 工程增强 |
+| `match/case` ExceptionTable CFG 重建 + AST | 🔴 高 | 需要 Match/MatchCase/MatchPattern AST 节点 + 代码生成器 + ExceptionTable CFG |
 
 详见 `docs/plan_phase_fix.md`。
 

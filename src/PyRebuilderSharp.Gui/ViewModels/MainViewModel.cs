@@ -188,10 +188,30 @@ public class MainViewModel : ViewModelBase
         set => SetProperty(ref _statusText, value);
     }
 
+    // -- 崩溃日志 --
+    public ObservableCollection<PyRebuilderSharp.Core.Services.CrashEntry> CrashEntries { get; } = new();
+
+    private bool _showCrashLog;
+    public bool ShowCrashLog
+    {
+        get => _showCrashLog;
+        set => SetProperty(ref _showCrashLog, value);
+    }
+
+    private string _crashCountText = "";
+    public string CrashCountText
+    {
+        get => _crashCountText;
+        set => SetProperty(ref _crashCountText, value);
+    }
+
     // -- 命令 --
     public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveResultCommand { get; }
     public ReactiveCommand<Unit, Unit> DecompileCommand { get; }
+    public ReactiveCommand<Unit, Unit> ShowCrashLogCommand { get; }
+    public ReactiveCommand<Unit, Unit> ClearCrashLogCommand { get; }
+    public ReactiveCommand<Unit, Unit> CloseCrashLogCommand { get; }
 
     // -- 顶层窗口引用（由View设置） --
     public Window? TopLevel { get; set; }
@@ -201,6 +221,9 @@ public class MainViewModel : ViewModelBase
         OpenFileCommand = ReactiveCommand.CreateFromTask(OpenFileAsync);
         SaveResultCommand = ReactiveCommand.CreateFromTask(SaveResultAsync);
         DecompileCommand = ReactiveCommand.CreateFromTask(DecompileCurrentAsync);
+        ShowCrashLogCommand = ReactiveCommand.Create(LoadCrashLog);
+        ClearCrashLogCommand = ReactiveCommand.Create(ClearCrashLog);
+        CloseCrashLogCommand = ReactiveCommand.Create(() => ShowCrashLog = false);
         PythonVersion = "🔍 选择 .pyc 文件开始反编译";
     }
 
@@ -397,6 +420,28 @@ public class MainViewModel : ViewModelBase
 
         // 如果没有按目录归组的文件，直接加到根
         if (pycFiles.Length > 0) HasFile = true;
+    }
+
+    // -- 崩溃日志 --
+    private void LoadCrashLog()
+    {
+        CrashEntries.Clear();
+        var entries = PyRebuilderSharp.Core.Services.CrashCollector.GetCrashHistory(50);
+        foreach (var e in entries)
+            CrashEntries.Add(e);
+        CrashCountText = $"{entries.Length} 条记录";
+        ShowCrashLog = true;
+        StatusText = entries.Length > 0
+            ? $"📋 加载 {entries.Length} 条崩溃记录"
+            : "📋 无崩溃记录";
+    }
+
+    private void ClearCrashLog()
+    {
+        PyRebuilderSharp.Core.Services.CrashCollector.ClearAll();
+        CrashEntries.Clear();
+        CrashCountText = "0 条记录";
+        StatusText = "🗑 崩溃日志已清除";
     }
 
     private async Task DecompileFile(string filePath)

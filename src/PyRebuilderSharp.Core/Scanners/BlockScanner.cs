@@ -17,9 +17,9 @@ public class BlockScanner : IBlockScanner
     {
         var instructions = codeObj.Instructions;
 
-        var leaders = MarkLeaders(instructions);
+        var leaders = MarkLeaders(instructions, codeObj.ExceptionTable);
         var blocks = SplitAtLeaders(instructions, leaders);
-        LinkBlocks(blocks);
+        LinkBlocks(blocks, codeObj.ExceptionTable);
         MarkBlockProperties(blocks);
 
         return blocks;
@@ -29,7 +29,7 @@ public class BlockScanner : IBlockScanner
     /// 标记Leader指令。
     /// Leader是基本块的起始指令。
     /// </summary>
-    private SortedSet<int> MarkLeaders(List<Instruction> instructions)
+    private SortedSet<int> MarkLeaders(List<Instruction> instructions, List<ExceptionTableEntry>? exceptionTable = null)
     {
         var leaders = new SortedSet<int> { 0 };
 
@@ -64,6 +64,15 @@ public class BlockScanner : IBlockScanner
                     var handlerOffset = instr.Offset + 2 + instr.Argument.Value;
                     leaders.Add(handlerOffset);
                 }
+            }
+        }
+
+        // 3.11+: ExceptionTable 条目定义 try/except/finally/match handler 入口
+        if (exceptionTable != null)
+        {
+            foreach (var entry in exceptionTable)
+            {
+                leaders.Add(entry.TargetOffset);
             }
         }
 
@@ -119,7 +128,7 @@ public class BlockScanner : IBlockScanner
         return blocks;
     }
 
-    private void LinkBlocks(List<BasicBlock> blocks)
+    private void LinkBlocks(List<BasicBlock> blocks, List<ExceptionTableEntry>? exceptionTable = null)
     {
         for (int i = 0; i < blocks.Count; i++)
         {
@@ -183,6 +192,27 @@ public class BlockScanner : IBlockScanner
                     if (i + 1 < blocks.Count)
                         AddSuccessor(block, blocks[i + 1]);
                     break;
+            }
+        }
+
+        // 3.11+: ExceptionTable handler 边 — try 体 → handler 块
+        if (exceptionTable != null)
+        {
+            foreach (var entry in exceptionTable)
+            {
+                var handlerBlock = FindBlockByOffset(blocks, entry.TargetOffset);
+                if (handlerBlock == null) continue;
+
+                // 找出 try 体覆盖范围的最后一个块
+                for (int j = 0; j < blocks.Count; j++)
+                {
+                    if (blocks[j].StartOffset >= entry.StartOffset
+                        && blocks[j].EndOffset <= entry.EndOffset)
+                    {
+                        AddSuccessor(blocks[j], handlerBlock);
+                    }
+                    if (blocks[j].StartOffset > entry.EndOffset) break;
+                }
             }
         }
     }

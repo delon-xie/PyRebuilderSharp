@@ -13,11 +13,16 @@ public class AstBuilder
 {
     private readonly BlockDecompiler _blockDecompiler;
     private readonly CodeObject _codeObject;
-    private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
     private Dictionary<int, BlockResult> _blockResults = new();
     private HashSet<int> _loopHeaderOffsets = new();
-    private HashSet<int> _phase2CoveredOffsets = new();
+    private List<BasicBlock> _allBlocks = new();
 
+    public AstBuilder(CodeObject codeObject)
+    {
+        _codeObject = codeObject;
+        _blockDecompiler = new BlockDecompiler();
+    }
+    
     /// <summary>
     /// 总基本块数（用于统计）。
     /// </summary>
@@ -41,6 +46,7 @@ public class AstBuilder
     {
         var cfg = structuredCFG.RawCFG;
         _blockResults = _blockDecompiler.DecompileBlocks(cfg.Blocks, _codeObject);
+        _allBlocks = cfg.Blocks;
         
         // 统计块级结果
         TotalBlockCount = _blockResults.Count;
@@ -260,6 +266,17 @@ public class AstBuilder
             return stmts;
         }
 
+        // 3.11+: 通过 ExceptionTable 检测 try/except
+        if (_codeObject.ExceptionTable.Count > 0)
+        {
+            var try311Stmts = BuildTryFromExceptionTable(block, visited);
+            if (try311Stmts != null)
+            {
+                stmts.AddRange(try311Stmts);
+                return stmts;
+            }
+        }
+
         // 检查是否为条件分支
         if (IsConditionBranch(block))
         {
@@ -362,6 +379,106 @@ public class AstBuilder
         // SETUP_EXCEPT (121) 仅在 3.5-3.7 有效，3.8+ 是 JUMP_IF_NOT_EXC_MATCH
         if (!isPython38Plus && op == Opcode.SETUP_EXCEPT) return true;
         return false;
+    }
+
+    private List<BasicBlock> GetAllBlocks() => _allBlocks;
+
+    /// <summary>
+    /// 3.11+: 通过 ExceptionTable 检测 try/except。
+    /// 如果 block 的字节码范围在某个 ExceptionTable 条目的 try 体内，构建 Try AST 并设置 IsGroup。
+    /// </summary>
+    private List<Stmt>? BuildTryFromExceptionTable(BasicBlock block, HashSet<BasicBlock> visited)
+    {
+        var instrs = block.Instructions;
+        if (instrs.Count == 0) return null;
+        var blockStart = instrs[0].Offset;
+        var blockEnd = instrs.Last().Offset;
+
+        var matchingEntry = _codeObject.ExceptionTable.FirstOrDefault(e =>
+            blockStart >= e.StartOffset && blockEnd <= e.EndOffset);
+        if (matchingEntry == null) return null;
+
+        var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
+        if (handlerBlock == null || visited.Contains(handlerBlock)) return null;
+
+        var tryBlocks = new List<BasicBlock>();
+        foreach (var b in GetAllBlocks())
+        {
+            if (b.Instructions.Count == 0) continue;
+            var start = b.Instructions[0].Offset;
+            if (start >= matchingEntry.StartOffset && start < matchingEntry.EndOffset)
+                tryBlocks.Add(b);
+        }
+        if (tryBlocks.Count == 0) return null;
+
+        var tryBody = new List<Stmt>();
+        var tryVisited = new HashSet<BasicBlock>();
+        foreach (var tb in tryBlocks)
+        {
+            if (tb == block)
+            {
+                var machine = new StackMachine(_codeObject);
+                foreach (var ins in tb.Instructions)
+                {
+                    var stmt = machine.Execute(ins);
+                    if (stmt != null) tryBody.Add(stmt);
+                }
+                while (machine.HasResults)
+                    tryBody.Add(new ExprStmt(machine.PopResult()));
+            }
+            else if (!visited.Contains(tb) && !tryVisited.Contains(tb))
+            {
+                tryBody.AddRange(BuildStatements(tb, tryVisited));
+            }
+        }
+
+        visited.Add(handlerBlock);
+        var handlerMachine = new StackMachine(_codeObject);
+        var handlerBody = new List<Stmt>();
+        foreach (var ins in handlerBlock.Instructions)
+        {
+            var stmt = handlerMachine.Execute(ins);
+            if (stmt != null) handlerBody.Add(stmt);
+        }
+        while (handlerMachine.HasResults)
+            handlerBody.Add(new ExprStmt(handlerMachine.PopResult()));
+
+        bool isGroup = handlerBlock.Instructions.Any(i => i.Opcode == Opcode.CHECK_EG_MATCH);
+
+        Expr? exceptType = null;
+        string? exceptName = null;
+        for (int i = 0; i < handlerBlock.Instructions.Count; i++)
+        {
+            var ins = handlerBlock.Instructions[i];
+            if (ins.Opcode == Opcode.CHECK_EXC_MATCH || ins.Opcode == Opcode.CHECK_EG_MATCH)
+            {
+                if (i > 0)
+                {
+                    var typeLoad = handlerBlock.Instructions[i - 1];
+                    if (typeLoad.Opcode == Opcode.LOAD_NAME)
+                    {
+                        var name = _codeObject.Names.ElementAtOrDefault(typeLoad.Argument ?? 0);
+                        if (name != null) exceptType = new Name(name);
+                    }
+                }
+                break;
+            }
+            if (ins.Opcode == Opcode.STORE_NAME)
+                exceptName = _codeObject.Names.ElementAtOrDefault(ins.Argument ?? 0);
+        }
+
+        var handlers = new List<ExceptHandler>
+        {
+            new ExceptHandler(exceptType, exceptName, handlerBody, isGroup)
+        };
+
+        foreach (var succ in handlerBlock.Successors)
+        {
+            if (!visited.Contains(succ) && succ.StartOffset <= matchingEntry.EndOffset)
+                visited.Add(succ);
+        }
+
+        return new List<Stmt> { new Try(tryBody, handlers) };
     }
 
     /// <summary>

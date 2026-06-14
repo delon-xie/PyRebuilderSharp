@@ -39,15 +39,28 @@
 
 ---
 
-## 五、执行计划
+## 执行计划
 
 ### ✅ 已修复
 
-| 项目 | 来源 | 状态 |
-|:-----|:-----|:------|
-| marshal TYPE_REF 偏移 (P3-1/2/3) | Phase 3 | ✅ **已修复** — `ReadRawMarshalBytes` 新增 TYPE_REF 处理 |
-| StackMachineTests (T-1/T-2) | 测试 | ✅ **已修复** |
-| TokenDumperTests (T-3) | 测试 | ✅ **已修复** |
+| 项目 | 来源 | 完成状态 |
+|:-----|:------|:---------|
+| marshal TYPE_REF 偏移 (P3-1/2/3) | Phase 3 | ✅ `ReadRawMarshalBytes` 新增 TYPE_REF 处理 |
+| StackMachineTests (T-1/T-2) | 测试 | ✅ 更新用例 |
+| TokenDumperTests (T-3) | 测试 | ✅ 更新预期值 |
+| class 定义 (ROT_TWO/PUSH_NULL) | Phase 4 | ✅ `case ROT_TWO` 检测 `_isPython312` |
+| cache 表→`rawOp==0` 跳过 | Phase 6 | ✅ `ParseInstructions311Plus` 修复 |
+| walrus `:=` NamedExpr + 检测 | Phase Fix | ✅ |
+| `except*` IsGroup + ExceptionTable CFG | Phase Fix | ✅ `BuildTryFromExceptionTable` |
+| 批量反编译模式 | Phase Fix | ✅ CLI `-d` |
+| CrashCollector Dashboard | Phase Fix | ✅ Avalonia 面板 |
+| AST 自动对比验证 | Phase Fix | ✅ `tools/ast_compare.py` |
+
+### ❌ 待完成
+
+| 项目 | 优先级 | 说明 |
+|:-----|:-------|:------|
+| `match/case` ExceptionTable CFG 重建 + AST | 🔴 高 | 需要 Match/MatchCase/MatchPattern AST 节点 + 代码生成器 + ExceptionTable CFG |
 
 ### 🔴 移入 Phase Fix（不阻塞关闭）
 
