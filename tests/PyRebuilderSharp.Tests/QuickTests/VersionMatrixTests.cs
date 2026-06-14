@@ -55,10 +55,6 @@ public class VersionMatrixTests
     {
         var runner = new PycdcSuiteRunner();
         return runner.GetAvailableTests("test_expr_basic", onlyModernPython: false)
-            .Where(t => {
-                var v = t.PythonVersion;
-                return v == "2.7" || v == "3.5" || v == "3.6" || v == "3.7" || v == "3.8" || v == "3.9" || v == "3.10";
-            })
             .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
     }
 
@@ -85,10 +81,6 @@ public class VersionMatrixTests
     {
         var runner = new PycdcSuiteRunner();
         return runner.GetAvailableTests("test_seq_clean", onlyModernPython: false)
-            .Where(t => {
-                var v = t.PythonVersion;
-                return v == "2.7" || v == "3.5" || v == "3.6" || v == "3.7" || v == "3.8" || v == "3.9" || v == "3.10";
-            })
             .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
     }
 
@@ -111,10 +103,6 @@ public class VersionMatrixTests
     {
         var runner = new PycdcSuiteRunner();
         return runner.GetAvailableTests("test_control_flow", onlyModernPython: false)
-            .Where(t => {
-                var v = t.PythonVersion;
-                return v == "2.7" || v == "3.5" || v == "3.6" || v == "3.7" || v == "3.8" || v == "3.9" || v == "3.10";
-            })
             .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
     }
 
@@ -183,6 +171,30 @@ public class VersionMatrixTests
     {
         var runner = new PycdcSuiteRunner();
         return runner.GetAvailableTests("test_nested_matrix", onlyModernPython: false)
+            .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
+    }
+
+    // ==================== Lv3-1: 九层塔嵌套 ====================
+
+    /// <summary>
+    /// Lv3-1: 9 层混合嵌套压力 — test_nested_depth_9
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(GetNestedDepth9VersionData))]
+    public void Lv3_1_NestedDepth9(string testName, string pycFile, string pyVersion)
+    {
+        var r = _runner.RunSingleFile(testName, pycFile);
+        if (!r.Passed)
+            _output.WriteLine($"❌ {testName} v{pyVersion}: {r.ErrorMessage}");
+        else
+            _output.WriteLine($"✅ {testName} v{pyVersion}");
+        Assert.True(r.Passed, $"{testName} v{pyVersion}: {r.ErrorMessage}");
+    }
+
+    public static IEnumerable<object[]> GetNestedDepth9VersionData()
+    {
+        var runner = new PycdcSuiteRunner();
+        return runner.GetAvailableTests("test_nested_depth_9", onlyModernPython: false)
             .Select(t => new object[] { t.TestName, t.PycFile, t.PythonVersion });
     }
 }

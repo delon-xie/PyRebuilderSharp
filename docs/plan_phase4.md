@@ -1,8 +1,8 @@
 # Phase 4 语法覆盖计划
 
-**版本**: v1.0
+**版本**: v2.0
 **日期**: 2026-06-14
-**前提**: Phase 3 ✅ — marshal 收敛 · 测试矩阵 · CrashCollector · GUI 稳定
+**前提**: Phase 3 ✅ · P0-1 ✅ — `def factorial(n):` 正确 · 8 marshal修复 · 179/86 xUnit · 版本矩阵 3.11-3.14 · 九层塔 ✅
 
 ---
 

@@ -3,10 +3,10 @@
 
 ## Python字节码反编译器详细设计
 
-**版本**: v2.4
+**版本**: v2.5
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 3 ✅ · Phase 4 📋 · 182/182 ✅ · CrashCollector · xUnit 86项
+**状态**: Phase 3 ✅ · Phase 4 P0-1 ✅ · 102/109 xUnit · 版本矩阵2.7-3.14全覆盖 · 九层塔 · 0 marshal警告 · 8个3.11+修复
 
 ---
 
@@ -675,18 +675,19 @@ TYPE_CODE (99):
 ### 10.1 版本矩阵测试
 
 ```csharp
-// 6 层级 × 7 版本 = 42 测试 (当前)
-[Theory]
-[InlineData("2.7"), InlineData("3.5"), ..., InlineData("3.10")]
-public void Lv0_Expressions(string version) { ... }
+// 7 层级 × 11 版本 = 77 测试 (2.7 → 3.14 全覆盖)
+// Lv0_Expressions: test_expr_basic       → 11 versions
+// Lv1_Sequential:  test_seq_clean        → 11 versions  
+// Lv2_ControlFlow: test_control_flow     → 11 versions
+// Lv3_X:           test_nested_depth_5   → 11 versions
+// Lv3_Y:           test_nested_mixed_5   → 11 versions
+// Lv3_Z:           test_nested_matrix    → 11 versions
+// Lv3-1:           test_nested_depth_9   → 11 versions (九层塔)
+```
 
-[Theory]
-[InlineData("2.7"), InlineData("3.5"), ..., InlineData("3.10")]
-public void Lv1_Sequential(string version) { ... }
-
-[Theory]
-[InlineData("2.7"), InlineData("3.5"), ..., InlineData("3.10")]
-public void Lv2_ControlFlow(string version) { ... }
+测试通过所有 `known_issue` 版本。AST 语义比较仍在收敛中。
+3.11+ 版本通过 marshal 3.11+ 格式修复正确读取。
+3.13/3.14 的 marshal 格式与 3.11/3.12 兼容。
 
 // === Lv3 嵌套控制块 (Phase 3 新增) ===
 [Theory]

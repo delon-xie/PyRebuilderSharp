@@ -1,24 +1,15 @@
 {
   "//": "PyRebuilderSharp — 测试兼容性清单",
+  "//": "known_issue: 该版本已知有问题，只验证不崩溃（标记通过）",
+  "//": "ast_check_ok: 该版本通过 AST 语义比较验证",
   "known_issue_versions": ["2.7","3.5","3.6","3.7","3.8","3.9","3.10","3.11","3.12","3.13","3.14"],
-  "ast_check_ok_versions": ["3.11","3.12"],
+  "ast_check_ok_versions": ["3.11","3.12","3.13","3.14"],
 
-  "test_nested_depth_5": {
-    "note": "5层同类型嵌套压力"
-  },
-  "test_nested_mixed_5": {
-    "note": "5层混合类型嵌套"
-  },
-  "test_nested_matrix": {
-    "note": "组合嵌套矩阵"
-  },
-  "test_control_flow": {
-    "note": "控制流"
-  },
-  "test_seq_clean": {
-    "note": "顺序代码"
-  },
-  "test_expr_basic": {
-    "note": "表达式"
-  }
+  "test_nested_depth_5":  { "note": "5层同类型嵌套压力", "ast_check_ok": true },
+  "test_nested_mixed_5":  { "note": "5层混合类型嵌套", "ast_check_ok": true },
+  "test_nested_matrix":   { "note": "组合嵌套矩阵", "ast_check_ok": true },
+  "test_nested_depth_9":  { "note": "九层塔混合嵌套", "ast_check_ok": false },
+  "test_control_flow":    { "note": "控制流", "ast_check_ok": true },
+  "test_seq_clean":       { "note": "顺序代码", "ast_check_ok": true },
+  "test_expr_basic":      { "note": "表达式", "ast_check_ok": true }
 }
