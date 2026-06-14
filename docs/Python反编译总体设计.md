@@ -5,7 +5,7 @@
 **版本**: v2.6
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ 全部关闭 — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 17 项修复 · 语法覆盖 14 项 · 剩余1项待完成
+**状态**: Phase 1–6 ✅ + Phase Fix ✅ 全部关闭 — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 15 语法项 · 0 项剩余 🎉
 
 ---
 
@@ -552,45 +552,33 @@ done
 | GUI | Avalonia 暗色主题 + 拖放 + 语法高亮 + 版本检测 | ✅ |
 | 编译脚本 | `tools/compile_test_data.py` 2.7→3.14 全覆盖 | ✅ |
 
-### 8.2 剩余工作
+### 8.2 语法覆盖（全部 ✅ 完成）
 
-- 语法覆盖：`match/case` (3.10+)、`except*` (3.11+)、walrus `:=`
-- 工程增强：AST 自动对比验证、CrashCollector Dashboard、批量反编译模式
+| 语法 | 版本 | 状态 |
+|:-----|:------|:------|
+| 表达式 / 顺序代码块 | 2.7–3.14 | ✅ |
+| 控制流 (if/while/for/try) | 2.7–3.14 | ✅ |
+| 嵌套 (5 层 + 九层塔) | 2.7–3.14 | ✅ |
+| lambda | 2.7–3.14 | ✅ |
+| `def` 函数定义 | 2.7–3.14 | ✅ |
+| `class` 类定义 | 2.7–3.14 | ✅ |
+| `yield` / `yield from` | 2.7–3.14 | ✅ |
+| `@decorator` | 2.7–3.14 | ✅ |
+| `async def` / `await` | 3.5–3.14 | ✅ |
+| 展开赋值 `a, b = ...` | 2.7–3.14 | ✅ |
+| walrus `:=` | 3.8–3.14 | ✅ NamedExpr + COPY+STORE |
+| `except*` | 3.11–3.14 | ✅ ExceptionTable + IsGroup |
+| `match/case` | 3.10–3.14 | ✅ 11 pattern types + codegen |
+| linetable 解析 | 3.11–3.14 | ✅ PEP 626 |
+| 跨平台 GUI | Windows/macOS/Linux | ✅ |
 
----
+### 工程增强（全部 ✅ 完成）
 
-## 9. 剩余工作计划
+| 项目 | 文件 | 状态 |
+|:-----|:------|:------|
+| 批量反编译模式 | `src/PyRebuilderSharp.Cli/Program.cs` | ✅ `-d <dir>`, `--stats` |
+| CrashCollector Dashboard | `PyRebuilderSharp.Gui` — Avalonia 面板 | ✅ 按钮 + 列表 + 清除 |
+| AST 自动对比验证 | `tools/ast_compare.py` | ✅ AST 语义比较 |
 
-Phase 1–6 全部关闭。剩余 1 项待完成：
 
-| 项目 | 优先级 | 说明 |
-|:-----|:-------|:------|
-| `match/case` ExceptionTable CFG 重建 + AST | 🔴 高 | 需要 Match/MatchCase/MatchPattern AST 节点 + 代码生成器 + ExceptionTable CFG |
-
-详见 `docs/plan_phase_fix.md`。
-
----
-
-## 10. 已知问题（已全部关闭）
-
-| 层级 | 内容 | 优先级 |
-|------|------|--------|
-| **Lv8a** | AST 语义比较自动化（CI） | P1 |
-| **Lv8b** | 性能优化（大文件/多代码对象） | P2 |
-| **Lv8c** | Python 2.7 bytecode 全面支持（SLICE/PRINT/EXEC/RAISE） | P2 |
-| **Lv8d** | Python 3.13+ 新特性适配 | P3 |
-| **Lv8e** | 插件化反编译引擎（支持第三方扩展） | P3 |
-
----
-
-## 10. 已知问题（已全部关闭）
-
-✅ Phase 3/4/5 已知问题已在 2026-06-14 全部修复。详见 `docs/summary_phase_fix_end.md`。
-
-| 问题 | 修复 |
-|:-----|:------|
-| module `co_names` 被 marshal TYPE_REF 耗尽 | `ReadRawMarshalBytes` 新增 `ReadRefAndReturnBytes` |
-| abc.3.12 `from name_8 import name_9` | 同上 |
-| `class __name__:` / `Foo = 'Foo'` → `class Foo: pass` | ROT_TWO/PUSH_NULL 枚举冲突 + cache 表修复 |
-| `x = f()` → `x = f` | cache 表重写为只跳过 `rawOp==0` |
-| StackMachineTests × 2, TokenDumperTests × 1 | 测试用例更新 |
+详见 `docs/summary_phase6_close.md`。

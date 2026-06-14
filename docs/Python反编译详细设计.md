@@ -6,7 +6,7 @@
 **版本**: v2.5
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 3 ✅ · Phase 4 ✅ · Phase 5 ✅ · 102/109 xUnit · 版本矩阵2.7-3.14全覆盖 · 九层塔测试 · 0 marshal警告 · 8个3.11+修复 · def/class/yield/decorator/async/展开赋值 · 支持至Python 3.14
+**状态**: Phase 1–6 ✅ + Phase Fix ✅ 全部关闭 · Phase 7 计划就绪 🚀
 
 ---
 
@@ -689,6 +689,7 @@ TYPE_CODE (99):
 3.11+ 版本通过 marshal 3.11+ 格式修复正确读取。
 3.13/3.14 的 marshal 格式与 3.11/3.12 兼容。
 
+```csharp
 // === Lv3 嵌套控制块 (Phase 3 新增) ===
 [Theory]
 [InlineData("2.7"), InlineData("3.5"), ..., InlineData("3.10")]
