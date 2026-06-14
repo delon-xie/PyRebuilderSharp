@@ -62,6 +62,8 @@ public class AstBuilder
         var stmts = BuildStatements(cfg.Entry, new HashSet<BasicBlock>());
         
         stmts = PostProcessFunctionDefs(stmts);
+        // Fallback: position-based ChildCode matching
+        stmts = ConvertChildCodesToFunctionDefs(stmts);
         
         // Remove trailing module-level return None
         if (stmts.Count > 0 && stmts[^1] is Return ret && ret.Value is Constant { Value: null })
@@ -2238,5 +2240,34 @@ public class AstBuilder
         }
 
         return new Lambda(args, new Constant(null));
+    }
+
+    /// <summary>
+    /// 兜底：从 ChildCodes 中按位置匹配 Assign 语句。
+    /// 当 PostProcessFunctionDefs 未能通过命名匹配时使用。
+    /// </summary>
+    private List<Stmt> ConvertChildCodesToFunctionDefs(List<Stmt> stmts)
+    {
+        var childCodes = _codeObject?.ChildCodes ?? new List<CodeObject>();
+        if (childCodes.Count == 0)
+            return stmts;
+
+        var result = new List<Stmt>(stmts.Count);
+        int childIdx = 0;
+
+        foreach (var stmt in stmts)
+        {
+            if (stmt is Assign assign && assign.Targets.Count == 1
+                && assign.Targets[0] is Name targetName
+                && assign.Value is Constant && childIdx < childCodes.Count)
+            {
+                var cc = childCodes[childIdx];
+                childIdx++;
+                var funcDef = BuildFunctionDef(cc.Name ?? targetName.Id, new FunctionRef(cc, cc.Name ?? targetName.Id));
+                if (funcDef != null) { result.Add(funcDef); continue; }
+            }
+            result.Add(stmt);
+        }
+        return result;
     }
 }

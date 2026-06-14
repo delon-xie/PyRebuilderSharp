@@ -116,7 +116,6 @@ public class PycReader
     private CodeObject ReadMarshalCodeObject(BinaryReader br, bool isSimple = false)
     {
         var code = new CodeObject();
-        var startPos = br.BaseStream.Position;
 
         // 设置版本信息
         code.IsPython38Plus = IsPython38Plus();
@@ -180,7 +179,10 @@ public class PycReader
             // v3.11+: TYPE_STRING(0x73) 是字节码（非 TYPE_CODE_SIMPLE），用 ReadRawMarshalBytes
             byte[]? bcBytes;
             if (IsPython311Plus())
+            {
+                var bcStart = br.BaseStream.Position;
                 bcBytes = ReadRawMarshalBytes(br);
+            }
             else
             {
                 var bytecodeObj = ReadMarshalObject(br);
@@ -190,12 +192,55 @@ public class PycReader
                 code.Instructions = ParseInstructions(bcBytes);
 
             code.Constants = ReadMarshalDictSafe(br, code);
-
-            // names/varnames/freevars/cellvars — 通过 ReadMarshalObject 以正确处理 FLAG_REF
-            code.Names = ReadMarshalObjectAsStrList(br);
-            code.Varnames = ReadMarshalObjectAsStrList(br);
-            code.Freevars = ReadMarshalObjectAsStrList(br);
-            code.Cellvars = ReadMarshalObjectAsStrList(br);
+            
+            // names/varnames/freevars/cellvars
+            if (IsPython311Plus())
+            {
+                // Python 3.11+: marshal 格式改为单个 localsplusnames + localspluskinds
+                // co_names 仍然独立存储
+                code.Names = ReadMarshalObjectAsStrList(br);
+                if (br.BaseStream.Position > 2700 && br.BaseStream.Position < 2900)
+                    Console.Error.WriteLine($"[FIELD] after names pos={br.BaseStream.Position} count={code.Names.Count}");
+                var localsplusnames = ReadMarshalObjectAsStrList(br);
+                
+                // localspluskinds = 字节数组
+                byte[]? localspluskinds = null;
+                try
+                {
+                    // 注意：不能使用 ReadMarshalObject，因为 0x73 (TYPE_STRING) 会被
+                    // ReadMarshalValue 当成 TYPE_CODE_SIMPLE (3.11+) 读到 EOF。
+                    // 直接使用 ReadRawMarshalBytes 读取原始字节数据。
+                    localspluskinds = ReadRawMarshalBytes(br);
+                }
+                catch { }
+                
+                // 按类型拆分为 varnames/cellvars/freevars
+                var varnames = new List<string>();
+                var cellvars = new List<string>();
+                var freevars = new List<string>();
+                for (int i = 0; i < localsplusnames.Count; i++)
+                {
+                    var kind = (localspluskinds != null && i < localspluskinds.Length) ? localspluskinds[i] : (byte)0;
+                    switch (kind)
+                    {
+                        case 2: freevars.Add(localsplusnames[i]); break;
+                        case 1: cellvars.Add(localsplusnames[i]); break;
+                        default:
+                        case 0: varnames.Add(localsplusnames[i]); break;
+                    }
+                }
+                code.Varnames = varnames;
+                code.Freevars = freevars;
+                code.Cellvars = cellvars;
+            }
+            else
+            {
+                // Pre-3.11: 独立的 varnames/freevars/cellvars
+                code.Names = ReadMarshalObjectAsStrList(br);
+                code.Varnames = ReadMarshalObjectAsStrList(br);
+                code.Freevars = ReadMarshalObjectAsStrList(br);
+                code.Cellvars = ReadMarshalObjectAsStrList(br);
+            }
 
             // filename/name — 通过 ReadMarshalObject 以正确处理 FLAG_REF
             var filenameObj = ReadMarshalObject(br);
@@ -230,9 +275,25 @@ public class PycReader
             {
                 try
                 {
-                    var excTblObj = ReadMarshalObject(br);
-                    if (excTblObj is byte[] excBytes && excBytes.Length > 0)
-                        code.ExceptionTable = ParseExceptionTable(excBytes);
+                    // 先 peek 类型字节，只有是 string/bytes/ref 类型才读取
+                    var peekByte = br.ReadByte();
+                    br.BaseStream.Position--;
+                    var peekType = (byte)(peekByte & ~MarshalType.TYPE_FLAG_REF);
+                    if (peekType == MarshalType.TYPE_STRING || peekType == MarshalType.TYPE_BYTES
+                        || peekType == MarshalType.TYPE_SHORT_ASCII || peekType == MarshalType.TYPE_ASCII
+                        || peekType == MarshalType.TYPE_UNICODE)
+                    {
+                        var excBytes = ReadRawMarshalBytes(br);
+                        if (excBytes != null && excBytes.Length > 0)
+                            code.ExceptionTable = ParseExceptionTable(excBytes);
+                    }
+                    else if (peekType == MarshalType.TYPE_REF)
+                    {
+                        // Exception table is a reference to previously stored bytes
+                        var excObj = ReadMarshalObject(br);
+                        if (excObj is byte[] excBytes && excBytes.Length > 0)
+                            code.ExceptionTable = ParseExceptionTable(excBytes);
+                    }
                 }
                 catch { }
             }
@@ -1209,6 +1270,15 @@ public class PycReader
                 return result;
             }
 
+            // Container (tuple) FLAG_REF: reserve ref slot + fill after reading elements
+            bool containerHasRef = (rawType & MarshalType.TYPE_FLAG_REF) != 0;
+            int containerRefIdx = -1;
+            if (containerHasRef)
+            {
+                containerRefIdx = _refList.Count;
+                _refList.Add(null);
+            }
+
             int count;
             if (type == MarshalType.TYPE_SMALL_TUPLE)
                 count = br.ReadByte();
@@ -1216,20 +1286,91 @@ public class PycReader
                 count = br.ReadInt32();
             else
             {
-                // Single string (non-tuple) — read it directly without going through
-                // ReadMarshalValue which would confuse TYPE_STRING(0x73) with TYPE_CODE_SIMPLE
-                var str = ReadMarshalStringValue(br, rawType);
+                // Single string (non-tuple)
+                // Handle 0x73 (TYPE_STRING) directly to avoid TYPE_CODE_SIMPLE confusion.
+                // For other types, use ReadMarshalObject for correct ref list alignment.
+                var str = ReadOneMarshalString(br, rawType);
                 if (str != null) result.Add(str);
                 return result;
             }
 
             for (int i = 0; i < count; i++)
             {
-                var str = ReadMarshalStringValue(br, null);
+                // Peek: if TYPE_STRING(0x73), read directly; else use ReadMarshalObject
+                var peek = br.ReadByte();
+                br.BaseStream.Position--;
+                var peekType = (byte)(peek & ~MarshalType.TYPE_FLAG_REF);
+
+                string? str;
+                if (peekType == MarshalType.TYPE_STRING)
+                {
+                    // 0x73 = TYPE_STRING in names context, NOT TYPE_CODE_SIMPLE
+                    str = ReadOneMarshalString(br, null);
+                }
+                else
+                {
+                    // For all other types, use ReadMarshalObject for correct ref list
+                    var obj = ReadMarshalObject(br);
+                    str = obj?.ToString();
+                }
                 if (str != null) result.Add(str);
             }
+            
+            // Fill container ref slot
+            if (containerRefIdx >= 0)
+                _refList[containerRefIdx] = result;
         }
         catch { }
+        return result;
+    }
+
+    /// <summary>
+    /// 读取单个 marshal 字符串值，保持 ref list 对齐。
+    /// 处理 0x73 为 TYPE_STRING（非 TYPE_CODE_SIMPLE）。
+    /// 不通过 ReadMarshalValue dispatch，避免 0x73 误判。
+    /// </summary>
+    private string? ReadOneMarshalString(BinaryReader br, byte? preReadRawType)
+    {
+        byte rawType;
+        if (preReadRawType.HasValue)
+            rawType = preReadRawType.Value;
+        else
+            rawType = br.ReadByte();
+
+        var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
+
+        // TYPE_REF: lookup in ref list
+        if (type == MarshalType.TYPE_REF)
+        {
+            var refIdx = br.ReadInt32();
+            if (refIdx >= 0 && refIdx < _refList.Count && _refList[refIdx] is string refStr)
+                return refStr;
+            return null;
+        }
+
+        // For FLAG_REF strings: reserve ref slot BEFORE reading (like ReadMarshalObject)
+        bool hasRef = (rawType & MarshalType.TYPE_FLAG_REF) != 0;
+        int flagRefIdx = -1;
+        if (hasRef)
+        {
+            flagRefIdx = _refList.Count;
+            _refList.Add(null);
+        }
+
+        string? result = type switch
+        {
+            MarshalType.TYPE_STRING => ReadLongString(br),
+            MarshalType.TYPE_SHORT_ASCII => ReadShortString(br),
+            MarshalType.TYPE_SHORT_ASCII_INTERNED => ReadShortString(br),
+            MarshalType.TYPE_ASCII => ReadLongString(br),
+            MarshalType.TYPE_ASCII_INTERNED => ReadLongString(br),
+            MarshalType.TYPE_UNICODE => ReadLongString(br),
+            _ => null,
+        };
+
+        if (flagRefIdx >= 0 && result != null)
+            _refList[flagRefIdx] = result;
+
         return result;
     }
 
@@ -1249,9 +1390,28 @@ public class PycReader
                 rawType = br.ReadByte();
 
             var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
-            return type switch
+            bool hasRef = (rawType & MarshalType.TYPE_FLAG_REF) != 0;
+            
+            // TYPE_REF (0x72) — reference to a previously stored string
+            if (type == MarshalType.TYPE_REF)
             {
-                // TYPE_STRING (0x73) — MUST be handled as string, NOT as TYPE_CODE_SIMPLE
+                var refIdx = br.ReadInt32();
+                if (refIdx >= 0 && refIdx < _refList.Count && _refList[refIdx] is string refStr)
+                    return refStr;
+                return null;
+            }
+            
+            // If FLAG_REF is set, pre-reserve a ref list slot (like ReadMarshalObject does)
+            // so later TYPE_REF references find the correct entry.
+            int flagRefIdx = -1;
+            if (hasRef)
+            {
+                flagRefIdx = _refList.Count;
+                _refList.Add(null);
+            }
+            
+            string? result = type switch
+            {
                 MarshalType.TYPE_STRING => ReadLongString(br),
                 MarshalType.TYPE_SHORT_ASCII => ReadShortString(br),
                 MarshalType.TYPE_SHORT_ASCII_INTERNED => ReadShortString(br),
@@ -1260,6 +1420,14 @@ public class PycReader
                 MarshalType.TYPE_UNICODE => ReadLongString(br),
                 _ => null,
             };
+            
+            // Fill the reserved ref slot with the actual string value
+            if (flagRefIdx >= 0 && result != null)
+            {
+                _refList[flagRefIdx] = result;
+            }
+            
+            return result;
         }
         catch { return null; }
     }
@@ -1375,7 +1543,15 @@ public class PycReader
         var items = isTuple ? new PyTuple() : new List<object?>();
         for (int i = 0; i < count; i++)
         {
-            items.Add(ReadMarshalObject(br));
+            try
+            {
+                items.Add(ReadMarshalObject(br));
+            }
+            catch
+            {
+                // Individual element failure — skip and continue
+                items.Add(null);
+            }
         }
         return items;
     }
@@ -1512,6 +1688,11 @@ public class PycReader
 
     private object? HandleUnknownMarshalType(BinaryReader br, byte type)
     {
+        // If the type byte is very small (< 4), it's likely padding or
+        // a non-marshal byte between fields. Don't skip any data.
+        if (type < 4)
+            return null;
+        
         // Try to skip: assume it's a value with a 4-byte length prefix
         try
         {
@@ -1555,12 +1736,13 @@ public class PycReader
         var rawType = br.ReadByte();
         var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
 
-        // Handle FLAG_REF: the 4 bytes after a FLAG_REF type byte are a ref index
-        if ((rawType & MarshalType.TYPE_FLAG_REF) != 0)
+        // FLAG_REF: reserve ref list slot (like ReadMarshalObject does)
+        bool hasRef = (rawType & MarshalType.TYPE_FLAG_REF) != 0;
+        int refIdx = -1;
+        if (hasRef)
         {
-            // Some type bytes with FLAG_REF have a ref index between type and length
-            // Skip the ref index: it's an int32
-            br.ReadInt32();
+            refIdx = _refList.Count;
+            _refList.Add(null);
         }
 
         byte[]? result = type switch
@@ -1569,11 +1751,15 @@ public class PycReader
                 => ReadShortStringBytes(br),
             MarshalType.TYPE_ASCII_INTERNED or MarshalType.TYPE_ASCII
                 or MarshalType.TYPE_STRING or MarshalType.TYPE_UNICODE
-                or 116 // TYPE_INTERNED (v2.7)
+                or 116
                 => ReadLongStringBytes(br),
             MarshalType.TYPE_BYTES => ReadLongStringBytes(br),
             _ => null,
         };
+
+        if (refIdx >= 0 && result != null)
+            _refList[refIdx] = result;
+
         return result;
     }
 
@@ -1595,7 +1781,14 @@ public class PycReader
         var items = new PyTuple();
         for (int i = 0; i < count; i++)
         {
-            items.Add(ReadMarshalObject(br));
+            try
+            {
+                items.Add(ReadMarshalObject(br));
+            }
+            catch
+            {
+                items.Add(null);
+            }
         }
         return items;
     }

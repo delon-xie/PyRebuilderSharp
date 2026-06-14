@@ -15,6 +15,7 @@ public class StackMachine
     private readonly CodeObject _code;
     private readonly HashSet<int> _loopHeaderOffsets;
     private bool _isForLoop;
+    private readonly bool _isPython312;
     // v2.7 print 语句缓冲
     private readonly List<Expr> _printItems = new();
 
@@ -23,6 +24,8 @@ public class StackMachine
         _code = code;
         _loopHeaderOffsets = new HashSet<int>();
         _isForLoop = false;
+        // Detect Python 3.12 by checking if any instruction uses the CALL opcode (171)
+        _isPython312 = code.Instructions?.Any(i => i.Opcode == Opcode.CALL) == true;
     }
 
     /// <summary>
@@ -442,7 +445,29 @@ public class StackMachine
                 return null;
             }
             case Opcode.CALL_FUNCTION_EX:
-                return null; // Skip for now
+            {
+                // flags: 0x01 = has args, 0x02 = has kwargs
+                var flags = instr.Argument ?? 0;
+                var args = new List<Expr>();
+                var keywords = new List<Keyword>();
+                
+                // Pop kwargs dict if present
+                if ((flags & 0x02) != 0)
+                {
+                    SafePop(); // kwargs dict — skip for now
+                }
+                // Pop args tuple if present  
+                if ((flags & 0x01) != 0)
+                {
+                    var argsExpr = SafePop();
+                    if (argsExpr is ListLiteral listLit)
+                        args.AddRange(listLit.Elts);
+                }
+                var func = SafePop();
+                if (func == null) return null;
+                _exprStack.Push(new Call(func, args, keywords));
+                return null;
+            }
 
             // ---- Print（Python 2.7）----
             case Opcode.PRINT_ITEM:
@@ -802,18 +827,28 @@ public class StackMachine
                 }
                 else
                 {
-                    // v3.3+: pop qualname + code
-                    var qualNameExpr = SafePop();
-                    var codeExpr = SafePop();
-
-                    funcName = qualNameExpr switch
+                    if (_isPython312)
                     {
-                        Constant c when c.Value is string s => s,
-                        _ => "<lambda>"
-                    };
+                        // Python 3.12+: MAKE_FUNCTION pops only code object (qualname from co_qualname)
+                        var codeExpr = SafePop();
+                        if (codeExpr is Constant c2 && c2.Value is CodeObject co)
+                        {
+                            childCode = co;
+                            funcName = co.Name ?? "<lambda>";
+                        }
+                    }
+                    else
+                    {
+                        // v3.3-3.11: pop qualname + code
+                        var qualNameExpr = SafePop();
+                        var codeExpr = SafePop();
 
-                    if (codeExpr is Constant c2 && c2.Value is CodeObject co)
-                        childCode = co;
+                        if (qualNameExpr is Constant c3 && c3.Value is string s)
+                            funcName = s;
+
+                        if (codeExpr is Constant c2 && c2.Value is CodeObject co)
+                            childCode = co;
+                    }
                 }
 
                 _exprStack.Push(new FunctionRef(childCode, funcName));
