@@ -45,6 +45,10 @@ public class CodeObject
 
     // ---- 行号表 ----
     public Dictionary<int, int> LineNumberTable { get; set; } = new();
+    /// <summary>原始 lnotab/linetable 字节</summary>
+    public byte[]? LineNumberBytes { get; set; }
+    /// <summary>指示行号表是否是 3.11+ linetable 格式</summary>
+    public bool HasLinetable { get; set; }
 
     // ---- 异常表 (Python 3.10+) ----
     public List<ExceptionTableEntry> ExceptionTable { get; set; } = new();

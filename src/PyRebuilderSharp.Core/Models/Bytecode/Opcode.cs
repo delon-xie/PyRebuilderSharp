@@ -230,6 +230,11 @@ public enum Opcode : byte
     PUSH_EXC_INFO_312 = 179,   // 3.12+ (was 138 in 3.5-3.10, raw byte 35)
     CHECK_EXC_MATCH = 197,     // 3.12+ (raw byte 36)
     CHECK_EG_MATCH = 198,      // 3.12+ (raw byte 37)
+    // 3.10+ match/case opcodes
+    MATCH_MAPPING_312 = 180,   // 3.12+ (raw byte 31)
+    MATCH_SEQUENCE_312 = 181,  // 3.12+ (raw byte 32)
+    MATCH_KEYS_312 = 182,      // 3.12+ (raw byte 33)
+    MATCH_CLASS_312 = 183,     // 3.12+ (raw byte 152)
     BEFORE_WITH_312 = 199,     // 3.12+ (was 153 in 3.7-3.10, raw byte 53)
     WITH_EXCEPT_START_312 = 188, // 3.12+ (was 154 in 3.7-3.10, raw byte 49)
 }

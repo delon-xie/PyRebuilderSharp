@@ -35,7 +35,7 @@ public record Try(
     List<Stmt>? Finalbody = null
 ) : Stmt;
 
-public record ExceptHandler(Expr? Type, string? Name, List<Stmt> Body) : Stmt;
+public record ExceptHandler(Expr? Type, string? Name, List<Stmt> Body, bool IsGroup = false) : Stmt;
 public record Raise(Expr? Exc = null, Expr? Cause = null) : Stmt;
 public record Assert(Expr Test, Expr? Msg = null) : Stmt;
 

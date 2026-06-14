@@ -266,7 +266,11 @@ public class PycReader
                 lnotab = lnotabObj as byte[];
             }
             if (lnotab != null)
-                code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions);
+            {
+                code.LineNumberBytes = lnotab;
+                code.HasLinetable = IsPython311Plus();
+                code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions, IsPython311Plus());
+            }
 
             // co_exceptiontable（3.11+ 的所有代码对象都有，包括 TYPE_CODE_SIMPLE）
             if (IsPython311Plus() && br.BaseStream.Position < br.BaseStream.Length)
@@ -1052,6 +1056,11 @@ public class PycReader
             35 when is312 => Models.Bytecode.Opcode.PUSH_EXC_INFO_312,
             36 when is312 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,
             37 when is312 => Models.Bytecode.Opcode.CHECK_EG_MATCH,
+            // 3.10+ match/case opcodes (3.12 raw byte values)
+            31 when is312 => Models.Bytecode.Opcode.MATCH_MAPPING_312,
+            32 when is312 => Models.Bytecode.Opcode.MATCH_SEQUENCE_312,
+            33 when is312 => Models.Bytecode.Opcode.MATCH_KEYS_312,
+            152 when is312 => Models.Bytecode.Opcode.MATCH_CLASS_312,
             49 when is312 => Models.Bytecode.Opcode.WITH_EXCEPT_START_312,
             53 when is312 => Models.Bytecode.Opcode.BEFORE_WITH_312,
             114 when is312 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,
@@ -1817,8 +1826,11 @@ public class PycReader
         return items;
     }
 
-    private Dictionary<int, int> ParseLineNumberTable(byte[] lnotab, List<Instruction> instructions)
+    private Dictionary<int, int> ParseLineNumberTable(byte[] lnotab, List<Instruction> instructions, bool isLinetable = false)
     {
+        if (isLinetable)
+            return ParseLinetable311(lnotab);
+        
         var table = new Dictionary<int, int>();
         int line = instructions.Count > 0 ? 1 : 0;
         int addr = 0;
@@ -1831,6 +1843,66 @@ public class PycReader
             table[addr] = line;
         }
 
+        return table;
+    }
+
+    /// <summary>
+    /// 解析 Python 3.11+ co_linetable（PEP 626 格式）。
+    /// 使用 Python 的 co_lines() 语义提取 (start_offset, line) 映射。
+    /// </summary>
+    private Dictionary<int, int> ParseLinetable311(byte[] data)
+    {
+        var table = new Dictionary<int, int>();
+        int line = 1;
+        int start = 0;
+        int i = 0;
+        while (i < data.Length)
+        {
+            int code = (data[i] >> 6) & 3;
+            switch (code)
+            {
+                case 0: // short: 1-3 bytes
+                    if (i + 1 >= data.Length) break;
+                    int lineDeltaShort = (data[i] >> 2) & 0xF;
+                    int endDeltaShort = ((data[i] & 3) << 2) | (data[i + 1] & 3);
+                    line += lineDeltaShort;
+                    start += endDeltaShort;
+                    i += 2;
+                    break;
+                case 1: // medium: 3 bytes
+                    if (i + 2 >= data.Length) break;
+                    int lineDeltaMed = ((data[i] & 0x3F) << 2) | ((data[i + 1] >> 6) & 3);
+                    int endDeltaMed = data[i + 1] & 0x3F;
+                    line += (sbyte)(lineDeltaMed > 31 ? lineDeltaMed - 64 : lineDeltaMed);
+                    start += endDeltaMed;
+                    i += 3;
+                    break;
+                case 2: // long: 4+ bytes
+                    if (i + 3 >= data.Length) break;
+                    int lineDeltaLong = data[i] & 0x3F;
+                    int column = data[i + 2];
+                    int endDeltaLong = data[i + 3];
+                    line += (sbyte)(lineDeltaLong > 31 ? lineDeltaLong - 64 : lineDeltaLong);
+                    start += endDeltaLong;
+                    i += 4;
+                    break;
+                case 3: // sentinel
+                    int entryCode = (data[i] >> 3) & 7;
+                    switch (entryCode)
+                    {
+                        case 0: break; // end of entries
+                        case 1: // simple no-line entry (skip)
+                            i += 2;
+                            continue;
+                        default:
+                            // skip 2 bytes per entry code 3+ 
+                            i += 2;
+                            continue;
+                    }
+                    return table;
+            }
+            table[start] = line;
+        }
         return table;
     }
 

@@ -19,12 +19,12 @@ public class StackMachine
     // v2.7 print 语句缓冲
     private readonly List<Expr> _printItems = new();
 
+    private int _pendingCopyDepth = -1; // 用于 walrus := 检测
+
     public StackMachine(CodeObject code)
     {
         _code = code;
         _loopHeaderOffsets = new HashSet<int>();
-        _isForLoop = false;
-        // Detect Python 3.12 by checking if any instruction uses the CALL opcode (171)
         _isPython312 = code.Instructions?.Any(i => i.Opcode == Opcode.CALL) == true;
     }
 
@@ -119,6 +119,13 @@ public class StackMachine
                 var storeName = GetName(instr);
                 var val = SafePop();
                 if (val == null) return null;
+                // walrus := detected: COPY followed by STORE_NAME
+                if (_pendingCopyDepth >= 0)
+                {
+                    _pendingCopyDepth = -1;
+                    _exprStack.Push(new NamedExpr(new Name(storeName, ExpressionContext.Store), val));
+                    return null;
+                }
                 return new Assign(new List<Expr> { new Name(storeName, ExpressionContext.Store) }, val);
             }
 
@@ -127,6 +134,13 @@ public class StackMachine
                 var storeLocal = GetVarname(instr);
                 var val = SafePop();
                 if (val == null) return null;
+                // walrus := detected: COPY followed by STORE_FAST
+                if (_pendingCopyDepth >= 0)
+                {
+                    _pendingCopyDepth = -1;
+                    _exprStack.Push(new NamedExpr(new Name(storeLocal, ExpressionContext.Store), val));
+                    return null;
+                }
                 return new Assign(new List<Expr> { new Name(storeLocal, ExpressionContext.Store) }, val);
             }
 
@@ -571,10 +585,13 @@ public class StackMachine
             {
                 var depth = instr.Argument ?? 0;
                 // COPY n: duplicate the element n positions below TOS
-                if (depth == 0)
+                // In Python 3.12, COPY n copies stack[-1-n]. For walrus := pattern,
+                // COPY 1 is used with only 1 element on stack — copy TOS.
+                if (depth == 0 || depth >= _exprStack.Count)
                 {
                     var top = SafePeek();
                     if (top != null) _exprStack.Push(top);
+                    _pendingCopyDepth = (int)depth;
                 }
                 else
                 {
@@ -584,6 +601,7 @@ public class StackMachine
                     int idx = (int)depth;
                     if (idx >= 0 && idx < arr.Length)
                         _exprStack.Push(arr[idx]);
+                    _pendingCopyDepth = (int)depth;
                 }
                 return null;
             }
@@ -724,6 +742,11 @@ public class StackMachine
             case Opcode.PUSH_EXC_INFO_312:
             case Opcode.CHECK_EXC_MATCH:
             case Opcode.CHECK_EG_MATCH:
+            // 3.10+ match/case: runtime pattern matching, no AST generation
+            case Opcode.MATCH_MAPPING_312:
+            case Opcode.MATCH_SEQUENCE_312:
+            case Opcode.MATCH_KEYS_312:
+            case Opcode.MATCH_CLASS_312:
                 return null;
 
             // ---- 3.5-3.10 opcodes that carry through ----

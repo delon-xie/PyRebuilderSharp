@@ -160,6 +160,11 @@ public class PythonCodeGenerator : ICodeGenerator
             case FunctionRef fr:
                 _output.Append(fr.Name);
                 break;
+            case NamedExpr ne:
+                Visit(ne.Target);
+                _output.Append(" := ");
+                Visit(ne.Value);
+                break;
             default:
                 _output.Append($"# Unknown node: {node.GetType().Name}");
                 break;
@@ -379,7 +384,7 @@ public class PythonCodeGenerator : ICodeGenerator
         foreach (var handler in tryStmt.Handlers)
         {
             WriteIndent();
-            _output.Append("except");
+            _output.Append(handler.IsGroup ? "except*" : "except");
             if (handler.Type != null)
             {
                 _output.Append(" ");

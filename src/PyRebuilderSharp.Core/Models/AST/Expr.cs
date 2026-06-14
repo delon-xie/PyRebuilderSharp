@@ -76,3 +76,6 @@ public record JoinedStr(List<Expr> Values) : Expr;
 
 // --- 函数引用（中间表示，用于Assign→FunctionDef转换） ---
 public record FunctionRef(Bytecode.CodeObject? Code, string Name) : Expr;
+
+// --- Walrus (NamedExpr) ---
+public record NamedExpr(Expr Target, Expr Value) : Expr;
