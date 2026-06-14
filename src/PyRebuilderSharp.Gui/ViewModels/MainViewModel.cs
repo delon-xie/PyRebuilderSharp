@@ -221,9 +221,9 @@ public class MainViewModel : ViewModelBase
         OpenFileCommand = ReactiveCommand.CreateFromTask(OpenFileAsync);
         SaveResultCommand = ReactiveCommand.CreateFromTask(SaveResultAsync);
         DecompileCommand = ReactiveCommand.CreateFromTask(DecompileCurrentAsync);
-        ShowCrashLogCommand = ReactiveCommand.Create(LoadCrashLog);
-        ClearCrashLogCommand = ReactiveCommand.Create(ClearCrashLog);
-        CloseCrashLogCommand = ReactiveCommand.Create(() => ShowCrashLog = false);
+        ShowCrashLogCommand = ReactiveCommand.Create(() => { LoadCrashLog(); return System.Reactive.Unit.Default; });
+        ClearCrashLogCommand = ReactiveCommand.Create(() => { ClearCrashLog(); return System.Reactive.Unit.Default; });
+        CloseCrashLogCommand = ReactiveCommand.Create(() => { ShowCrashLog = false; return System.Reactive.Unit.Default; });
         PythonVersion = "🔍 选择 .pyc 文件开始反编译";
     }
 

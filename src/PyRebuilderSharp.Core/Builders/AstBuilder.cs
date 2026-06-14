@@ -16,6 +16,7 @@ public class AstBuilder
     private Dictionary<int, BlockResult> _blockResults = new();
     private HashSet<int> _loopHeaderOffsets = new();
     private List<BasicBlock> _allBlocks = new();
+    private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
 
     public AstBuilder(CodeObject codeObject)
     {
@@ -32,12 +33,6 @@ public class AstBuilder
     /// 反编译失败的基本块数（用于统计）。
     /// </summary>
     public int FailedBlockCount { get; private set; }
-
-    public AstBuilder(CodeObject codeObject)
-    {
-        _codeObject = codeObject;
-        _blockDecompiler = new BlockDecompiler();
-    }
 
     /// <summary>
     /// 从结构化CFG构建AST。
@@ -66,6 +61,60 @@ public class AstBuilder
         }
 
         var stmts = BuildStatements(cfg.Entry, new HashSet<BasicBlock>());
+
+        // 确保所有块都被处理（防止 try/except 等结构导致块被错误标记跳过）
+        var allBlocksSet = new HashSet<BasicBlock>(cfg.Blocks);
+        var visited = new HashSet<BasicBlock>();
+        CollectVisited(cfg.Entry, visited);
+        var unvisited = allBlocksSet.Except(visited).ToList();
+        if (unvisited.Count > 0)
+        {
+            Console.Error.WriteLine($"[WARN] {unvisited.Count} unprocessed blocks — recovering");
+            // Mark blocks from the try body range to avoid duplication
+            var tryHandlerOffsets = new HashSet<int>();
+            foreach (var stmt in stmts)
+            {
+                if (stmt is Try tryStmt)
+                {
+                    foreach (var h in tryStmt.Handlers)
+                    {
+                        // Skip orphan blocks that would duplicate try handler content
+                        foreach (var orphan in unvisited.ToList())
+                        {
+                            if (orphan.StartOffset >= 0 && orphan.StartOffset < int.MaxValue)
+                                tryHandlerOffsets.Add(orphan.StartOffset);
+                        }
+                    }
+                }
+            }
+
+            foreach (var orphan in unvisited.OrderBy(b => b.StartOffset))
+            {
+                try
+                {
+                    var blockDecomp = new BlockDecompiler();
+                    var blockResult = blockDecomp.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
+                    stmts.Add(new CommentBlock($"# [Block @0x{orphan.StartOffset:X4}] Not yet processed"));
+                }
+                catch (Exception ex)
+                {
+                    // Record orphan block error to crash log
+                    try
+                    {
+                        PyRebuilderSharp.Core.Services.CrashCollector.RecordCrash(
+                            new PyRebuilderSharp.Core.Services.CrashContext
+                            {
+                                FileName = $"orphan_0x{orphan.StartOffset:X4}",
+                                SourceSnippet = orphan.Instructions.Count > 0
+                                    ? $"{orphan.Instructions[0].Opcode}..." : ""
+                            },
+                            ex);
+                    }
+                    catch { }
+                    stmts.Add(new CommentBlock($"# [Block @0x{orphan.StartOffset:X4}] Error: {ex.Message}"));
+                }
+            }
+        }
 
         stmts = PostProcessFunctionDefs(stmts);
         // Fallback: position-based ChildCode matching
@@ -204,6 +253,34 @@ public class AstBuilder
             return new List<Stmt>();
 
         visited.Add(block);
+
+        try
+        {
+            return BuildStatementsInternal(block, visited);
+        }
+        catch (Exception ex)
+        {
+            // Block-level fault tolerance — record to crash log
+            try
+            {
+                PyRebuilderSharp.Core.Services.CrashCollector.RecordCrash(
+                    new PyRebuilderSharp.Core.Services.CrashContext
+                    {
+                        FileName = $"ast_block_0x{block.StartOffset:X4}",
+                        SourceSnippet = block.Instructions.Count > 0
+                            ? $"{block.Instructions[0].Opcode}..." : ""
+                    },
+                    ex);
+            }
+            catch { }
+            var fallback = $"# [Block @0x{block.StartOffset:X4}] Error: {ex.GetType().Name}: {ex.Message}";
+            return new List<Stmt> { new CommentBlock(fallback) };
+        }
+    }
+
+    private List<Stmt> BuildStatementsInternal(
+        BasicBlock block, HashSet<BasicBlock> visited)
+    {
         var stmts = new List<Stmt>();
 
         var result = _blockResults.GetValueOrDefault(block.Id);
@@ -251,17 +328,27 @@ public class AstBuilder
             stmts.AddRange(tryBodyStmts);
             // 标记 handler 块为 visited
             var handlerAbs = GetHandlerOffset(block);
+            List<BasicBlock> handlerBlocks = new();
             if (handlerAbs.HasValue)
             {
-                var handlerBlocks = new List<BasicBlock>();
                 FindBlocksFromOffset(handlerAbs.Value, handlerBlocks);
                 foreach (var hb in handlerBlocks)
                     visited.Add(hb);
             }
+            // 处理 try block 的后缀块
             foreach (var succ in block.Successors)
             {
                 if (!visited.Contains(succ))
                     stmts.AddRange(BuildStatements(succ, visited));
+            }
+            // 处理 handler 块的后缀块（如类定义等在 try/except 之后的代码）
+            foreach (var hb in handlerBlocks)
+            {
+                foreach (var succ in hb.Successors)
+                {
+                    if (!visited.Contains(succ))
+                        stmts.AddRange(BuildStatements(succ, visited));
+                }
             }
             return stmts;
         }
@@ -890,13 +977,24 @@ public class AstBuilder
                     foreach (var ins in succ.Instructions.Take(3))
                     {
                         if (ins.Opcode == Opcode.DUP_TOP || ins.Opcode == Opcode.POP_TOP 
-                            || ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_GLOBAL
                             || ins.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH
                             || ins.Opcode == Opcode.RERAISE
                             || ins.Opcode == Opcode.POP_EXCEPT || ins.Opcode == Opcode.END_FINALLY
                             || ins.Opcode == Opcode.RETURN_VALUE)
                         {
                             isHandlerPart = true;
+                        }
+                        // LOAD_NAME/LOAD_GLOBAL is only handler preamble when immediately before JUMP_IF_NOT_EXC_MATCH
+                        // (not for class defs or function defs that follow the handler)
+                        if (ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_GLOBAL)
+                        {
+                            // Check if the very NEXT instruction is JUMP_IF_NOT_EXC_MATCH
+                            var nextIdx = succ.Instructions.IndexOf(ins) + 1;
+                            if (nextIdx < succ.Instructions.Count
+                                && succ.Instructions[nextIdx].Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH)
+                            {
+                                isHandlerPart = true;
+                            }
                         }
                     }
                     if (isHandlerPart || !pastHandlerPreamble)
@@ -1004,16 +1102,28 @@ public class AstBuilder
             Expr? exceptType = null;
             foreach (var hb in handlerBlocks)
             {
+                bool foundType = false;
                 foreach (var ins in hb.Instructions)
                 {
                     if (ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_GLOBAL)
                     {
-                        var typeName = _codeObject.Names.Count > (ins.Argument ?? 0)
-                            ? _codeObject.Names[ins.Argument!.Value] : null;
-                        if (typeName != null && typeName != "__doc__" && !typeName.StartsWith("__"))
-                            exceptType = new Name(typeName, ExpressionContext.Load);
+                        // Only take the FIRST LOAD_NAME/LOAD_GLOBAL (the one right after DUP_TOP for except type match)
+                        // subsequent LOAD_NAMEs belong to the handler body (function/class defs)
+                        if (exceptType == null)
+                        {
+                            var typeName = _codeObject.Names.Count > (ins.Argument ?? 0)
+                                ? _codeObject.Names[ins.Argument!.Value] : null;
+                            if (typeName != null && typeName != "__doc__" && !typeName.StartsWith("__"))
+                                exceptType = new Name(typeName, ExpressionContext.Load);
+                        }
+                    }
+                    else if (ins.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH && exceptType != null)
+                    {
+                        foundType = true;
+                        break;  // Found the except type match pattern
                     }
                 }
+                if (foundType) break;
             }
             handlers.Add(new ExceptHandler(exceptType, null, handlerBody));
 
@@ -2097,9 +2207,14 @@ public class AstBuilder
         => header.Successors.FirstOrDefault(s => !s.Flags.HasFlag(BlockFlags.LoopBody));
 
     private BasicBlock? FindBlockByOffset(int offset)
+        => _blockByOffset.GetValueOrDefault(offset);
+
+    private void CollectVisited(BasicBlock block, HashSet<BasicBlock> visited)
     {
-        _blockByOffset.TryGetValue(offset, out var block);
-        return block;
+        if (block == null || visited.Contains(block)) return;
+        visited.Add(block);
+        foreach (var succ in block.Successors)
+            CollectVisited(succ, visited);
     }
 
     private BasicBlock? FindFallthrough(BasicBlock block)

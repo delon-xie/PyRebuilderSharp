@@ -104,9 +104,6 @@ public class PythonCodeGenerator : ICodeGenerator
             case Match m:
                 VisitMatch(m);
                 break;
-            case CommentBlock cb:
-                // Skip — rendered as part of block
-                break;
             case Nonlocal n:
                 VisitNonlocal(n);
                 break;

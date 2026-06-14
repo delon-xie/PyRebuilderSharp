@@ -61,6 +61,19 @@ public class BlockDecompiler
         catch (Exception ex)
         {
             // ❗ 核心：捕获异常→生成注释块兜底
+            // 记录到崩溃日志
+            try
+            {
+                PyRebuilderSharp.Core.Services.CrashCollector.RecordCrash(
+                    new PyRebuilderSharp.Core.Services.CrashContext
+                    {
+                        FileName = $"block_{blockId}",
+                        SourceSnippet = instructions.Count > 0
+                            ? $"{instructions[0].Opcode}..." : ""
+                    },
+                    ex);
+            }
+            catch { }
             return BlockResult.FallbackAsComment(instructions, ex, blockId);
         }
     }

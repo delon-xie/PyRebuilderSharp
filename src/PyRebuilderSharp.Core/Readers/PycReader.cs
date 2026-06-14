@@ -24,6 +24,16 @@ public class PycReader
         { new byte[] { 0xCB, 0x0D, 0x0D, 0x0A }, "Python 3.12" },
         { new byte[] { 0xE7, 0x0D, 0x0D, 0x0A }, "Python 3.13" },
         { new byte[] { 0xF3, 0x0D, 0x0D, 0x0A }, "Python 3.14" },
+        { new byte[] { 0x2B, 0x0E, 0x0D, 0x0A }, "Python 3.14" },
+    };
+
+    // 3.11+ magic bytes 集合（用于 IsPython311Plus 快速查找）
+    private static readonly HashSet<string> _py311PlusMagicHex = new()
+    {
+        "A00D0D0A", "A70D0D0A",  // 3.11
+        "CB0D0D0A",               // 3.12
+        "E70D0D0A",               // 3.13
+        "F30D0D0A", "2B0E0D0A",  // 3.14
     };
 
     private readonly List<object?> _refList = new();
@@ -792,7 +802,8 @@ public class PycReader
     /// 检查是否为 Python 3.11+（有 CACHE 条目）
     /// </summary>
     private bool IsPython311Plus()
-        => _magicBytes.Length >= 2 && _magicBytes[0] >= 0xA0 && _magicBytes[1] == 0x0D;
+        => _magicBytes.Length >= 4 && _py311PlusMagicHex.Contains(
+            BitConverter.ToString(_magicBytes, 0, 4).Replace("-", ""));
 
     /// <summary>
     /// 3.11+ 的缓存条目数（每个缓存条目 = 2 字节）
