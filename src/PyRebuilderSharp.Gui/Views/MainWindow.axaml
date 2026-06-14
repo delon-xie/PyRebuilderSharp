@@ -30,12 +30,19 @@
         <Separator Width="1" Background="#3c3c3c" Margin="6,2" />
         <TextBlock Text="{Binding PythonVersion}" VerticalAlignment="Center" FontSize="12" Foreground="#999" />
         <TextBlock Text="{Binding StatsText}" VerticalAlignment="Center" FontSize="12" Foreground="#999" Margin="8,0,0,0" />
+        <Separator Width="1" Background="#3c3c3c" Margin="6,2" />
+        <CheckBox IsChecked="{Binding ShowOrphanBlocks}" Content="孤儿块" 
+                  VerticalAlignment="Center" FontSize="11" Foreground="#bbb"
+                  Background="Transparent" BorderBrush="#555" />
+        <CheckBox IsChecked="{Binding ShowSummary}" Content="#summary" 
+                  VerticalAlignment="Center" FontSize="11" Foreground="#bbb"
+                  Background="Transparent" BorderBrush="#555" />
       </StackPanel>
     </Border>
 
     <Grid Grid.Row="1" ColumnDefinitions="280, 4, *">
       <!-- 文件树 -->
-      <Border Background="#252526" BorderThickness="0">
+      <Border x:Name="FileTreeBorder" Background="{Binding DropHighlightBackground}" BorderThickness="0">
         <DockPanel>
           <TextBlock DockPanel.Dock="Top" Text="📂 字节码文件" FontWeight="SemiBold" Margin="12,10" Foreground="#bbb" FontSize="12" />
           <ScrollViewer Background="Transparent">

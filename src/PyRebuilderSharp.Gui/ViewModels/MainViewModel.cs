@@ -188,6 +188,13 @@ public class MainViewModel : ViewModelBase
         set => SetProperty(ref _statusText, value);
     }
 
+    private string _dropHighlightBackground = "#252526";
+    public string DropHighlightBackground
+    {
+        get => _dropHighlightBackground;
+        set => SetProperty(ref _dropHighlightBackground, value);
+    }
+
     // -- 崩溃日志 --
     public ObservableCollection<PyRebuilderSharp.Core.Services.CrashEntry> CrashEntries { get; } = new();
 
@@ -204,6 +211,32 @@ public class MainViewModel : ViewModelBase
         get => _crashCountText;
         set => SetProperty(ref _crashCountText, value);
     }
+
+    // -- 显示选项 --
+    private bool _showOrphanBlocks = true;
+    public bool ShowOrphanBlocks
+    {
+        get => _showOrphanBlocks;
+        set
+        {
+            if (SetProperty(ref _showOrphanBlocks, value))
+                ApplyDisplayFilters();
+        }
+    }
+
+    private bool _showSummary = true;
+    public bool ShowSummary
+    {
+        get => _showSummary;
+        set
+        {
+            if (SetProperty(ref _showSummary, value))
+                ApplyDisplayFilters();
+        }
+    }
+
+    /// <summary>存储完整的反编译结果（含孤儿块和摘要），用于复选框切换时过滤。</summary>
+    private string _fullDecompiledCode = "";
 
     // -- 命令 --
     public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
@@ -306,9 +339,23 @@ public class MainViewModel : ViewModelBase
             return;
         }
 
+        // macOS fix: 确保窗口获得焦点后再打开原生对话框
+        // 避免 "灰色不可点+嘟嘟声" — 对话框未获得 key window 焦点
+        try
+        {
+            TopLevel.Activate(); // 窗口激活（macOS → bring to front）
+            TopLevel.Focus();    // 确保键盘焦点
+            TopLevel.BringIntoView(); // 确保窗口可见
+        }
+        catch { /* 非 macOS 平台忽略 */ }
+
+        // macOS 需要两次事件循环传播：Activate→Focus→延迟→对话框才认 key window
+        await System.Threading.Tasks.Task.Delay(100);
+
         // 使用文件选择器，允许选文件夹或 .pyc
         try
         {
+            System.Console.Error.WriteLine("[DEBUG] OpenFileAsync: calling OpenFilePickerAsync");
             var files = await TopLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             Title = "选择 .pyc 文件或文件夹",
@@ -323,6 +370,7 @@ public class MainViewModel : ViewModelBase
             }
         });
 
+        System.Console.Error.WriteLine($"[DEBUG] OpenFileAsync: returned {files.Count} files");
         foreach (var file in files)
         {
             var localPath = file.Path.LocalPath;
@@ -444,6 +492,83 @@ public class MainViewModel : ViewModelBase
         StatusText = "🗑 崩溃日志已清除";
     }
 
+    /// <summary>
+    /// 根据 ShowOrphanBlocks / ShowSummary 复选框状态过滤完整源码。
+    /// </summary>
+    private void ApplyDisplayFilters()
+    {
+        if (string.IsNullOrEmpty(_fullDecompiledCode))
+        {
+            DecompiledCode = "";
+            SourceCodeText = "";
+            return;
+        }
+
+        var full = _fullDecompiledCode;
+        bool hideOrphans = !_showOrphanBlocks;
+        bool hideSummary = !_showSummary;
+
+        if (!hideOrphans && !hideSummary)
+        {
+            // 两个都显示 → 直接使用完整源码（DecompiledCode setter 自动触发 OnCodeChanged）
+            DecompiledCode = full;
+            SourceCodeText = full;
+            return;
+        }
+
+        // 需要过滤 → 纯内存字符串操作，同步完成
+        try
+        {
+            var lines = full.Replace("\r\n", "\n").Split('\n');
+            var result = new System.Collections.Generic.List<string>(lines.Length);
+            bool inOrphanBlock = false;
+
+            foreach (var line in lines)
+            {
+                var trimmed = line.TrimStart();
+
+                // 孤儿块标记
+                if (hideOrphans && (trimmed.StartsWith("# orphan @0x") || trimmed.StartsWith("# [Block @0x")))
+                {
+                    inOrphanBlock = true;
+                    continue;
+                }
+
+                // 离开孤儿块区域（遇到新的段首或摘要行）
+                if (inOrphanBlock && (trimmed.StartsWith("# [SUMMARY]") || trimmed.StartsWith("# [WARN]")))
+                {
+                    inOrphanBlock = false;
+                }
+
+                if (inOrphanBlock)
+                {
+                    // 孤儿块内的代码行（缩进）→ 跳过
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    if (line.Length > 0 && char.IsWhiteSpace(line[0]))
+                        continue;
+                    // 非缩进行 → 孤儿块结束
+                    inOrphanBlock = false;
+                }
+
+                // 摘要行
+                if (hideSummary && trimmed.StartsWith("# [SUMMARY]"))
+                    continue;
+
+                result.Add(line);
+            }
+
+            var filteredCode = string.Join("\n", result);
+            DecompiledCode = filteredCode;   // setter 自动触发 OnCodeChanged
+            SourceCodeText = filteredCode;
+        }
+        catch
+        {
+            // 过滤失败时的安全回退
+            DecompiledCode = full;
+            SourceCodeText = full;
+        }
+    }
+
     private async Task DecompileFile(string filePath)
     {
         if (!File.Exists(filePath)) return;
@@ -461,9 +586,9 @@ public class MainViewModel : ViewModelBase
             var decompiler = new Decompiler();
             var result = await Task.Run(() => decompiler.DecompileWithStats(pycData));
 
-            DecompiledCode = result.SourceCode;
-            SourceCodeText = result.SourceCode;
-            OnCodeChanged?.Invoke(result.SourceCode);  // 通知 TextEditor
+            // 存入完整源码（含孤儿块和摘要），然后根据复选框应用过滤
+            _fullDecompiledCode = result.SourceCode;
+            ApplyDisplayFilters();
             System.Console.Error.WriteLine($"[DEBUG] SourceCode length={result.SourceCode.Length}");
 
             // 生成字节码（dis）

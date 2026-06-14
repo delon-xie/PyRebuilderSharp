@@ -8,4 +8,10 @@ public class DecompileOptions
     public int MaxLineWidth { get; set; } = 88;
     public bool VerboseErrors { get; set; } = false;
     public string IndentString { get; set; } = "    ";
+    
+    /// <summary>是否在源码中输出孤儿块（已分块但未被正常流程处理的语句块）。</summary>
+    public bool ShowOrphanBlocks { get; set; } = true;
+    
+    /// <summary>是否在源码末尾输出 # [SUMMARY] 统计信息。</summary>
+    public bool ShowSummary { get; set; } = true;
 }

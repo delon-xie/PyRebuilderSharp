@@ -13,15 +13,17 @@ public class AstBuilder
 {
     private readonly BlockDecompiler _blockDecompiler;
     private readonly CodeObject _codeObject;
+    private readonly DecompileOptions _options;
     private Dictionary<int, BlockResult> _blockResults = new();
     private HashSet<int> _loopHeaderOffsets = new();
     private List<BasicBlock> _allBlocks = new();
     private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
     private readonly HashSet<int> _processedBlockIds = new(); // 已实际处理的块 ID（用于孤儿块检测）
 
-    public AstBuilder(CodeObject codeObject)
+    public AstBuilder(CodeObject codeObject, DecompileOptions? options = null)
     {
         _codeObject = codeObject;
+        _options = options ?? new DecompileOptions();
         _blockDecompiler = new BlockDecompiler();
     }
     
@@ -88,7 +90,7 @@ public class AstBuilder
                             && blockResult.Statements[0] is Return r
                             && r.Value is Constant { Value: null };
                         
-                        if (!isEmptyReturn)
+                        if (!isEmptyReturn && _options.ShowOrphanBlocks)
                         {
                             stmts.Add(new CommentBlock($"# orphan @0x{orphan.StartOffset:X4}"));
                             stmts.AddRange(blockResult.Statements);
@@ -153,9 +155,10 @@ public class AstBuilder
             Console.Error.WriteLine(
                 $"[SUMMARY] {cfg.Blocks.Count} blocks: {processedCount} processed, " +
                 $"{orphanCnt} orphan, {_codeObject.Instructions.Count} instrs");
-            stmts.Add(new CommentBlock(
-                $"# [SUMMARY] {cfg.Blocks.Count} blocks · {processedCount} processed · " +
-                $"{orphanCnt} orphan · {_codeObject.Instructions.Count} instr"));
+            if (_options.ShowSummary)
+                stmts.Add(new CommentBlock(
+                    $"# [SUMMARY] {cfg.Blocks.Count} blocks · {processedCount} processed · " +
+                    $"{orphanCnt} orphan · {_codeObject.Instructions.Count} instr"));
         }
 
         stmts = PostProcessFunctionDefs(stmts);
@@ -682,7 +685,7 @@ public class AstBuilder
             }
             else if (!visited.Contains(tb) && !tryVisited.Contains(tb))
             {
-                tryBody.AddRange(BuildStatements(tb, tryVisited));
+                tryBody.AddRange(BuildStatements(tb, visited));
             }
         }
 

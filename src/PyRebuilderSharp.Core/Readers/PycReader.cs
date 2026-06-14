@@ -97,9 +97,19 @@ public class PycReader
         else
         {
             // Python 3.7+ header: magic(4) + flags(4) + timestamp(4) + source_size(4) = 16 bytes
+            // Python 3.11+: flags & 0x01 → hash-based .pyc (PEP 552)
+            //   magic(4) + flags(4) + hash(8) + source_size(4) = 20 bytes
             var flags = br.ReadInt32();
-            var timestamp = br.ReadInt32();
-            var size = br.ReadInt32();
+            bool isHashBased = (flags & 0x01) != 0;
+            if (isHashBased)
+            {
+                br.ReadBytes(8); // hash (64 bits, PEP 552)
+            }
+            else
+            {
+                br.ReadInt32(); // timestamp
+            }
+            br.ReadInt32(); // source_size
         }
 
         // Step 3: 读取Marshal数据 — use ReadMarshalObject which handles FLAG_REF

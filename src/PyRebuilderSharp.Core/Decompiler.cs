@@ -48,7 +48,7 @@ public class Decompiler
             var structuredCFG = cfScanner.Analyze(blocks);
 
             // Phase 3: AST构建（含BlockDecompiler逐块反编译 + 注释兜底）
-            var astBuilder = new AstBuilder(codeObject);
+            var astBuilder = new AstBuilder(codeObject, _options);
             var ast = astBuilder.Build(structuredCFG);
 
             // 获取块级统计
