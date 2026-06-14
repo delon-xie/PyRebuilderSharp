@@ -72,7 +72,8 @@ public enum Opcode : byte
     BUILD_SET = 104,
     BUILD_MAP = 105,
     BUILD_SLICE = 133,    // 3.5-3.10
-    BUILD_STRING = 155,
+    FORMAT_VALUE = 155,    // 3.6+: format value for f-string
+    BUILD_STRING = 157,    // 3.6+: build f-string from formatted values
 
     // --- 导入 (108-109) ---
     IMPORT_NAME = 108,
@@ -122,10 +123,10 @@ public enum Opcode : byte
     FOR_ITER = 93,
 
     // --- 调用 ---
-    CALL_FUNCTION = 131,
-    CALL_FUNCTION_KW = 141,
-    LOAD_METHOD = 160,      // Python 3.7-3.9 method call optimization
-    CALL_METHOD = 161,      // Python 3.7-3.9 method call optimization
+    CALL_FUNCTION = 131,     // 3.5-3.10: call function
+    CALL_FUNCTION_KW = 141,  // 3.5-3.10: call with keyword args
+    LOAD_METHOD = 160,       // 3.7-3.9: method call optimization
+    CALL_METHOD = 161,       // 3.7-3.9: method call optimization
 
     // --- 返回 (83-87) ---
     RETURN_VALUE = 83,
@@ -201,16 +202,18 @@ public enum Opcode : byte
 
     LOAD_SUPER_ATTR = 141,   // 3.11+: super attribute
     CALL_FUNCTION_EX = 142,  // 3.5-3.12: call with *args/**kwargs
-
+    
     COPY_FREE_VARS = 149,    // 3.11+: copy free vars to closure
     RESUME = 151,            // 3.11+: resume at start of function/loop
+
+    // 3.8+ function call expressions
+    DICT_MERGE = 164,      // 3.8+: merge dict for **kwargs
 
     // 3.12: keyed/built operations
     BUILD_CONST_KEY_MAP = 156, // 3.12+
     LIST_EXTEND = 162,       // 3.12+: list extend inline
     SET_UPDATE = 163,        // 3.12+: set update inline
-    DICT_MERGE = 164,        // 3.12+:
-    DICT_UPDATE = 165,       // 3.12+:
+    DICT_UPDATE = 165,       // 3.12+: dict update inline
 
     // 3.11-specific (removed in 3.12)
     PRECALL_311 = 166,       // 3.11 only: prepare call

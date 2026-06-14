@@ -142,7 +142,11 @@ public class BlockScanner : IBlockScanner
                 case Opcode.RETURN_VALUE:
                 case Opcode.RAISE_VARARGS:
                     block.Flags |= BlockFlags.Exit;
-                    break;
+                    ResolveIntermediateJumps(block, blocks);
+                    // Exit blocks (RERAISE) still need a sequential fallthrough
+                    // for try/except handler → code after try/except
+                    if (i + 1 < blocks.Count)
+                        AddSuccessor(block, blocks[i + 1]);                    break;
 
                 case Opcode.JUMP_ABSOLUTE:
                 case Opcode.JUMP_FORWARD:
@@ -165,14 +169,15 @@ public class BlockScanner : IBlockScanner
                     {
                         AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr)!.Value));
                     }
-                    // 同时扫描块内中间条件跳转（如 POP_JUMP_IF_FALSE 后有 JUMP_FORWARD）
+                    // 扫描块内所有中间跳转（含无条件跳转如 JUMP_FORWARD 在 RERAISE 前）
                     foreach (var ins in block.Instructions)
                     {
                         if (ins.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                             or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-                            or Opcode.FOR_ITER)
+                            or Opcode.FOR_ITER
+                            or Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE)
                         {
-                            if (ins.Argument.HasValue)
+                            if (ins.Argument.HasValue && ins.Offset != lastInstr.Offset)
                                 AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(ins)!.Value));
                         }
                     }
@@ -217,9 +222,27 @@ public class BlockScanner : IBlockScanner
         }
     }
 
+    private void ResolveIntermediateJumps(BasicBlock block, List<BasicBlock> blocks)
+    {
+        foreach (var ins in block.Instructions)
+        {
+            if (ins.Opcode is Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE
+                or Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                or Opcode.FOR_ITER)
+            {
+                if (ins.Argument.HasValue)
+                {
+                    var target = ResolveJumpTarget(ins);
+                    if (target.HasValue)
+                        AddSuccessor(block, FindBlockByOffset(blocks, target.Value));
+                }
+            }
+        }
+    }
+
     private void AddSuccessor(BasicBlock from, BasicBlock? to)
     {
-        if (to == null) return;
         from.Successors.Add(to);
         to.Predecessors.Add(from);
     }

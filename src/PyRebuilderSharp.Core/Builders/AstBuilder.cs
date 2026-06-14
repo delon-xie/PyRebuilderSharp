@@ -17,6 +17,7 @@ public class AstBuilder
     private HashSet<int> _loopHeaderOffsets = new();
     private List<BasicBlock> _allBlocks = new();
     private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
+    private readonly HashSet<int> _processedBlockIds = new(); // 已实际处理的块 ID（用于孤儿块检测）
 
     public AstBuilder(CodeObject codeObject)
     {
@@ -62,11 +63,14 @@ public class AstBuilder
 
         var stmts = BuildStatements(cfg.Entry, new HashSet<BasicBlock>());
 
-        // 确保所有块都被处理（防止 try/except 等结构导致块被错误标记跳过）
-        var allBlocksSet = new HashSet<BasicBlock>(cfg.Blocks);
-        var visited = new HashSet<BasicBlock>();
-        CollectVisited(cfg.Entry, visited);
-        var unvisited = allBlocksSet.Except(visited).ToList();
+        // 确保所有块都被处理
+        // 使用 _processedBlockIds（BuildStatements 实际处理的块）而非 CollectVisited（只跟随 successor 边）
+        // 防止 try/except 的 handler 块标记为 visited 导致其后缀块被静默跳过
+        var unvisited = cfg.Blocks
+            .Where(b => !_processedBlockIds.Contains(b.Id))
+            .OrderBy(b => b.StartOffset)
+            .ToList();
+        
         if (unvisited.Count > 0)
         {
             Console.Error.WriteLine($"[WARN] {unvisited.Count} unprocessed blocks — recovering");
@@ -79,8 +83,16 @@ public class AstBuilder
                     var blockResult = blockDecomp.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
                     if (blockResult.IsSuccess)
                     {
-                        stmts.Add(new CommentBlock($"# === Orphan block @0x{orphan.StartOffset:X4} ==="));
-                        stmts.AddRange(blockResult.Statements);
+                        // 过滤孤儿块的无效内容：仅含 return None 时跳过
+                        bool isEmptyReturn = blockResult.Statements.Count == 1
+                            && blockResult.Statements[0] is Return r
+                            && r.Value is Constant { Value: null };
+                        
+                        if (!isEmptyReturn)
+                        {
+                            stmts.Add(new CommentBlock($"# orphan @0x{orphan.StartOffset:X4}"));
+                            stmts.AddRange(blockResult.Statements);
+                        }
                     }
                     else
                     {
@@ -105,6 +117,45 @@ public class AstBuilder
                     stmts.Add(new CommentBlock($"# [Block @0x{orphan.StartOffset:X4}] Error: {ex.Message}"));
                 }
             }
+        }
+
+        // 检测未反编译的指令（即使块被处理，也可能有条目被跳过）
+        // 终端跳转指令（JUMP_ABSOLUTE, FOR_ITER, POP_JUMP_IF_*）在分块时被剥离，
+        // 检测未反编译的指令...
+        if (_codeObject.Instructions != null && _codeObject.Instructions.Count > 0)
+        {
+            var terminalJumps = new HashSet<Opcode>
+            {
+                Opcode.JUMP_FORWARD, Opcode.JUMP_ABSOLUTE, Opcode.POP_JUMP_IF_FALSE,
+                Opcode.POP_JUMP_IF_TRUE, Opcode.FOR_ITER, Opcode.JUMP_IF_FALSE_OR_POP,
+                Opcode.JUMP_IF_TRUE_OR_POP
+            };
+            var missed = _codeObject.Instructions
+                .Where(i => !_codeObject.DecompiledInstructionOffsets.Contains(i.Offset)
+                    && !terminalJumps.Contains(i.Opcode))
+                .ToList();
+            if (missed.Count > 0)
+            {
+                Console.Error.WriteLine($"[WARN] {missed.Count} instructions not decompiled");
+                stmts.Add(new CommentBlock($"# [WARN] {missed.Count} instructions not decompiled"));
+                foreach (var mi in missed.Take(10))
+                {
+                    stmts.Add(new CommentBlock($"#   @0x{mi.Offset:X4}: {mi.Opcode} arg={mi.Argument}"));
+                }
+            }
+        }
+
+        // ---- 块级报告（仅顶层模块）----
+        if (_codeObject.Name == "<module>")
+        {
+            var processedCount = _processedBlockIds.Count;
+            var orphanCnt = unvisited.Count;
+            Console.Error.WriteLine(
+                $"[SUMMARY] {cfg.Blocks.Count} blocks: {processedCount} processed, " +
+                $"{orphanCnt} orphan, {_codeObject.Instructions.Count} instrs");
+            stmts.Add(new CommentBlock(
+                $"# [SUMMARY] {cfg.Blocks.Count} blocks · {processedCount} processed · " +
+                $"{orphanCnt} orphan · {_codeObject.Instructions.Count} instr"));
         }
 
         stmts = PostProcessFunctionDefs(stmts);
@@ -247,6 +298,7 @@ public class AstBuilder
 
         try
         {
+            _processedBlockIds.Add(block.Id);
             return BuildStatementsInternal(block, visited);
         }
         catch (Exception ex)
@@ -317,7 +369,7 @@ public class AstBuilder
         if (tryBodyStmts != null)
         {
             stmts.AddRange(tryBodyStmts);
-            // 标记 handler 块为 visited
+            // 标记 handler 块为 visited 
             var handlerAbs = GetHandlerOffset(block);
             List<BasicBlock> handlerBlocks = new();
             if (handlerAbs.HasValue)
@@ -333,12 +385,18 @@ public class AstBuilder
                     stmts.AddRange(BuildStatements(succ, visited));
             }
             // 处理 handler 块的后缀块（如类定义等在 try/except 之后的代码）
+            // handler 块被标记为 visited 后，其后缀块不被 BuildStatements 追踪
+            // 需要显式处理。BlockScanner 已正确创建 handler→后续块的 CFG 边。
+            // 注意：只处理直接 handler 块的后缀，不追踪 FindBlocksFromOffset（会过多包含）
             foreach (var hb in handlerBlocks)
             {
                 foreach (var succ in hb.Successors)
                 {
                     if (!visited.Contains(succ))
+                    {
+                        visited.Add(succ);
                         stmts.AddRange(BuildStatements(succ, visited));
+                    }
                 }
             }
             return stmts;
@@ -1229,8 +1287,12 @@ public class AstBuilder
                 var cur = queue.Dequeue();
                 if (cur == null || !visited.Add(cur.Id)) continue;
                 result.Add(cur);
+                // 只跟随 handler 链内的跳转，不跟随 Exit 块的后缀（避免跳转到 handler 以外的代码）
                 foreach (var succ in cur.Successors)
-                    queue.Enqueue(succ);
+                {
+                    if (!cur.Flags.HasFlag(BlockFlags.Exit))
+                        queue.Enqueue(succ);
+                }
             }
         }
     }
@@ -1761,10 +1823,15 @@ public class AstBuilder
         var lastInstr = header.Instructions.Last();
         var targetOffset = lastInstr.Argument!.Value;
 
-        // 统一规则：不论 POP_JUMP_IF_TRUE 还是 POP_JUMP_IF_FALSE，
-        // if-body 总是 fallthrough，跳过代码（else/after）总是 jump target
+        // POP_JUMP_IF_FALSE: body = fallthrough, else = jump target
+        // POP_JUMP_IF_TRUE:  body = same fallthrough, but condition needs NEGATION
+        bool isJumpIfTrue = lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_TRUE_PY38;
+        
         var bodyBranch = FindFallthrough(header);
         var afterBranch = FindBlockByOffset(targetOffset);
+        
+        if (isJumpIfTrue && testExpr != null)
+            testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
 
         // 检测 while 循环模式：bodyBranch 是循环头（LoopHeader）
         // 在 Python 3.10 中，while 循环的条件在前驱块，body 是独立的 LoopHeader
@@ -1823,6 +1890,16 @@ public class AstBuilder
             {
                 isElseClause = afterBranch.Predecessors.Count == 1
                     && afterBranch.Predecessors.Contains(header);
+            }
+
+            if (isElseClause)
+            {
+                // 同时检测 body 的最后一条语句是否为终止语句（Return/Raise/Break/Continue）
+                // 若是，则 afterBranch 是顺序代码而非 else 子句
+                bool bodyEndsWithTerminal = bodyStmts.Count > 0
+                    && bodyStmts[^1] is Return or Raise or Break or Continue;
+                if (bodyEndsWithTerminal)
+                    isElseClause = false;
             }
 
             if (isElseClause)
@@ -2006,8 +2083,23 @@ public class AstBuilder
         var lastInstr = header.Instructions.Last();
         var targetOffset = lastInstr.Argument!.Value;
 
+        // POP_JUMP_IF_FALSE: body = fallthrough (jump when False → else is jump target)
+        // POP_JUMP_IF_TRUE:  body = same fallthrough, but condition needs NEGATION
+        //                     (jump when True → body runs when False → need `not condition`)
+        bool isJumpIfTrue = lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_TRUE_PY38;
+        
         var bodyBranch = FindFallthrough(header);
         var afterBranch = FindBlockByOffset(targetOffset);
+        
+        // When using POP_JUMP_IF_TRUE, the extracted condition needs negation:
+        // source: `if not X:` → bytecodes: `X; POP_JUMP_IF_TRUE → skip_body`
+        // The condition X is True when we should SKIP the body (jump to else)
+        // So the decompiled condition should be `not X`
+        if (isJumpIfTrue && testExpr != null)
+        {
+            // Wrap in UnaryOp(Not, testExpr) to produce `if not X:`
+            testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
+        }
 
         // 检测 while 循环模式：bodyBranch 是 LoopHeader
         // 说明当前条件分支其实是 while 循环的入口条件
@@ -2129,9 +2221,30 @@ public class AstBuilder
 
     private Expr ExtractLoopVariable(BasicBlock header, List<BasicBlock> bodyBlocks)
     {
-        // 第一个 body block 的 STORE_NAME/STORE_FAST 指令就是循环变量
         foreach (var bodyBlock in bodyBlocks)
         {
+            // 检测 UNPACK_SEQUENCE n → 元组解包循环变量（如 for a, b in ...）
+            var unpackIdx = bodyBlock.Instructions.FindIndex(i => i.Opcode == Opcode.UNPACK_SEQUENCE);
+            if (unpackIdx >= 0 && bodyBlock.Instructions[unpackIdx].Argument.HasValue)
+            {
+                int count = bodyBlock.Instructions[unpackIdx].Argument.Value;
+                var names = new List<Expr>();
+                // UNPACK_SEQUENCE 后跟 count 个 STORE_FAST/STORE_NAME
+                for (int i = unpackIdx + 1; i < bodyBlock.Instructions.Count && names.Count < count; i++)
+                {
+                    var instr = bodyBlock.Instructions[i];
+                    if (instr.Opcode == Opcode.STORE_FAST && instr.Argument.HasValue
+                        && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Varnames.Count)
+                        names.Add(new Name(_codeObject.Varnames[instr.Argument.Value], ExpressionContext.Store));
+                    else if (instr.Opcode == Opcode.STORE_NAME && instr.Argument.HasValue
+                        && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Names.Count)
+                        names.Add(new Name(_codeObject.Names[instr.Argument.Value], ExpressionContext.Store));
+                    else break;
+                }
+                if (names.Count == count)
+                    return new ListLiteral(names, ContainerKind.Tuple);
+            }
+
             foreach (var instr in bodyBlock.Instructions)
             {
                 if ((instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME)
@@ -2484,6 +2597,17 @@ public class AstBuilder
 
         // 2. 递归反编译函数体
         var body = DecompileChildCode(childCode);
+
+        // 2.5 隐式 docstring: Python 3.10+ 将 docstring 放在 co_consts[0]
+        //    但不生成 LOAD_CONST 0 指令。需检测并插入。
+        if (childCode.Constants.TryGetValue(0, out var const0) && const0 is string docstr)
+        {
+            // 检查 body 是否已有 docstring
+            bool hasDoc = body.Count > 0 && body[0] is ExprStmt es
+                && es.Value is Constant c && c.Value is string;
+            if (!hasDoc)
+                body.Insert(0, new ExprStmt(new Constant(docstr)));
+        }
 
         // 3. 去掉函数体末尾的隐式 return None（由 LOAD_CONST None + RETURN_VALUE 产生）
         StripTrailingReturnNone(body);

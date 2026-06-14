@@ -168,6 +168,35 @@ public class PythonCodeGenerator : ICodeGenerator
                 _output.Append(" := ");
                 Visit(ne.Value);
                 break;
+            case FormattedValue fv:
+                Visit(fv.Value);
+                if (fv.Conversion > 0)
+                {
+                    _output.Append('!');
+                    _output.Append((char)fv.Conversion);
+                }
+                if (fv.FormatSpec != null)
+                {
+                    _output.Append(':');
+                    Visit(fv.FormatSpec);
+                }
+                break;
+            case JoinedStr js:
+                _output.Append('f');
+                _output.Append('"');
+                foreach (var part in js.Values)
+                {
+                    if (part is Constant c && c.Value is string s)
+                        _output.Append(s);
+                    else
+                    {
+                        _output.Append('{');
+                        Visit(part);
+                        _output.Append('}');
+                    }
+                }
+                _output.Append('"');
+                break;
             default:
                 _output.Append($"# Unknown node: {node.GetType().Name}");
                 break;
@@ -869,6 +898,10 @@ public class PythonCodeGenerator : ICodeGenerator
                 _output.Append(kw.Arg);
                 _output.Append("=");
             }
+            else
+            {
+                _output.Append("**");  // **kwargs dict unpacking
+            }
             Visit(kw.Value);
         }
 
@@ -1003,26 +1036,57 @@ public class PythonCodeGenerator : ICodeGenerator
     private string EscapeString(string s)
     {
         var sb = new StringBuilder();
-        sb.Append('\'');
+        bool isMultiLine = s.Contains('\n');
+        if (isMultiLine)
+            sb.Append("\"\"\"");
+        else
+            sb.Append('\'');
         foreach (char c in s)
         {
-            switch (c)
+            if (isMultiLine)
             {
-                case '\\': sb.Append("\\\\"); break;
-                case '\n': sb.Append("\\n"); break;
-                case '\r': sb.Append("\\r"); break;
-                case '\t': sb.Append("\\t"); break;
-                case '\'':
-                case '"': sb.Append("\\'"); break;
-                default:
-                    if (c < 0x20 || c == 0x7F)
-                        sb.Append($"\\x{(int)c:x2}");
-                    else
-                        sb.Append(c);
-                    break;
+                switch (c)
+                {
+                    case '\n': sb.Append('\n'); break;  // """内直接换行
+                    case '\r': sb.Append("\\r"); break;
+                    case '\t': sb.Append('\t'); break;  // """内直接制表符
+                    case '\\': sb.Append("\\\\"); break;
+                    case '"':
+                        if (sb.Length >= 2 && sb[^1] == '"' && sb[^2] == '"')
+                            sb.Append('\\');
+                        sb.Append('"');
+                        break;
+                    default:
+                        if (c < 0x20 || c == 0x7F)
+                            sb.Append($"\\x{(int)c:x2}");
+                        else
+                            sb.Append(c);
+                        break;
+                }
+            }
+            else
+            {
+                switch (c)
+                {
+                    case '\\': sb.Append("\\\\"); break;
+                    case '\n': sb.Append("\\n"); break;
+                    case '\r': sb.Append("\\r"); break;
+                    case '\t': sb.Append("\\t"); break;
+                    case '\'':
+                    case '"': sb.Append("\\'"); break;
+                    default:
+                        if (c < 0x20 || c == 0x7F)
+                            sb.Append($"\\x{(int)c:x2}");
+                        else
+                            sb.Append(c);
+                        break;
+                }
             }
         }
-        sb.Append('\'');
+        if (isMultiLine)
+            sb.Append("\"\"\"");
+        else
+            sb.Append('\'');
         return sb.ToString();
     }
 

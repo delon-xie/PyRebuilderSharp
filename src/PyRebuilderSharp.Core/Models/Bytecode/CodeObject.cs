@@ -53,6 +53,10 @@ public class CodeObject
     // ---- 异常表 (Python 3.10+) ----
     public List<ExceptionTableEntry> ExceptionTable { get; set; } = new();
 
+    // ---- 反编译追踪 ----
+    /// <summary>已被 StackMachine 执行/反编译的指令偏移集合</summary>
+    public HashSet<int> DecompiledInstructionOffsets { get; set; } = new();
+
     public override string ToString()
         => $"CodeObject: {Name} ({Instructions.Count} instrs)";
 }

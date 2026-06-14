@@ -20,6 +20,8 @@ public class StackMachine
     private readonly List<Expr> _printItems = new();
 
     private int _pendingCopyDepth = -1; // 用于 walrus := 检测
+    private Expr? _pendingUnpackContainer; // 待处理的元组解包容器
+    private List<Expr>? _pendingUnpackTargets; // 待处理的元组解包目标列表
 
     public StackMachine(CodeObject code)
     {
@@ -90,6 +92,7 @@ public class StackMachine
     /// </summary>
     public Stmt? Execute(Instruction instr)
     {
+        _code.DecompiledInstructionOffsets.Add(instr.Offset);
         switch (instr.Opcode)
         {
             // ---- 常量加载 ----
@@ -141,6 +144,55 @@ public class StackMachine
                     _exprStack.Push(new NamedExpr(new Name(storeLocal, ExpressionContext.Store), val));
                     return null;
                 }
+                // If there's a pending unpack, accumulate this STORE_FAST as a target
+                if (_pendingUnpackContainer != null)
+                {
+                    _pendingUnpackTargets!.Add(new Name(storeLocal, ExpressionContext.Store));
+                    
+                    // Check if more Starred items remain
+                    bool hasMoreStarred = false;
+                    foreach (var e in _exprStack)
+                    {
+                        if (e is Starred s && s.Value == _pendingUnpackContainer && s.Ctx == ExpressionContext.Load)
+                        { hasMoreStarred = true; break; }
+                    }
+                    if (!hasMoreStarred)
+                    {
+                        var container = _pendingUnpackContainer;
+                        var allTargets = _pendingUnpackTargets;
+                        _pendingUnpackContainer = null;
+                        _pendingUnpackTargets = null;
+                        return new Assign(
+                            new List<Expr> { new ListLiteral(allTargets!, ContainerKind.Tuple) }, container);
+                    }
+                    return null; // Still waiting
+                }
+                
+                // UNPACK_SEQUENCE with Starred: start collecting tuple targets
+                if (val is Starred starred && starred.Ctx == ExpressionContext.Load)
+                {
+                    var targets = new List<Expr> { new Name(storeLocal, ExpressionContext.Store) };
+                    _pendingUnpackContainer = starred.Value;
+                    _pendingUnpackTargets = targets;
+                    
+                    // Check if more Starred items remain
+                    bool hasMoreStarred = false;
+                    foreach (var e in _exprStack)
+                    {
+                        if (e is Starred s && s.Value == starred.Value && s.Ctx == ExpressionContext.Load)
+                        { hasMoreStarred = true; break; }
+                    }
+                    if (!hasMoreStarred)
+                    {
+                        // Single-item unpack — emit immediately
+                        _pendingUnpackContainer = null;
+                        _pendingUnpackTargets = null;
+                        return new Assign(
+                            new List<Expr> { new ListLiteral(targets, ContainerKind.Tuple) }, starred.Value);
+                    }
+                    return null; // Wait for more STORE_FAST instructions
+                }
+                
                 return new Assign(new List<Expr> { new Name(storeLocal, ExpressionContext.Store) }, val);
             }
 
@@ -214,6 +266,30 @@ public class StackMachine
                     if (item != null) items.Insert(0, item);
                 }
                 _exprStack.Push(new SetLiteral(items));
+                return null;
+            }
+
+            // ---- f-string: FORMAT_VALUE + BUILD_STRING ----
+            case Opcode.FORMAT_VALUE:
+            {
+                var conversion = (instr.Argument ?? 0) & 0x03;
+                int conv = conversion switch { 1 => 's', 2 => 'r', 3 => 'a', _ => -1 };
+                var fval = SafePop();
+                if (fval == null) return null;
+                _exprStack.Push(new FormattedValue(fval, conv));
+                return null;
+            }
+
+            case Opcode.BUILD_STRING:
+            {
+                var count = instr.Argument ?? 0;
+                var parts = new List<Expr>();
+                for (int i = 0; i < count && _exprStack.Count > 0; i++)
+                {
+                    var part = SafePop();
+                    if (part != null) parts.Insert(0, part);
+                }
+                _exprStack.Push(new JoinedStr(parts));
                 return null;
             }
 
@@ -347,7 +423,12 @@ public class StackMachine
                 if (_isForLoop)
                     return new Break();
                 if (popped != null)
+                {
+                    // import-from 产生的模块名是中间值，不是有效语句
+                    if (popped is Name n && n.IsImport)
+                        return null;
                     return new ExprStmt(popped);
+                }
                 return null;
             }
 
@@ -460,26 +541,36 @@ public class StackMachine
             }
             case Opcode.CALL_FUNCTION_EX:
             {
-                // flags: 0x01 = has args, 0x02 = has kwargs
                 var flags = instr.Argument ?? 0;
                 var args = new List<Expr>();
                 var keywords = new List<Keyword>();
                 
-                // Pop kwargs dict if present
-                if ((flags & 0x02) != 0)
-                {
-                    SafePop(); // kwargs dict — skip for now
-                }
-                // Pop args tuple if present  
-                if ((flags & 0x01) != 0)
-                {
-                    var argsExpr = SafePop();
-                    if (argsExpr is ListLiteral listLit)
-                        args.AddRange(listLit.Elts);
-                }
-                var func = SafePop();
+                // CPython 3.10 implementation (ceval.c):
+                // Stack: [func, args, kwargs]  — kwargs TOS, args TOS1, func TOS2
+                // flags & 0x01 = kwargs dict is present (dict on TOS)
+                // flags & 0x02 = args tuple is present (tuple on TOS1)
+                // Even when a flag is 0, the corresponding value IS on the stack,
+                // it just means kwargs=None or args=empty_tuple.
+                // But for decompilation: always pop both then func.
+                
+                var kwargsExpr = SafePop(); // TOS = kwargs dict or None
+                var argsExpr = SafePop();   // TOS1 = args tuple
+                var func = SafePop();       // TOS2 = func
                 if (func == null) return null;
-                _exprStack.Push(new Call(func, args, keywords));
+                
+                if (argsExpr is ListLiteral listLit)
+                    args.AddRange(listLit.Elts);
+                
+                if (kwargsExpr != null)
+                {
+                    if (kwargsExpr is Name kn)
+                        keywords.Add(new Keyword(null, kn));
+                    else
+                        keywords.Add(new Keyword(null, kwargsExpr));
+                }
+                
+                var call = new Call(func, args, keywords);
+                _exprStack.Push(call);
                 return null;
             }
 
@@ -649,6 +740,62 @@ public class StackMachine
                 // If the null sentinel exists, wrap as call; otherwise just treat as func(args)
                 var call = new Call(func, args, new List<Keyword>());
                 _exprStack.Push(call);
+                return null;
+            }
+
+            // ---- 3.5-3.10 CALL_FUNCTION_KW: call with keyword args ----
+            case Opcode.CALL_FUNCTION_KW:
+            {
+                // Stack: [func, arg0, arg1, ..., argN-1, keyword_names_tuple]
+                // keyword_names_tuple = (kw_name0, kw_name1, ...)
+                // arg = total number of arguments (positional + keyword)
+                var totalArgs = instr.Argument ?? 0;
+                var keywordNames = SafePop(); // TOS = keyword names tuple
+                var args = new List<Expr>();
+                var keywords = new List<Keyword>();
+                
+                // Pop all arguments
+                var argValues = new List<Expr>();
+                for (int i = 0; i < totalArgs && _exprStack.Count > 0; i++)
+                {
+                    var a = SafePop();
+                    if (a != null) argValues.Insert(0, a);
+                }
+                var func = SafePop();
+                if (func == null) return null;
+                
+                // Determine which args are positional vs keyword using keyword_names tuple
+                if (keywordNames is Constant kn && kn.Value is System.Collections.IList nameList)
+                {
+                    int kwCount = nameList.Count;
+                    int posCount = totalArgs - kwCount;
+                    for (int i = 0; i < posCount && i < argValues.Count; i++)
+                        args.Add(argValues[i]);
+                    for (int i = 0; i < kwCount && posCount + i < argValues.Count; i++)
+                    {
+                        var kwName = nameList[i]?.ToString() ?? "";
+                        keywords.Add(new Keyword(kwName, argValues[posCount + i]));
+                    }
+                }
+                else
+                {
+                    // Fallback: all args are positional
+                    args.AddRange(argValues);
+                }
+                
+                _exprStack.Push(new Call(func, args, keywords));
+                return null;
+            }
+
+            // ---- DICT_MERGE: merge dict for **kwargs ----
+            case Opcode.DICT_MERGE:
+            {
+                // Stack: [..., target_dict, source_dict]
+                // TOS = source_dict (kwargs), TOS1 = target_dict (empty BUILD_MAP)
+                var source = SafePop(); // kwargs dict
+                SafePop(); // empty dict from BUILD_MAP
+                if (source != null)
+                    _exprStack.Push(source);
                 return null;
             }
 
@@ -927,19 +1074,6 @@ public class StackMachine
             {
                 var yielded = SafePop();
                 return new Yield(yielded);
-            }
-
-            case Opcode.BUILD_STRING:
-            {
-                var count = instr.Argument ?? 0;
-                var parts = new List<Expr>();
-                for (int i = 0; i < count && _exprStack.Count > 0; i++)
-                {
-                    var p = SafePop();
-                    if (p != null) parts.Insert(0, p);
-                }
-                _exprStack.Push(new JoinedStr(parts));
-                return null;
             }
 
             // ---- STORE_SUBSCR (a[b] = c) ----
