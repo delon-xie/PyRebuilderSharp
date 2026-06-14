@@ -70,23 +70,6 @@ public class AstBuilder
         if (unvisited.Count > 0)
         {
             Console.Error.WriteLine($"[WARN] {unvisited.Count} unprocessed blocks — recovering");
-            // Mark blocks from the try body range to avoid duplication
-            var tryHandlerOffsets = new HashSet<int>();
-            foreach (var stmt in stmts)
-            {
-                if (stmt is Try tryStmt)
-                {
-                    foreach (var h in tryStmt.Handlers)
-                    {
-                        // Skip orphan blocks that would duplicate try handler content
-                        foreach (var orphan in unvisited.ToList())
-                        {
-                            if (orphan.StartOffset >= 0 && orphan.StartOffset < int.MaxValue)
-                                tryHandlerOffsets.Add(orphan.StartOffset);
-                        }
-                    }
-                }
-            }
 
             foreach (var orphan in unvisited.OrderBy(b => b.StartOffset))
             {
@@ -94,7 +77,15 @@ public class AstBuilder
                 {
                     var blockDecomp = new BlockDecompiler();
                     var blockResult = blockDecomp.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
-                    stmts.Add(new CommentBlock($"# [Block @0x{orphan.StartOffset:X4}] Not yet processed"));
+                    if (blockResult.IsSuccess)
+                    {
+                        stmts.Add(new CommentBlock($"# === Orphan block @0x{orphan.StartOffset:X4} ==="));
+                        stmts.AddRange(blockResult.Statements);
+                    }
+                    else
+                    {
+                        stmts.Add(new CommentBlock($"# [Block @0x{orphan.StartOffset:X4}] {blockResult.CommentFallback}"));
+                    }
                 }
                 catch (Exception ex)
                 {
