@@ -8,6 +8,8 @@
 | OS | — | macOS / Windows / Linux 均可 |
 | Git | 可选 | 用于克隆代码 |
 
+**支持 Python 版本**：2.7, 3.5 ~ 3.14
+
 ### 验证安装
 
 ```bash
