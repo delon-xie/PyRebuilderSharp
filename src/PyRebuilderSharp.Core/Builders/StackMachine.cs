@@ -550,10 +550,20 @@ public class StackMachine
             }
 
             // ---- 3.11+ PUSH_NULL: call protocol marker ----
-            case Opcode.PUSH_NULL:
+            // NOTE: ROT_TWO and PUSH_NULL share enum value 2 (same raw byte 02 in 3.11+)
+            // In 3.11+, raw byte 02 = PUSH_NULL. In 3.10-, raw byte 02 = ROT_TWO.
+            // Since both are 2 in the enum, only ROT_TWO appears in the switch.
+            // For 3.11+, treat as PUSH_NULL (push null sentinel for call protocol).
+            // For 3.10-: ROT_TWO was never handled (fell through to default → null),
+            // which broke SEND/JUMP_BACKWARD patterns. For now, still return null.
+            case Opcode.ROT_TWO:
                 // 在 3.11+ 调用协议中，PUSH_NULL 标记"我需要一个函数对象"
-                // 在 AST 层面透明 — 调用时根据栈结构判断
-                _exprStack.Push(new Constant(null));  // sentinel null
+                if (_isPython312)
+                {
+                    _exprStack.Push(new Constant(null));  // sentinel null
+                    return null;
+                }
+                // Fall through to default for pre-3.11 (ROT_TWO not supported)
                 return null;
 
             // ---- 3.11+ COPY: duplicate TOS[n] ----
@@ -617,7 +627,10 @@ public class StackMachine
                     _exprStack.Pop(); // discard null sentinel
                 }
                 
-                _exprStack.Push(new Call(func, args, new List<Keyword>()));
+                // Create a dummy Call to capture the null sentinel issue
+                // If the null sentinel exists, wrap as call; otherwise just treat as func(args)
+                var call = new Call(func, args, new List<Keyword>());
+                _exprStack.Push(call);
                 return null;
             }
 
@@ -706,6 +719,8 @@ public class StackMachine
             // ---- 3.12+ exception/with renumbered opcodes ----
             case Opcode.BEFORE_WITH_312:
             case Opcode.WITH_EXCEPT_START_312:
+            case Opcode.PUSH_EXC_HANDLER_312:
+            case Opcode.PULL_EXC_FROM_INFO_312:
             case Opcode.PUSH_EXC_INFO_312:
             case Opcode.CHECK_EXC_MATCH:
             case Opcode.CHECK_EG_MATCH:
@@ -773,14 +788,17 @@ public class StackMachine
                     var exc = SafePop();
                     return new Raise(exc);
                 }
-                // oparg == 2: raise X from Y
-                var cause = SafePop();
-                var exc2 = SafePop();
-                return new Raise(exc2, cause);
+                if (oparg == 2)
+                {
+                    var cause = SafePop();
+                    var exc = SafePop();
+                    return new Raise(exc, cause);
+                }
+                return null;
             }
-
-            // ---- Jump opcodes (handled by BlockScanner) ----
-            case Opcode.JUMP_FORWARD:
+            case Opcode.RERAISE:
+                return new Raise();
+            
             case Opcode.JUMP_BACKWARD:
             case Opcode.JUMP_BACKWARD_NO_INTERRUPT:
             case Opcode.JUMP_IF_TRUE_OR_POP:

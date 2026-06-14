@@ -12,11 +12,11 @@ public class TokenDumperTests
         var dumper = new TokenDumper();
         var source = "a = 42\n";
         var tokens = dumper.Tokenize(source);
-        tokens.Should().HaveCount(5); // WORD(a) SYMBOL(=) INT(42) ENDLINE
+        tokens.Should().HaveCount(4); // WORD(a) SYMBOL(=) INT(42) ENDLINE
         tokens[0].Should().BeOfType<WordToken>().Which.Word.Should().Be("a");
         tokens[1].Should().BeOfType<SymbolToken>().Which.Symbol.Should().Be("=");
         tokens[2].Should().BeOfType<IntToken>().Which.Value.Should().Be(42);
-        tokens[4].Type.Should().Be(TokenType.ENDLINE);
+        tokens[3].Type.Should().Be(TokenType.ENDLINE);
     }
 
     [Fact]

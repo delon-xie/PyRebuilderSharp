@@ -952,9 +952,11 @@ public class PycReader
 
             instructions.Add(new Instruction(offset, op, arg));
 
-            // Skip cache entries after this instruction
-            int cacheEntries = GetCacheCount311Plus(rawOp);
-            offset += 2 + cacheEntries * 2;
+            // Advance past this instruction (2 bytes) and any cache entries
+            // NOTE: don't trust the cache table — only skip actual CACHE markers (opcode=0)
+            offset += 2;
+            while (offset + 1 < bytecode.Length && bytecode[offset] == 0)
+                offset += 2;
         }
 
         return instructions;
@@ -1045,6 +1047,8 @@ public class PycReader
             112 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,  // 3.11: same value
 
             // 3.12 特有的值
+            20 when is312 => Models.Bytecode.Opcode.PULL_EXC_FROM_INFO_312,
+            34 when is312 => Models.Bytecode.Opcode.PUSH_EXC_HANDLER_312,
             35 when is312 => Models.Bytecode.Opcode.PUSH_EXC_INFO_312,
             36 when is312 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,
             37 when is312 => Models.Bytecode.Opcode.CHECK_EG_MATCH,
@@ -1752,6 +1756,7 @@ public class PycReader
                 or 116
                 => ReadLongStringBytes(br),
             MarshalType.TYPE_BYTES => ReadLongStringBytes(br),
+            MarshalType.TYPE_REF => ReadRefAndReturnBytes(br),
             _ => null,
         };
 
@@ -1765,6 +1770,23 @@ public class PycReader
     {
         var len = br.ReadByte();
         return br.ReadBytes(len);
+    }
+
+    /// <summary>
+    /// 读取 TYPE_REF (0x72) + 4字节索引，从 ref list 中获取已存储的字节数组。
+    /// 3.11+ 的 localspluskinds/linetable/exceptiontable 可能用 TYPE_REF 引用已存储数据。
+    /// </summary>
+    private byte[]? ReadRefAndReturnBytes(BinaryReader br)
+    {
+        var idx = br.ReadInt32();
+        if (idx >= 0 && idx < _refList.Count)
+        {
+            if (_refList[idx] is byte[] bytes)
+                return bytes;
+            if (_refList[idx] is string str)
+                return System.Text.Encoding.ASCII.GetBytes(str);
+        }
+        return null;
     }
 
     private byte[] ReadLongStringBytes(BinaryReader br)

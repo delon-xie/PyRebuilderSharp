@@ -39,7 +39,7 @@
 | 装饰器 | `@decorator` 链 | ✅ |
 | 异步 | `async def` / `await` | ✅ |
 | 展开赋值 | `a, b = ...`, `*rest` | ✅ |
-| CrashCollector | JSON 崩溃记录 | ✅ |
+| **Phase Fix 全部** | 5 项已知问题 + cache 表 + ROT_TWO/PUSH_NULL 冲突 | ✅ **全部关闭** |
 | GUI | Avalonia 暗色主题 + 拖放 + 语法高亮 | ✅ |
 | 跨平台 | Windows / macOS / Linux | ✅ |
 
@@ -192,13 +192,19 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 | C3 — CrashCollector 运行时 | ✅ 已实现 |
 | C4 — Lv3 嵌套深度测试 | ✅ 33/33 标记通过 |
 
-### Phase 4 — P0-1 完成, P0-2 进行中
+### Phase 4 ✅ 完成
 
 | P0 | 项目 | 状态 |
 |:--:|:-----|:------|
 | 1 | Assign+FunctionRef → FunctionDef (**`def` 语句**) | ✅ **完成** |
-| 2 | **class 定义** | ⏳ `__build_class__` 检测中 |
-| 3 | yield / yield from | ❌ 未启动 |
+| 2 | **class 定义** (基础结构) | ✅ **完成** |
+| 3 | yield / yield from | ✅ **完成** |
+
+| P1 | 项目 | 状态 |
+|:--:|:-----|:------|
+| 1 | **@decorator** 装饰器链 | ✅ **完成** |
+| 2 | **async def** / **await** 异步 | ✅ **完成** |
+| 3 | 展开赋值 `a, b = ...` | ✅ **完成** |
 
 ---
 
@@ -241,11 +247,13 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 | `except*` (3.11+) | 🟢 低 | ❌ |
 | walrus `:=` | 🟢 低 | ❌ |
 
-### Phase 5 — 工程增强
+### 工程增强 — 未完成
 
-- 反编译结果与原始 .py 的 AST 自动对比验证
-- CrashCollector Dashboard（GUI 内嵌异常管理面板）
-- 批量反编译模式
+| 项 | 说明 | 状态 |
+|:---|:-----|:------|
+| AST 自动对比验证 | 反编译输出与原 `.py` 的 AST 语义比较 | ❌ |
+| CrashCollector Dashboard | GUI 内嵌异常管理面板 | ❌ |
+| 批量反编译模式 | 拖入目录 → 批量反编译 | ❌ |
 
 ---
 

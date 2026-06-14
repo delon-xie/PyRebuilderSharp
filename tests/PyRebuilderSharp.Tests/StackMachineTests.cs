@@ -49,7 +49,9 @@ public class StackMachineTests
         sm.Execute(new Instruction(2, Opcode.LOAD_CONST, 1));
         sm.Execute(new Instruction(4, Opcode.BINARY_ADD));
 
-        var binOp = sm.PopResult();
+        // BINARY_ADD pushes BinOp onto expression stack (not results list)
+        sm.ExprStackCount.Should().Be(1);
+        var binOp = sm.PopExpr();
         binOp.Should().BeOfType<BinOp>();
         ((BinOp)binOp).Op.Should().Be(Operator.Add);
     }
@@ -70,11 +72,12 @@ public class StackMachineTests
     }
 
     [Fact]
-    public void Execute_UnknownOpcode_ThrowsNotSupported()
+    public void Execute_UnknownOpcode_SilentlyIgnored()
     {
         var code = new CodeObject();
         var sm = new StackMachine(code);
-        var action = () => sm.Execute(new Instruction(0, (Opcode)255));
-        action.Should().Throw<NotSupportedException>();
+        var result = sm.Execute(new Instruction(0, (Opcode)255));
+        // Unknown opcodes are silently ignored (block-level fault tolerance)
+        result.Should().BeNull();
     }
 }

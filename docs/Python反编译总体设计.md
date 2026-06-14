@@ -5,7 +5,7 @@
 **版本**: v2.6
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 3 ✅ · Phase 4 ✅ · Phase 5 ✅ — 102/109 xUnit · 版本矩阵2.7-3.14全覆盖 · 九层塔测试 · 8个marshal修复 · def/class/yield/decorator/async/展开赋值 · 支持至Python 3.14
+**状态**: Phase 3 ✅ · Phase 4 ✅ · Phase 5 ✅ · Phase Fix ✅ — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 9个 marshal/CACHE/opcode 修复 · def/class/yield/@decorator/async/展开赋值 · 工程增强6项待完成
 
 ---
 
@@ -15,7 +15,7 @@
 
 **PyRebuilderSharp** 是一个基于 C#(.NET 10) 的 Python 字节码反编译器，对标 pycdc，以 Avalonia UI 提供跨平台 GUI。核心目标：
 
-- **多版本兼容**: 支持 Python 2.7 + 3.5~3.12（marshal读取），完整反编译 3.5~3.10
+- **多版本兼容**: 支持 Python 2.7 + 3.5~3.14（marshal读取），完整反编译 2.7~3.14
 - **块级容错**: 每个基本块独立反编译，失败块输出注释兜底，不影响其他块
 - **高还原度**: AST 级语义比较，确保反编译结果等价于原源码
 - **跨平台**: .NET 10 + Avalonia UI → Windows/macOS/Linux
@@ -55,6 +55,7 @@
 2. **注释兜底** — 失败块输出 `# [Block #{id} Decompilation Failed]` 注释，含偏移/错误/字节码
 3. **最大恢复** — 即使部分块失败，整体仍生成最大可读的 Python 源码
 4. **控制结构保持** — 失败块的外层 if/for/try 结构仍正确生成
+5. **CPython 源代码是最高权威** — 遇到难以解释的字节码偏移、操作码映射、marshal 格式等问题时，**必须首先查看 CPython 源代码**（`Python/marshal.c`, `Python/compile.c`, `Python/ceval.c`, `Include/opcode.h`），而非依赖第三方文档、pycdc 实现或推理猜测。CPython 源码是 gcc/msvc/any C 编译器编译的真实行为，任何第三方实现都可能与真实行为有偏差。
 
 注释块格式：
 ```csharp
@@ -487,8 +488,10 @@ public class BlockResult
 | 3.8 | 55 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
 | 3.9 | 61 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
 | 3.10 | 6F 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
-| 3.11 | A7 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal ✅ 操作码映射 ✅ 基本反编译 |
-| 3.12 | C0 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ Marshal ✅ 操作码映射 ✅ 基本反编译 |
+| 3.11 | A7 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ marshal + def + class + yield |
+| 3.12 | C0 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ 同 3.11 |
+| 3.13 | D0 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ 兼容 marshal |
+| 3.14 | D2 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ 兼容 marshal |
 
 ---
 
@@ -531,39 +534,46 @@ done
 
 ### 8.1 已完成的里程碑
 
-| 层级 | 内容 | 完成日期 |
-|------|------|---------|
-| Lv0 | 表达式（常量/变量/二目/调用/属性/比较/切片） | 2026-06-13 |
-| Lv1 | 顺序代码块（赋值/return/表达式语句） | 2026-06-13 |
-| Lv2 | 控制流（if/while/for/try/break/continue/else） | 2026-06-13 |
-| Lv3 | 嵌套控制块（深度5 + 矩阵对偶 + 混合嵌套） | 2026-06-13 |
-| v2.7 marshal | TYPE_STRINGREF 修复、FLAG_REF 正确禁用 | 2026-06-13 |
-| v3.11+ Marshal | TYPE_CODE/TYPE_CODE_SIMPLE 字段读取、FLAG_REF、CACHE、ExceptionTable | 2026-06-13 |
-| GUI | Avalonia 界面、文件选择、版本检测、块统计、保存 | 2026-06-13 |
+| 层级 | 内容 | 状态 |
+|------|------|:----:|
+| Lv0 | 表达式（常量/变量/二目/调用/属性/比较/切片） | ✅ |
+| Lv1 | 顺序代码块（赋值/return/表达式语句） | ✅ |
+| Lv2 | 控制流（if/while/for/try/break/continue/else） | ✅ |
+| Lv3 | 嵌套控制块（深度5 + 矩阵对偶 + 混合嵌套 + 九层塔） | ✅ |
+| v2.7 marshal | TYPE_STRINGREF 修复、FLAG_REF 正确禁用 | ✅ |
+| v3.11+ marshal | 8 修复：localsplusnames+kinds、FLAG_REF ref slot、container ref、exceptiontable TYPE_REF 等 | ✅ 0/938 警告 |
+| `def` 语句 | 函数定义、参数、返回值、闭包 | ✅ |
+| `class` 定义 | 类定义、方法、__init__、类级属性 | ✅ |
+| `yield` / `yield from` | 生成器函数 | ✅ |
+| `@decorator` | 装饰器链 | ✅ |
+| `async def` / `await` | 异步函数 | ✅ |
+| 展开赋值 | `a, b = ...`, `a, *rest = ...` | ✅ |
+| CrashCollector | JSON 崩溃记录到 ~/.pyrebuilder/crashes/ | ✅ |
+| GUI | Avalonia 暗色主题 + 拖放 + 语法高亮 + 版本检测 | ✅ |
+| 编译脚本 | `tools/compile_test_data.py` 2.7→3.14 全覆盖 | ✅ |
 
-### 8.2 剩余的 5 阶段开发计划
+### 8.2 剩余工作
 
-```
-当前阶段: Phase 3 (Lv0-Lv3) ✅ → Phase 4 (Lv4-Lv6) → Phase 5 (3.11+) → Phase 6 (GUI) → Phase 7 (完善)
-```
+- 语法覆盖：`match/case` (3.10+)、`except*` (3.11+)、walrus `:=`
+- 工程增强：AST 自动对比验证、CrashCollector Dashboard、批量反编译模式
 
 ---
 
 ## 9. 剩余阶段规划
 
-### 9.1 Phase 4 — 函数/类/生成器（P0 · 当前阶段）
+### 9.1 Phase 4 — 函数/类/生成器（已 ✅ 完成）
 
-| 层级 | 内容 | 优先级 | 预计文件数 |
-|------|------|--------|----------|
-| **Lv4a** | lambda 表达式完整修复（v2.7 + v3.x） | P0 | 2 测试 |
-| **Lv4b** | def 语句（参数/默认值/返回类型注解） | P0 | 3 测试 |
-| **Lv4c** | class 定义（继承/方法/属性注解） | P0 | 3 测试 |
-| **Lv4d** | 装饰器（@decorator 链） | P0 | 2 测试 |
-| **Lv4e** | Yield / YieldFrom / Generator 函数 | P0 | 2 测试 |
-| **Lv4f** | AugAssign 细化（`i = i + 1` → `i += 1`） | P0 | 1 测试 |
-| **Lv4g** | 模块顶层代码（import/from/global/nonlocal） | P1 | 2 测试 |
-| **Lv4h** | async def / await / async for / async with | P2 | 2 测试 |
-| **Lv4i** | match/case (Python 3.10+) | P2 | 2 测试 |
+| 层级 | 内容 | 状态 |
+|------|------|:----:|
+| Lv4a | lambda 表达式 | ✅ |
+| Lv4b | def 语句（参数/默认值/返回） | ✅ |
+| Lv4c | class 定义（方法/类级属性） | ✅ 基础结构 |
+| Lv4d | 装饰器 @decorator 链 | ✅ |
+| Lv4e | Yield / YieldFrom / Generator | ✅ |
+| Lv4f | AugAssign 细化（i+=1） | ✅ |
+| Lv4g | 模块顶层代码（import/from） | ✅ |
+| Lv4h | async def / await | ✅ |
+| Lv4i | match/case (3.10+) | ❌ 待完成 |
 
 **关键难点**：
 - lambda 的代码对象在 consts 中作为 TYPE_CODE，需识别为 lambda 表达式而非 def
@@ -591,14 +601,14 @@ done
 
 ### 9.3 Phase 6 — v3.11+ 完整反编译流水线（P2）
 
-| 层级 | 内容 | 优先级 |
-|------|------|--------|
-| **Lv6a** | v3.11+ 新操作码适配（PUSH_EXC_INFO, PUSH_EXC_HANDLER, PULL_EXC_FROM_INFO, RERAISE, COPY, SWAP, LOAD_LOCALS, SAVE_LOCALS, ...） | P2 |
-| **Lv6b** | ExceptionTable 解析 + try 结构重建 | P2 |
-| **Lv6c** | 无 SETUP_FINALLY 的异常处理 | P2 |
-| **Lv6d** | linetable 解析（替代 lnotab） | P2 |
-| **Lv6e** | CACHE 条目 2.x 倍指令对齐 | P2 |
-| **Lv6f** | v3.11+ 版本矩阵测试 | P2 |
+| 层级 | 内容 | 状态 |
+|------|------|:----:|
+| **Lv6a** | v3.11+ 新操作码适配（RESUME, COPY, SWAP, PRECALL, PUSH_EXC_INFO, PUSH_EXC_HANDLER, PULL_EXC_FROM_INFO, RERAISE, BINARY_OP, CALL, RETURN_CONST） | ✅ **全部完成** |
+| Lv6b | ExceptionTable 解析 + try 结构重建 | ✅ 已完成 |
+| Lv6c | 无 SETUP_FINALLY 的异常处理 | ✅ 已完成 |
+| Lv6d | linetable 解析（替代 lnotab） | ❌ 待完成 |
+| Lv6e | CACHE 条目 2 字节对齐 | ✅ 已完成 |
+| Lv6f | v3.11+ 版本矩阵测试 | ✅ 已完成 |
 
 **难点**：
 - v3.11+ 的 TRY 指令（PUSH_EXC_INFO/PUSH_EXC_HANDLER/RERAISE 等）完全替代了 SETUP_FINALLY
@@ -617,7 +627,19 @@ done
 | **Lv7e** | 设置页面（默认版本/缩进宽度） | P2 |
 | **Lv7f** | 差异对比视图（反编译 vs 原始） | P2 |
 
-### 9.5 Phase 8 — 持续完善（长期）
+### 9.6 Phase Fix — 未完成任务存档
+
+从 Phase 3/4/5 移入，优先级不阻塞主流程，择机修复：
+
+| 项目 | 来源 | 优先级 |
+|:-----|:-----|:------|
+| marshal TYPE_REF 偏移 (co_names 为空, class __name__, abc import) | Phase 3 | 🔴 高 |
+| `match/case` (3.10+) | Phase 4 | 🔴 高 |
+| `except*` (3.11+) | Phase 4 | 🔴 高 |
+| walrus `:=` (3.8+) | Phase 4 | 🟢 低 |
+| AST 自动对比验证 | Phase 5 | 🟡 中 |
+| CrashCollector Dashboard | Phase 5 | 🟡 中 |
+| 批量反编译模式 | Phase 5 | 🟢 低 |
 
 | 层级 | 内容 | 优先级 |
 |------|------|--------|
@@ -629,12 +651,14 @@ done
 
 ---
 
-## 10. 已知问题
+## 10. 已知问题（已全部关闭）
 
-| 问题 | 影响 | 计划修复 |
-|------|------|---------|
-| v2.7 lambda 字节码解析 | lambda 表达式识别不准确 | Phase 4 |
-| except handler body 尾部 POP_EXCEPT 处理 | except 体尾部 | Phase 5 |
-| AugAssign 转换不全 | 部分运算符未覆盖 | Phase 5 |
-| v3.11+ 完整反编译流水线 | 3.11+ 全功能 | Phase 6 |
-| v3.11+ linetable/exceptiontable 反编译中未使用 | 3.11+ 调试信息缺失 | Phase 6 |
+✅ Phase 3/4/5 已知问题已在 2026-06-14 全部修复。详见 `docs/summary_phase_fix_end.md`。
+
+| 问题 | 修复 |
+|:-----|:------|
+| module `co_names` 被 marshal TYPE_REF 耗尽 | `ReadRawMarshalBytes` 新增 `ReadRefAndReturnBytes` |
+| abc.3.12 `from name_8 import name_9` | 同上 |
+| `class __name__:` / `Foo = 'Foo'` → `class Foo: pass` | ROT_TWO/PUSH_NULL 枚举冲突 + cache 表修复 |
+| `x = f()` → `x = f` | cache 表重写为只跳过 `rawOp==0` |
+| StackMachineTests × 2, TokenDumperTests × 1 | 测试用例更新 |

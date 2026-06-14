@@ -131,13 +131,13 @@ PyRebuilderSharp (~30000 行 C# 13 · .NET 10 · Avalonia 11)
 | `class __name__:` | 类名显示 `__name__` | 同上 |
 | `from name_8 import name_9` | abc.3.12 导入名丢失 | 7 个嵌套代码对象累积偏移 |
 
-### 建议后续
+### 工程增强 — 未完成
 
-1. **修复 marshal 累积偏移** — 在 `ReadMarshalCodeObject` 的 exceptiontable 后加位置校验
-2. **`match/case` (3.10+)** — 影响 Python 3.10→3.14 的语法完整性
-3. **`except*` (3.11+)** — 3.11+ 异常组语法
-4. **walrus `:=` (3.8+)** — DUP_TOP + STORE_FAST 模式检测
-5. **展开赋值 AST 组合** — 将多个 STORE_FAST 合并为单一 `Assign(Tuple(...), Call(...))`
+| 项 | 说明 | 状态 |
+|:---|:-----|:------|
+| AST 自动对比验证 | 反编译输出与原 `.py` 的 AST 语义比较 | ❌ |
+| CrashCollector Dashboard | GUI 内嵌异常管理面板 | ❌ |
+| 批量反编译模式 | 拖入目录 → 批量反编译 | ❌ |
 
 ---
 

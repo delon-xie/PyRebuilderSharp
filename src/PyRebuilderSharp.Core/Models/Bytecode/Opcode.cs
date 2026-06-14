@@ -225,7 +225,9 @@ public enum Opcode : byte
     LOAD_FROM_DICT_OR_DEREF = 176,   // 3.12+
 
     // 3.12+ exception/with renumbered
-    PUSH_EXC_INFO_312 = 196,   // 3.12+ (was 138 in 3.5-3.10, raw byte 35)
+    PUSH_EXC_HANDLER_312 = 177, // 3.12+: push exception handler (raw byte 34)
+    PULL_EXC_FROM_INFO_312 = 178, // 3.12+: pull exception info (raw byte 20)
+    PUSH_EXC_INFO_312 = 179,   // 3.12+ (was 138 in 3.5-3.10, raw byte 35)
     CHECK_EXC_MATCH = 197,     // 3.12+ (raw byte 36)
     CHECK_EG_MATCH = 198,      // 3.12+ (raw byte 37)
     BEFORE_WITH_312 = 199,     // 3.12+ (was 153 in 3.7-3.10, raw byte 53)
