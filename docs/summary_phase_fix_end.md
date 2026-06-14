@@ -1,6 +1,6 @@
 # Phase Fix 收尾总结 — PyRebuilderSharp
 
-**版本**: v1.0
+**版本**: v2.0
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp (.NET 10 + Avalonia GUI)
 
@@ -30,6 +30,15 @@
 | 6 | StackMachineTests × 2 | 用例更新：UnknownOpcode→SilentlyIgnored, BinaryAdd→PopExpr |
 | 7 | TokenDumperTests × 1 | 计数 5→4, 索引 4→3 |
 
+### Phase Fix (新增) — ✅ 完成
+
+| # | 项目 | 文件 | 状态 |
+|:-:|:-----|:------|:------|
+| 8 | `except*` IsGroup 标志 + codegen | `Stmt.cs`, `PythonCodeGenerator.cs` | ✅ |
+| 9 | walrus `:=` NamedExpr AST + 检测 | `Expr.cs`, `StackMachine.cs` | ✅ |
+| 10 | match/case 3.12 opcode 映射 + no-op | `Opcode.cs`, `PycReader.cs`, `StackMachine.cs` | ✅ |
+| 11 | Phase 6 Lv6d linetable 解析 | `CodeObject.cs`, `PycReader.cs` | ✅ |
+
 ---
 
 ## 二、三项关键架构修复
@@ -40,15 +49,15 @@ Opcode 枚举中 `ROT_TWO = 2` (Python 3.10-) 与 `PUSH_NULL = 2` (Python 3.11+)
 
 **修复**：`case Opcode.ROT_TWO:` 中检查 `_isPython312`，是则推入 sentinel。
 
-### 2. `GetCacheCount312` 错表
+### 2. `GetCacheCount312` 错表 → 改为跳过 `rawOp==0`
 
-3.12 的 cache 条目数从 Python 源码 `Python/opcode_targets.h` 派生，但与实际 Python 3.12 编译输出不一致（`LOAD_CONST=1` 但实际 0 cache, `LOAD_NAME=4` 但实际 0 cache）。
+3.12 的 cache 条目数与实际编译输出不一致（`LOAD_CONST=1` 但实际 0 cache）。
 
 **修复**：`ParseInstructions311Plus` 不再信任 cache 表，改为只跳过 `rawOp==0`（CACHE 标记）。
 
 ### 3. `ReadRawMarshalBytes` 漏 TYPE_REF
 
-CPython 的 `r_object()` 处理所有 code object 字段为通用 marshal 对象，包括 TYPE_REF(0x72)。C# 的 `ReadRawMarshalBytes` 只处理 TYPE_STRING/BYTES/SHORT_ASCII，遗漏 TYPE_REF→stream 偏移 4 字节→co_names 为空。
+CPython 的 `r_object()` 处理所有 code object 字段为通用 marshal 对象，包括 TYPE_REF(0x72)。C# 的 `ReadRawMarshalBytes` 遗漏 TYPE_REF→stream 偏移 4 字节→co_names 为空。
 
 **修复**：新增 `ReadRefAndReturnBytes` 处理 TYPE_REF。
 
@@ -62,13 +71,31 @@ CPython 的 `r_object()` 处理所有 code object 字段为通用 marshal 对象
 
 ---
 
-## 四、剩余工作（Phase Fix 6 项）
+## 四、已完成语法覆盖
 
-| 项目 | 优先级 |
-|:-----|:------|
-| `match/case` (3.10+) | 🔴 高 |
-| `except*` (3.11+) | 🔴 高 |
-| walrus `:=` (3.8+) | 🟢 低 |
-| AST 自动对比验证 | 🟡 中 |
-| CrashCollector Dashboard | 🟡 中 |
-| 批量反编译模式 | 🟢 低 |
+| 语法 | 版本 | 状态 |
+|:-----|:------|:------|
+| lambda | 2.7→3.14 | ✅ |
+| `def` 函数定义 | 2.7→3.14 | ✅ |
+| `class` 类定义 | 2.7→3.14 | ✅ |
+| `yield` / `yield from` | 2.7→3.14 | ✅ |
+| `@decorator` | 2.7→3.14 | ✅ |
+| `async def` / `await` | 3.5→3.14 | ✅ |
+| `a, b = ...` 展开赋值 | 2.7→3.14 | ✅ |
+| walrus `:=` | 3.8→3.14 | ✅ 基础检测 / ⚡ 控制流集成待完成 |
+| `except*` | 3.11→3.14 | ✅ codegen 就绪 / ⚡ IsGroup 映射待完成 |
+| `match/case` (opcode) | 3.10→3.14 | ⚡ opcode 映射完成，CFG 待重建 |
+| linetable 解析 | 3.11→3.14 | ✅ |
+
+---
+
+## 五、剩余工作
+
+| 项目 | 优先级 | 依赖 |
+|:-----|:-------|:------|
+| `match/case` ExceptionTable CFG 重建 | 🔴 高 | opcode 映射完成，CFG 待重建 |
+| `except*` ExceptionTable → IsGroup 映射 | 🔴 高 | codegen 就绪，handler 集成待完成 |
+| walrus 控制流检测 `COPY+STORE+COMPARE` | 🟢 低 | NamedExpr 基础检测完成 |
+| AST 自动对比验证 | 🟡 中 | 独立工具 |
+| CrashCollector Dashboard | 🟡 中 | Avalonia GUI |
+| 批量反编译模式 | 🟢 低 | CLI 工具 |

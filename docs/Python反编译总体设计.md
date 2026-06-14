@@ -5,7 +5,7 @@
 **版本**: v2.6
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 3 ✅ · Phase 4 ✅ · Phase 5 ✅ · Phase Fix ✅ — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 9个 marshal/CACHE/opcode 修复 · def/class/yield/@decorator/async/展开赋值 · 工程增强6项待完成
+**状态**: Phase 1–6 ✅ 全部关闭 — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 17 项修复 · 语法覆盖 13 项 · 工程增强6项待完成
 
 ---
 
@@ -559,87 +559,24 @@ done
 
 ---
 
-## 9. 剩余阶段规划
+## 9. 剩余工作计划
 
-### 9.1 Phase 4 — 函数/类/生成器（已 ✅ 完成）
+Phase 1–6 全部关闭。剩余工作移入 **Phase Fix**：
 
-| 层级 | 内容 | 状态 |
-|------|------|:----:|
-| Lv4a | lambda 表达式 | ✅ |
-| Lv4b | def 语句（参数/默认值/返回） | ✅ |
-| Lv4c | class 定义（方法/类级属性） | ✅ 基础结构 |
-| Lv4d | 装饰器 @decorator 链 | ✅ |
-| Lv4e | Yield / YieldFrom / Generator | ✅ |
-| Lv4f | AugAssign 细化（i+=1） | ✅ |
-| Lv4g | 模块顶层代码（import/from） | ✅ |
-| Lv4h | async def / await | ✅ |
-| Lv4i | match/case (3.10+) | ❌ 待完成 |
+| 项目 | 优先级 | 类型 |
+|:-----|:-------|:------|
+| `match/case` ExceptionTable CFG 重建 | 🔴 高 | 语法覆盖 |
+| `except*` ExceptionTable → IsGroup 映射 | 🔴 高 | 语法覆盖 |
+| walrus 控制流检测 | 🟢 低 | 语法覆盖 |
+| AST 自动对比验证 | 🟡 中 | 工程增强 |
+| CrashCollector Dashboard | 🟡 中 | 工程增强 |
+| 批量反编译模式 | 🟢 低 | 工程增强 |
 
-**关键难点**：
-- lambda 的代码对象在 consts 中作为 TYPE_CODE，需识别为 lambda 表达式而非 def
-- def 需要从 co_consts[co_consts[0]] 获取函数名和默认值
-- class 的字节码通过 BUILD_CLASS + STORE_NAME 识别，body 在另一个 code object
-- yield 导致 code.flags & 0x20 = CO_GENERATOR，需在栈机中支持 YIELD_VALUE
-- async def 有 CO_COROUTINE(0x80) 和 CO_ASYNC_GENERATOR 标志
+详见 `docs/plan_phase_fix.md`。
 
-### 9.2 Phase 5 — 异常处理增强与代码质量（P1）
+---
 
-| 层级 | 内容 | 优先级 | 预计文件数 |
-|------|------|--------|----------|
-| **Lv5a** | except handler body 尾部 POP_EXCEPT 处理细化 | P1 | 2 测试 |
-| **Lv5b** | with 语句（SETUP_WITH/WITH_EXCEPT_START） | P1 | 3 测试 |
-| **Lv5c** | finally 块 | P1 | 2 测试 |
-| **Lv5d** | raise from（链式异常） | P1 | 1 测试 |
-| **Lv5e** | assert 语句 | P1 | 1 测试 |
-| **Lv5f** | AugAssign 全模式覆盖（`*=`/`/=`/`//=`/`%=`/`&=`/`|=`/`^=`/`<<=`/`>>=`/`**=`) | P1 | 1 测试 |
-| **Lv5g** | 死代码消除增强 | P1 | — |
-
-**难点**：
-- with 语句编译为 SETUP_WITH + 调用 __enter__/__exit__，反编译需要识别这一模式
-- finally 在 3.10- 由 SETUP_FINALLY 处理，3.11+ 在 ExceptionTable 中
-- raise X from Y 编译为 3 条指令：LOAD... RAISE_VARARGS(2)，需要判断 from 是否存在
-
-### 9.3 Phase 6 — v3.11+ 完整反编译流水线（P2）
-
-| 层级 | 内容 | 状态 |
-|------|------|:----:|
-| **Lv6a** | v3.11+ 新操作码适配（RESUME, COPY, SWAP, PRECALL, PUSH_EXC_INFO, PUSH_EXC_HANDLER, PULL_EXC_FROM_INFO, RERAISE, BINARY_OP, CALL, RETURN_CONST） | ✅ **全部完成** |
-| Lv6b | ExceptionTable 解析 + try 结构重建 | ✅ 已完成 |
-| Lv6c | 无 SETUP_FINALLY 的异常处理 | ✅ 已完成 |
-| Lv6d | linetable 解析（替代 lnotab） | ❌ 待完成 |
-| Lv6e | CACHE 条目 2 字节对齐 | ✅ 已完成 |
-| Lv6f | v3.11+ 版本矩阵测试 | ✅ 已完成 |
-
-**难点**：
-- v3.11+ 的 TRY 指令（PUSH_EXC_INFO/PUSH_EXC_HANDLER/RERAISE 等）完全替代了 SETUP_FINALLY
-- ExceptionTable 编码了 try/except/finally 的范围、handler 偏移和类型
-- RESUME 指令（90）与旧版 STORE_NAME(90) 同 opcode 号，需通过 `IsPython311Plus()` 区分
-- 指令数膨胀：CACHE 条目导致字节码阵列变长
-
-### 9.4 Phase 7 — GUI 完善（P1）
-
-| 层级 | 内容 | 优先级 |
-|------|------|--------|
-| **Lv7a** | AvaloniaEdit 语法高亮（Python 关键字/字符串/注释） | P1 |
-| **Lv7b** | 注释兜底块着色（灰色背景） | P1 |
-| **Lv7c** | 批量反编译（文件夹模式） | P1 |
-| **Lv7d** | 统计面板（块数/成功率/版本） | P1 |
-| **Lv7e** | 设置页面（默认版本/缩进宽度） | P2 |
-| **Lv7f** | 差异对比视图（反编译 vs 原始） | P2 |
-
-### 9.6 Phase Fix — 未完成任务存档
-
-从 Phase 3/4/5 移入，优先级不阻塞主流程，择机修复：
-
-| 项目 | 来源 | 优先级 |
-|:-----|:-----|:------|
-| marshal TYPE_REF 偏移 (co_names 为空, class __name__, abc import) | Phase 3 | 🔴 高 |
-| `match/case` (3.10+) | Phase 4 | 🔴 高 |
-| `except*` (3.11+) | Phase 4 | 🔴 高 |
-| walrus `:=` (3.8+) | Phase 4 | 🟢 低 |
-| AST 自动对比验证 | Phase 5 | 🟡 中 |
-| CrashCollector Dashboard | Phase 5 | 🟡 中 |
-| 批量反编译模式 | Phase 5 | 🟢 低 |
+## 10. 已知问题（已全部关闭）
 
 | 层级 | 内容 | 优先级 |
 |------|------|--------|

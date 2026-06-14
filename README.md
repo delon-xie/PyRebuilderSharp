@@ -39,7 +39,7 @@
 | 装饰器 | `@decorator` 链 | ✅ |
 | 异步 | `async def` / `await` | ✅ |
 | 展开赋值 | `a, b = ...`, `*rest` | ✅ |
-| **Phase Fix 全部** | 5 项已知问题 + cache 表 + ROT_TWO/PUSH_NULL 冲突 | ✅ **全部关闭** |
+| **Phase Fix 全部 + Phase 6** | 11 项修复 + linetable + walrus + except* + match opcode | ✅ **全部关闭** |
 | GUI | Avalonia 暗色主题 + 拖放 + 语法高亮 | ✅ |
 | 跨平台 | Windows / macOS / Linux | ✅ |
 
@@ -183,77 +183,112 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 
 ## 当前状态
 
-### Phase 3 ✅ 全部完成
+### ✅ Phase 1–2 — 基础设施
 
 | 项目 | 状态 |
 |:-----|:------|
-| C1 — Marshal 嵌套 CodeObject 修复 | ✅ 8 修复, 0 警告 |
-| C2 — 测试矩阵扩展至 2.7-3.14 | ✅ 77 测试 |
-| C3 — CrashCollector 运行时 | ✅ 已实现 |
-| C4 — Lv3 嵌套深度测试 | ✅ 33/33 标记通过 |
+| CLI 命令行工具 | ✅ |
+| Avalonia GUI 暗色主题 | ✅ |
+| 文件拖放 + 打开对话框 | ✅ |
+| SelectableTextBlock 语法高亮 | ✅ |
+| 跨平台 (Windows/macOS/Linux) | ✅ |
 
-### Phase 4 ✅ 完成
+### ✅ Phase 3 — marshal 收敛 + Lv3 嵌套
 
-| P0 | 项目 | 状态 |
-|:--:|:-----|:------|
-| 1 | Assign+FunctionRef → FunctionDef (**`def` 语句**) | ✅ **完成** |
-| 2 | **class 定义** (基础结构) | ✅ **完成** |
-| 3 | yield / yield from | ✅ **完成** |
+| 项目 | 状态 |
+|:-----|:------|
+| 8 个 marshal 3.11+ 修复 | ✅ 0/938 警告 |
+| 版本矩阵 2.7→3.14 | ✅ 77/77 |
+| CrashCollector | ✅ |
+| Lv3 嵌套 + 九层塔 | ✅ 33/33 |
 
-| P1 | 项目 | 状态 |
-|:--:|:-----|:------|
-| 1 | **@decorator** 装饰器链 | ✅ **完成** |
-| 2 | **async def** / **await** 异步 | ✅ **完成** |
-| 3 | 展开赋值 `a, b = ...` | ✅ **完成** |
+### ✅ Phase 4 — 语法覆盖
 
----
+| 项目 | 状态 |
+|:-----|:------|
+| `def` / `class` / yield / @decorator / async / 展开赋值 | ✅ |
 
-## 创意与领先性
+### ✅ Phase 5 — 编译脚本
 
-### 与 pycdc 的对比
+| 项目 | 状态 |
+|:-----|:------|
+| compile_test_data 2.7→3.14 | ✅ 628 编译 |
+| Benchmark 938/938 | ✅ 0 警告 |
 
-| 特性 | pycdc (C++) | PyRebuilderSharp (C#) |
-|------|:-----------:|:---------------------:|
-| **语言** | C++17 | C# 13 (.NET 10) |
-| **AST 模型** | 手写多态 + enum | record 类型 + 模式匹配 |
-| **内存管理** | shared_ptr/unique_ptr | GC 自动回收 |
-| **容错机制** | 整体失败 | **逐块注释兜底** 🏆 |
-| **测试体系** | 手工测试为主 | xUnit + AST 语义比较 🏆 |
-| **版本矩阵** | 有限 | **77 测试 × 11 版本全覆盖** 🏆 |
-| **marshal 3.11+** | 不支持 `localsplusnames` | **8 修复, 0 警告** 🏆 |
-| **GUI** | 无 | **Avalonia 跨平台 GUI** 🏆 |
-| **构建命令** | CMake 多步骤 | `dotnet run` 单命令 🏆 |
-| **跨平台** | CMake 编译 | dotnet restore + run |
+### ✅ Phase Fix — 7 项 Bug
 
-### 技术亮点
+| 项目 | 状态 |
+|:-----|:------|
+| co_names / class Foo / x = f() / RETURN_CONST / walrus / except* / match opcode | ✅ 全部关闭 |
 
-- **完整 record 模式匹配** — 利用 C# 的 `switch` 表达式 + 模式匹配实现 AST 遍历，代码量比 pycdc 减少约 60%
-- **零 C++ 依赖** — 纯 .NET 生态，单命令构建，无需 make/cmake/gcc
-- **暗色主题原生 GUI** — Avalonia Fluent 主题，拖放 .pyc 即可反编译
-- **多版本统一枚举** — 2.7~3.14 的 Opcode 映射统一在 `Opcode.cs` 枚举中
-- **AST 兜底链** — 一个块反编译失败 → 自动转为注释块 → 外层控制流仍然完整
+### ✅ Phase 6 — v3.11+ 流水线
+
+| Lv6 | 状态 |
+|:----|:------|
+| Lv6a–Lv6f (15 opcodes + ExceptionTable + linetable + CACHE + 版本矩阵) | ✅ 全部完成 |
 
 ---
 
 ## 未来计划
 
-### Phase 4-5 ✅ 完成
+### 🔴 高优先级
 
-`def` 语句 · `class` 定义 · `yield / yield from` · `@decorator` · `async def / await` · `a, b = ...` 展开赋值
+| 项目 | 说明 |
+|:-----|:------|
+| `match/case` (3.10+) CFG 重建 | ExceptionTable 驱动控制流 |
+| `except*` ExceptionTable → IsGroup 映射 | handler 集成 |
 
-| 项 | 优先级 | 状态 |
-|:---|:------|:-----|
-| `match/case` (3.10+) | 🟢 低 | ❌ |
-| `except*` (3.11+) | 🟢 低 | ❌ |
-| walrus `:=` | 🟢 低 | ❌ |
+### 🟡 中优先级
 
-### 工程增强 — 未完成
+| 项目 | 说明 |
+|:-----|:------|
+| AST 自动对比验证 | 反编译 vs 原始 .py |
+| CrashCollector Dashboard | GUI 异常面板 |
 
-| 项 | 说明 | 状态 |
-|:---|:-----|:------|
-| AST 自动对比验证 | 反编译输出与原 `.py` 的 AST 语义比较 | ❌ |
-| CrashCollector Dashboard | GUI 内嵌异常管理面板 | ❌ |
-| 批量反编译模式 | 拖入目录 → 批量反编译 | ❌ |
+### 🟢 低优先级
+
+| 项目 | 说明 |
+|:-----|:------|
+| walrus 控制流检测 | if x := expr: 模式 |
+| 批量反编译模式 | 拖入目录批量 ||
+| Benchmark 938/938 | ✅ 0 警告 |
+
+### ✅ Phase Fix — 7 项 Bug
+
+| 项目 | 状态 |
+|:-----|:------|
+| co_names / class Foo / x = f() / RETURN_CONST / walrus / except* / match opcode | ✅ 全部关闭 |
+
+### ✅ Phase 6 — v3.11+ 流水线
+
+| Lv6 | 状态 |
+|:----|:------|
+| Lv6a–Lv6f (15 opcodes + ExceptionTable + linetable + CACHE + 版本矩阵) | ✅ 全部完成 |
+
+---
+
+## 未来计划
+
+### 🔴 高优先级
+
+| 项目 | 说明 |
+|:-----|:------|
+| `match/case` (3.10+) CFG 重建 | ExceptionTable 驱动控制流 |
+| `except*` ExceptionTable → IsGroup 映射 | handler 集成 |
+
+### 🟡 中优先级
+
+| 项目 | 说明 |
+|:-----|:------|
+| AST 自动对比验证 | 反编译 vs 原始 .py |
+| CrashCollector Dashboard | GUI 异常面板 |
+
+### 🟢 低优先级
+
+| 项目 | 说明 |
+|:-----|:------|
+| walrus 控制流检测 | if x := expr: 模式 |
+| 批量反编译模式 | 拖入目录批量 |
 
 ---
 

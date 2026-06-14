@@ -659,7 +659,7 @@ TYPE_CODE (99):
 
 | 变化 | 说明 | 处理 |
 |------|------|------|
-| CACHE 条目 | adaptive 指令后的 1-4 字节缓存 | 跳过 `rawOp==0`（不依赖 cache 表） |
+| CACHE 条目 | adaptive 指令后的 2 字节槽 | 跳过 `rawOp==0`（不依赖 cache 表） |
 | RESUME=90 | 与旧版 STORE_NAME 同值 | `IsPython311Plus() && rawOp == 90` → Opcode.RESUME |
 | JUMP_BACKWARD | 替代 JUMP_ABSOLUTE 的回跳 | 跳转方向不同 |
 | POP_JUMP_FORWARD_IF_* | 替代 POP_JUMP_IF_* 的前跳 | 跳转方向不同 |
