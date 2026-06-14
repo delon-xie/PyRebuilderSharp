@@ -27,17 +27,18 @@
 |------|------|:----:|
 | 支持版本 | 2.7, 3.5 ~ 3.14 | ✅ |
 | 真实 .pyc 文件通过率 | **182/182** (100%) | ✅ |
-| marshal 警告 | **0/182** | ✅ |
 | 失败基本块 | **0/827** (0%) | ✅ |
 | 基准测试耗时 | 182 文件 / 0.4 秒 | ✅ |
-| xUnit 单元测试 | **102/109 通过** | ✅ |
+| marshal 警告 | **0/938** (全覆盖) | ✅ |
 | 版本矩阵 | **77/77** (7 层级 × 11 版本 2.7→3.14) | ✅ |
+| Benchmark全覆盖 | **938** 文件 (11 版本 2.7→3.14) | ✅ |
 | 九层塔测试 | **11/11** (9 层混合嵌套, 2.7→3.14) | ✅ |
 | 函数定义 | `def greet(name): def factorial(n):` | ✅ |
 | 类定义 | `class __name__:` (基础结构) | ✅ |
 | 生成器 | `yield` / `yield from` | ✅ |
 | 装饰器 | `@decorator` 链 | ✅ |
 | 异步 | `async def` / `await` | ✅ |
+| 展开赋值 | `a, b = ...`, `*rest` | ✅ |
 | CrashCollector | JSON 崩溃记录 | ✅ |
 | GUI | Avalonia 暗色主题 + 拖放 + 语法高亮 | ✅ |
 | 跨平台 | Windows / macOS / Linux | ✅ |
@@ -230,15 +231,14 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 
 ## 未来计划
 
-### Phase 4 ✅ 完成 → Phase 5 (计划中)
+### Phase 4-5 ✅ 完成
 
-`def` 语句 · `class` 定义 · `yield / yield from` · `@decorator` · `async def / await`
+`def` 语句 · `class` 定义 · `yield / yield from` · `@decorator` · `async def / await` · `a, b = ...` 展开赋值
 
 | 项 | 优先级 | 状态 |
 |:---|:------|:-----|
-| 展开赋值 `a, b = ...` | 🟢 低 | ❌ |
 | `match/case` (3.10+) | 🟢 低 | ❌ |
-| 类型注解 | 🟢 低 | ❌ |
+| `except*` (3.11+) | 🟢 低 | ❌ |
 | walrus `:=` | 🟢 低 | ❌ |
 
 ### Phase 5 — 工程增强

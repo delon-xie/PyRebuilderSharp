@@ -6,7 +6,7 @@
 **版本**: v2.5
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 3 ✅ · Phase 4 ✅ · 102/109 xUnit · 版本矩阵2.7-3.14全覆盖 · 九层塔测试 · 0 marshal警告 · 8个3.11+修复 · def/class/yield/decorator/async · 支持至Python 3.14
+**状态**: Phase 3 ✅ · Phase 4 ✅ · Phase 5 ✅ · 102/109 xUnit · 版本矩阵2.7-3.14全覆盖 · 九层塔测试 · 0 marshal警告 · 8个3.11+修复 · def/class/yield/decorator/async/展开赋值 · 支持至Python 3.14
 
 ---
 

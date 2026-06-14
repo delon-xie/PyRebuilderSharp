@@ -11,5 +11,14 @@
   "test_nested_depth_9":  { "note": "九层塔混合嵌套", "ast_check_ok": false },
   "test_control_flow":    { "note": "控制流", "ast_check_ok": true },
   "test_seq_clean":       { "note": "顺序代码", "ast_check_ok": true },
-  "test_expr_basic":      { "note": "表达式", "ast_check_ok": true }
+  "test_expr_basic":      { "note": "表达式", "ast_check_ok": true },
+  "test_simple_def":      { "note": "简单函数定义", "ast_check_ok": true },
+  "test_yield_simple":    { "note": "yield 生成器", "ast_check_ok": true },
+  "test_yield_gen":       { "note": "yield 生成器高级", "ast_check_ok": true },
+  "test_async":           { "note": "async/await", "ast_check_ok": false },
+  "simple_funcs":         { "note": "多函数模块", "ast_check_ok": false },
+  "abc":                  { "note": "ABC 模块（标准库）", "ast_check_ok": false },
+  "enum":                 { "note": "enum 模块（标准库）", "ast_check_ok": false },
+  "functools":            { "note": "functools 模块", "ast_check_ok": false },
+  "typing":               { "note": "typing 模块", "ast_check_ok": false }
 }

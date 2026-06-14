@@ -726,10 +726,33 @@ public class StackMachine
             // ---- UNPACK_SEQUENCE: 展开序列到栈 ----
             case Opcode.UNPACK_SEQUENCE:
             {
-                // In 3.11+ call protocol, UNPACK_SEQUENCE before CALL is a call-prep
-                // marker; when used for actual unpacking (a, b = ...), it pops the
-                // container. For now, treat as no-op — CALL handles args correctly,
-                // and tuple assignments show the whole tuple instead of unpacking.
+                var count = instr.Argument ?? 0;
+                var container = SafePop();
+                if (container == null) return null;
+
+                for (int i = count - 1; i >= 0; i--)
+                    _exprStack.Push(new Starred(container, ExpressionContext.Load));
+                return null;
+            }
+
+            case Opcode.UNPACK_EX:
+            {
+                // UNPACK_EX: arg = (num_required_before << 8) | num_required_after
+                var rawArg = instr.Argument ?? 0;
+                var beforeCount = rawArg >> 8;
+                var afterCount = rawArg & 0xFF;
+                var container = SafePop();
+                if (container == null) return null;
+                
+                // Push required-before first (will be stored from the right)
+                // Then push starred container for the middle
+                // Then push required-after 
+                for (int i = 0; i < beforeCount; i++)
+                    _exprStack.Push(new Starred(container, ExpressionContext.Load));
+                // Push the *rest marker as Starred with a special flag
+                _exprStack.Push(new Starred(container, ExpressionContext.Store));
+                for (int i = 0; i < afterCount; i++)
+                    _exprStack.Push(new Starred(container, ExpressionContext.Load));
                 return null;
             }
 

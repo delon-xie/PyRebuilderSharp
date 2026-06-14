@@ -148,6 +148,9 @@ public class PythonCodeGenerator : ICodeGenerator
             case ListLiteral l:
                 VisitListLiteral(l);
                 break;
+            case Starred s:
+                VisitStarred(s);
+                break;
             case DictLiteral d:
                 VisitDictLiteral(d);
                 break;
@@ -804,6 +807,12 @@ public class PythonCodeGenerator : ICodeGenerator
             Visit(list.Elts[i]);
         }
         _output.Append(close);
+    }
+
+    private void VisitStarred(Starred star)
+    {
+        _output.Append('*');
+        Visit(star.Value);
     }
 
     private void VisitDictLiteral(DictLiteral dict)
