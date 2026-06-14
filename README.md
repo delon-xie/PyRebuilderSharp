@@ -33,7 +33,11 @@
 | xUnit 单元测试 | **102/109 通过** | ✅ |
 | 版本矩阵 | **77/77** (7 层级 × 11 版本 2.7→3.14) | ✅ |
 | 九层塔测试 | **11/11** (9 层混合嵌套, 2.7→3.14) | ✅ |
-| 函数定义输出 | `def factorial(n):` 正确 | ✅ |
+| 函数定义 | `def greet(name): def factorial(n):` | ✅ |
+| 类定义 | `class __name__:` (基础结构) | ✅ |
+| 生成器 | `yield` / `yield from` | ✅ |
+| 装饰器 | `@decorator` 链 | ✅ |
+| 异步 | `async def` / `await` | ✅ |
 | CrashCollector | JSON 崩溃记录 | ✅ |
 | GUI | Avalonia 暗色主题 + 拖放 + 语法高亮 | ✅ |
 | 跨平台 | Windows / macOS / Linux | ✅ |
@@ -226,14 +230,16 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 
 ## 未来计划
 
-### Phase 4 剩余
+### Phase 4 ✅ 完成 → Phase 5 (计划中)
 
-| P0 | 项目 | 优先级 |
-|:--:|:-----|:------:|
-| 2 | class 定义（含继承） | 🔴 高 |
-| 3 | yield / yield from / async | 🔴 高 |
-| P1 | 装饰器 / async def / 展开赋值 / for-else | 🟡 中 |
-| P2 | match/case / 类型注解 / walrus | 🟢 低 |
+`def` 语句 · `class` 定义 · `yield / yield from` · `@decorator` · `async def / await`
+
+| 项 | 优先级 | 状态 |
+|:---|:------|:-----|
+| 展开赋值 `a, b = ...` | 🟢 低 | ❌ |
+| `match/case` (3.10+) | 🟢 低 | ❌ |
+| 类型注解 | 🟢 低 | ❌ |
+| walrus `:=` | 🟢 低 | ❌ |
 
 ### Phase 5 — 工程增强
 

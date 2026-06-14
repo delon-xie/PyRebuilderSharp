@@ -4,9 +4,7 @@ using PyRebuilderSharp.Core;
 using PyRebuilderSharp.Core.Generators;
 
 var files = new[] {
-    "/tmp/simple_funcs.3.12.pyc",
-    "/Users/admin/codes/Tools/PyRebuilderSharp/test_data/compiled/test_for.3.12.pyc",
-    "/Users/admin/codes/Tools/PyRebuilderSharp/test_data/compiled/abc.3.12.pyc",
+    "/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_class_simple.3.12.pyc",
 };
 
 foreach (var file in files)
@@ -21,7 +19,7 @@ foreach (var file in files)
         var code = result.SourceCode;
         Console.WriteLine($"SourceCode ({code.Length} chars):");
         var lines = code.Split('\n');
-        for (int i = 0; i < Math.Min(lines.Length, 15); i++)
+        for (int i = 0; i < Math.Min(lines.Length, 30); i++)
             Console.WriteLine($"  {lines[i]}");
     }
     catch (Exception ex)

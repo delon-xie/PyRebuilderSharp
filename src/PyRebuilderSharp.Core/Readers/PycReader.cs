@@ -199,8 +199,6 @@ public class PycReader
                 // Python 3.11+: marshal 格式改为单个 localsplusnames + localspluskinds
                 // co_names 仍然独立存储
                 code.Names = ReadMarshalObjectAsStrList(br);
-                if (br.BaseStream.Position > 2700 && br.BaseStream.Position < 2900)
-                    Console.Error.WriteLine($"[FIELD] after names pos={br.BaseStream.Position} count={code.Names.Count}");
                 var localsplusnames = ReadMarshalObjectAsStrList(br);
                 
                 // localspluskinds = 字节数组
@@ -1736,7 +1734,7 @@ public class PycReader
         var rawType = br.ReadByte();
         var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
 
-        // FLAG_REF: reserve ref list slot (like ReadMarshalObject does)
+        // FLAG_REF: reserve ref list slot (matching CPython's r_object behavior)
         bool hasRef = (rawType & MarshalType.TYPE_FLAG_REF) != 0;
         int refIdx = -1;
         if (hasRef)
@@ -1772,6 +1770,10 @@ public class PycReader
     private byte[] ReadLongStringBytes(BinaryReader br)
     {
         var len = br.ReadInt32();
+        // 防止过读：如果 len 超过文件剩余字节，只读取到文件末尾
+        long remaining = br.BaseStream.Length - br.BaseStream.Position;
+        if (len > remaining)
+            len = (int)Math.Max(0, remaining);
         return br.ReadBytes(len);
     }
 

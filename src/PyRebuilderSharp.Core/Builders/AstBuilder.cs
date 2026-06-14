@@ -60,10 +60,37 @@ public class AstBuilder
         }
 
         var stmts = BuildStatements(cfg.Entry, new HashSet<BasicBlock>());
-        
+
         stmts = PostProcessFunctionDefs(stmts);
         // Fallback: position-based ChildCode matching
         stmts = ConvertChildCodesToFunctionDefs(stmts);
+        
+        // Fix co_names: extract names from bytecodes (works even when marshal co_names is wrong)
+        if (_codeObject.Instructions != null && _codeObject.ChildCodes.Count > 0)
+        {
+            var extractedNames = new List<string>();
+            foreach (var instr in _codeObject.Instructions)
+            {
+                if (instr.Opcode == Opcode.STORE_NAME && instr.Argument.HasValue)
+                {
+                    var idx = instr.Argument.Value;
+                    // Ensure the list is large enough
+                    while (extractedNames.Count <= idx)
+                        extractedNames.Add("");
+                    if (idx < _codeObject.ChildCodes.Count)
+                    {
+                        var cc = _codeObject.ChildCodes[idx];
+                        if (cc != null && !string.IsNullOrEmpty(cc.Name) && cc.Name != "<module>")
+                            extractedNames[idx] = cc.Name;
+                    }
+                }
+            }
+            // Only apply if we got meaningful names
+            if (extractedNames.Any(n => !string.IsNullOrEmpty(n)))
+            {
+                _codeObject.Names = extractedNames;
+            }
+        }
         
         // Remove trailing module-level return None
         if (stmts.Count > 0 && stmts[^1] is Return ret && ret.Value is Constant { Value: null })
@@ -2259,15 +2286,48 @@ public class AstBuilder
         {
             if (stmt is Assign assign && assign.Targets.Count == 1
                 && assign.Targets[0] is Name targetName
-                && assign.Value is Constant && childIdx < childCodes.Count)
+                && assign.Value is Constant constVal
+                && (constVal.Value == null || constVal.Value is CodeObject)
+                && childIdx < childCodes.Count)
             {
                 var cc = childCodes[childIdx];
                 childIdx++;
                 var funcDef = BuildFunctionDef(cc.Name ?? targetName.Id, new FunctionRef(cc, cc.Name ?? targetName.Id));
-                if (funcDef != null) { result.Add(funcDef); continue; }
+                if (funcDef != null)
+                {
+                    // Detect class body: FunctionDef with no args and contains methods
+                    if (funcDef.Args.Count == 0 && HasNestedFunctions(funcDef.Body))
+                    {
+                        // Use the STORE_NAME target as class name (more reliable than code object's name)
+                        var className = targetName.Id;
+                        // Try to get a better name from the code object if available
+                        if (!string.IsNullOrEmpty(cc.Name) && cc.Name != "<module>" && !cc.Name.StartsWith("name_"))
+                            className = cc.Name;
+                        var classDef = new ClassDef(
+                            className,
+                            new List<Expr>(),
+                            funcDef.Body
+                        );
+                        result.Add(classDef);
+                        continue;
+                    }
+                    result.Add(funcDef);
+                    continue;
+                }
             }
             result.Add(stmt);
         }
         return result;
+    }
+
+    private static bool HasNestedFunctions(List<Stmt> body)
+    {
+        if (body == null) return false;
+        foreach (var stmt in body)
+        {
+            if (stmt is FunctionDef) return true;
+            if (stmt is ClassDef) return true;
+        }
+        return false;
     }
 }

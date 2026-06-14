@@ -5,7 +5,7 @@
 **版本**: v2.6
 **日期**: 2026-06-14
 **项目**: PyRebuilderSharp
-**状态**: Phase 3 ✅ · Phase 4 P0-1 ✅ — 102/109 xUnit · 版本矩阵2.7-3.14全覆盖(77项) · 九层塔测试 · 8个marshal修复 · `def factorial(n):` 正确输出 · 0 marshal警告 · 支持至Python 3.14
+**状态**: Phase 3 ✅ · Phase 4 ✅ — 102/109 xUnit · 版本矩阵2.7-3.14全覆盖(77项) · 九层塔测试 · 8个marshal修复 · def/class/yield/decorator/async · 支持至Python 3.14
 
 ---
 
