@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Threading;
 using PyRebuilderSharp.Gui.Services;
 using PyRebuilderSharp.Gui.ViewModels;
 using System.IO;
@@ -38,7 +37,7 @@ public partial class MainWindow : Window
             System.Console.Error.WriteLine("[DEBUG] DataContextChanged: wiring VM");
             vm.TopLevel = this;
 
-            // 源码面板：DispatcherPriority.Background 避免阻塞渲染
+            // 源码面板：Highlight 直接在 UI 线程执行（反编译已在 Task.Run 中，UI 线程空闲）
             vm.OnCodeChanged += code =>
             {
                 if (SourceBlock == null) return;
@@ -47,10 +46,7 @@ public partial class MainWindow : Window
                     SourceBlock.Inlines = null;
                     return;
                 }
-                Dispatcher.UIThread.Post(() =>
-                {
-                    SourceBlock.Inlines = PythonSyntaxHighlight.Highlight(code);
-                }, DispatcherPriority.Background);
+                SourceBlock.Inlines = PythonSyntaxHighlight.Highlight(code);
             };
 
             // 字节码面板：同上
@@ -62,10 +58,7 @@ public partial class MainWindow : Window
                     DisasmBlock.Inlines = null;
                     return;
                 }
-                Dispatcher.UIThread.Post(() =>
-                {
-                    DisasmBlock.Inlines = DisasmSyntaxHighlight.Highlight(code);
-                }, DispatcherPriority.Background);
+                DisasmBlock.Inlines = DisasmSyntaxHighlight.Highlight(code);
             };
         };
     }

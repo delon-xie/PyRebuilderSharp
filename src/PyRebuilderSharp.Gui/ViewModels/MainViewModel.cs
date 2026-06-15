@@ -237,6 +237,9 @@ public class MainViewModel : ViewModelBase
 
     /// <summary>存储完整的反编译结果（含孤儿块和摘要），用于复选框切换时过滤。</summary>
     private string _fullDecompiledCode = "";
+    
+    /// <summary>反编译超时取消令牌（防止某些文件无限循环挂死 GUI）。</summary>
+    private CancellationTokenSource? _decompileCts;
 
     // -- 命令 --
     public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
@@ -572,6 +575,13 @@ public class MainViewModel : ViewModelBase
     private async Task DecompileFile(string filePath)
     {
         if (!File.Exists(filePath)) return;
+        
+        // 取消之前的反编译（切换文件时）
+        _decompileCts?.Cancel();
+        _decompileCts = new CancellationTokenSource();
+        var cts = _decompileCts;
+        const int DecompileTimeoutSeconds = 60;
+
         IsDecompiling = true;
         StatusText = "⏳ 反编译中...";
         PythonVersion = "⏳ 读取中...";
@@ -584,8 +594,26 @@ public class MainViewModel : ViewModelBase
 
             var pycData = await File.ReadAllBytesAsync(filePath);
             var decompiler = new Decompiler();
-            var result = await Task.Run(() => decompiler.DecompileWithStats(pycData));
 
+            // 带超时的反编译（防止无限循环挂死 GUI）
+            var decompileTask = Task.Run(() => decompiler.DecompileWithStats(pycData), cts.Token);
+            var completedTask = await Task.WhenAny(decompileTask, Task.Delay(TimeSpan.FromSeconds(DecompileTimeoutSeconds), cts.Token));
+
+            if (completedTask != decompileTask)
+            {
+                // 超时：显示错误信息
+                _fullDecompiledCode = $"# 反编译超时（超过 {DecompileTimeoutSeconds}s）\n" +
+                    $"# 文件: {Path.GetFileName(filePath)}\n" +
+                    $"# 版本: {pyVersion}\n" +
+                    $"# 原因: 某些 Python 3.11+ 的 yield/生成器字节码可能导致无限循环\n" +
+                    $"# 提示: 这是反编译器核心的已知问题，非 GUI 错误";
+                ApplyDisplayFilters();
+                StatusText = $"⏰ 反编译超时 ({DecompileTimeoutSeconds}s)";
+                StatsText = "超时";
+                return;
+            }
+
+            var result = decompileTask.Result;
             // 存入完整源码（含孤儿块和摘要），然后根据复选框应用过滤
             _fullDecompiledCode = result.SourceCode;
             ApplyDisplayFilters();
