@@ -40,16 +40,48 @@ public class PycReader
     private readonly List<string> _internedStrings27 = new(); // Python 2.7 interned string table
     private string _pythonVersion = "Python 3.8";
     private byte[] _magicBytes = Array.Empty<byte>();
+    /// <summary>检测到的 Python 次版本号（11=3.11, 12=3.12, 13=3.13, 14=3.14, 0=未知）。</summary>
+    private int _pythonMinorVersion;
     private int _marshalDepth = 0;
     private const int MaxMarshalDepth = 100000;
+    private int _marshalCalls = 0;
+    private const int MaxMarshalCalls = 50000;
     private System.Diagnostics.Stopwatch? _readTimer;
     private const int MaxReadSeconds = 15;
     private void CheckReadTimeout(BinaryReader? br = null)
     {
-        if (_readTimer != null && _readTimer.Elapsed.TotalSeconds > MaxReadSeconds)
+        if (_readTimer == null) return;
+        if (_readTimer.Elapsed.TotalSeconds > MaxReadSeconds)
+        {
+            System.Console.Error.WriteLine($"[TIMEOUT] CheckReadTimeout fires at {_readTimer.Elapsed.TotalSeconds:F1}s, offset={br?.BaseStream.Position}, calls={_marshalCalls}");
+            System.Console.Error.Flush();
             throw new TimeoutException(
                 $"PycReader timed out after {MaxReadSeconds}s at offset {br?.BaseStream.Position}/{br?.BaseStream.Length}, " +
-                $"marshalDepth={_marshalDepth}.");
+                $"marshalDepth={_marshalDepth}, calls={_marshalCalls}.");
+        }
+    }
+    
+    /// <summary>
+    /// 记录警告日志（含流位置、marshal深度、上下文方法名）。
+    /// 用于所有异常捕获点，方便后续排查 marshal 格式问题。
+    /// </summary>
+    private void LogCatch(BinaryReader br, string context, Exception ex)
+    {
+        System.Console.Error.WriteLine(
+            $"[WARN] PycReader.{context}: offset={br.BaseStream.Position}/{br.BaseStream.Length} " +
+            $"marshalDepth={_marshalDepth} elapsed={_readTimer?.Elapsed.TotalSeconds:F1}s " +
+            $"ex={ex.GetType().Name}: {ex.Message}");
+    }
+    
+    /// <summary>
+    /// 无 BinaryReader 时的重载。
+    /// </summary>
+    private void LogCatch(string context, Exception ex, string? extraInfo = null)
+    {
+        System.Console.Error.WriteLine(
+            $"[WARN] PycReader.{context}: marshalDepth={_marshalDepth} " +
+            $"elapsed={_readTimer?.Elapsed.TotalSeconds:F1}s " +
+            $"ex={ex.GetType().Name}: {ex.Message}{(extraInfo != null ? " " + extraInfo : "")}");
     }
 
     /// <summary>
@@ -84,12 +116,26 @@ public class PycReader
     {
         using var ms = new MemoryStream(data);
         using var br = new BinaryReader(ms);
-
+        
+        _marshalDepth = 0;
+        _marshalCalls = 0;
+        _readTimer = System.Diagnostics.Stopwatch.StartNew();
+        
         // Step 1: 验证Magic Number
         var magic = br.ReadBytes(4);
         _magicBytes = magic;
         var versionInfo = ValidateMagic(magic);
         _pythonVersion = versionInfo;
+        // 检测次版本号用于 3.11+/3.12/3.13+ 的分派
+        var magicHex = BitConverter.ToString(magic, 0, 4).Replace("-", "");
+        _pythonMinorVersion = magicHex switch
+        {
+            "A00D0D0A" or "A70D0D0A" => 11,
+            "CB0D0D0A" => 12,
+            "E70D0D0A" => 13,
+            "F30D0D0A" or "2B0E0D0A" => 14,
+            _ => 0,
+        };
 
         // Step 2: 读取头部信息
         if (IsPython27())
@@ -123,8 +169,9 @@ public class PycReader
             br.ReadInt32(); // source_size
         }
 
-        // Step 3: 读取Marshal数据 — use ReadMarshalObject which handles FLAG_REF
+        // Step 3: 读取Marshal数据
         _marshalDepth = 0;
+        _marshalCalls = 0;
         _readTimer = System.Diagnostics.Stopwatch.StartNew();
         return (CodeObject?)ReadMarshalObject(br);
     }
@@ -238,12 +285,9 @@ public class PycReader
                 byte[]? localspluskinds = null;
                 try
                 {
-                    // 注意：不能使用 ReadMarshalObject，因为 0x73 (TYPE_STRING) 会被
-                    // ReadMarshalValue 当成 TYPE_CODE_SIMPLE (3.11+) 读到 EOF。
-                    // 直接使用 ReadRawMarshalBytes 读取原始字节数据。
                     localspluskinds = ReadRawMarshalBytes(br);
                 }
-                catch { }
+                catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.localspluskinds", ex); }
                 
                 // 按类型拆分为 varnames/cellvars/freevars
                 var varnames = new List<string>();
@@ -279,20 +323,26 @@ public class PycReader
             var nameObj = ReadMarshalObject(br);
             code.Name = nameObj?.ToString() ?? "<module>";
 
-            // qualname (3.11+ 的所有代码对象都有，包括 TYPE_CODE_SIMPLE)
+            // qualname (3.11+ 的所有代码对象都有)
             if (IsPython311Plus())
             {
-                try { var _ = ReadMarshalObject(br); } catch { }
+                if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] before qualname: pos={br.BaseStream.Position}");
+                try { var qualObj = ReadMarshalObject(br); if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] qualname={qualObj} len={qualObj?.ToString()?.Length} pos={br.BaseStream.Position}"); }
+                catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.qualname", ex); }
             }
 
             // first line number (int32) — 3.8+ 的字段
-            try { code.FirstLineNumber = br.ReadInt32(); } catch { }
+            try { code.FirstLineNumber = br.ReadInt32(); if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] firstline={code.FirstLineNumber} pos={br.BaseStream.Position}"); }
+            catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.firstlineno", ex); }
 
-            // lnotab/linetable — 通过 ReadMarshalObject 以正确处理 FLAG_REF
-            // v3.11+: 用 ReadRawMarshalBytes（避免 TYPE_STRING 被误判为 TYPE_CODE_SIMPLE）
+            // lnotab/linetable
             byte[]? lnotab;
             if (IsPython311Plus())
+            {
+                if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] before lnotab: pos={br.BaseStream.Position}");
                 lnotab = ReadRawMarshalBytes(br);
+                if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] lnotab: len={lnotab?.Length} pos={br.BaseStream.Position}");
+            }
             else
             {
                 var lnotabObj = ReadMarshalObject(br);
@@ -305,7 +355,7 @@ public class PycReader
                 code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions, IsPython311Plus());
             }
 
-            // co_exceptiontable（3.11+ 的所有代码对象都有，包括 TYPE_CODE_SIMPLE）
+            // co_exceptiontable（3.11+ 的所有代码对象都有）
             if (IsPython311Plus() && br.BaseStream.Position < br.BaseStream.Length)
             {
                 try
@@ -314,13 +364,18 @@ public class PycReader
                     var peekByte = br.ReadByte();
                     br.BaseStream.Position--;
                     var peekType = (byte)(peekByte & ~MarshalType.TYPE_FLAG_REF);
+                    if (code.Name == "<module>")
+                        System.Console.Error.WriteLine($"[DIAG] exc table offset={br.BaseStream.Position} peek=0x{peekByte:X2} type=0x{peekType:X2} flag_ref={(peekByte & MarshalType.TYPE_FLAG_REF) != 0}");
                     if (peekType == MarshalType.TYPE_STRING || peekType == MarshalType.TYPE_BYTES
                         || peekType == MarshalType.TYPE_SHORT_ASCII || peekType == MarshalType.TYPE_ASCII
                         || peekType == MarshalType.TYPE_UNICODE)
                     {
                         var excBytes = ReadRawMarshalBytes(br);
                         if (excBytes != null && excBytes.Length > 0)
+                        {
+                            System.Console.Error.WriteLine($"[DIAG] ExceptionTable raw bytes ({excBytes.Length} bytes): {BitConverter.ToString(excBytes)}");
                             code.ExceptionTable = ParseExceptionTable(excBytes);
+                        }
                     }
                     else if (peekType == MarshalType.TYPE_REF)
                     {
@@ -330,11 +385,12 @@ public class PycReader
                             code.ExceptionTable = ParseExceptionTable(excBytes);
                     }
                 }
-                catch { }
+                catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.exceptiontable", ex); }
             }
         }
-        catch (EndOfStreamException)
+        catch (EndOfStreamException eos)
         {
+            LogCatch(br, "ReadMarshalCodeObject.outer", eos);
         }
 
         return code;
@@ -377,13 +433,17 @@ public class PycReader
             code.Name = ReadMarshalString27(br) ?? "<module>";
 
             // Python 2.7 有 firstlineno
-            try { code.FirstLineNumber = br.ReadInt32(); } catch { }
+            try { code.FirstLineNumber = br.ReadInt32(); }
+            catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject27.firstlineno", ex); }
 
             var lnotab = ReadMarshalBytes27(br);
             if (lnotab != null)
                 code.LineNumberTable = ParseLineNumberTable(lnotab, code.Instructions);
         }
-        catch (EndOfStreamException) { }
+        catch (EndOfStreamException eos)
+        {
+            LogCatch(br, "ReadMarshalCodeObject27.outer", eos);
+        }
         return code;
     }
 
@@ -412,14 +472,15 @@ public class PycReader
                 {
                     items.Add(ReadMarshalValue27(br));
                 }
-                catch
+                catch (Exception ex)
                 {
+                    LogCatch(br, "ReadMarshalListSafe27.element", ex);
                     break;
                 }
             }
             return items;
         }
-        catch { return null; }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalListSafe27.outer", ex); return null; }
     }
 
     private object? ReadMarshalValue27(BinaryReader br)
@@ -544,7 +605,7 @@ public class PycReader
             }
             return null;
         }
-        catch { return null; }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalBytes27", ex); return null; }
     }
 
     /// <summary>
@@ -568,7 +629,7 @@ public class PycReader
                 result = -result;
             return result;
         }
-        catch { return 0L; }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalLong27", ex); return 0L; }
     }
 
     /// <summary>
@@ -581,7 +642,10 @@ public class PycReader
         var count = br.ReadInt32();
         var items = new List<object?>();
         for (int i = 0; i < count; i++)
+        {
+            if (i >= 10000) { LogCatch($"ReadMarshalSetOrFrozenset27.count={count}", new InvalidOperationException($"Safety limit at {i}")); break; }
             items.Add(ReadMarshalValue27(br));
+        }
         return items;
     }
 
@@ -593,7 +657,10 @@ public class PycReader
         var count = br.ReadInt32();
         var items = new List<object?>();
         for (int i = 0; i < count; i++)
+        {
+            if (i >= 10000) { LogCatch($"ReadMarshalSetOrFrozenset.count={count}", new InvalidOperationException($"Safety limit at {i}")); break; }
             items.Add(ReadMarshalObject(br));
+        }
         return items;
     }
 
@@ -614,7 +681,10 @@ public class PycReader
         int count = type == 41 ? br.ReadByte() : br.ReadInt32(); // ')' SMALL_TUPLE
         var items = new List<object?>();
         for (int i = 0; i < count; i++)
+        {
+            if (i >= 10000) { LogCatch($"ReadMarshalList27.count={count}", new InvalidOperationException($"Safety limit at {i}")); break; }
             items.Add(ReadMarshalValue27(br));
+        }
         return items;
     }
 
@@ -638,7 +708,7 @@ public class PycReader
             }
             return dict;
         }
-        catch { return new(); }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalDictSafe27", ex); return new(); }
     }
 
     private object? SkipUnknown27(BinaryReader br, byte type)
@@ -651,7 +721,7 @@ public class PycReader
                 var skipped = br.ReadBytes(Math.Min(4, (int)(br.BaseStream.Length - br.BaseStream.Position)));
             }
         }
-        catch { }
+        catch (Exception ex) { LogCatch(br, "SkipUnknown27", ex); }
         return null;
     }
 
@@ -663,7 +733,7 @@ public class PycReader
         if (br.BaseStream.Position >= br.BaseStream.Length)
             return null;
         try { return ReadMarshalBytes(br); }
-        catch { return null; }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalBytesSafe", ex); return null; }
     }
 
     /// <summary>
@@ -690,7 +760,7 @@ public class PycReader
         }
         catch (Exception ex) 
         { 
-            System.Console.Error.WriteLine($"WARNING: Constants read failed at pos {br.BaseStream.Position}: {ex.Message}");
+            LogCatch(br, $"ReadMarshalDictSafe(offset={br.BaseStream.Position})", ex);
             return new(); 
         }
     }
@@ -703,7 +773,7 @@ public class PycReader
         if (br.BaseStream.Position >= br.BaseStream.Length)
             return null;
         try { return ReadMarshalList(br); }
-        catch { return null; }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalListSafe", ex); return null; }
     }
 
     /// <summary>
@@ -714,7 +784,7 @@ public class PycReader
         if (br.BaseStream.Position >= br.BaseStream.Length)
             return null;
         try { return ReadMarshalString(br); }
-        catch { return null; }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalStringSafe", ex); return null; }
     }
 
     /// <summary>
@@ -827,6 +897,11 @@ public class PycReader
     private bool IsPython311Plus()
         => _magicBytes.Length >= 4 && _py311PlusMagicHex.Contains(
             BitConverter.ToString(_magicBytes, 0, 4).Replace("-", ""));
+
+    /// <summary>检查是否为 Python 3.13+（操作码完全重新编号，3.13 和 3.14 编号不同）</summary>
+    private bool IsPython313Plus() => _pythonMinorVersion == 13;
+    /// <summary>检查是否为 Python 3.14（操作码编号与 3.13 不同，HAVE_ARGUMENT=43 vs 44）</summary>
+    private bool IsPython314() => _pythonMinorVersion == 14;
 
     /// <summary>
     /// 3.11+ 的缓存条目数（每个缓存条目 = 2 字节）
@@ -972,8 +1047,13 @@ public class PycReader
                 continue;
             }
 
-            // Map raw 3.11+/3.12 opcode to our unified enum
-            var op = MapOpcodePy311(rawOp);
+            // Map raw 3.11+/3.12/3.13/3.14 opcode to our unified enum
+            var op = _pythonMinorVersion switch
+            {
+                13 => MapOpcodePy313(rawOp),
+                14 => MapOpcodePy314(rawOp),
+                _ => MapOpcodePy311(rawOp),
+            };
 
             // Handle EXTENDED_ARG chain
             if (op == Models.Bytecode.Opcode.EXTENDED_ARG)
@@ -984,8 +1064,15 @@ public class PycReader
             }
 
             // Instructions with arguments: HAVE_ARGUMENT threshold
+            // 3.12: HAVE_ARGUMENT=90; 3.13: HAVE_ARGUMENT=44; 3.14: HAVE_ARGUMENT=43
             int? arg = null;
-            if (rawOp >= 90)
+            int haveArgThreshold = _pythonMinorVersion switch
+            {
+                13 => 44,
+                14 => 43,
+                _ => 90,
+            };
+            if (rawOp >= haveArgThreshold)
                 arg = (extArg << 8) | rawArg;
             extArg = 0;
 
@@ -1014,7 +1101,8 @@ public class PycReader
         // 3.12-specific: some opcodes renumbered from 3.11
         // 3.11: CALL=167, PRECALL=166, RESUME=90, POP_JUMP_IF_{TRUE,FALSE}=111/112
         // 3.12: CALL=171, no PRECALL, RESUME=151, POP_JUMP_IF_{TRUE,FALSE}=114/115
-        bool is312 = _magicBytes[0] >= 0xB0; // 3.12+ (3.11 is 0xA7-0xAF range)
+        // 3.14: uses 3.12-like numbering (RESUME=128, CALL=52)
+        bool is312 = _pythonMinorVersion == 12 || (_pythonMinorVersion == 0 && _magicBytes[0] >= 0xB0);
 
         return rawOp switch
         {
@@ -1130,7 +1218,142 @@ public class PycReader
     }
 
     /// <summary>
+    /// 将 Python 3.13+ 的原始 opcode 字节值映射到统一 Opcode 枚举。
+    /// 3.13 的操作码编号体系与 3.12 完全不同（HAVE_ARGUMENT=44, 插入/删除了多个操作码）。
+    /// 完整映射表来源于 CPython 3.13 Lib/opcode.py opname[]。
+    /// </summary>
+    private Models.Bytecode.Opcode MapOpcodePy313(byte rawOp)
+    {
+        return rawOp switch
+        {
+            // 3.13 opname 完整映射（raw byte → Opcode enum）
+            1 => Models.Bytecode.Opcode.BEFORE_ASYNC_WITH_313,
+            2 => Models.Bytecode.Opcode.BEFORE_WITH_313,
+            4 => Models.Bytecode.Opcode.BINARY_SLICE_313,
+            5 => Models.Bytecode.Opcode.BINARY_SUBSCR,      // enum=25
+            6 => Models.Bytecode.Opcode.CHECK_EG_MATCH,     // enum=198
+            7 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,    // enum=197
+            8 => Models.Bytecode.Opcode.CLEANUP_THROW_313,
+            9 => Models.Bytecode.Opcode.DELETE_SUBSCR_313,
+            10 => Models.Bytecode.Opcode.END_ASYNC_FOR_313,
+            11 => Models.Bytecode.Opcode.END_FOR_313,
+            12 => Models.Bytecode.Opcode.END_SEND_313,
+            13 => Models.Bytecode.Opcode.EXIT_INIT_CHECK_313,
+            14 => Models.Bytecode.Opcode.FORMAT_SIMPLE_313,
+            15 => Models.Bytecode.Opcode.FORMAT_WITH_SPEC_313,
+            16 => Models.Bytecode.Opcode.GET_AITER_313,
+            17 => Models.Bytecode.Opcode.RESERVED_313,
+            18 => Models.Bytecode.Opcode.GET_ANEXT_313,
+            19 => Models.Bytecode.Opcode.GET_ITER,          // enum=68
+            20 => Models.Bytecode.Opcode.GET_LEN_313,
+            21 => Models.Bytecode.Opcode.GET_YIELD_FROM_ITER, // enum=69
+            22 => Models.Bytecode.Opcode.INTERPRETER_EXIT,  // enum=3
+            23 => Models.Bytecode.Opcode.LOAD_ASSERTION_ERROR_313,
+            24 => Models.Bytecode.Opcode.LOAD_BUILD_CLASS,  // enum=71
+            25 => Models.Bytecode.Opcode.LOAD_LOCALS_313,
+            26 => Models.Bytecode.Opcode.MAKE_FUNCTION,     // enum=132
+            27 => Models.Bytecode.Opcode.MATCH_KEYS_313,
+            28 => Models.Bytecode.Opcode.MATCH_MAPPING_313,
+            29 => Models.Bytecode.Opcode.MATCH_SEQUENCE_313,
+            30 => Models.Bytecode.Opcode.NOP,               // enum=9
+            31 => Models.Bytecode.Opcode.POP_EXCEPT,         // enum=89
+            32 => Models.Bytecode.Opcode.POP_TOP,            // enum=1
+            33 => Models.Bytecode.Opcode.PUSH_EXC_INFO,      // → PUSH_EXC_INFO_312=179
+            34 => Models.Bytecode.Opcode.PUSH_NULL,          // enum=2
+            35 => Models.Bytecode.Opcode.RETURN_GENERATOR_313,
+            36 => Models.Bytecode.Opcode.RETURN_VALUE,       // enum=83
+            37 => Models.Bytecode.Opcode.SETUP_ANNOTATIONS,  // enum=85
+            38 => Models.Bytecode.Opcode.STORE_SLICE_313,
+            39 => Models.Bytecode.Opcode.STORE_SUBSCR,       // enum=49
+            40 => Models.Bytecode.Opcode.TO_BOOL_313,        // 3.13+ new (raw 40)
+            41 => Models.Bytecode.Opcode.UNARY_INVERT,       // enum=15
+            42 => Models.Bytecode.Opcode.UNARY_NEGATIVE,     // enum=11
+            43 => Models.Bytecode.Opcode.UNARY_NOT,          // enum=12
+            44 => Models.Bytecode.Opcode.WITH_EXCEPT_START,  // → WITH_EXCEPT_START_312=188
+            45 => Models.Bytecode.Opcode.BINARY_OP,          // enum 191 (raw 122 in 3.12)
+            46 => Models.Bytecode.Opcode.BUILD_CONST_KEY_MAP,// enum=156
+            47 => Models.Bytecode.Opcode.BUILD_LIST,         // enum=103
+            48 => Models.Bytecode.Opcode.BUILD_MAP,          // enum=105
+            49 => Models.Bytecode.Opcode.BUILD_SET,          // enum=104
+            50 => Models.Bytecode.Opcode.BUILD_SLICE,        // enum=133
+            51 => Models.Bytecode.Opcode.BUILD_STRING,       // enum=157
+            52 => Models.Bytecode.Opcode.BUILD_TUPLE,        // enum=102
+            53 => Models.Bytecode.Opcode.CALL,               // enum=171
+            54 => Models.Bytecode.Opcode.CALL_FUNCTION_EX,   // enum=142
+            55 => Models.Bytecode.Opcode.CALL_INTRINSIC_1_313, // 3.13+ (raw 55)
+            56 => Models.Bytecode.Opcode.CALL_INTRINSIC_2_313, // 3.13+ (raw 56)
+            57 => Models.Bytecode.Opcode.CALL_KW_313,        // 3.13+ (raw 57)
+            58 => Models.Bytecode.Opcode.COMPARE_OP,         // enum=107
+            59 => Models.Bytecode.Opcode.CONTAINS_OP,        // enum=118
+            60 => Models.Bytecode.Opcode.CONVERT_VALUE_313,  // 3.13+ (raw 60)
+            61 => Models.Bytecode.Opcode.COPY,               // enum=120
+            62 => Models.Bytecode.Opcode.COPY_FREE_VARS_313, // 3.13+ (was 149 in 3.12)
+            63 => Models.Bytecode.Opcode.DELETE_ATTR,
+            64 => Models.Bytecode.Opcode.DELETE_DEREF,       // enum=139
+            65 => Models.Bytecode.Opcode.DELETE_FAST,        // enum=126
+            66 => Models.Bytecode.Opcode.DELETE_GLOBAL,
+            67 => Models.Bytecode.Opcode.DELETE_NAME,
+            68 => Models.Bytecode.Opcode.DICT_MERGE,         // enum=164
+            69 => Models.Bytecode.Opcode.DICT_UPDATE,        // enum=165
+            70 => Models.Bytecode.Opcode.ENTER_EXECUTOR_313, // 3.13+ new
+            71 => Models.Bytecode.Opcode.EXTENDED_ARG,        // enum=144
+            72 => Models.Bytecode.Opcode.FOR_ITER,           // enum=93
+            73 => Models.Bytecode.Opcode.GET_AWAITABLE_313,
+            74 => Models.Bytecode.Opcode.IMPORT_FROM,        // enum=109
+            75 => Models.Bytecode.Opcode.IMPORT_NAME,        // enum=108
+            76 => Models.Bytecode.Opcode.IS_OP,              // enum=117
+            77 => Models.Bytecode.Opcode.JUMP_BACKWARD,      // enum=140
+            78 => Models.Bytecode.Opcode.JUMP_BACKWARD_NO_INTERRUPT, // enum=134
+            79 => Models.Bytecode.Opcode.JUMP_FORWARD,       // enum=110
+            80 => Models.Bytecode.Opcode.LIST_APPEND_313,
+            81 => Models.Bytecode.Opcode.LIST_EXTEND,        // enum=162
+            82 => Models.Bytecode.Opcode.LOAD_ATTR,          // enum=106
+            83 => Models.Bytecode.Opcode.LOAD_CONST,         // enum=100
+            84 => Models.Bytecode.Opcode.LOAD_DEREF,         // enum=137
+            85 => Models.Bytecode.Opcode.LOAD_FAST,          // enum=124
+            86 => Models.Bytecode.Opcode.LOAD_FAST_AND_CLEAR, // enum=192 (raw 143 in 3.12)
+            87 => Models.Bytecode.Opcode.LOAD_FAST_CHECK,    // enum=193 (raw 127 in 3.12)
+            88 => Models.Bytecode.Opcode.LOAD_FAST_LOAD_FAST_313, // 3.13+ new (raw 88)
+            89 => Models.Bytecode.Opcode.LOAD_FROM_DICT_OR_DEREF, // enum=176
+            90 => Models.Bytecode.Opcode.LOAD_FROM_DICT_OR_GLOBALS, // enum=175
+            91 => Models.Bytecode.Opcode.LOAD_GLOBAL,        // enum=116
+            92 => Models.Bytecode.Opcode.LOAD_NAME,          // enum=101
+            93 => Models.Bytecode.Opcode.LOAD_SUPER_ATTR,    // enum=141
+            94 => Models.Bytecode.Opcode.MAKE_CELL_313,      // 3.13+ (was 135 in 3.11)
+            95 => Models.Bytecode.Opcode.MAP_ADD_313,
+            96 => Models.Bytecode.Opcode.MATCH_CLASS_313,        // → MATCH_CLASS_312=183
+            97 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,  // enum=114
+            98 => Models.Bytecode.Opcode.POP_JUMP_IF_NONE,   // enum=195 (raw 129 in 3.12)
+            99 => Models.Bytecode.Opcode.POP_JUMP_IF_NOT_NONE, // enum=194 (raw 128 in 3.12)
+            100 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,  // enum=115
+            101 => Models.Bytecode.Opcode.RAISE_VARARGS,     // enum=130
+            102 => Models.Bytecode.Opcode.RERAISE,           // enum=119
+            103 => Models.Bytecode.Opcode.RETURN_CONST_313,  // 3.13+ (was 190 alias for raw 121 in 3.12)
+            104 => Models.Bytecode.Opcode.SEND,              // enum=123
+            105 => Models.Bytecode.Opcode.SET_ADD_313,
+            106 => Models.Bytecode.Opcode.SET_FUNCTION_ATTRIBUTE_313, // 3.13+ new
+            107 => Models.Bytecode.Opcode.SET_UPDATE,        // enum=163
+            108 => Models.Bytecode.Opcode.STORE_ATTR,        // enum=95
+            109 => Models.Bytecode.Opcode.STORE_DEREF,       // enum=138
+            110 => Models.Bytecode.Opcode.STORE_FAST,        // enum=125
+            111 => Models.Bytecode.Opcode.STORE_FAST_LOAD_FAST_313, // 3.13+ new
+            112 => Models.Bytecode.Opcode.STORE_FAST_STORE_FAST_313, // 3.13+ new
+            113 => Models.Bytecode.Opcode.STORE_GLOBAL,      // enum=97
+            114 => Models.Bytecode.Opcode.STORE_NAME,        // enum=90
+            115 => Models.Bytecode.Opcode.SWAP,              // enum=99
+            116 => Models.Bytecode.Opcode.UNPACK_EX,         // enum=94
+            117 => Models.Bytecode.Opcode.UNPACK_SEQUENCE,   // enum=92
+            118 => Models.Bytecode.Opcode.YIELD_VALUE_313,   // 3.13+ (was 86 in 3.10)
+            // RESUME at raw 149 (was 151 in 3.12, 90 in 3.11)
+            149 => Models.Bytecode.Opcode.RESUME_313,
+            // Fallback: cast raw value directly (some may still decode correctly)
+            _ => (Models.Bytecode.Opcode)rawOp,
+        };
+    }
+
+    /// <summary>
     /// 3.11+ 跳转指令检测（含 JUMP_BACKWARD）。
+    /// 3.14 新增：JUMP_IF_FALSE/TRUE（伪指令）、POP_ITER（结束循环）。
     /// </summary>
     private static bool IsJumpInstruction311Plus(Opcode op) => op switch
     {
@@ -1139,19 +1362,27 @@ public class PycReader
             or Opcode.POP_JUMP_IF_NOT_NONE or Opcode.POP_JUMP_IF_NONE
             or Opcode.FOR_ITER or Opcode.JUMP_BACKWARD_NO_INTERRUPT
             or Opcode.JUMP_ABSOLUTE or Opcode.JUMP_IF_TRUE_OR_POP
-            or Opcode.JUMP_IF_FALSE_OR_POP => true,
+            or Opcode.JUMP_IF_FALSE_OR_POP or Opcode.TO_BOOL_313
+            or Opcode.POP_ITER_314
+            or Opcode.SEND => true,
         _ => false
     };
 
     /// <summary>
     /// 3.11+ 的缓存条目数。
-    /// 3.11 和 3.12 的缓存配置完全不同：
+    /// 3.11, 3.12, 3.13, 3.14 的缓存配置完全不同：
     /// - 3.11: 自适应字节码初期，只有部分 opcode 有 cache（未特化的 opcode 无 cache）
     /// - 3.12: 所有 opcode 从初始就有固定 cache 条目
+    /// - 3.13: 操作码重新编号，cache 配置对应新的 raw byte 值
+    /// - 3.14: HAVE_ARGUMENT=43, cache 配置重新设计
     /// </summary>
     private int GetCacheCount311Plus(byte rawOp)
     {
-        bool is312 = _magicBytes[0] >= 0xB0;
+        if (IsPython314())
+            return GetCacheCount314(rawOp);
+        if (IsPython313Plus())
+            return GetCacheCount313(rawOp);
+        bool is312 = _pythonMinorVersion == 12 || _magicBytes[0] >= 0xB0;
         if (is312)
             return GetCacheCount312(rawOp);
         else
@@ -1249,6 +1480,210 @@ public class PycReader
             171 => 4, // CALL
             172 => 0, 173 => 0, 174 => 0, 175 => 0, 176 => 0,
             _ => 0,
+        };
+    }
+
+    /// <summary>
+    /// 3.13+ 的缓存条目数（CPython 3.13 Lib/opcode.py _inline_cache_entries）。
+    /// 注意：使用 3.13 的原始操作码字节值，因为 3.13 的操作码编号体系与 3.12 完全不同。
+    /// </summary>
+    private static int GetCacheCount313(byte rawOp)
+    {
+        return rawOp switch
+        {
+            5 => 1,   // BINARY_SUBSCR
+            39 => 1,  // STORE_SUBSCR
+            40 => 3,  // TO_BOOL
+            45 => 1,  // BINARY_OP
+            53 => 3,  // CALL
+            58 => 1,  // COMPARE_OP
+            59 => 1,  // CONTAINS_OP
+            72 => 1,  // FOR_ITER
+            77 => 1,  // JUMP_BACKWARD
+            82 => 9,  // LOAD_ATTR
+            91 => 4,  // LOAD_GLOBAL
+            93 => 1,  // LOAD_SUPER_ATTR
+            97 => 1,  // POP_JUMP_IF_FALSE
+            98 => 1,  // POP_JUMP_IF_NONE
+            99 => 1,  // POP_JUMP_IF_NOT_NONE
+            100 => 1, // POP_JUMP_IF_TRUE
+            104 => 1, // SEND
+            108 => 4, // STORE_ATTR
+            117 => 1, // UNPACK_SEQUENCE
+            _ => 0,
+        };
+    }
+
+    /// <summary>
+    /// 3.14 的缓存条目数（CPython 3.14 Lib/opcode.py _cache_format）。
+    /// 使用 3.14 原始操作码字节值，因为 3.14 的操作码编号与 3.13 完全不同。
+    /// </summary>
+    private static int GetCacheCount314(byte rawOp)
+    {
+        return rawOp switch
+        {
+            38 => 1,  // STORE_SUBSCR (raw 0x26)
+            39 => 3,  // TO_BOOL (raw 0x27)
+            44 => 5,  // BINARY_OP (raw 0x2c)
+            52 => 3,  // CALL (raw 0x34)
+            55 => 3,  // CALL_KW (raw 0x37)
+            56 => 1,  // COMPARE_OP (raw 0x38)
+            57 => 1,  // CONTAINS_OP (raw 0x39)
+            70 => 1,  // FOR_ITER (raw 0x46)
+            75 => 1,  // JUMP_BACKWARD (raw 0x4b)
+            80 => 9,  // LOAD_ATTR (raw 0x50)
+            92 => 4,  // LOAD_GLOBAL (raw 0x5c)
+            96 => 1,  // LOAD_SUPER_ATTR (raw 0x60)
+            100 => 1, // POP_JUMP_IF_FALSE (raw 0x64)
+            101 => 1, // POP_JUMP_IF_NONE (raw 0x65)
+            102 => 1, // POP_JUMP_IF_NOT_NONE (raw 0x66)
+            103 => 1, // POP_JUMP_IF_TRUE (raw 0x67)
+            106 => 1, // SEND (raw 0x6a)
+            110 => 4, // STORE_ATTR (raw 0x6e)
+            119 => 1, // UNPACK_SEQUENCE (raw 0x77)
+            _ => 0,
+        };
+    }
+
+    /// <summary>
+    /// 将 Python 3.14 的原始 opcode 字节值映射到统一 Opcode 枚举。
+    /// 3.14 的操作码编号体系与 3.13 完全不同（HAVE_ARGUMENT=43 vs 44）。
+    /// 完整映射表来源于 CPython 3.14 Lib/opcode.py opname[]。
+    /// 仅映射通用操作码（super-instruction 如 CALL_PY_EXACT_ARGS 等不映射——通常不会出现在
+    /// py_compile 生成的字节码中，直接以原始字节值 fallback 为 Opcode 枚举）。
+    /// </summary>
+    private Models.Bytecode.Opcode MapOpcodePy314(byte rawOp)
+    {
+        return rawOp switch
+        {
+            // --- 无参操作码 (0-42, HAVE_ARGUMENT=43) ---
+            0 => Models.Bytecode.Opcode.NOP,                  // CACHE → NOP（CACHE 已在前端跳过）
+            1 => Models.Bytecode.Opcode.BINARY_SLICE_313,     // BINARY_SLICE
+            2 => Models.Bytecode.Opcode.BEFORE_WITH_313,      // BUILD_TEMPLATE → BEFORE_WITH
+            3 => Models.Bytecode.Opcode.BINARY_OP_INPLACE_ADD_UNICODE_314, // (3.14 new)
+            4 => Models.Bytecode.Opcode.CALL_FUNCTION_EX,     // CALL_FUNCTION_EX (enum=142)
+            5 => Models.Bytecode.Opcode.CHECK_EG_MATCH,       // CHECK_EG_MATCH (enum=198)
+            6 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,      // CHECK_EXC_MATCH (enum=197)
+            7 => Models.Bytecode.Opcode.CLEANUP_THROW_313,    // CLEANUP_THROW
+            8 => Models.Bytecode.Opcode.DELETE_SUBSCR_313,    // DELETE_SUBSCR
+            9 => Models.Bytecode.Opcode.END_FOR_313,          // END_FOR (3.14 raw=9)
+            10 => Models.Bytecode.Opcode.END_SEND_313,        // END_SEND
+            11 => Models.Bytecode.Opcode.EXIT_INIT_CHECK_313, // EXIT_INIT_CHECK
+            12 => Models.Bytecode.Opcode.FORMAT_SIMPLE_313,   // FORMAT_SIMPLE
+            13 => Models.Bytecode.Opcode.FORMAT_WITH_SPEC_313,// FORMAT_WITH_SPEC
+            14 => Models.Bytecode.Opcode.GET_AITER_313,       // GET_AITER
+            15 => Models.Bytecode.Opcode.GET_ANEXT_313,       // GET_ANEXT
+            16 => Models.Bytecode.Opcode.GET_ITER,            // GET_ITER (enum=68)
+            17 => Models.Bytecode.Opcode.RESERVED_313,        // RESERVED
+            18 => Models.Bytecode.Opcode.GET_LEN_313,         // GET_LEN
+            19 => Models.Bytecode.Opcode.GET_YIELD_FROM_ITER, // (enum=69)
+            20 => Models.Bytecode.Opcode.INTERPRETER_EXIT,    // (enum=3)
+            21 => Models.Bytecode.Opcode.LOAD_BUILD_CLASS,    // (enum=71)
+            22 => Models.Bytecode.Opcode.LOAD_LOCALS_313,     // LOAD_LOCALS
+            23 => Models.Bytecode.Opcode.MAKE_FUNCTION,       // (enum=132)
+            24 => Models.Bytecode.Opcode.MATCH_KEYS_313,      // MATCH_KEYS
+            25 => Models.Bytecode.Opcode.MATCH_MAPPING_313,   // MATCH_MAPPING
+            26 => Models.Bytecode.Opcode.MATCH_SEQUENCE_313,  // MATCH_SEQUENCE
+            27 => Models.Bytecode.Opcode.NOP,                 // NOP (enum=9)
+            28 => Models.Bytecode.Opcode.NOT_TAKEN_314,       // NOT_TAKEN (3.14 new)
+            29 => Models.Bytecode.Opcode.POP_EXCEPT,          // POP_EXCEPT (enum=89)
+            30 => Models.Bytecode.Opcode.POP_ITER_314,        // POP_ITER (3.14 new)
+            31 => Models.Bytecode.Opcode.POP_TOP,             // POP_TOP (enum=1)
+            32 => Models.Bytecode.Opcode.PUSH_EXC_INFO_312,   // PUSH_EXC_INFO (enum=179)
+            33 => Models.Bytecode.Opcode.PUSH_NULL,           // PUSH_NULL (enum=2)
+            34 => Models.Bytecode.Opcode.RETURN_GENERATOR_313,// RETURN_GENERATOR
+            35 => Models.Bytecode.Opcode.RETURN_VALUE,        // (enum=83)
+            36 => Models.Bytecode.Opcode.SETUP_ANNOTATIONS,   // (enum=85)
+            37 => Models.Bytecode.Opcode.STORE_SLICE_313,     // STORE_SLICE
+            38 => Models.Bytecode.Opcode.STORE_SUBSCR,        // (enum=49)
+            39 => Models.Bytecode.Opcode.TO_BOOL_313,         // TO_BOOL (enum=213)
+            40 => Models.Bytecode.Opcode.UNARY_INVERT,        // (enum=15)
+            41 => Models.Bytecode.Opcode.UNARY_NEGATIVE,      // (enum=11)
+            42 => Models.Bytecode.Opcode.UNARY_NOT,           // (enum=12)
+
+            // --- 有参操作码 (43+) ---
+            43 => Models.Bytecode.Opcode.WITH_EXCEPT_START,   // → WITH_EXCEPT_START_312=188
+            44 => Models.Bytecode.Opcode.BINARY_OP,           // BINARY_OP (enum=191)
+            45 => Models.Bytecode.Opcode.BUILD_INTERPOLATION_314, // BUILD_INTERPOLATION (3.14 new)
+            46 => Models.Bytecode.Opcode.BUILD_LIST,          // (enum=103)
+            47 => Models.Bytecode.Opcode.BUILD_MAP,           // (enum=105)
+            48 => Models.Bytecode.Opcode.BUILD_SET,           // (enum=104)
+            49 => Models.Bytecode.Opcode.BUILD_SLICE,         // (enum=133)
+            50 => Models.Bytecode.Opcode.BUILD_STRING,        // (enum=157)
+            51 => Models.Bytecode.Opcode.BUILD_TUPLE,         // (enum=102)
+            52 => Models.Bytecode.Opcode.CALL,                // CALL (enum=171)
+            53 => Models.Bytecode.Opcode.CALL_INTRINSIC_1_313,// CALL_INTRINSIC_1 (enum=214)
+            54 => Models.Bytecode.Opcode.CALL_INTRINSIC_2_313,// CALL_INTRINSIC_2 (enum=215)
+            55 => Models.Bytecode.Opcode.CALL_KW_313,         // CALL_KW (enum=216)
+            56 => Models.Bytecode.Opcode.COMPARE_OP,          // (enum=107)
+            57 => Models.Bytecode.Opcode.CONTAINS_OP,         // (enum=118)
+            58 => Models.Bytecode.Opcode.CONVERT_VALUE_313,   // CONVERT_VALUE (enum=226)
+            59 => Models.Bytecode.Opcode.COPY,                // COPY (enum=120)
+            60 => Models.Bytecode.Opcode.COPY_FREE_VARS_313,  // COPY_FREE_VARS (enum=227)
+            61 => Models.Bytecode.Opcode.DELETE_ATTR,         // (enum=108)
+            62 => Models.Bytecode.Opcode.DELETE_DEREF,        // (enum=139)
+            63 => Models.Bytecode.Opcode.DELETE_FAST,         // (enum=126)
+            64 => Models.Bytecode.Opcode.DELETE_GLOBAL,       // (enum=98)
+            65 => Models.Bytecode.Opcode.DELETE_NAME,         // (enum=103)
+            66 => Models.Bytecode.Opcode.DICT_MERGE,          // DICT_MERGE (enum=164)
+            67 => Models.Bytecode.Opcode.DICT_UPDATE,         // DICT_UPDATE (enum=165)
+            68 => Models.Bytecode.Opcode.END_ASYNC_FOR_313,   // END_ASYNC_FOR (enum=243)
+            69 => Models.Bytecode.Opcode.EXTENDED_ARG,         // EXTENDED_ARG (enum=144)
+            70 => Models.Bytecode.Opcode.FOR_ITER,            // FOR_ITER (enum=93)
+            71 => Models.Bytecode.Opcode.GET_AWAITABLE_313,   // GET_AWAITABLE (enum=235)
+            72 => Models.Bytecode.Opcode.IMPORT_FROM,         // (enum=109)
+            73 => Models.Bytecode.Opcode.IMPORT_NAME,         // (enum=108)
+            74 => Models.Bytecode.Opcode.IS_OP,               // (enum=117)
+            75 => Models.Bytecode.Opcode.JUMP_BACKWARD,       // (enum=140)
+            76 => Models.Bytecode.Opcode.JUMP_BACKWARD_NO_INTERRUPT, // (enum=134)
+            77 => Models.Bytecode.Opcode.JUMP_FORWARD,        // (enum=110)
+            78 => Models.Bytecode.Opcode.LIST_APPEND_313,     // LIST_APPEND (enum=236)
+            79 => Models.Bytecode.Opcode.LIST_EXTEND,         // LIST_EXTEND (enum=162)
+            80 => Models.Bytecode.Opcode.LOAD_ATTR,           // (enum=106)
+            81 => Models.Bytecode.Opcode.LOAD_COMMON_CONSTANT_314, // LOAD_COMMON_CONSTANT (3.14 new)
+            82 => Models.Bytecode.Opcode.LOAD_CONST,          // (enum=100)
+            83 => Models.Bytecode.Opcode.LOAD_DEREF,          // (enum=137)
+            84 => Models.Bytecode.Opcode.LOAD_FAST,           // (enum=124)
+            85 => Models.Bytecode.Opcode.LOAD_FAST_AND_CLEAR, // (enum=192)
+            86 => Models.Bytecode.Opcode.LOAD_FAST_BORROW_314,  // LOAD_FAST_BORROW (3.14 new)
+            87 => Models.Bytecode.Opcode.LOAD_FAST_BORROW_LOAD_FAST_BORROW_314, // (3.14 new)
+            88 => Models.Bytecode.Opcode.LOAD_FAST_CHECK,     // LOAD_FAST_CHECK (enum=193)
+            89 => Models.Bytecode.Opcode.LOAD_FAST_LOAD_FAST_313, // (enum=218)
+            90 => Models.Bytecode.Opcode.LOAD_FROM_DICT_OR_DEREF, // (enum=176)
+            91 => Models.Bytecode.Opcode.LOAD_FROM_DICT_OR_GLOBALS, // (enum=175)
+            92 => Models.Bytecode.Opcode.LOAD_GLOBAL,         // (enum=116)
+            93 => Models.Bytecode.Opcode.LOAD_NAME,           // (enum=101)
+            94 => Models.Bytecode.Opcode.LOAD_SMALL_INT_314,     // LOAD_SMALL_INT (3.14 new)
+            95 => Models.Bytecode.Opcode.LOAD_SPECIAL_314,     // (3.14 new)
+            96 => Models.Bytecode.Opcode.LOAD_SUPER_ATTR,     // LOAD_SUPER_ATTR (enum=141)
+            97 => Models.Bytecode.Opcode.MAKE_CELL_313,       // MAKE_CELL (enum=219)
+            98 => Models.Bytecode.Opcode.MAP_ADD_313,         // MAP_ADD (enum=237)
+            99 => Models.Bytecode.Opcode.MATCH_CLASS_313,     // MATCH_CLASS (enum=238)
+            100 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,  // (enum=114)
+            101 => Models.Bytecode.Opcode.POP_JUMP_IF_NONE,   // (enum=195)
+            102 => Models.Bytecode.Opcode.POP_JUMP_IF_NOT_NONE, // (enum=194)
+            103 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,   // (enum=115)
+            104 => Models.Bytecode.Opcode.RAISE_VARARGS,      // (enum=130)
+            105 => Models.Bytecode.Opcode.RERAISE,            // (enum=119)
+            106 => Models.Bytecode.Opcode.SEND,               // (enum=123)
+            107 => Models.Bytecode.Opcode.SET_ADD_313,        // SET_ADD (enum=239)
+            108 => Models.Bytecode.Opcode.SET_FUNCTION_ATTRIBUTE_313, // (enum=220)
+            109 => Models.Bytecode.Opcode.SET_UPDATE,         // SET_UPDATE (enum=163)
+            110 => Models.Bytecode.Opcode.STORE_ATTR,         // (enum=95)
+            111 => Models.Bytecode.Opcode.STORE_DEREF,        // (enum=138)
+            112 => Models.Bytecode.Opcode.STORE_FAST,         // (enum=125)
+            113 => Models.Bytecode.Opcode.STORE_FAST_LOAD_FAST_313, // (enum=221)
+            114 => Models.Bytecode.Opcode.STORE_FAST_STORE_FAST_313, // (enum=222)
+            115 => Models.Bytecode.Opcode.STORE_GLOBAL,       // (enum=97)
+            116 => Models.Bytecode.Opcode.STORE_NAME,         // (enum=90)
+            117 => Models.Bytecode.Opcode.SWAP,               // SWAP (enum=99)
+            118 => Models.Bytecode.Opcode.UNPACK_EX,          // (enum=94)
+            119 => Models.Bytecode.Opcode.UNPACK_SEQUENCE,    // (enum=92)
+            120 => Models.Bytecode.Opcode.YIELD_VALUE_313,    // YIELD_VALUE (enum=224)
+            // 121-127: reserved (unnamed in 3.14 opname)
+            128 => Models.Bytecode.Opcode.RESUME_313,         // RESUME (enum=223, 3.14 raw=128)
+            // 129+: super-instructions (not mapped, use raw value as fallback)
+            _ => (Models.Bytecode.Opcode)rawOp,
         };
     }
 
@@ -1379,7 +1814,7 @@ public class PycReader
             if (containerRefIdx >= 0)
                 _refList[containerRefIdx] = result;
         }
-        catch { }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalObjectAsStrList", ex); }
         return result;
     }
 
@@ -1488,7 +1923,7 @@ public class PycReader
             
             return result;
         }
-        catch { return null; }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalStringValue", ex); return null; }
     }
 
     private string ReadShortString(BinaryReader br)
@@ -1603,13 +2038,18 @@ public class PycReader
         for (int i = 0; i < count; i++)
         {
             CheckReadTimeout(br);
+            if (i >= 10000)
+            {
+                LogCatch($"ReadMarshalList.count={count}", new InvalidOperationException($"Safety limit 10000 hit at item {i}"));
+                break;
+            }
             try
             {
                 items.Add(ReadMarshalObject(br));
             }
-            catch
+            catch (Exception ex)
             {
-                // Individual element failure — skip and continue
+                LogCatch(br, $"ReadMarshalList.item[{i}]", ex);
                 items.Add(null);
             }
         }
@@ -1676,13 +2116,17 @@ public class PycReader
                     dict[key] = val;
             }
         }
-        catch { }
+        catch (Exception ex) { LogCatch(br, "ReadMarshalDictObject", ex); }
         return dict;
     }
 
     private object? ReadMarshalObject(BinaryReader br)
     {
         CheckReadTimeout(br);
+        if (++_marshalCalls > MaxMarshalCalls)
+            throw new InvalidOperationException(
+                $"Marshal calls exceeded {MaxMarshalCalls} at offset {br.BaseStream.Position}. " +
+                "Possible infinite loop in marshal parsing.");
         if (++_marshalDepth > MaxMarshalDepth)
             throw new InvalidOperationException(
                 $"Marshal recursion depth exceeded {MaxMarshalDepth} at offset {br.BaseStream.Position}. " +
@@ -1735,9 +2179,7 @@ public class PycReader
             MarshalType.TYPE_COMPLEX => (br.ReadDouble(), br.ReadDouble()),
             MarshalType.TYPE_BINARY_COMPLEX => new double[] { br.ReadDouble(), br.ReadDouble() },
             MarshalType.TYPE_BYTES => ReadMarshalBytesDirect(br),
-            // 115 = TYPE_CODE_SIMPLE (3.11+) 或 TYPE_STRING (旧版)
-            MarshalType.TYPE_STRING when IsPython311Plus() && !IsPython27()
-                => ReadMarshalCodeObject(br, isSimple: true),
+            // 115 = TYPE_STRING — 永远是 bytes 对象（CPython 中所有代码对象都用 TYPE_CODE 'c'）
             MarshalType.TYPE_STRING => ReadMarshalBytesDirect(br),
             MarshalType.TYPE_SHORT_ASCII => ReadMarshalShortString(br),
             MarshalType.TYPE_SHORT_ASCII_INTERNED => ReadMarshalShortString(br),
@@ -1775,7 +2217,7 @@ public class PycReader
                 br.BaseStream.Position += length;
             }
         }
-        catch { }
+        catch (Exception ex) { LogCatch(br, $"HandleUnknownMarshalType type=0x{type:X2}", ex); }
         return null;
     }
 
@@ -1876,12 +2318,18 @@ public class PycReader
         var items = new PyTuple();
         for (int i = 0; i < count; i++)
         {
+            if (i >= 10000)
+            {
+                LogCatch($"ReadSmallTuple.count={count}", new InvalidOperationException($"Safety limit 10000 hit at item {i}"));
+                break;
+            }
             try
             {
                 items.Add(ReadMarshalObject(br));
             }
-            catch
+            catch (Exception ex)
             {
+                LogCatch(br, $"ReadSmallTuple.item[{i}]", ex);
                 items.Add(null);
             }
         }
@@ -1924,7 +2372,7 @@ public class PycReader
             switch (code)
             {
                 case 0: // short: 1-3 bytes
-                    if (i + 1 >= data.Length) break;
+                    if (i + 1 >= data.Length) return table;
                     int lineDeltaShort = (data[i] >> 2) & 0xF;
                     int endDeltaShort = ((data[i] & 3) << 2) | (data[i + 1] & 3);
                     line += lineDeltaShort;
@@ -1932,7 +2380,7 @@ public class PycReader
                     i += 2;
                     break;
                 case 1: // medium: 3 bytes
-                    if (i + 2 >= data.Length) break;
+                    if (i + 2 >= data.Length) return table;
                     int lineDeltaMed = ((data[i] & 0x3F) << 2) | ((data[i + 1] >> 6) & 3);
                     int endDeltaMed = data[i + 1] & 0x3F;
                     line += (sbyte)(lineDeltaMed > 31 ? lineDeltaMed - 64 : lineDeltaMed);
@@ -1940,7 +2388,7 @@ public class PycReader
                     i += 3;
                     break;
                 case 2: // long: 4+ bytes
-                    if (i + 3 >= data.Length) break;
+                    if (i + 3 >= data.Length) return table;
                     int lineDeltaLong = data[i] & 0x3F;
                     int column = data[i + 2];
                     int endDeltaLong = data[i + 3];
@@ -1969,12 +2417,22 @@ public class PycReader
     }
 
     /// <summary>
-    /// 解析 Python 3.10+ co_exceptiontable。
-    /// 每个条目 8 字节（4 个 word offset，每个 2 字节，小端序）：
-    ///   [start(2B)][end(2B)][target(2B)][depth+lasti(2B)]
-    /// word offset → byte offset = word * 2
+    /// 解析 3.13+ 异常表（变长 6-bit 编码，每条记录 4 个字段）。
+    /// 3.12 及更早使用固定 8 字节/条目的格式。
     /// </summary>
     private List<ExceptionTableEntry> ParseExceptionTable(byte[] data)
+    {
+        // 3.13+ exception table uses variable-length 6-bit encoding
+        if (_pythonMinorVersion == 13)
+            return ParseExceptionTable313(data);
+        return ParseExceptionTable312(data);
+    }
+
+    /// <summary>
+    /// 3.12 及更早：固定 8 字节/条目的异常表格式。
+    /// 每条：start(u16)*2, end(u16)*2, target(u16)*2, depth|lasti(u16)。
+    /// </summary>
+    private List<ExceptionTableEntry> ParseExceptionTable312(byte[] data)
     {
         var entries = new List<ExceptionTableEntry>();
         for (int i = 0; i + 7 < data.Length; i += 8)
@@ -1996,5 +2454,61 @@ public class PycReader
             });
         }
         return entries;
+    }
+
+    /// <summary>
+    /// 3.13+ 异常表：变长 6-bit/字节编码。
+    /// 每条记录 4 个字段：start, size(end-start), target, depth_lasti。
+    /// 每个字段用变长编码，6 位数据/字节，bit7=延续标记。
+    /// 所有偏移都是 WORD 偏移（字节偏移/2）。
+    /// </summary>
+    private List<ExceptionTableEntry> ParseExceptionTable313(byte[] data)
+    {
+        var entries = new List<ExceptionTableEntry>();
+        int i = 0;
+        while (i < data.Length)
+        {
+            if (i + 1 >= data.Length) break; // need at least start + size
+            
+            // Read 4 variable-length fields
+            int start = ReadBase128_6bit(data, ref i);
+            int size = ReadBase128_6bit(data, ref i);
+            int target = ReadBase128_6bit(data, ref i);
+            int depthLasti = ReadBase128_6bit(data, ref i);
+
+            if (i > data.Length) break; // overflow guard
+
+            int end = start + size;
+            int depth = (depthLasti >> 1) & 0x3;
+            bool lasti = (depthLasti & 1) != 0;
+
+            entries.Add(new ExceptionTableEntry
+            {
+                StartOffset = start * 2,
+                EndOffset = end * 2,
+                TargetOffset = target * 2,
+                Depth = depth,
+                Lasti = lasti
+            });
+        }
+        return entries;
+    }
+
+    /// <summary>
+    /// 读取变长 6-bit 编码的值。每字节：bits 0-5=数据，bit7=延续标记（1=还有后续字节）。
+    /// 数据以高 6 位在前、低 6 位在后的顺序存储。
+    /// </summary>
+    private static int ReadBase128_6bit(byte[] data, ref int offset)
+    {
+        int value = 0;
+        while (offset < data.Length)
+        {
+            byte b = data[offset++];
+            value = (value << 6) | (b & 0x3f);
+            if ((b & 0x80) == 0)
+                break;
+            if ((value >> 30) != 0) break; // safety: prevent overflow
+        }
+        return value;
     }
 }

@@ -14,7 +14,7 @@ namespace PyRebuilderSharp.Core.Models.Bytecode;
 ///   IS_OP      = 117
 ///   CONTAINS_OP = 118
 /// </summary>
-public enum Opcode : byte
+public enum Opcode
 {
     // --- 栈操作 (0-99) ---
     POP_TOP = 1,
@@ -240,4 +240,64 @@ public enum Opcode : byte
     MATCH_CLASS_312 = 183,     // 3.12+ (raw byte 152)
     BEFORE_WITH_312 = 199,     // 3.12+ (was 153 in 3.7-3.10, raw byte 53)
     WITH_EXCEPT_START_312 = 188, // 3.12+ (was 154 in 3.7-3.10, raw byte 49)
+
+    // ==================== Python 3.13+ 操作码 ====================
+    // 3.13 重新编号了几乎所有操作码，以下别名对应 3.13 的原始字节值。
+    BEFORE_ASYNC_WITH_313 = 212,   // 3.13+ (raw byte 1)
+    TO_BOOL_313 = 213,             // 3.13+ (raw byte 40)
+    CALL_INTRINSIC_1_313 = 214,    // 3.13+ (raw byte 55)
+    CALL_INTRINSIC_2_313 = 215,    // 3.13+ (raw byte 56)
+    CALL_KW_313 = 216,             // 3.13+ (raw byte 57)
+    ENTER_EXECUTOR_313 = 217,      // 3.13+ (raw byte 70)
+    LOAD_FAST_LOAD_FAST_313 = 218, // 3.13+ (raw byte 88)
+    MAKE_CELL_313 = 219,           // 3.13+ (raw byte 94, 3.11 的 MAKE_CELL=135)
+    SET_FUNCTION_ATTRIBUTE_313 = 220, // 3.13+ (raw byte 106)
+    STORE_FAST_LOAD_FAST_313 = 221,// 3.13+ (raw byte 111)
+    STORE_FAST_STORE_FAST_313 = 222, // 3.13+ (raw byte 112)
+    RESUME_313 = 223,              // 3.13+ (raw byte 149, 3.12=151)
+    YIELD_VALUE_313 = 224,         // 3.13+ (raw byte 118)
+    BEFORE_WITH_313 = 225,         // 3.13+ (raw byte 2)
+    CONVERT_VALUE_313 = 226,       // 3.13+ (raw byte 60)
+    COPY_FREE_VARS_313 = 227,      // 3.13+ (raw byte 62, was 149 in 3.11-3.12)
+    RETURN_CONST_313 = 228,        // 3.13+ (raw byte 103)
+    // 以下 3.13 映射所需别名（不常用的操作码）
+    LOAD_LOCALS_313 = 229,
+    MATCH_KEYS_313 = 230,
+    MATCH_MAPPING_313 = 231,
+    MATCH_SEQUENCE_313 = 232,
+    RETURN_GENERATOR_313 = 233,
+    STORE_SLICE_313 = 234,
+    GET_AWAITABLE_313 = 235,
+    LIST_APPEND_313 = 236,
+    MAP_ADD_313 = 237,
+    MATCH_CLASS_313 = 238,
+    SET_ADD_313 = 239,
+    // 余下 3.13 映射所用别名
+    BINARY_SLICE_313 = 240,
+    CLEANUP_THROW_313 = 241,
+    DELETE_SUBSCR_313 = 242,
+    END_ASYNC_FOR_313 = 243,
+    END_FOR_313 = 244,
+    END_SEND_313 = 245,
+    EXIT_INIT_CHECK_313 = 246,
+    FORMAT_SIMPLE_313 = 247,
+    FORMAT_WITH_SPEC_313 = 248,
+    GET_AITER_313 = 249,
+    GET_ANEXT_313 = 250,
+    GET_LEN_313 = 251,
+    LOAD_ASSERTION_ERROR_313 = 252,
+    RESERVED_313 = 253,
+
+    // ==================== Python 3.14 新增操作码 ====================
+    // 3.14 操作码体系与 3.13 完全不同（HAVE_ARGUMENT=43, 新增/移动了多个操作码）。
+    // 以下条目仅用于 MapOpcodePy314 映射，原始字节值见方法注释。
+    LOAD_SMALL_INT_314 = 254,         // 3.14 raw=94: 加载小整数（取代 LOAD_CONST+小int）
+    LOAD_FAST_BORROW_314 = 255,       // 3.14 raw=86: borrow-load local（不增加引用计数）
+    LOAD_FAST_BORROW_LOAD_FAST_BORROW_314 = 256, // 3.14 raw=87: 双 borrow-load
+    NOT_TAKEN_314 = 257,              // 3.14 raw=28: 紧随条件跳转后的标记（提示 JIT 该分支未执行）
+    POP_ITER_314 = 258,              // 3.14 raw=30: pop iterator after for-loop
+    LOAD_COMMON_CONSTANT_314 = 259,  // 3.14 raw=81: 加载常见常量（None/True/False/Ellipsis）
+    BUILD_INTERPOLATION_314 = 260,   // 3.14 raw=45: build interpolation for f-string
+    BINARY_OP_INPLACE_ADD_UNICODE_314 = 261, // 3.14 raw=3
+    LOAD_SPECIAL_314 = 262,          // 3.14 raw=95
 }

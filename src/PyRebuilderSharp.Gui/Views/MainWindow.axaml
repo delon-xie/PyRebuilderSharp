@@ -73,7 +73,7 @@
             <Border DockPanel.Dock="Top" Background="#2d2d2d" BorderBrush="#3c3c3c" BorderThickness="0,0,0,1" Padding="10,5">
               <TextBlock Text="🔍 字节码 (dis)" Foreground="#bbb" FontSize="11" />
             </Border>
-            <ScrollViewer Background="#1e1e1e" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="DisasmScroll" Background="#1e1e1e" HorizontalScrollBarVisibility="Auto">
               <SelectableTextBlock x:Name="DisasmBlock"
                 FontFamily="Consolas,Menlo,Monaco,'Courier New',monospace"
                 FontSize="12" Foreground="#d4d4d4" LineHeight="18"
@@ -90,7 +90,7 @@
             <Border DockPanel.Dock="Top" Background="#2d2d2d" BorderBrush="#3c3c3c" BorderThickness="0,0,0,1" Padding="10,5">
               <TextBlock Text="{Binding CurrentFileName}" Foreground="#bbb" FontSize="11" />
             </Border>
-            <ScrollViewer Background="#1e1e1e" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="SourceScroll" Background="#1e1e1e" HorizontalScrollBarVisibility="Auto">
               <SelectableTextBlock x:Name="SourceBlock"
                 FontFamily="Consolas,Menlo,Monaco,'Courier New',monospace"
                 FontSize="13" Foreground="#d4d4d4" LineHeight="20"

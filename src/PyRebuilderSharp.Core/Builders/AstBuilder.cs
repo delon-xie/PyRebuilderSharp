@@ -19,6 +19,7 @@ public class AstBuilder
     private List<BasicBlock> _allBlocks = new();
     private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
     private readonly HashSet<int> _processedBlockIds = new(); // 已实际处理的块 ID（用于孤儿块检测）
+    private bool _diagETPrinted; // temporary diagnostic flag
 
     public AstBuilder(CodeObject codeObject, DecompileOptions? options = null)
     {
@@ -408,10 +409,54 @@ public class AstBuilder
         // 3.11+: 通过 ExceptionTable 检测 try/except
         if (_codeObject.ExceptionTable.Count > 0)
         {
+            if (_codeObject.Name == "<module>" && !_diagETPrinted)
+            {
+                _diagETPrinted = true;
+                System.Console.Error.WriteLine($"[AST-DIAG] ExceptionTable ({_codeObject.ExceptionTable.Count} entries):");
+                foreach (var e in _codeObject.ExceptionTable)
+                    System.Console.Error.WriteLine($"  try[{e.StartOffset:X4}-{e.EndOffset:X4}]→handler@{e.TargetOffset:X4} depth={e.Depth}");
+                System.Console.Error.WriteLine($"[AST-DIAG] Blocks ({GetAllBlocks().Count}):");
+                foreach (var b in GetAllBlocks())
+                {
+                    var s = b.Instructions.Count > 0 ? b.Instructions[0].Offset.ToString("X4") : "?";
+                    var e = b.Instructions.Count > 0 ? b.Instructions.Last().Offset.ToString("X4") : "?";
+                    var succs = string.Join(",", b.Successors.Select(s2 => s2.Instructions.Count > 0 ? s2.Instructions[0].Offset.ToString("X4") : "?"));
+                    System.Console.Error.WriteLine($"  B@{s}-{e} succ=[{succs}]");
+                }
+            }
             var try311Stmts = BuildTryFromExceptionTable(block, visited);
             if (try311Stmts != null)
             {
                 stmts.AddRange(try311Stmts);
+                // 继续处理 try/except 后面的块（else 分支、类定义等）
+                var firstTry = try311Stmts.FirstOrDefault() as Try;
+                if (firstTry != null && firstTry.Orelse != null)
+                {
+                    // Orelse 已在 BuildTryFromExceptionTable 中填充，无需额外处理
+                }
+                else
+                {
+                    // 处理 handler 块的后缀块（类定义等在 try/except 之后的代码）
+                    var matchingEntry = _codeObject.ExceptionTable
+                        .FirstOrDefault(e => block.Instructions.Count > 0
+                            && block.Instructions[0].Offset >= e.StartOffset
+                            && block.Instructions[0].Offset < e.EndOffset);
+                    if (matchingEntry != null)
+                    {
+                        var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
+                        if (handlerBlock != null)
+                        {
+                            foreach (var succ in handlerBlock.Successors)
+                            {
+                                if (!visited.Contains(succ))
+                                {
+                                    visited.Add(succ);
+                                    stmts.AddRange(BuildStatements(succ, visited));
+                                }
+                            }
+                        }
+                    }
+                }
                 return stmts;
             }
             
@@ -651,12 +696,25 @@ public class AstBuilder
         var blockStart = instrs[0].Offset;
         var blockEnd = instrs.Last().Offset;
 
-        var matchingEntry = _codeObject.ExceptionTable.FirstOrDefault(e =>
-            blockStart >= e.StartOffset && blockEnd <= e.EndOffset);
-        if (matchingEntry == null) return null;
+        // Find the outermost entry that covers this block (lowest depth = 0 or 1 first)
+        var matchingEntry = _codeObject.ExceptionTable
+            .Where(e => blockStart >= e.StartOffset && blockEnd <= e.EndOffset)
+            .OrderBy(e => e.Depth)
+            .FirstOrDefault();
+        if (matchingEntry == null)
+        {
+            System.Console.Error.WriteLine($"[AST-DIAG] BuildTryFromExceptionTable: no matching entry for block @0x{blockStart:X4}-0x{blockEnd:X4} (ET count={_codeObject.ExceptionTable.Count})");
+            return null;
+        }
 
         var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
-        if (handlerBlock == null || visited.Contains(handlerBlock)) return null;
+        if (handlerBlock == null || visited.Contains(handlerBlock))
+        {
+            System.Console.Error.WriteLine($"[AST-DIAG] BuildTryFromExceptionTable: handler @0x{matchingEntry.TargetOffset:X4} null={handlerBlock==null} visited={visited.Contains(handlerBlock)}");
+            return null;
+        }
+
+        System.Console.Error.WriteLine($"[AST-DIAG] BuildTryFromExceptionTable: matched entry try[{matchingEntry.StartOffset:X4}-{matchingEntry.EndOffset:X4}]→handler@{matchingEntry.TargetOffset:X4} depth={matchingEntry.Depth}");
 
         var tryBlocks = new List<BasicBlock>();
         foreach (var b in GetAllBlocks())
