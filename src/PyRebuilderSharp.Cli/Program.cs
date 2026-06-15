@@ -2,6 +2,10 @@
 using System.IO;
 using System.Linq;
 using PyRebuilderSharp.Core;
+using PyRebuilderSharp.Core.Readers;
+using PyRebuilderSharp.Core.Scanners;
+using PyRebuilderSharp.Core.Builders;
+using PyRebuilderSharp.Core.Generators;
 
 namespace PyRebuilderSharp.Cli;
 
@@ -58,6 +62,12 @@ class Program
         {
             Console.Error.WriteLine("Error: No .pyc files found.");
             ShowUsage();
+            return;
+        }
+
+        if (args.Contains("--diagnose"))
+        {
+            DiagnosePhase(inputFiles[0]);
             return;
         }
 
@@ -145,5 +155,63 @@ class Program
 
         Console.Error.WriteLine($"\nBatch complete: {success} succeeded, {failed} failed, " +
             $"{success + failed} total, {totalMs / Math.Max(1, success + failed):F1}ms avg");
+    }
+
+    /// <summary>分阶段诊断反编译挂死位置。</summary>
+    static void DiagnosePhase(string inputFile)
+    {
+        try
+        {
+            var data = File.ReadAllBytes(inputFile);
+            Console.Error.WriteLine($"=== 分阶段诊断: {inputFile} ({data.Length} bytes) ===");
+
+            // Phase 1: Reader
+            Console.Error.Write("[Phase 1/5] PycReader.Read()... ");
+            Console.Error.Flush();
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var reader = new PycReader();
+            var codeObj = reader.Read(data);
+            sw.Stop();
+            Console.Error.WriteLine($"OK ({sw.Elapsed.TotalMilliseconds:F0}ms)  Instr={codeObj.Instructions?.Count} ChildCodes={codeObj.ChildCodes?.Count}");
+
+            // Phase 2: BlockScanner
+            Console.Error.Write("[Phase 2/5] BlockScanner.Scan()... ");
+            sw.Restart();
+            var blocks = new BlockScanner().Scan(codeObj);
+            sw.Stop();
+            Console.Error.WriteLine($"OK ({sw.Elapsed.TotalMilliseconds:F0}ms)  Blocks={blocks.Count}");
+
+            // Phase 3: ControlFlowScanner
+            Console.Error.Write("[Phase 3/5] ControlFlowScanner.Analyze()... ");
+            sw.Restart();
+            var cfg = new ControlFlowScanner().Analyze(blocks);
+            sw.Stop();
+            Console.Error.WriteLine($"OK ({sw.Elapsed.TotalMilliseconds:F0}ms)");
+
+            // Phase 4: AstBuilder.Build()
+            Console.Error.Write("[Phase 4/5] AstBuilder.Build()... ");
+            sw.Restart();
+            var builder = new AstBuilder(codeObj);
+            var ast = builder.Build(cfg);
+            sw.Stop();
+            Console.Error.WriteLine($"OK ({sw.Elapsed.TotalMilliseconds:F0}ms)  TotalBlocks={builder.TotalBlockCount} Failed={builder.FailedBlockCount}");
+
+            // Phase 5: Code generation
+            Console.Error.Write("[Phase 5/5] PythonCodeGenerator.Generate()... ");
+            sw.Restart();
+            var source = new PythonCodeGenerator().Generate(ast);
+            sw.Stop();
+            Console.Error.WriteLine($"OK ({sw.Elapsed.TotalMilliseconds:F0}ms)  Output={source.Length} chars");
+
+            Console.Error.WriteLine($"\n✅ 全部通过! 总耗时: {(sw.Elapsed.TotalMilliseconds):F0}ms");
+            Console.WriteLine(source);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"❌ 失败: {ex.GetType().Name}: {ex.Message}");
+            if (ex.InnerException != null)
+                Console.Error.WriteLine($"  Inner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+            Console.Error.WriteLine($"  Stack: {ex.StackTrace}");
+        }
     }
 }

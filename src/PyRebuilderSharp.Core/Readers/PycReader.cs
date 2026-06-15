@@ -40,6 +40,17 @@ public class PycReader
     private readonly List<string> _internedStrings27 = new(); // Python 2.7 interned string table
     private string _pythonVersion = "Python 3.8";
     private byte[] _magicBytes = Array.Empty<byte>();
+    private int _marshalDepth = 0;
+    private const int MaxMarshalDepth = 100000;
+    private System.Diagnostics.Stopwatch? _readTimer;
+    private const int MaxReadSeconds = 15;
+    private void CheckReadTimeout(BinaryReader? br = null)
+    {
+        if (_readTimer != null && _readTimer.Elapsed.TotalSeconds > MaxReadSeconds)
+            throw new TimeoutException(
+                $"PycReader timed out after {MaxReadSeconds}s at offset {br?.BaseStream.Position}/{br?.BaseStream.Length}, " +
+                $"marshalDepth={_marshalDepth}.");
+    }
 
     /// <summary>
     /// 检查是否为 Python 2.7
@@ -113,6 +124,8 @@ public class PycReader
         }
 
         // Step 3: 读取Marshal数据 — use ReadMarshalObject which handles FLAG_REF
+        _marshalDepth = 0;
+        _readTimer = System.Diagnostics.Stopwatch.StartNew();
         return (CodeObject?)ReadMarshalObject(br);
     }
 
@@ -941,9 +954,14 @@ public class PycReader
         var instructions = new List<Instruction>();
         int offset = 0;
         int extArg = 0;
+        int safety = 0;
 
         while (offset + 1 < bytecode.Length)
         {
+            if (++safety > 1000000)
+                throw new InvalidOperationException(
+                    $"Infinite loop in ParseInstructions311Plus at offset {offset}/{bytecode.Length}");
+
             byte rawOp = bytecode[offset];
             var rawArg = bytecode[offset + 1];
 
@@ -1242,9 +1260,13 @@ public class PycReader
         var instructions = new List<Instruction>();
         int offset = 0;
         int extArg = 0;
+        int safety = 0;
 
         while (offset + 1 < bytecode.Length)
         {
+            if (++safety > 1000000)
+                throw new InvalidOperationException(
+                    $"Infinite loop in ParseInstructionsWordcode at offset {offset}/{bytecode.Length}");
             var op = (Models.Bytecode.Opcode)bytecode[offset];
             var rawArg = bytecode[offset + 1];
 
@@ -1328,6 +1350,11 @@ public class PycReader
 
             for (int i = 0; i < count; i++)
             {
+                if (i >= 10000)
+                {
+                    Console.Error.WriteLine($"[WARN] ReadMarshalObjectAsStrList: aborting at {i} items (safety limit)");
+                    break;
+                }
                 // Peek: if TYPE_STRING(0x73), read directly; else use ReadMarshalObject
                 var peek = br.ReadByte();
                 br.BaseStream.Position--;
@@ -1575,6 +1602,7 @@ public class PycReader
         var items = isTuple ? new PyTuple() : new List<object?>();
         for (int i = 0; i < count; i++)
         {
+            CheckReadTimeout(br);
             try
             {
                 items.Add(ReadMarshalObject(br));
@@ -1623,8 +1651,15 @@ public class PycReader
         var dict = new Dictionary<object?, object?>();
         try
         {
+            int maxEntries = 100000;
+            int entries = 0;
             while (br.BaseStream.Position < br.BaseStream.Length)
             {
+                CheckReadTimeout(br);
+                if (++entries > maxEntries)
+                    throw new InvalidOperationException(
+                        $"Infinite loop in dictionary reading at offset {br.BaseStream.Position}. " +
+                        $"Last key: {dict.Keys.LastOrDefault()}");
                 // PEEK next type byte
                 var peekByte = br.ReadByte();
                 br.BaseStream.Position--; // unread
@@ -1647,6 +1682,12 @@ public class PycReader
 
     private object? ReadMarshalObject(BinaryReader br)
     {
+        CheckReadTimeout(br);
+        if (++_marshalDepth > MaxMarshalDepth)
+            throw new InvalidOperationException(
+                $"Marshal recursion depth exceeded {MaxMarshalDepth} at offset {br.BaseStream.Position}. " +
+                "Possible infinite loop in .pyc reading.");
+        
         var rawType = br.ReadByte();
         var type = (byte)(rawType & ~MarshalType.TYPE_FLAG_REF);
         
