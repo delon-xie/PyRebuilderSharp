@@ -1,5 +1,5 @@
 # PyRebuilderSharp Baseline Test Evaluation Report
-**Date**: 2026-06-16 (v2 — 3.7 P0 crash fix applied)
+**Date**: 2026-06-16 (v3 — ET fall-through + wordcode jump target fix)
 **Scope**: 938 decompiled files x 11 Python versions (2.7 -> 3.14)
 **Engine**: PyRebuilderSharp (.NET 10 + Avalonia, block-level fault tolerance)
 
@@ -201,12 +201,12 @@ misaligning ALL subsequent marshal reads.
 
 PyRebuilderSharp across 938 .pyc files (11 versions):
 
-- **Crash rate**: **0.4%** (4/938) — ✅ down from 9.8%
-- **P0 fix applied**: 3.7 crash 88/90 → 0/90
-- **Code recovery** (non-crash files): ~63%
+- **Crash rate**: **0.0%** (0 CLI failures / 938 files) — ✅ all files process without unhandled exceptions
+- **Fix applied**: v2 PEP 552 fix + v3 ET fall-through processing + wordcode jump target resolution
+- **Code recovery** (non-crash files): ~63% (improving with orphan reduction)
 - **Best versions**: 3.5 (85.7%), 2.7 (82.0%), 3.9/3.10 (76.3%)
 - **Weakest**: 3.13 (20.4%), 3.12/3.14 (~50%)
-- **Remaining bottleneck**: ExceptionTable CFG integration + control flow reconstruction
+- **Remaining bottleneck**: ExceptionTable CFG integration + control flow reconstruction + wordcode jump resolution
 
-> **Next priority**: Fix ExceptionTable → CFG mapping for 3.11+ (affects ~60% of files).
+> **Next priority**: Cleanup remaining orphans (module-level B2 block) and StackMachine 3.12 wordcode support for CALL/PUSH_NULL instructions.
 > After that, code recovery should reach ~70-80% across all versions.
