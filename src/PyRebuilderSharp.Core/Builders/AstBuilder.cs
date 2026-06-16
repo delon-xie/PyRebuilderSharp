@@ -68,10 +68,45 @@ public class AstBuilder
         var visited = new HashSet<BasicBlock>();
 
         // 3.11+: 在 BuildStatements 之前预处理 ExceptionTable try/except
-        // 避免 try 体块被 ControlFlowScanner 的循环检测误吞
         if (_codeObject.ExceptionTable.Count > 0)
         {
-            // 第一步：处理第一个 ET 条目之前的块（docstring、def/class 定义等）
+            // 第一步：处理 ET 条目（优先于 preBlocks，确保 visited 干净）
+            foreach (var entry in _codeObject.ExceptionTable.OrderBy(e => e.StartOffset))
+            {
+                var entryBlock = FindBlockByOffset(entry.StartOffset);
+                if (entryBlock == null || visited.Contains(entryBlock)) continue;
+                var etStmts = BuildTryFromExceptionTable(entryBlock, visited);
+                if (etStmts != null)
+                {
+                    stmts.AddRange(etStmts);
+                    foreach (var b in GetAllBlocks())
+                    {
+                        if (b.Instructions.Count == 0) continue;
+                        var start = b.Instructions[0].Offset;
+                        if (start >= entry.StartOffset && start < entry.EndOffset)
+                        {
+                            _processedBlockIds.Add(b.Id);
+                            visited.Add(b);
+                        }
+                    }
+                    var handler = FindBlockByOffset(entry.TargetOffset);
+                    if (handler != null)
+                    {
+                        _processedBlockIds.Add(handler.Id);
+                        visited.Add(handler);
+                        foreach (var succ in handler.Successors)
+                        {
+                            if (!visited.Contains(succ))
+                            {
+                                visited.Add(succ);
+                                stmts.AddRange(BuildStatements(succ, visited));
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 第二步：处理第一个 ET 条目之前的块（docstring、def/class 定义等）
             var firstET = _codeObject.ExceptionTable.OrderBy(e => e.StartOffset).First();
             var preBlocks = cfg.Blocks
                 .Where(b => b.Instructions.Count > 0
@@ -795,14 +830,13 @@ public class AstBuilder
         {
             if (tb == block)
             {
-                var machine = new StackMachine(_codeObject);
-                foreach (var ins in tb.Instructions)
+                var result = _blockResults.GetValueOrDefault(block.Id);
+                if (result?.Statements != null)
                 {
-                    var stmt = machine.Execute(ins);
-                    if (stmt != null) tryBody.Add(stmt);
+                    var filtered = result.Statements.Where(s => s is not Raise).ToList();
+                    if (filtered.Count > 0)
+                        tryBody.AddRange(filtered);
                 }
-                while (machine.HasResults)
-                    tryBody.Add(new ExprStmt(machine.PopResult()));
             }
             else if (!visited.Contains(tb) && !tryVisited.Contains(tb))
             {
@@ -811,15 +845,35 @@ public class AstBuilder
         }
 
         visited.Add(handlerBlock);
-        var handlerMachine = new StackMachine(_codeObject);
-        var handlerBody = new List<Stmt>();
-        foreach (var ins in handlerBlock.Instructions)
+        var handlerResult = _blockResults.GetValueOrDefault(handlerBlock.Id);
+        var handlerBody = handlerResult?.Statements
+            ?.Where(s => s is not Raise and not CommentBlock)
+            .ToList() ?? new List<Stmt>();
+
+        // Collect body from all handler successor blocks within the handler range
+        // Handler range = from handler target to the EndOffset of the ET entry covering it
+        var handlerET = _codeObject.ExceptionTable
+            .FirstOrDefault(e => e.StartOffset == matchingEntry.TargetOffset);
+        var handlerEnd = handlerET != null
+            ? handlerET.EndOffset
+            : matchingEntry.EndOffset;
+        foreach (var succ in handlerBlock.Successors.OrderBy(s => s.StartOffset))
         {
-            var stmt = handlerMachine.Execute(ins);
-            if (stmt != null) handlerBody.Add(stmt);
+            if (succ.Instructions.Count == 0) continue;
+            var succStart = succ.Instructions[0].Offset;
+            if (succStart >= matchingEntry.TargetOffset && succStart < handlerEnd
+                && !visited.Contains(succ))
+            {
+                var succResult = _blockResults.GetValueOrDefault(succ.Id);
+                if (succResult?.Statements != null)
+                {
+                    handlerBody.AddRange(succResult.Statements
+                        .Where(s => s is not Raise and not CommentBlock));
+                }
+                visited.Add(succ);
+                _processedBlockIds.Add(succ.Id);
+            }
         }
-        while (handlerMachine.HasResults)
-            handlerBody.Add(new ExprStmt(handlerMachine.PopResult()));
 
         bool isGroup = handlerBlock.Instructions.Any(i => i.Opcode == Opcode.CHECK_EG_MATCH);
 
