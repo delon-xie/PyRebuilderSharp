@@ -254,8 +254,26 @@ public class AstBuilder
                         
                         if (!isEmptyReturn && _options.ShowOrphanBlocks)
                         {
-                            stmts.Add(new CommentBlock($"# orphan @0x{orphan.StartOffset:X4}"));
-                            stmts.AddRange(blockResult.Statements);
+                            // 根据偏移位置插入孤儿块内容，而非始终追加在末尾。
+                            // 早期偏移的孤儿块（如函数体开头的初始化语句 `abstracts = set()`）
+                            // 应出现在函数开头而非末尾。
+                            var orphanStmts = new List<Stmt>
+                            {
+                                new CommentBlock($"# orphan @0x{orphan.StartOffset:X4}")
+                            };
+                            orphanStmts.AddRange(blockResult.Statements);
+
+                            // 检查 orphan 的偏移是否较小（早期初始化块）
+                            // 启发式：orphan 偏移在字节码前 1/3 范围内 → 插入开头
+                            var lastOffset = _allBlocks.Count > 0 
+                                ? _allBlocks[^1].EndOffset : 0;
+                            bool isEarlyOrphan = lastOffset > 0 
+                                && orphan.StartOffset < lastOffset / 3;
+
+                            if (isEarlyOrphan)
+                                stmts.InsertRange(0, orphanStmts);
+                            else
+                                stmts.AddRange(orphanStmts);
                         }
                     }
                     else
