@@ -94,12 +94,32 @@ public class AstBuilder
                     {
                         _processedBlockIds.Add(handler.Id);
                         visited.Add(handler);
+                        // Handler 后继：只处理前向边（偏移 ≥ handler 起始），且跳过自身也是 ET handler 的块
                         foreach (var succ in handler.Successors)
                         {
-                            if (!visited.Contains(succ))
+                            if (!visited.Contains(succ)
+                                && succ.StartOffset >= entry.TargetOffset
+                                && !_codeObject.ExceptionTable.Any(e => e.TargetOffset == succ.StartOffset))
                             {
                                 visited.Add(succ);
                                 stmts.AddRange(BuildStatements(succ, visited));
+                            }
+                        }
+                    }
+                    
+                    // 标记所有共享同一 handler 的 ET 条目的 try 体块为已处理
+                    // 这些是相同 try/except 结构的嵌套清理条目（depth>0），不应生成独立 try/except
+                    foreach (var sibling in _codeObject.ExceptionTable
+                        .Where(e => e.TargetOffset == entry.TargetOffset && e.StartOffset != entry.StartOffset))
+                    {
+                        foreach (var b in GetAllBlocks())
+                        {
+                            if (b.Instructions.Count == 0) continue;
+                            var start = b.Instructions[0].Offset;
+                            if (start >= sibling.StartOffset && start < sibling.EndOffset && !visited.Contains(b))
+                            {
+                                _processedBlockIds.Add(b.Id);
+                                visited.Add(b);
                             }
                         }
                     }
@@ -119,7 +139,29 @@ public class AstBuilder
                 stmts.AddRange(BuildStatements(preBlock, visited));
             }
 
-            // 第二步：处理每个 ET 条目
+            // 第三步：处理 try 体结束与 handler 起始之间的 fall-through 块
+            // 这些块是 try 体成功执行后的正常流程（如 ABCMeta 类定义等顶层声明）
+            foreach (var entry in _codeObject.ExceptionTable.OrderBy(e => e.StartOffset))
+            {
+                var fallthroughStart = entry.EndOffset;
+                var fallthroughEnd = entry.TargetOffset;
+                // 仅当 handler 在 try 体之后（前向）时处理 fall-through
+                if (fallthroughEnd <= fallthroughStart) continue;
+
+                var fallthroughBlocks = cfg.Blocks
+                    .Where(b => b.Instructions.Count > 0
+                        && b.Instructions[0].Offset >= fallthroughStart
+                        && b.Instructions[0].Offset < fallthroughEnd
+                        && !visited.Contains(b))
+                    .OrderBy(b => b.Instructions[0].Offset)
+                    .ToList();
+                foreach (var fb in fallthroughBlocks)
+                {
+                    stmts.AddRange(BuildStatements(fb, visited));
+                }
+            }
+
+            // 第四步：处理每个 ET 条目
             foreach (var entry in _codeObject.ExceptionTable.OrderBy(e => e.StartOffset))
             {
                 var entryBlock = FindBlockByOffset(entry.StartOffset);
@@ -148,11 +190,31 @@ public class AstBuilder
                         visited.Add(handler);
                         foreach (var succ in handler.Successors)
                         {
-                            if (!visited.Contains(succ))
+                            if (!visited.Contains(succ)
+                                && succ.StartOffset >= entry.TargetOffset
+                                && !_codeObject.ExceptionTable.Any(e => e.TargetOffset == succ.StartOffset))
                             {
                                 visited.Add(succ);
                                 stmts.AddRange(BuildStatements(succ, visited));
                             }
+                        }
+                    }
+                }
+                else
+                {
+                    // etStmts 为 null（如 handler 已被访问），但 entry 块仍需标记为已处理
+                    // 避免残余块变为孤儿
+                    _processedBlockIds.Add(entryBlock.Id);
+                    visited.Add(entryBlock);
+                    // 同时标记 try 体中的块
+                    foreach (var b in GetAllBlocks())
+                    {
+                        if (b.Instructions.Count == 0) continue;
+                        var start = b.Instructions[0].Offset;
+                        if (start >= entry.StartOffset && start < entry.EndOffset && !visited.Contains(b))
+                        {
+                            _processedBlockIds.Add(b.Id);
+                            visited.Add(b);
                         }
                     }
                 }
@@ -842,6 +904,17 @@ public class AstBuilder
             {
                 tryBody.AddRange(BuildStatements(tb, visited));
             }
+        }
+
+        // 跳过仅有基础设施指令（Raise/异常处理）的 try 体
+        // 这些是 CPython 嵌套清理条目，不应生成独立 try/except
+        if (tryBody.Count == 0 && tryBlocks.All(tb =>
+        {
+            var r = _blockResults.GetValueOrDefault(tb.Id);
+            return r?.Statements == null || r.Statements.All(s => s is Raise or ExprStmt);
+        }))
+        {
+            return null;
         }
 
         visited.Add(handlerBlock);

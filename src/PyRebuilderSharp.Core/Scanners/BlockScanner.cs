@@ -17,7 +17,7 @@ public class BlockScanner : IBlockScanner
     {
         var instructions = codeObj.Instructions;
 
-        var leaders = MarkLeaders(instructions, codeObj.ExceptionTable);
+        var leaders = MarkLeaders(instructions, codeObj.ExceptionTable, codeObj);
         var blocks = SplitAtLeaders(instructions, leaders);
         LinkBlocks(blocks, codeObj.ExceptionTable);
         MarkBlockProperties(blocks);
@@ -29,7 +29,7 @@ public class BlockScanner : IBlockScanner
     /// 标记Leader指令。
     /// Leader是基本块的起始指令。
     /// </summary>
-    private SortedSet<int> MarkLeaders(List<Instruction> instructions, List<ExceptionTableEntry>? exceptionTable = null)
+    private SortedSet<int> MarkLeaders(List<Instruction> instructions, List<ExceptionTableEntry>? exceptionTable = null, CodeObject? codeObj = null)
     {
         var leaders = new SortedSet<int> { 0 };
 
@@ -44,7 +44,7 @@ public class BlockScanner : IBlockScanner
             }
             else if (JumpHelper.IsConditionalJump(instr.Opcode))
             {
-                var target = ResolveJumpTarget(instr);
+                var target = ResolveJumpTarget(instr, codeObj);
                 if (target.HasValue)
                     leaders.Add(target.Value);
                 if (i + 1 < instructions.Count)
@@ -52,7 +52,7 @@ public class BlockScanner : IBlockScanner
             }
             else if (JumpHelper.IsUnconditionalJump(instr.Opcode))
             {
-                var target = ResolveJumpTarget(instr);
+                var target = ResolveJumpTarget(instr, codeObj);
                 if (target.HasValue)
                     leaders.Add(target.Value);
             }
@@ -87,16 +87,30 @@ public class BlockScanner : IBlockScanner
     /// JUMP_FORWARD/FOR_ITER/SETUP_FINALLY 使用相对偏移，
     /// JUMP_ABSOLUTE 使用绝对偏移，
     /// JUMP_BACKWARD 使用反向相对偏移。
+    /// 3.12+ wordcode: 条件跳转（POP_JUMP_IF_TRUE/FALSE 等）参数已转为字节偏移，
+    /// 需要计算 instr.Offset + 2 + arg 得到绝对目标。
     /// </summary>
-    private static int? ResolveJumpTarget(Instruction instr)
+    private static int? ResolveJumpTarget(Instruction instr, CodeObject? codeObj = null)
     {
         if (!instr.Argument.HasValue) return null;
+
+        // 检测 wordcode: 3.11+ 所有指令均为 2 字节，偏移均为偶数
+        // 而非 wordcode（3.10-）的指令长度可变（1或3字节），可能存在奇数偏移
+        // 注意：此检测需在所有指令上检查，因为简单函数可能无 ExceptionTable
+        bool isWordcode = codeObj?.Instructions != null
+            && codeObj.Instructions.Count > 1
+            && codeObj.Instructions.All(i => i.Offset % 2 == 0);
+
         return instr.Opcode switch
         {
             Opcode.JUMP_ABSOLUTE => instr.Argument.Value,
             Opcode.JUMP_FORWARD or Opcode.FOR_ITER
                 => instr.Offset + 2 + instr.Argument.Value,
-            Opcode.JUMP_BACKWARD => instr.Offset - instr.Argument.Value,
+            Opcode.JUMP_BACKWARD => instr.Offset + 2 - instr.Argument.Value,
+            // 3.12+ wordcode: 条件跳转参数是相对字节偏移，需加上当前指令+2
+            Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                when isWordcode => instr.Offset + 2 + instr.Argument.Value,
             _ => instr.Argument.Value
         };
     }
