@@ -64,7 +64,70 @@ public class AstBuilder
                 _loopHeaderOffsets.Add(b.StartOffset);
         }
 
-        var stmts = BuildStatements(cfg.Entry, new HashSet<BasicBlock>());
+        var stmts = new List<Stmt>();
+        var visited = new HashSet<BasicBlock>();
+
+        // 3.11+: 在 BuildStatements 之前预处理 ExceptionTable try/except
+        // 避免 try 体块被 ControlFlowScanner 的循环检测误吞
+        if (_codeObject.ExceptionTable.Count > 0)
+        {
+            // 第一步：处理第一个 ET 条目之前的块（docstring、def/class 定义等）
+            var firstET = _codeObject.ExceptionTable.OrderBy(e => e.StartOffset).First();
+            var preBlocks = cfg.Blocks
+                .Where(b => b.Instructions.Count > 0
+                    && b.Instructions[0].Offset < firstET.StartOffset
+                    && !visited.Contains(b))
+                .OrderBy(b => b.Instructions[0].Offset)
+                .ToList();
+            foreach (var preBlock in preBlocks)
+            {
+                stmts.AddRange(BuildStatements(preBlock, visited));
+            }
+
+            // 第二步：处理每个 ET 条目
+            foreach (var entry in _codeObject.ExceptionTable.OrderBy(e => e.StartOffset))
+            {
+                var entryBlock = FindBlockByOffset(entry.StartOffset);
+                if (entryBlock == null || visited.Contains(entryBlock)) continue;
+
+                var etStmts = BuildTryFromExceptionTable(entryBlock, visited);
+                if (etStmts != null)
+                {
+                    stmts.AddRange(etStmts);
+                    // Mark try body blocks as processed
+                    foreach (var b in GetAllBlocks())
+                    {
+                        if (b.Instructions.Count == 0) continue;
+                        var start = b.Instructions[0].Offset;
+                        if (start >= entry.StartOffset && start < entry.EndOffset)
+                        {
+                            _processedBlockIds.Add(b.Id);
+                            visited.Add(b);
+                        }
+                    }
+                    // Mark handler and successors
+                    var handler = FindBlockByOffset(entry.TargetOffset);
+                    if (handler != null)
+                    {
+                        _processedBlockIds.Add(handler.Id);
+                        visited.Add(handler);
+                        foreach (var succ in handler.Successors)
+                        {
+                            if (!visited.Contains(succ))
+                            {
+                                visited.Add(succ);
+                                stmts.AddRange(BuildStatements(succ, visited));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // No ET: normal single-pass BuildStatements
+            stmts.AddRange(BuildStatements(cfg.Entry, visited));
+        }
 
         // 确保所有块都被处理
         // 使用 _processedBlockIds（BuildStatements 实际处理的块）而非 CollectVisited（只跟随 successor 边）
