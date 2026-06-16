@@ -681,6 +681,7 @@ public class AstBuilder
         // 确保 header 在 visited 中，防止从 GetStructuredBlockStmts 调入时
         // body 块的后继 FOR_ITER 被再次检测导致递归循环
         visited.Add(header);
+        _processedBlockIds.Add(header.Id);
         var iterExpr = ExtractIterExpression(header);
 
         var bodyBlocks = new List<BasicBlock>();
@@ -689,8 +690,11 @@ public class AstBuilder
         var bodyEntry = header.Successors
             .OrderBy(s => s.StartOffset)
             .FirstOrDefault();
+        var exitBlock = header.Successors
+            .OrderByDescending(s => s.StartOffset)
+            .FirstOrDefault(b => b != bodyEntry); // 跳转目标 = exit
         if (bodyEntry != null)
-            CollectBodyBlocks(bodyEntry, header, bodyBlocks, visited);
+            CollectBodyBlocks(bodyEntry, header, bodyBlocks, visited, exitBlock);
 
         // 从 visited 中移除 body 块，让 GetStructuredBlockStmts 重新管理（嵌套循环防止 StackOverflow）
         foreach (var bb in bodyBlocks)
@@ -1817,13 +1821,8 @@ public class AstBuilder
         result.Add(new With(items, bodyStmts));
         return result;
     }
-
     private List<Stmt> BuildWhileLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
-        // DIAG: 打印 header 块信息
-        foreach (var instr in header.Instructions)
-            Console.Error.WriteLine($"    {instr.Offset:X4}: {instr.Opcode} arg={instr.Argument}");
-        
         bool hasTryBeforeJump = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus));
         // v3.10+: 如果 header 内含 SETUP_FINALLY（try body 在 while 体内），
         // 则 POP_JUMP 是内层 if 的条件，不是 while 循环的条件。
@@ -2252,6 +2251,7 @@ public class AstBuilder
         if (block == null || visited.Contains(block))
             return new List<Stmt>();
         visited.Add(block);
+        _processedBlockIds.Add(block.Id);
 
         var result = _blockResults.GetValueOrDefault(block.Id);
         if (result == null || !result.IsSuccess)
@@ -2284,6 +2284,7 @@ public class AstBuilder
         if (block == null || visited.Contains(block))
             return new List<Stmt>();
         visited.Add(block);
+        _processedBlockIds.Add(block.Id);  // 追踪通过 GetStructuredBlockStmts 处理的块，防止孤儿块恢复误报
 
         // 优先检测是否为循环头（即使在内层循环体中）
         // 跳过 for-loop 前导块：有 GET_ITER 但无 FOR_ITER → 不是真正的循环头
@@ -2314,7 +2315,18 @@ public class AstBuilder
         {
             // 检查是否为循环继续（向后跳转 → 不是 if/else）
             var lastInstr = block.Instructions.LastOrDefault();
-            if (lastInstr.Argument.HasValue && lastInstr.Argument.Value < block.StartOffset)
+            // 3.12+ wordcode: 使用解析后的目标偏移，而非原始 arg（wordcode arg 已 *2 但仍小于块偏移）
+            int resolvedTarget;
+            var isWc = _codeObject.Instructions.Count > 1
+                    && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
+            if (isWc && lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                       or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                       or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+                resolvedTarget = lastInstr.Offset + 2 + lastInstr.Argument!.Value;
+            else
+                resolvedTarget = lastInstr.Argument!.Value;
+
+            if (resolvedTarget < block.StartOffset)
             {
                 // 向后跳转 → 循环继续条件，不是 if/else
                 // 返回平坦语句（去掉尾部 Compare）
@@ -2558,7 +2570,8 @@ public class AstBuilder
 
     private void CollectBodyBlocks(
         BasicBlock entry, BasicBlock header,
-        List<BasicBlock> bodyBlocks, HashSet<BasicBlock> visited)
+        List<BasicBlock> bodyBlocks, HashSet<BasicBlock> visited,
+        BasicBlock? exitBlock = null)
     {
         var worklist = new Queue<BasicBlock>();
         worklist.Enqueue(entry);
@@ -2568,16 +2581,37 @@ public class AstBuilder
             var current = worklist.Dequeue();
             if (current == header || visited.Contains(current))
                 continue;
+            // 排除循环出口块（FOR_ITER 的跳转目标），防止收集到循环后代码
+            if (exitBlock != null && current == exitBlock)
+                continue;
 
             bodyBlocks.Add(current);
             visited.Add(current);
 
             // v3.10: 回边条件块（POP_JUMP_IF_TRUE 目标 < 自身偏移）的后继是循环出口，不是 body 的一部分
+            // 3.12+ wordcode: 使用解析后的目标偏移，否则 wordcode arg（已 *2）总是 < 块偏移
             var lastInstr = current.Instructions.LastOrDefault();
+            // 3.12+ wordcode: 使用解析后的目标偏移，否则 wordcode arg（已 *2）总是 < 块偏移
+            int resolvedBackEdge = int.MaxValue;
+            if (lastInstr != default && lastInstr.Argument.HasValue)
+            {
+                var iwc = _codeObject.Instructions.Count > 1
+                       && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
+                resolvedBackEdge = lastInstr.Opcode switch
+                {
+                    Opcode.JUMP_ABSOLUTE => lastInstr.Argument.Value,
+                    Opcode.JUMP_FORWARD or Opcode.FOR_ITER => lastInstr.Offset + 2 + lastInstr.Argument.Value,
+                    Opcode.JUMP_BACKWARD => lastInstr.Offset + 2 - lastInstr.Argument.Value,
+                    Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                        or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                        when iwc => lastInstr.Offset + 2 + lastInstr.Argument.Value,
+                    _ => lastInstr.Argument.Value
+                };
+            }
             bool isBackEdgeBlock = lastInstr != default
                 && JumpHelper.IsJump(lastInstr.Opcode)
                 && lastInstr.Argument.HasValue
-                && lastInstr.Argument.Value < current.StartOffset;
+                && resolvedBackEdge < current.StartOffset;
 
             foreach (var succ in current.Successors)
             {
