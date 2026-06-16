@@ -564,7 +564,11 @@ public class AstBuilder
             {
                 FindBlocksFromOffset(handlerAbs.Value, handlerBlocks);
                 foreach (var hb in handlerBlocks)
+                {
                     visited.Add(hb);
+                    // 记录 handler 块到 _processedBlockIds，防止孤儿块恢复重复处理
+                    _processedBlockIds.Add(hb.Id);
+                }
             }
             // 处理 try block 的后缀块
             foreach (var succ in block.Successors)
@@ -1582,11 +1586,17 @@ public class AstBuilder
                 var cur = queue.Dequeue();
                 if (cur == null || !visited.Add(cur.Id)) continue;
                 result.Add(cur);
-                // 只跟随 handler 链内的跳转，不跟随 Exit 块的后缀（避免跳转到 handler 以外的代码）
+                // 只跟随 handler 链内的跳转：
+                // 1. 不跟随 Exit 块的后缀（避免跳转到 handler 以外的代码）
+                // 2. 不跟随 POP_EXCEPT 块的后缀（POP_EXCEPT 退出 handler 区域，后续块属于 try/except 后的正常代码）
+                // 3. 不跟随 END_FINALLY 块的后缀（同 POP_EXCEPT）
+                bool hasPopExcept = cur.Instructions.Any(i =>
+                    i.Opcode == Opcode.POP_EXCEPT || i.Opcode == Opcode.END_FINALLY);
                 foreach (var succ in cur.Successors)
                 {
-                    if (!cur.Flags.HasFlag(BlockFlags.Exit))
-                        queue.Enqueue(succ);
+                    if (cur.Flags.HasFlag(BlockFlags.Exit)) continue;
+                    if (hasPopExcept) continue;
+                    queue.Enqueue(succ);
                 }
             }
         }
@@ -2339,7 +2349,30 @@ public class AstBuilder
         var tryResult = BuildTryFromBlock(block, visited);
         if (tryResult != null)
         {
-            return tryResult;
+            // 处理 try/except handler 的后缀块（如类/函数定义等在 try/except 之后的代码）。
+            // BuildStatementsInternal 的 try/except 分支（行 556-591）已经处理了 handler 后缀，
+            // 但从 GetStructuredBlockStmts 分派的 try/except（嵌套在 if-body、loop-body 内）也需处理。
+            // handler 块被 visited 后，其后缀块需要显式追踪——BlockScanner 已正确创建 handler→后续块的 CFG 边。
+            var tryStmtsList = new List<Stmt>(tryResult);
+            var handlerAbs = GetHandlerOffset(block);
+            if (handlerAbs.HasValue)
+            {
+                var hbList = new List<BasicBlock>();
+                FindBlocksFromOffset(handlerAbs.Value, hbList);
+                foreach (var hb in hbList)
+                {
+                    _processedBlockIds.Add(hb.Id);
+                    foreach (var succ in hb.Successors)
+                    {
+                        if (!visited.Contains(succ))
+                        {
+                            visited.Add(succ);
+                            tryStmtsList.AddRange(GetStructuredBlockStmts(succ, visited));
+                        }
+                    }
+                }
+            }
+            return tryStmtsList;
         }
 
         // 检测 if/else 条件分支
