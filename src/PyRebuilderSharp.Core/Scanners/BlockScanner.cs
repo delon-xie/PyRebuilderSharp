@@ -95,23 +95,34 @@ public class BlockScanner : IBlockScanner
         if (!instr.Argument.HasValue) return null;
 
         // 检测 wordcode: 3.11+ 所有指令均为 2 字节，偏移均为偶数
-        // 而非 wordcode（3.10-）的指令长度可变（1或3字节），可能存在奇数偏移
+        // 而非 wordcode（3.5）的指令长度可变（1或3字节），可能存在奇数偏移
         // 注意：此检测需在所有指令上检查，因为简单函数可能无 ExceptionTable
         bool isWordcode = codeObj?.Instructions != null
             && codeObj.Instructions.Count > 1
             && codeObj.Instructions.All(i => i.Offset % 2 == 0);
 
+        // 检测是否为 3.10 word offset（arg = 指令数*2 = 字节偏移）
+        // 3.6-3.9 wordcode: arg = 指令数（需 *2 转为字节偏移）
+        // 3.10+: 已在 ParseInstructions 中 *2（IsWordOffset=true）
+        // 3.12+: 已在 ParseInstructions 中 *2（HasCaches）
+        // 非 wordcode（3.5-）: arg = 绝对指令偏移（可变长度，需公式转换）
+        // 判定：wordcode && !IsWordOffset && !HasCaches → 3.6-3.9（需 *2）
+        bool is36To39Wordcode = isWordcode
+            && codeObj?.IsWordOffset == false
+            && codeObj?.IsPython27 == false;
+
         return instr.Opcode switch
         {
-            Opcode.JUMP_ABSOLUTE => instr.Argument.Value,
+            Opcode.JUMP_ABSOLUTE => is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value,
             Opcode.JUMP_FORWARD or Opcode.FOR_ITER
-                => instr.Offset + 2 + instr.Argument.Value,
+                => instr.Offset + 2 + (is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value),
             Opcode.JUMP_BACKWARD => instr.Offset + 2 - instr.Argument.Value,
             // 3.12+ wordcode: 条件跳转参数是相对字节偏移，需加上当前指令+2
+            // 3.6-3.9 wordcode: 参数是指令数，需 *2 转为字节偏移
             Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                 or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-                when isWordcode => instr.Offset + 2 + instr.Argument.Value,
-            _ => instr.Argument.Value
+                when isWordcode => instr.Offset + 2 + (is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value),
+            _ => is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value
         };
     }
 
@@ -260,6 +271,7 @@ public class BlockScanner : IBlockScanner
 
     private void AddSuccessor(BasicBlock from, BasicBlock? to)
     {
+        if (to == null) return;
         from.Successors.Add(to);
         to.Predecessors.Add(from);
     }

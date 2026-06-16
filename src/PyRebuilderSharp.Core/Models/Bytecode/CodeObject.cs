@@ -42,6 +42,8 @@ public class CodeObject
     public bool IsPython27 { get; set; }
     /// <summary>Python 3.8+（opcode 121 是 JUMP_IF_NOT_EXC_MATCH 而非 SETUP_EXCEPT）</summary>
     public bool IsPython38Plus { get; set; }
+    /// <summary>Python 3.10+ word offset（指令arg已 ×2 转为字节偏移）</summary>
+    public bool IsWordOffset { get; set; }
 
     // ---- 行号表 ----
     public Dictionary<int, int> LineNumberTable { get; set; } = new();

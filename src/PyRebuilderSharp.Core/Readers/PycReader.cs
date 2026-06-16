@@ -123,6 +123,7 @@ public class PycReader
 
         // 设置版本信息
         code.IsPython38Plus = _strategy.HasPosOnlyArgCount;
+        code.IsWordOffset = _strategy.IsWordOffset;
 
         try
         {
