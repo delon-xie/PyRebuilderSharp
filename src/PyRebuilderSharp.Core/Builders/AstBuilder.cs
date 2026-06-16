@@ -2579,46 +2579,53 @@ public class AstBuilder
 
     private Expr ExtractIterExpression(BasicBlock header)
     {
-        // 在 for 循环的 header block 中，FOR_ITER 可能在独立的块中，
-        // 而迭代表达式在 predecessor 块中
-        // 所以寻找 headr 的前驱块中的内容
+        // 遍历前驱链，只跟踪回落前驱（fallthrough），跳过跳转边（back-edge）。
+        // 字节码结构：
+        //   Block A: LOAD_FAST cls; LOAD_ATTR __mro__ ← fallthrough to B
+        //   Block B: GET_ITER                         ← fallthrough to C
+        //   Block C: FOR_ITER                         ← loop header
+        // 循环体末端的 JUMP_ABSOLUTE 跳回 C，但该跳转边不指向 A。
+        var visitedPreds = new HashSet<int>();
+        var predStack = new Stack<(BasicBlock block, BasicBlock? source)>();
+        foreach (var p in header.Predecessors) predStack.Push((p, header));
         
-        // 先看 header 自身中 FOR_ITER 之前的指令
-        var iterInstrs = header.Instructions
-            .TakeWhile(i => i.Opcode != Opcode.FOR_ITER)
-            .ToList();
-        
-        // 如果 header 自身没有找到 LOAD，检查前驱块
-        if (iterInstrs.Count <= 1)
+        while (predStack.Count > 0 && visitedPreds.Count < 20)
         {
-            foreach (var pred in header.Predecessors)
+            var (pred, source) = predStack.Pop();
+            if (pred == null || !visitedPreds.Add(pred.Id)) continue;
+            
+            var sm = new StackMachine(_codeObject);
+            Exception? execError = null;
+            foreach (var ins in pred.Instructions)
             {
-                var predInstrs = pred.Instructions.ToList();
-                if (predInstrs.Count > 0)
-                {
-                    // 找到 LOAD_NAME/LOAD_FAST/LOAD_GLOBAL + GET_ITER 模式
-                    var loadIdx = predInstrs.FindIndex(i => 
-                        i.Opcode is Opcode.LOAD_NAME or Opcode.LOAD_FAST or Opcode.LOAD_GLOBAL 
-                        or Opcode.LOAD_CONST or Opcode.LOAD_ATTR);
-                    if (loadIdx >= 0)
-                    {
-                        // 从 load 指令开始取到末尾
-                        iterInstrs = predInstrs.Skip(loadIdx).ToList();
-                        break;
-                    }
-                }
+                try { sm.Execute(ins); }
+                catch (Exception ex) { execError = ex; break; }
+            }
+            if (execError == null && sm.ExprStackCount > 0)
+            {
+                var expr = sm.PopExpr();
+                if (expr != null) return expr;
+            }
+            // 只跟踪落回前驱（block 末指令不是无条件跳转，如 JUMP_ABSOLUTE/JUMP_BACKWARD）
+            var lastInstr = pred.Instructions.LastOrDefault();
+            bool isFallthrough = lastInstr == default || !JumpHelper.IsUnconditionalJump(lastInstr.Opcode);
+            if (isFallthrough)
+            {
+                foreach (var pp in pred.Predecessors)
+                    predStack.Push((pp, pred));
             }
         }
 
-        // 去掉末尾的 GET_ITER
+        // Fallback: header's own instructions before FOR_ITER
+        var iterInstrs = header.Instructions
+            .TakeWhile(i => i.Opcode != Opcode.FOR_ITER)
+            .ToList();
         if (iterInstrs.Count > 0 && iterInstrs.Last().Opcode == Opcode.GET_ITER)
             iterInstrs = iterInstrs.Take(iterInstrs.Count - 1).ToList();
 
         var stackMachine = new StackMachine(_codeObject);
         foreach (var instr in iterInstrs)
             stackMachine.Execute(instr);
-
-        // 迭代表达式在 expr 栈上，不在 _results 中
         if (stackMachine.ExprStackCount > 0)
             return stackMachine.PopExpr();
         return stackMachine.HasResults ? stackMachine.PopResult() : new Name("iterable", ExpressionContext.Load);
