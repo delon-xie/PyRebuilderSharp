@@ -710,11 +710,7 @@ public class AstBuilder
             .FirstOrDefault(b => b != bodyEntry);
         if (bodyEntry != null)
         {
-            var preCount = visited.Count;
             CollectBodyBlocks(bodyEntry, header, bodyBlocks, visited, exitBlock);
-            // Print which blocks are in bodyBlocks
-            foreach (var bb in bodyBlocks)
-                System.Console.Error.WriteLine($"  body: @{bb.StartOffset:X4}");
         }
 
         // 从 visited 中移除 body 块，让 GetStructuredBlockStmts 重新管理（嵌套循环防止 StackOverflow）
@@ -2106,7 +2102,7 @@ public class AstBuilder
         var testExpr = ExtractCondition(header);
         if (header.Instructions.Count == 0) return new List<Stmt>();
         var lastInstr = header.Instructions.Last();
-        // 3.12+ wordcode: POP_JUMP_IF_* 的参数是相对字节码偏移, 需要 instr.Offset + 2 + arg
+        // 3.12+ wordcode
         var targetOffset = lastInstr.Argument!.Value;
         var isWordcode = _codeObject.Instructions.Count > 1
                       && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
@@ -2124,7 +2120,7 @@ public class AstBuilder
         
         var bodyBranch = FindFallthrough(header);
         var afterBranch = FindBlockByOffset(targetOffset);
-
+        
         if (isJumpIfTrue && testExpr != null)
             testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
 
@@ -2431,14 +2427,28 @@ public class AstBuilder
 
         var bodyStmts = BuildBlockOnly(bodyBranch, visited);
         
-        // 检测 continue：body 为空且块末尾有 JUMP_ABSOLUTE 到循环头
+        // 检测 continue：body 为空且块末尾有向后跳转到循环头
+        // 3.10+: JUMP_ABSOLUTE（非 wordcode）, 3.12+: JUMP_BACKWARD（wordcode）
         if (bodyStmts.Count == 0 && bodyBranch != null)
         {
             var lastInBody = bodyBranch.Instructions.LastOrDefault();
-            if (lastInBody != default && lastInBody.Opcode == Opcode.JUMP_ABSOLUTE
-                && lastInBody.Argument.HasValue && _loopHeaderOffsets.Contains(lastInBody.Argument.Value))
+            if (lastInBody != default)
             {
-                bodyStmts = new List<Stmt> { new Continue() };
+                bool isBackToLoop = false;
+                if (lastInBody.Opcode == Opcode.JUMP_ABSOLUTE
+                    && lastInBody.Argument.HasValue
+                    && _loopHeaderOffsets.Contains(lastInBody.Argument.Value))
+                {
+                    isBackToLoop = true;
+                }
+                else if (lastInBody.Opcode == Opcode.JUMP_BACKWARD
+                         && lastInBody.Argument.HasValue)
+                {
+                    // JUMP_BACKWARD 总是向后跳转（相对于自身偏移）
+                    isBackToLoop = true;
+                }
+                if (isBackToLoop)
+                    bodyStmts = new List<Stmt> { new Continue() };
             }
         }
 
@@ -2464,6 +2474,17 @@ public class AstBuilder
                 // else 体（非 elif 时）
                 orelse = afterStmts;
             }
+        }
+
+        // 当 body 仅为 continue（向后跳转）且 else 有有效代码时，
+        // 交换 body/else 并移除否定，产生 if X: Y 而非 if not X: continue else: Y
+        bool bodyIsJustContinue = bodyStmts.Count == 1 && bodyStmts[0] is Continue;
+        if (bodyIsJustContinue && orelse != null && orelse.Count > 0)
+        {
+            bodyStmts = orelse;
+            orelse = null;
+            // 移除否定：重新提取原始条件（不经过 isJumpIfTrue 的 Not 包装）
+            testExpr = ExtractCondition(header);
         }
 
         var result = new List<Stmt> { new If(testExpr, bodyStmts, orelse) };
