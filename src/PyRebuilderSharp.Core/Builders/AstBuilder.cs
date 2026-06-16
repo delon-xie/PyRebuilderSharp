@@ -2126,8 +2126,6 @@ public class AstBuilder
 
     private List<Stmt> BuildIfElse(BasicBlock header, HashSet<BasicBlock> visited)
     {
-        foreach (var instr in header.Instructions)
-            Console.Error.WriteLine($"    {instr.Offset:X4}: {instr.Opcode} arg={instr.Argument}");
         // 提取 header 块中条件之前的初始化语句（例如 `result = 0` 和 `if x0 > 0:` 在同一块时）
         var headerResult = _blockResults.GetValueOrDefault(header.Id);
         var headerInitStmts = new List<Stmt>();

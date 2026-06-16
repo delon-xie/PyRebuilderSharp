@@ -418,8 +418,11 @@ public class StackMachine
             case Opcode.POP_TOP:
             {
                 var popped = SafePop();
-                // for 循环体中的 POP_TOP = break（即使栈为空）
-                if (_isForLoop)
+                // for 循环体中的 POP_TOP：仅当栈为空时才生成 Break。
+                // 若有表达式（如 `abstracts.add(name)` 的返回值），则作为正常 ExprStmt。
+                // 参考 CPython 3.10: POP_TOP 在 for 循环体尾部用于丢弃循环变量值，
+                // 但调用表达式的返回值的 POP_TOP 属于语句体的一部分。
+                if (_isForLoop && popped == null)
                     return new Break();
                 if (popped != null)
                 {
