@@ -68,11 +68,14 @@ public class BlockScanner : IBlockScanner
         }
 
         // 3.11+: ExceptionTable 条目定义 try/except/finally/match handler 入口
+        // 同时拆块于 try 体起始/结束边界，使块边界与异常条目对齐
         if (exceptionTable != null)
         {
             foreach (var entry in exceptionTable)
             {
-                leaders.Add(entry.TargetOffset);
+                leaders.Add(entry.TargetOffset);               // handler 入口
+                leaders.Add(entry.StartOffset);                // try 体起始
+                leaders.Add(entry.EndOffset);                  // try 体结束（独占）
             }
         }
 

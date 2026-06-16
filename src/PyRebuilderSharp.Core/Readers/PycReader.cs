@@ -1569,64 +1569,37 @@ public class PycReader
     /// </summary>
     private List<ExceptionTableEntry> ParseExceptionTable(byte[] data)
     {
-        // 3.13+ exception table uses variable-length 6-bit encoding
-        if (_strategy.Version == PythonVersion.Py313 || _strategy.Version == PythonVersion.Py314)
-            return ParseExceptionTable313(data);
-        return ParseExceptionTable312(data);
+        // 3.11+ 异常表：统一使用变长 base-64 varint 编码（bit6=延续标记）
+        // 适用于 3.11, 3.12, 3.13, 3.14
+        return ParseExceptionTableVarint(data);
     }
 
     /// <summary>
-    /// 3.12 及更早：固定 8 字节/条目的异常表格式。
-    /// 每条：start(u16)*2, end(u16)*2, target(u16)*2, depth|lasti(u16)。
+    /// 3.11+ 异常表：变长 6-bit/字节编码（base-64 varint）。
+    /// CPython 3.11+ 统一使用此格式。见 Lib/dis.py → _parse_varint：
+    ///   val = byte & 63 (6 bits data)
+    ///   while byte & 64: (bit 6 = continuation)
+    ///       val <<= 6; val |= next_byte & 63
+    /// 每条 4 个字段：start(word), size(word), target(word), depth_lasti
+    /// 所有偏移都是 WORD 偏移（字节偏移/2），读取后 *2。
+    /// depth = dl >> 1, lasti = dl & 1
     /// </summary>
-    private List<ExceptionTableEntry> ParseExceptionTable312(byte[] data)
-    {
-        var entries = new List<ExceptionTableEntry>();
-        for (int i = 0; i + 7 < data.Length; i += 8)
-        {
-            int start = (data[i] | (data[i + 1] << 8)) * 2;
-            int end = (data[i + 2] | (data[i + 3] << 8)) * 2;
-            int target = (data[i + 4] | (data[i + 5] << 8)) * 2;
-            int depthLasti = data[i + 6] | (data[i + 7] << 8);
-            int depth = depthLasti & 0x3;
-            bool lasti = (depthLasti & 0x4) != 0;
-
-            entries.Add(new ExceptionTableEntry
-            {
-                StartOffset = start,
-                EndOffset = end,
-                TargetOffset = target,
-                Depth = depth,
-                Lasti = lasti
-            });
-        }
-        return entries;
-    }
-
-    /// <summary>
-    /// 3.13+ 异常表：变长 6-bit/字节编码。
-    /// 每条记录 4 个字段：start, size(end-start), target, depth_lasti。
-    /// 每个字段用变长编码，6 位数据/字节，bit7=延续标记。
-    /// 所有偏移都是 WORD 偏移（字节偏移/2）。
-    /// </summary>
-    private List<ExceptionTableEntry> ParseExceptionTable313(byte[] data)
+    private List<ExceptionTableEntry> ParseExceptionTableVarint(byte[] data)
     {
         var entries = new List<ExceptionTableEntry>();
         int i = 0;
         while (i < data.Length)
         {
-            if (i + 1 >= data.Length) break; // need at least start + size
-            
-            // Read 4 variable-length fields
-            int start = ReadBase128_6bit(data, ref i);
-            int size = ReadBase128_6bit(data, ref i);
-            int target = ReadBase128_6bit(data, ref i);
-            int depthLasti = ReadBase128_6bit(data, ref i);
+            // Read 4 variable-length fields (base-64, bit-6 continuation)
+            int start = ReadExceptionTableVarint(data, ref i);
+            int size = ReadExceptionTableVarint(data, ref i);
+            int target = ReadExceptionTableVarint(data, ref i);
+            int depthLasti = ReadExceptionTableVarint(data, ref i);
 
             if (i > data.Length) break; // overflow guard
 
             int end = start + size;
-            int depth = (depthLasti >> 1) & 0x3;
+            int depth = depthLasti >> 1;
             bool lasti = (depthLasti & 1) != 0;
 
             entries.Add(new ExceptionTableEntry
@@ -1642,19 +1615,17 @@ public class PycReader
     }
 
     /// <summary>
-    /// 读取变长 6-bit 编码的值。每字节：bits 0-5=数据，bit7=延续标记（1=还有后续字节）。
-    /// 数据以高 6 位在前、低 6 位在后的顺序存储。
+    /// 读取异常表的变长字段：6 位数据/字节，bit6=延续标记。
+    /// 大端序（高位在前）。对应 CPython 的 _parse_varint。
     /// </summary>
-    private static int ReadBase128_6bit(byte[] data, ref int offset)
+    private static int ReadExceptionTableVarint(byte[] data, ref int offset)
     {
-        int value = 0;
-        while (offset < data.Length)
+        if (offset >= data.Length) throw new IndexOutOfRangeException();
+        int value = data[offset++] & 0x3f; // bits 0-5 = first 6 bits
+        while (offset < data.Length && (data[offset - 1] & 0x40) != 0)
         {
-            byte b = data[offset++];
-            value = (value << 6) | (b & 0x3f);
-            if ((b & 0x80) == 0)
-                break;
-            if ((value >> 30) != 0) break; // safety: prevent overflow
+            value = (value << 6) | (data[offset] & 0x3f);
+            offset++;
         }
         return value;
     }
