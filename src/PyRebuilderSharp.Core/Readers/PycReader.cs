@@ -122,6 +122,7 @@ public class PycReader
         var code = new CodeObject();
 
         // 设置版本信息
+        code.Version = _strategy.Version;
         code.IsPython38Plus = _strategy.HasPosOnlyArgCount;
         code.IsWordOffset = _strategy.IsWordOffset;
 
@@ -328,6 +329,7 @@ public class PycReader
     private CodeObject ReadMarshalCodeObject27(BinaryReader br)
     {
         var code = new CodeObject();
+        code.Version = PythonVersion.Py27;
         code.IsPython27 = true;
         try
         {

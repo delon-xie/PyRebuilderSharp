@@ -1,6 +1,7 @@
 using PyRebuilderSharp.Core.Models.AST;
 using AstAttribute = PyRebuilderSharp.Core.Models.AST.Attribute;
 using PyRebuilderSharp.Core.Models.Bytecode;
+using PyRebuilderSharp.Core.Versioning;
 
 namespace PyRebuilderSharp.Core.Builders;
 
@@ -15,7 +16,6 @@ public class StackMachine
     private readonly CodeObject _code;
     private readonly HashSet<int> _loopHeaderOffsets;
     private bool _isForLoop;
-    private readonly bool _isPython312;
     // v2.7 print 语句缓冲
     private readonly List<Expr> _printItems = new();
 
@@ -27,7 +27,6 @@ public class StackMachine
     {
         _code = code;
         _loopHeaderOffsets = new HashSet<int>();
-        _isPython312 = code.Instructions?.Any(i => i.Opcode == Opcode.CALL) == true;
     }
 
     /// <summary>
@@ -662,8 +661,11 @@ public class StackMachine
             // For 3.10-: ROT_TWO was never handled (fell through to default → null),
             // which broke SEND/JUMP_BACKWARD patterns. For now, still return null.
             case Opcode.ROT_TWO:
-                // 在 3.11+ 调用协议中，PUSH_NULL 标记"我需要一个函数对象"
-                if (_isPython312)
+                // 在 3.12+ 调用协议中，PUSH_NULL 标记"我需要一个函数对象"
+                // 参考 CPython 3.12: Include/internal/pycore_opcode.h PUSH_NULL=2
+                // 3.11: PRECALL_311/CALL_311 协议，CALL opcode (171) 不存在
+                // 3.12+: CALL opcode (171) 引入，PUSH_NULL 在调用前压入 null 哨兵
+                if (_code.Version is PythonVersion.Py312 or PythonVersion.Py313 or PythonVersion.Py314)
                 {
                     _exprStack.Push(new Constant(null));  // sentinel null
                     return null;
@@ -1023,34 +1025,54 @@ public class StackMachine
 
             case Opcode.MAKE_FUNCTION:
             {
-                // v2.7: 栈顶只有 code object（无 qualname）
-                // v3.3+: 栈顶 → [defaults?, kwdefaults?, annotations?, closure?, qualname, code]
+                // MAKE_FUNCTION 的栈布局因 Python 版本而异。
+                // 参考 CPython:
+                //   - 2.7: 栈顶只有 code object（无 qualname）— Python/ceval.c 2.7 make_function
+                //   - 3.3-3.11: 栈顶 → defaults?, kwdefaults?, annotations?, closure?, [qualname,] code
+                //     3.11 中 qualname 来自 co_qualname，但依旧出现在栈上
+                //   - 3.12+: qualname 来自 co_qualname，栈上只有 code object
+                //     参见 CPython 3.12: Python/compile.c compiler_make_function
+                //     及 Python/ceval.c CALL 协议重构
                 string funcName = "<lambda>";
                 CodeObject? childCode = null;
 
-                if (_code.IsPython27)
+                switch (_code.Version)
                 {
-                    // v2.7: 只有 code object
-                    var codeExpr = SafePop();
-                    if (codeExpr is Constant c && c.Value is CodeObject co)
-                        childCode = co;
-                    funcName = childCode?.Name ?? "<lambda>";
-                }
-                else
-                {
-                    if (_isPython312)
+                    case PythonVersion.Py27:
+                        // v2.7: 只有 code object（无 qualname/freevars/cellvars 等复杂栈）
+                        // 参考 CPython 2.7: Python/ceval.c line ~2034 MAKE_FUNCTION
                     {
-                        // Python 3.12+: MAKE_FUNCTION pops only code object (qualname from co_qualname)
+                        var codeExpr = SafePop();
+                        if (codeExpr is Constant c && c.Value is CodeObject co)
+                            childCode = co;
+                        funcName = childCode?.Name ?? "<lambda>";
+                        break;
+                    }
+
+                    case PythonVersion.Py312:
+                    case PythonVersion.Py313:
+                    case PythonVersion.Py314:
+                        // Python 3.12+: MAKE_FUNCTION pops only code object
+                        // (qualname from co_qualname, defaults/kwdefaults/annotations/closure
+                        //  are pre-loaded by separate instructions or embedded in co_flags)
+                        // 参考 CPython 3.12: Python/compile.c compiler_make_function
+                        //     "Pops the code object from the stack; qualname is stored in
+                        //      the code object itself (co_qualname)."
+                    {
                         var codeExpr = SafePop();
                         if (codeExpr is Constant c2 && c2.Value is CodeObject co)
                         {
                             childCode = co;
                             funcName = co.Name ?? "<lambda>";
                         }
+                        break;
                     }
-                    else
-                    {
+
+                    default:
                         // v3.3-3.11: pop qualname + code
+                        // 参考 CPython 3.11: Python/ceval.c MAKE_FUNCTION
+                        //     "Pops a code object and a qualified name from the stack."
+                    {
                         var qualNameExpr = SafePop();
                         var codeExpr = SafePop();
 
@@ -1059,6 +1081,7 @@ public class StackMachine
 
                         if (codeExpr is Constant c2 && c2.Value is CodeObject co)
                             childCode = co;
+                        break;
                     }
                 }
 

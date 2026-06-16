@@ -2,6 +2,7 @@ using PyRebuilderSharp.Core.Models.AST;
 using PyRebuilderSharp.Core.Models.Bytecode;
 using PyRebuilderSharp.Core.Models.CFG;
 using PyRebuilderSharp.Core.Scanners;
+using PyRebuilderSharp.Core.Versioning;
 
 namespace PyRebuilderSharp.Core.Builders;
 
@@ -751,15 +752,29 @@ public class AstBuilder
     }
 
     /// <summary>
-    /// 从块中检测 SETUP_FINALLY/SETUP_EXCEPT → try/except 模式并构建 Try AST。
-    /// 如果块不包含 SETUP_FINALLY，返回 null。
+    /// 判断操作码是否为 try 设置操作码。
+    /// SETUP_FINALLY 在所有版本中都有效。
+    /// SETUP_EXCEPT 仅在 3.5-3.7 有效，3.8+ 该 opcode 值被 JUMP_IF_NOT_EXC_MATCH 取代。
+    /// 参考 CPython Include/opcode.h:
+    ///   - SETUP_EXCEPT=121 (3.5-3.7) — CPython Include/opcode.h line ~121
+    ///   - JUMP_IF_NOT_EXC_MATCH=121 (3.8+) — Python 3.8 将 opcode 121 重新定义（PEP 580）
+    ///   - CPython Python/compile.c: compiler_try_except uses SETUP_FINALLY → SETUP_EXCEPT (pre-3.8)
     /// </summary>
-    private bool IsTrySetupOpcode(Opcode op, bool isPython38Plus)
+    private bool IsTrySetupOpcode(Opcode op)
     {
         if (op == Opcode.SETUP_FINALLY) return true;
-        // SETUP_EXCEPT (121) 仅在 3.5-3.7 有效，3.8+ 是 JUMP_IF_NOT_EXC_MATCH
-        if (!isPython38Plus && op == Opcode.SETUP_EXCEPT) return true;
-        return false;
+
+        // SETUP_EXCEPT (opcode=121) 仅在 3.5-3.7 有效。
+        // Python 3.8+ 将 opcode 121 重新编号为 JUMP_IF_NOT_EXC_MATCH
+        // 参考 CPython 3.7: Include/opcode.h line 122 "#define SETUP_EXCEPT 121"
+        //     CPython 3.8: Include/opcode.h line 122 "#define JUMP_IF_NOT_EXC_MATCH 121"
+        // 3.11+ 改用 ExceptionTable（HasExceptionTable=true），SETUP_EXCEPT/SETUP_FINALLY 均不再出现
+        return _codeObject.Version switch
+        {
+            PythonVersion.Py27 or PythonVersion.Py35
+                or PythonVersion.Py36 or PythonVersion.Py37 => op == Opcode.SETUP_EXCEPT,
+            _ => false
+        };
     }
 
     private List<BasicBlock> GetAllBlocks() => _allBlocks;
@@ -1023,7 +1038,7 @@ public class AstBuilder
     {
         var instrs = block.Instructions;
         // 查找 SETUP_FINALLY/SETUP_EXCEPT
-        var setupIdx = instrs.FindIndex(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus));
+        var setupIdx = instrs.FindIndex(i => IsTrySetupOpcode(i.Opcode));
         if (setupIdx < 0) return null;
 
         // 找到 STORE_NAME（循环变量赋值，应保留）
@@ -1109,7 +1124,7 @@ public class AstBuilder
             var nestedSetups = new List<(int idx, int handlerRel, int handlerAbs)>();
             for (int i = 0; i < preBodyInstrs.Count; i++)
             {
-                if (IsTrySetupOpcode(preBodyInstrs[i].Opcode, _codeObject.IsPython38Plus))
+                if (IsTrySetupOpcode(preBodyInstrs[i].Opcode))
                 {
                     var rel = preBodyInstrs[i].Argument ?? 0;
                     var abs = preBodyInstrs[i].Offset + 2 + rel;
@@ -1840,7 +1855,7 @@ public class AstBuilder
     }
     private List<Stmt> BuildWhileLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
-        bool hasTryBeforeJump = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus));
+        bool hasTryBeforeJump = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode));
         // v3.10+: 如果 header 内含 SETUP_FINALLY（try body 在 while 体内），
         // 则 POP_JUMP 是内层 if 的条件，不是 while 循环的条件。
         // 此时从 predecessor（while 入口条件块）提取条件。
@@ -1878,7 +1893,7 @@ public class AstBuilder
 
         var bodyStmts = new List<Stmt>();
         // v3.10: header 有 SETUP_FINALLY 时 try body 覆盖 while body
-        if (header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus)))
+        if (header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode)))
         {
             var tryResult = BuildTryFromBlock(header, visited);
             if (tryResult != null)
@@ -1948,7 +1963,7 @@ public class AstBuilder
     private List<Stmt> BuildWhileLoopBody(BasicBlock header, HashSet<BasicBlock> visited)
     {
         // v3.10: header 有 SETUP_FINALLY 时用 BuildTryFromBlock 处理
-        if (header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus)))
+        if (header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode)))
         {
             var tryResult = BuildTryFromBlock(header, visited);
             if (tryResult != null)

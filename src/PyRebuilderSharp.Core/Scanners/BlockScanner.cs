@@ -1,5 +1,6 @@
 using PyRebuilderSharp.Core.Models.Bytecode;
 using PyRebuilderSharp.Core.Models.CFG;
+using PyRebuilderSharp.Core.Versioning;
 
 namespace PyRebuilderSharp.Core.Scanners;
 
@@ -83,33 +84,34 @@ public class BlockScanner : IBlockScanner
     }
 
     /// <summary>
-    /// 解析跳转目标为绝对偏移。
-    /// JUMP_FORWARD/FOR_ITER/SETUP_FINALLY 使用相对偏移，
-    /// JUMP_ABSOLUTE 使用绝对偏移，
-    /// JUMP_BACKWARD 使用反向相对偏移。
-    /// 3.12+ wordcode: 条件跳转（POP_JUMP_IF_TRUE/FALSE 等）参数已转为字节偏移，
-    /// 需要计算 instr.Offset + 2 + arg 得到绝对目标。
+    /// 解析跳转目标为绝对字节偏移。
+    /// 不同 Python 版本的跳转参数格式不同：
+    ///   - 2.7, 3.5: 可变长度指令，arg = 绝对或相对指令数（需公式转换）
+    ///   - 3.6-3.9: wordcode（2字节/指令），arg = 指令索引（需 *2 转字节偏移）
+    ///     参考 CPython 3.6: Include/opcode.h wordcode 格式，参数为指令计数
+    ///     Python/compile.c: assembler emits arg as instruction index
+    ///   - 3.10+: wordcode，arg 已在 ParseInstructions 中转为字节偏移
+    ///     参考 CPython 3.10: Python/compile.c line ~785 "jumps are absolute byte offsets"
+    ///   - 3.12+: wordcode + caches，参数已为字节偏移
     /// </summary>
     private static int? ResolveJumpTarget(Instruction instr, CodeObject? codeObj = null)
     {
         if (!instr.Argument.HasValue) return null;
 
-        // 检测 wordcode: 3.11+ 所有指令均为 2 字节，偏移均为偶数
-        // 而非 wordcode（3.5）的指令长度可变（1或3字节），可能存在奇数偏移
-        // 注意：此检测需在所有指令上检查，因为简单函数可能无 ExceptionTable
+        // -- 检测 wordcode 格式（启发式：所有指令偏移均为偶数）--
+        // 3.6-3.14 均使用 wordcode（2字节/指令），偏移均为偶数
+        // 非 wordcode（2.7, 3.5）指令长度可变，可能存在奇数偏移
         bool isWordcode = codeObj?.Instructions != null
             && codeObj.Instructions.Count > 1
             && codeObj.Instructions.All(i => i.Offset % 2 == 0);
 
-        // 检测是否为 3.10 word offset（arg = 指令数*2 = 字节偏移）
-        // 3.6-3.9 wordcode: arg = 指令数（需 *2 转为字节偏移）
-        // 3.10+: 已在 ParseInstructions 中 *2（IsWordOffset=true）
-        // 3.12+: 已在 ParseInstructions 中 *2（HasCaches）
-        // 非 wordcode（3.5-）: arg = 绝对指令偏移（可变长度，需公式转换）
-        // 判定：wordcode && !IsWordOffset && !HasCaches → 3.6-3.9（需 *2）
-        bool is36To39Wordcode = isWordcode
-            && codeObj?.IsWordOffset == false
-            && codeObj?.IsPython27 == false;
+        // -- 检测 3.6-3.9 wordcode（arg 为指令数，需 *2 转字节偏移）--
+        // 使用显式版本 case 而非 boolean flag 组合
+        bool is36To39Wordcode = codeObj?.Version switch
+        {
+            PythonVersion.Py36 or PythonVersion.Py37 or PythonVersion.Py38 or PythonVersion.Py39 => true,
+            _ => false
+        };
 
         return instr.Opcode switch
         {

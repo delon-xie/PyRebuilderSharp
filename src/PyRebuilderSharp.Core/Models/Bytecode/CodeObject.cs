@@ -1,3 +1,5 @@
+using PyRebuilderSharp.Core.Versioning;
+
 namespace PyRebuilderSharp.Core.Models.Bytecode;
 
 /// <summary>
@@ -38,6 +40,12 @@ public class CodeObject
     public bool IsAsyncGenerator { get; set; }
 
     // ---- 版本信息 ----
+    /// <summary>
+    /// 显式 Python 版本枚举，用于 switch/case 版本分支。
+    /// 每个 case 必须附带 CPython 源码引用注释（参见 Include/opcode.h, Python/ceval.c, Python/compile.c）。
+    /// </summary>
+    public PythonVersion Version { get; set; } = PythonVersion.Unknown;
+
     /// <summary>Python 2.7（opcode 布局/MAKE_FUNCTION 值不同）</summary>
     public bool IsPython27 { get; set; }
     /// <summary>Python 3.8+（opcode 121 是 JUMP_IF_NOT_EXC_MATCH 而非 SETUP_EXCEPT）</summary>
