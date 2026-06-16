@@ -563,6 +563,28 @@ public class AstBuilder
         if (tryBodyStmts != null)
         {
             stmts.AddRange(tryBodyStmts);
+            // 处理 SETUP_FINALLY 块中 POP_BLOCK 之后的残余指令（如 try/except 后的类/函数定义在同一块中）
+            // 这些指令未被 BuildTryFromBlock 包含（它只处理 SETUP_FINALLY 到 POP_BLOCK 之间的指令）
+            var instrs = block.Instructions;
+            var popBlockIdx = instrs.FindLastIndex(i => i.Opcode == Opcode.POP_BLOCK);
+            if (popBlockIdx >= 0 && popBlockIdx < instrs.Count - 1)
+            {
+                var postTryInstrs = instrs.Skip(popBlockIdx + 1).ToList();
+                // 排除末尾的 JUMP_FORWARD（跳到 handler 之后的代码，由 block 后继处理）
+                if (postTryInstrs.Count > 0 && JumpHelper.IsUnconditionalJump(postTryInstrs.Last().Opcode))
+                    postTryInstrs = postTryInstrs.Take(postTryInstrs.Count - 1).ToList();
+                if (postTryInstrs.Count > 0)
+                {
+                    var postMachine = new StackMachine(_codeObject);
+                    foreach (var ins in postTryInstrs)
+                    {
+                        var s = postMachine.Execute(ins);
+                        if (s != null) stmts.Add(s);
+                    }
+                    while (postMachine.HasResults)
+                        stmts.Add(new ExprStmt(postMachine.PopResult()));
+                }
+            }
             // 标记 handler 块为 visited 
             var handlerAbs = GetHandlerOffset(block);
             List<BasicBlock> handlerBlocks = new();
@@ -590,10 +612,14 @@ public class AstBuilder
             {
                 foreach (var succ in hb.Successors)
                 {
-                    if (!visited.Contains(succ))
+                    // 使用 _processedBlockIds 而非 visited.Contains：handler 块被 FindBlocksFromOffset 标记为 visited
+                    // 但其后缀块（如 try/except 后的类定义）可能因 FindBlocksFromOffset 在 POP_EXCEPT 处停止
+                    // 而未被加入 handlerBlocks，但已被某些路径隐式 visited。_processedBlockIds 是"实际已反编译"的可靠标记。
+                    if (!_processedBlockIds.Contains(succ.Id))
                     {
+                        var succStmts = BuildStatements(succ, visited);
                         visited.Add(succ);
-                        stmts.AddRange(BuildStatements(succ, visited));
+                        stmts.AddRange(succStmts);
                     }
                 }
             }
