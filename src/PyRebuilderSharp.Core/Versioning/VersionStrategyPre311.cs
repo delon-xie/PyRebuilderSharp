@@ -11,20 +11,23 @@ public class VersionStrategyPre311 : VersionStrategyBase
 {
     private readonly bool _is310;
     private readonly bool _is38plus;
+    private readonly bool _is37;
 
     /// <summary>
     /// 初始化 3.5-3.10 版本策略。
     /// </summary>
     /// <param name="is310">是否为 Python 3.10（word offset + linetable）</param>
-    /// <param name="is38plus">是否为 Python 3.8+（PEP 552 header + posonlyargcount）</param>
-    public VersionStrategyPre311(bool is310, bool is38plus)
+    /// <param name="is38plus">是否为 Python 3.8+（posonlyargcount）</param>
+    /// <param name="is37">是否为 Python 3.7（PEP 552 header，但无 posonlyargcount）</param>
+    public VersionStrategyPre311(bool is310, bool is38plus, bool is37 = false)
     {
         _is310 = is310;
         _is38plus = is38plus;
+        _is37 = is37;
     }
 
     /// <summary>
-    /// 根据 is310/is38plus 标志确定版本。
+    /// 根据 is310/is38plus/is37 标志确定版本。
     /// </summary>
     public override PythonVersion Version
     {
@@ -32,6 +35,7 @@ public class VersionStrategyPre311 : VersionStrategyBase
         {
             if (_is310) return PythonVersion.Py310;
             if (_is38plus) return PythonVersion.Py38;
+            if (_is37) return PythonVersion.Py37;
             // For versions before 3.8, we approximate with Py35
             // (caller can refine with specific version if needed)
             return PythonVersion.Py35;
@@ -44,6 +48,7 @@ public class VersionStrategyPre311 : VersionStrategyBase
         {
             if (_is310) return "Python 3.10";
             if (_is38plus) return "Python 3.8";
+            if (_is37) return "Python 3.7";
             return "Python 3.5";
         }
     }
@@ -59,8 +64,8 @@ public class VersionStrategyPre311 : VersionStrategyBase
     public override bool IsWordOffset => _is310;
     public override bool HasLinetable => _is310;
 
-    // 3.8 新增
-    public override bool HasPep552Header => _is38plus;
+    // 3.7+ 新增 (PEP 552 header), 3.8+ 新增 (posonlyargcount)
+    public override bool HasPep552Header => _is37 || _is38plus;
     public override bool HasPosOnlyArgCount => _is38plus;
 
     /// <summary>
