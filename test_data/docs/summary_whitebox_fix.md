@@ -1,8 +1,9 @@
-# Summary — Phase Whitebox Fix + Version Isolation (v1.3)
+# Summary — Phase Whitebox Fix + Version Isolation (v1.4)
 
-**日期**: 2026-06-15
+**日期**: 2026-06-16
 **3.10 白盒**: ✅ 93 文件, 92 通过, 0 崩溃
 **版本隔离**: ✅ Phase 1 完成（IVersionStrategy 接口 + 8 策略类）
+**3.7 P0 崩溃**: ✅ 修复（原 88/90 崩溃 → 0/90）
 
 ---
 
@@ -12,7 +13,8 @@
 |:-----|:------|:------|
 | 2.7 | ✅ 编译+反编译通过 | VersionStrategy27 |
 | 3.5 | ✅ | VersionStrategyPre311(is38plus=false) |
-| 3.6-3.7 | ✅ | VersionStrategyPre311(is38plus=false) |
+| 3.6 | ✅ | VersionStrategyPre311(is38plus=false) |
+| **3.7** | **✅ P0 修复（原88/90崩溃）** | **VersionStrategyPre311(is37=true)** |
 | 3.8-3.9 | ✅ | VersionStrategyPre311(is38plus=true) |
 | 3.10 | ✅ 93 文件全量白盒 | VersionStrategyPre311(is310=true) |
 | 3.11 | ⚠️ 可运行（CFG 问题） | VersionStrategy311 |
@@ -28,7 +30,7 @@
 PycReader.Read()
   └─ VersionStrategyFactory.Create(magic)
        ├─ VersionStrategy27          (Python 2.7)
-       ├─ VersionStrategyPre311      (3.5-3.10, 含 is310/is38plus 开关)
+       ├─ VersionStrategyPre311      (3.5-3.10, 含 is310/is38plus/is37 开关)
        ├─ VersionStrategy311         (3.11)
        ├─ VersionStrategy312         (3.12)
        ├─ VersionStrategy313         (3.13)
@@ -55,6 +57,7 @@ PycReader.Read()
 | 版本隔离计划 | `docs/plan_version_isolation.md` |
 | 白盒测试工具 | `tools/whitebox_test.py` |
 | 白盒总结 | `test_data/docs/summary_whitebox_fix.md` |
+| 基线评估报告 | `docs/baseline_evaluate_report_20260616.md` |
 | 策略代码 | `src/PyRebuilderSharp.Core/Versioning/*.cs` |
 
 ## 已知剩余问题
