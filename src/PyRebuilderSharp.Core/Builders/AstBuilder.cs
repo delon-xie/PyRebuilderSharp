@@ -504,6 +504,14 @@ public class AstBuilder
             return stmts;
         }
 
+        // 检测 for-loop 头：FOR_ITER 是条件跳转但不是 if/else，
+        // 即使 LoopHeader 标志未设置
+        if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+        {
+            stmts.AddRange(BuildForLoop(block, visited));
+            return stmts;
+        }
+
         // 检测 with 语句 (SETUP_WITH 模式)
         var withStmts = BuildWithFromBlock(block, visited);
         if (withStmts != null)
@@ -1812,10 +1820,14 @@ public class AstBuilder
 
     private List<Stmt> BuildWhileLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
+        // DIAG: 打印 header 块信息
+        foreach (var instr in header.Instructions)
+            Console.Error.WriteLine($"    {instr.Offset:X4}: {instr.Opcode} arg={instr.Argument}");
+        
+        bool hasTryBeforeJump = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus));
         // v3.10+: 如果 header 内含 SETUP_FINALLY（try body 在 while 体内），
         // 则 POP_JUMP 是内层 if 的条件，不是 while 循环的条件。
         // 此时从 predecessor（while 入口条件块）提取条件。
-        bool hasTryBeforeJump = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode, _codeObject.IsPython38Plus));
         Expr? testExpr;
         if (hasTryBeforeJump && header.Predecessors.Count > 0)
         {
@@ -2055,6 +2067,8 @@ public class AstBuilder
 
     private List<Stmt> BuildIfElse(BasicBlock header, HashSet<BasicBlock> visited)
     {
+        foreach (var instr in header.Instructions)
+            Console.Error.WriteLine($"    {instr.Offset:X4}: {instr.Opcode} arg={instr.Argument}");
         // 提取 header 块中条件之前的初始化语句（例如 `result = 0` 和 `if x0 > 0:` 在同一块时）
         var headerResult = _blockResults.GetValueOrDefault(header.Id);
         var headerInitStmts = new List<Stmt>();
@@ -2072,7 +2086,17 @@ public class AstBuilder
         var testExpr = ExtractCondition(header);
         if (header.Instructions.Count == 0) return new List<Stmt>();
         var lastInstr = header.Instructions.Last();
+        // 3.12+ wordcode: POP_JUMP_IF_* 的参数是相对字节码偏移, 需要 instr.Offset + 2 + arg
         var targetOffset = lastInstr.Argument!.Value;
+        var isWordcode = _codeObject.Instructions.Count > 1
+                      && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
+        if (isWordcode
+            && lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+        {
+            targetOffset = lastInstr.Offset + 2 + targetOffset;
+        }
 
         // POP_JUMP_IF_FALSE: body = fallthrough, else = jump target
         // POP_JUMP_IF_TRUE:  body = same fallthrough, but condition needs NEGATION
@@ -2080,7 +2104,7 @@ public class AstBuilder
         
         var bodyBranch = FindFallthrough(header);
         var afterBranch = FindBlockByOffset(targetOffset);
-        
+
         if (isJumpIfTrue && testExpr != null)
             testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
 
@@ -2333,6 +2357,16 @@ public class AstBuilder
         if (header.Instructions.Count == 0) return new List<Stmt>();
         var lastInstr = header.Instructions.Last();
         var targetOffset = lastInstr.Argument!.Value;
+        // 3.12+ wordcode: POP_JUMP_IF_* 的参数是相对字节码偏移, 需要 instr.Offset + 2 + arg
+        var isWordcode = _codeObject.Instructions.Count > 1
+                      && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
+        if (isWordcode
+            && lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+        {
+            targetOffset = lastInstr.Offset + 2 + targetOffset;
+        }
 
         // POP_JUMP_IF_FALSE: body = fallthrough (jump when False → else is jump target)
         // POP_JUMP_IF_TRUE:  body = same fallthrough, but condition needs NEGATION

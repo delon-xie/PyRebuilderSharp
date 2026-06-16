@@ -840,6 +840,14 @@ public class PycReader
                 arg = arg.Value >> 1;
             }
 
+            // Python 3.12+ wordcode: LOAD_ATTR 编码 (name_idx << 1) | self_or_null
+            // 始终需要 >> 1 提取真实 name index
+            if (_strategy.HasCaches && arg.HasValue
+                && op is Models.Bytecode.Opcode.LOAD_ATTR or Models.Bytecode.Opcode.LOAD_SUPER_ATTR)
+            {
+                arg = arg.Value >> 1;
+            }
+
             instructions.Add(new Instruction(offset, op, arg));
 
             // Advance past this instruction (2 bytes) and any cache entries

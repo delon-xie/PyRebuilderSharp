@@ -19,7 +19,7 @@ public class BlockScanner : IBlockScanner
 
         var leaders = MarkLeaders(instructions, codeObj.ExceptionTable, codeObj);
         var blocks = SplitAtLeaders(instructions, leaders);
-        LinkBlocks(blocks, codeObj.ExceptionTable);
+        LinkBlocks(blocks, codeObj.ExceptionTable, codeObj);
         MarkBlockProperties(blocks);
 
         return blocks;
@@ -145,7 +145,7 @@ public class BlockScanner : IBlockScanner
         return blocks;
     }
 
-    private void LinkBlocks(List<BasicBlock> blocks, List<ExceptionTableEntry>? exceptionTable = null)
+    private void LinkBlocks(List<BasicBlock> blocks, List<ExceptionTableEntry>? exceptionTable = null, CodeObject? codeObj = null)
     {
         for (int i = 0; i < blocks.Count; i++)
         {
@@ -159,7 +159,7 @@ public class BlockScanner : IBlockScanner
                 case Opcode.RETURN_VALUE:
                 case Opcode.RAISE_VARARGS:
                     block.Flags |= BlockFlags.Exit;
-                    ResolveIntermediateJumps(block, blocks);
+                    ResolveIntermediateJumps(block, blocks, codeObj);
                     // Exit blocks (RERAISE) still need a sequential fallthrough
                     // for try/except handler → code after try/except
                     if (i + 1 < blocks.Count)
@@ -177,14 +177,14 @@ public class BlockScanner : IBlockScanner
                                 AddSuccessor(block, FindBlockByOffset(blocks, ins.Argument.Value));
                             else if (ins.Opcode == Opcode.JUMP_BACKWARD && ins.Argument.HasValue)
                             {
-                                var target = ResolveJumpTarget(ins)!.Value;
+                                var target = ResolveJumpTarget(ins, codeObj)!.Value;
                                 AddSuccessor(block, FindBlockByOffset(blocks, target));
                             }
                         }
                     }
                     else
                     {
-                        AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr)!.Value));
+                        AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr, codeObj)!.Value));
                     }
                     // 扫描块内所有中间跳转（含无条件跳转如 JUMP_FORWARD 在 RERAISE 前）
                     foreach (var ins in block.Instructions)
@@ -195,7 +195,7 @@ public class BlockScanner : IBlockScanner
                             or Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE)
                         {
                             if (ins.Argument.HasValue && ins.Offset != lastInstr.Offset)
-                                AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(ins)!.Value));
+                                AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(ins, codeObj)!.Value));
                         }
                     }
                     break;
@@ -205,7 +205,7 @@ public class BlockScanner : IBlockScanner
                 case Opcode.JUMP_IF_TRUE_OR_POP:
                 case Opcode.JUMP_IF_FALSE_OR_POP:
                 case Opcode.FOR_ITER:
-                    AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr)!.Value));
+                    AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr, codeObj)!.Value));
                     if (i + 1 < blocks.Count)
                         AddSuccessor(block, blocks[i + 1]);
                     break;
@@ -239,7 +239,7 @@ public class BlockScanner : IBlockScanner
         }
     }
 
-    private void ResolveIntermediateJumps(BasicBlock block, List<BasicBlock> blocks)
+    private void ResolveIntermediateJumps(BasicBlock block, List<BasicBlock> blocks, CodeObject? codeObj = null)
     {
         foreach (var ins in block.Instructions)
         {
@@ -250,7 +250,7 @@ public class BlockScanner : IBlockScanner
             {
                 if (ins.Argument.HasValue)
                 {
-                    var target = ResolveJumpTarget(ins);
+                    var target = ResolveJumpTarget(ins, codeObj);
                     if (target.HasValue)
                         AddSuccessor(block, FindBlockByOffset(blocks, target.Value));
                 }
