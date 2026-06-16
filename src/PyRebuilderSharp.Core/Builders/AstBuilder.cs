@@ -508,7 +508,22 @@ public class AstBuilder
         // 即使 LoopHeader 标志未设置
         if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
         {
-            stmts.AddRange(BuildForLoop(block, visited));
+            var loopAst = BuildForLoop(block, visited);
+            stmts.AddRange(loopAst);
+            // 处理循环出口块的后继（如循环后的顺序代码）
+            // exit = 偏移较大的 successor（跳转目标），body = 偏移较小的 successor（fallthrough）
+            var bodySorter = block.Successors.Where(s => s != null).OrderBy(s => s.StartOffset).ToList();
+            var bodyEntry = bodySorter.FirstOrDefault();
+            foreach (var succ in block.Successors)
+            {
+                if (succ == null) continue;
+                // 跳过 body 块（已在 BuildForLoop 中被 GetStructuredBlockStmts 处理）
+                if (succ == bodyEntry) continue;
+                // exit 块可能已被 body 块的后继检测误加入 visited，移除以确保处理
+                if (visited.Contains(succ))
+                    visited.Remove(succ);
+                stmts.AddRange(BuildStatements(succ, visited));
+            }
             return stmts;
         }
 
@@ -692,9 +707,15 @@ public class AstBuilder
             .FirstOrDefault();
         var exitBlock = header.Successors
             .OrderByDescending(s => s.StartOffset)
-            .FirstOrDefault(b => b != bodyEntry); // 跳转目标 = exit
+            .FirstOrDefault(b => b != bodyEntry);
         if (bodyEntry != null)
+        {
+            var preCount = visited.Count;
             CollectBodyBlocks(bodyEntry, header, bodyBlocks, visited, exitBlock);
+            // Print which blocks are in bodyBlocks
+            foreach (var bb in bodyBlocks)
+                System.Console.Error.WriteLine($"  body: @{bb.StartOffset:X4}");
+        }
 
         // 从 visited 中移除 body 块，让 GetStructuredBlockStmts 重新管理（嵌套循环防止 StackOverflow）
         foreach (var bb in bodyBlocks)
