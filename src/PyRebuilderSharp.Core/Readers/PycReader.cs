@@ -832,6 +832,14 @@ public class PycReader
             if (_strategy.IsWordOffset && arg.HasValue && _strategy.IsJumpInstruction(op))
                 arg = arg.Value * 2;
 
+            // Python 3.12+ wordcode: LOAD_GLOBAL 编码 (name_idx << 1) | push_null
+            // 需要提取实际的 name index: arg >> 1
+            if (_strategy.HasCaches && arg.HasValue && op == Models.Bytecode.Opcode.LOAD_GLOBAL
+                && (arg.Value & 1) != 0)  // push_null bit set
+            {
+                arg = arg.Value >> 1;
+            }
+
             instructions.Add(new Instruction(offset, op, arg));
 
             // Advance past this instruction (2 bytes) and any cache entries
