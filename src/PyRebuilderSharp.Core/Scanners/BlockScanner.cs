@@ -115,16 +115,21 @@ public class BlockScanner : IBlockScanner
 
         return instr.Opcode switch
         {
-            Opcode.JUMP_ABSOLUTE => is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value,
+            Opcode.JUMP_ABSOLUTE => is36To39Wordcode ? instr.Argument.Value : instr.Argument.Value,
+            // 参考 CPython 3.8: Include/opcode.h wordcode 格式
+            //     JUMPTO(x) = first_instr + x / sizeof(_Py_CODEUNIT)
+            //     (Python/ceval.c 3.8) — arg 是字节偏移，非指令索引
             Opcode.JUMP_FORWARD or Opcode.FOR_ITER
-                => instr.Offset + 2 + (is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value),
+                => instr.Offset + 2 + (is36To39Wordcode ? instr.Argument.Value : instr.Argument.Value),
             Opcode.JUMP_BACKWARD => instr.Offset + 2 - instr.Argument.Value,
             // 3.12+ wordcode: 条件跳转参数是相对字节偏移，需加上当前指令+2
-            // 3.6-3.9 wordcode: 参数是指令数，需 *2 转为字节偏移
+            // 3.6-3.9 wordcode: 参数已为绝对字节偏移
             Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                 or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-                when isWordcode => instr.Offset + 2 + (is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value),
-            _ => is36To39Wordcode ? instr.Argument.Value * 2 : instr.Argument.Value
+                when isWordcode => is36To39Wordcode
+                    ? instr.Argument.Value  // 3.6-3.9: 绝对字节偏移
+                    : instr.Offset + 2 + instr.Argument.Value,  // 3.10+: 相对字节偏移
+            _ => is36To39Wordcode ? instr.Argument.Value : instr.Argument.Value
         };
     }
 
