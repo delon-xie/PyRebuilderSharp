@@ -21,6 +21,8 @@ public class AstBuilder
     private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
     private readonly HashSet<int> _processedBlockIds = new(); // 已实际处理的块 ID（用于孤儿块检测）
     private bool _diagETPrinted; // temporary diagnostic flag
+    private List<ExceptionTableEntry> _sortedExceptionTable = new();
+    private List<BasicBlock> _sortedBlocks = new(); // sorted by StartOffset
 
     public AstBuilder(CodeObject codeObject, DecompileOptions? options = null)
     {
@@ -47,6 +49,13 @@ public class AstBuilder
         var cfg = structuredCFG.RawCFG;
         _blockResults = _blockDecompiler.DecompileBlocks(cfg.Blocks, _codeObject);
         _allBlocks = cfg.Blocks;
+        _sortedBlocks = cfg.Blocks
+            .Where(b => b.Instructions.Count > 0)
+            .OrderBy(b => b.Instructions[0].Offset)
+            .ToList();
+        _sortedExceptionTable = _codeObject.ExceptionTable
+            .OrderBy(e => e.StartOffset)
+            .ToList();
         
         // 统计块级结果
         TotalBlockCount = _blockResults.Count;
@@ -72,7 +81,7 @@ public class AstBuilder
         if (_codeObject.ExceptionTable.Count > 0)
         {
             // 第一步：处理 ET 条目（优先于 preBlocks，确保 visited 干净）
-            foreach (var entry in _codeObject.ExceptionTable.OrderBy(e => e.StartOffset))
+            foreach (var entry in _sortedExceptionTable)
             {
                 var entryBlock = FindBlockByOffset(entry.StartOffset);
                 if (entryBlock == null || visited.Contains(entryBlock)) continue;
@@ -80,15 +89,10 @@ public class AstBuilder
                 if (etStmts != null)
                 {
                     stmts.AddRange(etStmts);
-                    foreach (var b in GetAllBlocks())
+                    foreach (var b in GetBlocksInRange(entry.StartOffset, entry.EndOffset))
                     {
-                        if (b.Instructions.Count == 0) continue;
-                        var start = b.Instructions[0].Offset;
-                        if (start >= entry.StartOffset && start < entry.EndOffset)
-                        {
-                            _processedBlockIds.Add(b.Id);
-                            visited.Add(b);
-                        }
+                        _processedBlockIds.Add(b.Id);
+                        visited.Add(b);
                     }
                     var handler = FindBlockByOffset(entry.TargetOffset);
                     if (handler != null)
@@ -110,14 +114,12 @@ public class AstBuilder
                     
                     // 标记所有共享同一 handler 的 ET 条目的 try 体块为已处理
                     // 这些是相同 try/except 结构的嵌套清理条目（depth>0），不应生成独立 try/except
-                    foreach (var sibling in _codeObject.ExceptionTable
+                    foreach (var sibling in _sortedExceptionTable
                         .Where(e => e.TargetOffset == entry.TargetOffset && e.StartOffset != entry.StartOffset))
                     {
-                        foreach (var b in GetAllBlocks())
+                        foreach (var b in GetBlocksInRange(sibling.StartOffset, sibling.EndOffset))
                         {
-                            if (b.Instructions.Count == 0) continue;
-                            var start = b.Instructions[0].Offset;
-                            if (start >= sibling.StartOffset && start < sibling.EndOffset && !visited.Contains(b))
+                            if (!visited.Contains(b))
                             {
                                 _processedBlockIds.Add(b.Id);
                                 visited.Add(b);
@@ -128,12 +130,9 @@ public class AstBuilder
             }
 
             // 第二步：处理第一个 ET 条目之前的块（docstring、def/class 定义等）
-            var firstET = _codeObject.ExceptionTable.OrderBy(e => e.StartOffset).First();
-            var preBlocks = cfg.Blocks
-                .Where(b => b.Instructions.Count > 0
-                    && b.Instructions[0].Offset < firstET.StartOffset
-                    && !visited.Contains(b))
-                .OrderBy(b => b.Instructions[0].Offset)
+            var firstET = _sortedExceptionTable.First();
+            var preBlocks = GetBlocksInRange(0, firstET.StartOffset)
+                .Where(b => !visited.Contains(b))
                 .ToList();
             foreach (var preBlock in preBlocks)
             {
@@ -142,19 +141,15 @@ public class AstBuilder
 
             // 第三步：处理 try 体结束与 handler 起始之间的 fall-through 块
             // 这些块是 try 体成功执行后的正常流程（如 ABCMeta 类定义等顶层声明）
-            foreach (var entry in _codeObject.ExceptionTable.OrderBy(e => e.StartOffset))
+            foreach (var entry in _sortedExceptionTable)
             {
                 var fallthroughStart = entry.EndOffset;
                 var fallthroughEnd = entry.TargetOffset;
                 // 仅当 handler 在 try 体之后（前向）时处理 fall-through
                 if (fallthroughEnd <= fallthroughStart) continue;
 
-                var fallthroughBlocks = cfg.Blocks
-                    .Where(b => b.Instructions.Count > 0
-                        && b.Instructions[0].Offset >= fallthroughStart
-                        && b.Instructions[0].Offset < fallthroughEnd
-                        && !visited.Contains(b))
-                    .OrderBy(b => b.Instructions[0].Offset)
+                var fallthroughBlocks = GetBlocksInRange(fallthroughStart, fallthroughEnd)
+                    .Where(b => !visited.Contains(b))
                     .ToList();
                 foreach (var fb in fallthroughBlocks)
                 {
@@ -163,7 +158,7 @@ public class AstBuilder
             }
 
             // 第四步：处理每个 ET 条目
-            foreach (var entry in _codeObject.ExceptionTable.OrderBy(e => e.StartOffset))
+            foreach (var entry in _sortedExceptionTable)
             {
                 var entryBlock = FindBlockByOffset(entry.StartOffset);
                 if (entryBlock == null || visited.Contains(entryBlock)) continue;
@@ -173,15 +168,10 @@ public class AstBuilder
                 {
                     stmts.AddRange(etStmts);
                     // Mark try body blocks as processed
-                    foreach (var b in GetAllBlocks())
+                    foreach (var b in GetBlocksInRange(entry.StartOffset, entry.EndOffset))
                     {
-                        if (b.Instructions.Count == 0) continue;
-                        var start = b.Instructions[0].Offset;
-                        if (start >= entry.StartOffset && start < entry.EndOffset)
-                        {
-                            _processedBlockIds.Add(b.Id);
-                            visited.Add(b);
-                        }
+                        _processedBlockIds.Add(b.Id);
+                        visited.Add(b);
                     }
                     // Mark handler and successors
                     var handler = FindBlockByOffset(entry.TargetOffset);
@@ -208,11 +198,9 @@ public class AstBuilder
                     _processedBlockIds.Add(entryBlock.Id);
                     visited.Add(entryBlock);
                     // 同时标记 try 体中的块
-                    foreach (var b in GetAllBlocks())
+                    foreach (var b in GetBlocksInRange(entry.StartOffset, entry.EndOffset))
                     {
-                        if (b.Instructions.Count == 0) continue;
-                        var start = b.Instructions[0].Offset;
-                        if (start >= entry.StartOffset && start < entry.EndOffset && !visited.Contains(b))
+                        if (!visited.Contains(b))
                         {
                             _processedBlockIds.Add(b.Id);
                             visited.Add(b);
@@ -801,6 +789,34 @@ public class AstBuilder
 
     private List<BasicBlock> GetAllBlocks() => _allBlocks;
 
+    private List<BasicBlock> GetBlocksInRange(int startInclusive, int endExclusive)
+    {
+        var list = _sortedBlocks;
+        if (list.Count == 0) return new List<BasicBlock>();
+
+        // Binary search: find first block with StartOffset >= startInclusive
+        int lo = 0, hi = list.Count - 1;
+        while (lo <= hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            if (list[mid].Instructions[0].Offset < startInclusive)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        }
+        int first = lo;
+
+        // Collect blocks from first until StartOffset >= endExclusive
+        var result = new List<BasicBlock>();
+        for (int i = first; i < list.Count; i++)
+        {
+            if (list[i].Instructions[0].Offset >= endExclusive)
+                break;
+            result.Add(list[i]);
+        }
+        return result;
+    }
+
     /// <summary>
     /// 3.10+: 通过 ExceptionTable 检测 match/case。
     /// 检测条件: handler 块中包含 MATCH_CLASS/MATCH_SEQUENCE/MATCH_MAPPING/MATCH_KEYS 等操作码。
@@ -942,14 +958,7 @@ public class AstBuilder
 
         System.Console.Error.WriteLine($"[AST-DIAG] BuildTryFromExceptionTable: matched entry try[{matchingEntry.StartOffset:X4}-{matchingEntry.EndOffset:X4}]→handler@{matchingEntry.TargetOffset:X4} depth={matchingEntry.Depth}");
 
-        var tryBlocks = new List<BasicBlock>();
-        foreach (var b in GetAllBlocks())
-        {
-            if (b.Instructions.Count == 0) continue;
-            var start = b.Instructions[0].Offset;
-            if (start >= matchingEntry.StartOffset && start < matchingEntry.EndOffset)
-                tryBlocks.Add(b);
-        }
+        var tryBlocks = GetBlocksInRange(matchingEntry.StartOffset, matchingEntry.EndOffset);
         if (tryBlocks.Count == 0) return null;
 
         var tryBody = new List<Stmt>();
