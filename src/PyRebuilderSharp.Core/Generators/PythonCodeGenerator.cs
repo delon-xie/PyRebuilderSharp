@@ -221,8 +221,6 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitFunctionDef(FunctionDef func)
     {
-        WriteIndent();
-
         if (func.Decorators?.Count > 0)
         {
             foreach (var decorator in func.Decorators)
@@ -234,6 +232,7 @@ public class PythonCodeGenerator : ICodeGenerator
             }
         }
 
+        WriteIndent();
         if (func.IsAsync)
             _output.Append("async ");
         _output.Append("def ");
