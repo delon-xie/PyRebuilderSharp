@@ -2207,8 +2207,20 @@ public class AstBuilder
         var bodyBranch = FindFallthrough(header);
         var afterBranch = FindBlockByOffset(targetOffset);
         
-        if (isJumpIfTrue && testExpr != null)
+        // 检测 OR 短接链: POP_JUMP_IF_TRUE + fallthrough 为条件分支
+        // if a or b: bytecode = "POP_JUMP_IF_TRUE → body ; POP_JUMP_IF_FALSE → after"
+        bool isOrChain = isJumpIfTrue && bodyBranch != null && IsConditionBranch(bodyBranch);
+        if (!isOrChain && isJumpIfTrue && testExpr != null)
             testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
+
+        // OR 短接: POP_JUMP_IF_TRUE + fallthrough 为条件分支
+        if (isOrChain || lastInstr.Opcode is Opcode.JUMP_IF_TRUE_OR_POP)
+        {
+            // body 在 jump target (afterBranch), else 是 fallthrough (bodyBranch = 第二条件)
+            var savedBody = bodyBranch;
+            bodyBranch = afterBranch;   // body = print
+            afterBranch = savedBody;    // else = 第二条件检查
+        }
 
         // 检测 while 循环模式：bodyBranch 是循环头（LoopHeader）
         // 在 Python 3.10 中，while 循环的条件在前驱块，body 是独立的 LoopHeader
@@ -2353,7 +2365,28 @@ public class AstBuilder
 
         var result = new List<Stmt>();
         result.AddRange(headerInitStmts);
-        result.Add(new If(testExpr, bodyStmts, orelse));
+        // AND 短接合并: POP_JUMP_IF_FALSE/JUMP_IF_FALSE_OR_POP + body 首条为 If → BoolOp(And, ...)
+        if ((lastInstr.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.JUMP_IF_FALSE_OR_POP
+                or Opcode.POP_JUMP_IF_FALSE_PY38)
+            && bodyStmts.Count > 0 && bodyStmts[0] is If innerIf && orelse == null)
+        {
+            var mergedTest = new BoolOp(BoolOperator.And, new List<Expr> { testExpr, innerIf.Test });
+            result.Add(new If(mergedTest, innerIf.Body, innerIf.Orelse));
+            if (bodyStmts.Count > 1)
+                result.AddRange(bodyStmts.Skip(1));
+        }
+        // OR 短接合并: orChain + afterStmts/else 首条为 If → BoolOp(Or, ...)
+        else if (isOrChain && orelse != null && orelse.Count > 0 && orelse[0] is If orInnerIf)
+        {
+            var mergedTest = new BoolOp(BoolOperator.Or, new List<Expr> { testExpr, orInnerIf.Test });
+            result.Add(new If(mergedTest, bodyStmts, orInnerIf.Orelse));
+            if (orelse.Count > 1)
+                result.AddRange(orelse.Skip(1));
+        }
+        else
+        {
+            result.Add(new If(testExpr, bodyStmts, orelse));
+        }
         result.AddRange(tailCode);
         return result;
     }

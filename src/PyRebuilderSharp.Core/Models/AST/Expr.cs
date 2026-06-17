@@ -35,6 +35,10 @@ public enum Operator
 public record Compare(Expr Left, List<CmpOp> Ops, List<Expr> Comparators) : Expr;
 public enum CmpOp { Eq, NotEq, Lt, LtE, Gt, GtE, Is, IsNot, In, NotIn }
 
+// --- 布尔运算 (and / or) ---
+public record BoolOp(BoolOperator Op, List<Expr> Values) : Expr;
+public enum BoolOperator { And, Or }
+
 // --- 函数调用 ---
 public record Call(Expr Func, List<Expr> Args, List<Keyword> Keywords) : Expr;
 public record Keyword(string? Arg, Expr Value);

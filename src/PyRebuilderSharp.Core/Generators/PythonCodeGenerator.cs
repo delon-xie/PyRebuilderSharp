@@ -139,6 +139,9 @@ public class PythonCodeGenerator : ICodeGenerator
             case Compare c:
                 VisitCompare(c);
                 break;
+            case BoolOp b:
+                VisitBoolOp(b);
+                break;
             case Call c:
                 VisitCall(c);
                 break;
@@ -865,6 +868,31 @@ public class PythonCodeGenerator : ICodeGenerator
         else
         {
             Visit(unaryOp.Operand);
+        }
+    }
+
+    private void VisitBoolOp(BoolOp boolOp)
+    {
+        string opStr = boolOp.Op switch
+        {
+            BoolOperator.And => " and ",
+            BoolOperator.Or => " or ",
+            _ => " ? "
+        };
+        for (int i = 0; i < boolOp.Values.Count; i++)
+        {
+            if (i > 0) _output.Append(opStr);
+            // Wrap sub-expressions in parens if needed
+            if (boolOp.Values[i] is BinOp or Compare)
+            {
+                _output.Append("(");
+                Visit(boolOp.Values[i]);
+                _output.Append(")");
+            }
+            else
+            {
+                Visit(boolOp.Values[i]);
+            }
         }
     }
 
