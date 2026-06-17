@@ -1170,6 +1170,7 @@ public class PycReader
 
     /// <summary>
     /// 读取 TYPE_SLICE (0x2D) 对象 — start, stop, step 三个 marshal 对象。
+    /// TODO：0x3A 需要重新确认
     /// </summary>
     private object? ReadMarshalSlice(BinaryReader br)
     {
@@ -1355,6 +1356,7 @@ public class PycReader
         {
             MarshalType.TYPE_NONE => null,
             MarshalType.TYPE_INT => br.ReadInt32(),
+            MarshalType.TYPE_INT64 => br.ReadInt64(),
             MarshalType.TYPE_LONG => br.ReadInt64(),
             MarshalType.TYPE_FLOAT => br.ReadDouble(),
             MarshalType.TYPE_BINARY_FLOAT => br.ReadDouble(),
@@ -1367,6 +1369,7 @@ public class PycReader
             MarshalType.TYPE_SHORT_ASCII_INTERNED => ReadMarshalShortString(br),
             MarshalType.TYPE_ASCII => ReadMarshalLongString(br),
             MarshalType.TYPE_ASCII_INTERNED => ReadMarshalLongString(br),
+            MarshalType.TYPE_INTERNED => ReadMarshalLongString(br),
             MarshalType.TYPE_UNICODE => ReadMarshalLongString(br),
             MarshalType.TYPE_SMALL_TUPLE => ReadSmallTuple(br),
             MarshalType.TYPE_TUPLE => ReadMarshalList(br, typeByteRead: true),
@@ -1376,6 +1379,8 @@ public class PycReader
             MarshalType.TYPE_TRUE => true,
             MarshalType.TYPE_FALSE => false,
             MarshalType.TYPE_ELLIPSIS => new object(),
+            MarshalType.TYPE_NULL => null,
+            MarshalType.TYPE_STOPITER => new object(),
             MarshalType.TYPE_REF => ReadRef(br),
             MarshalType.TYPE_SLICE => ReadMarshalSlice(br),
             MarshalType.TYPE_SET => ReadMarshalSetOrFrozenset(br),
