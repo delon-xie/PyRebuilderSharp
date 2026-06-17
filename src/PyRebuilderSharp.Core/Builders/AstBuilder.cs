@@ -3274,12 +3274,29 @@ public class AstBuilder
     /// </summary>
     private List<Stmt> ConvertChildCodesToFunctionDefs(List<Stmt> stmts)
     {
+        // 收集已在 PostProcessFunctionDefs 中正确定义的名称，防止兜底路径重复创建
+        var existingDefNames = new HashSet<string>();
+        void collectNames(List<Stmt> list)
+        {
+            foreach (var s in list)
+            {
+                if (s is FunctionDef fd) existingDefNames.Add(fd.Name);
+                else if (s is ClassDef cd) existingDefNames.Add(cd.Name);
+                else if (s is If ifNode) { collectNames(ifNode.Body); if (ifNode.Orelse != null) collectNames(ifNode.Orelse); }
+                else if (s is For forNode) { collectNames(forNode.Body); if (forNode.Orelse != null) collectNames(forNode.Orelse); }
+                else if (s is While wNode) { collectNames(wNode.Body); if (wNode.Orelse != null) collectNames(wNode.Orelse); }
+                else if (s is Try tNode) { collectNames(tNode.Body); foreach (var h in tNode.Handlers) collectNames(h.Body); }
+            }
+        }
+        collectNames(stmts);
+
         var childCodes = _codeObject?.ChildCodes ?? new List<CodeObject>();
         if (childCodes.Count == 0)
             return stmts;
 
         var result = new List<Stmt>(stmts.Count);
         int childIdx = 0;
+        var localSeen = new HashSet<string>(); // 防止同一方法内部重复创建同名定义
 
         foreach (var stmt in stmts)
         {
@@ -3302,12 +3319,24 @@ public class AstBuilder
                         // Try to get a better name from the code object if available
                         if (!string.IsNullOrEmpty(cc.Name) && cc.Name != "<module>" && !cc.Name.StartsWith("name_"))
                             className = cc.Name;
+                        // 跳过已在 PostProcessFunctionDefs 中正确定义的类（有 bases 的版本更完整）
+                        if (existingDefNames.Contains(className) || !localSeen.Add(className))
+                        {
+                            result.Add(stmt);
+                            continue;
+                        }
                         var classDef = new ClassDef(
                             className,
                             new List<Expr>(),
                             funcDef.Body
                         );
                         result.Add(classDef);
+                        continue;
+                    }
+                    // 跳过已在 PostProcessFunctionDefs 中正确定义或本方法已创建的函数
+                    if (existingDefNames.Contains(funcDef.Name) || !localSeen.Add(funcDef.Name))
+                    {
+                        result.Add(stmt);
                         continue;
                     }
                     result.Add(funcDef);
