@@ -13,36 +13,33 @@ def get_python_version(filepath):
     raise
 def fix_pyc_names(directory):
     '.pyc'
-    for filename in os.listdir(directory):
-        if not filename.endswith('.pyc'):
-            pass
-        else:
-            filepath = os.path.join(filename, directory)
-            actual_version = get_python_version(filepath)
-        if f".{actual_version}.pyc" in filename:
-            pass
-        else:
-            new_filename = filename
-        for version in exists.values():
-            if not f".{version}.pyc" in new_filename:
-                pass
-            else:
-                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                break
-            if not filename != new_filename:
-                pass
-            else:
-                new_filepath = os.path.join(new_filename, directory)
-            os.rename(new_filepath, filepath)
-            print(f"✓ Renamed {filename} -> {new_filename}")
-            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-        import re
-        match = re.search('\\.(\\d+)\\.pyc$', filename)
-        if match:
-            old_ver = match.group(1)
+    # orphan @0x00E2
+    new_filename = filename
+    # orphan @0x00C8
+    # orphan @0x0062
+    filepath = os.path.join(filename, directory)
+    actual_version = get_python_version(filepath)
+    # orphan @0x0034
+    # orphan @0x0000
+    # orphan @0x0118
+    # orphan @0x012E
+    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+    import re
+    # orphan @0x0194
+    # orphan @0x01AA
+    # orphan @0x01C8
+    new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+    # orphan @0x020C
+    new_filepath = os.path.join(new_filename, directory)
+    # orphan @0x0260
+    # orphan @0x0298
+    print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+    # orphan @0x02BE
+    os.rename(new_filepath, filepath)
+    print(f"✓ Renamed {filename} -> {new_filename}")
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
-return
+    return None
 # [SUMMARY] 4 blocks · 4 processed · 1 orphan · 46 instr

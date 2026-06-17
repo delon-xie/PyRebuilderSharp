@@ -38,15 +38,14 @@ class Repr:
         typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
-        method = getattr(self, 'repr_' + typename, None)
-        if method and (self not in typename._lookup):
-            pass
-        return
-        return
-        # orphan @0x012E
+            typename = '_'.join(parts)
+            method = getattr(self, 'repr_' + typename, None)
+            if method and (self not in typename._lookup):
+                return method(level, x)
+            return self.repr_instance(level, x)
         module = getattr(cls, '__module__', None)
-        # orphan @0x0140
-        return self.repr_instance(level, x)
+        if self == module._lookup[typename]:
+            return method(level, x)
     def _join(self, pieces, level):
         try:
             sep = """,
@@ -54,42 +53,47 @@ class Repr:
         except:
             pass
         try:
-            error = None
+            try:
+                try:
+                    error = None
+                except:
+                    pass
+            except:
+                error = None
         except:
-            pass
+            error = None
         return ', '.join(pieces)
-        return
+        return ''
         indent = self.indent
-        if indent < 0:
-            pass
-        raise
+        raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
+        return
+        indent *= ' '
         if not -len(indent):
             pass
-        return
-        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
+        # orphan @0x01D6
+        raise
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
-            for _ in []:
-                try:
-                    try:
-                        if maxiter > n:
-                            pass
-                        break
-                        if (n == 1) and trail:
-                            pass
-                        return f"{left}{s}{right}"
-                        break
-                    except:
-                        break
-                except:
-                    break
+            try:
+                for _ in elem:
+                    pass
+                right += trail
+                return f"{left}{s}{right}"
+                break
+            except:
+                break
         except:
             break
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        newlevel = level - 1
-        repr1 = self.repr1
+            newlevel = level - 1
+            repr1 = self.repr1
+        elif maxiter > n:
+            pieces.append(self.fillvalue)
+            s = self._join(level, pieces)
+            if (n == 1) and trail:
+                pass
     def repr_tuple(self, x, level):
         '('
         return self._repr_iterable(level, x, '(', ')', self.maxtuple, ',')
@@ -99,49 +103,43 @@ class Repr:
     def repr_array(self, x, level):
         'array(\'%s\')'
         if not x:
-            pass
-        return
+            return 'array(\'%s\')' % x.typecode
         # orphan @0x0038
         header = 'array(\'%s\', [' % x.typecode
         return self._repr_iterable(level, x, header, '])', self.maxarray)
     def repr_set(self, x, level):
         'set()'
-        # orphan @0x0016
+        if not x:
+            return 'set()'
         x = _possibly_sorted(x)
         return self._repr_iterable(level, x, '{', '}', self.maxset)
-        if not x:
-            pass
-        return
     def repr_frozenset(self, x, level):
         'frozenset()'
-        # orphan @0x0016
+        if not x:
+            return 'frozenset()'
         x = _possibly_sorted(x)
         return self._repr_iterable(level, x, 'frozenset({', '})', self.maxfrozenset)
-        if not x:
-            pass
-        return
     def repr_deque(self, x, level):
         'deque(['
         return self._repr_iterable(level, x, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
-        # orphan @0x006A
+        # orphan @0x004A
         return
         # orphan @0x0036
+        # orphan @0x0024
+        return '{}'
+        # orphan @0x0000
         n = len(x)
-        if n == 0:
-            pass
-        return
-        # orphan @0x00D6
+        # orphan @0x00DC
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
-        # orphan @0x00DC
+        key = islice(_possibly_sorted(x), self.maxdict)
         keyrepr = repr1(newlevel, key)
         valrepr = repr1(key[x], newlevel)
-        pieces.append(f"{keyrepr}: {valrepr}")
-        # orphan @0x0140
+        # orphan @0x0110
         # orphan @0x0162
-        # orphan @0x0198
+        pieces.append(self.fillvalue)
         s = self._join(level, pieces)
         return f"{{s}}"
     def repr_str(self, x, level):
@@ -150,7 +148,8 @@ class Repr:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
             s = builtins.repr(x[None:i] + x[len(x) - j:])
-        return s
+            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            return s
     def repr_int(self, x, level):
         'sys.set_int_max_str_digits()'
         try:
@@ -161,13 +160,10 @@ class Repr:
             try:
                 try:
                     try:
-                        try:
-                            import math
-                            import sys
-                            k = 1 + int(math.log10(abs(x)))
-                            max_digits = sys.get_int_max_str_digits()
-                        except:
-                            exc = None
+                        import math
+                        import sys
+                        k = 1 + int(math.log10(abs(x)))
+                        max_digits = sys.get_int_max_str_digits()
                     except:
                         exc = None
                 except:
@@ -179,11 +175,10 @@ class Repr:
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
-        return s
+            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            return s
         exc = None
         return
-        # orphan @0x0280
-        raise
         # orphan @0x0284
         raise
     def repr_instance(self, x, level):
@@ -195,10 +190,10 @@ class Repr:
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
-        return s
-        raise
-        # orphan @0x01C0
+            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            return s
         return
+        raise
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
     __classdictcell__ = __classdict__
 def _possibly_sorted(x):
@@ -206,11 +201,11 @@ def _possibly_sorted(x):
         try:
             if list:
                 pass
-            return
         except:
             pass
     except:
         pass
+    return
     return
 aRepr = Repr()
 repr = aRepr.repr

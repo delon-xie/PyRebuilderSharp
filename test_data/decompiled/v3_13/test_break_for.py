@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-for i in range(3):
-    if i == 1:
-        break
-break
-# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 20 instr
+# orphan @0x0000
+# orphan @0x0016
+# [SUMMARY] 6 blocks · 4 processed · 5 orphan · 20 instr

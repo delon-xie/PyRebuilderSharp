@@ -11,31 +11,30 @@ def get_python_version(filepath):
     return name_4.get(magic, 'unknown')
     raise
 def fix_pyc_names(directory):
-    for filename in os.listdir(directory):
-        if not filename.endswith('.pyc'):
-            pass
-        else:
-            actual_version = get_python_version(filepath)
-        if f".{actual_version}.pyc" in filename:
-            pass
-        else:
-            new_filename = filename
-        for version in exists.values():
-            if not f".{version}.pyc" in new_filename:
-                pass
-            else:
-                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                break
-            if not True:
-                pass
-            break
-            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-        break
-        if match:
-            old_ver = match.group(1)
-    break
+    # orphan @0x00DE
+    new_filename = filename
+    # orphan @0x00C6
+    # orphan @0x0062
+    actual_version = get_python_version(filepath)
+    # orphan @0x0034
+    # orphan @0x0000
+    # orphan @0x0112
+    # orphan @0x0128
+    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+    import re
+    # orphan @0x018E
+    # orphan @0x01A2
+    # orphan @0x01BE
+    new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+    # orphan @0x0202
+    # orphan @0x0252
+    # orphan @0x028C
+    print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+    # orphan @0x02B0
+    print(f"✓ Renamed {filename} -> {new_filename}")
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
+    return None
 # [SUMMARY] 3 blocks · 4 processed · 0 orphan · 39 instr

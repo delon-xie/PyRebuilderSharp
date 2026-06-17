@@ -21,26 +21,22 @@ def test_until_broken(exprs):
     r = ['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'](True, True, 30, ('capture_output', 'text', 'timeout'))
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     if not stderr.path.exists(pyc):
-        pass
-    return
+        return 'NO_COMPILE'
     r2 = ['dotnet', 'run', '--project', name_16, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
     out = r2.stdout + r2.stderr.strip()
-    return
-    return
+    return 'CRASH'
+    return f"CONDITIONAL: {out[:80]}"
     raise
 def find_breaking_point(exprs, lo, hi):
-    while hi < lo:
-        return lo
+    # orphan @0x000C
     mid = (hi + lo) // 2
     result = test_until_broken(exprs[None:mid + 1])
     print(f"  [{lo}-{hi}] mid={mid} ({mid[exprs][:30]}): {result}")
-    if result != 'OK':
-        hi = mid
-    else:
-        lo = mid + 1
-    # [WARN] 2 instructions not decompiled
-    #   @0x00B6: JUMP_BACKWARD arg=184
-    #   @0x00CC: JUMP_BACKWARD arg=206
+    # orphan @0x0000
+    # orphan @0x00B0
+    hi = mid
+    lo = mid + 1
+    return lo
 base = all_exprs[:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
@@ -56,5 +52,5 @@ Verification - up to #{bp}:")
 Verification - just #{bp}:")
     r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
-return
+    return None
 # [SUMMARY] 4 blocks · 4 processed · 1 orphan · 232 instr

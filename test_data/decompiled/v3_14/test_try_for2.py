@@ -2,18 +2,16 @@
 
 def test5():
     try:
-        for x in range(3):
+        try:
+            for _ in range(3):
+                pass
             try:
-                try:
-                    try:
-                        pass
-                    except:
-                        break
-                except:
-                    break
-                y = x
-            except:
                 break
+            except:
+                pass
+            y = x
+        except:
+            break
     except:
         break
     return None

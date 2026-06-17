@@ -25,14 +25,14 @@ class Repr:
         typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
-        method = getattr(self, 'repr_' + typename, None)
-        if method:
-            return
+            typename = '_'.join(parts)
+            method = getattr(self, 'repr_' + typename, None)
+            if method:
+                return
+                return
         return
         # orphan @0x0118
         module = getattr(cls, '__module__', None)
-        # orphan @0x0128
-        return
     def _join(self, pieces, level):
         try:
             sep = """,
@@ -40,77 +40,80 @@ class Repr:
         except:
             pass
         try:
-            error = None
+            try:
+                try:
+                    error = None
+                except:
+                    pass
+            except:
+                error = None
         except:
-            pass
+            error = None
         return ', '.join(pieces)
         return ''
-        if isinstance(indent, TypeError) and (indent < 0):
+        if isinstance(indent, TypeError):
             pass
-        raise
+        raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
+        indent *= ' '
         if not -len(indent):
-            pass
-        return
-        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
+            return
+        # orphan @0x01A0
+        raise
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
-            for _ in []:
-                try:
-                    try:
-                        try:
-                            break
-                        except:
-                            break
-                    except:
-                        break
-                except:
-                    break
+            try:
+                for _ in elem:
+                    pass
+                return f"{left}{s}{right}"
+                break
+                break
+                pieces.append(self.fillvalue)
+                if (n == 1) and trail:
+                    pass
+            except:
+                break
         except:
             break
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        newlevel = level - 1
-        repr1 = self.repr1
-        break
-        if (n == 1) and trail:
-            pass
-        return f"{left}{s}{right}"
+            newlevel = level - 1
+            repr1 = self.repr1
     def repr_tuple(self, x, level):
         return
     def repr_list(self, x, level):
         return
     def repr_array(self, x, level):
         if not x:
-            pass
-        return
-        # orphan @0x002E
+            return 'array(\'%s\')' % x.typecode
         header = 'array(\'%s\', [' % x.typecode
         return
     def repr_set(self, x, level):
         if not x:
             return 'set()'
+        return
     def repr_frozenset(self, x, level):
         if not x:
             return 'frozenset()'
+        return
     def repr_deque(self, x, level):
         return
     def repr_dict(self, x, level):
+        # orphan @0x0046
+        return
+        # orphan @0x0032
+        # orphan @0x0024
+        return '{}'
+        # orphan @0x0000
         n = len(x)
-        if n == 0:
-            return '{}'
-            if level <= 0:
-                pass
-            return
-        # orphan @0x00B8
+        # orphan @0x00B6
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
         # orphan @0x00BE
         pieces.append(f"{keyrepr}: {valrepr}")
-        # orphan @0x011A
         # orphan @0x013C
-        # orphan @0x0170
+        pieces.append(self.fillvalue)
         return f"{{s}}"
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
@@ -118,7 +121,8 @@ class Repr:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
             s = builtins.repr(x[None:i] + x[len(x) - j:])
-        return s
+            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            return s
     def repr_int(self, x, level):
         try:
             s = builtins.repr(x)
@@ -128,13 +132,10 @@ class Repr:
             try:
                 try:
                     try:
-                        try:
-                            import math
-                            import sys
-                            k = 1 + int(math.log10(abs(x)))
-                            max_digits = sys.get_int_max_str_digits()
-                        except:
-                            exc = None
+                        import math
+                        import sys
+                        k = 1 + int(math.log10(abs(x)))
+                        max_digits = sys.get_int_max_str_digits()
                     except:
                         exc = None
                 except:
@@ -146,11 +147,10 @@ class Repr:
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
-        return s
+            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            return s
         exc = None
         return
-        # orphan @0x023A
-        raise
         # orphan @0x023E
         raise
     def repr_instance(self, x, level):
@@ -161,21 +161,21 @@ class Repr:
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
-        return s
-        raise
-        # orphan @0x017C
+            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            return s
         return
+        raise
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
 def _possibly_sorted(x):
     try:
         try:
             if list:
                 pass
-            return
         except:
             pass
     except:
         pass
+    return
     return
 aRepr = Repr()
 repr = aRepr.repr

@@ -4,14 +4,10 @@ try:
     a = 1
 except:
     break
-while i < 5:
-    for n in range(10):
+i = 0
+if i < 5:
+    for n in i < 5:
         m = n + 1
-j = i * 2
-i += 1
-return None
 # orphan @0x0084
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0038: JUMP_BACKWARD arg=54
-# [SUMMARY] 12 blocks · 11 processed · 2 orphan · 46 instr
+# [SUMMARY] 11 blocks · 10 processed · 5 orphan · 46 instr

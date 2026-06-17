@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+# orphan @0x0000
 import sys
 import dis
 import marshal
@@ -15,27 +16,24 @@ raw = f.read()
 code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
-if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
-    for i in range(0, len(et), 8):
-        if i + 7 >= len(et):
-            break
-        start = int.from_bytes(et[i:i + 2], 'little')
-        end = int.from_bytes(et[i + 2:i + 4], 'little')
-        target = int.from_bytes(et[i + 4:i + 6], 'little')
-        dl = int.from_bytes(et[i + 6:i + 8], 'little')
-        print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
-        for const in code.co_consts:
-            if not isinstance(const, types.CodeType):
-                pass
-            else:
-                print(f"
+# orphan @0x023A
+# orphan @0x025C
+print(f"co_exceptiontable bytes ({len(code.co_exceptiontable)}): {code.co_exceptiontable.hex()}")
+et = code.co_exceptiontable
+# orphan @0x0304
+# orphan @0x0324
+start = int.from_bytes(et[i:i + 2], 'little')
+end = int.from_bytes(et[i + 2:i + 4], 'little')
+target = int.from_bytes(et[i + 4:i + 6], 'little')
+dl = int.from_bytes(et[i + 6:i + 8], 'little')
+print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
+# orphan @0x0464
+# orphan @0x0496
+print(f"
 --- Nested: {const.co_name} ---")
-                print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
-            if not const.co_exceptiontable:
-                pass
-            else:
-                print(f"  bytes: {const.co_exceptiontable.hex()}")
-        break
-break
-# orphan @0x0444
-# [SUMMARY] 19 blocks · 19 processed · 1 orphan · 312 instr
+print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
+# orphan @0x0506
+# orphan @0x052C
+print(f"  bytes: {const.co_exceptiontable.hex()}")
+return None
+# [SUMMARY] 23 blocks · 15 processed · 22 orphan · 312 instr

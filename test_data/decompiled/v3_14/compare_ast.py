@@ -3,7 +3,7 @@
 try:
     expected_ast = ast.parse(expected)(2, ('indent',))
 except Exception:
-    pass
+    return None
 try:
     actual_ast = ast.parse(decompiled)(2, ('indent',))
 except Exception:
@@ -28,26 +28,20 @@ decompiled = open('/tmp/actual_expr.py').read()
 expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read()
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
-return
-for i in range(max(len(exp_lines), len(act_lines))):
-    if i < len(exp_lines):
-        pass
-    elif i < len(act_lines):
-        pass
-    elif not e != a:
-        pass
-    else:
-        print(f"Line {i}:")
-        print(f"  expected: {e}")
-        print(f"  actual:   {a}")
-return None
+    return None
+break
+if not i > 5:
+    break
+for e in range(max(len(exp_lines), len(act_lines))):
+    e = '(missing)'
+    if i < len(act_lines):
+        a = '(missing)'
+        if not e != a:
+            print(f"Line {i}:")
+            print(f"  expected: {e}")
 e = None
 raise
 e = None
-# orphan @0x02D4
-raise
-# orphan @0x0368
-raise
 # orphan @0x036C
 raise
-# [SUMMARY] 35 blocks · 33 processed · 4 orphan · 243 instr
+# [SUMMARY] 37 blocks · 37 processed · 10 orphan · 243 instr

@@ -27,25 +27,20 @@ import sys
 decompiled = open('/tmp/actual_expr.py').read()
 expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read()
 if expected_ast == actual_ast:
-    print('✅ AST MATCH - test_expr_basic 3.10')
-for i in range(max(len(exp_lines), len(act_lines))):
-    if i < len(exp_lines):
-        pass
-    elif i < len(act_lines):
-        pass
-    elif not e != a:
-        pass
-    else:
-        print(f"Line {i}:")
-        print(f"  expected: {e}")
-        print(f"  actual:   {a}")
+    for i in expected_ast == actual_ast:
+        if i < len(exp_lines):
+            e = '(missing)'
+            if i < len(act_lines):
+                a = '(missing)'
+                if not e != a:
+                    print(f"Line {i}:")
+                    print(f"  expected: {e}")
+        break
+        if not i > 5:
+            break
 e = None
 raise
 e = None
-# orphan @0x02A4
-raise
-# orphan @0x0336
-raise
 # orphan @0x033A
 raise
-# [SUMMARY] 34 blocks · 31 processed · 3 orphan · 233 instr
+# [SUMMARY] 35 blocks · 35 processed · 8 orphan · 233 instr

@@ -7,14 +7,11 @@ except:
 x = 1
 y = 2
 z = x + y
-while i < 5:
-    for n in range(10):
+i = 0
+if i < 5:
+    for n in i < 5:
         m = n + 1
-j = i * 2
-i += 1
 return None
 # orphan @0x009E
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0052: JUMP_BACKWARD arg=54
-# [SUMMARY] 12 blocks · 11 processed · 2 orphan · 54 instr
+# [SUMMARY] 12 blocks · 11 processed · 5 orphan · 54 instr

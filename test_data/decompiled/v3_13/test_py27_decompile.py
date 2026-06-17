@@ -23,9 +23,7 @@ except Exception as e:
 print('2.7 compile:', result.stdout + result.stderr.strip())
 OUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData')
 result2 = ['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'](True, True, 60, ('capture_output', 'text', 'timeout'))
-if len(result2.stdout) > 500:
-    pass
-elif len(result2.stderr) > 500:
-    pass
+if (len(result2.stdout) > 500) and (len(result2.stderr) > 500):
+    return None
 raise
-# [SUMMARY] 12 blocks · 13 processed · 0 orphan · 174 instr
+# [SUMMARY] 13 blocks · 14 processed · 2 orphan · 174 instr

@@ -7,33 +7,27 @@ except:
     return None
 import struct
 import sys
-off = 16
-raw = data[off]
-type_byte = raw & 127
-'Type byte at '(f"{off}: {raw}#x, clean: {type_byte} (TYPE_CODE={type_byte == 99})")
-off += 1
-for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+for name in __name__():
     val = struct.unpack('<i', data[off:off + 4])[0]
     print(f"  {name}: {val} (off {off})")
     off += 4
-'Next marshal at off='(f"{off}, byte={data[off]}#x")
-raw2 = data[off]
-type2 = raw2 & 127
-'  type_byte='(f"{raw2}#x, clean={type2}")
-if raw2 & 128:
-    print('  (FLAG_REF set, _refList.Count used)')
-    off2 = off + 1
-off2 = off + 1
-if type2 == 90:
-    length = data[off2]
-    print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
-return
+    'Next marshal at off='(f"{off}, byte={data[off]}#x")
+    raw2 = data[off]
+    type2 = raw2 & 127
+    '  type_byte='(f"{raw2}#x, clean={type2}")
+    if raw2 & 128:
+        print('  (FLAG_REF set, _refList.Count used)')
+        off2 = off + 1
+        off2 = off + 1
+        if type2 == 90:
+            length = data[off2]
+            print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
+            return None
+print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
+return None
 length = data[off2]
 print(f"  TYPE_SHORT_ASCII len={length}")
-return
+return None
 print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
-length = struct.unpack('<i', data[off2:off2 + 4])[0]
-print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
-return
 raise
-# [SUMMARY] 23 blocks · 24 processed · 3 orphan · 281 instr
+# [SUMMARY] 23 blocks · 24 processed · 8 orphan · 281 instr

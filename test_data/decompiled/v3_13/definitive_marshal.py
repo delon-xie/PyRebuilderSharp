@@ -1,26 +1,26 @@
 # Decompiled from: <module>
 
 try:
-    for _ in {}:
-        try:
-            try:
-                try:
-                    try:
-                        try:
-                            try:
-                                break
-                            except:
-                                break
-                        except:
-                            break
-                    except:
-                        break
-                except:
-                    break
-            except:
+    try:
+        for _ in print:
+            pass
+        break
+        break
+        break
+        v
+        for start in f"{v} ({hex(v)})":
+            if start + 16 > len(m):
                 break
-        except:
-            break
+                if a0 == known['argcount']:
+                    pass
+                print(f"
+MATCH at offset {start}:")
+                print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+                '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
+                print
+                code2 = marshal.loads(m)
+    except:
+        break
 except:
     break
 __doc__ = 'Definitive test: field alignment in marshal data'
@@ -35,28 +35,4 @@ print('Length:', len(m))
 print()
 'Byte[0] = 0x'(f"{m[0]}02x ({m[0]})")
 known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': code.co_stacksize, 'argcount': code.co_flags}
-break
-for start in print:
-    if start + 16 > len(m):
-        break
-    vals = struct.unpack_from('<IIII', m, start)
-    a0 = *vals
-    nl = *vals
-    ss = *vals
-    fl = *vals
-    if not a0 == known['argcount']:
-        pass
-    print(f"
-MATCH at offset {start}:")
-    print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-    '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
-break
-code2 = marshal.loads(m)
-print(f"
-Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
-print(f"Match: {code2.co_argcount == code.co_argcount}")
-return None
-# [WARN] 2 instructions not decompiled
-#   @0x027C: JUMP_BACKWARD arg=116
-#   @0x0292: JUMP_BACKWARD arg=138
-# [SUMMARY] 20 blocks · 20 processed · 0 orphan · 286 instr
+# [SUMMARY] 21 blocks · 22 processed · 4 orphan · 286 instr

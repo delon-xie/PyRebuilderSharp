@@ -1,6 +1,12 @@
 # Decompiled from: <module>
 
-'Check marshal format across Python versions'
+# orphan @0x005A
+py = os.path.expanduser(py_path)
+r = [py, '-c', script](True, True, 10, ('capture_output', 'text', 'timeout'))
+out = r.stdout.strip()
+print(f"=== {ver} ===")
+# orphan @0x0000
+__doc__ = 'Check marshal format across Python versions'
 import subprocess
 import os
 versions = {'3.5': '~/.pyenv/versions/3.5.10/bin/python', '3.6': '~/.pyenv/versions/3.6.15/bin/python', '3.7': '~/.pyenv/versions/3.7.17/bin/python', '3.8': '~/.pyenv/versions/3.8.20/bin/python', '3.9': '~/.pyenv/versions/3.9.25/bin/python', '3.10': '~/.pyenv/versions/3.10.20/bin/python'}
@@ -17,9 +23,7 @@ for off in [1, 5]:
         if vals[2] == c.co_stacksize:
             print('FOUND at offset', off)
 """
-for (ver, py_path) in versions.items():
-    for line in out.split("""
-"""):
-        print(f"  {line}")
+# orphan @0x013C
+print(f"  {line}")
 return None
-# [SUMMARY] 7 blocks · 8 processed · 0 orphan · 91 instr
+# [SUMMARY] 7 blocks · 5 processed · 6 orphan · 91 instr

@@ -1,7 +1,8 @@
 # Decompiled from: <module>
 
+# orphan @0x0000
 total = 0
-for i in range(3):
-    total += 1
+# orphan @0x001A
+total += 1
 return None
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 19 instr
+# [SUMMARY] 4 blocks · 3 processed · 3 orphan · 19 instr

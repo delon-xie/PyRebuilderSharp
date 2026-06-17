@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
-'Check actual block layout for for loop'
+# orphan @0x0000
+__doc__ = 'Check actual block layout for for loop'
 import os
 import subprocess
 import struct
@@ -13,7 +14,8 @@ print('=== disassembly ===')
 dis.dis(code)
 print("""
 === instructions ===""")
-for instr in '  offset=':
-    instr.offset(f"3d opname={instr.opname}25s arg={instr.arg} argrepr={instr.argrepr}")
-break
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 93 instr
+# orphan @0x00F6
+instr.offset(f"3d opname={instr.opname}25s arg={instr.arg} argrepr={instr.argrepr}")
+'  offset='
+return None
+# [SUMMARY] 4 blocks · 3 processed · 3 orphan · 93 instr

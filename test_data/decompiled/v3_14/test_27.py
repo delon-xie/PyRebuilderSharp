@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+# orphan @0x0000
 import ast
 import subprocess
 import os
@@ -9,14 +10,12 @@ pyc = os.path.join(COMPILED_DIR, 'test_expr_basic.2.7.pyc')
 r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
 lines = r.stdout.split("""
 """)
-for (i, line) in enumerate(lines):
-    if not 'items[' in line:
-        pass
-    else:
-        print(f"Line {i}: {line}")
+# orphan @0x0140
+# orphan @0x0154
+print(f"Line {i}: {line}")
 print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.parse(r.stdout)(2, ('indent',))
 print(actual_ast)
 return None
-# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 108 instr
+# [SUMMARY] 7 blocks · 5 processed · 6 orphan · 108 instr

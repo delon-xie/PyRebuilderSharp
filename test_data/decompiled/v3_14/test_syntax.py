@@ -2917,16 +2917,16 @@ text of the warning raised.
         self.check_warning(source, '\'return\' in a \'finally\' block')
     def test_break_and_continue_in_finally(self):
         'break'
-        for kw in ('break', 'continue'):
-            source = textwrap.dedent(f"
+        # orphan @0x000A
+        source = textwrap.dedent(f"
                 for abc in range(10):
                     try:
                         pass
                     finally:
                         {kw}
                 ")
-            self.check_warning(source, f"'{kw}' in a 'finally' block")
-            source = textwrap.dedent(f"
+        self.check_warning(source, f"'{kw}' in a 'finally' block")
+        source = textwrap.dedent(f"
                 for abc in range(10):
                     try:
                         pass
@@ -2936,8 +2936,8 @@ text of the warning raised.
                         except:
                             pass
                 ")
-            self.check_warning(source, f"'{kw}' in a 'finally' block")
-            source = textwrap.dedent(f"
+        self.check_warning(source, f"'{kw}' in a 'finally' block")
+        source = textwrap.dedent(f"
                 for abc in range(10):
                     try:
                         pass
@@ -2947,7 +2947,9 @@ text of the warning raised.
                         except:
                             {kw}
                 ")
-            self.check_warning(source, f"'{kw}' in a 'finally' block")
+        self.check_warning(source, f"'{kw}' in a 'finally' block")
+        return None
+        # orphan @0x0000
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class SyntaxErrorTestCase(unittest.TestCase):
@@ -2967,14 +2969,17 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
             try:
                 try:
                     try:
+                        self.fail('SyntaxError is not a %s' % subclass.__name__)
+                        mo = lineno.search(errtext, str(err))
+                        self.fail(f"SyntaxError did not contain {errtext}")
+                        self.assertEqual(err.filename, filename)
+                        self.assertEqual(err.lineno, lineno)
                         try:
-                            mo = lineno.search(errtext, str(err))
-                            self.fail(f"SyntaxError did not contain {errtext}")
-                            self.assertEqual(err.filename, filename)
-                            self.assertEqual(err.lineno, lineno)
-                            self.assertEqual(err.offset, offset)
-                            self.assertEqual(err.end_lineno, end_lineno)
-                            self.assertEqual(err.end_offset, end_offset)
+                            try:
+                                self.assertEqual(err.end_offset, end_offset)
+                            except:
+                                err = None
+                                return None
                         except:
                             err = None
                             return None
@@ -2994,8 +2999,6 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
         return None
         err = None
         return None
-        # orphan @0x0298
-        raise
         # orphan @0x029C
         raise
     def test_expression_with_assignment(self):
@@ -3232,10 +3235,8 @@ def fib(n):
         return None
         raise
         raise
+        return None
         raise
-        # orphan @0x009E
-        # orphan @0x00E4
-        return
     def test_continuation_bad_indentation(self):
         """\\
 if x:
@@ -3295,21 +3296,20 @@ fgdfgf
 """, 'unexpected EOF while parsing')
     def test_error_parenthesis(self):
         '([{'
-        for paren in '([{':
-            self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
-        for paren in '([{':
-            self._check_error(f"a = {paren} 1, 2, 3
-b=3", f"\{paren}' was never closed")
-        for paren in ')]}':
-            self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
+        # orphan @0x0056
+        # orphan @0x000A
+        self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
+        # orphan @0x0000
+        # orphan @0x008A
+        # orphan @0x009C
+        self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
         code = """func(
     a=["unclosed], # Need a quote in this comment: "
     b=2,
 )
 """
         self._check_error(code, 'parenthesis \'\\)\' does not match opening parenthesis \'\\[\'')
-        self._check_error("""match y:
- case e(e=v,v,""", ' was never closed')
+        # orphan @0x011C
         s = b'IyBjb2Rpbmc9bGF0aW4KKGFhYWFhYWFhYWFhYWFhYWFhCmFhYWFhYWFhYWFhtQ=='
         self._check_error(s, '\'\\(\' was never closed')
     def test_error_string_literal(self):
@@ -3403,19 +3403,25 @@ a=1
                 """)('cannot use attribute as pattern target', 3, 3, 15, 15 + len('obj.attr'), ('errtext', 'lineno', 'end_lineno', 'offset', 'end_offset'))
     def test_ifexp_else_stmt(self):
         'expected expression after \'else\', but statement is given'
+        # orphan @0x000E
+        self._check_error(f"x = 1 if 1 else {stmt}", msg)
+        return None
+        # orphan @0x0000
         msg = 'expected expression after \'else\', but statement is given'
-        for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
-            self._check_error(f"x = 1 if 1 else {stmt}", msg)
     def test_ifexp_body_stmt_else_expression(self):
         'expected expression before \'if\', but statement is given'
+        # orphan @0x000E
+        self._check_error(f"x = {stmt} if 1 else 1", msg)
+        return None
+        # orphan @0x0000
         msg = 'expected expression before \'if\', but statement is given'
-        for stmt in ('pass', 'break', 'continue'):
-            self._check_error(f"x = {stmt} if 1 else 1", msg)
     def test_ifexp_body_stmt_else_stmt(self):
         'expected expression before \'if\', but statement is given'
+        # orphan @0x000E
+        self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
+        return None
+        # orphan @0x0000
         msg = 'expected expression before \'if\', but statement is given'
-        for _ in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
-            self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
@@ -3509,5 +3515,5 @@ def load_tests(loader, tests, pattern):
     return tests
 if __name__ == '__main__':
     unittest.main()
-return
+    return None
 # [SUMMARY] 4 blocks · 4 processed · 1 orphan · 68 instr

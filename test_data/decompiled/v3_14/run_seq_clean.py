@@ -19,8 +19,16 @@ try:
 except:
     e = None
 try:
-    print(f"❌ {ver}: AST parse failed - {e}")
-    print('  Decompiled: %s' % actual_src[:200])
+    try:
+        try:
+            try:
+                break
+            except:
+                e = None
+        except:
+            e = None
+    except:
+        e = None
 except:
     e = None
 __doc__ = 'Run AST comparison for test_seq_clean across all versions'
@@ -31,44 +39,41 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
-versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-results = {}
-for ver in []:
+for ver in ast.dump:
     pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: .pyc not found' % ver)
-    else:
         r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
         actual_src = r.stdout
+if not True:
+    pass
 passed = <genexpr>(results.items()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 return None
-if not True:
-    pass
 raise
 def <genexpr>(.0):
     try:
-        for _ in .0:
-            try:
-                raise
-            except:
+        try:
+            for _ in .0:
                 pass
-            if not True:
-                pass
+            raise
+        except:
+            pass
     except:
         pass
+    if not True:
+        pass
+    # [WARN] 1 instructions not decompiled
+    #   @0x0022: JUMP_BACKWARD arg=62
 raise
 e = None
-# orphan @0x0586
-raise
-# orphan @0x0608
-raise
+while True:
+    pass
 # orphan @0x060C
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x0222: JUMP_BACKWARD arg=178
-#   @0x041A: JUMP_BACKWARD arg=120
-#   @0x0472: JUMP_BACKWARD arg=770
-# [SUMMARY] 56 blocks · 54 processed · 3 orphan · 386 instr
+# [WARN] 2 instructions not decompiled
+#   @0x041A: JUMP_BACKWARD arg=1286
+#   @0x05FE: JUMP_BACKWARD arg=1554
+# [SUMMARY] 58 blocks · 58 processed · 15 orphan · 386 instr

@@ -2,11 +2,9 @@
 
 try:
     magic = f.read(4)
-    version = magic_numbers.get(magic, 'unknown')
     try:
         try:
             magic = f.read(4)
-            version = magic_numbers.get(magic, 'unknown')
             try:
                 version_files[version].append(filename)
             except:
@@ -17,27 +15,22 @@ try:
         pass
 except:
     pass
-import os
-magic_numbers = {b'Wg0NCg==': '3.10', b'Yg0NCg==': '3.11', b'bw0NCg==': '3.12', b'eg0NCg==': '3.13', b'hw0NCg==': '3.14', b'VQ0NCg==': '3.7', b'XQ0NCg==': '3.8', b'YQ0NCg==': '3.9'}
-pyc_dir = 'tests/compiled'
-version_files = {}
 for filename in os.listdir(pyc_dir):
     if not filename.endswith('.pyc'):
-        pass
-    else:
         filepath = os.path.join(pyc_dir, filename)
-print('各版本 pyc 文件分布:')
-for (version, files) in sorted(version_files.items()):
+for (version, files) in version not in version_files:
     print(f"  Python {version}: {len(files)} 个文件")
-    if not version == '3.10':
+    if version == '3.10':
         pass
     else:
         print('    文件列表:')
-    for f in sorted(files):
-        print(f"      {f}")
-return None
+    print(f"      {f}")
+    return None
 break
-break
+while True:
+    pass
 # orphan @0x028C
 raise
-# [SUMMARY] 23 blocks · 23 processed · 1 orphan · 177 instr
+# [WARN] 1 instructions not decompiled
+#   @0x0288: JUMP_BACKWARD arg=658
+# [SUMMARY] 26 blocks · 26 processed · 8 orphan · 177 instr

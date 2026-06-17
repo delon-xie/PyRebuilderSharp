@@ -7,11 +7,9 @@ def add(a, b):
     result = b + a
     return result
 def factorial(n):
-    # orphan @0x0014
-    return n * factorial(n - 1)
     if n <= 1:
-        pass
-    return
+        return 1
+    return n * factorial(n - 1)
 print(greet('World'))
 print(add(3, 4))
 print(factorial(5))

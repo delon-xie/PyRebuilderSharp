@@ -1,11 +1,8 @@
 # Decompiled from: <module>
 
-for i in range(10):
-    if i == 5:
-        break
-    if i == 1:
-        pass
-    else:
-        a = i
-break
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 25 instr
+# orphan @0x0000
+# orphan @0x0016
+# orphan @0x0034
+a = i
+return None
+# [SUMMARY] 9 blocks · 6 processed · 8 orphan · 25 instr

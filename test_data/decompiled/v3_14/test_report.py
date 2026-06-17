@@ -1,47 +1,46 @@
 # Decompiled from: <module>
 
+# orphan @0x0112
+current_group = parts[0].strip().replace('*** ', '')
+status = parts[1].strip()
+# orphan @0x00D6
+parts = line.split(':')
+# orphan @0x00A8
+# orphan @0x0000
 import subprocess
 import os
 result = ['python3', 'tests/run_tests.py'](True, True, ('capture_output', 'text'))
 output = result.stdout + result.stderr
 test_groups = {}
 current_group = None
-for line in output.split("""
-"""):
-    if line.startswith('***'):
-        parts = line.split(':')
-        if len(parts) >= 2:
-            current_group = parts[0].strip().replace('*** ', '')
-            status = parts[1].strip()
-    if not line.strip().endswith('.3.10.pyc'):
-        pass
-    else:
-        test_groups[current_group]['files'].append(line.strip())
+# orphan @0x01B8
+# orphan @0x0206
+test_groups[current_group]['files'].append(line.strip())
 print('============================================================')
 print('Python 3.10 版本测试报告')
 print('============================================================')
 passed_groups = []
 failed_groups = []
-for (group, info) in test_groups.items():
-    if not info['files']:
-        pass
-    if not 'FAIL' in info['status']:
-        pass
-    else:
-        failed_groups.append(group)
-    passed_groups.append(group)
+# orphan @0x02CA
+# orphan @0x02EE
+# orphan @0x030E
+passed_groups.append(group)
+# orphan @0x0350
+# orphan @0x0374
 print(f"
 通过的测试组 ({len(passed_groups)}):")
-print('----------------------------------------')
-for group in passed_groups:
-    print(f"  ✓ {group}")
+# orphan @0x03B2
+# orphan @0x03BC
+# orphan @0x03CC
 print(f"
 失败的测试组 ({len(failed_groups)}):")
 print('----------------------------------------')
-for group in failed_groups:
-    for f in test_groups[group]['files']:
-        print(f"    - {f}")
+# orphan @0x0410
+# orphan @0x0418
+print(f"  ✗ {group}")
+# orphan @0x0454
+print(f"    - {f}")
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
 return None
-# [SUMMARY] 30 blocks · 31 processed · 0 orphan · 278 instr
+# [SUMMARY] 37 blocks · 21 processed · 36 orphan · 278 instr

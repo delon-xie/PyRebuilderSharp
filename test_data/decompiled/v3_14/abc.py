@@ -158,34 +158,21 @@ If cls is not an instance of ABCMeta, does nothing.
 """
     # orphan @0x007A
     value = getattr(name, cls, None)
-    # orphan @0x0074
     # orphan @0x005A
-    # orphan @0x0054
+    # orphan @0x004A
     abstracts = set()
-    if not hasattr(cls, '__abstractmethods__'):
-        pass
-    return
+    # orphan @0x0024
+    return cls
+    # orphan @0x0000
     # orphan @0x00B8
-    # orphan @0x00BC
     abstracts.add(name)
-    # orphan @0x00E4
-    # orphan @0x00EC
-    # orphan @0x0122
     # orphan @0x0128
     # orphan @0x0152
-    # orphan @0x0156
-    abstracts.add(name)
-    # orphan @0x017E
+    # orphan @0x0174
     frozenset(abstracts).__abstractmethods__ = cls
     return cls
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
 return None
-try:
-    pass
-except:
-    pass
 raise
-# orphan @0x00DE
-# orphan @0x00E2
 raise
-# [SUMMARY] 9 blocks · 8 processed · 2 orphan · 96 instr
+# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 96 instr

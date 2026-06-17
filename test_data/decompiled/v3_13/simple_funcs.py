@@ -7,6 +7,7 @@ def add(a, b):
 def factorial(n):
     if n <= 1:
         return 1
+    return
 print(greet('World'))
 print(add(3, 4))
 print(factorial(5))

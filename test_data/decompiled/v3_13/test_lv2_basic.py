@@ -8,15 +8,16 @@ x = 1
 y = 2
 if x < y:
     z = x
-elif x > y:
-    z = y
+    if x > y:
+        z = y
+    for n in i < 5:
+        m = n + 1
+        break
+else:
+    z = 0
+    i = 0
 j = i * 2
-i += 1
-if i < 5:
-    pass
 return None
 # orphan @0x00A2
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0062: JUMP_BACKWARD arg=36
-# [SUMMARY] 18 blocks · 16 processed · 3 orphan · 67 instr
+# [SUMMARY] 20 blocks · 19 processed · 5 orphan · 67 instr

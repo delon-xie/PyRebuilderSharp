@@ -830,8 +830,27 @@ public class PycReader
             extArg = 0;
 
             // Python 3.10+ 使用 word 偏移
-            if (_strategy.IsWordOffset && arg.HasValue && _strategy.IsJumpInstruction(op))
+            // 3.10-3.12: arg 是 word 偏移 (×2 = 字节偏移)
+            // 3.13+: arg 是指令计数, 需要扫描计算实际字节偏移
+            if (_strategy.Version >= PythonVersion.Py313 && arg.HasValue && _strategy.IsJumpInstruction(op))
+            {
+                // 3.13+: 从当前偏移开始, 跳过 arg 条指令 (含 cache)
+                int skipCount = arg.Value;
+                int scanPos = offset;
+                while (skipCount > 0 && scanPos + 1 < bytecode.Length)
+                {
+                    byte scanOp = bytecode[scanPos];
+                    if (scanOp == 0) { scanPos += 2; continue; } // skip cache NOP
+                    int cacheBytes = _strategy.GetCacheCount(scanOp) * 2;
+                    scanPos += 2 + cacheBytes; // opcode+arg + cache
+                    skipCount--;
+                }
+                arg = scanPos;
+            }
+            else if (_strategy.IsWordOffset && arg.HasValue && _strategy.IsJumpInstruction(op))
+            {
                 arg = arg.Value * 2;
+            }
 
             // Python 3.12+ wordcode: LOAD_GLOBAL 编码 (name_idx << 1) | push_null
             // 需要提取实际的 name index: arg >> 1

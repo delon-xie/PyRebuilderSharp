@@ -11,7 +11,14 @@ except Exception:
     pass
 try:
     print(f"❌ {ver}: parse error: {ex}")
-    print('  Output: %s' % r.stdout[:200])
+    try:
+        try:
+            print(f"❌ {ver}: parse error: {ex}")
+        except:
+            ex = None
+        break
+    except:
+        ex = None
 except:
     ex = None
 __doc__ = 'Run AST comparison for test_control_flow across all versions'
@@ -21,27 +28,24 @@ import ast
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
-expected_ast = ast.parse(expected_src)(2, ('indent',))
-versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-for ver in []:
+for ver in __name__():
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)
-    else:
         r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-return None
 if not True:
     pass
+while True:
+    pass
+return None
 raise
 ex = None
-# orphan @0x046E
-raise
+while True:
+    pass
 # orphan @0x0472
 raise
-# [WARN] 5 instructions not decompiled
-#   @0x0214: JUMP_BACKWARD arg=178
-#   @0x037E: JUMP_BACKWARD arg=36
-#   @0x03A8: JUMP_BACKWARD arg=582
-#   @0x03B2: JUMP_BACKWARD arg=592
-#   @0x03B8: JUMP_BACKWARD arg=598
-# [SUMMARY] 41 blocks · 40 processed · 2 orphan · 263 instr
+# [WARN] 3 instructions not decompiled
+#   @0x037E: JUMP_BACKWARD arg=940
+#   @0x03A8: JUMP_BACKWARD arg=1144
+#   @0x0464: JUMP_BACKWARD arg=1144
+# [SUMMARY] 46 blocks · 46 processed · 13 orphan · 263 instr

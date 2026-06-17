@@ -1,12 +1,12 @@
 # Decompiled from: <module>
 
+# orphan @0x0012
+# orphan @0x0000
 x = 10
-if x > 0:
-    for n in range(x):
-        y = n
-return
-# orphan @0x0032
-# orphan @0x003A
+# orphan @0x0028
+y = n
+return None
+# orphan @0x0052
 y = -1
 return None
-# [SUMMARY] 7 blocks · 6 processed · 2 orphan · 26 instr
+# [SUMMARY] 7 blocks · 4 processed · 6 orphan · 26 instr
