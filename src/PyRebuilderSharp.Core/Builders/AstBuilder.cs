@@ -246,7 +246,7 @@ public class AstBuilder
                         bool isEmptyReturn = blockResult.Statements.Count == 1
                             && blockResult.Statements[0] is Return r
                             && r.Value is Constant { Value: null };
-                        
+
                         if (!isEmptyReturn && _options.ShowOrphanBlocks)
                         {
                             // 根据偏移位置插入孤儿块内容，而非始终追加在末尾。
@@ -2838,6 +2838,7 @@ public class AstBuilder
     private List<Stmt> PostProcessFunctionDefs(List<Stmt> stmts)
     {
         var result = new List<Stmt>(stmts.Count);
+        var seenNames = new HashSet<string>();
         var workQueue = new Queue<(List<Stmt> stmts, List<Stmt> result)>();
         workQueue.Enqueue((stmts, result));
 
@@ -2894,11 +2895,25 @@ public class AstBuilder
                 // FunctionDef/ClassDef body already processed by BuildFunctionDef/ExtractClassDef
                 if (stmt is FunctionDef fd)
                 {
+                    if (!seenNames.Add(fd.Name))
+                    {
+                        // 替换已有的重复定义（保留最后一个，通常更完整）
+                        for (int si = currentResult.Count - 1; si >= 0; si--)
+                            if (currentResult[si] is FunctionDef prev && prev.Name == fd.Name)
+                                { currentResult.RemoveAt(si); break; }
+                    }
                     currentResult.Add(fd);
                     continue;
                 }
                 if (stmt is ClassDef cd)
                 {
+                    if (!seenNames.Add(cd.Name))
+                    {
+                        // 替换已有的重复定义（保留最后一个，通常更完整）
+                        for (int si = currentResult.Count - 1; si >= 0; si--)
+                            if (currentResult[si] is ClassDef prev && prev.Name == cd.Name)
+                                { currentResult.RemoveAt(si); break; }
+                    }
                     currentResult.Add(cd);
                     continue;
                 }
@@ -2926,6 +2941,19 @@ public class AstBuilder
                             fnName = funcRef.Code.Name;
                         if (string.IsNullOrEmpty(fnName) || fnName == "<lambda>" || fnName.Contains("code object"))
                             fnName = targetName.Id;
+                        if (!seenNames.Add(fnName))
+                        {
+                            // 替换已存在的重复定义（保留最后一个，通常是正确的版本）
+                            for (int si = currentResult.Count - 1; si >= 0; si--)
+                            {
+                                if (currentResult[si] is FunctionDef prevFd && prevFd.Name == fnName
+                                    || currentResult[si] is ClassDef prevCd && prevCd.Name == fnName)
+                                {
+                                    currentResult.RemoveAt(si);
+                                    break;
+                                }
+                            }
+                        }
                         var funcDef = BuildFunctionDef(fnName, funcRef);
                         currentResult.Add(funcDef ?? stmt);
                         continue;
@@ -2933,6 +2961,21 @@ public class AstBuilder
                     // ClassDef
                     if (assign.Value is Call call && call.Func is Name callFuncName && callFuncName.Id == "__build_class__")
                     {
+                        if (!seenNames.Add(targetName.Id))
+                        {
+                            // 替换已存在的重复定义（保留最后一个，通常是正确的版本）
+                            Console.Error.WriteLine($"[DEDUP] ClassDef '{targetName.Id}' replaced at line {currentResult.Count}");
+                            // 搜索 FunctionDef 或 ClassDef
+                            for (int si = currentResult.Count - 1; si >= 0; si--)
+                            {
+                                if (currentResult[si] is ClassDef prevClass && prevClass.Name == targetName.Id
+                                    || currentResult[si] is FunctionDef prevFn && prevFn.Name == targetName.Id)
+                                {
+                                    currentResult.RemoveAt(si);
+                                    break;
+                                }
+                            }
+                        }
                         var classDef = ExtractClassDef(call, targetName.Id);
                         currentResult.Add(classDef ?? stmt);
                         continue;
