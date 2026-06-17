@@ -30,8 +30,8 @@ public static class VersionStrategyFactory
             
             "A00D0D0A" or "A70D0D0A" => new VersionStrategy311(),
             "CB0D0D0A" => new VersionStrategy312(),
-            "E70D0D0A" => new VersionStrategy313(),
-            "F30D0D0A" or "2B0E0D0A" => new VersionStrategy314(),
+            "E70D0D0A" or "F30D0D0A" => new VersionStrategy313(),
+            "2B0E0D0A" => new VersionStrategy314(),
             
             _ => throw new NotSupportedException($"Unknown Python magic: 0x{magicHex}")
         };
