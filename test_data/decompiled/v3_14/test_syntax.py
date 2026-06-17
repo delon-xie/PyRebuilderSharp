@@ -3516,4 +3516,4 @@ def load_tests(loader, tests, pattern):
 if __name__ == '__main__':
     unittest.main()
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 68 instr
+# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 67 instr

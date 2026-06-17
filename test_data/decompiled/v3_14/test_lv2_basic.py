@@ -19,4 +19,4 @@ for n in range(10):
 return None
 # orphan @0x00B8
 raise
-# [SUMMARY] 18 blocks · 17 processed · 4 orphan · 68 instr
+# [SUMMARY] 18 blocks · 17 processed · 4 orphan · 65 instr

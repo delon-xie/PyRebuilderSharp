@@ -122,7 +122,7 @@ class Repr:
         'deque(['
         return self._repr_iterable(level, x, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
-        # orphan @0x0036
+        # orphan @0x0038
         n = len(x)
         if n == 0:
             return '{}'
@@ -136,7 +136,7 @@ class Repr:
         valrepr = repr1(key[x], newlevel)
         # orphan @0x0110
         # orphan @0x0144
-        # orphan @0x0162
+        # orphan @0x0164
         pieces.append(self.fillvalue)
         s = self._join(level, pieces)
         return f"{{s}}"

@@ -6,4 +6,4 @@ for i in range(3):
 # orphan @0x0032
 a = i
 return None
-# [SUMMARY] 7 blocks · 7 processed · 3 orphan · 23 instr
+# [SUMMARY] 7 blocks · 7 processed · 3 orphan · 22 instr

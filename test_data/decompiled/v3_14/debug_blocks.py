@@ -64,4 +64,4 @@ if len(block_instrs) > 3:
 #   @0x03E2: JUMP_BACKWARD arg=700
 #   @0x06AC: JUMP_BACKWARD arg=0
 #   @0x06B6: JUMP_BACKWARD arg=0
-# [SUMMARY] 84 blocks · 85 processed · 8 orphan · 424 instr
+# [SUMMARY] 84 blocks · 85 processed · 8 orphan · 405 instr

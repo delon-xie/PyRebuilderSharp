@@ -76,4 +76,4 @@ raise
 #   @0x0452: JUMP_BACKWARD arg=0
 #   @0x0462: JUMP_BACKWARD arg=0
 #   @0x05DE: JUMP_BACKWARD arg=0
-# [SUMMARY] 57 blocks · 56 processed · 12 orphan · 395 instr
+# [SUMMARY] 57 blocks · 56 processed · 15 orphan · 386 instr

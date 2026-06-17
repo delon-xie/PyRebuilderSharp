@@ -32,4 +32,4 @@ print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
 raise
 # [WARN] 1 instructions not decompiled
 #   @0x017C: JUMP_BACKWARD arg=0
-# [SUMMARY] 23 blocks · 24 processed · 7 orphan · 281 instr
+# [SUMMARY] 23 blocks · 24 processed · 7 orphan · 276 instr

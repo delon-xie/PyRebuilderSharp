@@ -47,5 +47,5 @@ else:
         pass
 # orphan @0x047A
 offset += 2
-# orphan @0x04D6
-# [SUMMARY] 25 blocks · 24 processed · 5 orphan · 730 instr
+# orphan @0x04D8
+# [SUMMARY] 25 blocks · 24 processed · 5 orphan · 722 instr

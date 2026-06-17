@@ -36,4 +36,4 @@ for line in lines:
 #   @0x0216: JUMP_BACKWARD arg=0
 #   @0x0244: JUMP_BACKWARD arg=0
 #   @0x024C: JUMP_BACKWARD arg=0
-# [SUMMARY] 33 blocks · 34 processed · 2 orphan · 215 instr
+# [SUMMARY] 33 blocks · 34 processed · 2 orphan · 204 instr

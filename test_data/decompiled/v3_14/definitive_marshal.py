@@ -33,4 +33,4 @@ print('Length:', len(m))
 known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
 # [WARN] 1 instructions not decompiled
 #   @0x0374: JUMP_BACKWARD arg=0
-# [SUMMARY] 22 blocks · 23 processed · 1 orphan · 292 instr
+# [SUMMARY] 22 blocks · 23 processed · 1 orphan · 288 instr

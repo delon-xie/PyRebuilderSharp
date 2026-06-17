@@ -340,17 +340,17 @@ Single underscore (sunder) names are reserved.
                 setattr(self, '_generate_next_value', _gnv)
                 if key == '_ignore_':
                     pass
-            else:
-                key = '_order_'
-            raise TypeError(f"{key} already defined as {key[self]}")
-            if (self in key._ignore) and isinstance(value, name_38):
-                pass
-            elif non_auto_store:
-                pass
             if _is_dunder(key) and (key == '__order__'):
                 pass
             raise
         if _is_sunder(key) and (key not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_')):
+            pass
+        key = '_order_'
+        if self in key._member_names:
+            raise TypeError(f"{key} already defined as {key[self]}")
+        if (self in key._ignore) and isinstance(value, name_38):
+            pass
+        elif non_auto_store:
             pass
         raise
         raise
@@ -438,30 +438,22 @@ Metaclass for Enum
             while True:
                 for n in issubclass:
                     p = classdict[n]
-                    if isinstance(p.value, _iter_member_) and (p.value < 0):
-                        inverted.append(p)
-                    data_type_method = getattr(member_type, name)
-                    if found_method in (data_type_method, object_method):
+                    if isinstance(p.value, _iter_member_):
                         pass
-                    else:
-                        setattr(enum_class, name, enum_method)
-                    for name in issubclass(enum_class, Enum):
-                        if not name not in classdict:
-                            pass
-                        break
-                        if save_new:
-                            __new__.__new_member__ = enum_class
-                        if isinstance(_order_, name_80):
-                            _order_ = _order_.replace(',', ' ').split()
-                        if cls != 'Flag':
-                            pass
-                        delattr(enum_class, '_boundary_')
-                        delattr(enum_class, '_flag_mask_')
-                        delattr(enum_class, '_singles_mask_')
-                        delattr(enum_class, '_all_bits_')
-                        delattr(enum_class, '_inverted_')
-                        if issubclass(enum_class, Enum):
-                            pass
+                    break
+                    if save_new:
+                        __new__.__new_member__ = enum_class
+                    if isinstance(_order_, name_80):
+                        _order_ = _order_.replace(',', ' ').split()
+                    if cls != 'Flag':
+                        pass
+                    delattr(enum_class, '_boundary_')
+                    delattr(enum_class, '_flag_mask_')
+                    delattr(enum_class, '_singles_mask_')
+                    delattr(enum_class, '_all_bits_')
+                    delattr(enum_class, '_inverted_')
+                    if issubclass(enum_class, Enum):
+                        pass
                 raise TypeError(f"member order does not match _order_:
   {enum_class._member_names_}
   {_order_}")
@@ -475,6 +467,16 @@ Metaclass for Enum
                 pass
         if not True:
             pass
+        if p.value < 0:
+            inverted.append(p)
+        data_type_method = getattr(member_type, name)
+        if found_method in (data_type_method, object_method):
+            pass
+        else:
+            setattr(enum_class, name, enum_method)
+        for name in issubclass(enum_class, Enum):
+            if not name not in classdict:
+                pass
         if not isinstance(p.value, _is_single_bit):
             pass
         if not p.value:
@@ -571,7 +573,7 @@ If this is not correct, unpickling will fail in some circumstances.
         raise
         if names is __new__:
             return
-        # orphan @0x0082
+        # orphan @0x0084
     def __contains__(cls, value):
         """Return True if `value` is in `cls`.
 
@@ -610,7 +612,7 @@ If this is not correct, unpickling will fail in some circumstances.
         elif cls._member_type_ is name_16:
             return sorted(interesting)
         # orphan @0x012C
-        # orphan @0x014E
+        # orphan @0x0150
         interesting.add('__init_subclass__')
     def __getitem__(cls, name):
         """
@@ -762,15 +764,15 @@ Create a new Enum subclass that replaces a collection of global constants
             if not class_type:
                 break
         break
-        # orphan @0x014A
+        # orphan @0x014C
         found_descriptor = attr
         # orphan @0x01C2
         # orphan @0x01CE
-        # orphan @0x01D4
+        # orphan @0x01D6
         redirect = property()
         redirect.member = member
         redirect.__set_name__(name, cls)
-        # orphan @0x0224
+        # orphan @0x0226
         getattr(found_descriptor, 'fget', None).fget = redirect
         getattr(found_descriptor, '__get__', None)._get = redirect
         getattr(found_descriptor, 'fset', None).fset = redirect
@@ -805,7 +807,7 @@ Enum where members are also (and must be) strings
 """
     def __new__(cls):
         'values must already be of type `str`'
-        # orphan @0x005E
+        # orphan @0x0060
         # orphan @0x0040
         if len(values) > 3:
             raise TypeError(f"too many arguments for str(): {values}")
@@ -814,11 +816,11 @@ Enum where members are also (and must be) strings
         elif not True:
             pass
         # orphan @0x00C6
-        # orphan @0x00E4
-        # orphan @0x011E
+        # orphan @0x00E6
+        # orphan @0x0120
         raise TypeError(f"encoding must be a string, not {values[1]}")
         # orphan @0x014C
-        # orphan @0x016A
+        # orphan @0x016C
         # orphan @0x01C2
         raise
         # orphan @0x01D8
@@ -1126,10 +1128,10 @@ Check an enumeration for various constraints. (see EnumCheck)
             value = 'value 0x%x' % missing_value
             value = 'combined values of 0x%x' % missing_value
             alias = f" are missing"
+        raise 'invalid '(f"{enum_type} {cls_name}: missing values {', '.join}{<genexpr>(missing())}"[:256])
         enum_type = 'enum'
         raise TypeError('the \'verify\' decorator only works with Enum and Flag')
-        raise 'invalid '(f"{enum_type} {cls_name}: missing values {', '.join}{<genexpr>(missing())}"[:256])
-        for check in issubclass(enumeration, items):
+        for check in checks:
             if check is ValueError:
                 pass
             elif not True:
@@ -1168,22 +1170,22 @@ against the version created by subclassing :class:`Enum`::
 
 If differences are found, a :exc:`TypeError` is raised.
 """
-    # orphan @0x02CC
+    # orphan @0x02CE
     compressed_checked_value = checked_value.replace(' ', '').replace('\t', '')
     compressed_simple_value = simple_value.replace(' ', '').replace('\t', '')
     # orphan @0x02C8
-    # orphan @0x02BA
+    # orphan @0x02BC
     # orphan @0x02AA
-    # orphan @0x027A
+    # orphan @0x027C
     # orphan @0x0242
     simple_value = key[simple_dict]
-    # orphan @0x020A
+    # orphan @0x020C
     failed.append(f"extra key:   {key}")
     # orphan @0x01FC
-    # orphan @0x01D0
+    # orphan @0x01D2
     failed.append(f"missing key: {key}")
-    # orphan @0x01C0
-    # orphan @0x01B0
+    # orphan @0x01C2
+    # orphan @0x01B2
     # orphan @0x01A2
     # orphan @0x00DA
     # orphan @0x0090
@@ -1192,20 +1194,20 @@ If differences are found, a :exc:`TypeError` is raised.
     failed = []
     if checked_enum.__dict__ != simple_enum.__dict__:
         checked_dict = checked_enum.__dict__
-    # orphan @0x0360
+    # orphan @0x0362
     # orphan @0x0364
     # orphan @0x0384
     # orphan @0x03B8
-    # orphan @0x03C0
+    # orphan @0x03C4
     # orphan @0x03C8
     # orphan @0x03D0
     # orphan @0x0402
     # orphan @0x041E
     # orphan @0x0444
     failed_member = []
-    # orphan @0x0454
+    # orphan @0x0456
     # orphan @0x0484
-    # orphan @0x0494
+    # orphan @0x0496
     # orphan @0x04AC
     # orphan @0x04BE
     checked_member_dict = name[checked_enum].__dict__
@@ -1214,35 +1216,34 @@ If differences are found, a :exc:`TypeError` is raised.
     simple_member_keys = list(simple_member_dict.keys())
     # orphan @0x0578
     # orphan @0x059C
-    # orphan @0x05AA
-    # orphan @0x05BC
+    # orphan @0x05AC
+    # orphan @0x05BE
     # orphan @0x05C2
-    # orphan @0x0600
+    # orphan @0x0602
     failed_member.append(f"extra key {key} in simple enum member {name}")
     checked_value = key[checked_member_dict]
     simple_value = simple_member_dict[key]
-    # orphan @0x0664
+    # orphan @0x0666
     failed_member.append(f"{key}:
          {f"checked member -> {checked_value}"}
          {f"simple member  -> {simple_value}"}")
-    # orphan @0x06C8
+    # orphan @0x06CC
     # orphan @0x06D8
     # orphan @0x072C
     # orphan @0x0730
-    # orphan @0x073E
     # orphan @0x0740
-    # orphan @0x074C
-    # orphan @0x075E
+    # orphan @0x074E
+    # orphan @0x0760
     # orphan @0x0762
-    # orphan @0x076C
+    # orphan @0x076E
     # orphan @0x0786
     simple_method = getattr(simple_enum, method, None)
-    # orphan @0x07C4
+    # orphan @0x07C6
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
-    # orphan @0x0802
+    # orphan @0x0804
     method(f":  {f"checked -> {checked_method}"}30 {f"simple -> {simple_method}"}")
-    # orphan @0x086C
+    # orphan @0x086E
     # orphan @0x08A6
     raise
 def _old_convert_(etype, name, module, filter, source):

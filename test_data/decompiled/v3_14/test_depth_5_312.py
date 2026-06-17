@@ -41,12 +41,11 @@ def depth_5_while():
         d = 2
         if not d > 0:
             pass
-    # orphan @0x0062
+    # orphan @0x0064
     # orphan @0x0066
     # orphan @0x008E
     d -= 1
     # orphan @0x00A4
-    # orphan @0x00B2
     # orphan @0x00B4
     # orphan @0x00C8
     total += 1

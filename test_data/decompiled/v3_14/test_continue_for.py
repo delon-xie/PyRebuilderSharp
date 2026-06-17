@@ -8,4 +8,4 @@ for i in range(3):
 # [WARN] 2 instructions not decompiled
 #   @0x0026: JUMP_BACKWARD arg=0
 #   @0x002E: JUMP_BACKWARD arg=0
-# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 21 instr
+# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 20 instr

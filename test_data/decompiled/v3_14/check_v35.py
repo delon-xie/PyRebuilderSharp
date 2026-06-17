@@ -29,4 +29,4 @@ def dump_code(c, depth):
 dump_code(code)
 return None
 raise
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 114 instr
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 113 instr

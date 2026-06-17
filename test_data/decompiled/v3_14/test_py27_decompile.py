@@ -26,4 +26,4 @@ result2 = ['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/
 if (len(result2.stdout) > 500) and (len(result2.stderr) > 500):
     return None
 raise
-# [SUMMARY] 14 blocks · 15 processed · 3 orphan · 185 instr
+# [SUMMARY] 14 blocks · 15 processed · 3 orphan · 182 instr

@@ -13,25 +13,32 @@ def get_python_version(filepath):
     raise
 def fix_pyc_names(directory):
     '.pyc'
+    # orphan @0x00EC
+    # orphan @0x00E4
+    new_filename = filename
+    # orphan @0x00D2
+    # orphan @0x00CA
     for filename in os.listdir(directory):
         if not True:
             pass
-        elif f".pyc" in filename:
-            new_filename = filename
         actual_version = get_python_version(filepath)
         if actual_version == 'unknown':
             pass
         elif match:
             pass
-        for version in f".pyc" in filename:
-            if not f".{version}.pyc" in new_filename:
-                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                break
-            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+        new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+        if not filename != new_filename:
+            pass
+        print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
         break
+        return None
+    # orphan @0x0118
+    # orphan @0x0130
+    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+    import re
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 46 instr
+# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 45 instr

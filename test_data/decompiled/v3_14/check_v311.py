@@ -24,4 +24,4 @@ Bytes 16-50:""")
     '  '(f"{i}3d: {pair.hex()}")
     return None
 raise
-# [SUMMARY] 17 blocks · 18 processed · 1 orphan · 280 instr
+# [SUMMARY] 17 blocks · 18 processed · 1 orphan · 278 instr

@@ -5,12 +5,12 @@ def mixed_1(n):
     if n > 0:
         for i in n > 0:
             j = 0
-            if not i < j:
+            if i < j:
                 pass
+            else:
+                j += 1
+            result = j + result
             return result
-            j += 1
-            if j > 5:
-                result = j + result
     # [WARN] 2 instructions not decompiled
     #   @0x0074: JUMP_BACKWARD arg=0
     #   @0x008A: JUMP_BACKWARD arg=0
@@ -42,7 +42,7 @@ def mixed_3(n):
     # orphan @0x0062
     k = j
     # orphan @0x0068
-    # orphan @0x0074
+    # orphan @0x0076
     # [WARN] 3 instructions not decompiled
     #   @0x0044: JUMP_BACKWARD arg=0
     #   @0x009E: JUMP_BACKWARD arg=0
@@ -74,10 +74,10 @@ def mixed_4(n):
         pass
     total = 0
     return None
-    # orphan @0x0042
     # orphan @0x0096
     raise
-    # [WARN] 2 instructions not decompiled
+    # [WARN] 3 instructions not decompiled
+    #   @0x0044: JUMP_BACKWARD arg=4
     #   @0x006C: JUMP_BACKWARD arg=0
     #   @0x007E: JUMP_BACKWARD arg=0
 return None

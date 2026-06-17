@@ -16,4 +16,4 @@ for n in range(10):
 return None
 # orphan @0x009A
 raise
-# [SUMMARY] 12 blocks · 11 processed · 3 orphan · 52 instr
+# [SUMMARY] 12 blocks · 11 processed · 3 orphan · 51 instr

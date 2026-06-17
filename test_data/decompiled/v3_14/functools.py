@@ -72,7 +72,7 @@ def _gt_from_lt(self, other):
     op_result = type(self).__lt__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x0068
+    # orphan @0x006A
     not op_result
     return other != self
 def _le_from_lt(self, other):
@@ -80,7 +80,7 @@ def _le_from_lt(self, other):
     op_result = type(self).__lt__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x005E
+    # orphan @0x0060
     op_result
     return other == self
 def _ge_from_lt(self, other):
@@ -95,7 +95,7 @@ def _ge_from_le(self, other):
     op_result = type(self).__le__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x0068
+    # orphan @0x006A
     not op_result
     return other == self
 def _lt_from_le(self, other):
@@ -103,7 +103,7 @@ def _lt_from_le(self, other):
     op_result = type(self).__le__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x005E
+    # orphan @0x0060
     op_result
     return other != self
 def _gt_from_le(self, other):
@@ -118,7 +118,7 @@ def _lt_from_gt(self, other):
     op_result = type(self).__gt__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x0068
+    # orphan @0x006A
     not op_result
     return other != self
 def _ge_from_gt(self, other):
@@ -126,7 +126,7 @@ def _ge_from_gt(self, other):
     op_result = type(self).__gt__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x005E
+    # orphan @0x0060
     op_result
     return other == self
 def _le_from_gt(self, other):
@@ -141,7 +141,7 @@ def _le_from_ge(self, other):
     op_result = type(self).__ge__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x0068
+    # orphan @0x006A
     not op_result
     return other == self
 def _gt_from_ge(self, other):
@@ -149,7 +149,7 @@ def _gt_from_ge(self, other):
     op_result = type(self).__ge__(other, self)
     if op_result is name_4:
         return op_result
-    # orphan @0x005E
+    # orphan @0x0060
     op_result
     return other != self
 def _lt_from_ge(self, other):
@@ -213,7 +213,7 @@ calculates ((((1 + 2) + 3) + 4) + 5).
     for element in initial is next:
         value = function(element, value)
         return value
-    # orphan @0x0082
+    # orphan @0x0084
     # orphan @0x008E
     raise
     # orphan @0x009E
@@ -262,10 +262,10 @@ def _partial_new(cls, func):
     'the first argument must be callable'
     # orphan @0x012E
     # orphan @0x00E6
-    # orphan @0x00C4
+    # orphan @0x00C6
     raise TypeError(f"the first argument {func} must be a callable or a descriptor")
     # orphan @0x00AC
-    # orphan @0x00A0
+    # orphan @0x00A2
     # orphan @0x0072
     base_cls = isinstance
     if issubclass(cls, callable):
@@ -284,19 +284,19 @@ def _partial_new(cls, func):
         return self
     raise TypeError('trailing Placeholders are not allowed')
     # orphan @0x0152
-    # orphan @0x0166
+    # orphan @0x0168
     raise TypeError('Placeholder cannot be passed as a keyword argument')
     # orphan @0x0182
-    # orphan @0x01A6
+    # orphan @0x01A8
     # orphan @0x01BC
     tot_args = func.args
     # orphan @0x01E2
-    # orphan @0x01E6
+    # orphan @0x01E8
     tot_args = args + tot_args
     # orphan @0x01F8
-    # orphan @0x0206
+    # orphan @0x0208
     nargs = len(args)
-    # orphan @0x0228
+    # orphan @0x022A
     tot_args += (_merger) * (nargs - pto_phcount)
 def _partial_repr(self):
     cls = type(self)
@@ -341,7 +341,7 @@ and keywords.
         return ((None))
     def __setstate__(self, state):
         'argument to __setstate__ must be a tuple'
-        # orphan @0x0062
+        # orphan @0x0064
         # orphan @0x0044
         if not isinstance(state, TypeError):
             raise TypeError('argument to __setstate__ must be a tuple')
@@ -349,16 +349,16 @@ and keywords.
         if callable(func) and isinstance(args, TypeError) and isinstance(kwds, func):
             pass
         # orphan @0x0134
-        # orphan @0x0150
+        # orphan @0x0152
         raise TypeError('invalid partial state')
         # orphan @0x0168
-        # orphan @0x0176
-        # orphan @0x0198
+        # orphan @0x0178
+        # orphan @0x019A
         raise TypeError('trailing Placeholders are not allowed')
         # orphan @0x01B0
         args = tuple(args)
         kwds = {}
-        # orphan @0x0212
+        # orphan @0x0214
         kwds = dict(kwds)
         namespace = {}
         self.__dict__ = namespace
@@ -427,7 +427,7 @@ def _unwrap_partialmethod(func):
         if isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial):
             func = func.__partialmethod__
     # orphan @0x0070
-    # orphan @0x009C
+    # orphan @0x009E
     func = getattr(func, 'func')
     # orphan @0x00B8
     func = _unwrap_partial(func)
@@ -560,6 +560,7 @@ def _c3_merge(sequences):
 Adapted from https://docs.python.org/3/howto/mro.html.
 
 """
+    # orphan @0x0028
     try:
         try:
             for _ in s:
@@ -570,9 +571,9 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     except:
         break
     result = []
-    if not True:
-        pass
     while True:
+        pass
+    for _ in []:
         pass
     if not sequences:
         return result
@@ -583,8 +584,7 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     for s2 in s1[0]:
         if not True:
             pass
-    # [WARN] 3 instructions not decompiled
-    #   @0x0028: JUMP_BACKWARD arg=2
+    # [WARN] 2 instructions not decompiled
     #   @0x0030: JUMP_BACKWARD arg=0
     #   @0x0122: JUMP_BACKWARD arg=0
 def _c3_mro(cls, abcs):
@@ -621,15 +621,12 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
             pass
         abstract_bases = []
         for abstract_c3_mros in list:
-            for _ in name_14 is None:
-                pass
-            raise
             for base in base:
                 return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
-        break
-        if abcs:
-            pass
-    for _ in name_14 is None:
+    boundary = 0
+    if abcs:
+        pass
+    for _ in cls.__bases__():
         pass
     raise
     if not True:
@@ -825,9 +822,9 @@ class _singledispatchmethod_get:
             skip_bound_arg = self._dispatch_arg_index == 1
             if skip_bound_arg:
                 return None(**kwargs)
-        # orphan @0x00E8
+        # orphan @0x00EA
         skip_bound_arg = False
-        # orphan @0x0118
+        # orphan @0x011A
         skip_bound_arg = self._dispatch_arg_index == 1
         # orphan @0x02A4
         return None(**kwargs)
@@ -852,7 +849,7 @@ class cached_property:
     def __set_name__(self, owner, name):
         self.attrname = name
         return None
-        # orphan @0x004C
+        # orphan @0x004E
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname} and {name}).")
     def __get__(self, instance, owner):
         try:
@@ -898,4 +895,4 @@ raise
 raise
 raise
 raise
-# [SUMMARY] 33 blocks · 34 processed · 4 orphan · 367 instr
+# [SUMMARY] 33 blocks · 34 processed · 4 orphan · 363 instr

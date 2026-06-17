@@ -40,4 +40,4 @@ print('Stdout:', r.stdout[:500])
 print('Stderr:', r.stderr[:500])
 return None
 raise
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 103 instr
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 102 instr

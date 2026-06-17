@@ -14,4 +14,4 @@ for n in range(10):
 raise
 # [WARN] 1 instructions not decompiled
 #   @0x0064: JUMP_BACKWARD arg=0
-# [SUMMARY] 11 blocks · 10 processed · 3 orphan · 46 instr
+# [SUMMARY] 11 blocks · 10 processed · 3 orphan · 45 instr

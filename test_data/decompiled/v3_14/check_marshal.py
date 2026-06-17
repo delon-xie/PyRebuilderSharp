@@ -35,4 +35,4 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
     return None
 # [WARN] 1 instructions not decompiled
 #   @0x0406: JUMP_BACKWARD arg=0
-# [SUMMARY] 16 blocks · 17 processed · 1 orphan · 273 instr
+# [SUMMARY] 16 blocks · 17 processed · 1 orphan · 269 instr

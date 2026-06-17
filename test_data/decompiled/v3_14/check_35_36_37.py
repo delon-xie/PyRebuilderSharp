@@ -14,4 +14,4 @@ for ver in ('3.5', '3.6', '3.7'):
 # [WARN] 2 instructions not decompiled
 #   @0x019A: JUMP_BACKWARD arg=0
 #   @0x01D6: JUMP_BACKWARD arg=0
-# [SUMMARY] 10 blocks · 11 processed · 1 orphan · 100 instr
+# [SUMMARY] 10 blocks · 11 processed · 1 orphan · 98 instr

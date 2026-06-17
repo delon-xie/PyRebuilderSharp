@@ -51,4 +51,4 @@ if i < len(lines):
 # [WARN] 2 instructions not decompiled
 #   @0x02E6: JUMP_BACKWARD arg=0
 #   @0x038C: JUMP_BACKWARD arg=0
-# [SUMMARY] 38 blocks · 39 processed · 3 orphan · 243 instr
+# [SUMMARY] 38 blocks · 39 processed · 3 orphan · 230 instr

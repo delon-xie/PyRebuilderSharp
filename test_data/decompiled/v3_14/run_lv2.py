@@ -49,4 +49,4 @@ raise
 #   @0x03B2: JUMP_BACKWARD arg=0
 #   @0x03B8: JUMP_BACKWARD arg=0
 #   @0x0464: JUMP_BACKWARD arg=0
-# [SUMMARY] 46 blocks · 46 processed · 9 orphan · 263 instr
+# [SUMMARY] 46 blocks · 46 processed · 12 orphan · 256 instr

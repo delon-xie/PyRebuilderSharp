@@ -40,4 +40,4 @@ return None
 #   @0x00D6: JUMP_BACKWARD arg=0
 #   @0x029A: JUMP_BACKWARD arg=0
 #   @0x02F6: JUMP_BACKWARD arg=0
-# [SUMMARY] 18 blocks · 19 processed · 1 orphan · 205 instr
+# [SUMMARY] 18 blocks · 19 processed · 1 orphan · 203 instr

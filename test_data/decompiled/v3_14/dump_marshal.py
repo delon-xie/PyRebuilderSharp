@@ -52,24 +52,23 @@ raw = data[pos]
 pos += 1
 t = raw & 127
 if (t in (40, 41)) and (t == 41):
-    pass
+    count = struct.unpack('<I', data[pos:pos + 4])[0]
+    if t == 41:
+        for i in t == 41:
+            raw2 = data[pos]
+            pos += 1
+            t2 = raw2 & 127
+            flags = ''
+            if raw2 & 128:
+                ref = struct.unpack('<I', data[pos:pos + 4])[0]
+                pos += 4
+                flags = f" (ref={ref})"
+                if t2 == 99:
+                    pass
 break
 '  ['(f"{i}] type=0x{raw2}02X (stripped={t2}){flags} -> skip")
 tmp = io.BytesIO(data)
 break
-count = struct.unpack('<I', data[pos:pos + 4])[0]
-if t == 41:
-    for i in t == 41:
-        raw2 = data[pos]
-        pos += 1
-        t2 = raw2 & 127
-        flags = ''
-        if raw2 & 128:
-            ref = struct.unpack('<I', data[pos:pos + 4])[0]
-            pos += 4
-            flags = f" (ref={ref})"
-            if t2 == 99:
-                pass
 break
 if t2 == 78:
     print(f"  [{i}] None{flags}")
@@ -90,4 +89,4 @@ raise
 #   @0x0724: JUMP_BACKWARD arg=0
 #   @0x07D4: JUMP_BACKWARD arg=0
 #   @0x08BE: JUMP_BACKWARD arg=0
-# [SUMMARY] 48 blocks · 49 processed · 3 orphan · 602 instr
+# [SUMMARY] 47 blocks · 48 processed · 3 orphan · 590 instr

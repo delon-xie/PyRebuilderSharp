@@ -33,4 +33,4 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
             return None
 # [WARN] 1 instructions not decompiled
 #   @0x05DC: JUMP_BACKWARD arg=0
-# [SUMMARY] 23 blocks · 24 processed · 2 orphan · 319 instr
+# [SUMMARY] 23 blocks · 24 processed · 2 orphan · 313 instr

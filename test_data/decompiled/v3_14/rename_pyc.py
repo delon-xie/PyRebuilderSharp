@@ -55,4 +55,4 @@ Done!""")
 #   @0x027A: JUMP_BACKWARD arg=0
 #   @0x0326: JUMP_BACKWARD arg=0
 #   @0x04AE: JUMP_BACKWARD arg=1166
-# [SUMMARY] 41 blocks · 42 processed · 1 orphan · 308 instr
+# [SUMMARY] 41 blocks · 42 processed · 1 orphan · 302 instr

@@ -24,4 +24,4 @@ for offset_start in range(1, 21, 1):
 #   @0x0296: JUMP_BACKWARD arg=0
 #   @0x02A8: JUMP_BACKWARD arg=0
 #   @0x02BC: JUMP_BACKWARD arg=0
-# [SUMMARY] 19 blocks · 20 processed · 1 orphan · 178 instr
+# [SUMMARY] 19 blocks · 20 processed · 1 orphan · 173 instr

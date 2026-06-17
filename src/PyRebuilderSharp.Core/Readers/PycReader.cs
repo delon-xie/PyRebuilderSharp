@@ -196,6 +196,17 @@ public class PycReader
             if (bcBytes != null)
                 code.Instructions = ParseInstructions(bcBytes);
 
+            // 3.14+: 过滤 NOT_TAKEN 伪指令（JIT 分支预测提示，无执行效果）
+            // NOT_TAKEN 在条件跳转后出现，保留它会分裂出仅含 POP_TOP 的空块，
+            // 破坏 OR 短路链等连续条件模式的块结构。
+            // ref: CPython 3.14 Include/internal/pycore_opcode.h
+            if (code.Version >= PythonVersion.Py314 && code.Instructions != null)
+            {
+                code.Instructions = code.Instructions
+                    .Where(i => i.Opcode != Opcode.NOT_TAKEN_314)
+                    .ToList();
+            }
+
             code.Constants = ReadMarshalDictSafe(br, code);
 
             // names/varnames/freevars/cellvars

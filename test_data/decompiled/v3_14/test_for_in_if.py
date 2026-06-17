@@ -9,4 +9,4 @@ else:
 # orphan @0x0028
 y = n
 return None
-# [SUMMARY] 7 blocks · 6 processed · 4 orphan · 26 instr
+# [SUMMARY] 7 blocks · 6 processed · 4 orphan · 25 instr

@@ -13,4 +13,4 @@ Fields found at offset {offset}:")
 #   @0x0226: JUMP_BACKWARD arg=0
 #   @0x025A: JUMP_BACKWARD arg=0
 #   @0x033A: JUMP_BACKWARD arg=0
-# [SUMMARY] 13 blocks · 14 processed · 1 orphan · 199 instr
+# [SUMMARY] 13 blocks · 14 processed · 1 orphan · 196 instr

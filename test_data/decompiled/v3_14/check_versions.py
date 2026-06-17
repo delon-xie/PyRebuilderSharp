@@ -33,4 +33,4 @@ raise
 # [WARN] 2 instructions not decompiled
 #   @0x008E: JUMP_BACKWARD arg=0
 #   @0x0288: JUMP_BACKWARD arg=0
-# [SUMMARY] 25 blocks · 25 processed · 2 orphan · 177 instr
+# [SUMMARY] 25 blocks · 25 processed · 2 orphan · 173 instr

@@ -37,4 +37,4 @@ for line in result.stderr:
 #   @0x0208: JUMP_BACKWARD arg=0
 #   @0x0352: JUMP_BACKWARD arg=0
 #   @0x0378: JUMP_BACKWARD arg=0
-# [SUMMARY] 37 blocks · 38 processed · 1 orphan · 278 instr
+# [SUMMARY] 37 blocks · 38 processed · 1 orphan · 271 instr

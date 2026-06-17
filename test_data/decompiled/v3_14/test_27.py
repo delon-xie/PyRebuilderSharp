@@ -13,4 +13,4 @@ for (i, line) in subprocess.run:
         actual_ast = ast.parse(r.stdout)(2, ('indent',))
         print(actual_ast)
         return None
-# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 108 instr
+# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 107 instr
