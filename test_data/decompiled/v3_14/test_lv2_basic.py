@@ -10,13 +10,13 @@ if x < y:
     z = x
     if x > y:
         z = y
-    for n in i + 1:
-        m = n + 1
 z = 0
 i = 0
 if i < 5:
     pass
+for n in range(10):
+    m = n + 1
 return None
 # orphan @0x00B8
 raise
-# [SUMMARY] 18 blocks · 17 processed · 6 orphan · 68 instr
+# [SUMMARY] 18 blocks · 17 processed · 4 orphan · 68 instr

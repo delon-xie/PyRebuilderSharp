@@ -152,20 +152,20 @@ Returns cls, to allow usage as a class decorator.
 
 If cls is not an instance of ABCMeta, does nothing.
 """
-    # orphan @0x0078
-    # orphan @0x0058
-    # orphan @0x0048
-    abstracts = set()
-    # orphan @0x0024
-    return cls
-    # orphan @0x0000
-    # orphan @0x00B6
-    abstracts.add(name)
-    # orphan @0x0124
-    # orphan @0x014E
-    # orphan @0x016E
-    frozenset(abstracts).__abstractmethods__ = cls
-    return cls
+    if not hasattr(cls, '__abstractmethods__'):
+        return cls
+    for scls in hasattr(cls, '__abstractmethods__'):
+        for name in cls.__bases__:
+            if not getattr(value, '__isabstractmethod__', False):
+                pass
+            break
+            frozenset(abstracts).__abstractmethods__ = cls
+            return cls
+            break
+            break
+            for _ in abstracts.add:
+                if not getattr(value, '__isabstractmethod__', False):
+                    pass
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
 return None
 raise

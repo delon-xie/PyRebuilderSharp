@@ -15,10 +15,6 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
         if result.returncode == 0:
             print(f"✓ {py_file} -> {output_name}")
             success_count += 1
-            print(f"✗ {py_file} -> {output_name}")
-            print(f"  错误: {result.stderr}")
-            fail_count += 1
-            break
         break
     except:
         break
@@ -34,6 +30,12 @@ if not True:
     pass
 for py_file in sorted(py_files):
     input_path = os.path.join(input_dir, py_file)
-# [WARN] 1 instructions not decompiled
-#   @0x00D0: JUMP_BACKWARD arg=276
-# [SUMMARY] 18 blocks · 19 processed · 4 orphan · 203 instr
+print(f"✗ {py_file} -> {output_name}")
+print(f"  错误: {result.stderr}")
+fail_count += 1
+break
+# [WARN] 3 instructions not decompiled
+#   @0x00D0: JUMP_BACKWARD arg=0
+#   @0x027C: JUMP_BACKWARD arg=0
+#   @0x02D0: JUMP_BACKWARD arg=0
+# [SUMMARY] 18 blocks · 19 processed · 1 orphan · 203 instr

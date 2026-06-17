@@ -1,7 +1,14 @@
 # Decompiled from: <module>
 
 try:
-    output = f.read()
+    try:
+        try:
+            raise
+            raise
+        except:
+            pass
+    except:
+        pass
 except:
     pass
 import re
@@ -41,5 +48,7 @@ if i < len(lines):
                             i += 1
                             print(f"Total tests with versions found: {debug_count}")
                             return None
-raise
-# [SUMMARY] 37 blocks · 38 processed · 5 orphan · 243 instr
+# [WARN] 2 instructions not decompiled
+#   @0x02E6: JUMP_BACKWARD arg=0
+#   @0x038C: JUMP_BACKWARD arg=0
+# [SUMMARY] 38 blocks · 39 processed · 3 orphan · 243 instr

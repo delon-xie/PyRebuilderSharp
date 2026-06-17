@@ -7,15 +7,15 @@ try:
         break
         break
         for start in f"{v} ({hex(v)})":
-            if start + 16 > len(m):
-                break
-                if a0 == known['argcount']:
-                    pass
+            break
+            if not a0 == known['argcount']:
+                pass
+            if not True:
                 print(f"
 MATCH at offset {start}:")
                 print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
                 '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
-                code2 = marshal.loads(m)
+            code2 = marshal.loads(m)
     except:
         break
 except:
@@ -29,7 +29,8 @@ m = bytes(marshal.dumps(code))
 print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
 'Bytes:'(' '.join, <genexpr>(m[:60]()))
-print()
 'Byte[0] = 0x'(f"{m[0]}02x ({m[0]})")
 known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
-# [SUMMARY] 22 blocks · 23 processed · 5 orphan · 292 instr
+# [WARN] 1 instructions not decompiled
+#   @0x0374: JUMP_BACKWARD arg=0
+# [SUMMARY] 22 blocks · 23 processed · 1 orphan · 292 instr

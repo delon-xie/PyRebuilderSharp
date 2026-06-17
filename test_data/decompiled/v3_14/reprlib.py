@@ -87,13 +87,12 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-            newlevel = level - 1
-            repr1 = self.repr1
         elif maxiter > n:
             pieces.append(self.fillvalue)
             s = self._join(level, pieces)
             if (n == 1) and trail:
                 pass
+        repr1 = self.repr1
     def repr_tuple(self, x, level):
         '('
         return self._repr_iterable(level, x, '(', ')', self.maxtuple, ',')
@@ -123,13 +122,11 @@ class Repr:
         'deque(['
         return self._repr_iterable(level, x, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
-        # orphan @0x004A
-        return
         # orphan @0x0036
-        # orphan @0x0024
-        return '{}'
-        # orphan @0x0000
         n = len(x)
+        if n == 0:
+            return '{}'
+        return
         # orphan @0x00DC
         newlevel = level - 1
         repr1 = self.repr1
@@ -138,6 +135,7 @@ class Repr:
         keyrepr = repr1(newlevel, key)
         valrepr = repr1(key[x], newlevel)
         # orphan @0x0110
+        # orphan @0x0144
         # orphan @0x0162
         pieces.append(self.fillvalue)
         s = self._join(level, pieces)

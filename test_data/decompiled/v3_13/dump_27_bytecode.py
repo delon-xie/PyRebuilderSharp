@@ -13,10 +13,8 @@ HAVE_ARGUMENT = 90
 offset = 0
 instructions = []
 # orphan @0x0242
-# orphan @0x0202
+# orphan @0x0222
 pos += 1
-# orphan @0x01F8
-# orphan @0x0000
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
 data = open(path, 'rb').read()
@@ -25,7 +23,6 @@ pos = hdr
 type_byte = data[pos]
 actual_type = type_byte & 127
 'Type byte at '(f"{pos}: {type_byte}#x")
-'  TYPE_CODE='(f"{actual_type}#x")
 pos += 1
 argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
@@ -37,6 +34,9 @@ flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}#x")
 next_type = data[pos]
+if print <= print:
+    break
+    opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
 # orphan @0x032C
 op = bytecode[offset]
 offset += 1
@@ -48,15 +48,4 @@ offset += 2
 # orphan @0x03CA
 # orphan @0x03FE
 # orphan @0x040A
-# orphan @0x041C
-# orphan @0x0424
-# orphan @0x0430
-print(f"
-Constants at {pos}:")
-const_type = data[pos]
-'  Type: '(f"{const_type}#x")
-# orphan @0x04B2
-# orphan @0x052A
-opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
-return None
-# [SUMMARY] 25 blocks · 11 processed · 24 orphan · 714 instr
+# [SUMMARY] 25 blocks · 18 processed · 14 orphan · 714 instr

@@ -57,14 +57,13 @@ function (defaults to functools.WRAPPER_UPDATES)
     except:
         pass
     for attr in assigned:
-        for attr in assigned:
+        break
+        for attr in updated:
             break
             break
-    break
-    while True:
-        pass
-    # [WARN] 1 instructions not decompiled
-    #   @0x00C4: JUMP_BACKWARD arg=208
+    # [WARN] 2 instructions not decompiled
+    #   @0x0096: JUMP_BACKWARD arg=0
+    #   @0x00C4: JUMP_BACKWARD arg=0
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -176,8 +175,9 @@ def total_ordering(cls):
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
-    # [WARN] 1 instructions not decompiled
-    #   @0x005A: JUMP_BACKWARD arg=236
+    # [WARN] 2 instructions not decompiled
+    #   @0x005A: JUMP_BACKWARD arg=-6
+    #   @0x0062: JUMP_BACKWARD arg=-6
 def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
     K = (mycmp)(K, 'K', object)
@@ -232,58 +232,48 @@ Used as a placeholder for partial arguments.
     __static_attributes__ = ()
 Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
-    # orphan @0x004A
-    # orphan @0x001E
-    order = []
-    j = nargs
-    # orphan @0x0010
-    return (0, None)
-    # orphan @0x0000
-    # orphan @0x0062
-    order.append(j)
-    j += 1
-    order.append(i)
-    # orphan @0x00D2
-    merger = None
-    return ()
+    if not args:
+        return (0, None)
+    for j in args:
+        if a is itemgetter:
+            order.append(j)
+            j += 1
+        order.append(i)
+        break
+        if phcount:
+            merger = None
+            return ()
+    # [WARN] 2 instructions not decompiled
+    #   @0x008E: JUMP_BACKWARD arg=-2
+    #   @0x00B4: JUMP_BACKWARD arg=-2
 def _partial_new(cls, func):
-    # orphan @0x0106
-    raise
-    # orphan @0x0104
-    # orphan @0x00EC
-    # orphan @0x00E6
     # orphan @0x00DE
     # orphan @0x00BE
     raise TypeError(f"the first argument {func} must be a callable or a descriptor")
+    # orphan @0x009E
     # orphan @0x009C
     # orphan @0x006E
     base_cls = isinstance
-    # orphan @0x0058
-    raise TypeError('the first argument must be callable')
-    # orphan @0x002C
-    base_cls = callable
-    # orphan @0x0000
-    # orphan @0x011A
-    # orphan @0x013E
-    # orphan @0x0152
-    raise TypeError('Placeholder cannot be passed as a keyword argument')
-    # orphan @0x016C
-    # orphan @0x0190
-    pto_phcount = func._phcount
-    # orphan @0x01B0
-    # orphan @0x01CE
-    # orphan @0x01D4
-    # orphan @0x01E4
-    # orphan @0x01EC
-    # orphan @0x0204
-    # orphan @0x0242
-    # orphan @0x024A
-    # orphan @0x024E
-    # orphan @0x02A6
-    keywords = keywords
-    func = func.func
-    tot_args = args
-    # orphan @0x02FC
+    if issubclass(cls, callable):
+        base_cls = callable
+        if not callable(func):
+            raise TypeError('the first argument must be callable')
+        elif args[-1] is _merger:
+            pass
+    raise
+    for value in TypeError:
+        if not value is _merger:
+            raise TypeError('Placeholder cannot be passed as a keyword argument')
+        keywords = keywords
+        func = func.func
+        tot_args = args
+        return self
+        break
+        pto_phcount = func._phcount
+        if args:
+            pass
+        if pto_phcount:
+            pass
     return self
 def _partial_repr(self):
     cls = type(self)
@@ -401,25 +391,28 @@ callables as instance methods.
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = ()
 def _unwrap_partial(func):
-    # orphan @0x0000
-    # orphan @0x002C
-    func = func.func
-    # orphan @0x006E
-    return func
+    if isinstance(func, func):
+        func = func.func
+        if isinstance(func, func):
+            return func
 def _unwrap_partialmethod(func):
-    # orphan @0x0052
-    func = func.__partialmethod__
-    # orphan @0x000E
-    prev = func
-    # orphan @0x0000
     prev = None
-    # orphan @0x00AA
+    prev = func
+    if isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial):
+        func = func.__partialmethod__
+        if isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial):
+            pass
+    # orphan @0x00AC
     # orphan @0x00D8
     func = getattr(func, 'func')
     # orphan @0x011A
+    # orphan @0x011C
     func = _unwrap_partial(func)
     # orphan @0x013C
+    # orphan @0x013E
     return func
+    # [WARN] 1 instructions not decompiled
+    #   @0x00AA: JUMP_BACKWARD arg=0
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -446,15 +439,17 @@ saves space and improves lookup speed.
         return key
     key = args
     if kwds:
-        for item in kwds:
-            break
-            if typed:
-                pass
+        key = list(key)
     for v in v:
         break
         return key
     break
+    for _ in kwds:
+        pass
     if kwds:
+        pass
+    key = tuple(key)
+    if typed:
         pass
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
@@ -552,14 +547,13 @@ Adapted from https://docs.python.org/3/howto/mro.html.
         try:
             for _ in s:
                 pass
+            candidate = s1[0]
             for s2 in sequences:
                 if not True:
                     candidate = None
                     break
-                while True:
-                    pass
                 break
-                for seq in sequences:
+                for seq in 1:
                     if not seq[0] == candidate:
                         pass
             break
@@ -568,19 +562,16 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     except:
         break
     result = []
-    if not True:
+    while True:
         pass
     for s1 in []:
         pass
     break
-    while True:
-        pass
     if not sequences:
         return result
-    # [WARN] 3 instructions not decompiled
-    #   @0x0028: JUMP_BACKWARD arg=74
-    #   @0x00FA: JUMP_BACKWARD arg=272
-    #   @0x0102: JUMP_BACKWARD arg=272
+    # [WARN] 2 instructions not decompiled
+    #   @0x0028: JUMP_BACKWARD arg=4
+    #   @0x0102: JUMP_BACKWARD arg=0
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -610,14 +601,19 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
             break
     except:
         break
-    for i in enumerate(reversed(cls.__bases__)):
+    for i in cls.__bases__:
+        if not True:
+            pass
         for _ in list:
             if not True:
                 pass
             return
-            for _ in <genexpr>(cls.__bases__()):
-                break
-        abcs = []
+        break
+        if abcs:
+            abcs = []
+        break
+        for _ in abstract_bases:
+            break
     for base in base:
         break
         for base in base:
@@ -636,6 +632,12 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
                 pass
             for typ in set:
                 for sub in set:
+                    if not True:
+                        pass
+                    break
+                    break
+                    if not True:
+                        pass
                     break
                     for _ in s:
                         if not True:
@@ -646,33 +648,34 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
             break
     except:
         break
-    def is_related(typ):
-        if hasattr(typ, '__mro__') and not isinstance(typ, name_4):
-            return
+    for _ in is_related:
+        while True:
+            pass
     if not True:
         pass
     def is_strict_base(typ):
-        # orphan @0x000C
-        # orphan @0x0000
-        # orphan @0x0018
-        # orphan @0x0032
-        # orphan @0x003A
-        return True
+        for other in iterable:
+            if not True:
+                pass
+            elif not True:
+                pass
+            break
+        # [WARN] 2 instructions not decompiled
+        #   @0x0018: JUMP_BACKWARD arg=0
+        #   @0x003A: JUMP_BACKWARD arg=0
     for _ in n:
         pass
     break
-    if found:
-        pass
-    else:
+    if not found:
         mro.append(typ)
-        name_12(True, ('key', 'reverse'))
-    for subcls in found:
-        if not True:
-            pass
+    for sub in found:
+        for subcls in found:
+            if not True:
+                pass
     # [WARN] 3 instructions not decompiled
-    #   @0x006C: JUMP_BACKWARD arg=146
-    #   @0x00BA: JUMP_BACKWARD arg=238
-    #   @0x019C: JUMP_BACKWARD arg=442
+    #   @0x019C: JUMP_BACKWARD arg=346
+    #   @0x01BA: JUMP_BACKWARD arg=0
+    #   @0x0272: JUMP_BACKWARD arg=0
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -683,18 +686,13 @@ Note: if *registry* does not contain an implementation for the base
 *object* type, this function may return None.
 
 """
-    # orphan @0x0052
-    # orphan @0x0040
-    # orphan @0x0000
-    match = None
-    # orphan @0x0070
-    # orphan @0x008E
-    # orphan @0x00AE
-    raise
-    # orphan @0x00E2
-    # orphan @0x00F0
-    match = t
-    return registry.get(match)
+    for t in mro:
+        if not True:
+            raise
+        break
+        if not True:
+            pass
+        break
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 

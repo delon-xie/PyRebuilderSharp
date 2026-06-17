@@ -202,8 +202,7 @@ public class VersionStrategy313 : VersionStrategyBase
             or Models.Bytecode.Opcode.POP_JUMP_IF_NOT_NONE or Models.Bytecode.Opcode.POP_JUMP_IF_NONE
             or Models.Bytecode.Opcode.FOR_ITER or Models.Bytecode.Opcode.JUMP_BACKWARD_NO_INTERRUPT
             or Models.Bytecode.Opcode.JUMP_ABSOLUTE or Models.Bytecode.Opcode.JUMP_IF_TRUE_OR_POP
-            or Models.Bytecode.Opcode.JUMP_IF_FALSE_OR_POP or Models.Bytecode.Opcode.TO_BOOL_313
-            or Models.Bytecode.Opcode.POP_ITER_314
+            or Models.Bytecode.Opcode.JUMP_IF_FALSE_OR_POP
             or Models.Bytecode.Opcode.SEND => true,
         _ => false
     };

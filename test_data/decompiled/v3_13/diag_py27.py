@@ -18,8 +18,13 @@ if r.stdout.strip():
 else:
     break
 break
+print(f"Error: {r2.stderr[None:200]}")
+break
 break
 raise
 break
 raise
-# [SUMMARY] 23 blocks · 24 processed · 4 orphan · 267 instr
+# [WARN] 2 instructions not decompiled
+#   @0x0424: JUMP_BACKWARD arg=0
+#   @0x045A: JUMP_BACKWARD arg=0
+# [SUMMARY] 23 blocks · 24 processed · 2 orphan · 267 instr

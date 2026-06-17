@@ -15,14 +15,17 @@ print('  code len:', len(code.co_code))
 print('  code hex:', code.co_code.hex()[:60])
 def dump_code(c, depth):
     '  '
-    # orphan @0x0054
-    # orphan @0x0030
-    # orphan @0x0000
-    prefix = '  ' * depth
-    # orphan @0x007C
-    # orphan @0x00AC
-    # orphan @0x00FC
-    dump_code(depth, const + 1)
+    for const in c.co_consts:
+        if not hasattr(const, 'co_code'):
+            pass
+        break
+        break
+        if not hasattr(const, 'co_name'):
+            pass
+    # [WARN] 3 instructions not decompiled
+    #   @0x0056: JUMP_BACKWARD arg=0
+    #   @0x007E: JUMP_BACKWARD arg=0
+    #   @0x0156: JUMP_BACKWARD arg=0
 dump_code(code)
 return None
 raise

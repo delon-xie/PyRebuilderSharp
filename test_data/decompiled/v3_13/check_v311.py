@@ -7,7 +7,11 @@ except:
 import marshal
 import struct
 import sys
-for off in open(sys.argv[1], 'rb'):
+magic = f.read(4)
+hdr_rest = f.read(12)
+code = marshal.load(f)
+print('Python marshal results:')
+for off in f.close:
     if raw[off:off + 4] == b'AAAAAA==':
         pass
     else:
@@ -19,4 +23,4 @@ for off in open(sys.argv[1], 'rb'):
     return None
 break
 raise
-# [SUMMARY] 17 blocks · 18 processed · 4 orphan · 273 instr
+# [SUMMARY] 17 blocks · 18 processed · 1 orphan · 273 instr

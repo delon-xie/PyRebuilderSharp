@@ -99,22 +99,17 @@ class Repr:
     def repr_deque(self, x, level):
         return
     def repr_dict(self, x, level):
-        # orphan @0x0046
-        return
-        # orphan @0x0032
-        # orphan @0x0024
-        return '{}'
-        # orphan @0x0000
         n = len(x)
-        # orphan @0x00B6
-        newlevel = level - 1
-        repr1 = self.repr1
-        pieces = []
-        # orphan @0x00BE
-        pieces.append(f"{keyrepr}: {valrepr}")
-        # orphan @0x013C
-        pieces.append(self.fillvalue)
-        return f"{{s}}"
+        if n == 0:
+            return '{}'
+            if level <= 0:
+                pass
+            for key in level <= 0:
+                pieces.append(f"{keyrepr}: {valrepr}")
+                break
+                pieces.append(self.fillvalue)
+                return f"{{s}}"
+        return
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:

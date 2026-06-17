@@ -27,25 +27,26 @@ import subprocess
 import ast
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
+while __name__:
+    pass
 for ver in __name__():
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)
-        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+    r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
 if not True:
     pass
-while True:
-    pass
 return None
+break
 raise
 ex = None
-while True:
-    pass
 # orphan @0x0472
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x037E: JUMP_BACKWARD arg=940
-#   @0x03A8: JUMP_BACKWARD arg=1144
-#   @0x0464: JUMP_BACKWARD arg=1144
-# [SUMMARY] 46 blocks · 46 processed · 13 orphan · 263 instr
+# [WARN] 6 instructions not decompiled
+#   @0x0214: JUMP_BACKWARD arg=0
+#   @0x037E: JUMP_BACKWARD arg=732
+#   @0x03A8: JUMP_BACKWARD arg=0
+#   @0x03B2: JUMP_BACKWARD arg=0
+#   @0x03B8: JUMP_BACKWARD arg=0
+#   @0x0464: JUMP_BACKWARD arg=0
+# [SUMMARY] 46 blocks · 46 processed · 9 orphan · 263 instr

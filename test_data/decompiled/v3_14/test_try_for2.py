@@ -10,11 +10,11 @@ def test5():
             except:
                 pass
             y = x
+            return None
         except:
             break
     except:
         break
-    return None
     # orphan @0x003E
     raise
 return None

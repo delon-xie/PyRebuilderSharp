@@ -31,17 +31,22 @@ if expected_ast == actual_ast:
     return None
 break
 if not i > 5:
-    break
+    pass
 for e in range(max(len(exp_lines), len(act_lines))):
     e = '(missing)'
     if i < len(act_lines):
         a = '(missing)'
         if not e != a:
-            print(f"Line {i}:")
-            print(f"  expected: {e}")
+            pass
+    print(f"Line {i}:")
+    print(f"  expected: {e}")
+break
 e = None
 raise
 e = None
 # orphan @0x036C
 raise
-# [SUMMARY] 37 blocks · 37 processed · 10 orphan · 243 instr
+# [WARN] 2 instructions not decompiled
+#   @0x0212: JUMP_BACKWARD arg=0
+#   @0x0268: JUMP_BACKWARD arg=0
+# [SUMMARY] 37 blocks · 37 processed · 8 orphan · 243 instr

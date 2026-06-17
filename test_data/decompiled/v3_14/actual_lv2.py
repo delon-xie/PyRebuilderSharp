@@ -9,9 +9,11 @@ y = 2
 z = x + y
 i = 0
 if i < 5:
-    for n in i < 5:
-        m = n + 1
+    j = i * 2
+    i += 1
+for n in range(10):
+    m = n + 1
 return None
 # orphan @0x009A
 raise
-# [SUMMARY] 12 blocks · 11 processed · 5 orphan · 52 instr
+# [SUMMARY] 12 blocks · 11 processed · 3 orphan · 52 instr

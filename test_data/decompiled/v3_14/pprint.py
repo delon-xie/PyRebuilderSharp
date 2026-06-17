@@ -81,7 +81,7 @@ def _safe_tuple(t):
 class PrettyPrinter:
     try:
         try:
-            for _ in (1, 80, None, None):
+            for _ in cls:
                 pass
             def _pprint_user_list(self, object, stream, indent, allowance, context, level):
                 self._format(object.data, indent, stream, context, allowance, level - 1)
@@ -113,9 +113,7 @@ class PrettyPrinter:
             t = ('<f-string>')
             def _safe_repr(self, object, context, maxlevels, level):
                 # orphan @0x03B2
-                (krepr, kreadable, krecur) = self.format(context, k, level, maxlevels)
-                (vrepr, vreadable, vrecur) = self.format(v, maxlevels, context, level)
-                append(f"{krepr}: {vrepr}")
+                # orphan @0x03AC
                 # orphan @0x038A
                 items = object.items()
                 # orphan @0x0348
@@ -128,55 +126,53 @@ class PrettyPrinter:
                 # orphan @0x02DA
                 return (False, True)
                 # orphan @0x02CA
-                # orphan @0x0278
-                rep = f"{object.__class__.__name__}({rep})"
+                # orphan @0x02AA
+                rep = f")"
                 return (rep, False, context in objid)
+                # orphan @0x0290
+                # orphan @0x0278
                 # orphan @0x0264
                 rep = '{...}'
                 # orphan @0x025E
-                # orphan @0x0258
-                # orphan @0x0236
-                objid = id(object)
                 # orphan @0x01F0
                 rep = f"{object.__class__.__name__}()"
                 rep = '{}'
                 return (rep, True, False)
-                # orphan @0x01E0
-                # orphan @0x01C0
+                # orphan @0x01EC
                 # orphan @0x01B0
                 # orphan @0x0186
                 # orphan @0x0158
                 # orphan @0x0130
                 return (repr(object), True, False)
                 # orphan @0x0106
-                # orphan @0x00DA
-                return ('_d', True, False)
-                # orphan @0x00B6
-                # orphan @0x008E
-                r = getattr(typ, '__repr__', None)
-                # orphan @0x002C
-                return (repr(object), True, False)
-                # orphan @0x0000
                 typ = type(object)
+                if typ in repr:
+                    return (repr(object), True, False)
+                r = getattr(typ, '__repr__', None)
+                if (r is __class__.__repr__) and self._underscore_numbers:
+                    return ('_d', True, False)
+                elif not True:
+                    pass
+                else:
+                    recursive = True
+                    rep = '{%s}' % ', '.join(components)
+                objid = id(object)
+                if maxlevels:
+                    pass
+                elif r is name_44.__repr__:
+                    pass
+                # orphan @0x03E0
+                (vrepr, vreadable, vrecur) = self.format(v, maxlevels, context, level)
+                append(f"{krepr}: {vrepr}")
                 # orphan @0x0442
                 # orphan @0x044E
                 # orphan @0x0456
                 readable = vreadable
                 # orphan @0x046C
                 # orphan @0x047C
-                # orphan @0x0482
-                recursive = True
-                rep = '{%s}' % ', '.join(components)
-                # orphan @0x04D0
-                rep = f"{object.__class__.__name__}({rep})"
-                return (readable, rep, recursive)
                 # orphan @0x053C
                 # orphan @0x055E
                 # orphan @0x0564
-                # orphan @0x056C
-                # orphan @0x0574
-                # orphan @0x0592
-                # orphan @0x05BA
                 # orphan @0x05BE
                 # orphan @0x05E6
                 # orphan @0x05F6
@@ -231,20 +227,6 @@ class PrettyPrinter:
                 object = object(key, ('key',))
                 readable = True
                 recursive = False
-                # orphan @0x0A34
-                components = []
-                append = components.append
-                level += 1
-                # orphan @0x0A6A
-                (vrepr, vreadable, vrecur) = self.format(val, maxlevels, context, level)
-                append(vrepr)
-                # orphan @0x0ABA
-                readable = vreadable
-                # orphan @0x0AD0
-                recursive = True
-                # orphan @0x0AF4
-                # orphan @0x0B1E
-                return (recursive, readable)
                 # orphan @0x0B4C
                 rep = repr(object)
                 # orphan @0x0B62
@@ -394,9 +376,10 @@ underscore_numbers
         if not True:
             pass
         break
-        self._format_namespace_items(stream, items, allowance, indent, level, context)
-        # [WARN] 1 instructions not decompiled
-        #   @0x00F6: JUMP_BACKWARD arg=390
+        break
+        # [WARN] 2 instructions not decompiled
+        #   @0x00F6: JUMP_BACKWARD arg=-2
+        #   @0x013C: JUMP_BACKWARD arg=-2
     _dispatch = {}
     def _pprint_dict(self, object, stream, indent, allowance, context, level):
         '{'
@@ -477,84 +460,56 @@ underscore_numbers
         # orphan @0x0202
         stream.write(self._format_block_end(indent, endchar))
     def _pprint_str(self, object, stream, indent, allowance, context, level):
-        # orphan @0x0190
-        max_width1 = allowance - max_width1
-        # orphan @0x0148
-        rep = repr(line)
-        # orphan @0x00C4
-        indent += 1
-        allowance += 1
         # orphan @0x00B8
         # orphan @0x0094
         chunks = []
         lines = object.splitlines(True)
-        # orphan @0x003A
-        write(repr(object))
-        return None
-        # orphan @0x0000
         write = stream.write
-        # orphan @0x01C0
-        # orphan @0x01E0
-        # orphan @0x01E4
-        import re
-        parts = re.findall('\\S*\\s*', line)
-        # orphan @0x0222
-        raise None
-        # orphan @0x0228
-        # orphan @0x0244
-        raise None
-        # orphan @0x024A
-        # orphan @0x0252
-        max_width2 = max_width
-        current = ''
-        # orphan @0x028C
-        candidate = current + part
-        # orphan @0x02D2
-        # orphan @0x0300
-        max_width2 -= allowance
-        # orphan @0x0344
-        # orphan @0x0346
-        # orphan @0x0354
-        chunks.append(repr(current))
-        current = part
-        current = candidate
-        # orphan @0x03AC
-        # orphan @0x03DC
-        # orphan @0x0410
-        write(rep)
-        return None
-        # orphan @0x0432
-        # orphan @0x0446
-        # orphan @0x047E
-        # orphan @0x048A
-        # orphan @0x0490
-        write("""
+        if not len(object):
+            write(repr(object))
+            return None
+        for rep in indent._indent_per_level:
+            rep = repr(line)
+            max_width1 = allowance - max_width1
+            if len(rep) <= max_width1:
+                pass
+            break
+            write(rep)
+            break
+            if not True:
+                pass
+            import re
+            if not parts:
+                raise None
+            for _ in self._format_block_start:
+                write("""
 """ + ' ' * indent)
-        write(rep)
-        # orphan @0x04E2
-        write(self._format_block_end(')', self - indent._indent_per_level))
+                write(rep)
+                if level == 1:
+                    write(self._format_block_end(')', self - indent._indent_per_level))
+                    return None
+            if parts[-1]:
+                raise None
+            for (j, part) in parts.pop:
+                candidate = current + part
+                if (j == len(parts) - 1) and (i == len(lines) - 1):
+                    max_width2 -= allowance
+                    if len(repr(candidate)) > max_width2:
+                        pass
+        # orphan @0x0432
     def _pprint_bytes(self, object, stream, indent, allowance, context, level):
-        # orphan @0x00B2
-        indent += 1
-        allowance += 1
-        write(self._format_block_start('(', indent))
-        delim = ''
         # orphan @0x009C
         # orphan @0x0078
         parens = level == 1
-        # orphan @0x0038
-        write(repr(object))
-        return None
-        # orphan @0x0000
         write = stream.write
-        # orphan @0x015A
-        write(delim)
-        write(rep)
-        # orphan @0x018A
-        # orphan @0x019E
-        # orphan @0x01AC
-        # orphan @0x01C6
-        write(self._format_block_end(')', self - indent._indent_per_level))
+        if len(object) <= 4:
+            write(repr(object))
+        for rep in indent._indent_per_level:
+            write(delim)
+            write(rep)
+            if delim:
+                pass
+            write(self._format_block_end(')', self - indent._indent_per_level))
     def _pprint_bytearray(self, object, stream, indent, allowance, context, level):
         'bytearray('
         write = stream.write
@@ -583,41 +538,36 @@ underscore_numbers
     def _format_dict_items(self, items, stream, indent, allowance, context, level):
         """,
 """
-        # orphan @0x009C
-        last = last_index == i
-        rep = self._repr(context, key, level)
-        write(rep)
-        write(': ')
-        # orphan @0x0000
-        write = stream.write
-        indent = self + indent._indent_per_level
-        delimnl = """,
-""" + ' ' * indent
-        last_index = len(items) - 1
-        # orphan @0x015E
-        # orphan @0x0182
-        write(delimnl)
-        # orphan @0x01BA
-        write(',')
+        for i in enumerate(items):
+            last = last_index == i
+            rep = self._repr(context, key, level)
+            write(rep)
+            write(': ')
+            if last:
+                break
+                if not last:
+                    write(delimnl)
+            if not True:
+                pass
+            break
     def _format_namespace_items(self, items, stream, indent, allowance, context, level):
         """,
 """
-        # orphan @0x0078
-        last = last_index == i
-        write(key)
-        write('=')
-        # orphan @0x0000
-        write = stream.write
-        delimnl = """,
-""" + ' ' * indent
-        last_index = len(items) - 1
-        # orphan @0x00CA
-        write('...')
-        # orphan @0x0148
-        # orphan @0x016C
-        write(delimnl)
-        # orphan @0x01A4
-        write(',')
+        for i in enumerate(items):
+            last = last_index == i
+            write(key)
+            write('=')
+            if id(ent) in context:
+                write('...')
+                if last:
+                    break
+                    if not last:
+                        write(delimnl)
+            if not True:
+                pass
+            break
+        # [WARN] 1 instructions not decompiled
+        #   @0x01BA: JUMP_BACKWARD arg=-14
     def _format_items(self, items, stream, indent, allowance, context, level):
         """,
 """
@@ -649,12 +599,12 @@ underscore_numbers
                         write(delim)
                         delim = ', '
                         write(rep)
-                        write(delim)
-                        delim = delimnl
-                        if last and last:
-                            pass
-                        write(',')
-                        return None
+        delim = delimnl
+        if last and not last:
+            pass
+        if not True:
+            pass
+        return None
         return None
         raise
         raise
@@ -695,27 +645,23 @@ and whether the object represents a recursive construct.
         self._format_dict_items(items, stream, self._child_indent(indent, len(cls.__name__) + 1), allowance + 2, context, level)
         stream.write(self._format_block_end('})', indent))
     def _pprint_chain_map(self, object, stream, indent, allowance, context, level):
-        # orphan @0x0036
-        stream.write(repr(object))
-        return None
-        # orphan @0x0000
-        while True:
-            pass
+        if not len(object.maps):
+            stream.write(repr(object))
+            return None
+        for _ in indent._indent_per_level:
+            if i == len(object.maps) - 1:
+                self._format(stream, m, allowance, indent + 1, level, context)
+                if self._expand:
+                    stream.write(',')
+                    stream.write(self._format_block_end(')', self - indent._indent_per_level))
+            break
+            return None
         # orphan @0x012E
         cls = object.__class__
         stream.write(self._format_block_start(cls.__name__ + '(', self + indent._indent_per_level))
-        # orphan @0x0142
-        indent += len(cls.__name__) + 1
-        # orphan @0x01CA
-        # orphan @0x0210
-        self._format(stream, m, allowance, indent + 1, level, context)
-        # orphan @0x0268
-        stream.write(',')
-        stream.write(self._format_block_end(')', self - indent._indent_per_level))
         # orphan @0x02F0
-        self._format(stream, m, indent, 1, level, context)
-        stream.write(""",
-""" + ' ' * indent)
+        # [WARN] 1 instructions not decompiled
+        #   @0x02EE: JUMP_BACKWARD arg=-4
     def _pprint_deque(self, object, stream, indent, allowance, context, level):
         # orphan @0x00FA
         cls = object.__class__
@@ -754,8 +700,11 @@ def _wrap_bytes_repr(object, width, allowance):
             if (len(repr(candidate)) > width) and current:
                 pass
         except:
-            pass
+            return None
     except:
-        pass
+        return None
+    # [WARN] 2 instructions not decompiled
+    #   @0x0110: JUMP_BACKWARD arg=0
+    #   @0x0118: JUMP_BACKWARD arg=0
 return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 111 instr

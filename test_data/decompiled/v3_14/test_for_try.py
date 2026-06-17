@@ -10,4 +10,6 @@ return None
 # orphan @0x0040
 # orphan @0x0046
 raise
-# [SUMMARY] 10 blocks · 9 processed · 5 orphan · 27 instr
+# [WARN] 1 instructions not decompiled
+#   @0x0030: JUMP_BACKWARD arg=0
+# [SUMMARY] 10 blocks · 9 processed · 4 orphan · 27 instr

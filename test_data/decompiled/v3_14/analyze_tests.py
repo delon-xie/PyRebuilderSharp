@@ -28,11 +28,12 @@ if i < len(lines):
                     if version_match:
                         version = version_match.group(1)
                         if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
-                            i += 1
-                            print('======================================================================')
-                            print('Python 3.7-3.10 版本测试通过率统计')
-                            print('======================================================================')
-                for version in '<10':
+                            pass
+                print('----------------------------------------------------------------------')
+                total_passed = 0
+                total_failed = 0
+                total = 0
+                for version in version_stats.keys:
                     stats = version_stats[version]
                     t = stats['total']
                     p = stats['passed']
@@ -49,5 +50,12 @@ if i < len(lines):
                             '<10'(f" {total_failed}<10 {total}<10 {overall_rate}>8.1f%")
                             print('======================================================================')
                             return None
+i += 1
+print('======================================================================')
+print('Python 3.7-3.10 版本测试通过率统计')
+print('======================================================================')
 raise
-# [SUMMARY] 45 blocks · 46 processed · 7 orphan · 400 instr
+# [WARN] 2 instructions not decompiled
+#   @0x0380: JUMP_BACKWARD arg=0
+#   @0x0398: JUMP_BACKWARD arg=0
+# [SUMMARY] 45 blocks · 46 processed · 4 orphan · 400 instr

@@ -11,27 +11,22 @@ def get_python_version(filepath):
     return name_4.get(magic, 'unknown')
     raise
 def fix_pyc_names(directory):
-    # orphan @0x00DE
-    new_filename = filename
-    # orphan @0x00C6
-    # orphan @0x0062
-    actual_version = get_python_version(filepath)
-    # orphan @0x0034
-    # orphan @0x0000
-    # orphan @0x0112
-    # orphan @0x0128
-    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-    import re
-    # orphan @0x018E
-    # orphan @0x01A2
-    # orphan @0x01BE
-    new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
-    # orphan @0x0202
-    # orphan @0x0252
-    # orphan @0x028C
-    print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-    # orphan @0x02B0
-    print(f"✓ Renamed {filename} -> {new_filename}")
+    for filename in os.listdir(directory):
+        if not True:
+            pass
+        elif f".pyc" in filename:
+            new_filename = filename
+        actual_version = get_python_version(filepath)
+        if actual_version == 'unknown':
+            pass
+        elif match:
+            pass
+        for version in f".pyc" in filename:
+            if not f".{version}.pyc" in new_filename:
+                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                break
+            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+        break
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

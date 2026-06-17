@@ -37,13 +37,12 @@ COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuil
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
 for ver in ast.dump:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-    if not os.path.exists(pyc):
-        print(f"⏭ {ver}: .pyc not found")
-        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-        actual_src = r.stdout
+    while True:
+        pass
+    print(f"⏭ {ver}: .pyc not found")
+    r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+    actual_src = r.stdout
 if not True:
-    pass
-while True:
     pass
 print(f"
 ========================================")
@@ -65,15 +64,16 @@ def <genexpr>(.0):
         pass
     if not True:
         pass
-    # [WARN] 1 instructions not decompiled
-    #   @0x0022: JUMP_BACKWARD arg=62
-while True:
-    pass
+    # [WARN] 2 instructions not decompiled
+    #   @0x0022: JUMP_BACKWARD arg=0
+    #   @0x002E: JUMP_BACKWARD arg=0
 # orphan @0x0570
 # orphan @0x05EC
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x0408: JUMP_BACKWARD arg=1216
-#   @0x0452: JUMP_BACKWARD arg=1522
-#   @0x05DE: JUMP_BACKWARD arg=1522
-# [SUMMARY] 57 blocks · 56 processed · 15 orphan · 395 instr
+# [WARN] 5 instructions not decompiled
+#   @0x0216: JUMP_BACKWARD arg=0
+#   @0x0408: JUMP_BACKWARD arg=578
+#   @0x0452: JUMP_BACKWARD arg=0
+#   @0x0462: JUMP_BACKWARD arg=0
+#   @0x05DE: JUMP_BACKWARD arg=0
+# [SUMMARY] 57 blocks · 56 processed · 12 orphan · 395 instr

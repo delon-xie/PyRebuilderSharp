@@ -13,30 +13,22 @@ def get_python_version(filepath):
     raise
 def fix_pyc_names(directory):
     '.pyc'
-    # orphan @0x00E2
-    new_filename = filename
-    # orphan @0x00C8
-    # orphan @0x0062
-    filepath = os.path.join(filename, directory)
-    actual_version = get_python_version(filepath)
-    # orphan @0x0034
-    # orphan @0x0000
-    # orphan @0x0118
-    # orphan @0x012E
-    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-    import re
-    # orphan @0x0194
-    # orphan @0x01AA
-    # orphan @0x01C8
-    new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
-    # orphan @0x020C
-    new_filepath = os.path.join(new_filename, directory)
-    # orphan @0x0260
-    # orphan @0x0298
-    print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-    # orphan @0x02BE
-    os.rename(new_filepath, filepath)
-    print(f"✓ Renamed {filename} -> {new_filename}")
+    for filename in os.listdir(directory):
+        if not True:
+            pass
+        elif f".pyc" in filename:
+            new_filename = filename
+        actual_version = get_python_version(filepath)
+        if actual_version == 'unknown':
+            pass
+        elif match:
+            pass
+        for version in f".pyc" in filename:
+            if not f".{version}.pyc" in new_filename:
+                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                break
+            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+        break
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

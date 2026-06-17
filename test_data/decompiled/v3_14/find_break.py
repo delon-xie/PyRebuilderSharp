@@ -28,15 +28,18 @@ def test_until_broken(exprs):
     return f"CONDITIONAL: {out[:80]}"
     raise
 def find_breaking_point(exprs, lo, hi):
-    # orphan @0x000C
-    mid = (hi + lo) // 2
-    result = test_until_broken(exprs[None:mid + 1])
-    print(f"  [{lo}-{hi}] mid={mid} ({mid[exprs][:30]}): {result}")
-    # orphan @0x0000
-    # orphan @0x00B0
-    hi = mid
+    if hi < lo:
+        mid = (hi + lo) // 2
+        result = test_until_broken(exprs[None:mid + 1])
+        print(f"  [{lo}-{hi}] mid={mid} ({mid[exprs][:30]}): {result}")
+        if result != 'OK':
+            hi = mid
+    # orphan @0x00B8
     lo = mid + 1
+    # orphan @0x00CE
     return lo
+    # [WARN] 1 instructions not decompiled
+    #   @0x00B6: JUMP_BACKWARD arg=0
 base = all_exprs[:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")

@@ -9,9 +9,11 @@ if i < 5:
     j = i * 2
     i += 1
     if i < 5:
-        for n in i < 5:
-            break
+        pass
+break
+for n in range(10):
+    pass
 return None
 # orphan @0x0072
 raise
-# [SUMMARY] 13 blocks · 11 processed · 5 orphan · 47 instr
+# [SUMMARY] 12 blocks · 10 processed · 3 orphan · 47 instr

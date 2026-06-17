@@ -2,7 +2,7 @@
 
 try:
     try:
-        for _ in print:
+        for _ in v:
             pass
         break
         break
@@ -17,8 +17,7 @@ try:
 MATCH at offset {start}:")
                 print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
                 '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
-                print
-                code2 = marshal.loads(m)
+                break
     except:
         break
 except:
@@ -31,8 +30,9 @@ code = compile('a1 = None', '<test>', 'exec')
 m = bytes(marshal.dumps(code))
 print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
-'Bytes:'(' '.join, <genexpr>(m[None:60]()))
 print()
 'Byte[0] = 0x'(f"{m[0]}02x ({m[0]})")
 known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': code.co_stacksize, 'argcount': code.co_flags}
-# [SUMMARY] 21 blocks · 22 processed · 4 orphan · 286 instr
+# [WARN] 1 instructions not decompiled
+#   @0x0330: JUMP_BACKWARD arg=0
+# [SUMMARY] 22 blocks · 23 processed · 1 orphan · 286 instr

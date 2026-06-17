@@ -54,6 +54,8 @@ t = raw & 127
 if (t in (40, 41)) and (t == 41):
     pass
 break
+'  ['(f"{i}] type=0x{raw2}02X (stripped={t2}){flags} -> skip")
+tmp = io.BytesIO(data)
 break
 count = struct.unpack('<I', data[pos:pos + 4])[0]
 if t == 41:
@@ -71,15 +73,21 @@ if t == 41:
 break
 if t2 == 78:
     print(f"  [{i}] None{flags}")
-    if t2 in (122, 90):
-        length = data[pos]
-        pos += 1
-        s = 'utf-8'('replace', ('errors',))
-        pos += length
+if t2 in (122, 90):
+    length = data[pos]
+    pos += 1
+    s = 'utf-8'('replace', ('errors',))
+    pos += length
 pos = tmp.tell()
 print(f"    -> {repr(val)}")
 print(f"pos {pos}: after all constants")
 print(f"total file: {len(data)}")
 return None
 raise
-# [SUMMARY] 48 blocks · 49 processed · 9 orphan · 602 instr
+# [WARN] 5 instructions not decompiled
+#   @0x01E4: JUMP_BACKWARD arg=0
+#   @0x06F4: JUMP_BACKWARD arg=0
+#   @0x0724: JUMP_BACKWARD arg=0
+#   @0x07D4: JUMP_BACKWARD arg=0
+#   @0x08BE: JUMP_BACKWARD arg=0
+# [SUMMARY] 48 blocks · 49 processed · 3 orphan · 602 instr

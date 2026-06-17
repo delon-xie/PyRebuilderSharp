@@ -10,12 +10,10 @@ z = x + y
 i = 0
 if i < 5:
     j = i * 2
-    i += 1
-    if i < 5:
-        for n in i < 5:
-            m = n + 1
-            break
+for n in i < 5:
+    m = n + 1
+    break
 return None
 # orphan @0x0080
 raise
-# [SUMMARY] 13 blocks · 12 processed · 5 orphan · 53 instr
+# [SUMMARY] 13 blocks · 12 processed · 3 orphan · 53 instr

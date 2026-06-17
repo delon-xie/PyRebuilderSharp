@@ -6,8 +6,12 @@ except:
     break
 i = 0
 if i < 5:
-    for n in i < 5:
-        m = n + 1
+    j = i * 2
+    i += 1
+for n in range(10):
+    m = n + 1
 # orphan @0x0084
 raise
-# [SUMMARY] 11 blocks · 10 processed · 5 orphan · 46 instr
+# [WARN] 1 instructions not decompiled
+#   @0x0064: JUMP_BACKWARD arg=0
+# [SUMMARY] 11 blocks · 10 processed · 3 orphan · 46 instr

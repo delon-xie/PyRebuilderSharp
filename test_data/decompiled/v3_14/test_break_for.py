@@ -1,8 +1,9 @@
 # Decompiled from: <module>
 
-# orphan @0x0000
-# orphan @0x0016
-# orphan @0x004C
+for i in range(3):
+    if i == 1:
+        break
+# orphan @0x0032
 a = i
 return None
-# [SUMMARY] 7 blocks · 4 processed · 6 orphan · 23 instr
+# [SUMMARY] 7 blocks · 7 processed · 3 orphan · 23 instr

@@ -1,9 +1,8 @@
 # Decompiled from: <module>
 
-# orphan @0x0012
-# orphan @0x0000
 x = 10
-# orphan @0x0026
-y = n
-return None
-# [SUMMARY] 6 blocks · 4 processed · 5 orphan · 23 instr
+if x > 0:
+    for n in x > 0:
+        y = n
+        break
+# [SUMMARY] 5 blocks · 6 processed · 1 orphan · 23 instr

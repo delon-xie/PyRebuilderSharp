@@ -837,13 +837,36 @@ public class PycReader
                 // 3.13+: 从当前偏移开始, 跳过 arg 条指令 (含 cache)
                 int skipCount = arg.Value;
                 int scanPos = offset;
-                while (skipCount > 0 && scanPos + 1 < bytecode.Length)
+
+                if (op == Models.Bytecode.Opcode.JUMP_BACKWARD || op == Models.Bytecode.Opcode.JUMP_BACKWARD_NO_INTERRUPT)
                 {
-                    byte scanOp = bytecode[scanPos];
-                    if (scanOp == 0) { scanPos += 2; continue; } // skip cache NOP
-                    int cacheBytes = _strategy.GetCacheCount(scanOp) * 2;
-                    scanPos += 2 + cacheBytes; // opcode+arg + cache
-                    skipCount--;
+                    // Jump backward: scan negative direction from current offset
+                    while (skipCount > 0 && scanPos > 0)
+                    {
+                        scanPos -= 2; // walk backward by opcode+arg slot
+                        if (scanPos >= 0)
+                        {
+                            byte scanOp = bytecode[scanPos];
+                            if (scanOp != 0) // not a cache NOP
+                            {
+                                int cacheBytes = _strategy.GetCacheCount(scanOp) * 2;
+                                scanPos -= cacheBytes; // walk past cache entries
+                                skipCount--;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Jump forward: scan positive direction
+                    while (skipCount > 0 && scanPos + 1 < bytecode.Length)
+                    {
+                        byte scanOp = bytecode[scanPos];
+                        if (scanOp == 0) { scanPos += 2; continue; } // skip cache NOP
+                        int cacheBytes = _strategy.GetCacheCount(scanOp) * 2;
+                        scanPos += 2 + cacheBytes; // opcode+arg + cache
+                        skipCount--;
+                    }
                 }
                 arg = scanPos;
             }

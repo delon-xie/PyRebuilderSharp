@@ -5,37 +5,48 @@ def depth_5_if(x0, x1, x2, x3, x4):
     if (x0 > 0) and (x1 > 1) and (x2 > 2) and (x3 > 3) and (x4 > 4):
         result = 42
 def depth_5_for():
-    # orphan @0x003C
-    # orphan @0x0020
-    # orphan @0x0000
-    total = 0
-    # orphan @0x0058
-    # orphan @0x0074
-    # orphan @0x0090
-    total += 1
+    for a in range(2):
+        for b in range(2):
+            for c in range(2):
+                for d in range(2):
+                    for e in range(2):
+                        total += 1
+                        break
+                        break
+                        break
+                        break
+                        break
+    # [WARN] 4 instructions not decompiled
+    #   @0x00A4: JUMP_BACKWARD arg=-2
+    #   @0x00AC: JUMP_BACKWARD arg=-2
+    #   @0x00B4: JUMP_BACKWARD arg=-2
+    #   @0x00BC: JUMP_BACKWARD arg=-2
 def depth_5_while():
     # orphan @0x004A
     c -= 1
     d = 2
-    # orphan @0x0030
-    b -= 1
-    c = 2
-    # orphan @0x0016
-    a -= 1
-    b = 2
-    # orphan @0x0000
+    # orphan @0x0042
     total = 0
     a = 2
+    if a > 0:
+        a -= 1
+        b = 2
+        if b > 0:
+            b -= 1
+            c = 2
     # orphan @0x0064
     d -= 1
     e = 2
     # orphan @0x007E
     e -= 1
-    total += 1
+    # orphan @0x008A
     # orphan @0x009E
     # orphan @0x00AE
     # orphan @0x00BE
+    # orphan @0x00C0
     # orphan @0x00CE
+    # orphan @0x00D0
+    # orphan @0x00DE
 def depth_5_try():
     # orphan @0x001E
     try:

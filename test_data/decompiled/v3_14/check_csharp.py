@@ -30,4 +30,6 @@ print(f"  TYPE_SHORT_ASCII len={length}")
 return None
 print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
 raise
-# [SUMMARY] 23 blocks · 24 processed · 8 orphan · 281 instr
+# [WARN] 1 instructions not decompiled
+#   @0x017C: JUMP_BACKWARD arg=0
+# [SUMMARY] 23 blocks · 24 processed · 7 orphan · 281 instr

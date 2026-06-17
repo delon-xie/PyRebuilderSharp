@@ -31,15 +31,20 @@ if i < len(lines):
                 version = version_match.group(1)
                 found_versions.append((version, next_line.strip()))
                 j += 1
-                if (j < len(lines)) and (j < i + 30) and found_versions:
-                    debug_count += 1
-                    if debug_count <= 5:
-                        for (v, line_text) in debug_count <= 5:
-                            print(f"  Found version: {v} in: {line_text}")
-                            break
-                            if i < len(lines):
-                                pass
-                            break
+                if (j < len(lines)) and (j < i + 30):
+                    pass
+                break
+if found_versions:
+    debug_count += 1
+    if debug_count <= 5:
+        for (v, line_text) in debug_count <= 5:
+            print(f"  Found version: {v} in: {line_text}")
+            break
+            if i < len(lines):
+                pass
 break
 raise
-# [SUMMARY] 43 blocks · 44 processed · 6 orphan · 243 instr
+# [WARN] 2 instructions not decompiled
+#   @0x02C4: JUMP_BACKWARD arg=0
+#   @0x036E: JUMP_BACKWARD arg=0
+# [SUMMARY] 43 blocks · 44 processed · 3 orphan · 243 instr

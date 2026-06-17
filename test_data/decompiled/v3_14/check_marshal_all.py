@@ -1,29 +1,9 @@
 # Decompiled from: <module>
 
-# orphan @0x005A
-py = os.path.expanduser(py_path)
-r = [py, '-c', script](True, True, 10, ('capture_output', 'text', 'timeout'))
-out = r.stdout.strip()
-print(f"=== {ver} ===")
-# orphan @0x0000
-__doc__ = 'Check marshal format across Python versions'
-import subprocess
-import os
-versions = {'3.5': '~/.pyenv/versions/3.5.10/bin/python', '3.6': '~/.pyenv/versions/3.6.15/bin/python', '3.7': '~/.pyenv/versions/3.7.17/bin/python', '3.8': '~/.pyenv/versions/3.8.20/bin/python', '3.9': '~/.pyenv/versions/3.9.25/bin/python', '3.10': '~/.pyenv/versions/3.10.20/bin/python'}
-script = """
-import marshal, struct
-c = compile('a=1','<t>','exec')
-m = bytes(marshal.dumps(c))
-print(m[0], len(m), ':')
-print(' '.join('{:02x}'.format(b) for b in m[:24]))
-# Check field alignment
-for off in [1, 5]:
-    if off + 16 <= len(m):
-        vals = struct.unpack_from('<IIII', m, off)
-        if vals[2] == c.co_stacksize:
-            print('FOUND at offset', off)
-"""
-# orphan @0x013C
-print(f"  {line}")
-return None
-# [SUMMARY] 7 blocks · 5 processed · 6 orphan · 91 instr
+for (ver, py_path) in versions.items():
+    for line in os.path.expanduser:
+        print(f"  {line}")
+        return None
+# [WARN] 1 instructions not decompiled
+#   @0x015C: JUMP_BACKWARD arg=0
+# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 91 instr

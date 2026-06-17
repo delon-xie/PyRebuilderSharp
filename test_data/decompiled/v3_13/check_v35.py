@@ -14,12 +14,14 @@ print('  nlocals:', code.co_nlocals)
 print('  code len:', len(code.co_code))
 print('  code hex:', code.co_code.hex()[None:60])
 def dump_code(c, depth):
-    # orphan @0x004C
-    # orphan @0x0028
-    # orphan @0x0000
-    prefix = '  ' * depth
-    # orphan @0x0072
-    # orphan @0x009A
+    for const in c.co_consts:
+        if not hasattr(const, 'co_code'):
+            pass
+        break
+        break
+        break
+        if not True:
+            pass
 dump_code(code)
 return None
 raise

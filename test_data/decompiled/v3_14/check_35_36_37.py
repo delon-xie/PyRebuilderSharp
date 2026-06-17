@@ -1,19 +1,17 @@
 # Decompiled from: <module>
 
-# orphan @0x008A
-pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-print(f"
+for ver in ('3.5', '3.6', '3.7'):
+    pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
+    r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+    print(f"
 === {ver} ===")
-# orphan @0x0000
-__doc__ = 'Show actual decompiled output for 3.5, 3.6, 3.7'
-import os
-import subprocess
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-# orphan @0x0142
-r.stdout[:500]('(empty)')
-# orphan @0x0198
-print(f"STDERR: {r.stderr[:200]}")
-return None
-# [SUMMARY] 10 blocks · 7 processed · 9 orphan · 100 instr
+    if r.stdout:
+        r.stdout[:500]('(empty)')
+        if not r.stderr:
+            pass
+    print(f"STDERR: {r.stderr[:200]}")
+    return None
+# [WARN] 2 instructions not decompiled
+#   @0x019A: JUMP_BACKWARD arg=0
+#   @0x01D6: JUMP_BACKWARD arg=0
+# [SUMMARY] 10 blocks · 11 processed · 1 orphan · 100 instr

@@ -15,9 +15,9 @@ if x < y:
         break
 else:
     z = 0
-    i = 0
+i = 0
 j = i * 2
 return None
 # orphan @0x00A2
 raise
-# [SUMMARY] 20 blocks · 19 processed · 5 orphan · 67 instr
+# [SUMMARY] 20 blocks · 19 processed · 3 orphan · 67 instr

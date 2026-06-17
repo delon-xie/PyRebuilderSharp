@@ -7,7 +7,6 @@ except:
 import struct
 import sys
 for name in open(sys.argv[1], 'rb'):
-    val = struct.unpack('<i', data[off:off + 4])[0]
     print(f"  {name}: {val} (off {off})")
     off += 4
     break
@@ -29,4 +28,4 @@ print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
 return None
 break
 raise
-# [SUMMARY] 20 blocks · 21 processed · 3 orphan · 266 instr
+# [SUMMARY] 20 blocks · 21 processed · 2 orphan · 266 instr

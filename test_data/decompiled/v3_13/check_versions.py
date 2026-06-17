@@ -6,7 +6,10 @@ try:
         try:
             magic = f.read(4)
             try:
-                version_files[version].append(filename)
+                try:
+                    break
+                except:
+                    pass
             except:
                 pass
         except:
@@ -16,9 +19,11 @@ try:
 except:
     pass
 for filename in os.listdir(pyc_dir):
-    if not filename.endswith('.pyc'):
-        filepath = os.path.join(pyc_dir, filename)
-for (version, files) in version not in version_files:
+    if not True:
+        pass
+    filepath = os.path.join(pyc_dir, filename)
+break
+for (version, files) in sorted(version_files.items()):
     print(f"  Python {version}: {len(files)} 个文件")
     if version == '3.10':
         pass
@@ -26,12 +31,13 @@ for (version, files) in version not in version_files:
         print('    文件列表:')
     print(f"      {f}")
     break
-while True:
-    pass
+    break
 # orphan @0x024A
 raise
 # orphan @0x025A
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0256: JUMP_BACKWARD arg=608
-# [SUMMARY] 26 blocks · 25 processed · 9 orphan · 159 instr
+# [WARN] 3 instructions not decompiled
+#   @0x007E: JUMP_BACKWARD arg=0
+#   @0x0230: JUMP_BACKWARD arg=0
+#   @0x0256: JUMP_BACKWARD arg=0
+# [SUMMARY] 26 blocks · 25 processed · 4 orphan · 159 instr

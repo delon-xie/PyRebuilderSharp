@@ -1,46 +1,40 @@
 # Decompiled from: <module>
 
-# orphan @0x0112
-current_group = parts[0].strip().replace('*** ', '')
-status = parts[1].strip()
-# orphan @0x00D6
-parts = line.split(':')
-# orphan @0x00A8
-# orphan @0x0000
 import subprocess
 import os
 result = ['python3', 'tests/run_tests.py'](True, True, ('capture_output', 'text'))
-output = result.stdout + result.stderr
-test_groups = {}
-current_group = None
-# orphan @0x01B8
-# orphan @0x0206
-test_groups[current_group]['files'].append(line.strip())
-print('============================================================')
-print('Python 3.10 版本测试报告')
-print('============================================================')
-passed_groups = []
-failed_groups = []
-# orphan @0x02CA
-# orphan @0x02EE
-# orphan @0x030E
-passed_groups.append(group)
-# orphan @0x0350
-# orphan @0x0374
-print(f"
-通过的测试组 ({len(passed_groups)}):")
-# orphan @0x03B2
-# orphan @0x03BC
-# orphan @0x03CC
-print(f"
-失败的测试组 ({len(failed_groups)}):")
-print('----------------------------------------')
-# orphan @0x0410
-# orphan @0x0418
-print(f"  ✗ {group}")
-# orphan @0x0454
-print(f"    - {f}")
-print(f"
+for line in result.stderr:
+    if line.startswith('***'):
+        parts = line.split(':')
+    break
+    for group in print(f"  ✓ {group}"):
+        for f in failed_groups:
+            print(f"    - {f}")
+            print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-return None
-# [SUMMARY] 37 blocks · 21 processed · 36 orphan · 278 instr
+            return None
+    for group in print('----------------------------------------'):
+        pass
+    status = parts[1].strip()
+    if not current_group:
+        pass
+    break
+    print(f"
+通过的测试组 ({len(passed_groups)}):")
+    if not line.strip().endswith('.3.10.pyc'):
+        pass
+    test_groups[current_group]['files'].append(line.strip())
+    for (group, info) in test_groups.items():
+        if info['files']:
+            pass
+        passed_groups.append(group)
+        if not 'FAIL' in info['status']:
+            pass
+# [WARN] 6 instructions not decompiled
+#   @0x01A2: JUMP_BACKWARD arg=0
+#   @0x01A6: JUMP_BACKWARD arg=0
+#   @0x01BA: JUMP_BACKWARD arg=0
+#   @0x0208: JUMP_BACKWARD arg=0
+#   @0x0352: JUMP_BACKWARD arg=0
+#   @0x0378: JUMP_BACKWARD arg=0
+# [SUMMARY] 37 blocks · 38 processed · 1 orphan · 278 instr
