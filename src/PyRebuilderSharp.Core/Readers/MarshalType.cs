@@ -36,6 +36,7 @@ internal static class MarshalType
     public const byte TYPE_ELLIPSIS = 46;        // '.'
     public const byte TYPE_STOPITERATION = 63;   // '?'
     public const byte TYPE_UNKNOWN = 33;         // '!'
+    public const byte TYPE_SLICE = 45;           // '-'
     public const byte TYPE_INTERNAL_REF = 73;    // 'I'
     public const byte TYPE_INTERNAL_STR_REF = 74; // 'J'
 

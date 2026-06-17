@@ -1168,6 +1168,17 @@ public class PycReader
         return br.ReadBytes(length);
     }
 
+    /// <summary>
+    /// 读取 TYPE_SLICE (0x2D) 对象 — start, stop, step 三个 marshal 对象。
+    /// </summary>
+    private object? ReadMarshalSlice(BinaryReader br)
+    {
+        ReadMarshalObject(br);
+        ReadMarshalObject(br);
+        ReadMarshalObject(br);
+        return null;
+    }
+
     private List<object?> ReadMarshalList(BinaryReader br, bool typeByteRead = false, bool forceList = false)
     {
         int count;
@@ -1366,6 +1377,7 @@ public class PycReader
             MarshalType.TYPE_FALSE => false,
             MarshalType.TYPE_ELLIPSIS => new object(),
             MarshalType.TYPE_REF => ReadRef(br),
+            MarshalType.TYPE_SLICE => ReadMarshalSlice(br),
             MarshalType.TYPE_SET => ReadMarshalSetOrFrozenset(br),
             MarshalType.TYPE_FROZENSET => ReadMarshalSetOrFrozenset(br),
             _ => HandleUnknownMarshalType(br, type),
