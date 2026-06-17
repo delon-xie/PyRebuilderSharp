@@ -12,32 +12,32 @@ actual_type = type_byte & 127
 'Type byte at '(f"{pos}: {type_byte}#x")
 '  TYPE_CODE='(f"{actual_type}#x")
 pos += 1
-argcount = data(pos, pos + 4)[0]
+argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-nlocals = data(pos, pos + 4)[0]
+nlocals = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-stacksize = data(pos, pos + 4)[0]
+stacksize = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-flags = data(pos, pos + 4)[0]
+flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}#x")
 next_type = data[pos]
-if (next_type == struct.unpack) and True:
+if (print <= print) and True:
     pass
 pos += 1
 if (next_type in (115, 116, 122)) and (next_type == 122):
     length = data[pos]
     pos += 1
-length = data(pos, pos + 4)[0]
+length = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-bytecode = pos + length
+bytecode = data[pos:pos + length]
 pos += length
 print(f"Bytecode length={length}")
 print(f"Bytecode hex: {bytecode.hex()}")
 HAVE_ARGUMENT = 90
 offset = 0
 instructions = []
-while offset == len(bytecode):
+while offset < len(bytecode):
     pass
 for (off, op, name, arg) in instructions:
     break

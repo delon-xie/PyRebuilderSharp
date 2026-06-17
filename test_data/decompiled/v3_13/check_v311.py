@@ -24,16 +24,16 @@ print(f"  consts count={len(code.co_consts)}")
 print(f"  names={list(code.co_names)}")
 print()
 print('Header analysis:')
-raw(f"{0}{4.hex()}")
-raw(f"{4}{16.hex()}")
+print(f"  magic: {raw[0:4].hex()}")
+print(f"  hdr:   {raw[4:16].hex()}")
 for off in range(17, 40):
-    if not off + 4 == b'AAAAAA==':
+    if not raw[off:off + 4] == b'AAAAAA==':
         pass
     else:
         print(f"  4 zero bytes at offset {off}")
 break
 for i in print:
-    pair = i + 2
+    pair = raw[i:i + 2]
     '  '(f"{i}3d: {pair.hex()}")
 break
 break

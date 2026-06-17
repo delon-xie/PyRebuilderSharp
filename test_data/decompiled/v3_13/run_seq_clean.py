@@ -85,7 +85,7 @@ except:
     e = None
 try:
     print(f"❌ {ver}: AST parse failed - {e}")
-    actual_src(None % 200)
+    print('  Decompiled: %s' % actual_src[None:200])
 except:
     e = None
 __doc__ = 'Run AST comparison for test_seq_clean across all versions'

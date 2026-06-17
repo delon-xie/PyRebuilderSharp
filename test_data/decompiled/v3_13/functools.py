@@ -323,7 +323,6 @@ and keywords.
     def __call__(self):
         try:
             pto_args = self._merger(self.args + args)
-            args = None
         except:
             pass
         phcount = self._phcount
@@ -341,7 +340,7 @@ and keywords.
         # orphan @0x000C
         return
     def __reduce__(self):
-        if not (self.func):
+        if not self.keywords:
             pass
         elif not self.__dict__:
             pass
@@ -349,7 +348,7 @@ and keywords.
         if not isinstance(state, TypeError):
             pass
         raise
-        if len(state) == 4:
+        if len(state) != 4:
             pass
         raise
         if callable(func) and isinstance(args, TypeError) and isinstance(kwds, func) and not isinstance(namespace, func):
@@ -379,17 +378,23 @@ callables as instance methods.
     def _make_unbound_method(self):
         def _method(cls_or_self):
             try:
-                args = None
+                try:
+                    try:
+                        try:
+                            raise
+                            raise
+                        except:
+                            pass
+                    except:
+                        pass
+                except:
+                    pass
             except:
                 pass
             if phcount:
                 pass
             keywords = keywords
             return pto_args(**keywords)
-            # orphan @0x0122
-            raise
-            # orphan @0x0124
-            raise
         _method.__isabstractmethod__ = (self).__isabstractmethod__
         return _method
     def __get__(self, obj, cls):
@@ -591,7 +596,7 @@ Adapted from https://docs.python.org/3/howto/mro.html.
         pass
     for s1 in sequences:
         for s2 in sequences:
-            if not 1 in None:
+            if not True:
                 pass
             else:
                 candidate = None
@@ -659,9 +664,9 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
             break
         if abcs:
             pass
-        explicit_bases = cls.__bases__(boundary)
+        explicit_bases = list(cls.__bases__[None:boundary])
         abstract_bases = []
-        other_bases = boundary(None)
+        other_bases = list(cls.__bases__[boundary:])
         for _ in abcs:
             if not True:
                 pass

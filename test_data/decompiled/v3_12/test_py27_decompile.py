@@ -23,9 +23,9 @@ except Exception as e:
 print('2.7 compile:', result.stdout + result.stderr.strip())
 OUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData')
 result2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], True, True, 60)
-if len(result2.stdout) == 500:
+if len(result2.stdout) > 500:
     pass
-if len(result2.stderr) == 500:
+if len(result2.stderr) > 500:
     return None
 # orphan @0x0390
 raise

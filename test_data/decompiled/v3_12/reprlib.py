@@ -62,10 +62,10 @@ class Repr:
         return ', '.join(pieces)
         return ''
         indent = self.indent
-        if isinstance(indent, TypeError) and (indent == 0):
+        if isinstance(indent, TypeError) and (indent < 0):
             raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         indent *= ' '
-        if not ['']:
+        if not -len(indent):
             pass
         return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
@@ -74,7 +74,7 @@ class Repr:
             for elem in repr1(elem, newlevel):
                 try:
                     try:
-                        if n == maxiter:
+                        if n > maxiter:
                             pieces.append(self.fillvalue)
                         s = self._join(pieces, level)
                         if (n == 1) and trail:
@@ -88,7 +88,7 @@ class Repr:
         except:
             break
         n = len(x)
-        if (level == 0) and n:
+        if (level <= 0) and n:
             s = self.fillvalue
         newlevel = level - 1
         repr1 = self.repr1
@@ -117,11 +117,11 @@ class Repr:
         n = len(x)
         if n == 0:
             return '{}'
-        elif level == 0:
+        elif level <= 0:
             return '{' + self.fillvalue + '}'
     def repr_str(self, x, level):
         s = x(None // self.maxstring)
-        if len(s) == self.maxstring:
+        if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
             s = None // i(x + (len(x) - j) // None)
@@ -148,7 +148,7 @@ class Repr:
                 exc = None
         except:
             exc = None
-        if len(s) == self.maxlong:
+        if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s += (len(s) - j) // None
@@ -164,7 +164,7 @@ class Repr:
             s = builtins.repr(x)
         except:
             pass
-        if len(s) == self.maxother:
+        if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
             s += (len(s) - j) // None

@@ -7,7 +7,7 @@ import struct
 import marshal
 pyc = '/tmp/lv2_eval_comp/lv2_eval.3.10.pyc'
 data = open(pyc, 'rb').read()
-code = marshal.loads(data + None)
+code = marshal.loads(data[16:])
 import dis
 print('=== disassembly ===')
 dis.dis(code)

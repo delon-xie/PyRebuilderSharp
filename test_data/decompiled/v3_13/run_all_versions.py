@@ -81,7 +81,7 @@ except Exception:
     pass
 try:
     print(f"❌ {ver}: AST parse failed - {e}")
-    actual_src(f"{None}{200}")
+    print(f"  Decompiled: {actual_src[None:200]}")
 except:
     e = None
 __doc__ = 'Run AST comparison for test_expr_basic across all versions'

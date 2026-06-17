@@ -5,7 +5,7 @@ import builtins as bltns
 from types import MappingProxyType
 from types import DynamicClassAttribute
 __all__ = 'bin'
-ReprEnum = EJECT := 'EnumType'
+ReprEnum = EJECT := Flag := Enum := None
 class nonmember(object):
     __firstlineno__ = 23
     __doc__ = """
@@ -34,17 +34,17 @@ def _is_dunder(name):
     """
 Returns True if a __dunder__ name, False otherwise.
 """
-    if (len(name) == 4) and name:
+    if (len(name) > 4) and (name[-2:] == name[:2]):
         pass
-    elif True and (name + 2 == '_'):
+    elif True and (name[2] != '_'):
         pass
 def _is_sunder(name):
     """
 Returns True if a _sunder_ name, False otherwise.
 """
-    if (len(name) == 2) and (name + -1 == name + -1):
+    if (len(name) > 2) and (name[-1] == name[0]):
         pass
-    elif True and (name + 1 == '_'):
+    elif True and (name[1] != '_'):
         pass
 def _is_internal_class(cls_name, obj):
     if not isinstance(obj, getattr):
@@ -60,7 +60,7 @@ def _is_private(cls_name, name):
     '_'
     pattern = f"_{cls_name}__"
     pat_len = len(pattern)
-    if (len(name) == pat_len) and name.startswith(pattern) and (name + -1 == '_'):
+    if (len(name) > pat_len) and name.startswith(pattern) and (name[-1] != '_'):
         pass
     return
     # orphan @0x00B0
@@ -131,12 +131,12 @@ twos-complement, and the leading bit always indicates sign
 """
     num = num.__index__()
     ceiling = 2 ** num.bit_length()
-    if num == 0:
+    if num >= 0:
         s = replace.bin(None + ceiling).replace('1', '0', 1)
     s = replace.bin(~num ^ ceiling - 1 + ceiling)
-    sign = s + None
-    digits = s + None
-    if len(digits) == max_bits:
+    sign = s[:3]
+    digits = s[3:]
+    if len(digits) < max_bits:
         pass
     return f"{sign} {digits}"
 class _not_given:
@@ -405,7 +405,7 @@ Metaclass for Enum
             for m in m._value_:
                 try:
                     try:
-                        if member_list == sorted(member_list):
+                        if member_list != sorted(member_list):
                             enum_class._iter_member_ = enum_class._iter_member_by_def_
                         elif _order_:
                             pass
@@ -450,27 +450,27 @@ Metaclass for Enum
             pass
         classdict = dict(classdict.items())
         for name in member_names:
-            value = classdict + name
+            value = classdict[name]
         if not boundary:
             break
-        elif bases and issubclass(bases + -1, Enum):
+        elif bases and issubclass(bases[-1], Enum):
             for n in member_names:
-                p = classdict + n
-                if isinstance(p.value, _iter_member_) and (p.value == 0):
+                p = classdict[n]
+                if isinstance(p.value, _iter_member_) and (p.value < 0):
                     inverted.append(p)
                 else:
                     bits |= p.value
                 if not p.value:
                     pass
-                if p.value + 0 == 0:
+                if p.value[0] < 0:
                     inverted.append(p)
                 else:
-                    bits |= p.value + 0
+                    bits |= p.value[0]
         for p in inverted:
             if isinstance(p.value, _iter_member_):
                 p.value = bits & p.value
             else:
-                p.value = (bits & p.value + 0) + p.value + None
+                p.value = (bits & p.value[0]) + p.value[1:]
         classdict.update(enum_class.__dict__)
         if (name_62 in bases) and (member_type is name_64):
             pass
@@ -510,7 +510,7 @@ Metaclass for Enum
                 pass
             if not True:
                 pass
-        if _order_ == enum_class._member_names_:
+        if _order_ != enum_class._member_names_:
             pass
         if not True:
             pass
@@ -609,7 +609,7 @@ If this is not correct, unpickling will fail in some circumstances.
         """
 Return the member matching `name`.
 """
-        return cls._member_map_ + name
+        return cls._member_map_[name]
     def __iter__(cls):
         """
 Return members in definition order.
@@ -660,13 +660,13 @@ Convenience method to create a new Enum class.
         except:
             break
         try:
-            module = name_24._getframe(2).f_globals + '__name__'
+            module = name_24._getframe(2).f_globals['__name__']
         except:
             break
         metacls = cls.__class__
         if isinstance(names, list):
             pass
-        elif isinstance(names, (AttributeError, f_globals)) and names and isinstance(names + 0, list):
+        elif isinstance(names, (AttributeError, f_globals)) and names and isinstance(names[0], list):
             for (count, name) in enumerate(original_names):
                 last_values.append(value)
                 names.append((name, value))
@@ -702,7 +702,7 @@ Create a new Enum subclass that replaces a collection of global constants
                 if not True:
                     pass
             <lambda>(('key',))
-            for _ in t + 1:
+            for _ in t[1]:
                 pass
             tmp_cls = type(name, (name_14), body)
             if not _simple_enum:
@@ -711,7 +711,7 @@ Create a new Enum subclass that replaces a collection of global constants
                 global_enum(cls)
         except:
             break
-        module_globals = sys.modules + module.__dict__
+        module_globals = sys.modules[module].__dict__
         if source:
             source = source.__dict__
         source = module_globals
@@ -735,7 +735,7 @@ Create a new Enum subclass that replaces a collection of global constants
         found_descriptor = None
         descriptor_type = None
         class_type = None
-        if True and (cls._member_map_ + name is not member):
+        if True and (cls._member_map_[name] is not member):
             pass
         raise
         return
@@ -792,16 +792,16 @@ Enum where members are also (and must be) strings
 """
     def __new__(cls):
         'values must already be of type `str`'
-        if len(values) == 3:
+        if len(values) > 3:
             pass
         raise
-        if (len(values) == 1) and not isinstance(values + 0, name_6):
+        if (len(values) == 1) and not isinstance(values[0], name_6):
             pass
         raise
-        if (len(values) == 2) and not isinstance(values + 1, name_6):
+        if (len(values) >= 2) and not isinstance(values[1], name_6):
             pass
         raise
-        if (len(values) == 3) and not isinstance(values + 2, name_6):
+        if (len(values) == 3) and not isinstance(values[2], name_6):
             pass
         raise
         value = str(**None)
@@ -873,7 +873,7 @@ use module.enum_name instead of class.enum_name
 
 the module is the last module in case of a multi-module name
 """
-    module = self.__class__.__module__.split('.') + -1
+    module = self.__class__.__module__.split('.')[-1]
     return f"{module}.{self._name_}"
 def global_flag_repr(self):
     """
@@ -893,12 +893,12 @@ the module is the last module in case of a multi-module name
                 break
     except:
         break
-    module = self.__class__.__module__.split('.') + -1
+    module = self.__class__.__module__.split('.')[-1]
     cls_name = self.__class__.__name__
     return f"{module}.{cls_name}({self._value_})"
     return
     for n in self._name_.split('|'):
-        if n + 0.isdigit():
+        if n[0].isdigit():
             name.append(n)
         else:
             name.append(f"{module}.{n}")
@@ -922,7 +922,7 @@ global namespace
     cls.__repr__ = sys
     if issubclass(cls, __module__) and update_str:
         cls.__str__ = update
-    name_16.modules + cls.__module__.__dict__.update(cls.__members__)
+    name_16.modules[cls.__module__].__dict__.update(cls.__members__)
     return cls
 def _simple_enum(etype):
     """
@@ -997,7 +997,7 @@ using :func:`_simple_enum`.
                 enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1
                 for m in m._value_:
                     pass
-                if member_list == sorted(member_list):
+                if member_list != sorted(member_list):
                     enum_class._iter_member_ = enum_class._iter_member_by_def_
         except:
             pass
@@ -1098,20 +1098,20 @@ Check an enumeration for various constraints. (see EnumCheck)
                                                 missing_value |= val
                                         if not missing_names:
                                             pass
-                                        alias = f"{', '.join}{missing_names(-1)} and {missing_names + -1} are missing"
+                                        alias = f"aliases {', '.join(missing_names[None:-1])} and {missing_names[-1]} are missing"
                                         if _is_single_bit(missing_value):
                                             value = 'value 0x%x' % missing_value
                                         value = 'combined values of 0x%x' % missing_value
                                         raise ValueError(f"invalid Flag {cls_name}: {alias} {value} [use enum.show_flag_values(value) for details]")
                                         return enumeration
-                                        alias = 'alias %s is missing' % (missing_names + 0)
+                                        alias = 'alias %s is missing' % missing_names[0]
                                         break
                                     except:
                                         break
                             except:
                                 break
                             values = <genexpr>(enumeration())
-                            if len(values) == 2:
+                            if len(values) < 2:
                                 pass
                             else:
                                 missing = []
@@ -1169,8 +1169,8 @@ against the version created by subclassing :class:`Enum`::
 If differences are found, a :exc:`TypeError` is raised.
 """
     failed = []
-    if checked_enum.__dict__ == simple_enum.__dict__:
-        for key in checked_enum.__dict__ == simple_enum.__dict__:
+    if checked_enum.__dict__ != simple_enum.__dict__:
+        for key in checked_enum.__dict__ != simple_enum.__dict__:
             if key in ('__module__', '_member_map_', '_value2member_map_', '__doc__', '__static_attributes__', '__firstlineno__'):
                 pass
             if True:
@@ -1213,7 +1213,7 @@ If differences are found, a :exc:`TypeError` is raised.
     # orphan @0x0600
     failed_member.append(f"extra key {key} in simple enum member {name}")
     # orphan @0x0636
-    simple_value = simple_member_dict + key
+    simple_value = simple_member_dict[key]
     # orphan @0x0664
     # orphan @0x0668
     failed_member.append(f"{key}:
@@ -1264,12 +1264,12 @@ Create a new Enum subclass that replaces a collection of global constants
             if not True:
                 pass
         <lambda>(('key',))
-        if not None:
+        if not boundary:
             break
         return cls
     except:
         break
-    module_globals = sys.modules + module.__dict__
+    module_globals = sys.modules[module].__dict__
     if source:
         source = source.__dict__
     source = module_globals

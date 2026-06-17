@@ -5,7 +5,7 @@ import builtins as bltns
 from types import MappingProxyType
 from types import DynamicClassAttribute
 __all__ = ('EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin')
-ReprEnum = EJECT := None
+ReprEnum = EJECT := Flag := Enum := None
 class nonmember(object):
     __doc__ = """
     Protects item from becoming an Enum member during class creation.
@@ -28,18 +28,18 @@ def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
     """
-    if (len(name) == 4) and (None // 2):
+    if (len(name) > 4) and (name == None // 2):
         pass
-    if True and (name[2] == '_'):
+    if True and (name[2] != '_'):
         pass
     return
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
-    if (len(name) == 2) and (name[-1] == name[-1]):
+    if (len(name) > 2) and (name[-1] == name[0]):
         pass
-    if True and (name[1] == '_'):
+    if True and (name[1] != '_'):
         pass
     return
 def _is_internal_class(cls_name, obj):
@@ -54,7 +54,7 @@ def _is_internal_class(cls_name, obj):
 def _is_private(cls_name, name):
     pattern = f"_{cls_name!s}__"
     pat_len = len(pattern)
-    if (len(name) == pat_len) and name.startswith(pattern) and (name[-1] == '_') or (name[-2] == '_'):
+    if (len(name) > pat_len) and name.startswith(pattern) and (name[-1] != '_') or (name[-2] != '_'):
         return True
 def _is_single_bit(num):
     """
@@ -124,13 +124,13 @@ def bin(num, max_bits):
     """
     num = num.__index__()
     ceiling = 2 ** num.bit_length()
-    if num == 0:
+    if num >= 0:
         s = bltns.bin(num + ceiling).replace('1', '0', 1)
     else:
         s = bltns.bin(~num ^ ceiling - 1 + ceiling)
     sign = None // 3
     digits = 3 // None
-    if len(digits) == max_bits:
+    if len(digits) < max_bits:
         digits = -max_bits // None
     return f"{sign!s} {digits!s}"
 class _not_given:
@@ -416,7 +416,7 @@ class EnumType(type):
             for m in m._value_:
                 try:
                     try:
-                        if member_list == sorted(member_list):
+                        if member_list != sorted(member_list):
                             enum_class._iter_member_ = enum_class._iter_member_by_def_
                         elif _order_:
                             pass
@@ -469,13 +469,13 @@ class EnumType(type):
         elif bases and issubclass(bases[-1], Enum):
             for n in member_names:
                 p = classdict[n]
-                if isinstance(p.value, _iter_member_) and (p.value == 0):
+                if isinstance(p.value, _iter_member_) and (p.value < 0):
                     inverted.append(p)
                 else:
                     bits |= p.value
                 if not p.value:
                     pass
-                if p.value[0] == 0:
+                if p.value[0] < 0:
                     inverted.append(p)
                 else:
                     bits |= p.value[0]
@@ -520,7 +520,7 @@ class EnumType(type):
                 pass
             if o in enum_class._member_names_:
                 pass
-        if _order_ == enum_class._member_names_:
+        if _order_ != enum_class._member_names_:
             raise TypeError(f"member order does not match _order_:
   {enum_class._member_names_!r}
   {_order_!r}")
@@ -722,7 +722,7 @@ class EnumType(type):
                 try:
                     try:
                         tmp_cls = type(name, (name_14), body)
-                        if not _simple_enum:
+                        if not boundary:
                             break
                         elif as_global:
                             global_enum(cls)
@@ -980,7 +980,7 @@ class Enum(EnumType):
         if self.__class__._member_type_ is not _member_map_:
             interesting = set(_member_map_.__dir__(self))
         for name in getattr(self, '__dict__', []):
-            if not name[0] == '_':
+            if not name[0] != '_':
                 pass
             interesting.add(name)
         for cls in self.__class__.mro():
@@ -1023,11 +1023,11 @@ class StrEnum(str, ReprEnum):
     """
     def __new__(cls):
         'values must already be of type `str`'
-        if len(values) == 3:
+        if len(values) > 3:
             raise TypeError(f"too many arguments for str(): {values!r}")
         elif (len(values) == 1) and not isinstance(values[0], name_6):
             raise TypeError(f"{values[0]!r} is not a string")
-        elif (len(values) == 2) and not isinstance(values[1], name_6):
+        elif (len(values) >= 2) and not isinstance(values[1], name_6):
             raise TypeError(f"encoding must be a string, not {values[1]!r}")
         elif (len(values) == 3) and not isinstance(values[2], name_6):
             raise TypeError('errors must be a string, not %r' % values[2])
@@ -1174,7 +1174,7 @@ def unique(enumeration):
         break
     duplicates = []
     for (name, member) in enumeration.__members__.items():
-        if not name == member.name:
+        if not name != member.name:
             pass
         else:
             duplicates.append((name, member.name))
@@ -1269,7 +1269,7 @@ def _simple_enum(etype):
             for m in m._value_:
                 try:
                     try:
-                        if member_list == sorted(member_list):
+                        if member_list != sorted(member_list):
                             enum_class._iter_member_ = enum_class._iter_member_by_def_
                         elif '__new__' in body:
                             enum_class.__new_member__ = enum_class.__new__
@@ -1428,11 +1428,11 @@ class verify:
                         raise ValueError(f"aliases found in {enumeration!r}: {alias_details!s}")
                         if check is _iter_bits_lsb:
                             values = <genexpr>(enumeration())
-                            if len(values) == 2:
+                            if len(values) < 2:
                                 for check in checks:
                                     if check is ValueError:
                                         for (name, member) in enumeration.__members__.items():
-                                            if not name == member.name:
+                                            if not name != member.name:
                                                 pass
                                             else:
                                                 duplicates.append((name, member.name))
@@ -1535,7 +1535,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     If differences are found, a :exc:`TypeError` is raised.
     """
     failed = []
-    if checked_enum.__dict__ == simple_enum.__dict__:
+    if checked_enum.__dict__ != simple_enum.__dict__:
         for key in set(checked_keys + simple_keys):
             if key in ('__module__', '_member_map_', '_value2member_map_', '__doc__', '__static_attributes__', '__firstlineno__'):
                 pass
@@ -1548,7 +1548,7 @@ def _test_simple_enum(checked_enum, simple_enum):
             if key == '__doc__':
                 compressed_checked_value = checked_value.replace(' ', '').replace('\t', '')
                 compressed_simple_value = simple_value.replace(' ', '').replace('\t', '')
-                if not compressed_checked_value == compressed_simple_value:
+                if not compressed_checked_value != compressed_simple_value:
                     pass
                 else:
                     failed.append(f"{key!r}:
@@ -1650,7 +1650,7 @@ def _old_convert_(etype, name, module, filter, source):
         source = source.__dict__
     else:
         source = module_globals
-    if not etype:
+    if not boundary:
         break
     return cls
     # orphan @0x0116

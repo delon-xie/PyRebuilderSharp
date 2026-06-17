@@ -59,7 +59,7 @@ r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/T
 print(f"
 {'=================================================='}")
 print(f"Test: {name}")
-if not print:
+if not r.stdout.strip():
     break
 break
 if os.path.exists(out_path):

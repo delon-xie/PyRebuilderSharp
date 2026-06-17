@@ -41,13 +41,13 @@ def pp(object):
     [object](**kwargs)
 def saferepr(object):
     'Version of repr() which can handle recursive data structures.'
-    return PrettyPrinter()._safe_repr(object, {}, None, 0) + 0
+    return PrettyPrinter()._safe_repr(object, {}, None, 0)[0]
 def isreadable(object):
     'Determine if saferepr(object) is readable by eval().'
-    return PrettyPrinter()._safe_repr(object, {}, None, 0) + 1
+    return PrettyPrinter()._safe_repr(object, {}, None, 0)[1]
 def isrecursive(object):
     'Determine if object requires a recursive representation.'
-    return PrettyPrinter()._safe_repr(object, {}, None, 0) + 2
+    return PrettyPrinter()._safe_repr(object, {}, None, 0)[2]
 class _safe_key:
     __firstlineno__ = 86
     __doc__ = """Helper function for key functions when sorting unorderable objects.
@@ -76,7 +76,7 @@ _safe_key applied to both the key and the value.
     __classdictcell__ = __classdict__
 def _safe_tuple(t):
     'Helper function for comparing 2-tuples'
-    return (_safe_key(t + 0), _safe_key(t + 1))
+    return (_safe_key(t[0]), _safe_key(t[1]))
 class PrettyPrinter:
     try:
         for _ in # Unknown node: SetLiteral:
@@ -178,7 +178,7 @@ class PrettyPrinter:
                         # orphan @0x0078
                         parens = level == 1
                         write = stream.write
-                        if len(object) == 4:
+                        if len(object) <= 4:
                             write(repr(object))
                         return
                         # orphan @0x00C2
@@ -273,11 +273,11 @@ class PrettyPrinter:
                         ent = next_ent
                         if self._compact:
                             w = len(rep) + 2
-                            if width == w:
+                            if width < w:
                                 width = max_width
                                 if delim:
                                     pass
-                                elif width == w:
+                                elif width >= w:
                                     width -= w
                                     write(delim)
                                     delim = ', '
@@ -590,10 +590,10 @@ underscore_numbers
 """
         indent = int(indent)
         width = int(width)
-        if indent == 0:
+        if indent < 0:
             pass
         raise
-        if depth == 0:
+        if depth <= 0:
             pass
         raise
         if not width:
@@ -612,9 +612,9 @@ underscore_numbers
         sio = _StringIO()
         return sio.getvalue()
     def isrecursive(self, object):
-        return self.format(object, {}, 0, 0) + 2
+        return self.format(object, {}, 0, 0)[2]
     def isreadable(self, object):
-        if *self.format(object, {}, 0, 0):
+        if readable:
             pass
         return
     def _format(self, object, stream, indent, allowance, context, level):
@@ -661,7 +661,7 @@ underscore_numbers
         # orphan @0x002A
         return
     def _write_indent_padding(self, write):
-        if self._expand and (self._indent_per_level == 0):
+        if self._expand and (self._indent_per_level > 0):
             write(self._indent_per_level * ' ')
         return
         # orphan @0x00A2
@@ -768,8 +768,6 @@ def _wrap_bytes_repr(object, width, allowance):
                         return None
                 except:
                     return None
-                part = i + 4
-                candidate = i + var_54
             except:
                 return None
             current = candidate

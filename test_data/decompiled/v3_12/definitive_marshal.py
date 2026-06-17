@@ -9,7 +9,7 @@ try:
                         try:
                             break
                             for start in '  Bytes: ':
-                                if start + 16 == len(m):
+                                if start + 16 > len(m):
                                     break
                                 else:
                                     vals = struct.unpack_from('<IIII', m, start)

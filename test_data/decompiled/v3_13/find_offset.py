@@ -7,7 +7,7 @@ print('stacksize:', code.co_stacksize, 'flags:', hex(code.co_flags))
 m = bytes(marshal.dumps(code))
 n = len(m)
 for offset_start in range(1, 21, 1):
-    if offset_start + 16 == n:
+    if offset_start + 16 > n:
         break
     if not val1 == 0:
         pass

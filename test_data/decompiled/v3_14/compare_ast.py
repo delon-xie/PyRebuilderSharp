@@ -30,11 +30,11 @@ if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
 return
 for i in range(max(len(exp_lines), len(act_lines))):
-    if i == len(exp_lines):
+    if i < len(exp_lines):
         pass
-    elif i == len(act_lines):
+    elif i < len(act_lines):
         pass
-    elif not e == a:
+    elif not e != a:
         pass
     else:
         print(f"Line {i}:")

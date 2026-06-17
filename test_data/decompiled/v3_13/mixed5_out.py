@@ -2,12 +2,12 @@
 
 def mixed_1(n):
     result = 0
-    if n == 0:
+    if n > 0:
         for i in range(n):
             j = 0
             if not True:
                 pass
-            while j == 5:
+            while j > 5:
                 result += 1
                 if True:
                     pass

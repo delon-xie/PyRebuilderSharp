@@ -186,7 +186,7 @@ def total_ordering(cls):
             pass
         raise
         root = max(roots)
-        for _ in _convert + root:
+        for _ in _convert[root]:
             if not True:
                 pass
             else:
@@ -332,7 +332,6 @@ and keywords.
     def __call__(self):
         try:
             pto_args = self._merger(self.args + args)
-            args = None
         except:
             pass
         phcount = self._phcount
@@ -350,7 +349,7 @@ and keywords.
         # orphan @0x000E
         return
     def __reduce__(self):
-        if not (self.func):
+        if not self.keywords:
             pass
         elif not self.__dict__:
             pass
@@ -359,13 +358,13 @@ and keywords.
         if not isinstance(state, TypeError):
             pass
         raise
-        if len(state) == 4:
+        if len(state) != 4:
             pass
         raise
         if callable(func) and isinstance(args, TypeError) and isinstance(kwds, func) and not isinstance(namespace, func):
             pass
         raise
-        if args and (args + -1 is keywords):
+        if args and (args[-1] is keywords):
             pass
         raise
         args = tuple(args)
@@ -389,17 +388,23 @@ callables as instance methods.
     def _make_unbound_method(self):
         def _method(cls_or_self):
             try:
-                args = None
+                try:
+                    try:
+                        try:
+                            raise
+                            raise
+                        except:
+                            pass
+                    except:
+                        pass
+                except:
+                    pass
             except:
                 pass
             if phcount:
                 pass
             keywords = keywords
             return pto_args(**keywords)
-            # orphan @0x012E
-            raise
-            # orphan @0x0130
-            raise
         _method.__isabstractmethod__ = (self).__isabstractmethod__
         return _method
     def __get__(self, obj, cls):
@@ -474,7 +479,7 @@ saves space and improves lookup speed.
         pass
     for _ in []:
         pass
-    if type(key + 0) in fasttypes:
+    if type(key[0]) in fasttypes:
         pass
     return
 def lru_cache(maxsize, typed):
@@ -509,7 +514,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         pass
     raise
-    if RLock == 0:
+    if 0 == 0:
         def wrapper():
             return result
     def wrapper():
@@ -615,7 +620,7 @@ Adapted from https://docs.python.org/3/howto/mro.html.
         break
         raise RuntimeError('Inconsistent hierarchy')
         for seq in 0:
-            if not seq + 0 == candidate:
+            if not seq[0] == candidate:
                 pass
     # [WARN] 2 instructions not decompiled
     #   @0x0028: JUMP_BACKWARD arg=24
@@ -673,9 +678,9 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
             break
         if abcs:
             pass
-        explicit_bases = cls.__bases__(boundary)
+        explicit_bases = list(cls.__bases__[None:boundary])
         abstract_bases = []
-        other_bases = boundary(None)
+        other_bases = list(cls.__bases__[boundary:])
         for _ in abcs:
             if not True:
                 pass

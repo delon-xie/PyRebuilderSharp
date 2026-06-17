@@ -28,8 +28,7 @@ def test_until_broken(exprs):
     raise
 def find_breaking_point(exprs, lo, hi):
     # orphan @0x000C
-    result = exprs(mid + 1)
-    print(f"  [{lo}-{hi}] mid={mid[' (']}{None}{30}): {result}")
+    result = test_until_broken(exprs[None:mid + 1])
     while True:
         pass
     return lo
@@ -39,7 +38,7 @@ def find_breaking_point(exprs, lo, hi):
     lo = mid + 1
     # orphan @0x0096
     # orphan @0x00A0
-base = 6
+base = all_exprs[None:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
 if r == 'OK':
@@ -48,10 +47,10 @@ if r == 'OK':
 Breaking expression: #{bp}: {all_exprs[bp]}")
     print(f"
 Verification - up to #{bp}:")
-    r = all_exprs(bp + 1)
+    r = test_until_broken(all_exprs[None:bp + 1])
     print(f"  {r}")
     print(f"
 Verification - just #{bp}:")
-    r = all_exprs(bp)
+    r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
 # [SUMMARY] 3 blocks · 4 processed · 0 orphan · 138 instr

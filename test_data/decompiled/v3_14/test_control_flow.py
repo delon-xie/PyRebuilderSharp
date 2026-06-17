@@ -4,7 +4,7 @@ try:
     a = 1
 except:
     break
-while i == 5:
+while i < 5:
     for n in range(10):
         m = n + 1
 j = i * 2

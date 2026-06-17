@@ -142,11 +142,14 @@ public class StackMachine
 
             case Opcode.LOAD_FAST_BORROW_LOAD_FAST_BORROW_314:
                 // 双 borrow-load: 连续加载两个局部变量
-                var borrow1 = GetVarname(instr);
-                _exprStack.Push(new Name(borrow1, ExpressionContext.Load));
-                // 第二个局部变量的索引在指令的 argument 中已编码
-                // 注：CPython 中 arg1=arg>>6, arg2=arg&63，此处简化为压入同一个
-                // TODO: 如果编译后变量名仍为 var_X，需要实现正确的位域解码
+                // CPython 3.14: arg>>6 = var1 index, arg&63 = var2 index
+                var argVal = instr.Argument ?? 0;
+                int varIdx1 = argVal >> 6;
+                int varIdx2 = argVal & 0x3F;
+                var vName1 = varIdx1 < _code.Varnames.Count ? _code.Varnames[varIdx1] : $"v_{varIdx1}";
+                var vName2 = varIdx2 < _code.Varnames.Count ? _code.Varnames[varIdx2] : $"v_{varIdx2}";
+                _exprStack.Push(new Name(vName1, ExpressionContext.Load));
+                _exprStack.Push(new Name(vName2, ExpressionContext.Load));
                 return null;
 
             case Opcode.POP_ITER_314:

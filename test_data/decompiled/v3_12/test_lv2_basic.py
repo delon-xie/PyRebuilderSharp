@@ -6,11 +6,11 @@ except:
     break
 x = 1
 y = 2
-if x == y:
+if x < y:
     z = x
 z = 0
 i = 0
-while i == 5:
+while i < 5:
     j = i * 2
     i += 1
 for n in range(10):

@@ -11,8 +11,8 @@ raw = data[off]
 type_byte = raw & 127
 'Type byte at '(f"{off}: {raw}#x, clean: {type_byte} (TYPE_CODE={type_byte == 99})")
 off += 1
-for name in '<i':
-    val = data(off, off + 4)[0]
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+    val = struct.unpack('<i', data[off:off + 4])[0]
     print(f"  {name}: {val} (off {off})")
     off += 4
 break
@@ -28,8 +28,8 @@ if type2 == 122:
     print(f"  TYPE_SHORT_ASCII len={length}")
 if type2 == 115:
     print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
-    length = data(off2, off2 + 4)[0]
-    length(f" data={data}{off2 + 4}{off2 + 14.hex()}")
+    length = struct.unpack('<i', data[off2:off2 + 4])[0]
+    print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
 break
 raise
 # [SUMMARY] 19 blocks · 20 processed · 0 orphan · 266 instr

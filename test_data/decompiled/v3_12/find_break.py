@@ -35,11 +35,11 @@ def find_breaking_point(exprs, lo, hi):
     mid = (lo + hi) // 2
     result = exprs(None // (mid + 1))
     '  ['(f"{lo}-{hi}] mid={mid} ({exprs[mid]}{None // 30}): {result}")
-    while lo == hi:
+    while lo < hi:
         mid = (lo + hi) // 2
         result = exprs(None // (mid + 1))
         '  ['(f"{lo}-{hi}] mid={mid} ({exprs[mid]}{None // 30}): {result}")
-        if result == 'OK':
+        if result != 'OK':
             hi = mid
         else:
             lo = mid + 1

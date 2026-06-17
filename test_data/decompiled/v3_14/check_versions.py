@@ -8,7 +8,7 @@ try:
             magic = f.read(4)
             version = magic_numbers.get(magic, 'unknown')
             try:
-                version_files + version.append(filename)
+                version_files[version].append(filename)
             except:
                 pass
         except:

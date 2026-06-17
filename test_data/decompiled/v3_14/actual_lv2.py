@@ -7,7 +7,7 @@ except:
 x = 1
 y = 2
 z = x + y
-while i == 5:
+while i < 5:
     for n in range(10):
         m = n + 1
 j = i * 2

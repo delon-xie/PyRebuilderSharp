@@ -2,11 +2,11 @@
 
 def mixed_1(n):
     result = 0
-    if n == 0:
+    if n > 0:
         for i in range(n):
             while True:
                 j += 1
-                if j == 5:
+                if j > 5:
                     pass
                 else:
                     result += 1
@@ -36,7 +36,7 @@ def mixed_3(n):
     if not i % 2 == 0:
         pass
     for j in range(i):
-        while k == 0:
+        while k > 0:
             k -= 1
             total += 1
     # [WARN] 3 instructions not decompiled

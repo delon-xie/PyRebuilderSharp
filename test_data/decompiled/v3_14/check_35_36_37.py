@@ -16,6 +16,6 @@ for ver in ('3.5', '3.6', '3.7'):
     if not r.stderr:
         pass
     else:
-        print(f"STDERR: {r.stderr + None}")
+        print(f"STDERR: {r.stderr[:200]}")
 return None
 # [SUMMARY] 9 blocks · 10 processed · 0 orphan · 100 instr

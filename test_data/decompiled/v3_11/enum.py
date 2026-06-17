@@ -5,7 +5,7 @@ import builtins as bltns
 from types import MappingProxyType
 from types import DynamicClassAttribute
 __all__ = ('EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin')
-ReprEnum = EJECT := None
+ReprEnum = EJECT := Flag := Enum := None
 class nonmember(object):
     __doc__ = """
     Protects item from becoming an Enum member during class creation.
@@ -29,7 +29,7 @@ def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
     """
-    if (len(name) > 4) or not name[-2:] == name[-2:]:
+    if (len(name) > 4) or not name[-2:] == name[None:2]:
         return
     if True:
         pass
@@ -37,7 +37,7 @@ def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
-    if (len(name) > 2) or not name[-1] == name[-1]:
+    if (len(name) > 2) or not name[-1] == name[0]:
         return
     if True:
         pass
@@ -188,7 +188,7 @@ class _proto_member:
         name_104 = issubclass(enum_class, name_38)
         name_47 = isinstance(value, name_42)
         enum_class.TypeError | value._flag_mask_ = enum_class
-        enum_class.__cause__ | value._singles_mask_ = enum_class
+        len := _is_single_bit(value)._singles_mask_ = enum_class.__cause__ | value
         enum_class._all_bits_ = enum_class.TypeError.bit_length ** enum_class.TypeError() - 1
         try:
             items = issubclass

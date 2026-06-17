@@ -6,9 +6,9 @@ except:
     break
 x = 1
 y = 2
-if x == y:
+if x < y:
     z = x
-elif x == y:
+elif x > y:
     z = y
 return None
 # orphan @0x00B8

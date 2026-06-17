@@ -15,7 +15,7 @@ try:
     fail_count = 0
     for py_file in sorted(py_files):
         input_path = os.path.join(input_dir, py_file)
-        base_name = os.path.splitext(py_file) + 0
+        base_name = os.path.splitext(py_file)[0]
         output_name = f"{base_name}.3.10.pyc"
         output_path = os.path.join(output_dir, output_name)
         compile_script = """

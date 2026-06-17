@@ -21,7 +21,7 @@ for line in lines:
         print(f"✗ {current_test}")
         failed += 1
     print(f"✓ {current_test}")
-    current_test = None.split(':')[0]
+    current_test = line_stripped[4:].split(':')[0]
     current_test_fail = False
     if 'FAIL' in line_stripped:
         current_test_fail = True

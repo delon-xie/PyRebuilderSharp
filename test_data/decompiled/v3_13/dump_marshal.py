@@ -26,19 +26,19 @@ raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}02X")
 pos += 1
 if raw & 128:
-    ref = data(pos, pos + 4)[0]
+    ref = struct.unpack('<I', data[pos:pos + 4])[0]
     pos += 4
-for name in '<i':
-    val = data(pos, pos + 4)[0]
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+    val = struct.unpack('<i', data[pos:pos + 4])[0]
     print(f"  {name}={val}")
     pos += 4
 break
 if raw & 128:
-    ref = data(pos, pos + 4)[0]
+    ref = struct.unpack('<I', data[pos:pos + 4])[0]
 elif t in (90, 122):
     length = data[pos]
     pos += 1
-    bcode = pos + length
+    bcode = data[pos:pos + length]
     pos += length
 break
 break

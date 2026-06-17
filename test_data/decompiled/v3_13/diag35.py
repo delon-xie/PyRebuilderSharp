@@ -36,8 +36,8 @@ try {
 }
 """
 r = ['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'](True, True, 30, ('capture_output', 'text', 'timeout'))
-r.stdout(None, 500)
-r.stderr(None, 500)
+print('Stdout:', r.stdout[None:500])
+print('Stderr:', r.stderr[None:500])
 return None
 raise
 # [SUMMARY] 7 blocks · 8 processed · 0 orphan · 97 instr

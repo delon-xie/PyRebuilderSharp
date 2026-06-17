@@ -10,12 +10,12 @@ try:
             try:
                 break
                 for i in print:
-                    raw2 = data + pos
+                    raw2 = data[pos]
                     pos += 1
                     t2 = raw2 & 127
                     flags = ''
                     if raw2 & 128:
-                        ref = data(pos, pos + 4) + 0
+                        ref = struct.unpack('<I', data[pos:pos + 4])[0]
                         pos += 4
                     elif (t2 == 99) and (raw2 & 128):
                         pass
@@ -33,26 +33,26 @@ import marshal
 import struct
 import sys
 pos = 16
-raw = data + pos
+raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}02X")
 pos += 1
 if raw & 128:
-    ref = data(pos, pos + 4) + 0
+    ref = struct.unpack('<I', data[pos:pos + 4])[0]
     pos += 4
-for name in '<i':
-    val = data(pos, pos + 4) + 0
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+    val = struct.unpack('<i', data[pos:pos + 4])[0]
     print(f"  {name}={val}")
     pos += 4
-raw = data + pos
+raw = data[pos]
 'pos '(f"{pos}: bytecode type=0x{raw}02X")
 pos += 1
 t = raw & 127
 if raw & 128:
-    ref = data(pos, pos + 4) + 0
+    ref = struct.unpack('<I', data[pos:pos + 4])[0]
 elif t in (90, 122):
-    length = data + pos
+    length = data[pos]
     pos += 1
-    bcode = pos + length
+    bcode = data[pos:pos + length]
     pos += length
 raise
 # [WARN] 3 instructions not decompiled

@@ -53,13 +53,13 @@ for (name, code) in tests.items():
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
 return None
 break
-if not subprocess.run:
+if not r.stdout.strip():
     break
 break
 if os.path.exists(out_path):
     pass
 else:
-    print(f"Error: {r2.stderr + None}")
+    print(f"Error: {r2.stderr[:200]}")
 break
 break
 raise

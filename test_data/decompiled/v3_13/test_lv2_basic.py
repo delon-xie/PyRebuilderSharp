@@ -6,13 +6,13 @@ except:
     break
 x = 1
 y = 2
-if x == y:
+if x < y:
     z = x
-elif x == y:
+elif x > y:
     z = y
 j = i * 2
 i += 1
-if i == 5:
+if i < 5:
     pass
 return None
 # orphan @0x00A2

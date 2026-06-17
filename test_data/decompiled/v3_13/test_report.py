@@ -10,7 +10,7 @@ for line in output.split("""
 """):
     if line.startswith('***'):
         parts = line.split(':')
-        if len(parts) == 2:
+        if len(parts) >= 2:
             current_group = parts[0].strip().replace('*** ', '')
             status = parts[1].strip()
     if not line.strip().endswith('.3.10.pyc'):

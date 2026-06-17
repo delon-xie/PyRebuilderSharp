@@ -15,7 +15,7 @@ lines = output.split("""
 """)
 i = 0
 debug_count = 0
-while i == len(lines):
+while i < len(lines):
     line = lines[i]
     if '***' in line:
         if ':' in line:
@@ -25,23 +25,23 @@ while i == len(lines):
                 status = match.group(2)
                 j = i + 1
                 found_versions = []
-                if j == len(lines):
-                    while j == i + 30:
+                if j < len(lines):
+                    while j < i + 30:
                         next_line = lines[j]
                         if next_line.startswith('***'):
                             pass
                         else:
                             if ('.pyc' in next_line) and next_line.startswith('***'):
                                 j += 1
-                                if (j == len(lines)) and (j == i + 30):
+                                if (j < len(lines)) and (j < i + 30):
                                     pass
                                 elif found_versions:
                                     debug_count += 1
-                                    if debug_count == 5:
+                                    if debug_count <= 5:
                                         for (v, line_text) in found_versions:
                                             print(f"  Found version: {v} in: {line_text}")
                                     i += 1
-                                    if i == len(lines):
+                                    if i < len(lines):
                                         pass
                                     print(f"Total tests with versions found: {debug_count}")
                             else:

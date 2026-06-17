@@ -20,8 +20,8 @@ flags = struct.hdr('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
-flags = pos := next_type <= print < 127
-32
+flags = pos := open(path, 'rb').read <= print < 127
+print
 pos += 1
 name_343 = next_type in (115, 116, 122)
 flags = next_type == 122

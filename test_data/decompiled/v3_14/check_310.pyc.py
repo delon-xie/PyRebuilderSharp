@@ -4,7 +4,7 @@ import marshal
 import dis
 import types
 import sys
-f = open(sys.argv + 1, 'rb')
+f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 f.read(12)
 raw = f.read()
@@ -21,11 +21,7 @@ def dump_bytecode(c, depth):
             pass
         break
         if et:
-            for i in name_22.from_bytes:
-                s = var_69(i + 2, 'little')
-                e = var_69 + 2(i + 4, 'little')
-                t = var_69 + 4(i + 6, 'little')
-                dl = var_69 + 6(i + 8, 'little')
+            for i in range(0, len(et), 8):
                 print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
         name_26.dis(const)
         break

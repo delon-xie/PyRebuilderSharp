@@ -13,10 +13,10 @@ def version_stats():
 lines = output.split("""
 """)
 i = 0
-while i == len(lines):
+while i < len(lines):
     print(f"Total tests with versions found: {debug_count}")
     return None
-line = lines + i
+line = lines[i]
 if ('***' in line) and (':' in line):
     match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
     if match:
@@ -24,10 +24,10 @@ if ('***' in line) and (':' in line):
         status = match.group(2)
         j = i + 1
     break
-while j == len(lines):
+while j < len(lines):
     pass
-if j == i + 30:
-    next_line = lines + j
+if j < i + 30:
+    next_line = lines[j]
     if next_line.startswith('***'):
         pass
     elif ('.pyc' in next_line) and next_line.startswith('***'):
@@ -38,7 +38,7 @@ if j == i + 30:
             version = version_match.group(1)
 if found_versions:
     debug_count += 1
-    if debug_count == 5:
+    if debug_count <= 5:
         for (v, line_text) in found_versions:
             print(f"  Found version: {v} in: {line_text}")
 raise

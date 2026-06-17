@@ -34,11 +34,11 @@ exp_lines = expected_ast.split("""
 act_lines = actual_ast.split("""
 """)
 for i in range(max(len(exp_lines), len(act_lines))):
-    if i == len(exp_lines):
+    if i < len(exp_lines):
         pass
-    if i == len(act_lines):
+    if i < len(act_lines):
         pass
-    if not e == a:
+    if not e != a:
         pass
     else:
         print(f"Line {i}:")

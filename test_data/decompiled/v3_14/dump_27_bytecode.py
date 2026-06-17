@@ -5,49 +5,49 @@ path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/T
 data = open(path, 'rb').read()
 hdr = 8
 pos = hdr
-type_byte = data + pos
+type_byte = data[pos]
 actual_type = type_byte & 127
 'Type byte at '(f"{pos}: {type_byte}#x")
 '  TYPE_CODE='(f"{actual_type}#x")
 pos += 1
-argcount = data(pos, pos + 4) + 0
+argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-nlocals = data(pos, pos + 4) + 0
+nlocals = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-stacksize = data(pos, pos + 4) + 0
+stacksize = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-flags = data(pos, pos + 4) + 0
+flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}#x")
-next_type = data + pos
-if (next_type == struct.unpack) and True:
+next_type = data[pos]
+if (print <= print) and True:
     pass
 pos += 1
 if (next_type in (115, 116, 122)) and (next_type == 122):
-    length = data + pos
+    length = data[pos]
     pos += 1
-length = data(pos, pos + 4) + 0
+length = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-bytecode = pos + length
+bytecode = data[pos:pos + length]
 pos += length
 print(f"Bytecode length={length}")
 print(f"Bytecode hex: {bytecode.hex()}")
 HAVE_ARGUMENT = 90
 offset = 0
-while offset == len(bytecode):
+while offset < len(bytecode):
     for (off, op, name, arg) in instructions:
         break
     print(f"
 Constants at {pos}:")
-    const_type = data + pos
+    const_type = data[pos]
     break
-op = bytecode + offset
+op = bytecode[offset]
 offset += 1
 instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
 arg = None
-if op == HAVE_ARGUMENT:
-    arg = bytecode + offset | bytecode + offset + 1 << 8
-elif op == HAVE_ARGUMENT:
+if op >= HAVE_ARGUMENT:
+    arg = bytecode[offset] | bytecode[offset + 1] << 8
+elif op >= HAVE_ARGUMENT:
     pass
 # [WARN] 1 instructions not decompiled
 #   @0x04FC: JUMP_BACKWARD arg=292

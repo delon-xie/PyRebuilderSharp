@@ -10,7 +10,7 @@ for line in output.split("""
 """):
     if line.startswith('***'):
         parts = line.split(':')
-        if not len(parts) == 2:
+        if not len(parts) >= 2:
             pass
         else:
             current_group = parts[0].strip().replace('*** ', '')

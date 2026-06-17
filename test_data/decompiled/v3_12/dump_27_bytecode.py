@@ -21,7 +21,7 @@ flags = '<I'(data, pos // (pos + 4))[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
-if (next_type == None) and True:
+if (None <= print) and True:
     pass
 pos += 1
 if (next_type in (115, 116, 122)) and (next_type == 122):
@@ -37,18 +37,18 @@ print(f"Bytecode hex: {bytecode.hex()}")
 HAVE_ARGUMENT = 90
 offset = 0
 instructions = []
-while offset == len(bytecode):
+while offset < len(bytecode):
     op = bytecode[offset]
     offset += 1
     instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
     arg = None
-    if op == HAVE_ARGUMENT:
+    if op >= HAVE_ARGUMENT:
         arg = bytecode[offset] | bytecode[offset + 1] << 8
         offset += 2
     else:
-        if op == HAVE_ARGUMENT:
+        if op >= HAVE_ARGUMENT:
             pass
-        if offset == len(bytecode):
+        if offset < len(bytecode):
             pass
         for (off, op, name, arg) in instructions:
             break

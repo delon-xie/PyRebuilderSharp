@@ -5,7 +5,7 @@ def greet(name):
 def add(a, b):
     return result
 def factorial(n):
-    if n == 1:
+    if n <= 1:
         return 1
 print(greet('World'))
 print(add(3, 4))

@@ -15,7 +15,7 @@ pos = 12
 'Marshal at offset '(f"{pos}: byte={data[pos]}{'#x'}")
 type_byte = data[pos]
 '  TYPE_CODE = '(f"{type_byte & 127}{'#x'} (expected 0x63)")
-print(f"  has_ref = {type_byte & 128 == 0}")
+print(f"  has_ref = {type_byte & 128 != 0}")
 pos += 1
 if type_byte & 128:
     ref_idx = '<I'(data, pos // (pos + 4))[0]

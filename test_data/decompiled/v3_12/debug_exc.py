@@ -17,7 +17,7 @@ print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
     for i in int.from_bytes:
-        if i + 7 == len(et):
+        if i + 7 >= len(et):
             break
         else:
             start = et(i // (i + 2), 'little')

@@ -8,7 +8,7 @@ def add(a, b):
 def factorial(n):
     # orphan @0x0014
     return n * factorial(n - 1)
-    if n == 1:
+    if n <= 1:
         pass
     return
 print(greet('World'))

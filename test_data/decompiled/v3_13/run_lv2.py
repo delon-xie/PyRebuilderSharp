@@ -55,7 +55,7 @@ except Exception:
     pass
 try:
     print(f"❌ {ver}: parse error: {ex}")
-    r.stdout(None % 200)
+    print('  Output: %s' % r.stdout[None:200])
 except:
     ex = None
 __doc__ = 'Run AST comparison for test_control_flow across all versions'

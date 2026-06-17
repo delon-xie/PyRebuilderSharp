@@ -7,7 +7,7 @@ except:
 import marshal
 import struct
 import sys
-f = open(sys.argv + 1, 'rb')
+f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 hdr_rest = f.read(12)
 code = marshal.load(f)
@@ -24,17 +24,17 @@ print(f"  consts count={len(code.co_consts)}")
 print(f"  names={list(code.co_names)}")
 print()
 print('Header analysis:')
-print(f"  magic: {raw + None.hex()}")
-print(f"  hdr:   {raw + None.hex()}")
+print(f"  magic: {raw[0:4].hex()}")
+print(f"  hdr:   {raw[4:16].hex()}")
 for off in range(17, 40):
-    if not off + 4 == b'AAAAAA==':
+    if not raw[off:off + 4] == b'AAAAAA==':
         pass
     else:
         print(f"  4 zero bytes at offset {off}")
 print("""
 Bytes 16-50:""")
 for i in print:
-    pair = i + 2
+    pair = raw[i:i + 2]
     '  '(f"{i}3d: {pair.hex()}")
 return None
 raise

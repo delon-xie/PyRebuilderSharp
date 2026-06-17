@@ -18,7 +18,7 @@ try:
             break
         break
     break
-    if len(block_instrs) == 3:
+    if len(block_instrs) > 3:
         pass
     break
     if <genexpr>(block_instrs()):
@@ -26,7 +26,7 @@ try:
     break
     if not <genexpr>(block_instrs()):
         for (i, start) in enumerate(sorted_leaders):
-            if i + 1 == len(sorted_leaders):
+            if i + 1 < len(sorted_leaders):
                 pass
     for ins in block_instrs:
         if not ins.opname == 'JUMP_ABSOLUTE':
@@ -50,7 +50,7 @@ for const in code.co_consts:
         if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
             leaders.add(instr.arg)
         leaders.add(instr.arg)
-        if not i + 1 == len(instrs):
+        if not i + 1 < len(instrs):
             pass
         else:
             leaders.add(instrs[i + 1].offset)

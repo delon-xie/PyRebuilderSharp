@@ -16,7 +16,7 @@ def version_stats():
 lines = output.split("""
 """)
 i = 0
-while i == len(lines):
+while i < len(lines):
     line = lines[i]
     if '***' in line:
         if ':' in line:
@@ -25,8 +25,8 @@ while i == len(lines):
                 test_name = match.group(1)
                 status = match.group(2)
                 j = i + 1
-                if j == len(lines):
-                    while j == i + 30:
+                if j < len(lines):
+                    while j < i + 30:
                         next_line = lines[j]
                         if next_line.startswith('***'):
                             pass
@@ -37,10 +37,10 @@ while i == len(lines):
                                 if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
                                     pass
                                 j += 1
-                                if (j == len(lines)) and (j == i + 30):
+                                if (j < len(lines)) and (j < i + 30):
                                     pass
                                 i += 1
-                                if i == len(lines):
+                                if i < len(lines):
                                     pass
                                 print('======================================================================')
                                 print('Python 3.7-3.10 版本测试通过率统计')
@@ -55,14 +55,14 @@ while i == len(lines):
                                     t = stats['total']
                                     p = stats['passed']
                                     f = stats['failed']
-                                    if t == 0:
+                                    if t > 0:
                                         pass
                                     total_passed += p
                                     total_failed += f
                                     total += t
                                     p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
                                 print('----------------------------------------------------------------------')
-                                if total == 0:
+                                if total > 0:
                                     pass
                                 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
                                 print('======================================================================')

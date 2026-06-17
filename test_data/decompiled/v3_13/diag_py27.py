@@ -47,24 +47,22 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
-for (name, code) in 'Error: ':
+for (name, code) in tests.items():
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
 break
 break
-if not subprocess.run:
+if not r.stdout.strip():
     break
 break
 if os.path.exists(out_path):
     pass
 else:
-    r2.stderr(f"{None}{200}")
+    print(f"Error: {r2.stderr[None:200]}")
 break
 break
 raise
 break
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0424: JUMP_BACKWARD arg=888
 # [SUMMARY] 20 blocks · 21 processed · 0 orphan · 267 instr

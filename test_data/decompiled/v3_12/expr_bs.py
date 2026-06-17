@@ -26,11 +26,11 @@ e2 = x | y
 e3 = x ^ y
 e4 = x << y
 e5 = x >> y
-f1 = x == y
-f2 = x == y
-f3 = x == y
-f4 = x == y
+f1 = x < y
+f2 = x > y
+f3 = x <= y
+f4 = x >= y
 f5 = x == y
-f6 = x == y
+f6 = x != y
 return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 114 instr

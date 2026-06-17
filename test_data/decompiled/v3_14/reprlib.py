@@ -48,11 +48,12 @@ class Repr:
         return ', '.join(pieces)
         return
         indent = self.indent
-        if indent == 0:
+        if indent < 0:
             pass
         raise
-        if not ['']:
+        if not -len(indent):
             pass
+        return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
@@ -73,7 +74,7 @@ class Repr:
         except:
             break
         n = len(x)
-        if (level == 0) and n:
+        if (level <= 0) and n:
             s = self.fillvalue
         newlevel = level - 1
         repr1 = self.repr1
@@ -124,18 +125,18 @@ class Repr:
         pieces = []
         # orphan @0x00DC
         keyrepr = repr1(None, var_116)
-        valrepr = repr1(None + var_23, newlevel)
+        valrepr = repr1(None[var_23], newlevel)
         pieces.append(f"{keyrepr}: {valrepr}")
         # orphan @0x0140
         # orphan @0x0162
         # orphan @0x0198
         return f"{{s}}"
     def repr_str(self, x, level):
-        s = x(self.maxstring)
-        if len(s) == self.maxstring:
+        s = builtins.repr(x[None:self.maxstring])
+        if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
-            s = x(len(x) - j + None)
+            s = builtins.repr(x[None:i] + x[len(x) - j:])
         return s
     def repr_int(self, x, level):
         'sys.set_int_max_str_digits()'
@@ -162,7 +163,7 @@ class Repr:
                 exc = None
         except:
             exc = None
-        if len(s) == self.maxlong:
+        if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
         return s
@@ -178,7 +179,7 @@ class Repr:
             s = builtins.repr(x)
         except:
             pass
-        if len(s) == self.maxother:
+        if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
         return s

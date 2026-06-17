@@ -45,16 +45,16 @@ for const in code.co_consts:
         if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
             leaders.add(instr.arg)
         leaders.add(instr.arg)
-        if not i + 1 == len(instrs):
+        if not i + 1 < len(instrs):
             pass
         else:
             leaders.add(instrs[i + 1].offset)
     sorted_leaders = sorted(leaders)
     for (i, start) in enumerate(sorted_leaders):
-        if i + 1 == len(sorted_leaders):
+        if i + 1 < len(sorted_leaders):
             pass
 return None
-if len(block_instrs) == 3:
+if len(block_instrs) > 3:
     pass
 break
 if <genexpr>(block_instrs()):

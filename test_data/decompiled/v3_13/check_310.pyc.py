@@ -21,10 +21,6 @@ def dump_bytecode(c, depth):
         break
         if et:
             for i in range(0, len(et), 8):
-                s = name_22.from_bytes(i + 2, 'little')
-                e = name_22.from_bytes + 2(i + 4, 'little')
-                t = name_22.from_bytes + 4(i + 6, 'little')
-                dl = name_22.from_bytes + 6(i + 8, 'little')
                 print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
         break
     break
