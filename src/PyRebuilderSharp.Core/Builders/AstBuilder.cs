@@ -979,6 +979,21 @@ public class AstBuilder
         var tryBlocks = GetBlocksInRange(matchingEntry.StartOffset, matchingEntry.EndOffset);
         if (tryBlocks.Count == 0) return null;
 
+        // 排除嵌入在 try 体范围内的 handler 块。
+        // 当 handler 偏移（TargetOffset）在 try 体 [StartOffset, EndOffset) 内时，
+        // GetBlocksInRange 会同时返回 try 体和 handler 块。
+        // handler 块不应作为 try 体的一部分处理。
+        // 参考 CPython 3.13 abc.py 的异常表：handler 在 try 体内部
+        if (matchingEntry.TargetOffset > matchingEntry.StartOffset
+            && matchingEntry.TargetOffset < matchingEntry.EndOffset)
+        {
+            tryBlocks = tryBlocks
+                .Where(tb => tb.Instructions.Count == 0
+                    || tb.Instructions[0].Offset < matchingEntry.TargetOffset)
+                .ToList();
+            if (tryBlocks.Count == 0) return null;
+        }
+
         var tryBody = new List<Stmt>();
         var tryVisited = new HashSet<BasicBlock>();
         foreach (var tb in tryBlocks)
