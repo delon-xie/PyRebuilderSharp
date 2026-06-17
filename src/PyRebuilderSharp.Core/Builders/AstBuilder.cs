@@ -639,17 +639,6 @@ public class AstBuilder
             if (_codeObject.Name == "<module>" && !_diagETPrinted)
             {
                 _diagETPrinted = true;
-                System.Console.Error.WriteLine($"[AST-DIAG] ExceptionTable ({_codeObject.ExceptionTable.Count} entries):");
-                foreach (var e in _codeObject.ExceptionTable)
-                    System.Console.Error.WriteLine($"  try[{e.StartOffset:X4}-{e.EndOffset:X4}]→handler@{e.TargetOffset:X4} depth={e.Depth}");
-                System.Console.Error.WriteLine($"[AST-DIAG] Blocks ({GetAllBlocks().Count}):");
-                foreach (var b in GetAllBlocks())
-                {
-                    var s = b.Instructions.Count > 0 ? b.Instructions[0].Offset.ToString("X4") : "?";
-                    var e = b.Instructions.Count > 0 ? b.Instructions.Last().Offset.ToString("X4") : "?";
-                    var succs = string.Join(",", b.Successors.Select(s2 => s2.Instructions.Count > 0 ? s2.Instructions[0].Offset.ToString("X4") : "?"));
-                    System.Console.Error.WriteLine($"  B@{s}-{e} succ=[{succs}]");
-                }
             }
             var try311Stmts = BuildTryFromExceptionTable(block, visited);
             if (try311Stmts != null)
@@ -978,18 +967,14 @@ public class AstBuilder
             .FirstOrDefault();
         if (matchingEntry == null)
         {
-            System.Console.Error.WriteLine($"[AST-DIAG] BuildTryFromExceptionTable: no matching entry for block @0x{blockStart:X4}-0x{blockEnd:X4} (ET count={_codeObject.ExceptionTable.Count})");
             return null;
         }
 
         var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
         if (handlerBlock == null || visited.Contains(handlerBlock))
         {
-            System.Console.Error.WriteLine($"[AST-DIAG] BuildTryFromExceptionTable: handler @0x{matchingEntry.TargetOffset:X4} null={handlerBlock==null} visited={visited.Contains(handlerBlock)}");
             return null;
         }
-
-        System.Console.Error.WriteLine($"[AST-DIAG] BuildTryFromExceptionTable: matched entry try[{matchingEntry.StartOffset:X4}-{matchingEntry.EndOffset:X4}]→handler@{matchingEntry.TargetOffset:X4} depth={matchingEntry.Depth}");
 
         var tryBlocks = GetBlocksInRange(matchingEntry.StartOffset, matchingEntry.EndOffset);
         if (tryBlocks.Count == 0) return null;
