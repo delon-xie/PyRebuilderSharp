@@ -2449,6 +2449,14 @@ public class AstBuilder
             return tryStmtsList;
         }
 
+        // 3.11+: ET-based try/except 检测（优先于 if/else，因为 ET 条目也可能包含条件跳转）
+        if (_codeObject.ExceptionTable != null && _codeObject.ExceptionTable.Count > 0)
+        {
+            var etTry = BuildTryFromExceptionTable(block, visited);
+            if (etTry != null)
+                return etTry;
+        }
+
         // 检测 if/else 条件分支
         if (IsConditionBranch(block))
         {

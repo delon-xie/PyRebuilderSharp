@@ -746,8 +746,22 @@ public class StackMachine
                 }
                 
                 var func = SafePop();
-                if (func == null) return null;
-                
+                // 3.14+: PUSH_NULL 可能在函数之后（栈: [func, NULL, ...]），
+                // 而非 3.12-3.13 的之前（栈: [NULL, func, ...]）。
+                // 参考 CPython 3.14 调用协议变化。
+                if (func is Constant { Value: null })
+                {
+                    // PUSH_NULL sentinel was on top — pop the real function
+                    if (_exprStack.Count > 0)
+                        func = SafePop();
+                    else
+                        return null;
+                }
+                else if (func == null)
+                {
+                    return null;
+                }
+
                 // If TOS is a null sentinel (PUSH_NULL), pop it
                 var peeked = SafePeek();
                 if (peeked is Constant { Value: null })
