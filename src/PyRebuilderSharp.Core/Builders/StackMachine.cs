@@ -650,6 +650,7 @@ public class StackMachine
 
             // ---- 3.11+ RETURN_CONST: LOAD_CONST + RETURN_VALUE combined ----
             case Opcode.RETURN_CONST:
+            case Opcode.RETURN_CONST_313:
             {
                 var constIdx = instr.Argument ?? 0;
                 var retConst = _code.Constants.TryGetValue(constIdx, out var cv) ? cv : null;
@@ -678,6 +679,7 @@ public class StackMachine
 
             // ---- 3.11+ COPY: duplicate TOS[n] ----
             case Opcode.COPY:
+            case Opcode.COPY_FREE_VARS_313:
             {
                 var depth = instr.Argument ?? 0;
                 // COPY n: duplicate the element n positions below TOS
@@ -719,6 +721,7 @@ public class StackMachine
             // ---- 3.11+ CALL / CALL_311: new call protocol ----
             case Opcode.CALL:
             case Opcode.CALL_311:
+            case Opcode.CALL_KW_313:
             {
                 var argCount = instr.Argument ?? 0;
                 // In 3.11+: stack = [..., PUSH_NULL?, func, arg0, arg1, ...]
@@ -1109,6 +1112,10 @@ public class StackMachine
                 SafePop(); // object
                 return null;
             }
+
+            // 3.13+ TO_BOOL: convert TOS to boolean (no-op for decompiler, expression unchanged)
+            case Opcode.TO_BOOL_313:
+                return null;
 
             default:
                 // Instead of crashing, create a comment to preserve surrounding block
