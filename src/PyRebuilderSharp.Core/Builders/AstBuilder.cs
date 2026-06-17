@@ -3095,6 +3095,40 @@ public class AstBuilder
             }
         }
 
+        // 合并连续的同模块 import-from
+        // from types import A, B (was: from types import A / from types import B)
+        var merged = new List<Stmt>();
+        ImportFrom? pendingImportFrom = null;
+        foreach (var stmt in result)
+        {
+            if (stmt is ImportFrom impf)
+            {
+                if (pendingImportFrom != null && pendingImportFrom.Module == impf.Module
+                    && pendingImportFrom.Level == impf.Level)
+                {
+                    pendingImportFrom.Names.AddRange(impf.Names);
+                }
+                else
+                {
+                    if (pendingImportFrom != null)
+                        merged.Add(pendingImportFrom);
+                    pendingImportFrom = impf;
+                }
+            }
+            else
+            {
+                if (pendingImportFrom != null)
+                {
+                    merged.Add(pendingImportFrom);
+                    pendingImportFrom = null;
+                }
+                merged.Add(stmt);
+            }
+        }
+        if (pendingImportFrom != null)
+            merged.Add(pendingImportFrom);
+        result = merged;
+
         // 过滤 import 后遗留的模块名表达式
         var importedModules = new HashSet<string>();
         foreach (var stmt in result)
