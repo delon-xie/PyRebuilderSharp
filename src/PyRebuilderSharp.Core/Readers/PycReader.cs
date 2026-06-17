@@ -920,8 +920,13 @@ public class PycReader
             if (type == MarshalType.TYPE_REF)
             {
                 var idx = br.ReadInt32();
-                if (idx >= 0 && idx < _refList.Count && _refList[idx] is List<string> cached)
-                    return cached;
+                if (idx >= 0 && idx < _refList.Count)
+                {
+                    if (_refList[idx] is List<string> cached)
+                        return cached;
+                    if (_refList[idx] is List<object?> objList)
+                        return objList.Where(x => x != null).Select(x => x.ToString() ?? "").ToList();
+                }
                 return result;
             }
 
