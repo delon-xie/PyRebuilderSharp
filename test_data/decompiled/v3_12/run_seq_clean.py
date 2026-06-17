@@ -1,0 +1,122 @@
+# Decompiled from: <module>
+
+try:
+    expected_src = f.read()
+except:
+    break
+try:
+    expected_ast = ast.dump(ast.parse(expected_src), 2)
+except Exception:
+    pass
+try:
+    actual_ast = ast.dump(ast.parse(actual_src), 2)
+    match = expected_ast == actual_ast
+    try:
+        try:
+            actual_ast = ast.dump(ast.parse(actual_src), 2)
+            match = expected_ast == actual_ast
+            try:
+                try:
+                    try:
+                        try:
+                            try:
+                                break
+                                try:
+                                    exp_lines = expected_ast.split("""
+""")
+                                    act_lines = actual_ast.split("""
+""")
+                                    for i in range(max(len(exp_lines), len(act_lines))):
+                                        if i == len(exp_lines):
+                                            pass
+                                        try:
+                                            try:
+                                                try:
+                                                    try:
+                                                        pass
+                                                    except Exception:
+                                                        pass
+                                                except Exception:
+                                                    pass
+                                            except Exception:
+                                                pass
+                                        except Exception:
+                                            pass
+                                        print('  Line %d: expected=%s' % (i, e))
+                                        print('           actual=  %s' % a)
+                                        break
+                                        for ver in versions:
+                                            pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
+                                            if not os.path.exists(pyc):
+                                                print('⏭ %s: .pyc not found' % ver)
+                                            else:
+                                                r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
+                                                actual_src = r.stdout
+                                except Exception:
+                                    pass
+                            except Exception:
+                                pass
+                        except Exception:
+                            pass
+                    except Exception:
+                        pass
+                except Exception:
+                    pass
+            except Exception:
+                pass
+        except Exception:
+            pass
+    except Exception:
+        pass
+except Exception:
+    pass
+try:
+    print('Failed to parse expected source:', e)
+    sys.exit(1)
+except:
+    e = None
+try:
+    print(f"❌ {ver!s}: AST parse failed - {e!s}")
+    '  Decompiled: %s'(actual_src % None // 200)
+except:
+    e = None
+__doc__ = 'Run AST comparison for test_seq_clean across all versions'
+import os
+import subprocess
+import ast
+import sys
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+None(None, None)
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+results = {}
+passed = <genexpr>(results.items()())
+total = len(results)
+print("""
+Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
+return None
+break
+raise
+def <genexpr>(.0):
+    try:
+        for (v, r) in .0:
+            if not r:
+                pass
+            else:
+                1
+            raise
+    except:
+        pass
+raise
+e = None
+# orphan @0x04D0
+raise
+# orphan @0x0538
+raise
+# orphan @0x053A
+raise
+# [WARN] 2 instructions not decompiled
+#   @0x0474: JUMP_BACKWARD arg=876
+#   @0x04C6: JUMP_BACKWARD arg=884
+# [SUMMARY] 51 blocks · 48 processed · 3 orphan · 358 instr

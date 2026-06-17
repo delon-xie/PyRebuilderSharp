@@ -1,0 +1,51 @@
+# Decompiled from: <module>
+
+import os
+import struct
+MAGIC_NUMBERS = {b'hQ0NCg==': '3.10', b'eg0NCg==': '3.11', b'bw0NCg==': '3.12', b'Yg0NCg==': '3.13', b'Wg0NCg==': '3.14'}
+def get_python_version(filepath):
+    try:
+        magic = fp.read(4)
+    except:
+        pass
+    None(None, None)
+    return name_4.get(magic, 'unknown')
+    # orphan @0x008C
+    raise
+    # [WARN] 1 instructions not decompiled
+    #   @0x008A: JUMP_BACKWARD arg=62
+def fix_pyc_names(directory):
+    for filename in os.listdir(directory):
+        if not filename.endswith('.pyc'):
+            pass
+        else:
+            filepath = os.path.join(directory, filename)
+            actual_version = get_python_version(filepath)
+        if f".{actual_version}.pyc" in filename:
+            pass
+        else:
+            new_filename = filename
+        for version in exists.values():
+            if not f".{version}.pyc" in new_filename:
+                pass
+            else:
+                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                break
+            if not new_filename == filename:
+                pass
+            else:
+                new_filepath = os.path.join(directory, new_filename)
+            os.rename(filepath, new_filepath)
+            print(f"✓ Renamed {filename} -> {new_filename}")
+            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+        import re
+        match = re.search('\\.(\\d+)\\.pyc$', filename)
+        if match:
+            old_ver = match.group(1)
+            new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+if __name__ == '__main__':
+    fix_pyc_names('tests/compiled')
+    print("""
+Done!""")
+    return None
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 39 instr

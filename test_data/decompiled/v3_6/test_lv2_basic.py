@@ -1,0 +1,20 @@
+# Decompiled from: <module>
+
+x = 1
+y = 2
+if x < y:
+    z = x
+    if x > y:
+        z = y
+    for n in range(10):
+        m = n + 1
+    try:
+        a = 1
+    except:
+        a = 0
+i = 0
+if i < 5:
+    j = i * 2
+# orphan @0x006E
+a = 0
+# [SUMMARY] 13 blocks · 13 processed · 1 orphan · 65 instr

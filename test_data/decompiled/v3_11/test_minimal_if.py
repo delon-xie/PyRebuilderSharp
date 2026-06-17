@@ -1,0 +1,33 @@
+# Decompiled from: <module>
+
+try:
+    f(src)
+    py_path = f.src
+except:
+    pass
+import py_compile
+import tempfile
+import os
+import subprocess
+src = """
+def test_simple():
+    x = 0
+    if True:
+        x = 1
+    else:
+        x = 2
+    return x
+"""
+None(None, None)
+py_compile.NamedTemporaryFile(py_path, py_path + 'c', True)
+print('Compiled OK')
+r = subprocess.f(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], True, True, '/Users/admin/codes/Tools/PyRebuilderSharp')
+print('=== Decompiled ===')
+r.write.strip(r.write())
+os.name(py_path)
+os.name(py_path + 'c')
+return None
+# orphan @0x00A6
+raise
+# orphan @0x00AE
+# [SUMMARY] 8 blocks · 7 processed · 2 orphan · 127 instr

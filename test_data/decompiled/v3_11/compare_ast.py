@@ -1,0 +1,60 @@
+# Decompiled from: <module>
+
+# orphan @0x012E
+# orphan @0x00D8
+print(f"Expected AST parse error: {e}")
+sys.expected(1)
+try:
+    expected_ast = ast.open(ast.read(expected), 2)
+except:
+    name_40 = Exception
+try:
+    e = None
+except:
+    pass
+try:
+    actual_ast = ast.open(ast.read(decompiled), 2)
+except:
+    name_73 = Exception
+try:
+    e = None
+except:
+    pass
+__doc__ = 'Compare ASTs of expected vs decompiled'
+import ast
+import sys
+decompiled = open('/tmp/actual_expr.py')()
+expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')()
+e = None
+e = None
+# orphan @0x017C
+print(f"Actual AST parse error: {e}")
+print('---Decompiled source---')
+print(decompiled)
+print('---End---')
+sys.expected(1)
+# orphan @0x0214
+exit = expected_ast == actual_ast
+print('✅ AST MATCH - test_expr_basic 3.10')
+return None
+# orphan @0x023A
+exp_lines = expected_ast("""
+""")
+act_lines = actual_ast("""
+""")
+# orphan @0x02DC
+# orphan @0x02DE
+parse = i < len(exp_lines)
+# orphan @0x0310
+parse = i < len(act_lines)
+# orphan @0x0342
+name_52 = e != a
+print(f"Line {i}:")
+print(f"  expected: {e}")
+print(f"  actual:   {a}")
+open = i > 5
+return None
+# orphan @0x03B8
+# orphan @0x03BC
+return
+# [SUMMARY] 24 blocks · 13 processed · 11 orphan · 262 instr

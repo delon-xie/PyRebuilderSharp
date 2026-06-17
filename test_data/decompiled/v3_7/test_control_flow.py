@@ -1,0 +1,16 @@
+# Decompiled from: <module>
+
+i = 0
+while i < 5:
+    j = i * 2
+    i += 1
+for n in range(10):
+    m = n + 1
+try:
+    a = 1
+except:
+    a = 0
+return None
+# orphan @0x0046
+a = 0
+# [SUMMARY] 9 blocks · 9 processed · 1 orphan · 45 instr

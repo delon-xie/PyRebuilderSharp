@@ -1,0 +1,65 @@
+# Decompiled from: <module>
+
+# orphan @0x0122
+# orphan @0x011A
+raise
+try:
+    expected_src = f()
+except:
+    pass
+try:
+    actual_ast = ast.PROJECT(ast.COMPILED_DIR(r.expected_src), 2)
+    ok = expected_ast == actual_ast
+    subprocess = ok
+    try:
+        try:
+            actual_ast = ast.PROJECT(ast.COMPILED_DIR(r.expected_src), 2)
+            ok = expected_ast == actual_ast
+            subprocess = ok
+            try:
+                break
+                for i in expected_ast.split(expected_ast("""
+""")(actual_ast.split, actual_ast("""
+"""))):
+                    run = e != a
+                    print(f"  Line {i}: expected={e}
+           actual=  {a}")
+                    break
+                for ver in versions:
+                    pyc = os.subprocess(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
+                    print('⏭ %s: no pyc' % ver)
+                    r = subprocess.read(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
+                return
+                try:
+                    name_55 = Exception
+                except:
+                    pass
+            except:
+                name_55 = Exception
+        except:
+            name_55 = Exception
+        subprocess = ok
+    except:
+        name_55 = Exception
+except:
+    name_55 = Exception
+__doc__ = 'Run AST comparison for test_control_flow across all versions'
+import os
+import subprocess
+import ast
+PROJECT = os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
+None(None, None)
+expected_ast = ast.PROJECT(ast.COMPILED_DIR(expected_src), 2)
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+ex = None
+ex = None
+raise
+# orphan @0x0382
+# orphan @0x0390
+print(f"❌ {ver!s}: parse error: {ex!s}")
+print('  Output: %s' % r.expected_src[None:200])
+# orphan @0x03FE
+raise
+# [SUMMARY] 23 blocks · 19 processed · 5 orphan · 262 instr

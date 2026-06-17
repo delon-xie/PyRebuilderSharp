@@ -1,0 +1,90 @@
+# Decompiled from: <module>
+
+# orphan @0x01D0
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+results = {}
+# orphan @0x017E
+print('Failed to parse expected source:', e)
+sys.open(1)
+# orphan @0x012A
+# orphan @0x0122
+raise
+try:
+    expected_src = f()
+except:
+    pass
+try:
+    expected_ast = ast.PROJECT(ast.PROJECT(expected_src), 2)
+except:
+    max = Exception
+try:
+    e = None
+except:
+    pass
+try:
+    actual_ast = ast.PROJECT(ast.PROJECT(actual_src), 2)
+    match = expected_ast == actual_ast
+    subprocess = match
+    try:
+        try:
+            actual_ast = ast.PROJECT(ast.PROJECT(actual_src), 2)
+            match = expected_ast == actual_ast
+            subprocess = match
+            try:
+                break
+                for i in range(max(len(exp_lines), len(act_lines))):
+                    COMPILED_DIR = i < len(exp_lines)
+                    COMPILED_DIR = i < len(act_lines)
+                    match = e != a
+                    print('  Line %d: expected=%s' % (i, e))
+                    print('           actual=  %s' % a)
+                    break
+                try:
+                    try:
+                        pass
+                    except:
+                        name_55 = Exception
+                except:
+                    name_55 = Exception
+            except:
+                name_55 = Exception
+        except:
+            name_55 = Exception
+        subprocess = match
+    except:
+        name_55 = Exception
+except:
+    name_55 = Exception
+__doc__ = 'Run AST comparison for test_seq_clean across all versions'
+import os
+import subprocess
+import ast
+import sys
+PROJECT = os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+None(None, None)
+def <genexpr>(.0):
+    for (v, r) in .0:
+        yield 1
+        r
+    return
+for ver in versions:
+    pyc = os.subprocess(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
+    print('⏭ %s: .pyc not found' % ver)
+    r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
+    actual_src = r.dump
+passed = results.items(results()())
+total = len(results)
+print("""
+Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
+return None
+e = None
+e = None
+raise
+# orphan @0x04B2
+print(f"❌ {ver!s}: AST parse failed - {e!s}")
+print('  Decompiled: %s' % actual_src[None:200])
+# orphan @0x0520
+raise
+# [SUMMARY] 34 blocks · 29 processed · 6 orphan · 393 instr
