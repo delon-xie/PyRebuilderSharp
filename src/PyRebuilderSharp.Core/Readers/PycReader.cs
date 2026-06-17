@@ -251,7 +251,6 @@ public class PycReader
             // qualname (3.11+ 的所有代码对象都有)
             if (_strategy.HasQualname)
             {
-                if (code.Name == "<module>") Console.Error.Write($"\r[DIAG] before qualname: pos={br.BaseStream.Position} ");
                 try { var qualObj = ReadMarshalObject(br); }
                 catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.qualname", ex); }
             }

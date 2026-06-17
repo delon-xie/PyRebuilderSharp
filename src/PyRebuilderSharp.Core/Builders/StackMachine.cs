@@ -816,7 +816,7 @@ public class StackMachine
                 // COPY n: duplicate the element n positions below TOS
                 // In Python 3.12, COPY n copies stack[-1-n]. For walrus := pattern,
                 // COPY 1 is used with only 1 element on stack — copy TOS.
-                if (depth == 0 || depth >= _exprStack.Count)
+                if (depth == 0 || depth > _exprStack.Count)
                 {
                     var top = SafePeek();
                     if (top != null) _exprStack.Push(top);
@@ -824,10 +824,12 @@ public class StackMachine
                 }
                 else
                 {
-                    // COPY n: push expr_stack[stack_count - 1 - depth]
+                    // COPY n: push stack[-n], where stack[-1]=TOS.
+                    // In reversed array: TOS is at lastIdx, TOS1 at lastIdx-1.
                     var arr = _exprStack.ToArray();
                     Array.Reverse(arr);
-                    int idx = (int)depth;
+                    int lastIdx = arr.Length - 1;
+                    int idx = lastIdx - (int)depth + 1;
                     if (idx >= 0 && idx < arr.Length)
                         _exprStack.Push(arr[idx]);
                     _pendingCopyDepth = (int)depth;
@@ -835,16 +837,32 @@ public class StackMachine
                 return null;
             }
 
-            // ---- 3.11+ SWAP: swap TOS and TOS1 ----
+            // ---- 3.11+ SWAP: swap TOS and TOS[n] ----
             case Opcode.SWAP:
             {
                 var depth = instr.Argument ?? 0;
-                if (depth <= 1 && _exprStack.Count >= 2)
+                // SWAP n: swap TOS with item at depth n below TOS
+                // depth=1: swap TOS and TOS1 (standard two-item swap)
+                // depth=2: swap TOS and TOS2 (e.g., SWAP 2 in 3.13+)
+                if (depth >= 1 && depth <= _exprStack.Count)
                 {
-                    var a = _exprStack.Pop();
-                    var b = _exprStack.Pop();
-                    _exprStack.Push(a);
-                    _exprStack.Push(b);
+                    // Convert stack to array, reverse (bottom→top), swap positions
+                    var arr = _exprStack.ToArray();
+                    Array.Reverse(arr);
+                    int lastIdx = arr.Length - 1;
+                    // CPython: SWAP n swaps TOS (reversed[lastIdx]) with stack[-n]
+                    // where stack[-1]=TOS, stack[-2]=TOS1, etc.
+                    // In reversed array: TOS is at lastIdx, TOS1 at lastIdx-1, etc.
+                    // So swap TOS with reversed[lastIdx - depth + 1]
+                    int swapIdx = lastIdx - (int)depth + 1;
+                    if (swapIdx >= 0 && swapIdx < arr.Length)
+                    {
+                        (arr[lastIdx], arr[swapIdx]) = (arr[swapIdx], arr[lastIdx]);
+                        _exprStack.Clear();
+                        Array.Reverse(arr);
+                        for (int i = 0; i < arr.Length; i++)
+                            _exprStack.Push(arr[i]);
+                    }
                 }
                 return null;
             }
