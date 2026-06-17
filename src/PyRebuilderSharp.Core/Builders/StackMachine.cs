@@ -1117,6 +1117,27 @@ public class StackMachine
             case Opcode.TO_BOOL_313:
                 return null;
 
+            // 3.13+ SET_FUNCTION_ATTRIBUTE: set function attribute (closure/defaults/annotations)
+            // Pops one value from stack. StackMachine: just skip — output unaffected.
+            case Opcode.SET_FUNCTION_ATTRIBUTE_313:
+                return null;
+
+            // 3.13+ FORMAT_SIMPLE: f-string simple format (no-op, expression unchanged)
+            case Opcode.FORMAT_SIMPLE_313:
+                return null;
+
+            // 3.13+ CONVERT_VALUE: convert to repr/str/ascii (no-op for decompiler)
+            case Opcode.CONVERT_VALUE_313:
+                return null;
+
+            // 3.13+ CALL_INTRINSIC_1: intrinsic function call type 1
+            case Opcode.CALL_INTRINSIC_1_313:
+                return null;
+
+            // 3.13+ CALL_INTRINSIC_2: intrinsic function call type 2
+            case Opcode.CALL_INTRINSIC_2_313:
+                return null;
+
             default:
                 // Instead of crashing, create a comment to preserve surrounding block
                 return null; // Skip unknown opcodes — block becomes partial output
