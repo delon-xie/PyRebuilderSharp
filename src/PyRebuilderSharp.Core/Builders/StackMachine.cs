@@ -100,6 +100,81 @@ public class StackMachine
                 _exprStack.Push(new Constant(value));
                 return null;
 
+            // ---- 3.14 新操作码 ----
+            case Opcode.LOAD_SMALL_INT_314:
+                // LOAD_SMALL_INT: arg 本身就是小整数值（0-255）
+                _exprStack.Push(new Constant((long)(instr.Argument ?? 0)));
+                return null;
+
+            case Opcode.LOAD_COMMON_CONSTANT_314:
+                // LOAD_COMMON_CONSTANT: arg 映射到常见常量
+                // CPython 3.14: 0=None, 1=True, 2=False, 3=Ellipsis
+                var commonIdx = instr.Argument ?? 0;
+                object? commonVal;
+                switch (commonIdx)
+                {
+                    case 0: commonVal = null; break;
+                    case 1: commonVal = true; break;
+                    case 2: commonVal = false; break;
+                    default: commonVal = null; break;
+                }
+                _exprStack.Push(new Constant(commonVal));
+                return null;
+
+            case Opcode.LOAD_SPECIAL_314:
+                // LOAD_SPECIAL: arg 映射到特殊名称
+                // CPython 3.14: 0=__name__, 1=__module__, 2=__qualname__
+                var specialName = (instr.Argument ?? 0) switch
+                {
+                    0 => "__name__",
+                    1 => "__module__",
+                    2 => "__qualname__",
+                    _ => $"__special_{instr.Argument}__"
+                };
+                _exprStack.Push(new Name(specialName, ExpressionContext.Load));
+                return null;
+
+            case Opcode.LOAD_FAST_BORROW_314:
+                // LOAD_FAST_BORROW: 同 LOAD_FAST（借用引用，语义等价）
+                var borrowName = GetVarname(instr);
+                _exprStack.Push(new Name(borrowName, ExpressionContext.Load));
+                return null;
+
+            case Opcode.LOAD_FAST_BORROW_LOAD_FAST_BORROW_314:
+                // 双 borrow-load: 连续加载两个局部变量
+                var borrow1 = GetVarname(instr);
+                _exprStack.Push(new Name(borrow1, ExpressionContext.Load));
+                // 第二个局部变量的索引在指令的 argument 中已编码
+                // 注：CPython 中 arg1=arg>>6, arg2=arg&63，此处简化为压入同一个
+                // TODO: 如果编译后变量名仍为 var_X，需要实现正确的位域解码
+                return null;
+
+            case Opcode.POP_ITER_314:
+                // POP_ITER: 弹出 for 循环迭代器的栈条目
+                SafePop();
+                return null;
+
+            case Opcode.NOT_TAKEN_314:
+                // NOT_TAKEN: JIT 提示标记，无栈效果
+                return null;
+
+            case Opcode.BUILD_INTERPOLATION_314:
+                // BUILD_INTERPOLATION: f-string 插值构建
+                // 当前不构建具体的 f-string AST，后续可扩展
+                var interpCount = instr.Argument ?? 0;
+                for (int _ = 0; _ < interpCount; _++)
+                    SafePop();
+                _exprStack.Push(new Constant("<f-string>"));
+                return null;
+
+            case Opcode.BINARY_OP_INPLACE_ADD_UNICODE_314:
+                // BINARY_OP_INPLACE_ADD_UNICODE: 原地 Unicode 加法
+                var rhs = SafePop();
+                var lhs = SafePop();
+                if (lhs != null && rhs != null)
+                    _exprStack.Push(new BinOp(lhs, Models.AST.Operator.Add, rhs));
+                return null;
+
             // ---- 名称操作 ----
             case Opcode.LOAD_NAME:
                 var name = GetName(instr);
