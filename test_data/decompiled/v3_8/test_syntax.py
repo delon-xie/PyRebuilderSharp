@@ -3135,8 +3135,8 @@ if x:
   foo = 1
         """
         self.assertRaises(IndentationError, exec, code)
-        @support.cpython_only
-def test_disallowed_type_param_names(self):
+    @support.cpython_only
+    def test_disallowed_type_param_names(self):
         self._check_error('class A[__classdict__]: pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
         self._check_error('def f[__classdict__](): pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
         self._check_error('type T[__classdict__] = tuple[__classdict__]', 'reserved name \'__classdict__\' cannot be used for type parameter')
@@ -3145,8 +3145,8 @@ def test_disallowed_type_param_names(self):
 class A:
     class B[{name}]: pass
                 ", '<testcase>', mode='exec')
-        @support.cpython_only
-def test_nested_named_except_blocks(self):
+    @support.cpython_only
+    def test_nested_named_except_blocks(self):
         code = ''
         for i in range(12):
             code += f"{'    ' * i}try:
@@ -3157,8 +3157,8 @@ def test_nested_named_except_blocks(self):
 "
         code += f"{'                                                '}pass"
         self._check_error(code, 'too many statically nested blocks')
-        @support.cpython_only
-def test_with_statement_many_context_managers(self):
+    @support.cpython_only
+    def test_with_statement_many_context_managers(self):
         def get_code(n):
             code = textwrap.dedent("""
                 def bug():
@@ -3178,8 +3178,8 @@ def test_with_statement_many_context_managers(self):
         for n in range(MAX_MANAGERS, MAX_MANAGERS + 5):
             self.subTest(f"out of range: n={n!r}")
             self._check_error(get_code(n), 'too many statically nested blocks')
-        @support.cpython_only
-def test_async_with_statement_many_context_managers(self):
+    @support.cpython_only
+    def test_async_with_statement_many_context_managers(self):
         def get_code(n):
             code = [textwrap.dedent("""
                 async def bug():
@@ -3281,8 +3281,8 @@ a=1
     "line3"
     x=1
 )""", 'Perhaps you forgot a comma', lineno=4)
-        @support.cpython_only
-def test_syntax_error_on_deeply_nested_blocks(self):
+    @support.cpython_only
+    def test_syntax_error_on_deeply_nested_blocks(self):
         source = """
 while 1:
  while 2:
@@ -3309,16 +3309,16 @@ while 1:
                       break
 """
         self._check_error(source, 'too many statically nested blocks')
-        @support.cpython_only
-def test_error_on_parser_stack_overflow(self):
+    @support.cpython_only
+    def test_error_on_parser_stack_overflow(self):
         source = '-' * 100000 + '4'
         for mode in ('exec', 'eval', 'single'):
             self.subTest(mode=mode)
             self.assertRaisesRegex(MemoryError, 'too complex')
             compile(source, '<string>', mode)
-        @support.skip_wasi_stack_overflow()
+    @support.skip_wasi_stack_overflow()
     @support.cpython_only
-def test_deep_invalid_rule(self):
+    def test_deep_invalid_rule(self):
         source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
         with self.assertRaises(SyntaxError):
             compile(source, '<string>', 'exec')

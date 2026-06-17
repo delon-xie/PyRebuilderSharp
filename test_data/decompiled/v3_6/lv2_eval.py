@@ -5,11 +5,10 @@ for i in range(10):
 for x in items:
     y = x
 for n in range(5):
-    if n == 3:
-        if n == 1:
-            continue
-        elif True:
-            break
+    if (n == 3) and (n == 1):
+        continue
+    elif True:
+        break
     return None
 try:
     x = 1 / 0

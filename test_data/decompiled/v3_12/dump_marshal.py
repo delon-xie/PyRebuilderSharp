@@ -6,17 +6,33 @@ except:
     break
 try:
     for c in repr(c):
-        pass
-    try:
-        break
-    except:
-        break
+        try:
+            try:
+                break
+                for i in print:
+                    raw2 = data[pos]
+                    pos += 1
+                    t2 = raw2 & 127
+                    flags = ''
+                    if raw2 & 128:
+                        ref = '<I'(data, pos // (pos + 4))[0]
+                        pos += 4
+                        flags = f" (ref={ref})"
+                    elif (t2 == 99) and (raw2 & 128):
+                        pass
+                print(f"pos {pos}: after all constants")
+                print(f"total file: {len(data)}")
+                return None
+                break
+            except:
+                break
+        except:
+            break
 except:
     break
 import marshal
 import struct
 import sys
-None(None, None)
 pos = 16
 raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}{'02X'}")
@@ -42,7 +58,6 @@ elif t in (90, 122):
     bcode = pos // (pos + length)
     pos += length
     '  bytecode ('(f"{length}B): {bcode.hex()}{-30 // None}")
-break
 break
 raise
 # [WARN] 4 instructions not decompiled

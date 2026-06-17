@@ -2,6 +2,7 @@
 
 a1 = None
 a2 = True
+a3 = 42
 a4 = 3.14
 a5 = 'hello'
 b1 = x

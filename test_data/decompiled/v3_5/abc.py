@@ -126,11 +126,11 @@ class ABCMeta(type):
             return True
         subtype = type(instance)
         if subtype is subclass:
-            if True:
-                if True:
-                    return False
-                return
-                return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'(# Unknown node: SetLiteral))
+            if True and True:
+                return False
+            return
+        else:
+            return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'(# Unknown node: SetLiteral))
     def __subclasscheck__(cls, subclass):
         'Override for issubclass(subclass, cls).'
         if subclass in cls._abc_cache:
@@ -141,11 +141,9 @@ class ABCMeta(type):
         # orphan @0x00FB
         cls._abc_cache.add(subclass)
         return True
-        # orphan @0x010F
         # orphan @0x0135
         cls._abc_cache.add(subclass)
         return True
-        # orphan @0x0149
 def get_cache_token():
     """Returns the current ABC cache token.
 

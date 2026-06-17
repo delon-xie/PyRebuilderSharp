@@ -19,12 +19,12 @@ def test_simple():
     return x
 """
 py_path(py_path + 'c', True, ('cfile', 'doraise'))
-None('Compiled OK')
+print('Compiled OK')
 r = ['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'](True, True, '/Users/admin/codes/Tools/PyRebuilderSharp', ('capture_output', 'text', 'cwd'))
-None('=== Decompiled ===')
+print('=== Decompiled ===')
 print(r.stdout.strip())
-None(py_path)
-None(py_path + 'c')
+os.unlink(py_path)
+os.unlink(py_path + 'c')
 return None
 raise
 # [SUMMARY] 8 blocks · 9 processed · 0 orphan · 124 instr

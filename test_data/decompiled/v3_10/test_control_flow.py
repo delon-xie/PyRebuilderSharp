@@ -1,16 +1,18 @@
 # Decompiled from: <module>
 
+# orphan @0x000C
+j = i * 2
+i += 1
 i = 0
-if i < 5:
+while i < 5:
     j = i * 2
     i += 1
-    if not i < 5:
-        pass
+for n in range(10):
     m = n + 1
-    for n in range(10):
-        pass
-    try:
-        a = 1
-    except:
-        a = 0
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 43 instr
+try:
+    a = 1
+except:
+    a = 0
+return None
+return None
+# [SUMMARY] 7 blocks · 7 processed · 1 orphan · 43 instr

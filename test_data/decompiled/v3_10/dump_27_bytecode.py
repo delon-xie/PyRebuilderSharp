@@ -1,22 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x01A8
-bytecode = data[pos:pos + length]
-pos += length
-print(f"Bytecode length={length}")
-print(f"Bytecode hex: {bytecode.hex()}")
-HAVE_ARGUMENT = 90
-offset = 0
-instructions = []
-# orphan @0x0172
-length = data[pos]
-pos += 1
-length = struct.unpack('<I', data[pos:pos + 4])[0]
-pos += 4
-# orphan @0x016A
-# orphan @0x014E
-pos += 1
-# orphan @0x014C
 # orphan @0x0144
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
@@ -38,31 +21,44 @@ flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
-if next_type <= next_type:
-    if True:
-        pass
-    elif arg is not None:
-        pass
-elif not True:
+if (next_type <= next_type) and True:
     pass
-# orphan @0x01FA
-op = bytecode[offset]
-offset += 1
-instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
-arg = None
-# orphan @0x022A
-arg = bytecode[offset] | bytecode[offset + 1] << 8
-offset += 2
-# orphan @0x025A
-# orphan @0x0260
-# orphan @0x027E
-# orphan @0x0280
-# orphan @0x02AE
+pos += 1
+if (next_type in (115, 116, 122)) and (next_type == 122):
+    length = data[pos]
+    pos += 1
+else:
+    length = struct.unpack('<I', data[pos:pos + 4])[0]
+    pos += 4
+bytecode = data[pos:pos + length]
+pos += length
+print(f"Bytecode length={length}")
+print(f"Bytecode hex: {bytecode.hex()}")
+HAVE_ARGUMENT = 90
+offset = 0
+instructions = []
+while offset < len(bytecode):
+    op = bytecode[offset]
+    offset += 1
+    instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
+    arg = None
+    if op >= HAVE_ARGUMENT:
+        arg = bytecode[offset] | bytecode[offset + 1] << 8
+        offset += 2
+    else:
+        if op >= HAVE_ARGUMENT:
+            pass
+        if not offset < len(bytecode):
+            for (off, op, name, arg) in instructions:
+                if arg is not None:
+                    pass
+                break
+        while op >= HAVE_ARGUMENT:
+            pass
+opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
 # orphan @0x02BA
 print(f"
 Constants at {pos}:")
 const_type = data[pos]
 '  Type: '(f"{const_type}{'#x'}")
-# orphan @0x02F6
-# orphan @0x044C
-# [SUMMARY] 26 blocks · 11 processed · 16 orphan · 701 instr
+# [SUMMARY] 25 blocks · 24 processed · 2 orphan · 701 instr

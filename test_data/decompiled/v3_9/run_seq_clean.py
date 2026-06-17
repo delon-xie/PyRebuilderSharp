@@ -73,5 +73,4 @@ total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 return None
-# orphan @0x0494
-# [SUMMARY] 33 blocks · 5 processed · 28 orphan · 332 instr
+# [SUMMARY] 33 blocks · 6 processed · 28 orphan · 332 instr

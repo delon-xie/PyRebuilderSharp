@@ -1,10 +1,14 @@
 # Decompiled from: <module>
 
 try:
-    break
+    total += 1
 except:
-    pass
-for i in range(None):
+    break
+total = 0
+for i in range(3):
     pass
 return None
-# [SUMMARY] 9 blocks · 9 processed · 0 orphan · 27 instr
+# orphan @0x0040
+# orphan @0x0046
+raise
+# [SUMMARY] 9 blocks · 8 processed · 2 orphan · 27 instr

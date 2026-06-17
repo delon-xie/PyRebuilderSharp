@@ -21,12 +21,11 @@ for start in nl == known['nlocals']:
     nl = *vals
     ss = *vals
     fl = *vals
-    if a0 == known['argcount']:
-        if nl == known['nlocals']:
-            print(f"
+    if (a0 == known['argcount']) and (nl == known['nlocals']):
+        print(f"
 MATCH at offset {start}:")
-            print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-            print(f"  Bytes: {' '.join(<genexpr>(m[start:start + 16]))}")
+        print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+        print(f"  Bytes: {' '.join(<genexpr>(m[start:start + 16]))}")
 code2 = marshal.loads(m)
 print(f"
 Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")

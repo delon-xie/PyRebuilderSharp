@@ -1,34 +1,36 @@
 # Decompiled from: <module>
 
-name_0 = None
-name_1 = True
-name_2 = False
-name_4 = 3.14
-name_5 = 'hello'
-name_7 = name_6
-name_10 = name_8.name_9
-name_13 = name_11 + None
-name_14 = name_11 + None
-name_15 = not name_6
-name_16 = ~name_6
-name_17 = -name_6
-name_19 = name_6 + name_18
-name_20 = name_6 - name_18
-name_21 = name_6 * name_18
-name_22 = name_6 / name_18
-name_23 = name_6 // name_18
-name_24 = name_6 % name_18
-name_25 = name_6 ** name_18
-name_26 = name_6 & name_18
-name_27 = name_6 | name_18
-name_28 = name_6 ^ name_18
-name_29 = name_6 << name_18
-name_30 = name_6 >> name_18
-name_31 = name_6 == name_18
-name_32 = name_6 == name_18
-name_33 = name_6 == name_18
-name_34 = name_6 == name_18
-name_35 = name_6 == name_18
-name_36 = name_6 == name_18
+a1 = None
+a2 = True
+a3 = False
+a4 = 42
+a5 = 3.14
+a6 = 'hello'
+b1 = x
+b2 = obj.attr
+b3 = items + 0
+b4 = items + None
+b5 = items + None
+c1 = not x
+c2 = ~x
+c3 = -x
+d1 = x + y
+d2 = x - y
+d3 = x * y
+d4 = x / y
+d5 = x // y
+d6 = x % y
+d7 = x ** y
+e1 = x & y
+e2 = x | y
+e3 = x ^ y
+e4 = x << y
+e5 = x >> y
+f1 = x == y
+f2 = x == y
+f3 = x == y
+f4 = x == y
+f5 = x == y
+f6 = x == y
 return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 114 instr

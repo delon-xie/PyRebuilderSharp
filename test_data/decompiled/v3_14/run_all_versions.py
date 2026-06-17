@@ -1,55 +1,70 @@
 # Decompiled from: <module>
 
-name_0 = 'Run AST comparison for test_expr_basic across all versions'
-import name_1
-import name_2
-import name_3
-name_6 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-name_7 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-name_8 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
-name_12 = name_10.name_11()
-name_10 := None(name_8)()(None, None, None)
-import name_13
-name_16 = name_13.name_15(None(name_12), ('indent',))
-name_19 = None
-name_20 = {}
-for _ in name_17:
-    name_23 = name_1.name_4.name_22(name_7, f"test_expr_basic.{name_21}.pyc")
-    if not name_1.name_4.name_24(name_23):
-        None(f"⏭ {name_21}: .pyc not found")
+try:
+    expected_src = f.read()
+except:
+    pass
+try:
+    import ast
+    expected_ast = ast.parse(expected_src)(2, ('indent',))
+except:
+    print('Failed to parse expected source')
+    sys.exit(1)
+try:
+    actual_ast = ast.parse(actual_src)(2, ('indent',))
+    match = expected_ast == actual_ast
+except Exception:
+    pass
+try:
+    print(f"❌ {ver}: AST parse failed - {e}")
+    print(f"  Decompiled: {actual_src + None}")
+except:
+    e = None
+__doc__ = 'Run AST comparison for test_expr_basic across all versions'
+import os
+import subprocess
+import sys
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+results = {}
+for ver in []:
+    pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
+    if not os.path.exists(pyc):
+        print(f"⏭ {ver}: .pyc not found")
     else:
-        name_26 = None(['dotnet', 'run', '--project', name_6, '--', name_23], True, True, ('capture_output', 'text', 'timeout'))
-        name_28 = name_26.name_27
-        name_29 = name_13.name_15(None(name_28), ('indent',))
-        name_30 = name_16 == name_29
-    if name_30:
-        pass
-    break
-    if not name_30:
-        for _ in name_37(None(name_33)(name_37, None(name_34))):
-            if name_37 == None(name_33):
-                pass
-            elif name_37 == None(name_34):
-                pass
-            elif not name_39 == name_40:
-                pass
-            else:
-                None(f"  Line {name_38}: expected={name_39}")
-                None(f"           actual=  {name_40}")
-                name_17
-None(f"
-{None}")
-name_44 = <lambda>(name_20.name_43()())
-name_45 = None(name_20)
-None(f"{None}{name_44}{None}{name_45}{None * name_44 / name_45}{None}{None}")
+        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+        actual_src = r.stdout
+print(f"
+========================================")
+passed = <genexpr>(results.items()())
+total = len(results)
+'Passed: '(f"{passed}/{total} ({passed / total * 100}.0f%)")
 return None
 if not True:
     pass
 raise
-if name_41:
-    None(f"❌ {name_21}: AST parse failed - {name_39}")
-    None(f"  Decompiled: {name_28 + None}")
-    name_39 = None
-    name_39 = None
 raise
-# [SUMMARY] 31 blocks · 32 processed · 0 orphan · 395 instr
+def <genexpr>(.0):
+    try:
+        for _ in .0:
+            try:
+                raise
+            except:
+                pass
+            if not True:
+                pass
+    except:
+        pass
+# orphan @0x0570
+# orphan @0x05E8
+raise
+# orphan @0x05EC
+raise
+# [WARN] 4 instructions not decompiled
+#   @0x0216: JUMP_BACKWARD arg=166
+#   @0x0408: JUMP_BACKWARD arg=120
+#   @0x0452: JUMP_BACKWARD arg=738
+#   @0x0462: JUMP_BACKWARD arg=754
+# [SUMMARY] 54 blocks · 52 processed · 4 orphan · 395 instr

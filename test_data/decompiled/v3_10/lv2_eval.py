@@ -7,20 +7,21 @@ for x in items:
 for n in range(5):
     if n == 3:
         break
-        if n == 1:
-            continue
-        return
-        raise
-    return
-    IOError
-    break
+    elif n == 1:
+        pass
 try:
     x = 1 / 0
 except open:
     x = 0
 try:
     f = open('test.txt')
-    return
-except IOError:
-    f = None
-# [SUMMARY] 19 blocks · 20 processed · 0 orphan · 67 instr
+finally:
+    pass
+return None
+# orphan @0x0084
+raise
+# orphan @0x00F8
+IOError
+f = None
+return None
+# [SUMMARY] 19 blocks · 18 processed · 2 orphan · 67 instr

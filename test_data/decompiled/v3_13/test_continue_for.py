@@ -1,7 +1,9 @@
 # Decompiled from: <module>
 
-if not range:
-    pass
-# orphan @0x003C
-# orphan @0x004C
-# [SUMMARY] 4 blocks · 2 processed · 2 orphan · 19 instr
+for i in range(3):
+    if i == 1:
+        pass
+    else:
+        a = i
+break
+# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 19 instr

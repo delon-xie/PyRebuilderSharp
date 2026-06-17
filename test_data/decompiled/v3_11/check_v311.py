@@ -10,7 +10,6 @@ except:
 import marshal
 import struct
 import sys
-None(None, None)
 f = open(sys.sys[1], 'rb')
 magic = f(4)
 hdr_rest = f(12)

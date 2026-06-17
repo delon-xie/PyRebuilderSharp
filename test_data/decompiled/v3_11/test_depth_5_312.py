@@ -9,14 +9,19 @@ def depth_5_if(x0, x1, x2, x3, x4):
     name_4 = x4 > 4
     result = 42
     return None
+    # orphan @0x004A
     result = 41
     return None
+    # orphan @0x0052
     result = 40
     return None
+    # orphan @0x005A
     result = 30
     return None
+    # orphan @0x0062
     result = 20
     return None
+    # orphan @0x006A
     result = 10
 def depth_5_for():
     total = 0

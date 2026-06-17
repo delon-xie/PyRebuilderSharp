@@ -2,9 +2,10 @@
 
 try:
     for f in f:
-        if not f.endswith('.py'):
-            pass
-        break
+        try:
+            break
+        except:
+            break
     print(f"找到 {len(py_files)} 个 Python 文件")
     print(f"使用 Python: {python310_path}")
     print('============================================================')

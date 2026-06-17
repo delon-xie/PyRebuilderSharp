@@ -1,61 +1,69 @@
 # Decompiled from: <module>
 
-import opname
-import name_1
-import name_2
-import name_3
-name_5 := None('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb')()(name_5.name_6)
-name_8 = None(name_5)
-name_1.name_7(None, None, None)
-for _ in name_8.name_9:
-    if not None(name_10, name_2.name_12):
+try:
+    f.read(16)
+    code = marshal.load(f)
+except:
+    pass
+try:
+    for ins in ins:
+        try:
+            try:
+                if not True:
+                    pass
+                break
+            except:
+                break
+        except:
+            break
+        break
+    if len(block_instrs) == 3:
         pass
-    None('=== Block structure ===')
-    name_17 = opname.name_16(None(name_10))
-    name_18 = # Unknown node: SetLiteral
-    for _ in None(name_17):
-        if name_21.name_22 in None:
-            name_18.name_24(name_21.name_23)
-        name_18.name_24(name_21.name_23)
-        if not name_25 == None(name_17):
+    break
+    if any is None:
+        for last in block_instrs():
+            if not True:
+                pass
+            if True:
+                last = block_instrs + -1
+            break
+            if any is None:
+                for ins in block_instrs():
+                    if not True:
+                        pass
+                    if not True:
+                        for (i, start) in enumerate(sorted_leaders):
+                            if i + 1 == len(sorted_leaders):
+                                pass
+                    for ins in block_instrs:
+                        if not ins.opname == 'JUMP_ABSOLUTE':
+                            pass
+                        else:
+                            print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+except:
+    break
+import dis
+import marshal
+import types
+import struct
+for const in code.co_consts:
+    if not isinstance(const, types.CodeType):
+        pass
+    print('=== Block structure ===')
+    instrs = list(dis.Bytecode(const))
+    leaders = # Unknown node: SetLiteral
+    for (i, instr) in enumerate(instrs):
+        if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
+            leaders.add(instr.arg)
+        leaders.add(instr.arg)
+        if not i + 1 == len(instrs):
             pass
         else:
-            break
-    name_28 = None(name_18)
-    for _ in None(name_28):
-        if name_25 == None(name_28):
-            pass
-        for _ in []:
-            if name_29.name_26 == name_29.name_26:
-                if not True:
-                    pass
-            else:
-                break
-        if name_25 == None(name_31):
-            pass
-        break
-        if name_33 is name_33:
-            for _ in name_31():
-                if not True:
-                    pass
-                if True:
-                    name_34 = name_31 + None
-                break
-                if name_33 is name_33:
-                    for _ in name_31():
-                        if not True:
-                            pass
-                        if not True:
-                            pass
-                        for _ in name_14:
-                            if not name_35.name_22 == 'JUMP_ABSOLUTE':
-                                pass
-                            else:
-                                None(f"{None}{name_35.name_26}{None}{name_35.name_23}")
+            leaders.add(instrs + i + 1.offset)
+    sorted_leaders = sorted(leaders)
 return None
-if not True:
-    pass
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x065A: JUMP_BACKWARD arg=44
-# [SUMMARY] 62 blocks · 63 processed · 0 orphan · 424 instr
+# [WARN] 2 instructions not decompiled
+#   @0x03E2: JUMP_BACKWARD arg=60
+#   @0x03EA: JUMP_BACKWARD arg=68
+# [SUMMARY] 71 blocks · 72 processed · 0 orphan · 424 instr

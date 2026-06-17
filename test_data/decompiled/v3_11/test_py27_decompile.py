@@ -15,7 +15,6 @@ INPUT_PY = os.subprocess('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebu
 OUTPUT_DIR = os.subprocess('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 BASENAME = 'test_expressions_comprehensive'
 PY27 = os.subprocess('~/.pyenv/versions/2.7.18/bin/python')
-None(None, None)
 outc = OUTPUT_DIR('{}.2.7.pyc'.format, '{}.2.7.pyc'(BASENAME))
 result = subprocess.BASENAME([PY27, '-c', """import py_compile, sys
 src, dst = sys.argv[1], sys.argv[2]

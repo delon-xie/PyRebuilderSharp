@@ -38,7 +38,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     return wrapper
     # orphan @0x002C
     setattr(wrapper, attr, value)
-def wraps():
+def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
        Returns a decorator that invokes update_wrapper() with the decorated
@@ -47,7 +47,7 @@ def wraps():
        This is a convenience function to simplify applying partial() to
        update_wrapper().
     """
-    return partial(update_wrapper, wrapped=var_0, assigned=var_1, updated=var_2)
+    return partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)
 def _gt_from_lt(self, other):
     'Return a > b.  Computed by @total_ordering from (not a < b) and (a != b).'
     op_result = type(self).__lt__(self, other)
@@ -208,8 +208,7 @@ class _PlaceholderType:
 
     Used as a placeholder for partial arguments.
     """
-    def __init_subclass__(cls):
-        raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
+    _PlaceholderType__instance = None
     __slots__ = []
     def __init_subclass__(cls):
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
@@ -334,10 +333,8 @@ class partial:
     def __reduce__(self):
         if self.keywords:
             pass
-        # orphan @0x001C
-        # orphan @0x0022
-        # orphan @0x0024
-        return (())
+        elif self.__dict__:
+            pass
     def __setstate__(self, state):
         # orphan @0x004E
         # orphan @0x0044
@@ -421,8 +418,8 @@ class partialmethod:
         result = self._make_unbound_method().__get__(obj, cls)
         # orphan @0x007C
         return result
-        @property
-def __isabstractmethod__(self):
+    @property
+    def __isabstractmethod__(self):
         return getattr(self.func, '__isabstractmethod__', False)
     __class_getitem__ = classmethod(GenericAlias)
 def _unwrap_partial(func):
@@ -490,9 +487,8 @@ def lru_cache(maxsize, typed):
     """
     # orphan @0x0020
     # orphan @0x0018
-    if True:
-        if True:
-            pass
+    if True and True:
+        pass
     # orphan @0x002A
     user_function = 128
     wrapper.cache_parameters = lru_cache.<locals>.<lambda>
@@ -540,7 +536,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     def cache_info():
         'Report cache statistics'
         with _:
-            return None
+            pass
     def cache_clear():
         'Clear the cache and cache statistics'
         with _:
@@ -628,9 +624,8 @@ def _compose_mro(cls, types):
     mro = []
     for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
         for sub in typ.__subclasses__():
-            if True:
-                if True:
-                    found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+            if True and True:
+                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
             for sub in found:
                 for subcls in subcls not in mro:
                     if subcls not in mro:
@@ -652,12 +647,8 @@ def _find_impl(cls, registry):
     mro = _compose_mro(cls, registry.keys())
     match = None
     for t in t in registry:
-        if match is not None:
-            if t in registry:
-                if t not in cls.__mro__:
-                    if match not in cls.__mro__:
-                        if not issubclass(match, t):
-                            raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
+        if (match is not None) and (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
+            raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
         if t in registry:
             match = t
         break
@@ -690,9 +681,8 @@ class singledispatchmethod:
     callables as instance methods.
     """
     def __init__(self, func):
-        if not callable(func):
-            if not hasattr(func, '__get__'):
-                raise TypeError(f"{func!r} is not callable or a descriptor")
+        if callable(func) or not hasattr(func, '__get__'):
+            pass
         # orphan @0x0020
         self.dispatcher = singledispatch(func)
         self.func = func
@@ -704,8 +694,8 @@ class singledispatchmethod:
         return self.dispatcher.register(cls, func=method)
     def __get__(self, obj, cls):
         return _singledispatchmethod_get(self, obj, cls)
-        @property
-def __isabstractmethod__(self):
+    @property
+    def __isabstractmethod__(self):
         return getattr(self.func, '__isabstractmethod__', False)
     def __repr__(self):
         try:
@@ -724,9 +714,8 @@ class _singledispatchmethod_get:
         self._obj = obj
         self._cls = cls
         func = unbound.func
-        if obj is None:
-            if isinstance(func, FunctionType):
-                pass
+        if (obj is None) and isinstance(func, FunctionType):
+            pass
         # orphan @0x0038
         # orphan @0x003A
         self.__module__ = func.__module__
@@ -775,11 +764,11 @@ class _singledispatchmethod_get:
             raise AttributeError
         # orphan @0x000C
         return getattr(self._unbound.func, name)
-        @property
-def __wrapped__(self):
+    @property
+    def __wrapped__(self):
         return self._unbound.func
-        @property
-def register(self):
+    @property
+    def register(self):
         return self._unbound.register
 _NOT_FOUND = object()
 class cached_property:

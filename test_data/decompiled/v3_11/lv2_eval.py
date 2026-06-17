@@ -18,7 +18,6 @@ for n in range(5):
     break
 return None
 raise
-raise
 # orphan @0x0080
 # orphan @0x0084
 raise

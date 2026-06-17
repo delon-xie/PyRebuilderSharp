@@ -152,10 +152,9 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
     """
-    # orphan @0x000E
-    abstracts = set()
     if not hasattr(cls, '__abstractmethods__'):
         return cls
+    abstracts = set()
     for scls in cls.__bases__:
         for name in getattr(scls, '__abstractmethods__', []):
             value = getattr(cls, name, None)
@@ -172,4 +171,4 @@ class ABC:
     """
     __slots__ = []
 return None
-# [SUMMARY] 5 blocks · 6 processed · 0 orphan · 96 instr
+# [SUMMARY] 5 blocks · 6 processed · 1 orphan · 96 instr

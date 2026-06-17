@@ -1,12 +1,16 @@
 # Decompiled from: <module>
 
-name_0 = 'Diagnose 3.5 crash'
-import name_1
-import name_2
-import name_3
-name_6 = name_3.name_4.name_5('~/codes/Tools/PyRebuilderSharp')
-name_8 = name_3.name_4.name_7(name_6, 'src/PyRebuilderSharp.Cli')
-name_9 = """
+try:
+    f.write(test_code)
+except:
+    pass
+__doc__ = 'Diagnose 3.5 crash'
+import subprocess
+import tempfile
+import os
+SRC = os.path.expanduser('~/codes/Tools/PyRebuilderSharp')
+PROJECT = os.path.join(SRC, 'src/PyRebuilderSharp.Cli')
+test_code = """
 using PyRebuilderSharp.Core;
 using PyRebuilderSharp.Core.Readers;
 using PyRebuilderSharp.Core.Scanners;
@@ -31,13 +35,9 @@ try {
     Console.Error.WriteLine("ERROR: " + ex.GetType().Name + ": " + ex.Message);
 }
 """
-name_11.name_12(name_9)
-name_11 := None('/tmp/diag35.cs', 'w')()(None, None, None)
-name_14 = None(['dotnet', 'run', '--project', name_8, '--', '/tmp/t1.35.pyc'], True, True, ('capture_output', 'text', 'timeout'))
-None('Stdout:', name_14.name_16 + None)
-None(None, name_14.name_17 + None)
+r = ['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'](True, True, 30, ('capture_output', 'text', 'timeout'))
+print('Stdout:', r.stdout + None)
+print('Stderr:', r.stderr + None)
 return None
-if not True:
-    pass
 raise
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 103 instr
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 103 instr

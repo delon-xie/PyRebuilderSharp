@@ -61,7 +61,4 @@ arg = bytecode[offset] | bytecode[offset + 1] << 8
 offset += 2
 # orphan @0x0262
 # orphan @0x0268
-# orphan @0x047C
-# orphan @0x0484
-# orphan @0x04C8
-# [SUMMARY] 26 blocks · 13 processed · 14 orphan · 484 instr
+# [SUMMARY] 26 blocks · 16 processed · 15 orphan · 484 instr

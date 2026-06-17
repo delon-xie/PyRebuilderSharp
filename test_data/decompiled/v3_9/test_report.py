@@ -12,13 +12,11 @@ for line in line.strip().endswith('.3.10.pyc'):
         if len(parts) >= 2:
             current_group = parts[0].strip().replace('*** ', '')
             status = parts[1].strip()
-    if current_group:
-        if line.strip().endswith('.3.10.pyc'):
-            test_groups[current_group]['files'].append(line.strip())
-        elif info['files']:
-            if 'PASS' in info['status']:
-                for _ in 'FAIL' in info['status']:
-                    pass
+    if current_group and line.strip().endswith('.3.10.pyc'):
+        test_groups[current_group]['files'].append(line.strip())
+    elif info['files'] and ('PASS' in info['status']):
+        for _ in 'FAIL' in info['status']:
+            pass
 print('============================================================')
 print('Python 3.10 版本测试报告')
 print('============================================================')

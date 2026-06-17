@@ -1,6 +1,8 @@
 # Decompiled from: <module>
 
-if not n:
-    if not True:
-        pass
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 23 instr
+x = 10
+if x == 0:
+    for n in range(x):
+        y = n
+# orphan @0x0030
+# [SUMMARY] 6 blocks · 6 processed · 1 orphan · 23 instr

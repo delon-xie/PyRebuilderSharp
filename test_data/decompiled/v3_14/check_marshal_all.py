@@ -18,7 +18,8 @@ for off in [1, 5]:
             print('FOUND at offset', off)
 """
 for (ver, py_path) in versions.items():
-    for line in print:
-        None(f"  {line}")
+    for line in out.split("""
+"""):
+        print(f"  {line}")
 return None
 # [SUMMARY] 7 blocks · 8 processed · 0 orphan · 91 instr

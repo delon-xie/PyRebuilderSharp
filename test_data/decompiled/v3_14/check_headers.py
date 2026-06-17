@@ -1,19 +1,19 @@
 # Decompiled from: <module>
 
-import name_0
-for _ in name_6:
-    name_2 = f"/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.{name_1}.pyc"
-    name_5 = None(name_2, 'rb').name_4()
-    None(f"{name_1}: {name_7}{None(name_5)} bytes, magic={name_5 + None.name_8()}{name_5 + None.name_8()}")
-    name_10 = name_0.name_9 + None(None, name_5 + None)
-    name_11 = name_0.name_9 + None(None, name_5 + None)
-    name_12 = name_6 + name_5
-    None(f"{name_10}{None}{name_11}{None}{name_12}{None}")
-    name_13 = name_0.name_9 + None(None, name_5 + None)
-    name_14 = name_0.name_9 + None(None, name_5 + None)
-    name_15 = name_0.name_9 + None(None, name_5 + None)
-    name_16 = name_6 + name_5
-    None(f"{name_13}{None}{name_14}{None}{name_15}{None}{name_16}{None}")
-    None()
+import struct
+for ver in print:
+    path = f"/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.{ver}.pyc"
+    data = open(path, 'rb').read()
+    print(f"{ver}: {len(data)} bytes, magic={data + None.hex()}, bytes 4-16: {data + None.hex()}")
+    ts12 = struct.unpack('<I', data + None) + 0
+    sz12 = struct.unpack('<I', data + None) + 0
+    marshal12 = data + 12
+    '  12-byte header: ts='(f"{ts12}, size={sz12}, marshal_start_byte={marshal12}#x")
+    fl16 = struct.unpack('<I', data + None) + 0
+    ts16 = struct.unpack('<I', data + None) + 0
+    sz16 = struct.unpack('<I', data + None) + 0
+    marshal16 = data + 16
+    '  16-byte header: flags='(f"{fl16}, ts={ts16}, size={sz16}, marshal_start_byte={marshal16}#x")
+    print()
 return None
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 155 instr

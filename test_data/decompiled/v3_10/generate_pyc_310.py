@@ -26,7 +26,10 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
     if result.returncode == 0:
         print(f"✓ {py_file} -> {output_name}")
         success_count += 1
-        continue
+    else:
+        print(f"✗ {py_file} -> {output_name}")
+        print(f"  错误: {result.stderr}")
+        fail_count += 1
 print('============================================================')
 print(f"完成！成功: {success_count}, 失败: {fail_count}")
 return None

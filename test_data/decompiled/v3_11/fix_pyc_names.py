@@ -8,7 +8,6 @@ def get_python_version(filepath):
         magic = fp(4)
     except:
         pass
-    None(None, None)
     return name_4(magic, 'unknown')
     # orphan @0x006E
     raise
@@ -42,5 +41,4 @@ fix_pyc_names('tests/compiled')
 print("""
 Done!""")
 return None
-return None
-# [SUMMARY] 2 blocks · 3 processed · 0 orphan · 43 instr
+# [SUMMARY] 2 blocks · 2 processed · 1 orphan · 43 instr

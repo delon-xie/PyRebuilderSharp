@@ -7,7 +7,6 @@ except:
 import marshal
 import struct
 import sys
-None(None, None)
 f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 hdr_rest = f.read(12)

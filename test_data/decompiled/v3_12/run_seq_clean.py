@@ -27,13 +27,20 @@ try:
                                     act_lines = actual_ast.split("""
 """)
                                     for i in range(max(len(exp_lines), len(act_lines))):
-                                        if i == len(exp_lines):
-                                            pass
                                         try:
                                             try:
                                                 try:
                                                     try:
-                                                        pass
+                                                        try:
+                                                            try:
+                                                                try:
+                                                                    pass
+                                                                except Exception:
+                                                                    pass
+                                                            except Exception:
+                                                                pass
+                                                        except Exception:
+                                                            pass
                                                     except Exception:
                                                         pass
                                                 except Exception:
@@ -88,7 +95,6 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
-None(None, None)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 passed = <genexpr>(results.items()())
@@ -101,11 +107,11 @@ raise
 def <genexpr>(.0):
     try:
         for (v, r) in .0:
-            if not r:
+            try:
+                raise
+            except:
                 pass
-            else:
-                1
-            raise
+            1
     except:
         pass
 raise

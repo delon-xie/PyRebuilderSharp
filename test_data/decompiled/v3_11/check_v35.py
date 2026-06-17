@@ -8,7 +8,6 @@ except:
     pass
 import marshal
 import sys
-None(None, None)
 print('Module:', code.read)
 print('  argc:', code.read)
 print('  nlocals:', code.magic)

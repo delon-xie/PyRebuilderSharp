@@ -1,44 +1,59 @@
 # Decompiled from: <module>
 
-name_0 = 'Binary search to find which expression breaks decompilation'
-import name_1
-import name_2
-import name_3
-name_6 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py')
-name_7 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-name_8 = 'n6 = a * b * c'
-def <module>():
+'Binary search to find which expression breaks decompilation'
+import os
+import subprocess
+import sys
+PY_MATRIX = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py')
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+all_exprs = 'n6 = a * b * c'
+def test_until_broken(exprs):
     """
 """
-    var_2 = '/tmp/expr_bs.py'
-    var_3 = '/tmp/expr_bs.3.10.pyc'
-    var_6 = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
-    if not var_5 := name_6.name_4([None, 'python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', '/tmp/expr_compiled2'], True, True, ('capture_output', 'text', 'timeout'))(name_10.name_6.name_7):
+    try:
+        f.write(code)
+    except:
+        return 'OK'
+    code = """
+""".join(exprs)
+    pyf = '/tmp/expr_bs.py'
+    pycf = '/tmp/expr_bs.3.10.pyc'
+    r = ['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'](True, True, 30, ('capture_output', 'text', 'timeout'))
+    pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
+    if not stderr.path.exists(pyc):
         pass
     return
-    var_7 = name_6.name_4([None, 'dotnet', 'run', '--project', name_16, '--'], True, True, ('capture_output', 'text', 'timeout'))
-    if True:
-        pass
+    r2 = ['dotnet', 'run', '--project', name_16, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+    out = r2.stdout + r2.stderr.strip()
     return
-    if True:
-        pass
     return
-    if not True:
-        pass
     raise
-    # [SUMMARY] 13 blocks · 14 processed · 0 orphan · 117 instr
-name_10 = <lambda>
-name_11 = name_8 + None
-name_12 = None(name_11)
-None(f"{None}{name_12}")
-if name_12 == None:
-    name_15 = name_10(None, name_8, name_14 - None(name_8))
-    None(f"{None}{name_15}{None}{name_8 + name_15}")
-    None(f"{None}{name_15}{None}")
-    name_12 = name_8(None + name_15)
-    None(f"{None}{name_12}")
-    None(f"{None}{name_15}{None}")
-    name_12 = None(name_15)
-    None(f"{None}{name_12}")
+def find_breaking_point(exprs, lo, hi):
+    while True:
+        return lo
+    result = exprs(mid + 1)
+    test_until_broken(f"{print}  [{lo}-{hi}] mid={mid}{' (' + mid + None}): {result}")
+    if result == 'OK':
+        hi = mid
+    else:
+        lo = mid + 1
+    # [WARN] 2 instructions not decompiled
+    #   @0x00B6: JUMP_BACKWARD arg=184
+    #   @0x00CC: JUMP_BACKWARD arg=206
+base = all_exprs + None
+r = test_until_broken(base)
+print(f"Base (6 exprs): {r}")
+if r == 'OK':
+    bp = find_breaking_point(all_exprs, 6, len(all_exprs) - 1)
+    print(f"
+Breaking expression: #{bp}: {all_exprs + bp}")
+    print(f"
+Verification - up to #{bp}:")
+    r = all_exprs(bp + 1)
+    print(f"  {r}")
+    print(f"
+Verification - just #{bp}:")
+    r = all_exprs(bp)
+    print(f"  {r}")
 return
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 232 instr
+# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 232 instr

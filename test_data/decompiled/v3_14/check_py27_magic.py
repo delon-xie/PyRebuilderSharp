@@ -4,12 +4,12 @@
 import os
 import subprocess
 result = [os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python'), '-c', 'import py_compile; py_compile.compile(\'/tmp/test_py27.py\', cfile=\'/tmp/test_py27.pyc\', doraise=True)'](True, True, ('capture_output', 'text'))
-None('Compile result:', result.stdout, result.stderr)
-data = None('/tmp/test_py27.pyc', 'rb').read()
-'Length:'(len, None(data))
+print('Compile result:', result.stdout, result.stderr)
+data = open('/tmp/test_py27.pyc', 'rb').read()
+print('Length:', len(data))
 'Full bytes:'(' '.join, <genexpr>(data()))
 result2 = [os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python'), '-c', 'import imp; m = imp.get_magic(); print(\' \'.join(\'{:02x}\'.format(ord(b)) for b in m))'](True, True, ('capture_output', 'text'))
-None('Python 2.7 magic:', result2.stdout.strip())
+print('Python 2.7 magic:', result2.stdout.strip())
 result3 = [os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python'), '-c', """
 import marshal, dis
 code = marshal.loads(open('/tmp/test_py27.pyc', 'rb').read()[8:])
@@ -27,8 +27,8 @@ print('co_name:', repr(code.co_name))
 print('co_firstlineno:', code.co_firstlineno)
 dis.disassemble(code)
      """](True, True, ('capture_output', 'text'))
-None('Marshal dump:', result3.stdout)
+print('Marshal dump:', result3.stdout)
 if result3.stderr:
-    None('Stderr:', result3.stderr)
+    print('Stderr:', result3.stderr)
 return
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 130 instr
+# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 130 instr

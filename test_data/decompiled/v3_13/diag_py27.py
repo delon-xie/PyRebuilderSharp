@@ -1,23 +1,70 @@
 # Decompiled from: <module>
 
 try:
-    try:
-        try:
-            if True:
-                pass
-        except:
-            pass
-    except:
-        pass
+    f.write(code)
 except:
     pass
-while True:
+try:
+    content = f.read().strip()
+except:
     pass
-if ~os:
+__doc__ = 'Diagnose Python 2.7 decompilation failures by stepping through analysis'
+import os
+import subprocess
+import tempfile
+import sys
+PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
+OUTPUT_DIR = '/tmp/py27_diag'
+OUTPUT_DIR(True, ('exist_ok',))
+tests = {'expr_all': """a = 1
+b = 2
+c = a + b
+""", 'expr_bool': """def foo():
+    return 42
+x = foo()
+""", 'expr_func': """x = True
+y = False
+z = x and y
+w = x or y
+""", 'expr_simple': """# Complete expressions for 2.7
+a = 1
+b = True
+c = None
+d = 3.14
+e = "hello"
+f = x + y
+g = x - y
+h = x * y
+i = x / y
+j = -x
+k = not x
+l = x < y
+m = x == y
+n = x is y
+o = func(x)
+p = items[0]
+q = items[1:10]
+r = obj.attr
+s = x if cond else y
+"""}
+for (name, code) in 'Error: ':
+    py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
+    pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
+    out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
+break
+break
+if not subprocess.run:
+    break
+break
+if os.path.exists(out_path):
     pass
-elif not ((print, py_path(**content)), print(**None)):
-    pass
-# orphan @0x060A
+else:
+    r2.stderr(f"{None}{200}")
+break
+break
+raise
+break
+raise
 # [WARN] 1 instructions not decompiled
-#   @0x001A: JUMP_BACKWARD arg=6
-# [SUMMARY] 22 blocks · 22 processed · 1 orphan · 271 instr
+#   @0x0424: JUMP_BACKWARD arg=888
+# [SUMMARY] 20 blocks · 21 processed · 0 orphan · 267 instr

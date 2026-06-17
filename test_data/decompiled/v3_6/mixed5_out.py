@@ -39,7 +39,6 @@ def mixed_3(n):
                 continue
     # orphan @0x0058
     return total
-    # orphan @0x0096
 def mixed_4(n):
     total = 0
     try:
@@ -59,6 +58,5 @@ def mixed_4(n):
     # orphan @0x0052
     # orphan @0x0058
     total = -1
-    # orphan @0x0078
 return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

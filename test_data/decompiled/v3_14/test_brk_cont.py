@@ -1,12 +1,11 @@
 # Decompiled from: <module>
 
-for i in range(None):
-    if True:
+for i in i == 1:
+    if i == 5:
         break
     return
-    if True:
-        pass
-    else:
-        a = i
 return None
-# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 29 instr
+# orphan @0x0038
+# orphan @0x003C
+a = i
+# [SUMMARY] 9 blocks · 8 processed · 3 orphan · 29 instr

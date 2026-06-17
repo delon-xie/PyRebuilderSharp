@@ -60,7 +60,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     raise
     # orphan @0x00C8
     raise
-def wraps():
+def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
        Returns a decorator that invokes update_wrapper() with the decorated
@@ -69,7 +69,7 @@ def wraps():
        This is a convenience function to simplify applying partial() to
        update_wrapper().
     """
-    return partial(name_2, var_0, var_1, var_2)
+    return partial(name_2, wrapped, assigned, updated)
 def _gt_from_lt(self, other):
     'Return a > b.  Computed by @total_ordering from (not a < b) and (a != b).'
     op_result = type(self).__lt__(self, other)
@@ -155,9 +155,10 @@ def total_ordering(cls):
     'Class decorator that fills in missing ordering methods'
     try:
         for op in op:
-            if not getattr(cls, op, None) is not getattr(max, op, None):
-                pass
-            break
+            try:
+                break
+            except:
+                break
         if not roots:
             raise ValueError('must define at least one ordering operation: < > <= >=')
         root = max(roots)
@@ -193,7 +194,7 @@ def reduce(function, sequence, initial):
     try:
         value = next(it)
     except:
-        break
+        pass
     it = iter(sequence)
     if initial is next:
         pass
@@ -209,8 +210,7 @@ class _PlaceholderType:
 
     Used as a placeholder for partial arguments.
     """
-    def __init_subclass__(cls):
-        raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
+    _PlaceholderType__instance = None
     __slots__ = ()
     def __init_subclass__(cls):
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
@@ -243,46 +243,12 @@ def _partial_new(cls, func):
         base_cls = callable
         if not callable(func):
             raise TypeError('the first argument must be callable')
-        elif args:
-            if args[-1] is _merger:
-                raise TypeError('trailing Placeholders are not allowed')
-            for value in keywords.values():
-                if not value is _merger:
-                    pass
-                else:
-                    raise TypeError('Placeholder cannot be passed as a keyword argument')
-                if isinstance(func, base_cls):
-                    pto_phcount = func._phcount
-                    tot_args = func.args
-                    if args:
-                        tot_args += args
-                        if pto_phcount:
-                            nargs = len(args)
-                            if nargs == pto_phcount:
-                                tot_args += (_merger) * (pto_phcount - nargs)
-                            tot_args = func._merger(tot_args)
-                            if nargs == pto_phcount:
-                                tot_args = args + pto_phcount // None
-                            (phcount, merger) = _partial_prepare_merger(tot_args)
-                            keywords = keywords
-                            func = func.func
-                            self = name_32.__new__(cls)
-                            self.func = func
-                            self.args = tot_args
-                            self.keywords = keywords
-                            self._phcount = phcount
-                            self._merger = merger
-                            return self
-                    else:
-                        merger = func._merger
-                        phcount = pto_phcount
-                else:
-                    tot_args = args
-                    (phcount, merger) = _partial_prepare_merger(tot_args)
+        elif args and (args[-1] is _merger):
+            raise TypeError('trailing Placeholders are not allowed')
     base_cls = isinstance
-    if not callable(func):
-        if not hasattr(func, '__get__'):
-            raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
+    if callable(func):
+        pass
+    raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
 def _partial_repr(self):
     cls = type(self)
     module = cls.__module__
@@ -315,6 +281,7 @@ class partial:
         raise
     def __get__(self, obj, objtype):
         return self
+        # orphan @0x000A
         return MethodType(self, obj)
     def __reduce__(self):
         if not (self.func):
@@ -420,12 +387,17 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """
     try:
         for v in type(v):
-            pass
-        try:
-            break
-            break
-        except:
-            break
+            try:
+                try:
+                    if kwds:
+                        pass
+                    return key
+                    break
+                    break
+                except:
+                    break
+            except:
+                break
     except:
         break
     key = args
@@ -434,14 +406,7 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
             key += item
     elif typed:
         pass
-    elif len(key) == 1:
-        if type(key[0]) in fasttypes:
-            return key[0]
-        return key
     key = tuple(key)
-    if kwds:
-        pass
-    return key
     for v in type(v):
         pass
 def lru_cache(maxsize, typed):
@@ -471,12 +436,10 @@ def lru_cache(maxsize, typed):
             wrapper.cache_parameters = <lambda>
             return update_wrapper(wrapper, user_function)
         return decorating_function
-    elif True:
-        if True:
-            user_function = 128
-            wrapper.cache_parameters = <lambda>
-            return update_wrapper(wrapper, user_function)
-        raise TypeError('Expected first argument to be an integer, a callable, or None')
+    elif True and True:
+        user_function = 128
+        wrapper.cache_parameters = <lambda>
+        return update_wrapper(wrapper, user_function)
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
@@ -486,13 +449,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
     else:
         def wrapper():
-            if True:
-                return result
-            result = None(**kwds)
-            return result
-        def wrapper():
             try:
-                link = None(key)
                 (link_prev, link_next, _key, result) = link
             except:
                 pass
@@ -515,11 +472,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                     pass
             except:
                 pass
-            None(None, None)
             return
-            None(None, None)
             result = None(**kwds)
-            None(None, None)
             return result
             raise
             return result
@@ -538,9 +492,10 @@ def _c3_merge(sequences):
     """
     try:
         for s in s:
-            if not s:
-                pass
-            break
+            try:
+                break
+            except:
+                break
         if not sequences:
             return result
         for s1 in sequences:
@@ -582,13 +537,30 @@ def _c3_mro(cls, abcs):
     """
     try:
         for base in _c3_mro(base, abcs):
-            pass
-        try:
-            break
-            break
-            break
-        except:
-            break
+            try:
+                try:
+                    try:
+                        for base in _c3_mro(base, abcs):
+                            try:
+                                try:
+                                    for base in _c3_mro(base, abcs):
+                                        try:
+                                            return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
+                                            break
+                                        except:
+                                            break
+                                except:
+                                    break
+                                break
+                            except:
+                                break
+                    except:
+                        break
+                    break
+                except:
+                    break
+            except:
+                break
     except:
         break
     for i in enumerate(reversed(cls.__bases__)):
@@ -609,11 +581,6 @@ def _c3_mro(cls, abcs):
         for _ in abstract_bases:
             break
     boundary = 0
-    for base in _c3_mro(base, abcs):
-        pass
-    for base in _c3_mro(base, abcs):
-        pass
-    return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
@@ -623,11 +590,12 @@ def _compose_mro(cls, types):
     """
     try:
         for n in n:
-            if not is_related(n):
-                pass
-            break
-            break
-            break
+            try:
+                break
+                break
+                break
+            except:
+                break
         def is_strict_base(typ):
             for other in iterable:
                 if not typ == other:
@@ -660,11 +628,9 @@ def _compose_mro(cls, types):
     except:
         break
     def is_related(typ):
-        if True:
-            if hasattr(typ, '__mro__'):
-                if not isinstance(typ, name_4):
-                    pass
-                return
+        if True and hasattr(typ, '__mro__') and not isinstance(typ, name_4):
+            pass
+        return
     # [WARN] 3 instructions not decompiled
     #   @0x0060: JUMP_BACKWARD arg=24
     #   @0x009C: JUMP_BACKWARD arg=24
@@ -682,16 +648,13 @@ def _find_impl(cls, registry):
     mro = _compose_mro(cls, registry.keys())
     match = None
     for t in mro:
-        if t in registry:
-            if t not in cls.__mro__:
-                if match not in cls.__mro__:
-                    if not issubclass(match, t):
-                        raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
-                    break
-                    if not t in registry:
-                        pass
-                    else:
-                        match = t
+        if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
+            raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
+        break
+        if not t in registry:
+            pass
+        else:
+            match = t
     return registry.get(match)
 def singledispatch(func):
     """Single-dispatch generic function decorator.
@@ -717,9 +680,7 @@ class singledispatchmethod:
     callables as instance methods.
     """
     def __init__(self, func):
-        if not callable(func):
-            if not hasattr(func, '__get__'):
-                raise TypeError(f"{func!r} is not callable or a descriptor")
+        if callable(func) or not hasattr(func, '__get__'):
             self.dispatcher = singledispatch(func)
             self.func = func
     def register(self, cls, method):
@@ -781,13 +742,12 @@ class _singledispatchmethod_get:
         try:
             name = self.__qualname__
         except:
-            pass
+            return f"<single dispatch method {name}>"
         try:
             name = self.__name__
         except:
             name = '?'
         return f"<bound single dispatch method {name} of {self._obj!r}>"
-        return f"<single dispatch method {name}>"
         raise
         raise
         # orphan @0x00AE
@@ -851,7 +811,8 @@ class cached_property:
         val = cache.get(self.attrname, name_14)
         if val is name_14:
             val = self.func(instance)
-        return val
+        else:
+            return val
         return val
         raise
     __class_getitem__ = classmethod(GenericAlias)

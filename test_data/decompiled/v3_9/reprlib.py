@@ -22,19 +22,19 @@ def recursive_repr(fillvalue):
 class Repr:
     _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
     def __init__(self):
-        self.name_0 = maxlevel
-        self.name_1 = maxtuple
-        self.name_2 = maxlist
-        self.name_3 = maxarray
-        self.name_4 = maxdict
-        self.name_5 = maxset
-        self.name_6 = maxfrozenset
-        self.name_7 = maxdeque
-        self.name_8 = maxstring
-        self.name_9 = maxlong
-        self.name_10 = maxother
-        self.name_11 = fillvalue
-        self.name_12 = indent
+        self.maxlevel = maxlevel
+        self.maxtuple = maxtuple
+        self.maxlist = maxlist
+        self.maxarray = maxarray
+        self.maxdict = maxdict
+        self.maxset = maxset
+        self.maxfrozenset = maxfrozenset
+        self.maxdeque = maxdeque
+        self.maxstring = maxstring
+        self.maxlong = maxlong
+        self.maxother = maxother
+        self.fillvalue = fillvalue
+        self.indent = indent
     def repr(self, x):
         return self.repr1(x, self.maxlevel)
     def repr1(self, x, level):
@@ -66,7 +66,7 @@ class Repr:
         if self.indent is None:
             return ', '.join(pieces)
         # orphan @0x0044
-        indent = ' '
+        indent *= ' '
         # orphan @0x004C
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
@@ -81,14 +81,12 @@ class Repr:
         # orphan @0x00C0
         # orphan @0x00C2
         return
-        # orphan @0x010C
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         # orphan @0x001C
         pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
         n = len(x)
-        if level <= 0:
-            if n:
-                s = self.fillvalue
+        if (level <= 0) and n:
+            s = self.fillvalue
         # orphan @0x004C
         pieces.append(self.fillvalue)
         # orphan @0x0058
@@ -163,9 +161,9 @@ class Repr:
             k = 1 + int(math.log10(abs(x)))
             max_digits = sys.get_int_max_str_digits()
             yield from '<'
+        exc = None
         if len(s) > self.maxlong:
             pass
-        exc = None
         # orphan @0x00AE
         j = max(0, self.maxlong - 3 - i)
         s = s[None:i] + self.fillvalue + s[len(s) - j:]

@@ -65,7 +65,7 @@ class Repr:
         if self.indent is None:
             return ', '.join(pieces)
         # orphan @0x0044
-        indent = ' '
+        indent *= ' '
         # orphan @0x004C
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
@@ -84,9 +84,8 @@ class Repr:
         # orphan @0x001C
         pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
         n = len(x)
-        if level <= 0:
-            if n:
-                s = self.fillvalue
+        if (level <= 0) and n:
+            s = self.fillvalue
         # orphan @0x004C
         pieces.append(self.fillvalue)
         # orphan @0x0058
@@ -166,14 +165,13 @@ class Repr:
         try:
             s = builtins.repr(x)
         except ValueError:
-            pass
+            exc = None
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-        # orphan @0x0086
-        exc = None
         # orphan @0x0092
+        exc = None
         # orphan @0x00F0
         return s
     def repr_instance(self, x, level):
@@ -195,9 +193,10 @@ def _possibly_sorted(x):
     try:
         return sorted(x)
     except Exception:
-        pass
-    if True:
+        return None
         return list(x)
+    # orphan @0x0012
+    return list(x)
 aRepr = Repr()
 repr = aRepr.repr
 return None

@@ -38,5 +38,4 @@ with open('/tmp/diag35.cs', 'w') as f:
     print('Stdout:', r.stdout[None:500])
     print('Stderr:', r.stderr[None:500])
     return None
-# orphan @0x00C6
-# [SUMMARY] 4 blocks · 3 processed · 1 orphan · 92 instr
+# [SUMMARY] 4 blocks · 4 processed · 0 orphan · 92 instr

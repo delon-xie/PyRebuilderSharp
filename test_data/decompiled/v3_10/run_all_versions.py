@@ -1,6 +1,9 @@
 # Decompiled from: <module>
 
+# orphan @0x00E2
+print(f"⏭ {ver}: .pyc not found")
 # orphan @0x00BE
+pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
 # orphan @0x00BC
 # orphan @0x00AC
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
@@ -20,48 +23,55 @@ with open(INPUT_FILE) as f:
         expected_ast = ast.dump(ast.parse(expected_src), indent=2)
     except print:
         sys.exit(1)
-if not os.path.exists(pyc):
-    print(f"⏭ {ver}: .pyc not found")
-    r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
-    actual_src = r.stdout
-    try:
-        actual_ast = ast.dump(ast.parse(actual_src), indent=2)
-        match = expected_ast == actual_ast
-        if match:
-            pass
-        if match:
-            pass
-        break
-        break
-        if not match:
-            exp_lines = expected_ast.split("""
+# orphan @0x00F4
+r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
+actual_src = r.stdout
+actual_ast = ast.dump(ast.parse(actual_src), indent=2)
+match = expected_ast == actual_ast
+# orphan @0x013A
+# orphan @0x013E
+# orphan @0x0140
+# orphan @0x0154
+# orphan @0x0158
+# orphan @0x015A
+# orphan @0x0166
+exp_lines = expected_ast.split("""
 """)
-            act_lines = actual_ast.split("""
+act_lines = actual_ast.split("""
 """)
-        for i in range(max(len(exp_lines), len(act_lines))):
-            if i < len(exp_lines):
-                pass
-            if i < len(act_lines):
-                pass
-            if e != a:
-                pass
-            break
-    except Exception:
-        print(f"❌ {ver}: AST parse failed - {e}")
-        print(f"  Decompiled: {actual_src[None:200]}")
-        yield from results
+# orphan @0x0190
+# orphan @0x0192
+# orphan @0x01A0
+# orphan @0x01A8
+# orphan @0x01AA
+# orphan @0x01B8
+# orphan @0x01C0
+# orphan @0x01C2
+# orphan @0x01CC
+print(f"  Line {i}: expected={e}")
+print(f"           actual=  {a}")
+# orphan @0x01F2
+# orphan @0x01F4
+# orphan @0x01FE
 # orphan @0x0206
-# orphan @0x0258
+# orphan @0x020A
+Exception
+print(f"❌ {ver}: AST parse failed - {e}")
+print(f"  Decompiled: {actual_src[None:200]}")
+yield from results
 def <genexpr>(.0):
-    for (v, r) in .0:
+    for (v, r) in r:
         if r:
             yield 1
-        break
+            break
+# orphan @0x0258
+e = None
 raise
 # orphan @0x0262
 print(f"
 {'========================================'}")
-# orphan @0x0278
+passed = sum(<genexpr>(results.items()))
 total = len(results)
-# orphan @0x0472
-# [SUMMARY] 34 blocks · 27 processed · 8 orphan · 347 instr
+'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
+return None
+# [SUMMARY] 34 blocks · 6 processed · 29 orphan · 347 instr

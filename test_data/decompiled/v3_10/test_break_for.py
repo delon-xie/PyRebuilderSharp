@@ -5,4 +5,4 @@ for i in range(3):
         break
     a = i
 return None
-# [SUMMARY] 7 blocks · 8 processed · 0 orphan · 18 instr
+# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 18 instr

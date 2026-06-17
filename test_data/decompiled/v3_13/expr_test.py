@@ -1,5 +1,22 @@
 # Decompiled from: <module>
 
-if not y:
-    pass
-# [SUMMARY] 2 blocks · 2 processed · 0 orphan · 59 instr
+a1 = None
+a2 = True
+a3 = False
+a4 = 42
+a5 = 3.14
+a6 = 'hello'
+b1 = x
+b2 = obj.attr
+b3 = items[0]
+b4 = 10
+b5 = None
+c1 = not x
+c2 = ~x
+c3 = -x
+d1 = x + y
+d2 = x - y
+d3 = x * y
+d4 = x / y
+return None
+# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 59 instr

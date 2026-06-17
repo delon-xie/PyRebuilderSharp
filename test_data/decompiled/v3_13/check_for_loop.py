@@ -1,11 +1,19 @@
 # Decompiled from: <module>
 
-# orphan @0x0072
-# orphan @0x001C
-while True:
-    pass
-# orphan @0x0182
-# orphan @0x01FC
-# [WARN] 1 instructions not decompiled
-#   @0x001A: JUMP_BACKWARD arg=6
-# [SUMMARY] 8 blocks · 4 processed · 4 orphan · 93 instr
+'Check actual block layout for for loop'
+import os
+import subprocess
+import struct
+import marshal
+pyc = '/tmp/lv2_eval_comp/lv2_eval.3.10.pyc'
+data = open(pyc, 'rb').read()
+code = 16(None)
+import dis
+print('=== disassembly ===')
+dis.dis(code)
+print("""
+=== instructions ===""")
+for instr in '  offset=':
+    instr.offset(f"3d opname={instr.opname}25s arg={instr.arg} argrepr={instr.argrepr}")
+break
+# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 93 instr

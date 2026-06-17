@@ -14,12 +14,12 @@ print(' '.join(<genexpr>(m[None:40])))
 Byte 0 = """(f"{m[0]}{'02x'}")
 for offset in range(0, 8):
     vals = struct.unpack_from('<IIII', m, offset)
-    if not vals[0] == code.co_argcount:
-        if not vals[2] == code.co_stacksize:
-            if vals[3] == code.co_flags:
-                print(f"
+    if vals[0] == code.co_argcount:
+        pass
+    if vals[3] == code.co_flags:
+        print(f"
 Fields found at offset {offset}:")
-                print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
-                print(f"  Bytes: {' '.join(<genexpr>(m[offset:offset + 16]))}")
+        print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
+        print(f"  Bytes: {' '.join(<genexpr>(m[offset:offset + 16]))}")
 return None
-# [SUMMARY] 10 blocks · 11 processed · 0 orphan · 181 instr
+# [SUMMARY] 10 blocks · 11 processed · 1 orphan · 181 instr

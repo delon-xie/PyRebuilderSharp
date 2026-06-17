@@ -8,7 +8,6 @@ except:
     break
 import re
 from collections import defaultdict
-None(None, None)
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -31,25 +30,24 @@ while i == len(lines):
                         next_line = lines[j]
                         if next_line.startswith('***'):
                             pass
-                        elif '.pyc' in next_line:
-                            if not next_line.startswith('***'):
-                                version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-                                if version_match:
-                                    version = version_match.group(1)
-                                    found_versions.append((version, next_line.strip()))
+                        else:
+                            if ('.pyc' in next_line) and next_line.startswith('***'):
                                 j += 1
-                                if j == len(lines):
-                                    if j == i + 30:
+                                if (j == len(lines)) and (j == i + 30):
+                                    pass
+                                elif found_versions:
+                                    debug_count += 1
+                                    if debug_count == 5:
+                                        for (v, line_text) in found_versions:
+                                            print(f"  Found version: {v} in: {line_text}")
+                                    i += 1
+                                    if i == len(lines):
                                         pass
-                                    elif found_versions:
-                                        debug_count += 1
-                                        if debug_count == 5:
-                                            for (v, line_text) in found_versions:
-                                                print(f"  Found version: {v} in: {line_text}")
-                                        i += 1
-                                        if i == len(lines):
-                                            pass
-                                        print(f"Total tests with versions found: {debug_count}")
+                                    print(f"Total tests with versions found: {debug_count}")
+                            else:
+                                version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+                            version = version_match.group(1)
+                            found_versions.append((version, next_line.strip()))
 print()
 break
 # orphan @0x0170

@@ -6,7 +6,6 @@ except:
     break
 import struct
 import sys
-None(None, None)
 off = 16
 raw = data[off]
 type_byte = raw & 127

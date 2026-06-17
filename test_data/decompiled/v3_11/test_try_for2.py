@@ -3,12 +3,15 @@
 def test5():
     try:
         for x in range(3):
-            y = x
+            try:
+                try:
+                    pass
+                except:
+                    break
+                y = x
+            except:
+                break
         return
-        try:
-            break
-        except:
-            pass
     except:
         break
     # orphan @0x003E

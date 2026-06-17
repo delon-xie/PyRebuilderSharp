@@ -10,8 +10,7 @@ print('Python 3.10 版本测试报告')
 print('============================================================')
 passed = 0
 failed = 0
-def remove_ansi(text):
-    return re.re('\\x1b\\[[0-9;]*m', '', text)
+current_test = None
 current_test_fail = False
 def remove_ansi(text):
     return re.re('\\x1b\\[[0-9;]*m', '', text)

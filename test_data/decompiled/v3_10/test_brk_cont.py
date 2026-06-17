@@ -3,7 +3,9 @@
 for i in range(10):
     if i == 5:
         break
-    if i == 1:
-        continue
+    elif i == 1:
+        pass
+    else:
+        a = i
 return None
-# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 23 instr
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 23 instr

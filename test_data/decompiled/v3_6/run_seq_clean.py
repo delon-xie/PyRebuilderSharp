@@ -66,5 +66,4 @@ print('  Decompiled: %s' % actual_src[None:200])
 yield from results
 # orphan @0x025A
 e = None
-# orphan @0x0484
-# [SUMMARY] 34 blocks · 27 processed · 8 orphan · 328 instr
+# [SUMMARY] 34 blocks · 28 processed · 8 orphan · 328 instr

@@ -1,20 +1,27 @@
 # Decompiled from: <module>
 
-import name_0
-import name_1
-name_6 = name_4 := name_2(None + name_1.name_3, 'rb')()(name_4.name_5)
-name_2(None + name_1.name_3, 'rb')(name_4.name_5)
-name_8 = None(name_4)
-name_0.name_7(None, None, None)
-None('Module:', name_8.name_10)
-None('  argc:', name_8.name_11)
-None('  nlocals:', name_8.name_12)
-'  code len:'(name_13, None(name_8.name_14))
-None('  code hex:', name_8.name_14.name_15() + None)
-name_16 = <lambda>
-None(name_8)
-return None
-if not True:
+try:
+    magic = f.read(4)
+    f.read(8)
+    code = marshal.load(f)
+except:
     pass
+import marshal
+import sys
+print('Module:', code.co_name)
+print('  argc:', code.co_argcount)
+print('  nlocals:', code.co_nlocals)
+print('  code len:', len(code.co_code))
+print('  code hex:', code.co_code.hex() + None)
+def dump_code(c, depth):
+    '  '
+    prefix = '  ' * depth
+    for const in c.co_consts:
+        if not hasattr(const, 'co_code'):
+            pass
+        print(f"{prefix}Function: {const.co_name}")
+        break
+dump_code(code)
+return None
 raise
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 114 instr
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 114 instr

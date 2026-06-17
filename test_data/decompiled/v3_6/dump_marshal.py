@@ -19,10 +19,9 @@ if raw & 128:
         'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
         pos += 1
         t = raw & 127
-        if t in (40, 41):
-            if t == 41:
-                pass
-            break
+        if (t in (40, 41)) and (t == 41):
+            pass
+        break
     break
     if t2 == 78:
         print(f"  [{i}] None{flags}")
@@ -34,9 +33,8 @@ if raw & 128:
             print(f"  [{i}] {.0(s)}{flags}")
 pos += 4
 flags = f" (ref={ref})"
-if t2 == 99:
-    if raw2 & 128:
-        pass
+if (t2 == 99) and (raw2 & 128):
+    pass
 ref = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 print(f"  FLAG_REF ref_index={ref}")
@@ -67,5 +65,4 @@ tmp = io.BytesIO(data)
 print(f"pos {pos}: after all constants")
 print(f"total file: {len(data)}")
 return None
-# orphan @0x04EC
-# [SUMMARY] 33 blocks · 24 processed · 10 orphan · 528 instr
+# [SUMMARY] 33 blocks · 25 processed · 10 orphan · 528 instr

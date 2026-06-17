@@ -52,12 +52,10 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
 {'=' * 50}")
     print(f"Test: {name}")
     if r.stdout.strip():
+        pass
+    else:
         break
-        if os.path.exists(out_path):
-            f = open(out_path)
-            content = f.read().strip()
-            print(f"Output ({len(content)} bytes):
-{content[None:300]}")
-            continue
+    with open(out_path) as f:
+        content = f.read().strip()
 return None
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 230 instr
+# [SUMMARY] 8 blocks · 9 processed · 1 orphan · 230 instr

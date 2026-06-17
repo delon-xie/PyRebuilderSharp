@@ -2,9 +2,10 @@
 
 try:
     for f in f:
-        if not f not in conflicts:
-            pass
-        break
+        try:
+            break
+        except:
+            break
     print(f"
 Renaming {len(files_to_rename)} files...")
     for (old_path, new_path) in files_to_rename:

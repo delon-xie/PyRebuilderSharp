@@ -2,28 +2,27 @@
 
 import struct
 import marshal
-code = None('a1 = None', '<test>', 'exec')
-'stacksize:'(code.co_stacksize, 'flags:', hex, None(code.co_flags))
-m = marshal.dumps(None(code))
-n = None(m)
-for offset_start in print:
-    if True:
+code = compile('a1 = None', '<test>', 'exec')
+print('stacksize:', code.co_stacksize, 'flags:', hex(code.co_flags))
+m = bytes(marshal.dumps(code))
+n = len(m)
+for offset_start in val1 == 0:
+    if offset_start + 16 == n:
         break
     return
-    val1 = struct.unpack + '<I'(m, offset_start + offset_start)
-    val2 = struct.unpack + None('<I', m + offset_start + offset_start)
-    val3 = struct.unpack + None('<I', m + offset_start + offset_start)
-    val4 = struct.unpack + None('<I', m + offset_start + offset_start)
-    None(f"start={offset_start}: {val1} {val2} {val3} {val4}")
-    if not print == val1:
-        pass
-    if not True:
-        pass
-    None('  -> FOUND!')
 return None
-# [WARN] 4 instructions not decompiled
-#   @0x0272: JUMP_BACKWARD arg=434
-#   @0x0284: JUMP_BACKWARD arg=452
-#   @0x0296: JUMP_BACKWARD arg=470
-#   @0x02A8: JUMP_BACKWARD arg=488
-# [SUMMARY] 15 blocks · 16 processed · 0 orphan · 178 instr
+# orphan @0x0270
+val1 = m(offset_start, offset_start + 4) + 0
+val2 = m(offset_start + 4, offset_start + 8) + 0
+val3 = m(offset_start + 8, offset_start + 12) + 0
+val4 = m(offset_start + 12, offset_start + 16) + 0
+print(f"start={offset_start}: {val1} {val2} {val3} {val4}")
+# orphan @0x0274
+# orphan @0x0282
+# orphan @0x0286
+# orphan @0x0294
+# orphan @0x0298
+# orphan @0x02A6
+# orphan @0x02AA
+print('  -> FOUND!')
+# [SUMMARY] 15 blocks · 8 processed · 9 orphan · 178 instr

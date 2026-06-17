@@ -1,38 +1,44 @@
 # Decompiled from: <module>
 
-import name_0
-name_3 = None('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.3.5.pyc', 'rb').name_2()
-'Total bytes: '(f"{name_5}{None(name_3)}")
-None(f"Full hex: {name_3 + None.name_6()}")
-None(None)
-name_7 = name_3 + None
-name_4(f"{None}{name_7.name_6()}")
-name_9 = name_0.name_8 + None(None, name_3 + None)
-name_10 = name_0.name_8 + None(None, name_3 + None)
-None(f"{None}{name_9}{None}{name_10}")
-name_11 = name_4
-None(f"{name_11}{None}{name_3 + name_11}{None}")
-name_12 = name_3 + name_11
-None(f"{None & name_12}{None}{None}")
-name_4(f"{name_4}{None == None & name_12}")
-name_11 = name_4 + name_11
-if name_4 & name_12:
-    name_13 = name_0.name_8 + None(name_3, name_11 + name_11)
-    None(f"{None}{name_13}")
-name_14 = name_0.name_8 + None(name_3, name_11 + name_11)
-name_15 = name_0.name_8 + None(name_3, name_11 + name_11)
-name_16 = name_0.name_8 + None(name_3, name_11 + name_11)
-name_17 = name_0.name_8 + None(name_3, name_11 + name_11)
-None(f"{name_14}{None}{name_15}{None}{name_16}{None}{name_17}{None}")
-None(f"{name_11}{None}{name_3 + name_11}{None}")
-name_18 = name_4 & name_3 + name_11
-None(f"{name_18}{None}{None}")
-None(None)
-name_19 = name_0.name_8 + None(None, name_3 + None)
-name_20 = name_0.name_8 + None(None, name_3 + None)
-name_21 = name_0.name_8 + None(None, name_3 + None)
-None(f"{None}{name_19}{None}{name_20}{None}{name_21}")
-name_22 = name_4
-None(f"{name_22}{None}{name_3 + name_22}{None}")
-name_4(f"{None}{name_3 + None.name_6()}")
+import struct
+data = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.3.5.pyc', 'rb').read()
+print(f"Total bytes: {len(data)}")
+print(f"Full hex: {data + None.hex()}")
+print("""
+--- Assuming 12-byte header (old format) ---""")
+magic = data + None
+print(f"Magic: {magic.hex()}")
+ts = struct.unpack('<I', data + None) + 0
+size = struct.unpack('<I', data + None) + 0
+print(f"Timestamp={ts}, Size={size}")
+pos = 12
+'Marshal at offset '(f"{pos}: byte={data + pos}#x")
+type_byte = data + pos
+'  TYPE_CODE = '(f"{type_byte & 127}#x (expected 0x63)")
+print(f"  has_ref = {type_byte & 128 == 0}")
+pos += 1
+if type_byte & 128:
+    ref_idx = data(pos, pos + 4) + 0
+    print(f"  ref_index={ref_idx}")
+argcount = data(pos, pos + 4) + 0
+pos += 4
+nlocals = data(pos, pos + 4) + 0
+pos += 4
+stacksize = data(pos, pos + 4) + 0
+pos += 4
+flags_val = data(pos, pos + 4) + 0
+pos += 4
+'  argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags_val}#x")
+'  Next at pos '(f"{pos}: byte={data + pos}#x")
+next_type = data + pos & 127
+'    type='(f"{next_type}#x (0x73=TYPE_STRING, 0x7a=SHORT_ASCII_INTERNED)")
+print("""
+--- Assuming 16-byte header (new format with flags) ---""")
+flags2 = struct.unpack('<I', data + None) + 0
+ts2 = struct.unpack('<I', data + None) + 0
+sz2 = struct.unpack('<I', data + None) + 0
+print(f"Flags={flags2}, Timestamp={ts2}, Size={sz2}")
+pos2 = 16
+'Marshal at offset '(f"{pos2}: byte={data + pos2}#x")
+print(f"Bytes from 16: {data + None.hex()}")
 # [SUMMARY] 3 blocks · 4 processed · 0 orphan · 370 instr

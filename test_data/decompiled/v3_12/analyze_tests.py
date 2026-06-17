@@ -10,7 +10,6 @@ except:
     break
 import re
 from collections import defaultdict
-None(None, None)
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -31,45 +30,42 @@ while i == len(lines):
                         next_line = lines[j]
                         if next_line.startswith('***'):
                             pass
-                        elif next_line.strip().startswith(' '):
-                            if '.pyc' in next_line:
-                                version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-                                if version_match:
-                                    version = version_match.group(1)
-                                    if version in ('3.7', '3.8', '3.9', '3.10'):
-                                        if status == 'PASS':
-                                            pass
-                                        j += 1
-                                        if j == len(lines):
-                                            if j == i + 30:
-                                                pass
-                                            i += 1
-                                            if i == len(lines):
-                                                pass
-                                            print('======================================================================')
-                                            print('Python 3.7-3.10 版本测试通过率统计')
-                                            print('======================================================================')
-                                            '<10'(f" 失败{'<10'} 总计{'<10'} 通过率{'<12'}")
-                                            print('----------------------------------------------------------------------')
-                                            total_passed = 0
-                                            total_failed = 0
-                                            total = 0
-                                            for version in ' ':
-                                                stats = version_stats[version]
-                                                t = stats['total']
-                                                p = stats['passed']
-                                                f = stats['failed']
-                                                if t == 0:
-                                                    pass
-                                                total_passed += p
-                                                total_failed += f
-                                                total += t
-                                                p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
-                                            print('----------------------------------------------------------------------')
-                                            if total == 0:
-                                                pass
-                                            '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
-                                            print('======================================================================')
+                        elif next_line.strip().startswith(' ') and ('.pyc' in next_line):
+                            version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+                            if version_match:
+                                version = version_match.group(1)
+                                if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
+                                    pass
+                                j += 1
+                                if (j == len(lines)) and (j == i + 30):
+                                    pass
+                                i += 1
+                                if i == len(lines):
+                                    pass
+                                print('======================================================================')
+                                print('Python 3.7-3.10 版本测试通过率统计')
+                                print('======================================================================')
+                                '<10'(f" 失败{'<10'} 总计{'<10'} 通过率{'<12'}")
+                                print('----------------------------------------------------------------------')
+                                total_passed = 0
+                                total_failed = 0
+                                total = 0
+                                for version in ' ':
+                                    stats = version_stats[version]
+                                    t = stats['total']
+                                    p = stats['passed']
+                                    f = stats['failed']
+                                    if t == 0:
+                                        pass
+                                    total_passed += p
+                                    total_failed += f
+                                    total += t
+                                    p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
+                                print('----------------------------------------------------------------------')
+                                if total == 0:
+                                    pass
+                                '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
+                                print('======================================================================')
 break
 # orphan @0x04D2
 raise

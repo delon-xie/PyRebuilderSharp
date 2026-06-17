@@ -19,27 +19,27 @@ def test_until_broken(exprs):
         pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
         if not os.path.exists(pyc):
             return 'NO_COMPILE'
-    out = r2.stdout + r2.stderr.strip()
-    if 'Decompilation failed' in out:
-        return 'CRASH'
-    # orphan @0x0074
-    # orphan @0x00AE
-    # orphan @0x00B6
-    return f"CONDITIONAL: {out[None:80]}"
-    # orphan @0x00C8
-    return 'OK'
-    # orphan @0x017E
+        r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
+        out = r2.stdout + r2.stderr.strip()
+        if 'Decompilation failed' in out:
+            return 'CRASH'
+        elif 'if ' in out:
+            return f"CONDITIONAL: {out[None:80]}"
 def find_breaking_point(exprs, lo, hi):
-    if lo < hi:
+    # orphan @0x0008
+    mid = (lo + hi) // 2
+    result = test_until_broken(exprs[None:mid + 1])
+    print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][None:30]}): {result}")
+    while lo < hi:
         mid = (lo + hi) // 2
         result = test_until_broken(exprs[None:mid + 1])
         print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][None:30]}): {result}")
         if result != 'OK':
             hi = mid
+        else:
             lo = mid + 1
-    # orphan @0x0070
-    # orphan @0x0078
     return lo
+    # orphan @0x0070
 base = all_exprs[None:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
@@ -56,4 +56,4 @@ Verification - just #{bp}:")
     r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 133 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 133 instr

@@ -17,4 +17,4 @@ a = 1
 return None
 # orphan @0x0082
 raise
-# [SUMMARY] 8 blocks · 6 processed · 2 orphan · 55 instr
+# [SUMMARY] 8 blocks · 7 processed · 2 orphan · 55 instr

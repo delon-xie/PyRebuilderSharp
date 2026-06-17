@@ -1,35 +1,45 @@
 # Decompiled from: <module>
 
 try:
-    for _ in []:
+    for _ in f:
+        try:
+            break
+        except:
+            break
         if not True:
             pass
-    try:
-        break
-    except:
-        break
+    print(f"
+Renaming {len(files_to_rename)} files...")
+    for (old_path, new_path) in files_to_rename:
+        print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
+        os.rename(old_path, new_path)
+    print("""
+Done!""")
+    return None
 except:
     break
 import os
 import re
 compiled_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 files_to_rename = []
-for filename in None(compiled_dir):
+for filename in os.listdir(compiled_dir):
     if not filename.endswith('.pyc'):
         pass
     else:
-        match_38 = None('^(.*)38\\.pyc$', filename)
-        match_310 = None('^(.*)310\\.pyc$', filename)
+        match_38 = re.search('^(.*)38\\.pyc$', filename)
+        match_310 = re.search('^(.*)310\\.pyc$', filename)
     if not match_310:
         pass
     else:
         old_path = os.path.join(compiled_dir, filename)
+        new_name = match_310.group(1) + '3.10.pyc'
         new_path = os.path.join(compiled_dir, new_name)
         files_to_rename.append((old_path, new_path))
     old_path = os.path.join(compiled_dir, filename)
+    new_name = match_38.group(1) + '3.8.pyc'
     new_path = os.path.join(compiled_dir, new_name)
     files_to_rename.append((old_path, new_path))
-'Found '(f"{len}{None(files_to_rename)} files to rename")
+print(f"Found {len(files_to_rename)} files to rename")
 conflicts = []
 for (old_path, new_path) in files_to_rename:
     if not os.path.exists(new_path):
@@ -37,18 +47,13 @@ for (old_path, new_path) in files_to_rename:
     else:
         conflicts.append((old_path, new_path))
 if conflicts:
-    for (old, new) in print:
-        None(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
-"""
-Renaming """(f"{len}{None(files_to_rename)} files...")
-for (old_path, new_path) in os.rename:
-    None(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
-    None(old_path, new_path)
-None("""
-Done!""")
-None("""
+    for (old, new) in conflicts:
+        print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
+print("""
 Removing conflicting source files...""")
-for (old, new) in os.remove:
-    None(f"  Removing {os.path.basename(old)}")
-    None(old)
+for (old, new) in conflicts:
+    print(f"  Removing {os.path.basename(old)}")
+    os.remove(old)
+# [WARN] 1 instructions not decompiled
+#   @0x04AE: JUMP_BACKWARD arg=22
 # [SUMMARY] 36 blocks · 37 processed · 0 orphan · 308 instr

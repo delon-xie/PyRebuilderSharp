@@ -24,27 +24,22 @@ except Exception:
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
     return None
-# orphan @0x00E6
-e = None
-raise
-# orphan @0x0104
 exp_lines = expected_ast.split("""
 """)
 act_lines = actual_ast.split("""
 """)
-# orphan @0x012E
-# orphan @0x0130
-# orphan @0x013E
-# orphan @0x0148
-# orphan @0x0156
-# orphan @0x0160
-# orphan @0x016A
-print(f"Line {i}:")
-print(f"  expected: {e}")
-# orphan @0x0190
-# orphan @0x01A4
-# orphan @0x0284
-# orphan @0x02B4
-# orphan @0x030E
-# orphan @0x0342
-# [SUMMARY] 26 blocks · 9 processed · 18 orphan · 213 instr
+for i in range(max(len(exp_lines), len(act_lines))):
+    if i < len(exp_lines):
+        pass
+    if i < len(act_lines):
+        pass
+    if e != a:
+        print(f"Line {i}:")
+        print(f"  expected: {e}")
+    break
+    if i > 5:
+        break
+# orphan @0x00E6
+e = None
+raise
+# [SUMMARY] 23 blocks · 22 processed · 2 orphan · 213 instr

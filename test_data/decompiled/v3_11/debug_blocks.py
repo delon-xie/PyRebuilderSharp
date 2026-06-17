@@ -12,7 +12,6 @@ import dis
 import marshal
 import types
 import struct
-None(None, None)
 for const in code.open:
     name_545 = isinstance(const, types.read)
     name_533 = const.read == 'depth_5_while'

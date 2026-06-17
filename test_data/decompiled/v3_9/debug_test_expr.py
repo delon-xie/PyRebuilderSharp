@@ -7,9 +7,8 @@ with open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expr
     data = bytearray(f.read())
     for i in i:
         stripped = data[i] & 127
-        if stripped in known_types:
-            if data[i] != stripped:
-                pass
+        if (stripped in known_types) and (data[i] != stripped):
+            pass
 # orphan @0x0092
 code = marshal.loads(bytes(data[16:]))
 print('Code name:', code.co_name)

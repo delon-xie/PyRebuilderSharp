@@ -2,15 +2,18 @@
 
 def test5():
     try:
-        for x in iterable:
-            y = x
-        try:
+        for x in range(3):
             try:
-                pass
+                try:
+                    try:
+                        pass
+                    except:
+                        break
+                except:
+                    break
+                y = x
             except:
                 break
-        except:
-            break
     except:
         break
     return None

@@ -7,4 +7,4 @@ except:
 return None
 # orphan @0x001A
 raise
-# [SUMMARY] 6 blocks · 4 processed · 2 orphan · 16 instr
+# [SUMMARY] 6 blocks · 5 processed · 2 orphan · 16 instr

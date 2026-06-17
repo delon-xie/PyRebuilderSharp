@@ -127,8 +127,8 @@ class ABCMeta(type):
         if not isinstance(subclass, type):
             raise TypeError('Can only register classes')
         return subclass
-        if issubclass(cls, subclass):
-            raise RuntimeError('Refusing to create an inheritance cycle')
+        # orphan @0x002A
+        raise RuntimeError('Refusing to create an inheritance cycle')
         # orphan @0x0032
         # orphan @0x003C
         ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
@@ -146,48 +146,34 @@ class ABCMeta(type):
             return
     def __instancecheck__(cls, instance):
         'Override for isinstance(instance, cls).'
-        # orphan @0x0014
-        subtype = type(instance)
         subclass = instance.__class__
         if True:
             return True
-        elif True:
-            if True:
-                return False
-        # orphan @0x003E
-        return
+        subtype = type(instance)
+        if (subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and True:
+            return False
         # orphan @0x0048
         return (any)(ABCMeta.__instancecheck__.<locals>.<genexpr>(# Unknown node: SetLiteral))
         # orphan @0x006C
+        return
     def __subclasscheck__(cls, subclass):
         'Override for issubclass(subclass, cls).'
-        # orphan @0x003A
-        ok = cls.__subclasshook__(subclass)
-        # orphan @0x000E
         if subclass in cls._abc_cache:
             return True
-        elif True:
+        elif cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
             cls._abc_negative_cache = WeakSet()
             cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
             if subclass in cls._abc_negative_cache:
                 return False
             return ok
-            if cls in getattr(subclass, '__mro__', ()):
-                cls._abc_cache.add(subclass)
-                return True
-        elif True:
-            if not isinstance(ok, bool):
-                raise AssertionError
-            elif True:
-                cls._abc_cache.add(subclass)
-                return True
         # orphan @0x005A
         # orphan @0x005E
         cls._abc_cache.add(subclass)
-        # orphan @0x009C
+        # orphan @0x008C
+        cls._abc_cache.add(subclass)
+        return True
         # orphan @0x00A4
         # orphan @0x00A6
-        # orphan @0x00C2
         # orphan @0x00C4
 class ABC:
     __doc__ = """Helper class that provides a standard way to create an ABC using

@@ -36,7 +36,7 @@ for (version, files) in sorted(version_files.items()):
     for f in sorted(files):
         print(f"      {f}")
 return None
-None(None, None)
+break
 break
 # orphan @0x022C
 raise

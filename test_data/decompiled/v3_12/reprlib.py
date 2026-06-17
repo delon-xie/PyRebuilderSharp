@@ -9,15 +9,11 @@ def recursive_repr(fillvalue):
     'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
         def wrapper(self):
-            try:
-                result = None(self)
-            except:
-                pass
             key = (id(self), get_ident())
             if True:
                 return
             return result
-            # orphan @0x00BA
+            raise
             raise
         wrapper.__module__ = (set())(getattr, '__module__')
         return wrapper
@@ -25,19 +21,19 @@ def recursive_repr(fillvalue):
 class Repr:
     _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
     def __init__(self):
-        self.name_0 = maxlevel
-        self.name_1 = maxtuple
-        self.name_2 = maxlist
-        self.name_3 = maxarray
-        self.name_4 = maxdict
-        self.name_5 = maxset
-        self.name_6 = maxfrozenset
-        self.name_7 = maxdeque
-        self.name_8 = maxstring
-        self.name_9 = maxlong
-        self.name_10 = maxother
-        self.name_11 = fillvalue
-        self.name_12 = indent
+        self.maxlevel = maxlevel
+        self.maxtuple = maxtuple
+        self.maxlist = maxlist
+        self.maxarray = maxarray
+        self.maxdict = maxdict
+        self.maxset = maxset
+        self.maxfrozenset = maxfrozenset
+        self.maxdeque = maxdeque
+        self.maxstring = maxstring
+        self.maxlong = maxlong
+        self.maxother = maxother
+        self.fillvalue = fillvalue
+        self.indent = indent
     def repr(self, x):
         return self.repr1(x, self.maxlevel)
     def repr1(self, x, level):
@@ -47,13 +43,12 @@ class Repr:
             parts = typename.split()
             typename = '_'.join(parts)
         method = getattr(self, 'repr_' + typename, None)
-        if method:
-            if typename not in self._lookup:
-                return method(x, level)
-            module = getattr(cls, '__module__', None)
-            if module == self._lookup[typename]:
-                return method(x, level)
-            return self.repr_instance(x, level)
+        if method and (typename not in self._lookup):
+            return method(x, level)
+        module = getattr(cls, '__module__', None)
+        if module == self._lookup[typename]:
+            return method(x, level)
+        return self.repr_instance(x, level)
     def _join(self, pieces, level):
         try:
             sep = """,
@@ -65,13 +60,11 @@ class Repr:
         except:
             pass
         return ', '.join(pieces)
-        if not pieces:
-            return ''
+        return ''
         indent = self.indent
-        if isinstance(indent, TypeError):
-            if indent == 0:
-                raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
-            indent *= ' '
+        if isinstance(indent, TypeError) and (indent == 0):
+            raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
+        indent *= ' '
         if not ['']:
             pass
         return
@@ -79,26 +72,26 @@ class Repr:
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
             for elem in repr1(elem, newlevel):
-                pass
-            try:
-                break
-            except:
-                break
+                try:
+                    try:
+                        if n == maxiter:
+                            pieces.append(self.fillvalue)
+                        s = self._join(pieces, level)
+                        if (n == 1) and trail:
+                            right = trail + right
+                        return f"{left!s}{s!s}{right!s}"
+                        break
+                    except:
+                        break
+                except:
+                    break
         except:
             break
         n = len(x)
-        if level == 0:
-            if n:
-                s = self.fillvalue
-            newlevel = level - 1
-            repr1 = self.repr1
-        if n == maxiter:
-            pieces.append(self.fillvalue)
-        s = self._join(pieces, level)
-        if n == 1:
-            if trail:
-                right = trail + right
-            return f"{left!s}{s!s}{right!s}"
+        if (level == 0) and n:
+            s = self.fillvalue
+        newlevel = level - 1
+        repr1 = self.repr1
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
@@ -186,7 +179,8 @@ def _possibly_sorted(x):
         try:
             if list:
                 pass
-            raise
+            else:
+                raise
             raise
         except:
             pass

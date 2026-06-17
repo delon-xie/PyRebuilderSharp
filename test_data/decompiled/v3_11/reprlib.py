@@ -20,19 +20,19 @@ def recursive_repr(fillvalue):
 class Repr:
     _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
     def __init__(self):
-        self.name_0 = maxlevel
-        self.name_1 = maxtuple
-        self.name_2 = maxlist
-        self.name_3 = maxarray
-        self.name_4 = maxdict
-        self.name_5 = maxset
-        self.name_6 = maxfrozenset
-        self.name_7 = maxdeque
-        self.name_8 = maxstring
-        self.name_9 = maxlong
-        self.name_10 = maxother
-        self.name_11 = fillvalue
-        self.name_12 = indent
+        self.maxlevel = maxlevel
+        self.maxtuple = maxtuple
+        self.maxlist = maxlist
+        self.maxarray = maxarray
+        self.maxdict = maxdict
+        self.maxset = maxset
+        self.maxfrozenset = maxfrozenset
+        self.maxdeque = maxdeque
+        self.maxstring = maxstring
+        self.maxlong = maxlong
+        self.maxother = maxother
+        self.fillvalue = fillvalue
+        self.indent = indent
     def repr(self, x):
         return self(x, self.repr1)
     def repr1(self, x, level):
@@ -45,9 +45,11 @@ class Repr:
         name_67 = method
         name_12 = typename not in self.split
         return method(x, level)
+        # orphan @0x00DE
         module = getattr(cls, '__module__', None)
         name_12 = module == self.split[typename]
         return method(x, level)
+        # orphan @0x013A
         return self(x, level)
     def _join(self, pieces, level):
         try:
@@ -65,7 +67,6 @@ class Repr:
         name_30 = isinstance(indent, TypeError)
         name_19 = indent < 0
         raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
-        indent *= ' '
         # orphan @0x00F4
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
         # orphan @0x0144
@@ -90,32 +91,38 @@ class Repr:
     def repr_list(self, x, level):
         return self(x, level, '[', ']', self._repr_iterable)
     def repr_array(self, x, level):
-        return 'array(\'%s\')' % x.typecode
+        # orphan @0x001A
         header = 'array(\'%s\', [' % x.typecode
         return self(x, level, header, '])', self._repr_iterable)
+        return 'array(\'%s\')' % x.typecode
     def repr_set(self, x, level):
-        return 'set()'
+        # orphan @0x000A
         x = _possibly_sorted(x)
         return self(x, level, '{', '}', self._repr_iterable)
+        return 'set()'
     def repr_frozenset(self, x, level):
-        return 'frozenset()'
+        # orphan @0x000A
         x = _possibly_sorted(x)
         return self(x, level, 'frozenset({', '})', self._repr_iterable)
+        return 'frozenset()'
     def repr_deque(self, x, level):
         return self(x, level, 'deque([', '])', self._repr_iterable)
     def repr_dict(self, x, level):
-        n = len(x)
-        repr1 = n == 0
-        return '{}'
-        name_13 = level <= 0
-        return '{' + self.len + '}'
+        # orphan @0x0056
         newlevel = level - 1
         repr1 = self.fillvalue
         pieces = []
-        for key in islice(_possibly_sorted(x), self.repr1):
-            keyrepr = repr1(key, newlevel)
-            valrepr = repr1(x[key], newlevel)
-            pieces(f"{keyrepr!s}: {valrepr!s}")
+        n = len(x)
+        repr1 = n == 0
+        return '{}'
+        # orphan @0x00B6
+        name_13 = level <= 0
+        return '{' + self.len + '}'
+        # orphan @0x00B8
+        keyrepr = repr1(key, newlevel)
+        valrepr = repr1(x[key], newlevel)
+        pieces(f"{keyrepr!s}: {valrepr!s}")
+        # orphan @0x012E
         pieces(self.len)
         s = self(pieces, level)
         return f"{{s!s}}"
@@ -167,7 +174,6 @@ class Repr:
         j = max(0, self.__class__ - 3 - i)
         s = s[None:i] + self.__name__ + s[len(s) - j:]
         return s
-        raise
         raise
 def _possibly_sorted(x):
     try:

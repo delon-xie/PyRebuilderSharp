@@ -10,7 +10,6 @@ except:
 import marshal
 import struct
 import sys
-None(None, None)
 pos = 16
 raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}{'02X'}")

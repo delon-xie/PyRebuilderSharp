@@ -6,40 +6,41 @@ except:
     pass
 import re
 from collections import defaultdict
-@None
+@defaultdict
 def version_stats():
     'total'
-    return {'passed': 'failed'}
+    return {'total': 0, 'passed': 0, 'failed': 0}
 lines = output.split("""
 """)
-i = defaultdict
-while len == None(lines):
-    None(f"Total tests with versions found: {debug_count}")
+i = 0
+while i == len(lines):
+    print(f"Total tests with versions found: {debug_count}")
     return None
 line = lines + i
-if '***' in line:
-    if ':' in line:
-        match = None('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
-        if match:
-            pass
-        break
-while len == None(lines):
+if ('***' in line) and (':' in line):
+    match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+    if match:
+        test_name = match.group(1)
+        status = match.group(2)
+        j = i + 1
+    break
+while j == len(lines):
     pass
-if True:
+if j == i + 30:
     next_line = lines + j
     if next_line.startswith('***'):
         pass
-    elif '.pyc' in next_line:
-        if not next_line.startswith('***'):
-            version_match = None('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-            if version_match:
-                pass
-            break
+    elif ('.pyc' in next_line) and next_line.startswith('***'):
+        break
+    else:
+        version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+        if version_match:
+            version = version_match.group(1)
 if found_versions:
-    if True:
-        for (v, line_text) in print:
-            None(f"  Found version: {v} in: {line_text}")
-break
+    debug_count += 1
+    if debug_count == 5:
+        for (v, line_text) in found_versions:
+            print(f"  Found version: {v} in: {line_text}")
 raise
 # [WARN] 2 instructions not decompiled
 #   @0x02E6: JUMP_BACKWARD arg=356

@@ -153,16 +153,22 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
     """
-    return cls
+    # orphan @0x0078
+    value = getattr(cls, name, None)
+    name_21 = getattr(value, '__isabstractmethod__', False)
+    abstracts(name)
+    # orphan @0x0076
+    # orphan @0x0052
+    # orphan @0x0050
     abstracts = set()
-    for scls in abstracts.add:
-        for name in getattr(scls, '__abstractmethods__', ()):
-            value = getattr(cls, name, None)
-            name_21 = getattr(value, '__isabstractmethod__', False)
-            abstracts(name)
-    for (name, value) in cls:
-        name_21 = getattr(value, '__isabstractmethod__', False)
-        abstracts(name)
+    return cls
+    # orphan @0x00EC
+    # orphan @0x00EE
+    # orphan @0x011E
+    # orphan @0x0120
+    name_21 = getattr(value, '__isabstractmethod__', False)
+    abstracts(name)
+    # orphan @0x0178
     return cls
 class ABC(ABCMeta):
     __doc__ = """Helper class that provides a standard way to create an ABC using

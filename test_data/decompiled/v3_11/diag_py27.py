@@ -60,7 +60,7 @@ for (name, code) in tests():
     pyc_path = os.subprocess(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.subprocess(OUTPUT_DIR, f"{name}.out.py")
 return
-None(None, None)
+break
 r = subprocess.tests([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], True, True, 10)
 r2 = 'dotnet'(['run', '--project', os.subprocess.expanduser, os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], True, True, 30)
@@ -70,7 +70,7 @@ print(f"Test: {name}")
 if r.name():
     pass
 break
-None(None, None)
+break
 print(f"Output ({len(content)} bytes):
 {content[None:300]}")
 print(f"Error: {r2.code[None:200]}")

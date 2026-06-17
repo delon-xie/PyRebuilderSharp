@@ -59,7 +59,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     raise
     raise
     # orphan @0x0064
-def wraps():
+def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
        Returns a decorator that invokes update_wrapper() with the decorated
@@ -68,94 +68,98 @@ def wraps():
        This is a convenience function to simplify applying partial() to
        update_wrapper().
     """
-    return partial(name_2, var_0, var_1, var_2)
+    return partial(name_2, wrapped, assigned, updated)
 def _gt_from_lt(self, other):
     'Return a > b.  Computed by @total_ordering from (not a < b) and (a != b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if not not op_result:
-        pass
+    # orphan @0x0064
+    # orphan @0x006E
     return
 def _le_from_lt(self, other):
     'Return a <= b.  Computed by @total_ordering from (a < b) or (a == b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if op_result:
-        pass
+    # orphan @0x0062
+    # orphan @0x006C
     return
 def _ge_from_lt(self, other):
     'Return a >= b.  Computed by @total_ordering from (not a < b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
+    # orphan @0x005E
     return not op_result
 def _ge_from_le(self, other):
     'Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if not op_result:
-        pass
+    # orphan @0x0064
+    # orphan @0x006E
     return
 def _lt_from_le(self, other):
     'Return a < b.  Computed by @total_ordering from (a <= b) and (a != b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if not op_result:
-        pass
+    # orphan @0x0062
+    # orphan @0x006C
     return
 def _gt_from_le(self, other):
     'Return a > b.  Computed by @total_ordering from (not a <= b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
+    # orphan @0x005E
     return not op_result
 def _lt_from_gt(self, other):
     'Return a < b.  Computed by @total_ordering from (not a > b) and (a != b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if not not op_result:
-        pass
+    # orphan @0x0064
+    # orphan @0x006E
     return
 def _ge_from_gt(self, other):
     'Return a >= b.  Computed by @total_ordering from (a > b) or (a == b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if op_result:
-        pass
+    # orphan @0x0062
+    # orphan @0x006C
     return
 def _le_from_gt(self, other):
     'Return a <= b.  Computed by @total_ordering from (not a > b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
+    # orphan @0x005E
     return not op_result
 def _le_from_ge(self, other):
     'Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if not op_result:
-        pass
+    # orphan @0x0064
+    # orphan @0x006E
     return
 def _gt_from_ge(self, other):
     'Return a > b.  Computed by @total_ordering from (a >= b) and (a != b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
-    if not op_result:
-        pass
+    # orphan @0x0062
+    # orphan @0x006C
     return
 def _lt_from_ge(self, other):
     'Return a < b.  Computed by @total_ordering from (not a >= b).'
     op_result = type(self)(self, other)
     NotImplemented = op_result is name_4
     return op_result
+    # orphan @0x005E
     return not op_result
 _convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
@@ -204,8 +208,7 @@ class _PlaceholderType:
 
     Used as a placeholder for partial arguments.
     """
-    def __init_subclass__(cls):
-        raise TypeError(f"type '{cls.TypeError}' is not an acceptable base type")
+    _PlaceholderType__instance = None
     __slots__ = ()
     def __init_subclass__(cls):
         raise TypeError(f"type '{cls.TypeError}' is not an acceptable base type")
@@ -218,16 +221,19 @@ class _PlaceholderType:
         return 'Placeholder'
 Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
-    return (0, None)
+    # orphan @0x0050
+    name_27 = a is itemgetter
+    order(j)
+    j += 1
+    order(i)
+    # orphan @0x004E
     nargs = len(args)
     order = []
     j = nargs
-    for (i, a) in enumerate(args):
-        name_27 = a is itemgetter
-        order(j)
-        j += 1
-        order(i)
+    return (0, None)
+    # orphan @0x00CE
     name_9 = phcount
+    # orphan @0x00EE
     return (phcount, merger)
 def _partial_new(cls, func):
     name_38 = issubclass(cls, callable)
@@ -294,8 +300,9 @@ class partial:
         # orphan @0x00C0
         raise
     def __get__(self, obj, objtype):
-        return self
+        # orphan @0x000A
         return MethodType(self, obj)
+        return self
     def __reduce__(self):
         if self.func:
             pass
@@ -433,43 +440,30 @@ def lru_cache(maxsize, typed):
     wrapper.cache_parameters = <lambda>
     return update_wrapper(wrapper, user_function)
     raise TypeError('Expected first argument to be an integer, a callable, or None')
-    def decorating_function(user_function):
-        wrapper.cache_parameters = <lambda>
-        return update_wrapper(wrapper, user_function)
-    return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     raise TypeError('the first argument must be callable')
-    def wrapper():
-        return result
-    def wrapper():
-        return result
-        return result
     def wrapper():
         try:
             (link_prev, link_next, _key, result) = link
         except:
             pass
-        None(None, None)
         return
-        None(None, None)
-        None(None, None)
         return result
-        raise
-        while True:
-            pass
         # orphan @0x00E8
         raise
         # orphan @0x00F0
+        # orphan @0x00F6
+        # orphan @0x01FE
+        raise
+        # orphan @0x0206
     def cache_info():
         'Report cache statistics'
-        None(None, None)
         return
         raise
         while True:
             pass
     def cache_clear():
         'Clear the cache and cache statistics'
-        None(None, None)
         return None
         raise
         while True:
@@ -488,20 +482,28 @@ def _c3_merge(sequences):
     Adapted from https://docs.python.org/3/howto/mro.html.
 
     """
+    # orphan @0x0046
+    name_4 = candidate in s2[1:]
+    def <listcomp>(.0):
+        for s in .0:
+            return s
+    # orphan @0x0044
+    # orphan @0x002E
+    candidate = s1[0]
+    # orphan @0x002C
     result = []
-    for s1 in 0:
-        for s1 in sequences:
-            candidate = s1[0]
-            for s2 in sequences:
-                name_4 = candidate in s2[1:]
-                candidate = None
-                break
-        raise RuntimeError('Inconsistent hierarchy')
-        result(candidate)
-        for seq in sequences:
-            name_3 = seq[0] == candidate
+    for _ in 0:
+        pass
+    # orphan @0x006C
     # orphan @0x006E
-    # orphan @0x00E6
+    # orphan @0x0070
+    # orphan @0x0072
+    raise RuntimeError('Inconsistent hierarchy')
+    # orphan @0x0092
+    result(candidate)
+    # orphan @0x00C0
+    # orphan @0x00C2
+    name_3 = seq[0] == candidate
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -642,7 +644,6 @@ class _singledispatchmethod_get:
         raise
         return None
         raise
-        raise
         # orphan @0x00CC
     def __repr__(self):
         # orphan @0x0028
@@ -656,12 +657,13 @@ class _singledispatchmethod_get:
             name_5 = __name__
             name = '?'
         return f"<bound single dispatch method {name} of {self.AttributeError!r}>"
-        return f"<single dispatch method {name}>"
         raise
         raise
         raise
         raise
         # orphan @0x0052
+        # orphan @0x0094
+        return f"<single dispatch method {name}>"
     def __call__(self):
         funcname = getattr(self.getattr._unbound, '__name__', 'singledispatchmethod method')
         raise TypeError(f"{funcname} requires at least 1 positional argument")
@@ -675,6 +677,7 @@ class _singledispatchmethod_get:
         skip_bound_arg = self.func == 1
         name_16 = skip_bound_arg
         return method(**kwargs)
+        # orphan @0x01B2
         return method(**kwargs)
     def __getattr__(self, name):
         name_7 = name not in ['__name__', '__qualname__', '__annotations__', '__type_params__', '__isabstractmethod__']
@@ -692,6 +695,7 @@ class cached_property:
     def __set_name__(self, owner, name):
         self.attrname = name
         return None
+        # orphan @0x006E
         name_27 = name != self.attrname
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
     def __get__(self, instance, owner):

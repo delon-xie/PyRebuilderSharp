@@ -13,33 +13,32 @@ for filename in os.listdir(compiled_dir):
             new_name = match_38.group(1) + '3.8.pyc'
             new_path = os.path.join(compiled_dir, new_name)
             files_to_rename.append((old_path, new_path))
-            continue
-            if match_310:
-                old_path = os.path.join(compiled_dir, filename)
-                new_name = match_310.group(1) + '3.10.pyc'
-                new_path = os.path.join(compiled_dir, new_name)
-                files_to_rename.append((old_path, new_path))
-            break
-            for (old, new) in conflicts:
-                pass
-            print("""
-Removing conflicting source files...""")
-            for (old, new) in conflicts:
-                print(f"  Removing {os.path.basename(old)}")
-                os.remove(old)
-            files_to_rename = <listcomp>(files_to_rename)
-            print(f"
+        old_path = os.path.join(compiled_dir, filename)
+        new_name = match_310.group(1) + '3.10.pyc'
+        new_path = os.path.join(compiled_dir, new_name)
+        files_to_rename.append((old_path, new_path))
+print(f"Found {len(files_to_rename)} files to rename")
+conflicts = []
+for (old_path, new_path) in files_to_rename:
+    if os.path.exists(new_path):
+        conflicts.append((old_path, new_path))
+if conflicts:
+    for (old, new) in conflicts:
+        print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
+print(f"
 Renaming {len(files_to_rename)} files...")
-            for (old_path, new_path) in files_to_rename:
-                print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
-                os.rename(old_path, new_path)
-            print("""
+for (old_path, new_path) in files_to_rename:
+    print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
+    os.rename(old_path, new_path)
+print("""
 Done!""")
-        break
-        for (old_path, new_path) in files_to_rename:
-            if True:
-                conflicts.append((old_path, new_path))
-        if conflicts:
-            print(f"
-Found {len(conflicts)} conflicts (target file already exists):")
-# [SUMMARY] 26 blocks · 27 processed · 0 orphan · 249 instr
+# orphan @0x0150
+print("""
+Removing conflicting source files...""")
+# orphan @0x015C
+# orphan @0x015E
+print(f"  Removing {os.path.basename(old)}")
+os.remove(old)
+# orphan @0x0186
+files_to_rename = <listcomp>(files_to_rename)
+# [SUMMARY] 25 blocks · 22 processed · 4 orphan · 249 instr

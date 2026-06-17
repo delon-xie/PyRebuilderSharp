@@ -22,39 +22,32 @@ def _is_descriptor(obj):
     """
     Returns True if obj is a descriptor, False otherwise.
     """
-    if hasattr(obj, '__get__'):
-        if hasattr(obj, '__set__'):
-            pass
-        return
+    if hasattr(obj, '__get__') and hasattr(obj, '__set__'):
+        pass
+    return
 def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
     """
-    if not len(name) > 4:
-        if not name[-2:] == name[-2:]:
-            pass
-        if not True:
-            if not name[2] != '_':
-                pass
-            return
+    if (len(name) > 4) or not name[-2:] == name[-2:]:
+        return
+    if True:
+        pass
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
-    if not len(name) > 2:
-        if not name[-1] == name[-1]:
-            pass
-        if not True:
-            if not name[1] != '_':
-                pass
-            return
+    if (len(name) > 2) or not name[-1] == name[-1]:
+        return
+    if True:
+        pass
 def _is_internal_class(cls_name, obj):
     return False
+    # orphan @0x0096
     qualname = getattr(obj, '__qualname__', '')
     s_pattern = cls_name + '.' + getattr(obj, '__name__', '')
     e_pattern = '.' + s_pattern
-    if qualname == s_pattern:
-        pass
+    # orphan @0x00BE
     return
 def _is_private(cls_name, name):
     pattern = f"_{cls_name!s}__"
@@ -63,6 +56,7 @@ def _is_private(cls_name, name):
     name_26 = name(pattern)
     name_2 = name[-2] != '_'
     return True
+    # orphan @0x00B0
     return False
 def _is_single_bit(num):
     """
@@ -70,6 +64,7 @@ def _is_single_bit(num):
     """
     name_2 = num == 0
     return False
+    # orphan @0x0012
     num &= num - 1
     return num == 0
 def _make_class_unpicklable(obj):
@@ -82,6 +77,7 @@ def _make_class_unpicklable(obj):
         raise TypeError('%r cannot be pickled' % self)
     name_12 = isinstance(obj, setattr)
     return None
+    # orphan @0x004A
     setattr(obj, '__reduce_ex__', _break_on_call_reduce)
     setattr(obj, '__module__', '<unknown>')
 def _iter_bits_lsb(num):
@@ -141,6 +137,9 @@ class property(DynamicClassAttribute):
     through the enum class will instead look in the class' _member_map_ for
     a corresponding enum member.
     """
+    member = None
+    _attr_type = None
+    _cls_type = None
     def __get__(self, instance, ownerclass):
         try:
             name_27 = name_18
@@ -155,43 +154,18 @@ class property(DynamicClassAttribute):
             pass
         return self.member
         raise AttributeError(f"{ownerclass!r} has no attribute {self.AttributeError!r}")
-        return self(instance)
-        name_26 = self.name == 'attr'
-        return getattr(self.fget, self.AttributeError)
         name_26 = self.name == 'desc'
         return getattr(instance.fget, self.AttributeError)
+        name_26 = self.name == 'attr'
+        return getattr(self.fget, self.AttributeError)
         return
     def __set__(self, instance, value):
         return self(instance, value)
+        # orphan @0x003C
         raise AttributeError(f"<enum {self.AttributeError!r}> cannot set attribute {self.AttributeError!r}")
     def __delete__(self, instance):
         return self(instance)
-        raise AttributeError(f"<enum {self.AttributeError!r}> cannot delete attribute {self.AttributeError!r}")
-    def __get__(self, instance, ownerclass):
-        try:
-            name_27 = name_18
-            try:
-                try:
-                    name_27 = name_18
-                except:
-                    pass
-            except:
-                pass
-        except:
-            pass
-        return self.member
-        raise AttributeError(f"{ownerclass!r} has no attribute {self.AttributeError!r}")
-        return self(instance)
-        name_26 = self.name == 'attr'
-        return getattr(self.fget, self.AttributeError)
-        name_26 = self.name == 'desc'
-        return getattr(instance.fget, self.AttributeError)
-        return
-    def __set__(self, instance, value):
-        return self(instance, value)
-        raise AttributeError(f"<enum {self.AttributeError!r}> cannot set attribute {self.AttributeError!r}")
-    def __delete__(self, instance):
-        return self(instance)
+        # orphan @0x003A
         raise AttributeError(f"<enum {self.AttributeError!r}> cannot delete attribute {self.AttributeError!r}")
     def __set_name__(self, ownerclass, name):
         self.name = name
@@ -243,8 +217,7 @@ class _proto_member:
             _member_map_ = value not in enum_class._member_names_
             enum_class._member_names_(value)
         except:
-            name_76 = _flag_mask_
-            break
+            return None
         delattr(enum_class, member_name)
         value = self.delattr
         args = (value)
@@ -260,8 +233,6 @@ class _proto_member:
         raise new_exc
         raise
         return None
-        return None
-        raise
         raise
         # orphan @0x0500
         raise
@@ -356,21 +327,28 @@ class EnumDict(dict):
     def update(self, members):
         try:
             for name in members():
-                pass
-            try:
-                name_16 = items
-                break
-                for (name, value) in members:
-                    pass
-                for (name, value) in more_members():
-                    pass
-                return
-                raise
-            except:
-                pass
+                try:
+                    try:
+                        name_16 = items
+                        break
+                        for (name, value) in members:
+                            try:
+                                pass
+                            except:
+                                pass
+                        for (name, value) in more_members():
+                            pass
+                        return
+                    except:
+                        pass
+                except:
+                    name_16 = items
+                    break
         except:
             name_16 = items
             break
+        raise
+        # orphan @0x007E
         raise
 _EnumDict = EnumDict
 class EnumType(type):
@@ -389,8 +367,6 @@ class EnumType(type):
             pass
         update = _simple
         return super().super(metacls, cls, bases, classdict, **kwds)
-        classdict('_ignore_', [])('_ignore_')
-        ignore = classdict['_ignore_']
         for key in ignore:
             classdict(key, None)
         invalid_names = set(member_names) & # Unknown node: SetLiteral
@@ -509,9 +485,10 @@ class EnumType(type):
         name_7 = names is not __new__
         value = (value, names) + values
         return cls(cls, value)
+        # orphan @0x0096
         name_20 = names is __new__
         raise TypeError(f"{cls} has no members; specify `names=()` if you meant to create a new, empty, enum")
-        __new__ = names is __new__
+        # orphan @0x00C8
         return
     def __contains__(cls, value):
         """Return True if `value` is in `cls`.
@@ -522,19 +499,18 @@ class EnumType(type):
         3) `value` is a pseudo-member (flags)
         """
         try:
-            result = cls(value)
-        except:
             _missing_ = name_8
+        except:
+            pass
         Flag = isinstance(value, cls)
         return True
         name_54 = issubclass(cls, ValueError)
+        result = cls(value)
         return
-        raise
-        raise
-        if value in cls.Flag:
-            pass
+        # orphan @0x00BC
+        # orphan @0x00CE
+        # orphan @0x00DE
         return
-        # orphan @0x00B0
     def __delattr__(cls, attr):
         name_26 = attr in cls._member_map_
         raise AttributeError(f"{cls.AttributeError!r} cannot delete member {attr!r}.")
@@ -550,6 +526,7 @@ class EnumType(type):
         interesting('__init_subclass__')
         name_15 = cls.set is name_16
         return sorted(interesting)
+        # orphan @0x018A
         return sorted(set(dir(cls.set)) | interesting)
     def __getitem__(cls, name):
         """
@@ -570,6 +547,7 @@ class EnumType(type):
     def __repr__(cls):
         name_10 = issubclass(cls, Flag)
         return '<flag %r>' % cls.issubclass
+        # orphan @0x004E
         return '<enum %r>' % cls.issubclass
     def __reversed__(cls):
         """
@@ -670,26 +648,31 @@ class EnumType(type):
     _find_data_type_ = _find_data_type_()
     _find_new_ = _find_new_()
     def _add_member_(cls, name, member):
+        # orphan @0x00A0
+        attr = base.NameError(name)
+        _is_descriptor = isinstance(attr, (fget, fset))
+        found_descriptor = attr
+        class_type = base
+        descriptor_type = 'enum'
+        base.NameError.get
+        getattr = _is_descriptor(attr)
+        found_descriptor = attr
+        # orphan @0x009E
+        found_descriptor = None
+        descriptor_type = None
+        class_type = None
         name_48 = name in cls._member_map_
         name_31 = cls._member_map_[name] is not member
         raise NameError(f"{name!r} is already bound: {cls._member_map_[name]!r}")
         return None
-        found_descriptor = None
-        descriptor_type = None
-        class_type = None
-        for base in cls.NameError[1:]:
-            attr = base.NameError(name)
-            _is_descriptor = isinstance(attr, (fget, fset))
-            found_descriptor = attr
-            class_type = base
-            descriptor_type = 'enum'
-            base.NameError.get
-            getattr = _is_descriptor(attr)
-            found_descriptor = attr
-            if descriptor_type:
-                pass
-            elif class_type:
-                pass
+        # orphan @0x0148
+        # orphan @0x014A
+        # orphan @0x0150
+        # orphan @0x0152
+        descriptor_type = 'attr'
+        class_type = base
+        # orphan @0x0160
+        # orphan @0x0162
         redirect = property()
         redirect.member = member
         redirect(cls, name)
@@ -704,8 +687,6 @@ class EnumType(type):
         redirect._cls_type = class_type
         setattr(cls, name, redirect)
         setattr(cls, name, member)
-        return None
-        # orphan @0x0160
     __signature__ = __signature__()
 EnumMeta = EnumType
 class Enum(EnumType):
@@ -775,9 +756,6 @@ class Enum(EnumType):
         exc = None
         ve_exc = None
         return
-        exc = None
-        ve_exc = None
-        return
         # orphan @0x0144
         EJECT = getattr(cls, '_%s__in_progress' % cls._unhashable_values_map_, False)
         raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
@@ -790,8 +768,6 @@ class Enum(EnumType):
         # orphan @0x0230
         # orphan @0x03A8
         raise
-        # [WARN] 1 instructions not decompiled
-        #   @0x0136: JUMP_BACKWARD arg=58
     def _add_alias_(self, name):
         self.__class__(name, self)
     def _add_value_alias_(self, value):
@@ -813,14 +789,11 @@ class Enum(EnumType):
         raise
         return None
         raise
-        raise
         # orphan @0x00CE
         name_39 = m.TypeError == value
         name_31 = m is not self
         raise ValueError(f"{value!r} is already bound: {cls.__class__[value]!r}")
         # orphan @0x012C
-        # [WARN] 1 instructions not decompiled
-        #   @0x0134: JUMP_BACKWARD arg=106
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
     def __repr__(self):
@@ -939,43 +912,56 @@ class Flag(Enum, STRICT):
         if self.__class__.__name__:
             pass
         return f"<{cls_name!s}: {v_repr(self._value_repr_)!s}>"
+        # orphan @0x007C
         return f"<{cls_name!s}.{self._value_repr_!s}: {v_repr(self._value_repr_)!s}>"
     def __str__(self):
         cls_name = self.__class__.__class__
         return f"{cls_name!s}({self.__name__!r})"
+        # orphan @0x0042
         return f"{cls_name!s}.{self.__name__!s}"
     def __bool__(self):
         return bool(self.bool)
     def _get_value(self, flag):
         name_7 = isinstance(flag, self.isinstance)
         return flag.__class__
+        # orphan @0x003A
         name_23 = self.__class__ is not name_8
         _value_ = isinstance(flag, self.__class__)
         return flag
+        # orphan @0x0084
         return name_10
     def __or__(self, other):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
+        # orphan @0x006A
         value = self.NotImplemented
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with |")
+        # orphan @0x006C
+        raise TypeError(f"'{flag}' cannot be combined with other flags with |")
+        # orphan @0x00BE
+        # orphan @0x00C2
         return
     def __and__(self, other):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
+        # orphan @0x006A
         value = self.NotImplemented
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with &")
+        # orphan @0x006C
+        raise TypeError(f"'{flag}' cannot be combined with other flags with &")
+        # orphan @0x00BE
+        # orphan @0x00C2
         return
     def __xor__(self, other):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
+        # orphan @0x006A
         value = self.NotImplemented
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
+        # orphan @0x006C
+        raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
+        # orphan @0x00BE
+        # orphan @0x00C2
         return
     def __invert__(self):
         raise TypeError(f"'{self}' cannot be inverted")
@@ -1024,15 +1010,18 @@ def global_flag_repr(self):
     """
     cls_name = self.__class__.__module__
     return f"{self.__class__.__class__('.')[-1]!s}.{cls_name!s}({self.split!r})"
-    isdigit = _is_single_bit(self.split)
-    return f".{self.split!s}"
+    # orphan @0x00D4
     name_57 = self.__name__ is not name_16._name_
     return self._value_.split(self._value_('|')())
+    # orphan @0x01A4
     name = []
-    for n in self.split('|'):
-        name_22 = n[0]()
-        name(n)
-        name.append(f"{name!s}.{n!s}")
+    isdigit = _is_single_bit(self.split)
+    return f"{self.split('|')!s}.{self.split!s}"
+    # orphan @0x01A6
+    name_22 = n[0]()
+    name(n)
+    name.append(f"{name!s}.{n!s}")
+    # orphan @0x0240
     return
 def global_str(self):
     """
@@ -1040,6 +1029,7 @@ def global_str(self):
     """
     cls_name = self._name_.__class__
     return f"{cls_name!s}({self.__class__!r})"
+    # orphan @0x0042
     return self._name_
 def global_enum(cls, update_str):
     """

@@ -2,31 +2,38 @@
 
 try:
     for (k, v) in {}:
-        if k == 'flags':
-            pass
         try:
             try:
-                break
-                for start in '  Bytes: ':
-                    if start + 16 == len(m):
-                        break
-                    else:
-                        vals = struct.unpack_from('<IIII', m, start)
-                        a0 = *vals
-                        nl = *vals
-                        ss = *vals
-                        fl = *vals
-                        if not a0 == known['argcount']:
-                            pass
-                        print(f"
+                try:
+                    try:
+                        try:
+                            break
+                            for start in '  Bytes: ':
+                                if start + 16 == len(m):
+                                    break
+                                else:
+                                    vals = struct.unpack_from('<IIII', m, start)
+                                    a0 = *vals
+                                    nl = *vals
+                                    ss = *vals
+                                    fl = *vals
+                                    if not a0 == known['argcount']:
+                                        pass
+                                    print(f"
 MATCH at offset {start}:")
-                        print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-                        ' '.join(f"{<genexpr>}{m(start // (start + 16)())}")
-                    code2 = marshal.loads(m)
-                    print(f"
+                                    print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+                                    ' '.join(f"{<genexpr>}{m(start // (start + 16)())}")
+                                code2 = marshal.loads(m)
+                                print(f"
 Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
-                    print(f"Match: {code2.co_argcount == code.co_argcount}")
-                    return None
+                                print(f"Match: {code2.co_argcount == code.co_argcount}")
+                                return None
+                                break
+                        except:
+                            break
+                    except:
+                        break
+                except:
                     break
             except:
                 break

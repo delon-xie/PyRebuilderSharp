@@ -5,22 +5,20 @@ import sys
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
     raise
-    off = 16
-    raw = data[off]
-    type_byte = raw & 127
-off += 1
-for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
-    val = struct.unpack('<i', data[off:off + 4])[0]
-    print(f"  {name}: {val} (off {off})")
-    off += 4
+    for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+        val = struct.unpack('<i', data[off:off + 4])[0]
+        print(f"  {name}: {val} (off {off})")
+        off = off + 4
+# orphan @0x00D6
 'Next marshal at off='(f"{off}, byte={data[off]}{'#x'}")
 raw2 = data[off]
 type2 = raw2 & 127
 '  type_byte='(f"{raw2}{'#x'}, clean={type2}")
-if raw2 & 128:
-    print('  (FLAG_REF set, _refList.Count used)')
-    off2 = off + 1
-    off2 = off + 1
+# orphan @0x011E
+print('  (FLAG_REF set, _refList.Count used)')
+off2 = off + 1
+# orphan @0x0130
+off2 = off + 1
 # orphan @0x0138
 # orphan @0x0140
 length = data[off2]
@@ -40,7 +38,4 @@ return None
 # orphan @0x01D4
 print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")
 return None
-# orphan @0x029A
-# orphan @0x02DE
-# orphan @0x0358
-# [SUMMARY] 19 blocks · 10 processed · 10 orphan · 254 instr
+# [SUMMARY] 16 blocks · 6 processed · 10 orphan · 254 instr

@@ -1,5 +1,5 @@
 # Decompiled from: <module>
 
-if not True:
-    pass
-# [SUMMARY] 2 blocks · 2 processed · 0 orphan · 4 instr
+a = 1
+return None
+# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 4 instr

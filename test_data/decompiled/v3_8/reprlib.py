@@ -21,19 +21,19 @@ def recursive_repr(fillvalue):
 class Repr:
     _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
     def __init__(self):
-        self.name_0 = maxlevel
-        self.name_1 = maxtuple
-        self.name_2 = maxlist
-        self.name_3 = maxarray
-        self.name_4 = maxdict
-        self.name_5 = maxset
-        self.name_6 = maxfrozenset
-        self.name_7 = maxdeque
-        self.name_8 = maxstring
-        self.name_9 = maxlong
-        self.name_10 = maxother
-        self.name_11 = fillvalue
-        self.name_12 = indent
+        self.maxlevel = maxlevel
+        self.maxtuple = maxtuple
+        self.maxlist = maxlist
+        self.maxarray = maxarray
+        self.maxdict = maxdict
+        self.maxset = maxset
+        self.maxfrozenset = maxfrozenset
+        self.maxdeque = maxdeque
+        self.maxstring = maxstring
+        self.maxlong = maxlong
+        self.maxother = maxother
+        self.fillvalue = fillvalue
+        self.indent = indent
     def repr(self, x):
         return self.repr1(x, self.maxlevel)
     def repr1(self, x, level):
@@ -65,7 +65,7 @@ class Repr:
         if self.indent is None:
             return ', '.join(pieces)
         # orphan @0x0044
-        indent = ' '
+        indent *= ' '
         # orphan @0x004C
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
@@ -84,9 +84,8 @@ class Repr:
         # orphan @0x001C
         pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
         n = len(x)
-        if level <= 0:
-            if n:
-                s = self.fillvalue
+        if (level <= 0) and n:
+            s = self.fillvalue
         # orphan @0x004C
         pieces.append(self.fillvalue)
         # orphan @0x0058
@@ -156,12 +155,11 @@ class Repr:
         try:
             s = builtins.repr(x)
         except ValueError:
-            pass
+            exc = None
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-        exc = None
         # orphan @0x00F8
         return s
     def repr_instance(self, x, level):
@@ -179,7 +177,7 @@ def _possibly_sorted(x):
     try:
         pass
     except Exception:
-        pass
+        return None
     return
     return
 aRepr = Repr()

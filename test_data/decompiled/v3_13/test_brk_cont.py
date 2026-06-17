@@ -1,9 +1,11 @@
 # Decompiled from: <module>
 
-if not range:
-    pass
-elif not range:
-    pass
-# orphan @0x005C
-# orphan @0x006C
-# [SUMMARY] 6 blocks · 4 processed · 2 orphan · 25 instr
+for i in range(10):
+    if i == 5:
+        break
+    if i == 1:
+        pass
+    else:
+        a = i
+break
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 25 instr

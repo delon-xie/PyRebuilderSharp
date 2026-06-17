@@ -1,9 +1,12 @@
 # Decompiled from: <module>
 
-if True:
-    for n in None(x):
+x = 10
+if x == 0:
+    for n in range(x):
         y = n
 return
-y = -1
 # orphan @0x0032
-# [SUMMARY] 7 blocks · 7 processed · 1 orphan · 26 instr
+# orphan @0x003A
+y = -1
+return None
+# [SUMMARY] 7 blocks · 6 processed · 2 orphan · 26 instr

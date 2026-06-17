@@ -1,25 +1,26 @@
 # Decompiled from: <module>
 
 try:
-    f = None('test.txt')
-except IOError:
+    x = 1 / 0
+except:
     break
 try:
+    f = open('test.txt')
+except IOError:
     break
-except:
-    pass
-for i in range(None):
+for i in range(10):
     a = i
 for x in items:
     y = x
-for n in range(None):
-    if True:
+for n in range(5):
+    if n == 3:
         break
-    elif not True:
+    elif not n == 1:
         pass
 return None
 raise
 raise
+# orphan @0x00AE
 # orphan @0x00CE
 return
-# [SUMMARY] 28 blocks · 28 processed · 1 orphan · 82 instr
+# [SUMMARY] 28 blocks · 27 processed · 2 orphan · 82 instr

@@ -14,17 +14,14 @@ def test_until_broken(exprs):
     pycf = '/tmp/expr_bs.3.10.pyc'
     with open(pyf, 'w') as f:
         f.write(code)
+    return 'OK'
     return 'NO_COMPILE'
+    # orphan @0x0096
     r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
     out = r2.stdout + r2.stderr.strip()
-    if 'Decompilation failed' in out:
-        return 'CRASH'
-    # orphan @0x009A
+    return 'CRASH'
     # orphan @0x00A2
     return f"CONDITIONAL: {out[None:80]}"
-    # orphan @0x00B4
-    return 'OK'
-    # orphan @0x0156
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:
         pass

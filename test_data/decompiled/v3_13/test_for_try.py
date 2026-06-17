@@ -1,8 +1,14 @@
 # Decompiled from: <module>
 
-if not True:
+try:
+    total += 1
+except:
+    break
+total = 0
+for i in range(3):
     pass
+break
+# orphan @0x0036
 # orphan @0x003C
-# orphan @0x0040
-# orphan @0x0060
-# [SUMMARY] 9 blocks · 7 processed · 3 orphan · 26 instr
+raise
+# [SUMMARY] 9 blocks · 7 processed · 2 orphan · 26 instr

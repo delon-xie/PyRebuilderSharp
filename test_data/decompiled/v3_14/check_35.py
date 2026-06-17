@@ -5,15 +5,15 @@ import subprocess
 import os
 import struct
 py35 = os.path.expanduser('~/.pyenv/versions/3.5.10/bin/python')
-result = None([py35, '-c', 'import marshal, dis; c=compile(\'a=1\',\'<t>\',\'exec\'); m=marshal.dumps(c); print(len(m)); print(\' \'.join(\'{:02x}\'.format(b) for b in m))'], True, True, ('capture_output', 'text', 'timeout'))
-None('3.5 marshal:')
+result = [py35, '-c', 'import marshal, dis; c=compile(\'a=1\',\'<t>\',\'exec\'); m=marshal.dumps(c); print(len(m)); print(\' \'.join(\'{:02x}\'.format(b) for b in m))'](True, True, 10, ('capture_output', 'text', 'timeout'))
+print('3.5 marshal:')
 print(result.stdout.strip())
-result2 = None([py35, '-c', 'import dis; c=compile(\'a=1\',\'<t>\',\'exec\'); dis.dis(c); print(\'co_code:\', \' \'.join(\'{:02x}\'.format(b) for b in c.co_code))'], True, True, ('capture_output', 'text', 'timeout'))
-None("""
+result2 = [py35, '-c', 'import dis; c=compile(\'a=1\',\'<t>\',\'exec\'); dis.dis(c); print(\'co_code:\', \' \'.join(\'{:02x}\'.format(b) for b in c.co_code))'](True, True, 10, ('capture_output', 'text', 'timeout'))
+print("""
 Disassembly:""")
 print(result2.stdout.strip())
-result3 = None([py35, '-c', 'import dis; c=compile(\'a=1\',\'<t>\',\'exec\'); [print(i.offset, i.opname, i.arg) for i in dis.get_instructions(c)]'], True, True, ('capture_output', 'text', 'timeout'))
-None("""
+result3 = [py35, '-c', 'import dis; c=compile(\'a=1\',\'<t>\',\'exec\'); [print(i.offset, i.opname, i.arg) for i in dis.get_instructions(c)]'](True, True, 10, ('capture_output', 'text', 'timeout'))
+print("""
 Instructions:""")
 print(result3.stdout.strip())
 return None

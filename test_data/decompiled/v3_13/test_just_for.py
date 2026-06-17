@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
-if not total:
-    pass
-# orphan @0x003C
-# [SUMMARY] 3 blocks · 2 processed · 1 orphan · 18 instr
+total = 0
+for i in range(3):
+    total += 1
+break
+# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 18 instr

@@ -1,25 +1,28 @@
 # Decompiled from: <module>
 
-name_0 = 'Check marshal fields for 3.7 code object'
-import name_1
-import name_2
-name_4 = None('a1 = None', '<test>', 'exec')
-None('Python 3.7 says:')
-'  argcount='(f"{name_4.name_6} nlocals={name_4.name_7} stacksize={name_4.name_8} flags={name_9}{None(name_4.name_10)}")
-name_13 = name_2.name_12(None(name_4))
+'Check marshal fields for 3.7 code object'
+import struct
+import marshal
+code = compile('a1 = None', '<test>', 'exec')
+print('Python 3.7 says:')
+print(f"  argcount={code.co_argcount} nlocals={code.co_nlocals} stacksize={code.co_stacksize} flags={hex(code.co_flags)}")
+m = bytes(marshal.dumps(code))
+print(f"
+Marshaled ({len(m)} bytes):")
+' '.join(<genexpr>(m + None()))
 """
-Marshaled ("""(f"{name_14}{None(name_13)} bytes):")
-' '.name_15(<genexpr>(name_13 + None()))
-None(f"{None + name_13}{None}")
-for _ in None:
-    name_19 = None(None, name_13, name_17)
-    if not name_1.name_18 + name_19 == name_4.name_6:
+Byte 0 = """(f"{m + 0}02x")
+for offset in ' '.join:
+    vals = struct.unpack_from('<IIII', m, offset)
+    if not vals + 0 == code.co_argcount:
         pass
-    if not True:
+    if not vals + 3 == code.co_flags:
         pass
     else:
-        None(f"{None}{name_17}{None}")
-        break
+        print(f"
+Fields found at offset {offset}:")
+        print(f"  [arg={vals + 0}, nlocals={vals + 1}, stacksize={vals + 2}, flags={hex(vals + 3)}]")
+        <genexpr>(f"{m}{offset(offset + 16())}")
 return None
 # [WARN] 3 instructions not decompiled
 #   @0x01F2: JUMP_BACKWARD arg=98

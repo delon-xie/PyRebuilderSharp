@@ -1,45 +1,47 @@
 # Decompiled from: <module>
 
-name_0 = 'Run AST comparison for test_control_flow across all versions'
-import name_1
-import name_2
-import name_3
-name_6 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-name_7 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-name_8 = name_1.name_4.name_5('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
-name_12 = name_10.name_11()
-name_10 := None(name_8)()(None, None, None)
-name_15 = name_3.name_14(None(name_12), ('indent',))
-name_16 = None
-for _ in name_21:
-    name_19 = name_1.name_4.name_18(name_7, 'test_control_flow.%s.pyc' % name_17)
-    if not name_1.name_4.name_20(name_19):
-        None('⏭ %s: no pyc' % name_17)
+try:
+    expected_src = f.read()
+except:
+    pass
+try:
+    actual_ast = ast.parse(r.stdout)(2, ('indent',))
+    ok = expected_ast == actual_ast
+except Exception:
+    pass
+try:
+    print(f"❌ {ver}: parse error: {ex}")
+    print('  Output: %s' % (r.stdout + None))
+except:
+    ex = None
+__doc__ = 'Run AST comparison for test_control_flow across all versions'
+import os
+import subprocess
+import ast
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
+expected_ast = ast.parse(expected_src)(2, ('indent',))
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+for ver in []:
+    pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
+    if not os.path.exists(pyc):
+        print('⏭ %s: no pyc' % ver)
     else:
-        name_23 = None(['dotnet', 'run', '--project', name_6, '--', name_19], True, True, ('capture_output', 'text', 'timeout'))
-        name_25 = name_3.name_14(None(name_23.name_24), ('indent',))
-        name_26 = name_15 == name_25
-    if name_26:
-        pass
-    break
-    if not name_26:
-        for _ in name_27(name_28(name_15.name_29("""
-"""), name_25.name_29("""
-"""))):
-            if not name_31 == name_32:
-                pass
-            else:
-                None(f"  Line {name_30}: expected={name_31}
-           actual=  {name_32}")
-                name_21
+        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
 return None
 if not True:
     pass
 raise
-if name_33:
-    None(f"❌ {name_17}: parse error: {name_34}")
-    None('  Output: %s' % (name_23.name_24 + None))
-    name_34 = None
-    name_34 = None
+ex = None
+# orphan @0x046E
 raise
-# [SUMMARY] 24 blocks · 25 processed · 0 orphan · 263 instr
+# orphan @0x0472
+raise
+# [WARN] 5 instructions not decompiled
+#   @0x0214: JUMP_BACKWARD arg=178
+#   @0x037E: JUMP_BACKWARD arg=36
+#   @0x03A8: JUMP_BACKWARD arg=582
+#   @0x03B2: JUMP_BACKWARD arg=592
+#   @0x03B8: JUMP_BACKWARD arg=598
+# [SUMMARY] 41 blocks · 40 processed · 2 orphan · 263 instr

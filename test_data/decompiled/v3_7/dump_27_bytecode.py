@@ -21,9 +21,8 @@ flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
-if next_type <= next_type:
-    if True:
-        pass
+if (next_type <= next_type) and True:
+    pass
 # orphan @0x0148
 # orphan @0x0150
 # orphan @0x0152

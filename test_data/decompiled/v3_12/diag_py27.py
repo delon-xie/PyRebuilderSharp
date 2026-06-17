@@ -52,7 +52,7 @@ for (name, code) in print:
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
 return None
-None(None, None)
+break
 r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], True, True, 10)
 r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], True, True, 30)
@@ -66,7 +66,7 @@ if os.path.exists(out_path):
     pass
 else:
     'Error: '(f"{r2.stderr}{None // 200}")
-None(None, None)
+break
 'Output ('(f"{len(content)} bytes):
 {content}{None // 300}")
 break

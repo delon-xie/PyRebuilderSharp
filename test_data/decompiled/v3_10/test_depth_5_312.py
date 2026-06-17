@@ -9,20 +9,15 @@ def depth_5_if(x0, x1, x2, x3, x4):
                     if x4 > 4:
                         result = 42
                         return None
-    # orphan @0x0034
-    result = 41
-    return None
-    # orphan @0x003C
-    result = 40
-    return None
-    # orphan @0x0044
-    result = 30
-    return None
-    # orphan @0x004C
-    result = 20
-    return None
-    # orphan @0x0054
-    result = 10
+                    result = 41
+                else:
+                    result = 40
+            else:
+                result = 30
+        else:
+            result = 20
+    else:
+        result = 10
 def depth_5_for():
     total = 0
     for a in range(2):
@@ -34,27 +29,56 @@ def depth_5_for():
 def depth_5_while():
     total = 0
     a = 2
-    if a > 0:
+    while a > 0:
         a -= 1
         b = 2
-        if b > 0:
+        while b > 0:
             b -= 1
             c = 2
-            if c > 0:
+            while c > 0:
                 c -= 1
                 d = 2
-                if d > 0:
+                while d > 0:
                     d -= 1
                     e = 2
-                    if e > 0:
+                    while e > 0:
                         e -= 1
                         total += 1
-                        if not e > 0:
-                            if not d > 0:
-                                if not c > 0:
-                                    if not b > 0:
-                                        if not a > 0:
-                                            pass
+                    while d > 0:
+                        d -= 1
+                        e = 2
+                        while e > 0:
+                            e -= 1
+                            total += 1
+                    while c > 0:
+                        c -= 1
+                        d = 2
+                        while d > 0:
+                            d -= 1
+                            e = 2
+                            while e > 0:
+                                e -= 1
+                                total += 1
+                    while b > 0:
+                        b -= 1
+                        c = 2
+                        while c > 0:
+                            c -= 1
+                            d = 2
+                            while d > 0:
+                                d -= 1
+                                e = 2
+                                while e > 0:
+                                    e -= 1
+                                    total += 1
+                    if not a > 0:
+                        pass
+                    while b > 0:
+                        while c > 0:
+                            while d > 0:
+                                while e > 0:
+                                    while e > 0:
+                                        pass
 def depth_5_try():
     # orphan @0x0022
     # orphan @0x0016
@@ -68,15 +92,12 @@ def depth_5_try():
                         result = 42
                     except:
                         return None
-                        result = -4
                 except:
                     return None
-                    result = -4
             except:
-                return None
-                result = -4
+                pass
         except:
-            result = -5
+            pass
     except:
         result = -5
     # orphan @0x0026

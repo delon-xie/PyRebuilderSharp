@@ -7,15 +7,18 @@ except:
     break
 try:
     for ins in []:
-        if ins.offset == ins.offset:
-            if not True:
-                pass
+        try:
             try:
+                if not True:
+                    pass
                 try:
-                    break
                     try:
+                        break
                         try:
-                            pass
+                            try:
+                                pass
+                            except:
+                                break
                         except:
                             break
                     except:
@@ -24,13 +27,14 @@ try:
                     break
             except:
                 break
+        except:
+            break
 except:
     break
 import dis
 import marshal
 import types
 import struct
-None(None, None)
 for const in code.co_consts:
     if not isinstance(const, types.CodeType):
         pass

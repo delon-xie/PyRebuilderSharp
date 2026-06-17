@@ -8,21 +8,18 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
     f.read(16)
     code = marshal.load(f)
     for const in const.co_name == 'depth_5_while':
-        if isinstance(const, types.CodeType):
-            if const.co_name == 'depth_5_while':
-                for (i, instr) in i + 1 < len(instrs):
-                    if instr.<genexpr> in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-                        if instr.arg is not None:
-                            leaders.add(instr.arg)
-                        break
-                        if any(<lambda>(block_instrs)):
-                            last = block_instrs[-1]
-                            print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].end + 2}")
-                    if instr.<genexpr> in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
-                        if instr.arg is not None:
-                            leaders.add(instr.arg)
-                    if i + 1 < len(instrs):
-                        leaders.add(instrs[i + 1].end)
+        if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
+            for (i, instr) in i + 1 < len(instrs):
+                if (instr.<genexpr> in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD')) and (instr.arg is not None):
+                    leaders.add(instr.arg)
+                break
+                if any(<lambda>(block_instrs)):
+                    last = block_instrs[-1]
+                    print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].end + 2}")
+                if (instr.<genexpr> in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER')) and (instr.arg is not None):
+                    leaders.add(instr.arg)
+                if i + 1 < len(instrs):
+                    leaders.add(instrs[i + 1].end)
         for (i, offset) in any(<lambda>(block_instrs)):
             if i + 1 < len(sorted_leaders):
                 pass

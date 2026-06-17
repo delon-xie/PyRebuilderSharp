@@ -6,27 +6,24 @@ with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 while i < len(lines):
     line = lines[i]
-    if '***' in line:
-        if ':' in line:
-            match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
-            if match:
-                test_name = match.group(1)
-                status = match.group(2)
-                j = i + 1
+    if ('***' in line) and (':' in line):
+        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+        if match:
+            test_name = match.group(1)
+            status = match.group(2)
+            j = i + 1
     i += 1
     while j < len(lines):
         if j < i + 30:
             next_line = lines[j]
             if next_line.startswith('***'):
                 pass
-        if next_line.strip().startswith(' '):
-            if '.pyc' in next_line:
-                version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-                if version_match:
-                    version = version_match.group(1)
-                    if version in ('3.7', '3.8', '3.9', '3.10'):
-                        if status == 'PASS':
-                            pass
+        if next_line.strip().startswith(' ') and ('.pyc' in next_line):
+            version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+            if version_match:
+                version = version_match.group(1)
+                if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
+                    pass
         j += 1
 print('======================================================================')
 print('Python 3.7-3.10 版本测试通过率统计')

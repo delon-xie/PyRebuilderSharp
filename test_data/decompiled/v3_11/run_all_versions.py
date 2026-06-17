@@ -28,19 +28,28 @@ try:
             try:
                 break
                 for i in range(max(len(exp_lines), len(act_lines))):
-                    INPUT_FILE = i < len(exp_lines)
-                    INPUT_FILE = i < len(act_lines)
-                    exp_lines = e != a
-                    print(f"  Line {i}: expected={e}")
-                    print(f"           actual=  {a}")
-                    break
-                try:
                     try:
-                        pass
+                        INPUT_FILE = i < len(exp_lines)
+                        try:
+                            INPUT_FILE = i < len(act_lines)
+                            try:
+                                exp_lines = e != a
+                                print(f"  Line {i}: expected={e}")
+                                print(f"           actual=  {a}")
+                                break
+                                try:
+                                    try:
+                                        pass
+                                    except:
+                                        name_55 = Exception
+                                except:
+                                    name_55 = Exception
+                            except:
+                                name_55 = Exception
+                        except:
+                            name_55 = Exception
                     except:
                         name_55 = Exception
-                except:
-                    name_55 = Exception
             except:
                 name_55 = Exception
         except:
@@ -57,7 +66,6 @@ import sys
 PROJECT = os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
-None(None, None)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 for ver in versions:

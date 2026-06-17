@@ -7,15 +7,7 @@ with open('/tmp/test_full.txt', 'r') as f:
 while i < len(lines):
     pass
 line = lines[i]
-if not '***' in line:
-    if ':' in line:
-        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
-        if match:
-            test_name = match.group(1)
-            status = match.group(2)
-            j = i + 1
-            found_versions = []
-elif True:
+if ('***' in line) and True:
     version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
     if version_match:
         version = version_match.group(1)
@@ -26,6 +18,12 @@ elif True:
             if debug_count <= 5:
                 for (v, line_text) in found_versions:
                     print(f"  Found version: {v} in: {line_text}")
+match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+if match:
+    test_name = match.group(1)
+    status = match.group(2)
+    j = i + 1
+    found_versions = []
 # orphan @0x00B0
 # orphan @0x00BC
 # orphan @0x00CA
@@ -38,7 +36,4 @@ print()
 i += 1
 print(f"Total tests with versions found: {debug_count}")
 return None
-# orphan @0x01BA
-# orphan @0x01D6
-# orphan @0x01F6
-# [SUMMARY] 29 blocks · 20 processed · 10 orphan · 201 instr
+# [SUMMARY] 29 blocks · 23 processed · 10 orphan · 201 instr

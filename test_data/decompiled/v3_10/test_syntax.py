@@ -2870,8 +2870,8 @@ class SyntaxWarningTest(unittest.TestCase):
         """
         with self.assertWarnsRegex(SyntaxWarning, errtext):
             compile(code, filename, mode)
-            if not True:
-                raise
+        # orphan @0x002E
+        raise
     def test_return_in_finally(self):
         source = textwrap.dedent("""
             def f():
@@ -2946,15 +2946,16 @@ class SyntaxErrorTestCase(unittest.TestCase):
         try:
             compile(code, filename, mode)
         except SyntaxError:
-            pass
-        self.fail('compile() did not raise SyntaxError')
-        return None
-        err = None
-        return None
+            mo = re.search(errtext, str(err))
+            self.assertEqual(err.filename, filename)
+            self.fail('SyntaxError did not contain %r' % (errtext))
+            self.fail('SyntaxError is not a %s' % subclass.__name__)
+            self.assertEqual(err.lineno, lineno)
+            self.assertEqual(err.offset, offset)
+            self.assertEqual(err.end_lineno, end_lineno)
+            yield from end_lineno is not None
         err = None
         raise
-        # orphan @0x0108
-        # orphan @0x0198
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
     def test_curly_brace_after_primary_raises_immediately(self):
@@ -3133,9 +3134,13 @@ def fib(n):
 """
         try:
             compile(s1, '<string>', 'exec')
-        except SyntaxError:
+        finally:
             pass
+        # orphan @0x0076
         raise
+        # orphan @0x00D6
+        SyntaxError
+        self.fail('Indented statement over multiple lines is valid')
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:
@@ -3144,8 +3149,8 @@ if x:
   foo = 1
         """
         self.assertRaises(IndentationError, exec, code)
-        @support.cpython_only
-def test_disallowed_type_param_names(self):
+    @support.cpython_only
+    def test_disallowed_type_param_names(self):
         self._check_error('class A[__classdict__]: pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
         self._check_error('def f[__classdict__](): pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
         self._check_error('type T[__classdict__] = tuple[__classdict__]', 'reserved name \'__classdict__\' cannot be used for type parameter')
@@ -3154,8 +3159,8 @@ def test_disallowed_type_param_names(self):
 class A:
     class B[{name}]: pass
                 ", '<testcase>', mode='exec')
-        @support.cpython_only
-def test_nested_named_except_blocks(self):
+    @support.cpython_only
+    def test_nested_named_except_blocks(self):
         code = ''
         for i in range(12):
             code += f"{'    ' * i}try:
@@ -3166,8 +3171,8 @@ def test_nested_named_except_blocks(self):
 "
         code += f"{'                                                '}pass"
         self._check_error(code, 'too many statically nested blocks')
-        @support.cpython_only
-def test_with_statement_many_context_managers(self):
+    @support.cpython_only
+    def test_with_statement_many_context_managers(self):
         def get_code(n):
             code = textwrap.dedent("""
                 def bug():
@@ -3188,14 +3193,15 @@ def test_with_statement_many_context_managers(self):
             if not True:
                 raise
             break
-            for n in range(MAX_MANAGERS, MAX_MANAGERS + 5):
-                self.subTest(f"out of range: n={n!r}")
-                self._check_error(get_code(n), 'too many statically nested blocks')
-                break
-                if not True:
-                    raise
-        @support.cpython_only
-def test_async_with_statement_many_context_managers(self):
+        for n in range(MAX_MANAGERS, MAX_MANAGERS + 5):
+            self.subTest(f"out of range: n={n!r}")
+            self._check_error(get_code(n), 'too many statically nested blocks')
+            break
+            if not True:
+                raise
+            break
+    @support.cpython_only
+    def test_async_with_statement_many_context_managers(self):
         def get_code(n):
             code = [textwrap.dedent("""
                 async def bug():
@@ -3216,12 +3222,13 @@ def test_async_with_statement_many_context_managers(self):
             if not True:
                 raise
             break
-            for n in range(MAX_MANAGERS, MAX_MANAGERS + 5):
-                self.subTest(f"out of range: n={n!r}")
-                self._check_error(get_code(n), 'too many statically nested blocks')
-                break
-                if not True:
-                    raise
+        for n in range(MAX_MANAGERS, MAX_MANAGERS + 5):
+            self.subTest(f"out of range: n={n!r}")
+            self._check_error(get_code(n), 'too many statically nested blocks')
+            break
+            if not True:
+                raise
+            break
     def test_barry_as_flufl_with_syntax_errors(self):
         code = """
 def func1():
@@ -3304,8 +3311,8 @@ a=1
     "line3"
     x=1
 )""", 'Perhaps you forgot a comma', lineno=4)
-        @support.cpython_only
-def test_syntax_error_on_deeply_nested_blocks(self):
+    @support.cpython_only
+    def test_syntax_error_on_deeply_nested_blocks(self):
         source = """
 while 1:
  while 2:
@@ -3332,8 +3339,8 @@ while 1:
                       break
 """
         self._check_error(source, 'too many statically nested blocks')
-        @support.cpython_only
-def test_error_on_parser_stack_overflow(self):
+    @support.cpython_only
+    def test_error_on_parser_stack_overflow(self):
         source = '-' * 100000 + '4'
         for mode in ('exec', 'eval', 'single'):
             self.subTest(mode=mode)
@@ -3343,16 +3350,18 @@ def test_error_on_parser_stack_overflow(self):
             if not True:
                 raise
             break
+            break
             if not True:
                 raise
-        @support.skip_wasi_stack_overflow()
+            break
+    @support.skip_wasi_stack_overflow()
     @support.cpython_only
-def test_deep_invalid_rule(self):
+    def test_deep_invalid_rule(self):
         source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
         with self.assertRaises(SyntaxError):
             compile(source, '<string>', 'exec')
-            if not True:
-                raise
+        # orphan @0x0030
+        raise
     def test_except_stmt_invalid_as_expr(self):
         self._check_error(textwrap.dedent("""
                 try:
@@ -3467,4 +3476,4 @@ def load_tests(loader, tests, pattern):
 if __name__ == '__main__':
     unittest.main()
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 66 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 66 instr

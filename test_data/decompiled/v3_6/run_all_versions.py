@@ -16,40 +16,28 @@ versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-    if not os.path.exists(pyc):
+    if os.path.exists(pyc):
+        if True:
+            print(f"  Line {i}: expected={e}")
+            print(f"           actual=  {a}")
+    else:
         print(f"⏭ {ver}: .pyc not found")
-        r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
-        actual_src = r.stdout
-        try:
-            actual_ast = ast.dump(ast.parse(actual_src), indent=2)
-            match = expected_ast == actual_ast
-            if match:
-                pass
-            if match:
-                pass
-            break
-            break
-            if not match:
-                exp_lines = expected_ast.split("""
-""")
-                act_lines = actual_ast.split("""
-""")
-            for i in range(max(len(exp_lines), len(act_lines))):
-                if i < len(exp_lines):
-                    pass
-                if i < len(act_lines):
-                    pass
-                if True:
-                    print(f"  Line {i}: expected={e}")
-                    print(f"           actual=  {a}")
-        except Exception:
-            print(f"❌ {ver}: AST parse failed - {e}")
-            print(f"  Decompiled: {actual_src[None:200]}")
-            yield from results
+        continue
     break
     break
-# orphan @0x0204
-# orphan @0x0218
+    if match:
+        pass
+    break
+    if not match:
+        exp_lines = expected_ast.split("""
+""")
+        act_lines = actual_ast.split("""
+""")
+    for i in range(max(len(exp_lines), len(act_lines))):
+        if i < len(exp_lines):
+            pass
+        if i < len(act_lines):
+            pass
 # orphan @0x021C
 # orphan @0x0226
 print(f"❌ {ver}: AST parse failed - {e}")
@@ -62,5 +50,4 @@ def <genexpr>(.0):
             pass
         yield
         break
-# orphan @0x0496
-# [SUMMARY] 32 blocks · 26 processed · 7 orphan · 349 instr
+# [SUMMARY] 32 blocks · 29 processed · 5 orphan · 349 instr

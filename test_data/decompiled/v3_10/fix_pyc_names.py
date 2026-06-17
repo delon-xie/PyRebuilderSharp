@@ -8,32 +8,33 @@ def get_python_version(filepath):
         magic = fp.read(4)
         raise
         return MAGIC_NUMBERS.get(magic, 'unknown')
-    # orphan @0x0052
 def fix_pyc_names(directory):
     for filename in os.listdir(directory):
         if filename.endswith('.pyc'):
             filepath = os.path.join(directory, filename)
             actual_version = get_python_version(filepath)
             if actual_version == 'unknown':
-                continue
-                if f".{actual_version}.pyc" in filename:
-                    continue
-                match = re.search('\\.(\\d+)\\.pyc$', filename)
-                if match:
-                    old_ver = match.group(1)
-                    new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
-            break
+                pass
+            new_filename = filename
             for version in MAGIC_NUMBERS.values():
                 if f".{version}.pyc" in new_filename:
-                    pass
-                break
-            if new_filename != filename:
-                new_filepath = os.path.join(directory, new_filename)
-                if os.path.exists(new_filepath):
-                    pass
+                    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                    break
+                if new_filename != filename:
+                    new_filepath = os.path.join(directory, new_filename)
+                    if os.path.exists(new_filepath):
+                        print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+                    else:
+                        os.rename(filepath, new_filepath)
+                        print(f"✓ Renamed {filename} -> {new_filename}")
+            import re
+            match = re.search('\\.(\\d+)\\.pyc$', filename)
+            if match:
+                old_ver = match.group(1)
+                new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 40 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 40 instr

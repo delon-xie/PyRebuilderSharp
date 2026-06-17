@@ -33,19 +33,28 @@ try:
             try:
                 break
                 for i in range(max(len(exp_lines), len(act_lines))):
-                    COMPILED_DIR = i < len(exp_lines)
-                    COMPILED_DIR = i < len(act_lines)
-                    match = e != a
-                    print('  Line %d: expected=%s' % (i, e))
-                    print('           actual=  %s' % a)
-                    break
-                try:
                     try:
-                        pass
+                        COMPILED_DIR = i < len(exp_lines)
+                        try:
+                            COMPILED_DIR = i < len(act_lines)
+                            try:
+                                match = e != a
+                                print('  Line %d: expected=%s' % (i, e))
+                                print('           actual=  %s' % a)
+                                break
+                                try:
+                                    try:
+                                        pass
+                                    except:
+                                        name_55 = Exception
+                                except:
+                                    name_55 = Exception
+                            except:
+                                name_55 = Exception
+                        except:
+                            name_55 = Exception
                     except:
                         name_55 = Exception
-                except:
-                    name_55 = Exception
             except:
                 name_55 = Exception
         except:
@@ -63,7 +72,6 @@ import sys
 PROJECT = os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
-None(None, None)
 def <genexpr>(.0):
     for (v, r) in .0:
         yield 1

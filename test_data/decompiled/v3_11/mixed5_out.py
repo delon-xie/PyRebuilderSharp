@@ -37,20 +37,26 @@ def mixed_4(n):
     try:
         name_1 = n > 0
         for i in j < i:
-            j = 0
-            name_25 = j < i
-            j += 1
-            total += j
-            break
+            try:
+                try:
+                    name_1 = n > 0
+                except:
+                    break
+                j = 0
+                name_25 = j < i
+                j += 1
+            except:
+                break
+            try:
+                total += j
+            except:
+                break
             raise
         return
-        try:
-            break
-        except:
-            pass
     except:
         break
     total = 0
+    # orphan @0x0060
     # orphan @0x008E
     raise
 return None

@@ -38,7 +38,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     return wrapper
     # orphan @0x002A
     setattr(wrapper, attr, value)
-def wraps():
+def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
        Returns a decorator that invokes update_wrapper() with the decorated
@@ -47,106 +47,86 @@ def wraps():
        This is a convenience function to simplify applying partial() to
        update_wrapper().
     """
-    return partial(update_wrapper, wrapped=var_0, assigned=var_1, updated=var_2)
+    return partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)
 def _gt_from_lt(self, other):
     'Return a > b.  Computed by @total_ordering from (not a < b) and (a != b).'
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0022
-    return self != other
-    # orphan @0x004A
+    elif not not op_result:
+        pass
 def _le_from_lt(self, other):
     'Return a <= b.  Computed by @total_ordering from (a < b) or (a == b).'
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0020
-    return self == other
-    # orphan @0x0046
+    elif op_result:
+        return
 def _ge_from_lt(self, other):
     'Return a >= b.  Computed by @total_ordering from (not a < b).'
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
     return not op_result
 def _ge_from_le(self, other):
     'Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b).'
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0022
-    return self == other
-    # orphan @0x004A
+    elif not op_result:
+        return
 def _lt_from_le(self, other):
     'Return a < b.  Computed by @total_ordering from (a <= b) and (a != b).'
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0020
-    return self != other
-    # orphan @0x0046
+    elif not op_result:
+        pass
 def _gt_from_le(self, other):
     'Return a > b.  Computed by @total_ordering from (not a <= b).'
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
     return not op_result
 def _lt_from_gt(self, other):
     'Return a < b.  Computed by @total_ordering from (not a > b) and (a != b).'
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0022
-    return self != other
-    # orphan @0x004A
+    elif not not op_result:
+        pass
 def _ge_from_gt(self, other):
     'Return a >= b.  Computed by @total_ordering from (a > b) or (a == b).'
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0020
-    return self == other
-    # orphan @0x0046
+    elif op_result:
+        return
 def _le_from_gt(self, other):
     'Return a <= b.  Computed by @total_ordering from (not a > b).'
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
     return not op_result
 def _le_from_ge(self, other):
     'Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b).'
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0022
-    return self == other
-    # orphan @0x004A
+    elif not op_result:
+        return
 def _gt_from_ge(self, other):
     'Return a > b.  Computed by @total_ordering from (a >= b) and (a != b).'
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    # orphan @0x0020
-    return self != other
-    # orphan @0x0046
+    elif not op_result:
+        pass
 def _lt_from_ge(self, other):
     'Return a < b.  Computed by @total_ordering from (not a >= b).'
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
     return not op_result
 _convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
@@ -154,14 +134,11 @@ def total_ordering(cls):
     roots = total_ordering.<locals>.<setcomp>(_convert)
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
-    elif opname not in roots:
-        opfunc.__name__ = opname
-        break
-    # orphan @0x001E
     root = max(roots)
-    # orphan @0x002E
-    # orphan @0x0030
-    # orphan @0x0052
+    for (opname, opfunc) in _convert[root]:
+        if opname not in roots:
+            opfunc.__name__ = opname
+            break
     return
 def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
@@ -193,12 +170,12 @@ def reduce(function, sequence, initial):
             raise
             raise
             value = initial
+    value = initial
     for element in it:
-        pass
+        value = function(value, element)
     return value
     # orphan @0x0034
     raise
-    # orphan @0x003A
 try:
     from _functools import reduce
 except ImportError:
@@ -208,67 +185,46 @@ class _PlaceholderType:
 
     Used as a placeholder for partial arguments.
     """
-    def __init_subclass__(cls):
-        raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
+    _PlaceholderType__instance = None
     __slots__ = []
     def __init_subclass__(cls):
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
     def __new__(cls):
         if cls._PlaceholderType__instance is None:
             cls._PlaceholderType__instance = object.__new__(cls)
-            return cls._PlaceholderType__instance
+        return cls._PlaceholderType__instance
     def __repr__(self):
         return 'Placeholder'
     def __reduce__(self):
         return 'Placeholder'
 Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
-    # orphan @0x0008
     if not args:
         return (0, None)
+    nargs = len(args)
     order = []
     j = nargs
     for (i, a) in enumerate(args):
         if a is Placeholder:
             order.append(j)
             j += 1
-            continue
+        else:
+            order.append(i)
     phcount = j - nargs
     if phcount:
         pass
-    # orphan @0x0066
     return (phcount, merger)
 def _partial_new(cls, func):
-    # orphan @0x005E
-    # orphan @0x0056
-    raise TypeError('trailing Placeholders are not allowed')
-    # orphan @0x004A
-    # orphan @0x0046
-    # orphan @0x001E
-    base_cls = partialmethod
     if issubclass(cls, partial):
         base_cls = partial
         if not callable(func):
             raise TypeError('the first argument must be callable')
-        elif not True:
-            raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
-        elif isinstance(func, base_cls):
-            pto_phcount = func._phcount
-            tot_args = func.args
-            if args:
-                tot_args += args
-                if pto_phcount:
-                    pass
-    elif not True:
-        pass
-    # orphan @0x00A8
-    # orphan @0x00B2
-    # orphan @0x00B4
-    tot_args = (Placeholder) * (pto_phcount - nargs)
-    tot_args = func._merger(tot_args)
-    # orphan @0x00D6
-    tot_args += args[pto_phcount:]
-    # orphan @0x01BC
+        elif args and (args[-1] is Placeholder):
+            raise TypeError('trailing Placeholders are not allowed')
+    else:
+        base_cls = partialmethod
+    if not hasattr(func, '__get__'):
+        raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
 def _partial_repr(self):
     cls = type(self)
     module = cls.__module__
@@ -294,55 +250,25 @@ class partial:
                 raise
                 raise
                 pto_args = self.args
+                keywords = keywords
+                return pto_args(**keywords)
+        pto_args = self.args
         keywords = keywords
         return pto_args(**keywords)
         # orphan @0x0050
         raise
-        # orphan @0x0058
     def __get__(self, obj, objtype):
         if obj is None:
             return self
-        return
-        # orphan @0x000C
+        return MethodType(self, obj)
     def __reduce__(self):
-        if self.keywords:
-            if self.__dict__:
-                return ((None))
+        if self.keywords and self.__dict__:
+            return (())
     def __setstate__(self, state):
-        # orphan @0x0044
-        # orphan @0x0030
-        (func, args, kwds, namespace) = state
-        # orphan @0x0012
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
-        elif True:
+        elif len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
-        elif kwds is not None:
-            if isinstance(kwds, dict):
-                if namespace is not None:
-                    if not isinstance(namespace, dict):
-                        raise TypeError('invalid partial state')
-                    self._phcount = phcount
-                    self._merger = merger
-                self.keywords = kwds
-            self.__dict__ = namespace
-            self.func = func
-        elif True:
-            kwds = dict(kwds)
-        # orphan @0x007A
-        # orphan @0x007E
-        # orphan @0x008A
-        raise TypeError('trailing Placeholders are not allowed')
-        # orphan @0x0092
-        (phcount, merger) = _partial_prepare_merger(args)
-        args = tuple(args)
-        # orphan @0x00AE
-        kwds = {}
-        # orphan @0x00C8
-        # orphan @0x00D0
-        # orphan @0x011C
-        # orphan @0x0162
-        # orphan @0x01A4
     __class_getitem__ = classmethod(GenericAlias)
 try:
     from _functools import partial
@@ -367,11 +293,12 @@ class partialmethod:
                 except IndexError:
                     raise
                     raise
+                    keywords = keywords
+                    return pto_args(**keywords)
             keywords = keywords
             return pto_args(**keywords)
             # orphan @0x0050
             raise
-            # orphan @0x0058
         _method.__isabstractmethod__ = ().__isabstractmethod__
         return _method
     def __get__(self, obj, cls):
@@ -385,34 +312,37 @@ class partialmethod:
                     result.__self__ = new_func.__self__
                 except AttributeError:
                     pass
-        return
         # orphan @0x0068
         # orphan @0x0070
         result = self._make_unbound_method().__get__(obj, cls)
-        # orphan @0x00C2
-        # orphan @0x00F0
-        @property
-def __isabstractmethod__(self):
+        # orphan @0x0080
+        return result
+    @property
+    def __isabstractmethod__(self):
         return getattr(self.func, '__isabstractmethod__', False)
     __class_getitem__ = classmethod(GenericAlias)
 def _unwrap_partial(func):
-    if isinstance(func, partial):
+    while isinstance(func, partial):
         func = func.func
-        if not isinstance(func, partial):
-            return func
+    return func
+    # orphan @0x000A
+    func = func.func
 def _unwrap_partialmethod(func):
     prev = None
-    if func is not prev:
+    while func is not prev:
         prev = func
-        if isinstance(getattr(func, '__partialmethod__', None), partialmethod):
+        while isinstance(getattr(func, '__partialmethod__', None), partialmethod):
             func = func.__partialmethod__
-            if not isinstance(getattr(func, '__partialmethod__', None), partialmethod):
-                if isinstance(func, partialmethod):
-                    func = getattr(func, 'func')
-                    if not isinstance(func, partialmethod):
-                        pass
-            elif not func is not prev:
-                return func
+        while isinstance(func, partialmethod):
+            func = getattr(func, 'func')
+        func = _unwrap_partial(func)
+        if not func is not prev:
+            return func
+        while isinstance(getattr(func, '__partialmethod__', None), partialmethod):
+            while isinstance(getattr(func, '__partialmethod__', None), partialmethod):
+                pass
+    # orphan @0x0044
+    func = getattr(func, 'func')
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -431,20 +361,13 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     if kwds:
         for item in kwds.items():
             key += item
-    key = ()(_make_key.<locals>.<listcomp>(args))
-    if kwds:
-        key += (tuple)(_make_key.<locals>.<listcomp>(kwds.values()))
+    elif typed:
+        key += (tuple)(_make_key.<locals>.<listcomp>(args))
+        if kwds:
+            key += (tuple)(_make_key.<locals>.<listcomp>(kwds.values()))
         return key
-    # orphan @0x003A
-    # orphan @0x007A
-    # orphan @0x0086
-    # orphan @0x0096
-    return key[0]
-    # orphan @0x009E
-    return key
-    # orphan @0x00B4
-    # orphan @0x0124
-    # orphan @0x0134
+    elif (len(key) == 1) and True:
+        return key[0]
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
 
@@ -467,63 +390,24 @@ def lru_cache(maxsize, typed):
     """
     if True:
         if True:
-            if 0(callable):
-                pass
-            return
-        elif True:
-            user_function = 128
-            wrapper.cache_parameters = lru_cache.<locals>.<lambda>
+            pass
+        def decorating_function(user_function):
+            wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
             return update_wrapper(wrapper, user_function)
-    # orphan @0x005C
-    # orphan @0x0064
-    raise TypeError('Expected first argument to be an integer, a callable, or None')
-    # orphan @0x006C
-    def decorating_function(user_function):
-        wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
+        return decorating_function
+    elif True and True:
+        user_function = 128
+        wrapper.cache_parameters = lru_cache.<locals>.<lambda>
         return update_wrapper(wrapper, user_function)
-    # orphan @0x00D0
+    elif True:
+        raise TypeError('Expected first argument to be an integer, a callable, or None')
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
-    # orphan @0x0010
     if not True:
         raise TypeError('the first argument must be callable')
     elif # Unknown node: Slice == 0:
         def wrapper():
             result = 1(**kwds)
             return result
-        if () is None:
-            def wrapper():
-                if True:
-                    return result
-                return result
-                # orphan @0x002A
-                result = 1(**kwds)
-            def wrapper():
-                with _:
-                    (link_prev, link_next, _key, result) = link
-                    last = link_prev[link_next]
-                    yield from link + 1
-                    link(None, None, None)
-                    return last
-                    if not True:
-                        raise
-                    return result
-                    return result
-                    return result
-                    if not True:
-                        raise
-                    if True:
-                        if True:
-                            oldkey = result[oldroot[oldroot]]
-                            oldresult = key[oldroot]
-                            last = oldroot[key]
-                            link = [oldkey, last, key, result]
-                    return result
-    # orphan @0x00C6
-    def cache_info():
-        'Report cache statistics'
-        with _:
-            if not True:
-                raise
 try:
     from _functools import _lru_cache_wrapper
 except ImportError:
@@ -538,21 +422,20 @@ def _c3_merge(sequences):
 
     """
     result = []
-    for s1 in sequences:
+    for _ in sequences:
         return result
-        for s1 in sequences:
-            candidate = s1[0]
-            for s2 in sequences:
-                if candidate in s2[1:]:
-                    candidate = None
-                    break
-            break
-        if candidate is None:
-            raise RuntimeError('Inconsistent hierarchy')
-        for seq in 0:
-            if seq[0] == candidate:
-                pass
-    # orphan @0x0052
+    for s1 in sequences:
+        for s2 in sequences:
+            if candidate in s2[1:]:
+                candidate = None
+                break
+        break
+    if candidate is None:
+        raise RuntimeError('Inconsistent hierarchy')
+    result.append(candidate)
+    for seq in sequences:
+        if seq[0] == candidate:
+            pass
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -570,17 +453,18 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
-    # orphan @0x0046
     for i in enumerate(reversed(cls.__bases__)):
         if True:
             boundary = len(cls.__bases__) - i
             break
+        if True:
+            pass
+        explicit_bases = list(cls.__bases__[None:boundary])
         abstract_bases = []
         other_bases = list(cls.__bases__[boundary:])
-        for _ in boundary:
-            if True:
-                if not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
-                    break
+        for _ in []:
+            if True and not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
+                break
         for _ in abstract_bases:
             break
         explicit_c3_mros = _c3_mro.<locals>.<listcomp>(explicit_bases)
@@ -588,8 +472,6 @@ def _c3_mro(cls, abcs):
         other_c3_mros = _c3_mro.<locals>.<listcomp>(other_bases)
         return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
     boundary = 0
-    if True:
-        pass
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
@@ -600,14 +482,16 @@ def _compose_mro(cls, types):
     mro = []
     for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
         for sub in typ.__subclasses__():
-            if True:
-                if True:
-                    found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+            if True and True:
+                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
         if not found:
-            for sub in found:
-                for subcls in sub:
-                    if subcls not in mro:
-                        mro.append(subcls)
+            mro.append(typ)
+        else:
+            found.sort(key=len, reverse=True)
+        for sub in found:
+            for subcls in sub:
+                if subcls not in mro:
+                    mro.append(subcls)
     return
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -623,15 +507,12 @@ def _find_impl(cls, registry):
     match = None
     for t in mro:
         if match is not None:
-            if t in registry:
-                if t not in cls.__mro__:
-                    if match not in cls.__mro__:
-                        if not issubclass(match, t):
-                            raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
-        break
-        if t in registry:
+            if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
+                raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
+            break
+            return registry.get(match)
+        elif t in registry:
             match = t
-    return registry.get(match)
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -646,7 +527,6 @@ def singledispatch(func):
         if not args:
             raise
         return
-        # orphan @0x0012
     wrapper.register = object
     wrapper.dispatch = func
     wrapper.registry = getattr(func, '__name__', 'singledispatch function')(MappingProxyType)
@@ -660,12 +540,9 @@ class singledispatchmethod:
     callables as instance methods.
     """
     def __init__(self, func):
-        if not callable(func):
-            if not hasattr(func, '__get__'):
-                raise TypeError(f"{func!r} is not callable or a descriptor")
-            return
-        self.func = func
-        # orphan @0x0020
+        if callable(func) or not hasattr(func, '__get__'):
+            self.dispatcher = singledispatch(func)
+            self.func = func
     def register(self, cls, method):
         """generic_method.register(cls, func) -> func
 
@@ -674,8 +551,8 @@ class singledispatchmethod:
         return self.dispatcher.register(cls, func=method)
     def __get__(self, obj, cls):
         return _singledispatchmethod_get(self, obj, cls)
-        @property
-def __isabstractmethod__(self):
+    @property
+    def __isabstractmethod__(self):
         return getattr(self.func, '__isabstractmethod__', False)
     def __repr__(self):
         try:
@@ -687,7 +564,6 @@ def __isabstractmethod__(self):
         AttributeError
         name = '?'
         raise
-        # orphan @0x006A
 _NOT_FOUND = object()
 class cached_property:
     def __init__(self, func):
@@ -698,24 +574,17 @@ class cached_property:
     def __set_name__(self, owner, name):
         if self.attrname is None:
             self.attrname = name
-            return None
-        raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
-        # orphan @0x0014
+        elif name != self.attrname:
+            raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
     def __get__(self, instance, owner):
-        # orphan @0x002A
-        AttributeError
-        # orphan @0x001E
-        cache = instance.__dict__
-        # orphan @0x000C
         if instance is None:
             return self
-        elif True:
+        elif self.attrname is None:
             raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         # orphan @0x00BE
-        raise
-        # orphan @0x0152
+        TypeError
+        msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
+        raise TypeError(msg) from None
     __class_getitem__ = classmethod(GenericAlias)
 return None
-# orphan @0x041E
-# orphan @0x0516
-# [SUMMARY] 13 blocks · 12 processed · 2 orphan · 378 instr
+# [SUMMARY] 13 blocks · 14 processed · 3 orphan · 378 instr

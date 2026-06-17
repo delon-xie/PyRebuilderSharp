@@ -12,8 +12,10 @@ def recursive_repr(fillvalue):
             key = (id(self), get_ident())
             if True:
                 return
-            return result
-            # orphan @0x001A
+            try:
+                pass
+            finally:
+                pass
         wrapper.__module__ = (set())(getattr, '__module__')
         return wrapper
     return decorating_function
@@ -46,47 +48,39 @@ class Repr:
                 pass
         elif True:
             return method(x, level)
-        # orphan @0x0050
-        module = getattr(cls, '__module__', None)
         # orphan @0x006A
+        module = getattr(cls, '__module__', None)
         return method(x, level)
-        # orphan @0x0074
-        return self.repr_instance(x, level)
-        # orphan @0x00DE
     def _join(self, pieces, level):
-        # orphan @0x001C
         # orphan @0x0018
         return ''
-        # orphan @0x0014
         if self.indent is None:
             return ', '.join(pieces)
-        elif isinstance(indent, int):
-            if indent < 0:
-                raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
-            raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
-            error = None
-            if -len(indent):
-                return
+        indent = self.indent
+        if isinstance(indent, int) and (indent < 0):
+            raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
+        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
+        error = None
+        if -len(indent):
+            pass
+        else:
+            return
         # orphan @0x0044
-        indent = ' '
+        indent *= ' '
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
         # orphan @0x0068
         # orphan @0x0070
-        # orphan @0x010C
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
-        if level <= 0:
-            if n:
-                s = self.fillvalue
-            pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
-            if n > maxiter:
-                pieces.append(self.fillvalue)
-                s = self._join(pieces, level)
-                if n == 1:
-                    if trail:
-                        if self.indent is None:
-                            right = trail + right
+        if (level <= 0) and n:
+            s = self.fillvalue
+        pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
+        if n > maxiter:
+            pieces.append(self.fillvalue)
+            s = self._join(pieces, level)
+            if (n == 1) and trail and (self.indent is None):
+                right = trail + right
         # orphan @0x0082
         return '%s%s%s' % (left, s, right)
     def repr_tuple(self, x, level):
@@ -96,38 +90,40 @@ class Repr:
     def repr_array(self, x, level):
         if not x:
             return 'array(\'%s\')' % x.typecode
+        header = 'array(\'%s\', [' % x.typecode
         return self._repr_iterable(x, level, header, '])', self.maxarray)
-        # orphan @0x000E
     def repr_set(self, x, level):
-        # orphan @0x0008
         if not x:
             return 'set()'
+        x = _possibly_sorted(x)
         return self._repr_iterable(x, level, '{', '}', self.maxset)
     def repr_frozenset(self, x, level):
-        # orphan @0x0008
         if not x:
             return 'frozenset()'
+        x = _possibly_sorted(x)
         return self._repr_iterable(x, level, 'frozenset({', '})', self.maxfrozenset)
     def repr_deque(self, x, level):
         return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
         # orphan @0x001C
-        # orphan @0x0014
         n = len(x)
         if n == 0:
             return '{}'
         return '}'
+        # orphan @0x0046
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
-        for key in _possibly_sorted(x):
-            keyrepr = repr1(key, newlevel)
-            valrepr = repr1(x[key], newlevel)
-            pieces.append('%s: %s' % (keyrepr, valrepr))
-        if n > self.maxdict:
-            pieces.append(self.fillvalue)
-            s = self._join(pieces, level)
-            return '{%s}' % (s)
+        # orphan @0x004E
+        # orphan @0x0050
+        keyrepr = repr1(key, newlevel)
+        valrepr = repr1(x[key], newlevel)
+        pieces.append('%s: %s' % (keyrepr, valrepr))
+        # orphan @0x007E
+        # orphan @0x008A
+        pieces.append(self.fillvalue)
+        s = self._join(pieces, level)
+        return '{%s}' % (s)
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -151,12 +147,11 @@ class Repr:
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
             return s
+        exc = None
         if len(s) > self.maxlong:
             pass
         # orphan @0x005C
         return f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
-        # orphan @0x0086
-        exc = None
         # orphan @0x00A8
         j = max(0, self.maxlong - 3 - i)
         s = s[None:i] + self.fillvalue + s[len(s) - j:]
@@ -174,7 +169,6 @@ class Repr:
             return '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
             pass
-        # orphan @0x0032
         # orphan @0x004A
         j = max(0, self.maxother - 3 - i)
         s = s[None:i] + self.fillvalue + s[len(s) - j:]
@@ -184,8 +178,8 @@ def _possibly_sorted(x):
         return sorted(x)
     except Exception:
         return list(x)
-    if True:
-        return list(x)
+    # orphan @0x0012
+    return list(x)
 aRepr = Repr()
 repr = aRepr.repr
 return None

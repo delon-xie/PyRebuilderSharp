@@ -18,7 +18,6 @@ def test_simple():
         x = 2
     return x
 """
-None(None, None)
 py_compile.compile(py_path, py_path + 'c', True)
 print('Compiled OK')
 r = subprocess.run(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], True, True, '/Users/admin/codes/Tools/PyRebuilderSharp')

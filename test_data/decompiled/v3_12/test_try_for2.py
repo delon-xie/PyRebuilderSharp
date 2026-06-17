@@ -3,14 +3,17 @@
 def test5():
     try:
         for x in range(3):
-            y = x
-        try:
             try:
-                pass
+                try:
+                    try:
+                        pass
+                    except:
+                        break
+                except:
+                    break
+                y = x
             except:
                 break
-        except:
-            break
     except:
         break
     return None

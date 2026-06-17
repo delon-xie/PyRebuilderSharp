@@ -8,7 +8,6 @@ def get_python_version(filepath):
         magic = fp.read(4)
     except:
         pass
-    None(None, None)
     return name_4.get(magic, 'unknown')
     # orphan @0x008C
     raise

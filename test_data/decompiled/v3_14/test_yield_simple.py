@@ -2,7 +2,7 @@
 
 def f():
     try:
-        pass
+        1
     except:
         pass
 return None

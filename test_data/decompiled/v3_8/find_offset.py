@@ -14,10 +14,7 @@ for offset_start in val4 == 64:
     val3 = struct.unpack('<I', m[offset_start + 8:offset_start + 12])[0]
     val4 = struct.unpack('<I', m[offset_start + 12:offset_start + 16])[0]
     print(f"start={offset_start}: {val1} {val2} {val3} {val4}")
-    if val1 == 0:
-        if val2 == 0:
-            if val3 == 1:
-                if val4 == 64:
-                    print('  -> FOUND!')
+    if (val1 == 0) and (val2 == 0) and (val3 == 1) and (val4 == 64):
+        print('  -> FOUND!')
 return None
 # [SUMMARY] 10 blocks · 11 processed · 0 orphan · 156 instr

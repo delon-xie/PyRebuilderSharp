@@ -4,18 +4,21 @@ x = 1
 y = 2
 if x < y:
     z = x
-    if x > y:
-        z = y
-    elif not i < 5:
-        for n in range(10):
-            m = n + 1
+z = 0
 i = 0
-if i < 5:
+while i < 5:
     j = i * 2
-# orphan @0x0062
-a = 1
+    i += 1
+for n in range(10):
+    m = n + 1
+try:
+    a = 1
+except:
+    a = 0
 return None
-# orphan @0x006E
-a = 0
 return None
-# [SUMMARY] 13 blocks · 12 processed · 2 orphan · 63 instr
+z = y
+# orphan @0x0034
+j = i * 2
+i += 1
+# [SUMMARY] 12 blocks · 12 processed · 1 orphan · 63 instr

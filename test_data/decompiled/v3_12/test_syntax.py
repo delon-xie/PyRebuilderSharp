@@ -2872,7 +2872,6 @@ class SyntaxWarningTest(unittest.TestCase):
             compile(code, filename, mode)
         except:
             pass
-        None(None, None)
         return None
         return None
         raise

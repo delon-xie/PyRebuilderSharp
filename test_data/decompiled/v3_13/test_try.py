@@ -1,10 +1,10 @@
 # Decompiled from: <module>
 
 try:
-    if not True:
-        pass
+    a = 1
 except:
-    pass
-if not True:
-    pass
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 14 instr
+    a = 0
+return None
+# orphan @0x0016
+raise
+# [SUMMARY] 6 blocks · 4 processed · 2 orphan · 14 instr

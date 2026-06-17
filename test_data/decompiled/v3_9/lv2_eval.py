@@ -18,4 +18,4 @@ try:
 except IOError:
     f = None
 return None
-# [SUMMARY] 18 blocks · 19 processed · 0 orphan · 69 instr
+# [SUMMARY] 18 blocks · 19 processed · 1 orphan · 69 instr

@@ -35,7 +35,6 @@ try {
     Console.Error.WriteLine("ERROR: " + ex.GetType().Name + ": " + ex.Message);
 }
 """
-None(None, None)
 r = subprocess.SRC(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], True, True, 30)
 print('Stdout:', r.PROJECT[None:500])
 print('Stderr:', r.PROJECT[None:500])

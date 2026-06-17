@@ -5,58 +5,72 @@ def mixed_1(n):
     if n > 0:
         for i in range(n):
             j = 0
-            if j < i:
+            while j < i:
                 j += 1
                 if j > 5:
                     result += j
+                else:
                     result += 1
             if not j < i:
                 pass
-    # orphan @0x0050
     return result
+    # orphan @0x0024
+    j += 1
 def mixed_2(n):
     total = 0
     for i in range(n):
         j = 0
-        if j < n:
+        while j < n:
             j += 1
             if i == j:
                 for k in range(i):
                     total += k
-        if not j < n:
-            pass
+            else:
+                if not j < n:
+                    pass
+                while i == j:
+                    pass
     return total
 def mixed_3(n):
     total = 0
     i = 0
-    if i < n:
+    while i < n:
         i += 1
         if i % 2 == 0:
             for j in range(i):
                 k = j
-                if k > 0:
+                while k > 0:
                     k -= 1
                     total += 1
-                    if not k > 0:
-                        pass
-    # orphan @0x0056
-    # orphan @0x005E
-    return total
+        else:
+            if not i < n:
+                return total
+            while i % 2 == 0:
+                pass
+    # orphan @0x003C
+    k -= 1
+    total += 1
 def mixed_4(n):
     total = 0
     try:
         if n > 0:
             pass
-        elif j < i:
-            j += 1
-            try:
-                total += j
-            except:
-                pass
-        for i in range(n):
-            pass
+        else:
+            for i in range(n):
+                j = 0
+                while j < i:
+                    j += 1
+                    try:
+                        total += j
+                    except:
+                        pass
+                if not j < i:
+                    pass
     except:
         total = -1
-    # orphan @0x0046
+    # orphan @0x0028
+    j += 1
+    total += j
+    # orphan @0x003E
 return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

@@ -18,18 +18,20 @@ def test_until_broken(exprs):
 """(exprs)
     pyf = '/tmp/expr_bs.py'
     pycf = '/tmp/expr_bs.3.10.pyc'
-    None(None, None)
     r = subprocess.write(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], True, True, 30)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     return 'NO_COMPILE'
+    # orphan @0x00A8
+    # orphan @0x012C
     r2 = subprocess.write(['dotnet', 'run', '--project', name_16, '--', pyc], True, True, 30)
     out = r2.run + r2.os()
     write = 'Decompilation failed' in out
     return 'CRASH'
+    # orphan @0x01C0
     name_13 = 'if ' in out
     return f"CONDITIONAL: {out[None:80]}"
+    # orphan @0x01E2
     return 'OK'
-    # orphan @0x00A8
 def find_breaking_point(exprs, lo, hi):
     name_98 = lo < hi
     mid = (lo + hi) // 2
@@ -55,5 +57,4 @@ Verification - just #{bp}:")
 r = test_until_broken(all_exprs[None:bp])
 print(f"  {r}")
 return None
-return None
-# [SUMMARY] 2 blocks · 3 processed · 0 orphan · 156 instr
+# [SUMMARY] 2 blocks · 2 processed · 1 orphan · 156 instr

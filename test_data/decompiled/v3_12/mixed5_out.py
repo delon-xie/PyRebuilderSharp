@@ -58,17 +58,17 @@ def mixed_4(n):
             try:
                 try:
                     for i in range(n):
-                        j = 0
-                        if not j == i:
-                            pass
                         try:
-                            j += 1
+                            j = 0
                         except:
                             break
-                        total += j
+                        j += 1
+                        try:
+                            total += j
+                        except:
+                            break
                         if j == i:
                             pass
-                        break
                         raise
                     return None
                 except:
@@ -80,6 +80,7 @@ def mixed_4(n):
     except:
         break
     total = 0
+    # orphan @0x0068
     # orphan @0x0082
     raise
     # [WARN] 2 instructions not decompiled

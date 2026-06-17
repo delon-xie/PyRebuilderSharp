@@ -31,5 +31,4 @@ print('Marshal dump:', result3.path)
 name_19 = result3.path
 print('Stderr:', result3.path)
 return None
-return None
-# [SUMMARY] 2 blocks · 3 processed · 0 orphan · 146 instr
+# [SUMMARY] 2 blocks · 2 processed · 1 orphan · 146 instr

@@ -21,19 +21,19 @@ try:
                                     for i in enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
 """))):
-                                        if not e == a:
-                                            pass
-                                        else:
-                                            print(f"  Line {i}: expected={e}
-           actual=  {a}")
-                                            break
                                         try:
-                                            try:
-                                                pass
-                                            except Exception:
-                                                pass
+                                            pass
                                         except Exception:
                                             pass
+                                        print(f"  Line {i}: expected={e}
+           actual=  {a}")
+                                        break
+                                        for ver in versions:
+                                            pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
+                                            if not os.path.exists(pyc):
+                                                print('⏭ %s: no pyc' % ver)
+                                            else:
+                                                r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
                                 except Exception:
                                     pass
                             except Exception:
@@ -64,15 +64,8 @@ import ast
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
-None(None, None)
 expected_ast = ast.dump(ast.parse(expected_src), 2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-for ver in versions:
-    pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
-    if not os.path.exists(pyc):
-        print('⏭ %s: no pyc' % ver)
-    else:
-        r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
 return None
 break
 raise

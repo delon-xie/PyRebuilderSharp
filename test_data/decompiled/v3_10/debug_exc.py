@@ -15,22 +15,21 @@ raw = f.read()
 code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
-if hasattr(code, 'co_exceptiontable'):
-    if code.co_exceptiontable:
-        for i in range(0, len(et), 8):
-            if i + 7 >= len(et):
-                break
-# orphan @0x01D0
-# orphan @0x01D6
-# orphan @0x01D8
-# orphan @0x01E8
-print(f"
+if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
+    for i in range(0, len(et), 8):
+        if i + 7 >= len(et):
+            break
+        else:
+            start = int.from_bytes(et[i:i + 2], 'little')
+            end = int.from_bytes(et[i + 2:i + 4], 'little')
+            target = int.from_bytes(et[i + 4:i + 6], 'little')
+            dl = int.from_bytes(et[i + 6:i + 8], 'little')
+            print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
+for const in code.co_consts:
+    if isinstance(const, types.CodeType):
+        print(f"
 --- Nested: {const.co_name} ---")
-print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
-# orphan @0x021A
-# orphan @0x0222
-print(f"  bytes: {const.co_exceptiontable.hex()}")
-# orphan @0x041E
-# orphan @0x0450
-# orphan @0x0458
-# [SUMMARY] 19 blocks · 10 processed · 10 orphan · 283 instr
+        print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
+        if hasattr(const, 'co_exceptiontable') and const.co_exceptiontable:
+            print(f"  bytes: {const.co_exceptiontable.hex()}")
+# [SUMMARY] 15 blocks · 16 processed · 0 orphan · 283 instr

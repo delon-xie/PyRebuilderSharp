@@ -49,8 +49,6 @@ for (name, code) in tests.items():
     if not True:
         raise
     break
-    if not True:
-        raise
     r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], capture_output=True, text=True, timeout=10)
     r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], capture_output=True, text=True, timeout=30)
@@ -61,7 +59,14 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
         break
         if os.path.exists(out_path):
             f = open(out_path)
-    print(f"Output ({len(content)} bytes):
+            content = f.read().strip()
+            break
+            if not True:
+                raise
+            break
+            print(f"Output ({len(content)} bytes):
 {content[None:300]}")
+        else:
+            print(f"Error: {r2.stderr[None:200]}")
 return None
 # [SUMMARY] 14 blocks · 15 processed · 0 orphan · 246 instr

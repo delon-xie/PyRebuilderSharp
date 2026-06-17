@@ -11,7 +11,9 @@ with open(INPUT_FILE) as f:
     expected_src = f.read()
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
-    if not os.path.exists(pyc):
+    if os.path.exists(pyc):
+        break
+    else:
         print('⏭ %s: no pyc' % ver)
         r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
         try:
@@ -41,5 +43,4 @@ print('❌ %s: parse error: %s' % (ver, ex))
 print('  Output: %s' % r.stdout[None:200])
 # orphan @0x01B6
 ex = None
-# orphan @0x0342
-# [SUMMARY] 23 blocks · 19 processed · 5 orphan · 221 instr
+# [SUMMARY] 23 blocks · 20 processed · 5 orphan · 221 instr

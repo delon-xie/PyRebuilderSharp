@@ -14,7 +14,6 @@ def mixed_1(n):
     else:
         return result
     # orphan @0x006D
-    # orphan @0x0071
 def mixed_2(n):
     total = 0
     for i in range(n):
