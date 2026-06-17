@@ -3141,7 +3141,108 @@ public class AstBuilder
         }
         result = result.Where(s => s is not ExprStmt { Value: Name n } || !importedModules.Contains(n.Id)).ToList();
 
+        // Return-Fold: 将 if cond: return True; return False → return cond
+        // 递归扫描所有 FunctionDef/ClassDef 体
+        for (int i = 0; i < result.Count; i++)
+        {
+            if (result[i] is FunctionDef fd)
+                result[i] = fd with { Body = FoldReturnIf(fd.Body) };
+            else if (result[i] is ClassDef cd)
+                result[i] = cd with { Body = FoldReturnIf(cd.Body) };
+        }
+
         return result;
+    }
+
+    /// <summary>
+    /// 将 if cond: return True; return False → return cond。
+    /// 递归扫描嵌套结构体（If/While/For/Try/FunctionDef/ClassDef）。
+    /// </summary>
+    private List<Stmt> FoldReturnIf(List<Stmt> stmts)
+    {
+        // 递归处理嵌套结构
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            stmts[i] = stmts[i] switch
+            {
+                FunctionDef fd => fd with { Body = FoldReturnIf(fd.Body) },
+                ClassDef cd => cd with { Body = FoldReturnIf(cd.Body) },
+                If ifNode => new If(ifNode.Test,
+                    FoldReturnIf(ifNode.Body),
+                    ifNode.Orelse != null ? FoldReturnIf(ifNode.Orelse) : null),
+                While wNode => new While(wNode.Test,
+                    FoldReturnIf(wNode.Body),
+                    wNode.Orelse != null ? FoldReturnIf(wNode.Orelse) : null),
+                For fNode => new For(fNode.Target, fNode.Iter,
+                    FoldReturnIf(fNode.Body),
+                    fNode.Orelse != null ? FoldReturnIf(fNode.Orelse) : null),
+                Try tNode => new Try(FoldReturnIf(tNode.Body),
+                    tNode.Handlers.Select(h => new ExceptHandler(h.Type, h.Name,
+                        FoldReturnIf(h.Body))).ToList(),
+                    tNode.Orelse != null ? FoldReturnIf(tNode.Orelse) : null,
+                    tNode.Finalbody != null ? FoldReturnIf(tNode.Finalbody) : null),
+                _ => stmts[i]
+            };
+        }
+
+        // 从后向前扫描可折叠模式（保证删除不影响前向索引）
+        for (int i = stmts.Count - 2; i >= 0; i--)
+        {
+            if (stmts[i] is If ifStmt)
+            {
+                // 规则 1: if cond: return val; return False → return cond and val
+                if (ifStmt.Orelse == null
+                    && ifStmt.Body is [Return retVal]
+                    && stmts[i + 1] is Return { Value: Constant { Value: false } })
+                {
+                    // 折叠为 return cond and val
+                    var merged = MergeBoolOpValues(BoolOperator.And,
+                        new List<Expr> { ifStmt.Test, retVal.Value ?? new Constant(true) });
+                    stmts[i] = new Return(merged);
+                    stmts.RemoveAt(i + 1);
+                }
+                // 规则 1b: if cond: return False; return True → return not cond
+                else if (ifStmt.Orelse == null
+                    && ifStmt.Body is [Return { Value: Constant { Value: false } }]
+                    && stmts[i + 1] is Return { Value: Constant { Value: true } })
+                {
+                    stmts[i] = new Return(new UnaryOp(UnaryOperator.Not, ifStmt.Test));
+                    stmts.RemoveAt(i + 1);
+                }
+                // 规则 2: if cond: return True; else: return False → return cond
+                else if (ifStmt.Orelse is [Return { Value: Constant { Value: false } }]
+                    && ifStmt.Body is [Return { Value: Constant { Value: true } }])
+                {
+                    stmts[i] = new Return(ifStmt.Test);
+                }
+                // 规则 2b: if cond: return False; else: return True → return not cond
+                else if (ifStmt.Orelse is [Return { Value: Constant { Value: true } }]
+                    && ifStmt.Body is [Return { Value: Constant { Value: false } }])
+                {
+                    stmts[i] = new Return(new UnaryOp(UnaryOperator.Not, ifStmt.Test));
+                }
+            }
+        }
+
+        // 规则 3: if cond: return val（纯 AND 链末尾，无其他语句）→ return cond and val
+        // 3.13+ AND 链终端：跳转直达共享 RETURN_VALUE，无显式 Return(False)
+        // 仅对纯单-if 函数体应用（[docstring?, If(cond, [Return(val)])]），
+        // 且 val 为布尔表达式（Compare/BoolOp），避免误伤非纯布尔模式
+        if (stmts.Count >= 1 && stmts.Count <= 2 && stmts[^1] is If lastIf
+            && lastIf.Orelse == null
+            && lastIf.Body is [Return { Value: not null } lastRet])
+        {
+            bool isPureIfReturn = stmts.Count == 1
+                || (stmts.Count == 2 && stmts[0] is ExprStmt { Value: Constant { Value: string } });
+            bool isBoolExpr = lastRet.Value is Compare or BoolOp;
+            if (isPureIfReturn && isBoolExpr)
+            {
+                var merged = MergeBoolOpValues(BoolOperator.And,
+                    new List<Expr> { lastIf.Test, lastRet.Value });
+                stmts[^1] = new Return(merged);
+            }
+        }
+        return stmts;
     }
 
     /// <summary>

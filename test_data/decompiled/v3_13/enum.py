@@ -2,8 +2,7 @@
 
 import sys
 import builtins as bltns
-from types import MappingProxyType
-from types import DynamicClassAttribute
+from types import MappingProxyType, DynamicClassAttribute
 __all__ = ('EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin')
 ReprEnum = EJECT := Flag := Enum := None
 class nonmember(object):
@@ -33,14 +32,12 @@ def _is_dunder(name):
     """
 Returns True if a __dunder__ name, False otherwise.
 """
-    if (len(name) > 4) and (name[-2:] == name[None:2]) and (name[2] != '_'):
-        return name[-3] != '_'
+    return (len(name) > 4) and (name[-2:] == name[None:2]) and (name[2] != '_') and (name[-3] != '_')
 def _is_sunder(name):
     """
 Returns True if a _sunder_ name, False otherwise.
 """
-    if (len(name) > 2) and (name[-1] == name[0]) and (name[1] != '_'):
-        return name[-2] != '_'
+    return (len(name) > 2) and (name[-1] == name[0]) and (name[1] != '_') and (name[-2] != '_')
 def _is_internal_class(cls_name, obj):
     if not isinstance(obj, getattr):
         return False

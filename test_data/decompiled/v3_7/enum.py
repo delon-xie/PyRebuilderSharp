@@ -2,8 +2,7 @@
 
 import sys
 import builtins as bltns
-from types import MappingProxyType
-from types import DynamicClassAttribute
+from types import MappingProxyType, DynamicClassAttribute
 __all__ = ['EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin']
 Enum = None
 Flag = None
@@ -927,8 +926,7 @@ class EnumType(type):
     def __signature__(cls):
         # orphan @0x0028
         return Signature([Parameter('new_class_name', Parameter.POSITIONAL_ONLY), Parameter('names', Parameter.POSITIONAL_OR_KEYWORD), Parameter('module', Parameter.KEYWORD_ONLY, default=None), Parameter('qualname', Parameter.KEYWORD_ONLY, default=None), Parameter('type', Parameter.KEYWORD_ONLY, default=None), Parameter('start', Parameter.KEYWORD_ONLY, default=1), Parameter('boundary', Parameter.KEYWORD_ONLY, default=None)])
-        from inspect import Parameter
-        from inspect import Signature
+        from inspect import Parameter, Signature
         if cls._member_names_:
             return Signature([Parameter('values', Parameter.VAR_POSITIONAL)])
 EnumMeta = EnumType

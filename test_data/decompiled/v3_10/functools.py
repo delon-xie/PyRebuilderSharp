@@ -7,11 +7,7 @@ from abc import get_cache_token
 from collections import namedtuple
 from operator import itemgetter
 from reprlib import recursive_repr
-from types import FunctionType
-from types import GenericAlias
-from types import MethodType
-from types import MappingProxyType
-from types import UnionType
+from types import FunctionType, GenericAlias, MethodType, MappingProxyType, UnionType
 from _thread import RLock
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
 WRAPPER_UPDATES = ('__dict__',)

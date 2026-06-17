@@ -148,8 +148,7 @@ class ABC:
 return None
 # orphan @0x006A
 # orphan @0x0072
-from _py_abc import ABCMeta
-from _py_abc import get_cache_token
+from _py_abc import ABCMeta, get_cache_token
 ABCMeta.__module__ = 'abc'
 # orphan @0x0092
 # [SUMMARY] 6 blocks · 4 processed · 3 orphan · 93 instr
