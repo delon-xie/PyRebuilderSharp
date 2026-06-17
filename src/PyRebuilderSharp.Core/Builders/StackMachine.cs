@@ -142,14 +142,16 @@ public class StackMachine
 
             case Opcode.LOAD_FAST_BORROW_LOAD_FAST_BORROW_314:
                 // 双 borrow-load: 连续加载两个局部变量
-                // CPython 3.14: arg>>6 = var1 index, arg&63 = var2 index
-                var argVal = instr.Argument ?? 0;
-                int varIdx1 = argVal >> 6;
-                int varIdx2 = argVal & 0x3F;
-                var vName1 = varIdx1 < _code.Varnames.Count ? _code.Varnames[varIdx1] : $"v_{varIdx1}";
-                var vName2 = varIdx2 < _code.Varnames.Count ? _code.Varnames[varIdx2] : $"v_{varIdx2}";
-                _exprStack.Push(new Name(vName1, ExpressionContext.Load));
-                _exprStack.Push(new Name(vName2, ExpressionContext.Load));
+                // CPython 3.14 wordcode: 1-byte arg packs two 4-bit indices
+                //   arg & 0x0F = var1 index (low 4 bits)
+                //   arg >> 4   = var2 index (high 4 bits)
+                var packedArg = instr.Argument ?? 0;
+                int idxA = packedArg & 0x0F;
+                int idxB = packedArg >> 4;
+                var nameA = idxA < _code.Varnames.Count ? _code.Varnames[idxA] : $"v_{idxA}";
+                var nameB = idxB < _code.Varnames.Count ? _code.Varnames[idxB] : $"v_{idxB}";
+                _exprStack.Push(new Name(nameA, ExpressionContext.Load));
+                _exprStack.Push(new Name(nameB, ExpressionContext.Load));
                 return null;
 
             case Opcode.POP_ITER_314:
@@ -287,9 +289,20 @@ public class StackMachine
             case Opcode.STORE_ATTR:
             {
                 var attrName = GetName(instr);
-                // Python 3.10: stack = [value, object]; TOS=object, TOS1=value
-                var obj = SafePop();       // TOS = 对象
-                var attrValue = SafePop(); // TOS1 = 值
+                // 3.10-: stack = [value, object]; TOS=object (conventional LOAD order)
+                // 3.13+: stack = [object, value]; TOS=value (LOAD_FAST_BORROW dual-load order)
+                // See CPython Python/generated_cases.c.h: POP()=value, POP()=owner
+                Expr? attrValue, obj;
+                if (_code.Version >= PythonVersion.Py313)
+                {
+                    attrValue = SafePop();  // TOS = value (3.13+ convention)
+                    obj = SafePop();        // TOS1 = object
+                }
+                else
+                {
+                    obj = SafePop();        // TOS = object (3.10- convention)
+                    attrValue = SafePop();  // TOS1 = value
+                }
                 if (attrValue == null || obj == null) return null;
                 return new Assign(new List<Expr> { new AstAttribute(obj, attrName, ExpressionContext.Store) }, attrValue);
             }

@@ -2365,12 +2365,21 @@ public class AstBuilder
 
         var result = new List<Stmt>();
         result.AddRange(headerInitStmts);
+
+        // 优化: 条件为 Constant(true) 时跳过 If，直接内联 body
+        if (testExpr is Constant { Value: bool tv } && tv)
+        {
+            result.AddRange(bodyStmts);
+            result.AddRange(tailCode);
+            return result;
+        }
+
         // AND 短接合并: POP_JUMP_IF_FALSE/JUMP_IF_FALSE_OR_POP + body 首条为 If → BoolOp(And, ...)
         if ((lastInstr.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.JUMP_IF_FALSE_OR_POP
                 or Opcode.POP_JUMP_IF_FALSE_PY38)
             && bodyStmts.Count > 0 && bodyStmts[0] is If innerIf && orelse == null)
         {
-            var mergedTest = new BoolOp(BoolOperator.And, new List<Expr> { testExpr, innerIf.Test });
+            var mergedTest = MergeBoolOpValues(BoolOperator.And, new List<Expr> { testExpr, innerIf.Test });
             result.Add(new If(mergedTest, innerIf.Body, innerIf.Orelse));
             if (bodyStmts.Count > 1)
                 result.AddRange(bodyStmts.Skip(1));
@@ -2378,7 +2387,7 @@ public class AstBuilder
         // OR 短接合并: orChain + afterStmts/else 首条为 If → BoolOp(Or, ...)
         else if (isOrChain && orelse != null && orelse.Count > 0 && orelse[0] is If orInnerIf)
         {
-            var mergedTest = new BoolOp(BoolOperator.Or, new List<Expr> { testExpr, orInnerIf.Test });
+            var mergedTest = MergeBoolOpValues(BoolOperator.Or, new List<Expr> { testExpr, orInnerIf.Test });
             result.Add(new If(mergedTest, bodyStmts, orInnerIf.Orelse));
             if (orelse.Count > 1)
                 result.AddRange(orelse.Skip(1));
@@ -2673,6 +2682,32 @@ public class AstBuilder
         if (stackMachine.ExprStackCount > 0)
             return stackMachine.PopExpr();
         return stackMachine.HasResults ? stackMachine.PopResult() : new Constant(true);
+    }
+
+    /// <summary>
+    /// Simplify BoolOp by stripping True/False constants from AND/OR expressions.
+    /// True and X → X,  False and X → False,  True or X → True,  False or X → X
+    /// </summary>
+    private Expr MergeBoolOpValues(BoolOperator op, List<Expr> values)
+    {
+        // Filter out identity elements
+        var filtered = values.Where(v =>
+        {
+            if (v is Constant { Value: bool b })
+                return op switch
+                {
+                    BoolOperator.And => b,       // keep True in AND, drop False
+                    BoolOperator.Or => !b,       // keep False in OR, drop True
+                    _ => true
+                };
+            return true;
+        }).ToList();
+
+        if (filtered.Count == 0)
+            return new Constant(op == BoolOperator.And); // empty AND=True, empty OR=False
+        if (filtered.Count == 1)
+            return filtered[0];
+        return new BoolOp(op, filtered);
     }
 
     private Expr ExtractIterExpression(BasicBlock header)
