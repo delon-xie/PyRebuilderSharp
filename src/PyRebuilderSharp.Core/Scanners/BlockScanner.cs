@@ -98,6 +98,14 @@ public class BlockScanner : IBlockScanner
     {
         if (!instr.Argument.HasValue) return null;
 
+        // -- 检测是否使用 CACHE（3.11+）—
+        bool hasCaches = codeObj?.Version switch
+        {
+            PythonVersion.Py311 or PythonVersion.Py312 or PythonVersion.Py313 or PythonVersion.Py314 => true,
+            _ => false
+        };
+        // 参考 CPython 3.12: Include/internal/pycore_opcode.h 的 FOR_ITER_CACHE_ENTRIES = 1
+
         // -- 检测 wordcode 格式（启发式：所有指令偏移均为偶数）--
         // 3.6-3.14 均使用 wordcode（2字节/指令），偏移均为偶数
         // 非 wordcode（2.7, 3.5）指令长度可变，可能存在奇数偏移
@@ -120,7 +128,11 @@ public class BlockScanner : IBlockScanner
             //     JUMPTO(x) = first_instr + x / sizeof(_Py_CODEUNIT)
             //     (Python/ceval.c 3.8) — arg 是字节偏移，非指令索引
             Opcode.JUMP_FORWARD or Opcode.FOR_ITER
-                => instr.Offset + 2 + (is36To39Wordcode ? instr.Argument.Value : instr.Argument.Value),
+                => instr.Offset + 2 + (is36To39Wordcode ? instr.Argument.Value : instr.Argument.Value)
+                // 3.11+ (HasCaches): FOR_ITER 有 1 个 CACHE 条目(2字节)，跳转需额外偏移
+                + (hasCaches && instr.Opcode == Opcode.FOR_ITER ? 2 : 0),
+            // 参考 CPython 3.12: Include/internal/pycore_opcode.h
+            //     FOR_ITER 的 cache 偏移 = FOR_ITER_CACHE_ENTRIES * 2 = 2
             Opcode.JUMP_BACKWARD => instr.Offset + 2 - instr.Argument.Value,
             // 3.12+ wordcode: 条件跳转参数是相对字节偏移，需加上当前指令+2
             // 3.6-3.9 wordcode: 参数已为绝对字节偏移
