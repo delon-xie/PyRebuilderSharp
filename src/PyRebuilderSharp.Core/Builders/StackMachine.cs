@@ -1052,15 +1052,14 @@ public class StackMachine
                         break;
                     }
 
+                    case PythonVersion.Py311:
                     case PythonVersion.Py312:
                     case PythonVersion.Py313:
                     case PythonVersion.Py314:
-                        // Python 3.12+: MAKE_FUNCTION pops only code object
-                        // (qualname from co_qualname, defaults/kwdefaults/annotations/closure
-                        //  are pre-loaded by separate instructions or embedded in co_flags)
-                        // 参考 CPython 3.12: Python/compile.c compiler_make_function
-                        //     "Pops the code object from the stack; qualname is stored in
-                        //      the code object itself (co_qualname)."
+                        // Python 3.11+: MAKE_FUNCTION pops only code object
+                        // 参考 CPython 3.11: Python/ceval.c TARGET(MAKE_FUNCTION)
+                        //     ONLY pops code object. qualname no longer on stack.
+                        //     PyFunction_New() reads co_qualname from code object.
                     {
                         var codeExpr = SafePop();
                         if (codeExpr is Constant c2 && c2.Value is CodeObject co)
