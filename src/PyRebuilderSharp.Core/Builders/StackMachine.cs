@@ -533,9 +533,25 @@ public class StackMachine
                 var cmpRight = SafePop();
                 var cmpLeft = SafePop();
                 if (cmpLeft == null || cmpRight == null) return null;
-                // CPython 比较码：0=<, 1=<=, 2===, 3=!=, 4=>, 5=>=, 6=in, 7=not in, 8=is, 9=is not
                 var pyOp = instr.Argument ?? 0;
-                var cmpOp = pyOp switch
+
+                // 3.12+ encodes comparison type in upper bits, flags in lower bits:
+                //   3.12: oparg >> 4 = comparison index
+                //   3.13+: oparg >> 5 = comparison index
+                // 3.11-: oparg is the comparison index directly (0-9)
+                int cmpIdx;
+                if (_code.Version is PythonVersion.Py312)
+                    cmpIdx = pyOp >> 4;
+                else if (_code.Version >= PythonVersion.Py313)
+                    cmpIdx = pyOp >> 5;
+                else
+                    cmpIdx = pyOp;
+
+                // Standard comparison indices:
+                //   0=Lt, 1=LtE, 2=Eq, 3=NotEq, 4=Gt, 5=GtE, 6=In, 7=NotIn, 8=Is, 9=IsNot
+                // Note: IS_OP and CONTAINS_OP are separate opcodes in 3.9+;
+                // for 3.8- they are encoded as indices 6-9 in COMPARE_OP.
+                var cmpOp = cmpIdx switch
                 {
                     0 => CmpOp.Lt,
                     1 => CmpOp.LtE,
@@ -547,8 +563,9 @@ public class StackMachine
                     7 => CmpOp.NotIn,
                     8 => CmpOp.Is,
                     9 => CmpOp.IsNot,
-                    _ => CmpOp.Eq
+                    _ => CmpOp.Eq,
                 };
+
                 _exprStack.Push(new Compare(cmpLeft, new List<CmpOp> { cmpOp }, new List<Expr> { cmpRight }));
                 return null;
             }
@@ -722,15 +739,43 @@ public class StackMachine
                 return null;
 
             // ---- 3.11+ BINARY_OP (arg 指定操作类型) ----
+            // 注意: CPython 3.13+ 扩展了 BINARY_OP, arg=26 = subscript ([])
             case Opcode.BINARY_OP:
             {
+                var opType = instr.Argument ?? 0;
+
+                // CPython 3.13+: BINARY_OP arg=26 is subscript (a[b])
+                // See Python/bytecodes.c: BINARY_OP with oparg 26 = BINARY_SUBSCR
+                if (opType == 26)
+                {
+                    var idx = SafePop();
+                    var obj = SafePop();
+                    if (idx == null || obj == null) return null;
+                    _exprStack.Push(new Subscript(obj, idx, ExpressionContext.Load));
+                    return null;
+                }
+
                 // pop TOS, TOS1 → push BinOp(TOS1, op, TOS)
                 var right = SafePop();
                 var left = SafePop();
                 if (left == null || right == null) return null;
-                var opType = instr.Argument ?? 0;
                 var binOp = MapBinaryOpArg(opType);
                 _exprStack.Push(new BinOp(left, binOp, right));
+                return null;
+            }
+
+            // ---- 3.13+ BINARY_SLICE: name[start:end] (replaces BUILD_SLICE+BINARY_SUBSCR) ----
+            // CPython 3.13+: pops (container, start, end) from stack, pushes subscript-slice
+            // See Python/bytecodes.c: BINARY_SLICE = 'obj[slice(start, end)]'
+            case Opcode.BINARY_SLICE_313:
+            {
+                var end = SafePop();
+                var start = SafePop();
+                var container = SafePop();
+                if (container == null) return null;
+                if (start == null) start = new Constant(null);
+                if (end == null) end = new Constant(null);
+                _exprStack.Push(new Subscript(container, new Slice(start, end, null), ExpressionContext.Load));
                 return null;
             }
 

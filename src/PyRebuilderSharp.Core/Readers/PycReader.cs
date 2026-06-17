@@ -251,22 +251,20 @@ public class PycReader
             // qualname (3.11+ 的所有代码对象都有)
             if (_strategy.HasQualname)
             {
-                if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] before qualname: pos={br.BaseStream.Position}");
-                try { var qualObj = ReadMarshalObject(br); if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] qualname={qualObj} len={qualObj?.ToString()?.Length} pos={br.BaseStream.Position}"); }
+                if (code.Name == "<module>") Console.Error.Write($"\r[DIAG] before qualname: pos={br.BaseStream.Position} ");
+                try { var qualObj = ReadMarshalObject(br); }
                 catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.qualname", ex); }
             }
 
             // first line number (int32) — 3.8+ 的字段
-            try { code.FirstLineNumber = br.ReadInt32(); if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] firstline={code.FirstLineNumber} pos={br.BaseStream.Position}"); }
+            try { code.FirstLineNumber = br.ReadInt32(); }
             catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.firstlineno", ex); }
 
-            // lnotab/linetable
-            byte[]? lnotab;
+            // lnotab
+            byte[]? lnotab = null;
             if (_strategy.HasCaches)
             {
-                if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] before lnotab: pos={br.BaseStream.Position}");
                 lnotab = ReadRawMarshalBytes(br);
-                if (code.Name == "<module>") System.Console.Error.WriteLine($"[DIAG] lnotab: len={lnotab?.Length} pos={br.BaseStream.Position}");
             }
             else
             {
@@ -289,17 +287,18 @@ public class PycReader
                     var peekByte = br.ReadByte();
                     br.BaseStream.Position--;
                     var peekType = (byte)(peekByte & ~MarshalType.TYPE_FLAG_REF);
-                    if (code.Name == "<module>")
-                        System.Console.Error.WriteLine($"[DIAG] exc table offset={br.BaseStream.Position} peek=0x{peekByte:X2} type=0x{peekType:X2} flag_ref={(peekByte & MarshalType.TYPE_FLAG_REF) != 0}");
                     if (peekType == MarshalType.TYPE_STRING || peekType == MarshalType.TYPE_BYTES
                         || peekType == MarshalType.TYPE_SHORT_ASCII || peekType == MarshalType.TYPE_ASCII
                         || peekType == MarshalType.TYPE_UNICODE)
                     {
-                        var excBytes = ReadRawMarshalBytes(br);
-                        if (excBytes != null && excBytes.Length > 0)
+                        if (_strategy.HasExceptionTable)
                         {
-                            System.Console.Error.WriteLine($"[DIAG] ExceptionTable raw bytes ({excBytes.Length} bytes): {BitConverter.ToString(excBytes)}");
-                            code.ExceptionTable = ParseExceptionTable(excBytes);
+                            // Read exception table (marshal bytes)
+                            var excBytes = ReadRawMarshalBytes(br);
+                            if (excBytes != null && excBytes.Length > 0)
+                            {
+                                code.ExceptionTable = ParseExceptionTable(excBytes);
+                            }
                         }
                     }
                     else if (peekType == MarshalType.TYPE_REF)
@@ -1169,15 +1168,15 @@ public class PycReader
     }
 
     /// <summary>
-    /// 读取 TYPE_SLICE (0x2D) 对象 — start, stop, step 三个 marshal 对象。
-    /// TODO：0x3A 需要重新确认
+    /// 读取 TYPE_SLICE 对象 — start, stop, step 三个 marshal 对象。
+    /// Python 的 slice(start, stop, step) 对象作为常量存储在 co_consts 中。
     /// </summary>
     private object? ReadMarshalSlice(BinaryReader br)
     {
-        ReadMarshalObject(br);
-        ReadMarshalObject(br);
-        ReadMarshalObject(br);
-        return null;
+        var start = ReadMarshalObject(br);
+        var stop = ReadMarshalObject(br);
+        var step = ReadMarshalObject(br);
+        return new PySliceData(start, stop, step);
     }
 
     private List<object?> ReadMarshalList(BinaryReader br, bool typeByteRead = false, bool forceList = false)

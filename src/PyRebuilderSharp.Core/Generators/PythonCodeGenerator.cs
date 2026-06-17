@@ -1,5 +1,6 @@
 using System.Text;
 using PyRebuilderSharp.Core.Models.AST;
+using PyRebuilderSharp.Core.Models.Bytecode;
 using AstAttribute = PyRebuilderSharp.Core.Models.AST.Attribute;
 
 namespace PyRebuilderSharp.Core.Generators;
@@ -949,32 +950,83 @@ public class PythonCodeGenerator : ICodeGenerator
         if (sub.Slice is Slice slice)
         {
             // Output as slice: items[lower:upper:step]
-            // Strip trailing None for cleaner output: items[1:] instead of items[1:None]
-            Visit(slice.Lower);
-            _output.Append(":");
-            bool hasUpper = !(slice.Upper is Constant { Value: null }); // None
-            bool hasStep = slice.Step != null && !(slice.Step is Constant { Value: null });
-            if (hasUpper)
-                Visit(slice.Upper);
-            if (hasStep || hasUpper)
-            {
-                // Still need an empty upper if step is present but upper is None
-                if (!hasUpper && hasStep)
-                {
-                    // items[1::2] → lower is provided, upper is empty
-                }
-                if (hasStep)
-                {
-                    _output.Append(":");
-                    Visit(slice.Step);
-                }
-            }
+            VisitSliceLiteral(slice);
+        }
+        else if (sub.Slice is Constant { Value: PySliceData ps })
+        {
+            // Pre-computed slice constant: items[start:stop:step]
+            VisitSliceConstantLiteral(ps);
+        }
+        else if (sub.Slice is Constant c)
+        {
+            // Non-slice constant index (e.g., name[2])
+            Visit(c);
         }
         else
         {
+            // Fallback: unknown index type
             Visit(sub.Slice);
         }
         _output.Append("]");
+    }
+
+    /// <summary>
+    /// Render a Slice AST node as [lower:upper:step] slice literal.
+    /// </summary>
+    private void VisitSliceLiteral(Slice slice)
+    {
+        // Strip trailing None for cleaner output: items[1:] instead of items[1:None]
+        Visit(slice.Lower);
+        _output.Append(":");
+        bool hasUpper = !(slice.Upper is Constant { Value: null }); // None
+        bool hasStep = slice.Step != null && !(slice.Step is Constant { Value: null });
+        if (hasUpper)
+            Visit(slice.Upper);
+        if (hasStep || hasUpper)
+        {
+            // Still need an empty upper if step is present but upper is None
+            if (!hasUpper && hasStep)
+            {
+                // items[1::2] → lower is provided, upper is empty
+            }
+            if (hasStep)
+            {
+                _output.Append(":");
+                Visit(slice.Step);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Render a pre-computed PySliceData constant as [start:stop:step] slice literal.
+    /// Python's slice(None, 2, None) → [:2]
+    /// </summary>
+    private void VisitSliceConstantLiteral(PySliceData ps)
+    {
+        bool hasStart = ps.Start != null && !(ps.Start is int i && i == 0 && ps.Stop == null);
+        bool hasStop = ps.Stop != null;
+        bool hasStep = ps.Step != null && !(ps.Step is int step && step == 1);
+
+        if (hasStart)
+            _output.Append(FormatSliceValue(ps.Start));
+        _output.Append(":");
+        if (hasStop)
+            _output.Append(FormatSliceValue(ps.Stop));
+        if (hasStep)
+        {
+            _output.Append(":");
+            _output.Append(FormatSliceValue(ps.Step));
+        }
+    }
+
+    private string FormatSliceValue(object? val)
+    {
+        if (val == null) return "";
+        if (val is bool b) return b ? "True" : "False";
+        if (val is int i) return i.ToString();
+        if (val is long l) return l.ToString();
+        if (val is string s) return EscapeString(s);
+        return val.ToString() ?? "";
     }
 
     private void VisitListLiteral(ListLiteral list)
