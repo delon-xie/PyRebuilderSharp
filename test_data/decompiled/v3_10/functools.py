@@ -366,8 +366,9 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         if kwds:
             key += (tuple)(_make_key.<locals>.<listcomp>(kwds.values()))
         return key
-    elif (len(key) == 1) and True:
+    elif len(key) == 1:
         return key[0]
+        return key
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
 
@@ -388,19 +389,10 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    if True:
-        if True:
-            pass
-        def decorating_function(user_function):
-            wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
-            return update_wrapper(wrapper, user_function)
-        return decorating_function
-    elif True and True:
-        user_function = 128
-        wrapper.cache_parameters = lru_cache.<locals>.<lambda>
+    def decorating_function(user_function):
+        wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
         return update_wrapper(wrapper, user_function)
-    elif True:
-        raise TypeError('Expected first argument to be an integer, a callable, or None')
+    return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
@@ -454,16 +446,13 @@ def _c3_mro(cls, abcs):
 
     """
     for i in enumerate(reversed(cls.__bases__)):
-        if True:
-            boundary = len(cls.__bases__) - i
-            break
-        if True:
-            pass
+        boundary = len(cls.__bases__) - i
+        break
         explicit_bases = list(cls.__bases__[None:boundary])
         abstract_bases = []
         other_bases = list(cls.__bases__[boundary:])
         for _ in []:
-            if True and not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
+            if not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
                 break
         for _ in abstract_bases:
             break
@@ -482,8 +471,7 @@ def _compose_mro(cls, types):
     mro = []
     for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
         for sub in typ.__subclasses__():
-            if True and True:
-                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+            found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
         if not found:
             mro.append(typ)
         else:

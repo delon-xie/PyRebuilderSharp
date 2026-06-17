@@ -488,8 +488,6 @@ def lru_cache(maxsize, typed):
     """
     # orphan @0x0020
     # orphan @0x0018
-    if True and True:
-        pass
     # orphan @0x002A
     user_function = 128
     wrapper.cache_parameters = lru_cache.<locals>.<lambda>
@@ -513,8 +511,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     # orphan @0x0078
     # orphan @0x0080
     def wrapper():
-        if True:
-            return result
+        return result
         # orphan @0x002A
         result = 1(**kwds)
         return result
@@ -528,11 +525,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return last
             if not True:
                 pass
-            if True:
-                pass
-            if True:
-                oldkey = result[oldroot[oldroot]]
-                oldresult = key[oldroot]
+            oldkey = result[oldroot[oldroot]]
+            oldresult = key[oldroot]
             link = [last, key, result]
         # orphan @0x014C
         # orphan @0x0160
@@ -604,12 +598,9 @@ def _c3_mro(cls, abcs):
     other_bases = list(cls.__bases__[boundary:])
     # orphan @0x0044
     for i in enumerate(reversed(cls.__bases__)):
-        if True:
-            boundary = len(cls.__bases__) - i
-            break
+        boundary = len(cls.__bases__) - i
+        break
     boundary = 0
-    if True:
-        pass
     # orphan @0x0074
     # orphan @0x0076
     # orphan @0x0082
@@ -632,8 +623,7 @@ def _compose_mro(cls, types):
     mro = []
     for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
         for sub in typ.__subclasses__():
-            if True and True:
-                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+            found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
             for sub in found:
                 for subcls in subcls not in mro:
                     if subcls not in mro:

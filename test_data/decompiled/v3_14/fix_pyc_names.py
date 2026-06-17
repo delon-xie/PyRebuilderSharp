@@ -17,6 +17,7 @@ def fix_pyc_names(directory):
         if not filename.endswith('.pyc'):
             pass
         else:
+            filepath = os.path.join(filename, directory)
             actual_version = get_python_version(filepath)
         if f".{actual_version}.pyc" in filename:
             pass
@@ -28,9 +29,11 @@ def fix_pyc_names(directory):
             else:
                 new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
                 break
-            if not True:
+            if not filename != new_filename:
                 pass
-            os.rename(None, var_41)
+            else:
+                new_filepath = os.path.join(new_filename, directory)
+            os.rename(new_filepath, filepath)
             print(f"✓ Renamed {filename} -> {new_filename}")
             print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
         import re

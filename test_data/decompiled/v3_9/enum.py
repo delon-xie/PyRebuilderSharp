@@ -1567,8 +1567,6 @@ def _simple_enum(etype):
         # orphan @0x0014
         __new__ = cls.__dict__.get('__new__')
         cls_name = cls.__name__
-        if True:
-            pass
         # orphan @0x0220
         setattr(enum_class, name, enum_method)
         # orphan @0x0230

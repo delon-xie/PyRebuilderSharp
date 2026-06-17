@@ -30,7 +30,7 @@ def _is_dunder(name):
     """
     if (len(name) > 4) and (name == None // 2):
         pass
-    if True and (name[2] != '_'):
+    if name[2] != '_':
         pass
     return
 def _is_sunder(name):
@@ -39,7 +39,7 @@ def _is_sunder(name):
     """
     if (len(name) > 2) and (name[-1] == name[0]):
         pass
-    if True and (name[1] != '_'):
+    if name[1] != '_':
         pass
     return
 def _is_internal_class(cls_name, obj):
@@ -1340,41 +1340,32 @@ def _simple_enum(etype):
             for (name, value) in attrs.items():
                 if isinstance(value, name_58) and (name_58.value is name_62):
                     value = gnv(name, 1, len(member_names), gnv_last_values)
-                elif True:
-                    if not isinstance(value, name_66):
-                        value = (value)
-                    member = new_member(enum_class, **value)
-                    value = value[0]
-                    member._value_ = value
-                else:
-                    member = new_member(enum_class)
+                elif not isinstance(value, name_66):
+                    value = (value)
         for (name, value) in attrs.items():
             if isinstance(value, name_58) and (value.value is name_62):
                 value.value = gnv(name, 1, len(member_names), gnv_last_values)
             value = value.value
-            if True:
-                if not isinstance(value, name_66):
-                    value = (value)
-                member = new_member(enum_class, **value)
-                value = value[0]
-                member._value_ = value
-                contained = value2member_map.get(member._value_)
-                contained._add_alias_(name)
-                member._name_ = name
-                member.__objclass__ = enum_class
-                member.__init__(value)
-                member._sort_order_ = len(member_names)
-                if name not in ('name', 'value'):
-                    setattr(enum_class, name, member)
-                else:
-                    enum_class._add_member_(name, member)
-                member_names.append(name)
-                gnv_last_values.append(value)
-                enum_class._value2member_map_.setdefault(value, member)
-                if value not in hashable_values:
-                    hashable_values.append(value)
+            if not isinstance(value, name_66):
+                value = (value)
+            member = new_member(enum_class, **value)
+            value = value[0]
+            member._value_ = value
+            contained = value2member_map.get(member._value_)
+            contained._add_alias_(name)
+            member._name_ = name
+            member.__objclass__ = enum_class
+            member.__init__(value)
+            member._sort_order_ = len(member_names)
+            if name not in ('name', 'value'):
+                setattr(enum_class, name, member)
             else:
-                member = new_member(enum_class)
+                enum_class._add_member_(name, member)
+            member_names.append(name)
+            gnv_last_values.append(value)
+            enum_class._value2member_map_.setdefault(value, member)
+            if value not in hashable_values:
+                hashable_values.append(value)
         contained._add_alias_(name)
         member._name_ = name
         member.__objclass__ = enum_class

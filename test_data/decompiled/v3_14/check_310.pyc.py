@@ -22,9 +22,13 @@ def dump_bytecode(c, depth):
         break
         if et:
             for i in range(0, len(et), 8):
+                s = name_22.from_bytes(i[et:i + 2], 'little')
+                e = name_22.from_bytes(i[et + 2:i + 4], 'little')
+                t = name_22.from_bytes(i[et + 4:i + 6], 'little')
+                dl = name_22.from_bytes(i[et + 6:i + 8], 'little')
                 print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
         name_26.dis(const)
-        break
+        dump_bytecode(depth, const + 1)
 dump_bytecode(code)
 return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 58 instr

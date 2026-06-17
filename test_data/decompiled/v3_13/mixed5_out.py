@@ -9,8 +9,6 @@ def mixed_1(n):
                 pass
             while j > 5:
                 result += 1
-                if True:
-                    pass
     break
     # orphan @0x007C
     # [WARN] 1 instructions not decompiled
@@ -23,8 +21,6 @@ def mixed_2(n):
             pass
         while True:
             break
-            if True:
-                pass
         for k in range(i):
             pass
     break

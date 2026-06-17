@@ -22,8 +22,7 @@ pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
 if next_type <= next_type:
-    if True:
-        pass
+    pass
 elif arg is not None:
     pass
 # orphan @0x0148

@@ -2870,17 +2870,13 @@ errtest is a regular expression that must be present in the
 text of the warning raised.
 """
         try:
-            try:
-                try:
-                    raise
-                    return None
-                    raise
-                except:
-                    pass
-            except:
-                pass
+            compile(filename, code, mode)
         except:
             pass
+        return None
+        return None
+        # orphan @0x008E
+        raise
     def test_return_in_finally(self):
         """
             def f():
@@ -2964,13 +2960,7 @@ text of the exception raised.  If subclass is specified it
 is the expected subclass of SyntaxError (e.g. IndentationError).
 """
         try:
-            try:
-                if __name__:
-                    pass
-                raise
-                raise
-            except:
-                pass
+            compile(filename, code, mode)
         except:
             pass
         try:
@@ -3003,6 +2993,11 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
         self.fail('compile() did not raise SyntaxError')
         return None
         err = None
+        return None
+        # orphan @0x0298
+        raise
+        # orphan @0x029C
+        raise
     def test_expression_with_assignment(self):
         'print(end1 + end2 = \' \')'
         'print(end1 + end2 = \' \')'('expression cannot contain assignment, perhaps you meant \'==\'?', 7, ('offset',))

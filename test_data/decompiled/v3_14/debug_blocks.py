@@ -6,7 +6,7 @@ try:
 except:
     pass
 try:
-    for ins in ins:
+    for ins in []:
         try:
             try:
                 if not True:
@@ -24,8 +24,7 @@ try:
         for last in block_instrs():
             if not True:
                 pass
-            if True:
-                last = block_instrs[-1]
+            last = block_instrs[-1]
             break
             if any is None:
                 for ins in block_instrs():
@@ -63,7 +62,4 @@ for const in code.co_consts:
     sorted_leaders = sorted(leaders)
 return None
 raise
-# [WARN] 2 instructions not decompiled
-#   @0x03E2: JUMP_BACKWARD arg=60
-#   @0x03EA: JUMP_BACKWARD arg=68
 # [SUMMARY] 71 blocks · 72 processed · 0 orphan · 424 instr

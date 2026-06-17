@@ -20,10 +20,7 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
                     for debug_blocks.py in block_instrs:
                         if debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
                             print(f"  → JUMP: offset={debug_blocks.py.end}, target={debug_blocks.py.arg}")
-        if True:
-            if instr.arg is not None:
-                pass
-        elif True:
+        if instr.arg is not None:
             pass
         print('=== Block structure ===')
         instrs = list(dis.Bytecode(const))

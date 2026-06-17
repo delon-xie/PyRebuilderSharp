@@ -6,7 +6,7 @@ try:
 except:
     pass
 try:
-    for ins in ins:
+    for ins in []:
         try:
             try:
                 if not True:
@@ -59,7 +59,4 @@ break
 break
 break
 raise
-# [WARN] 2 instructions not decompiled
-#   @0x0380: JUMP_BACKWARD arg=56
-#   @0x0388: JUMP_BACKWARD arg=64
 # [SUMMARY] 54 blocks · 55 processed · 0 orphan · 358 instr

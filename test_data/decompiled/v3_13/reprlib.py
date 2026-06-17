@@ -8,9 +8,9 @@ from _thread import get_ident
 def recursive_repr(fillvalue):
     'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
-        wrapper.__module__ = wrapper := wrapper(getattr, '__module__')
-        wrapper.__doc__ = (fillvalue, repr_running, user_function)(getattr, '__doc__')
-        wrapper.__name__ = set()(getattr, '__name__')
+        wrapper := wrapper(getattr, '__module__').__module__ = wrapper
+        (fillvalue, repr_running, user_function)(getattr, '__doc__').__doc__ = wrapper
+        set()(getattr, '__name__').__name__ = wrapper
         return wrapper
     return decorating_function
 class Repr:
@@ -26,9 +26,8 @@ class Repr:
         if ' ' in typename:
             parts = typename.split()
         method = getattr(self, 'repr_' + typename, None)
-        if method and True:
-            pass
-        return
+        if method:
+            return
         return
         # orphan @0x0118
         module = getattr(cls, '__module__', None)
@@ -73,8 +72,6 @@ class Repr:
             s = self.fillvalue
         newlevel = level - 1
         repr1 = self.repr1
-        if True:
-            pass
         break
         if (n == 1) and trail:
             pass

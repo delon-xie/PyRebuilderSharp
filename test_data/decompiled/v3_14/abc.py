@@ -12,7 +12,7 @@ try:
 except ImportError:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
-    ABCMeta.__module__ = 'abc'
+    'abc'.__module__ = ABCMeta
 __doc__ = 'Abstract Base Classes (ABCs) according to PEP 3119.'
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
@@ -31,7 +31,7 @@ Usage:
         def my_abstract_method(self, arg1, arg2, argN):
             ...
 """
-    funcobj.__isabstractmethod__ = True
+    True.__isabstractmethod__ = funcobj
     return funcobj
 class abstractclassmethod(classmethod):
     __firstlineno__ = 28
@@ -51,7 +51,7 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
     __isabstractmethod__ = True
     def __init__(self, callable):
         'abc.abstractclassmethod'((3, 21), ('remove',))
-        callable.__isabstractmethod__ = True
+        True.__isabstractmethod__ = callable
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class abstractstaticmethod(staticmethod):
@@ -72,7 +72,7 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
     __isabstractmethod__ = True
     def __init__(self, callable):
         'abc.abstractstaticmethod'((3, 21), ('remove',))
-        callable.__isabstractmethod__ = True
+        True.__isabstractmethod__ = callable
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class abstractproperty(property):
@@ -117,13 +117,13 @@ even via super()).
 
 Returns the subclass, to allow usage as a class decorator.
 """
-        return
+        return _abc_register(subclass, cls)
     def __instancecheck__(cls, instance):
         'Override for isinstance(instance, cls).'
-        return
+        return _abc_instancecheck(instance, cls)
     def __subclasscheck__(cls, subclass):
         'Override for issubclass(subclass, cls).'
-        return
+        return _abc_subclasscheck(subclass, cls)
     def _dump_registry(cls, file):
         'Debug helper to print the ABC registry.'
         f"Class: {cls.__module__}.{cls.__qualname__}"(file, ('file',))
@@ -157,6 +157,7 @@ Returns cls, to allow usage as a class decorator.
 If cls is not an instance of ABCMeta, does nothing.
 """
     # orphan @0x007A
+    value = getattr(name, cls, None)
     # orphan @0x0074
     # orphan @0x005A
     # orphan @0x0054
@@ -175,7 +176,7 @@ If cls is not an instance of ABCMeta, does nothing.
     # orphan @0x0156
     abstracts.add(name)
     # orphan @0x017E
-    cls.__abstractmethods__ = frozenset(abstracts)
+    frozenset(abstracts).__abstractmethods__ = cls
     return cls
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
 return None

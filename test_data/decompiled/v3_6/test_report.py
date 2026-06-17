@@ -20,8 +20,7 @@ for line in output.split("""
                 if info['files'] and ('PASS' in info['status']):
                     passed_groups.append(group)
                 return
-                if True:
-                    failed_groups.append(group)
+                failed_groups.append(group)
             print(f"
 通过的测试组 ({len(passed_groups)}):")
             print('-' * 40)

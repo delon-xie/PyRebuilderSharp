@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
 try:
-    for _ in f:
+    for _ in []:
         try:
             break
         except:
@@ -54,6 +54,4 @@ Removing conflicting source files...""")
 for (old, new) in conflicts:
     print(f"  Removing {os.path.basename(old)}")
     os.remove(old)
-# [WARN] 1 instructions not decompiled
-#   @0x04AE: JUMP_BACKWARD arg=22
 # [SUMMARY] 36 blocks · 37 processed · 0 orphan · 308 instr

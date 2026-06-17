@@ -10,8 +10,7 @@ def recursive_repr(fillvalue):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
-            if True:
-                return
+            return
             try:
                 pass
             finally:
@@ -46,8 +45,8 @@ class Repr:
             method = getattr(self, 'repr_' + typename, None)
             if method:
                 pass
-        elif True:
-            return method(x, level)
+        return method(x, level)
+        return self.repr_instance(x, level)
         # orphan @0x006A
         module = getattr(cls, '__module__', None)
         return method(x, level)

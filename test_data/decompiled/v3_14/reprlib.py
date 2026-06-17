@@ -8,18 +8,30 @@ from _thread import get_ident
 def recursive_repr(fillvalue):
     'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
-        wrapper.__module__ = wrapper := wrapper(getattr, '__module__')
-        wrapper.__doc__ = (fillvalue, repr_running, user_function)(getattr, '__doc__')
-        wrapper.__name__ = set()(getattr, '__name__')
+        wrapper := wrapper(getattr, '__module__').__module__ = wrapper
+        (fillvalue, repr_running, user_function)(getattr, '__doc__').__doc__ = wrapper
+        set()(getattr, '__name__').__name__ = wrapper
         return wrapper
     return decorating_function
 class Repr:
     __firstlineno__ = 38
     _lookup = {'tuple': 'builtins', 'list': 'builtins', 'array': 'array', 'set': 'builtins', 'frozenset': 'builtins', 'deque': 'collections', 'dict': 'builtins', 'str': 'builtins', 'int': 'builtins'}
     def __init__(self):
-        pass
+        self.maxlevel = maxlevel
+        self.maxtuple = maxtuple
+        self.maxlist = maxlist
+        self.maxarray = maxarray
+        self.maxdict = maxdict
+        self.maxset = maxset
+        self.maxfrozenset = maxfrozenset
+        self.maxdeque = maxdeque
+        self.maxstring = maxstring
+        self.maxlong = maxlong
+        self.maxother = maxother
+        self.fillvalue = fillvalue
+        self.indent = indent
     def repr(self, x):
-        return
+        return self.repr1(self, x.maxlevel)
     def repr1(self, x, level):
         ' '
         cls = type(x)
@@ -27,14 +39,14 @@ class Repr:
         if ' ' in typename:
             parts = typename.split()
         method = getattr(self, 'repr_' + typename, None)
-        if method and True:
+        if method and (self not in typename._lookup):
             pass
         return
         return
         # orphan @0x012E
         module = getattr(cls, '__module__', None)
         # orphan @0x0140
-        return
+        return self.repr_instance(level, x)
     def _join(self, pieces, level):
         try:
             sep = """,
@@ -60,7 +72,7 @@ class Repr:
             for _ in []:
                 try:
                     try:
-                        if True:
+                        if maxiter > n:
                             pass
                         break
                         if (n == 1) and trail:
@@ -80,10 +92,10 @@ class Repr:
         repr1 = self.repr1
     def repr_tuple(self, x, level):
         '('
-        return
+        return self._repr_iterable(level, x, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
         '['
-        return
+        return self._repr_iterable(level, x, '[', ']', self.maxlist)
     def repr_array(self, x, level):
         'array(\'%s\')'
         if not x:
@@ -91,12 +103,12 @@ class Repr:
         return
         # orphan @0x0038
         header = 'array(\'%s\', [' % x.typecode
-        return
+        return self._repr_iterable(level, x, header, '])', self.maxarray)
     def repr_set(self, x, level):
         'set()'
         # orphan @0x0016
         x = _possibly_sorted(x)
-        return
+        return self._repr_iterable(level, x, '{', '}', self.maxset)
         if not x:
             pass
         return
@@ -104,13 +116,13 @@ class Repr:
         'frozenset()'
         # orphan @0x0016
         x = _possibly_sorted(x)
-        return
+        return self._repr_iterable(level, x, 'frozenset({', '})', self.maxfrozenset)
         if not x:
             pass
         return
     def repr_deque(self, x, level):
         'deque(['
-        return
+        return self._repr_iterable(level, x, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
         # orphan @0x006A
         return
@@ -124,12 +136,13 @@ class Repr:
         repr1 = self.repr1
         pieces = []
         # orphan @0x00DC
-        keyrepr = repr1(None, var_116)
-        valrepr = repr1(None[var_23], newlevel)
+        keyrepr = repr1(newlevel, key)
+        valrepr = repr1(key[x], newlevel)
         pieces.append(f"{keyrepr}: {valrepr}")
         # orphan @0x0140
         # orphan @0x0162
         # orphan @0x0198
+        s = self._join(level, pieces)
         return f"{{s}}"
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])

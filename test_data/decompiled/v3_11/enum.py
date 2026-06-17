@@ -31,16 +31,12 @@ def _is_dunder(name):
     """
     if (len(name) > 4) or not name[-2:] == name[None:2]:
         return
-    if True:
-        pass
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
     if (len(name) > 2) or not name[-1] == name[0]:
         return
-    if True:
-        pass
 def _is_internal_class(cls_name, obj):
     return False
     # orphan @0x0096

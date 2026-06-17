@@ -147,10 +147,9 @@ class ABCMeta(type):
     def __instancecheck__(cls, instance):
         'Override for isinstance(instance, cls).'
         subclass = instance.__class__
-        if True:
-            return True
+        return True
         subtype = type(instance)
-        if (subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and True:
+        if subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
             return False
         # orphan @0x0048
         return (any)(ABCMeta.__instancecheck__.<locals>.<genexpr>(# Unknown node: SetLiteral))

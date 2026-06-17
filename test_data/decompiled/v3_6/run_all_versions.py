@@ -17,9 +17,8 @@ results = {}
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     if os.path.exists(pyc):
-        if True:
-            print(f"  Line {i}: expected={e}")
-            print(f"           actual=  {a}")
+        print(f"  Line {i}: expected={e}")
+        print(f"           actual=  {a}")
     else:
         print(f"⏭ {ver}: .pyc not found")
         continue

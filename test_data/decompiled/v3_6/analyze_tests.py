@@ -29,13 +29,12 @@ while i < len(lines):
     print('=' * 70)
     return None
 line = lines[i]
-if ('***' in line) and True:
-    pass
-version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-if version_match:
-    version = version_match.group(1)
-    if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
-        pass
+if '***' in line:
+    version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+    if version_match:
+        version = version_match.group(1)
+        if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
+            pass
 match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
 if match:
     test_name = match.group(1)

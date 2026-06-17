@@ -10,8 +10,7 @@ def recursive_repr(fillvalue):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
-            if True:
-                return
+            return
             try:
                 pass
             finally:

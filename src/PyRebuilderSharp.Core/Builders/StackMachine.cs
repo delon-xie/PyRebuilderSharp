@@ -1309,6 +1309,26 @@ public class StackMachine
             case Opcode.CONVERT_VALUE_313:
                 return null;
 
+            // ---- 3.11+ LIST_APPEND: TOS → append to list at TOS[n] ----
+            case Opcode.LIST_APPEND_313:
+            {
+                var depth = instr.Argument ?? 0;
+                // LIST_APPEND n: pop TOS (item), append to list at stack[-n]
+                // arg=1: pop item, append to list at TOS1 (the list below the item)
+                var item = SafePop();
+                if (item == null) return null;
+                // The list at stack[-depth] should be a ListLiteral from BUILD_LIST
+                // Since records can't be cast/mutated in-place, we pop, modify, push back
+                if (_exprStack.Count >= depth && _exprStack.Peek() is ListLiteral listLit)
+                {
+                    // Only modify if we can find the list — BUILD_LIST already pushed it
+                    // ListLiteral.Elts is a mutable List<Expr>; add the new item
+                    var elts = listLit.Elts;
+                    elts.Add(item);
+                }
+                return null;
+            }
+
             // 3.13+ CALL_INTRINSIC_1: intrinsic function call type 1
             case Opcode.CALL_INTRINSIC_1_313:
                 return null;

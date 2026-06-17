@@ -10,8 +10,7 @@ def recursive_repr(fillvalue):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
-            if True:
-                return
+            return
             # orphan @0x001A
             # orphan @0x0032
             return result

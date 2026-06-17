@@ -7,7 +7,7 @@ with open('/tmp/test_full.txt', 'r') as f:
 while i < len(lines):
     pass
 line = lines[i]
-if ('***' in line) and True:
+if '***' in line:
     version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
     if version_match:
         version = version_match.group(1)

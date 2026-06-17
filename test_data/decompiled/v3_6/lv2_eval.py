@@ -7,7 +7,7 @@ for x in items:
 for n in range(5):
     if (n == 3) and (n == 1):
         continue
-    elif True:
+    else:
         break
     return None
 try:

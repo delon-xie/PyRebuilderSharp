@@ -35,16 +35,12 @@ def _is_dunder(name):
     """
     if (len(name) > 4) or not name[-2:] == name[-2:]:
         return
-    if True:
-        pass
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
     if (len(name) > 2) or not name[-1] == name[-1]:
         return
-    if True:
-        pass
 def _is_internal_class(cls_name, obj):
     if not isinstance(obj, type):
         return False
@@ -375,26 +371,11 @@ class EnumType(type):
                     data_type_method = getattr(member_type, name)
                     if found_method in (data_type_method, object_method):
                         break
-            if (Flag is not None) and True:
+            if Flag is not None:
                 for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
                     if name not in classdict:
                         enum_method = getattr(Flag, name)
                         break
-            elif (Enum is not None) and save_new:
-                pass
-            elif (_order_ is not None) and isinstance(_order_, str):
-                _order_ = _order_.replace(',', ' ').split()
-            elif (Flag is None) and (cls != 'Flag') or (Flag is not None) and not True:
-                break
-            elif (Flag is not None) and True and (member_list != sorted(member_list)):
-                pass
-            elif _order_:
-                _order_ = EnumType.__new__.<locals>.<listcomp>(_order_)
-            elif _order_:
-                _order_ = EnumType.__new__.<locals>.<listcomp>(_order_)
-                if () != _order_._member_names_:
-                    raise
-                return
         def <genexpr>(.0):
             for n in .0:
                 yield repr(n)
@@ -772,9 +753,8 @@ class Enum:
                 result = None
         raise TypeError('%r has no members defined' % cls)
         raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
-        if True:
-            cls[name]
-            return
+        cls[name]
+        return
         # orphan @0x00CC
         result = cls._missing_(value)
         # orphan @0x00FE
@@ -1013,43 +993,8 @@ class Flag(Enum):
             for m in m._name_:
                 pass
             return
-        if (value <= value) and True:
+        if value <= value:
             pass
-        elif cls._boundary_ is STRICT:
-            max_bits = max(value.bit_length(), flag_mask.bit_length())
-            raise ValueError("""%r invalid value %r
-    given %s
-  allowed %s""" % (cls, value, bin(value, max_bits), bin(flag_mask, max_bits)))
-        else:
-            if cls._boundary_ is CONFORM:
-                value &= flag_mask
-            if cls._boundary_ is KEEP:
-                if value < 0:
-                    value = max(all_bits + 1, 2 ** value.bit_length()) + value
-                elif value < 0:
-                    neg_value = value
-                    if cls._boundary_ in (EJECT, KEEP):
-                        value = all_bits + 1 + value
-                    else:
-                        value = singles_mask & value
-                    unknown = value & ~flag_mask
-                    aliases = value & ~singles_mask
-                    member_value = value & singles_mask
-                    if unknown and (cls._boundary_ is not KEEP):
-                        raise ValueError('%s(%r) -->  unknown values %r [%s]' % (cls.__name__, value, unknown, bin(unknown)))
-                    else:
-                        if cls._member_type_ is object:
-                            pseudo_member = object.__new__(cls)
-                        else:
-                            pseudo_member = cls._member_type_.__new__(cls, value)
-                        if not hasattr(pseudo_member, '_value_'):
-                            pseudo_member._value_ = value
-                        elif member_value:
-                            for m in cls._iter_member_(member_value):
-                                members.append(m)
-                                combined_value |= m._value_
-            else:
-                raise ValueError('%r unknown flag boundary %r' % (cls, cls._boundary_))
         # orphan @0x01D4
         # orphan @0x01DA
         value = member_value | aliases
@@ -1228,8 +1173,6 @@ def _simple_enum(etype):
     """
     def convert_class(cls):
         cls_name = cls.__name__
-        if True:
-            pass
         __new__ = cls.__dict__.get('__new__')
         if __new__ is not None:
             new_member = __new__.__func__
@@ -1244,7 +1187,7 @@ def _simple_enum(etype):
         hashable_values = '_hashable_values_'
         unhashable_values = '_unhashable_values_'
         member_type = '_member_type_'
-        if '_value_repr_'(issubclass, Flag) and True:
+        if '_value_repr_'(issubclass, Flag):
             pass
         for (name, obj) in name:
             if name in ('__dict__', '__weakref__'):
@@ -1267,100 +1210,67 @@ def _simple_enum(etype):
             for (name, value) in attrs.items():
                 if isinstance(value, auto) and (auto.value is _auto_null):
                     value = gnv(name, 1, len(member_names), gnv_last_values)
-                elif True:
-                    if not isinstance(value, tuple):
-                        value = (value)
-                    member = new_member(enum_class, **value)
-                    value = value[0]
-                    if __new__ is None:
-                        member._value_ = value
-                    try:
-                        contained = value2member_map.get(member._value_)
-                    except TypeError:
-                        contained = None
-                    if contained is not None:
-                        contained._add_alias_(name)
-                    else:
-                        member._name_ = name
-                        member.__objclass__ = enum_class
-                        member.__init__(value)
-                        member._sort_order_ = len(member_names)
-                    enum_class._add_member_(name, member)
-                    hashable_values.append(value)
-                    if _is_single_bit(value):
-                        member_names.append(name)
-                        single_bits |= value
-                    else:
-                        multi_bits |= value
-                    gnv_last_values.append(value)
-                    setattr(enum_class, name, member)
-                else:
-                    member = new_member(enum_class)
+                elif not isinstance(value, tuple):
+                    value = (value)
         for (name, value) in attrs.items():
             if isinstance(value, auto) and (value.value is _auto_null):
                 value.value = gnv(name, 1, len(member_names), gnv_last_values)
             value = value.value
-            if True:
-                if not isinstance(value, tuple):
-                    value = (value)
-                member = new_member(enum_class, **value)
-                value = value[0]
-                if __new__ is None:
-                    member._value_ = value
-                try:
-                    contained = value2member_map.get(member._value_)
-                except TypeError:
-                    contained = None
-                if contained is not None:
-                    contained._add_alias_(name)
-                else:
-                    member._name_ = name
-                    member.__objclass__ = enum_class
-                    member.__init__(value)
-                    member._sort_order_ = len(member_names)
-                enum_class._add_member_(name, member)
-                member_names.append(name)
-                gnv_last_values.append(value)
-                try:
-                    enum_class._value2member_map_.setdefault(value, member)
-                    if value not in hashable_values:
-                        hashable_values.append(value)
-                    else:
-                        for (name, value) in attrs.items():
-                            if isinstance(value, auto) and (value.value is _auto_null):
-                                value.value = gnv(name, 1, len(member_names), gnv_last_values)
-                            value = value.value
-                            if True:
-                                if not isinstance(value, tuple):
-                                    value = (value)
-                                member = new_member(enum_class, **value)
-                                value = value[0]
-                                if __new__ is None:
-                                    member._value_ = value
-                                try:
-                                    contained = value2member_map.get(member._value_)
-                                except TypeError:
-                                    contained = None
-                                if contained is not None:
-                                    contained._add_alias_(name)
-                                else:
-                                    member._name_ = name
-                                    member.__objclass__ = enum_class
-                                    member.__init__(value)
-                                    member._sort_order_ = len(member_names)
-                                enum_class._add_member_(name, member)
-                                setattr(enum_class, name, member)
-                            else:
-                                member = new_member(enum_class)
-                except TypeError:
-                    enum_class._unhashable_values_map_.setdefault(name, []).append(value)
-                if '__new__' in body:
-                    enum_class.__new_member__ = enum_class.__new__
-                enum_class.__new__ = Enum.__new__
-                return enum_class
-                setattr(enum_class, name, member)
+            if not isinstance(value, tuple):
+                value = (value)
+            member = new_member(enum_class, **value)
+            value = value[0]
+            if __new__ is None:
+                member._value_ = value
+            try:
+                contained = value2member_map.get(member._value_)
+            except TypeError:
+                contained = None
+            if contained is not None:
+                contained._add_alias_(name)
             else:
-                member = new_member(enum_class)
+                member._name_ = name
+                member.__objclass__ = enum_class
+                member.__init__(value)
+                member._sort_order_ = len(member_names)
+            enum_class._add_member_(name, member)
+            member_names.append(name)
+            gnv_last_values.append(value)
+            try:
+                enum_class._value2member_map_.setdefault(value, member)
+                if value not in hashable_values:
+                    hashable_values.append(value)
+                else:
+                    for (name, value) in attrs.items():
+                        if isinstance(value, auto) and (value.value is _auto_null):
+                            value.value = gnv(name, 1, len(member_names), gnv_last_values)
+                        value = value.value
+                        if not isinstance(value, tuple):
+                            value = (value)
+                        member = new_member(enum_class, **value)
+                        value = value[0]
+                        if __new__ is None:
+                            member._value_ = value
+                        try:
+                            contained = value2member_map.get(member._value_)
+                        except TypeError:
+                            contained = None
+                        if contained is not None:
+                            contained._add_alias_(name)
+                        else:
+                            member._name_ = name
+                            member.__objclass__ = enum_class
+                            member.__init__(value)
+                            member._sort_order_ = len(member_names)
+                        enum_class._add_member_(name, member)
+                        setattr(enum_class, name, member)
+            except TypeError:
+                enum_class._unhashable_values_map_.setdefault(name, []).append(value)
+            if '__new__' in body:
+                enum_class.__new_member__ = enum_class.__new__
+            enum_class.__new__ = Enum.__new__
+            return enum_class
+            setattr(enum_class, name, member)
         # orphan @0x03C6
         enum_class._flag_mask_ = single_bits | multi_bits
         enum_class._singles_mask_ = single_bits

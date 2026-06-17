@@ -429,17 +429,10 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    if True:
-        if True:
-            pass
-        def decorating_function(user_function):
-            wrapper.cache_parameters = <lambda>
-            return update_wrapper(wrapper, user_function)
-        return decorating_function
-    elif True and True:
-        user_function = 128
+    def decorating_function(user_function):
         wrapper.cache_parameters = <lambda>
         return update_wrapper(wrapper, user_function)
+    return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
@@ -628,7 +621,7 @@ def _compose_mro(cls, types):
     except:
         break
     def is_related(typ):
-        if True and hasattr(typ, '__mro__') and not isinstance(typ, name_4):
+        if hasattr(typ, '__mro__') and not isinstance(typ, name_4):
             pass
         return
     # [WARN] 3 instructions not decompiled

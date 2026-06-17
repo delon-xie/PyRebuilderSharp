@@ -9,8 +9,7 @@ for n in n == 1:
         pass
     if n == 1:
         continue
-    elif True:
-        f = None
+    f = None
 try:
     x = 1 / 0
 except open:

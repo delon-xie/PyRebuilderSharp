@@ -12,7 +12,7 @@ try:
 except ImportError:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
-    ABCMeta.__module__ = 'abc'
+    'abc'.__module__ = ABCMeta
 __doc__ = 'Abstract Base Classes (ABCs) according to PEP 3119.'
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
@@ -31,7 +31,7 @@ Usage:
         def my_abstract_method(self, arg1, arg2, argN):
             ...
 """
-    funcobj.__isabstractmethod__ = True
+    True.__isabstractmethod__ = funcobj
     return funcobj
 class abstractclassmethod(classmethod):
     __firstlineno__ = 28
@@ -51,7 +51,7 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
     __isabstractmethod__ = True
     def __init__(self, callable):
         'abc.abstractclassmethod'((3, 21), ('remove',))
-        callable.__isabstractmethod__ = True
+        True.__isabstractmethod__ = callable
     __static_attributes__ = ()
 class abstractstaticmethod(staticmethod):
     __firstlineno__ = 52
@@ -71,7 +71,7 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
     __isabstractmethod__ = True
     def __init__(self, callable):
         'abc.abstractstaticmethod'((3, 21), ('remove',))
-        callable.__isabstractmethod__ = True
+        True.__isabstractmethod__ = callable
     __static_attributes__ = ()
 class abstractproperty(property):
     __firstlineno__ = 76
@@ -171,7 +171,7 @@ If cls is not an instance of ABCMeta, does nothing.
     # orphan @0x0150
     abstracts.add(name)
     # orphan @0x0178
-    cls.__abstractmethods__ = frozenset(abstracts)
+    frozenset(abstracts).__abstractmethods__ = cls
     return cls
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
 return None

@@ -122,12 +122,10 @@ class ABCMeta(type):
     def __instancecheck__(cls, instance):
         'Override for isinstance(instance, cls).'
         subclass = instance.__class__
-        if True:
-            return True
+        return True
         subtype = type(instance)
         if subtype is subclass:
-            if True and True:
-                return False
+            return False
             return
         else:
             return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'(# Unknown node: SetLiteral))

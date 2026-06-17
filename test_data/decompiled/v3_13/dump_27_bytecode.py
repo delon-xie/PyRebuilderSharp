@@ -22,27 +22,26 @@ flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}#x")
 next_type = data[pos]
-if (print <= print) and True:
-    pass
-pos += 1
-if (next_type in (115, 116, 122)) and (next_type == 122):
-    length = data[pos]
+if print <= print:
     pos += 1
-length = struct.unpack('<I', data[pos:pos + 4])[0]
-pos += 4
-bytecode = data[pos:pos + length]
-pos += length
-print(f"Bytecode length={length}")
-print(f"Bytecode hex: {bytecode.hex()}")
-HAVE_ARGUMENT = 90
-offset = 0
-instructions = []
-while offset < len(bytecode):
-    pass
-for (off, op, name, arg) in instructions:
+    if (next_type in (115, 116, 122)) and (next_type == 122):
+        length = data[pos]
+        pos += 1
+    length = struct.unpack('<I', data[pos:pos + 4])[0]
+    pos += 4
+    bytecode = data[pos:pos + length]
+    pos += length
+    print(f"Bytecode length={length}")
+    print(f"Bytecode hex: {bytecode.hex()}")
+    HAVE_ARGUMENT = 90
+    offset = 0
+    instructions = []
+    while offset < len(bytecode):
+        pass
+    for (off, op, name, arg) in instructions:
+        break
     break
-break
-break
+    break
 # orphan @0x032C
 op = bytecode[offset]
 offset += 1

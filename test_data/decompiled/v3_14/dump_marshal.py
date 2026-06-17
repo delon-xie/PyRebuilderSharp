@@ -5,7 +5,7 @@ try:
 except:
     pass
 try:
-    for c in repr(c):
+    for c in []:
         try:
             try:
                 break

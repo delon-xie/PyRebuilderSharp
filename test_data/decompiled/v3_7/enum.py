@@ -982,15 +982,10 @@ class Enum:
         return cls._value2member_map_[value]
         if type(value) is cls:
             return value
-        else:
-            if cls._member_map_ or getattr(cls, '_%s__in_progress' % cls.__name__, False):
-                pass
-            elif exc is None:
-                raise ve_exc
-            if True:
-                for (name, unhashable_values) in value in unhashable_values:
-                    if value in unhashable_values:
-                        return cls[name]
+        elif cls._member_map_ or getattr(cls, '_%s__in_progress' % cls.__name__, False):
+            pass
+        elif exc is None:
+            raise ve_exc
         # orphan @0x0092
         # orphan @0x00B6
         raise TypeError('%r has no members defined' % cls)
@@ -1588,8 +1583,6 @@ def _simple_enum(etype):
         # orphan @0x0014
         __new__ = cls.__dict__.get('__new__')
         cls_name = cls.__name__
-        if True:
-            pass
         # orphan @0x0226
         setattr(enum_class, name, enum_method)
         # orphan @0x0236

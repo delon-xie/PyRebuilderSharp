@@ -20,7 +20,8 @@ def dump_code(c, depth):
         if not hasattr(const, 'co_code'):
             pass
         print(f"{prefix}Function: {const.co_name}")
-        break
+        print('%s  argc=%d nlocals=%d code=%dB' % (const, prefix.co_argcount, const.co_nlocals, len(const.co_code)))
+        dump_code(depth, const + 1)
 dump_code(code)
 return None
 raise

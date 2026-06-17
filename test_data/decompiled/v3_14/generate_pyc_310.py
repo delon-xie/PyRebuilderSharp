@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
 try:
-    for _ in f:
+    for _ in []:
         try:
             break
         except:
@@ -42,6 +42,4 @@ input_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/input'
 output_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 output_dir(True, ('exist_ok',))
 python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
-# [WARN] 1 instructions not decompiled
-#   @0x00D6: JUMP_BACKWARD arg=54
 # [SUMMARY] 16 blocks · 17 processed · 0 orphan · 205 instr

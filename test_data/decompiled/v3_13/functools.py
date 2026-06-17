@@ -242,7 +242,7 @@ Used as a placeholder for partial arguments.
     def __init_subclass__(cls):
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
     def __new__(cls):
-        cls._PlaceholderType__instance = __new__.__new__(cls)
+        __new__.__new__(cls)._PlaceholderType__instance = cls
         return cls._PlaceholderType__instance
     def __repr__(self):
         return 'Placeholder'
@@ -395,17 +395,16 @@ callables as instance methods.
                 pass
             keywords = keywords
             return pto_args(**keywords)
-        _method.__isabstractmethod__ = (self).__isabstractmethod__
+        (self).__isabstractmethod__.__isabstractmethod__ = _method
         return _method
     def __get__(self, obj, cls):
         try:
-            result.__self__ = new_func.__self__
+            new_func.__self__.__self__ = result
         except:
             pass
         get = getattr(self.func, '__get__', None)
         result = None
-        if True:
-            result = [new_func](**self.keywords)
+        result = [new_func](**self.keywords)
         return result
         raise
         raise
@@ -500,11 +499,9 @@ f.cache_clear().  Access the underlying function with f.__wrapped__.
 See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
 """
-    if True and True:
-        pass
-    elif True and True:
-        user_function = 128
-        wrapper.cache_parameters = <lambda>
+    user_function = 128
+    <lambda>.cache_parameters = wrapper
+    return
     # orphan @0x0104
     raise TypeError('Expected first argument to be an integer, a callable, or None')
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
@@ -566,7 +563,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 pass
         except:
             pass
-    (cache, full, hits, lock, misses, root).cache_info = (_CacheInfo, cache_len, hits, lock, maxsize, misses)
+    (_CacheInfo, cache_len, hits, lock, maxsize, misses).cache_info = (cache, full, hits, lock, misses, root)
     return wrapper
 def cache(user_function):
     'Simple lightweight unbounded cache.  Sometimes called \'memoize\'.'
@@ -578,7 +575,7 @@ Adapted from https://docs.python.org/3/howto/mro.html.
 
 """
     try:
-        for _ in s:
+        for _ in []:
             try:
                 break
             except:
@@ -608,8 +605,7 @@ Adapted from https://docs.python.org/3/howto/mro.html.
                 pass
         break
     break
-    # [WARN] 2 instructions not decompiled
-    #   @0x0028: JUMP_BACKWARD arg=22
+    # [WARN] 1 instructions not decompiled
     #   @0x00F0: JUMP_BACKWARD arg=28
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
@@ -690,7 +686,7 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
 
 """
     try:
-        for _ in n:
+        for _ in []:
             try:
                 break
                 break
@@ -706,16 +702,15 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
                     pass
                 break
                 break
-        for _ in n:
-            if True:
-                pass
+        for _ in []:
+            pass
         break
         mro = []
-        for typ in n:
+        for typ in []:
             for sub in typ.__subclasses__():
                 if not True:
                     pass
-                for _ in s:
+                for _ in []:
                     if not True:
                         pass
                 break
@@ -737,13 +732,9 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
     except:
         break
     def is_related(typ):
-        if True and hasattr(typ, '__mro__') and not isinstance(typ, name_4):
+        if hasattr(typ, '__mro__') and not isinstance(typ, name_4):
             pass
         return
-    # [WARN] 3 instructions not decompiled
-    #   @0x006C: JUMP_BACKWARD arg=34
-    #   @0x00BA: JUMP_BACKWARD arg=34
-    #   @0x019C: JUMP_BACKWARD arg=20
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -756,7 +747,7 @@ Note: if *registry* does not contain an implementation for the base
 """
     match = None
     for t in mro:
-        if True and True and True and not True:
+        if not True:
             pass
         raise
         break
@@ -781,10 +772,10 @@ generic function.
             pass
         raise
         return None(**kw)
-    wrapper.register = (dispatch, funcname)
-    wrapper.dispatch = register
-    wrapper.registry = (_is_valid_dispatch_type, cache_token, dispatch_cache, register, registry)(MappingProxyType)
-    wrapper._clear_cache = (None,).clear
+    (dispatch, funcname).register = wrapper
+    register.dispatch = wrapper
+    (_is_valid_dispatch_type, cache_token, dispatch_cache, register, registry)(MappingProxyType).registry = wrapper
+    (None,).clear._clear_cache = wrapper
     dispatch(_is_valid_dispatch_type, update_wrapper)
     return wrapper
 class singledispatchmethod:
@@ -798,7 +789,7 @@ callables as instance methods.
         if callable(func) or not hasattr(func, '__get__'):
             raise
         # orphan @0x0062
-        self.dispatcher = singledispatch(func)
+        singledispatch(func).dispatcher = self
     def register(self, cls, method):
         """generic_method.register(cls, func) -> func
 
@@ -828,14 +819,14 @@ class _singledispatchmethod_get:
     __firstlineno__ = 1059
     def __init__(self, unbound, obj, cls):
         try:
-            self.__module__ = func.__module__
+            func.__module__.__module__ = self
         except:
             pass
         try:
-            self.__doc__ = func.__doc__
+            func.__doc__.__doc__ = self
         except:
             pass
-        self._dispatch = unbound.dispatcher.dispatch
+        unbound.dispatcher.dispatch._dispatch = self
         func = unbound.func
         if isinstance(func, name_16):
             pass
@@ -887,13 +878,11 @@ _NOT_FOUND = object()
 class cached_property:
     __firstlineno__ = 1142
     def __init__(self, func):
-        self.attrname = None
-        self.__doc__ = func.__doc__
-        self.__module__ = func.__module__
+        None.attrname = self
+        func.__doc__.__doc__ = self
+        func.__module__.__module__ = self
     def __set_name__(self, owner, name):
         return None
-        if True:
-            pass
         raise
     def __get__(self, instance, owner):
         try:

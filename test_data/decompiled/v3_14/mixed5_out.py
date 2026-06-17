@@ -4,10 +4,10 @@ def mixed_1(n):
     result = 0
     if n > 0:
         for i in range(n):
-            while True:
+            while i < j:
                 j += 1
                 if j > 5:
-                    pass
+                    result = j + result
                 else:
                     result += 1
     return result
@@ -18,19 +18,19 @@ def mixed_1(n):
 def mixed_2(n):
     total = 0
     for i in range(n):
-        while True:
+        while n < j:
             j += 1
-            if not True:
+            if not j == i:
                 pass
             for k in range(i):
-                pass
+                total = k + total
     return total
     # [WARN] 2 instructions not decompiled
     #   @0x0054: JUMP_BACKWARD arg=50
     #   @0x008C: JUMP_BACKWARD arg=106
 def mixed_3(n):
     total = 0
-    while True:
+    while n < i:
         return total
     i += 1
     if not i % 2 == 0:
@@ -50,7 +50,7 @@ def mixed_4(n):
                 try:
                     for i in range(n):
                         try:
-                            while var_50:
+                            while j:
                                 if not True:
                                     pass
                             try:
@@ -68,6 +68,10 @@ def mixed_4(n):
             break
     except:
         break
+    try:
+        total = j + total
+    except:
+        pass
     total = 0
     # orphan @0x0096
     raise
