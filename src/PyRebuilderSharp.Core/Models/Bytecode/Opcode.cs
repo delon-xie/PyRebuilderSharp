@@ -48,8 +48,20 @@ public enum Opcode
     BINARY_OR = 66,
 
     // --- 原地运算 ---
+    // 注意: 3.10 的 INPLACE 操作码重新编号，以下值对应 CPython 3.10 Include/opcode.h
     INPLACE_ADD = 55,
     INPLACE_SUBTRACT = 56,
+    INPLACE_MULTIPLY = 57,
+    INPLACE_MODULO = 59,
+    INPLACE_POWER = 67,
+    INPLACE_FLOOR_DIVIDE = 28,
+    INPLACE_TRUE_DIVIDE = 29,
+    INPLACE_AND = 77,
+    INPLACE_OR = 79,
+    INPLACE_XOR = 78,
+    INPLACE_LSHIFT = 75,
+    INPLACE_RSHIFT = 76,
+    INPLACE_MATRIX_MULTIPLY = 17,
 
     // --- 订阅操作 ---
     STORE_SUBSCR = 49,

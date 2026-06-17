@@ -231,6 +231,13 @@ public class AstBuilder
             {
                 try
                 {
+                    // 跳过已被 BlockScanner.MergeOrphanBlocks 清空的块（0 指令 = 已合并到后继块）
+                    if (orphan.Instructions.Count == 0)
+                    {
+                        _processedBlockIds.Add(orphan.Id);
+                        continue;
+                    }
+
                     var blockDecomp = new BlockDecompiler();
                     var blockResult = blockDecomp.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
                     if (blockResult.IsSuccess)
@@ -2286,7 +2293,20 @@ public class AstBuilder
             }
             else
             {
-                afterStmts = BuildStatements(afterBranch, visited);
+                // bodyBranch == afterBranch: 块已被 GetStructuredBlockStmts 消费，
+                // 其后继即为顺序代码（tailCode），常见于 if X: return Y; Z() 模式。
+                if (bodyBranch == afterBranch && afterBranch != null)
+                {
+                    foreach (var succ in afterBranch.Successors)
+                    {
+                        if (!visited.Contains(succ))
+                            tailCode.AddRange(BuildStatements(succ, visited));
+                    }
+                }
+                else
+                {
+                    afterStmts = BuildStatements(afterBranch, visited);
+                }
             }
         }
 

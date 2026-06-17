@@ -308,6 +308,17 @@ public class StackMachine
             case Opcode.BINARY_XOR: return HandleBinaryOp(Operator.BitXor);
             case Opcode.INPLACE_ADD: return HandleBinaryOp(Operator.Add);
             case Opcode.INPLACE_SUBTRACT: return HandleBinaryOp(Operator.Sub);
+            case Opcode.INPLACE_MULTIPLY: return HandleBinaryOp(Operator.Mul);
+            case Opcode.INPLACE_MODULO: return HandleBinaryOp(Operator.Mod);
+            case Opcode.INPLACE_POWER: return HandleBinaryOp(Operator.Pow);
+            case Opcode.INPLACE_FLOOR_DIVIDE: return HandleBinaryOp(Operator.FloorDiv);
+            case Opcode.INPLACE_TRUE_DIVIDE: return HandleBinaryOp(Operator.Div);
+            case Opcode.INPLACE_AND: return HandleBinaryOp(Operator.BitAnd);
+            case Opcode.INPLACE_OR: return HandleBinaryOp(Operator.BitOr);
+            case Opcode.INPLACE_XOR: return HandleBinaryOp(Operator.BitXor);
+            case Opcode.INPLACE_LSHIFT: return HandleBinaryOp(Operator.LShift);
+            case Opcode.INPLACE_RSHIFT: return HandleBinaryOp(Operator.RShift);
+            case Opcode.INPLACE_MATRIX_MULTIPLY: return HandleBinaryOp(Operator.MatMul);
 
             // ---- BINARY_SUBSCR (a[b]) and Python 2 SLICE opcodes ----
             case Opcode.BINARY_SUBSCR:
