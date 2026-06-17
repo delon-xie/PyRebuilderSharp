@@ -2189,10 +2189,13 @@ public class AstBuilder
         var targetOffset = lastInstr.Argument!.Value;
         var isWordcode = _codeObject.Instructions.Count > 1
                       && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
+        // 3.10 特殊处理：ParseInstructionsWordcode 已将 arg *2 转为绝对字节偏移
+        // 3.11+ wordcode: arg 是相对字节偏移，需加上 current_offset + 2
         if (isWordcode
             && lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                 or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38
+                && _codeObject.Version != PythonVersion.Py310)
         {
             targetOffset = lastInstr.Offset + 2 + targetOffset;
         }
@@ -2511,7 +2514,8 @@ public class AstBuilder
         if (isWordcode
             && lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                 or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38
+                && _codeObject.Version != PythonVersion.Py310)
         {
             targetOffset = lastInstr.Offset + 2 + targetOffset;
         }
