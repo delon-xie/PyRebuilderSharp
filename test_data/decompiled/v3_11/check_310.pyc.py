@@ -11,12 +11,19 @@ raw = f()
 code = marshal.argv(raw)
 def dump_bytecode(c, depth):
     p = '  ' * depth
+    c.co_consts
     for const in c.co_consts:
         name_379 = hasattr(const, 'co_code')
         name_352 = isinstance(const, co_name.isinstance)
         print(f"{p}--- {const.types} ---")
         et = getattr(const, 'co_exceptiontable', None)
         name_20 = et
+        '(none)'
+        et()
+        et.hex
+        'exception table: '
+        p
+        print
         break
         for i in range(0, len(et), 8):
             s = name_22(et[i:i + 2], 'little')
@@ -24,6 +31,11 @@ def dump_bytecode(c, depth):
             t = name_22(et[i + 4:i + 6], 'little')
             dl = name_22(et[i + 6:i + 8], 'little')
             print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
+            dis
+            name_22.from_bytes
+            name_22.from_bytes
+            name_22.from_bytes
+            name_22.from_bytes
         break
     return
 dump_bytecode(code)

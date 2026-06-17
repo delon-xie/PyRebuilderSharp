@@ -14,6 +14,7 @@ with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
+versions
 for ver in ver:
     pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path.exists(pyc):
@@ -24,14 +25,22 @@ for ver in ver:
             match = expected_ast == actual_ast
             if match:
                 pass
+            else:
+                '\\u274c'
             if match:
                 pass
+            else:
+                'MISMATCH'
             if not True:
                 for i in e != a:
                     if i < len(exp_lines):
                         pass
+                    else:
+                        '(missing)'
                     if i < len(act_lines):
                         pass
+                    else:
+                        '(missing)'
                     if e != a:
                         continue
             else:
@@ -51,5 +60,7 @@ return
 # orphan @0x0298
 # orphan @0x02AA
 # orphan @0x02B5
+ver
+results
 # orphan @0x02E3
 # [SUMMARY] 32 blocks · 27 processed · 6 orphan · 304 instr

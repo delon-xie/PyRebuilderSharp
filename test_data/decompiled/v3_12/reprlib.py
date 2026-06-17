@@ -65,14 +65,16 @@ class Repr:
             raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         indent *= ' '
         if not -len(indent):
-            pass
+            None
         return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
+            []
             for elem in repr1(elem, newlevel):
                 try:
                     try:
+                        []
                         if n > maxiter:
                             pieces.append(self.fillvalue)
                         s = self._join(pieces, level)
@@ -91,6 +93,8 @@ class Repr:
             s = self.fillvalue
         newlevel = level - 1
         repr1 = self.repr1
+        elem
+        islice(x, maxiter)
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
@@ -125,6 +129,10 @@ class Repr:
             j = max(0, self.maxstring - 3 - i)
             s = None // i(x + (len(x) - j) // None)
             s += (len(s) - j) // None
+            None // i + self.fillvalue
+            s
+            x
+            builtins.repr
         return s
     def repr_int(self, x, level):
         try:
@@ -139,6 +147,8 @@ class Repr:
                         import sys
                         k = 1 + int(math.log10(abs(x)))
                         max_digits = sys.get_int_max_str_digits()
+                        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
+                        '<'
                     except:
                         exc = None
                 except:
@@ -151,6 +161,8 @@ class Repr:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s += (len(s) - j) // None
+            None // i + self.fillvalue
+            s
         return s
         exc = None
         return
@@ -162,11 +174,13 @@ class Repr:
         try:
             s = builtins.repr(x)
         except:
-            pass
+            '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
             s += (len(s) - j) // None
+            None // i + self.fillvalue
+            s
         return s
         return
         # orphan @0x0178
@@ -175,18 +189,15 @@ class Repr:
         raise
 def _possibly_sorted(x):
     try:
-        try:
-            if list:
-                pass
-            else:
-                raise
-            raise
-        except:
-            pass
+        sorted(x)
     except:
-        pass
+        list(x)
     return
     return
+    # orphan @0x0046
+    raise
+    # orphan @0x0048
+    raise
 aRepr = Repr()
 repr = aRepr.repr
 return None

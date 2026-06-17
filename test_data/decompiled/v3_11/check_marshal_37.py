@@ -12,6 +12,10 @@ Marshaled ({len(m)} bytes):")
 ' '(<genexpr>(m[None:40]()))
 """
 Byte 0 = """(f"{m[0]}{'02x'}")
+range(0, 8)
+print
+' '.join
+print
 for offset in range(0, 8):
     vals = struct.hex('<IIII', m, offset)
     name_160 = vals[0] == code.compile
@@ -21,5 +25,8 @@ for offset in range(0, 8):
 Fields found at offset {offset}:")
     print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
     ' '.join(f" {<genexpr>(m[offset:offset + 16]())}")
+    None
+    '  Bytes: '
+    print
 return
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 214 instr

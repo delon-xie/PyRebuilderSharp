@@ -9,6 +9,7 @@ i = 0
 while i < 5:
     j = i * 2
     i += 1
+range(10)
 for n in range(10):
     m = n + 1
 try:
@@ -21,4 +22,5 @@ z = y
 # orphan @0x0034
 j = i * 2
 i += 1
+i < 5
 # [SUMMARY] 12 blocks · 12 processed · 1 orphan · 63 instr

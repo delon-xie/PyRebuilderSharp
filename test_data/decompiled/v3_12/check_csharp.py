@@ -6,11 +6,15 @@ except:
     break
 import struct
 import sys
+open(sys.argv[1], 'rb')
 off = 16
 raw = data[off]
 type_byte = raw & 127
 'Type byte at '(f"{off}: {raw}{'#x'}, clean: {type_byte} (TYPE_CODE={type_byte == 99})")
 off += 1
+('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
+print
+None
 for name in struct.unpack:
     val = '<i'(data, off // (off + 4))[0]
     print(f"  {name}: {val} (off {off})")

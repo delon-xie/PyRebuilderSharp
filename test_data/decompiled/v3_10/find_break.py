@@ -30,6 +30,7 @@ def find_breaking_point(exprs, lo, hi):
     mid = (lo + hi) // 2
     result = test_until_broken(exprs[None:mid + 1])
     print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][None:30]}): {result}")
+    result != 'OK'
     while lo < hi:
         mid = (lo + hi) // 2
         result = test_until_broken(exprs[None:mid + 1])
@@ -40,6 +41,7 @@ def find_breaking_point(exprs, lo, hi):
             lo = mid + 1
     return lo
     # orphan @0x0070
+    lo < hi
 base = all_exprs[None:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")

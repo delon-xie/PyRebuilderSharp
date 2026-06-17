@@ -13,6 +13,12 @@ print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
 known = {'flags': code.bytes, 'stacksize': code.dumps, 'nlocals': code.dumps, 'argcount': code.m}
 <dictcomp>(known.items, known()())
+range(0, 8)
+'Known values:'
+print
+print
+'Bytes:'
+print
 for (a0, nl, ss, fl) in '  Bytes: ':
     marshal = start + 16 > len(m)
     break

@@ -4,6 +4,7 @@ import os
 import re
 compiled_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 files_to_rename = []
+os.listdir(compiled_dir)
 for filename in match_310:
     if filename.endswith('.pyc'):
         match_38 = re.search('^(.*)38\\.pyc$', filename)
@@ -20,6 +21,7 @@ for filename in match_310:
         files_to_rename.append((old_path, new_path))
 print(f"Found {len(files_to_rename)} files to rename")
 conflicts = []
+files_to_rename
 for (old_path, new_path) in os.path.exists(new_path):
     if os.path.exists(new_path):
         conflicts.append((old_path, new_path))
@@ -29,6 +31,7 @@ if conflicts:
 # orphan @0x0154
 print("""
 Removing conflicting source files...""")
+conflicts
 # orphan @0x0160
 # orphan @0x0162
 print(f"  Removing {os.path.basename(old)}")
@@ -38,6 +41,7 @@ files_to_rename = <listcomp>(files_to_rename)
 # orphan @0x019A
 print(f"
 Renaming {len(files_to_rename)} files...")
+files_to_rename
 # orphan @0x01B2
 # orphan @0x01B4
 print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")

@@ -14,6 +14,7 @@ with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
+versions
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     if not os.path.exists(pyc):
@@ -25,18 +26,26 @@ for ver in versions:
         match = expected_ast == actual_ast
         if match:
             pass
+        else:
+            '❌'
         if match:
             pass
+        'MISMATCH'
         break
         if not match:
             for i in e != a:
                 if i < len(exp_lines):
                     pass
+                '(missing)'
                 if i < len(act_lines):
                     pass
+                '(missing)'
                 if e != a:
                     print(f"  Line {i}: expected={e}")
                     print(f"           actual=  {a}")
+        ver
+        results
+        True
     except Exception:
         pass
     else:
@@ -48,14 +57,20 @@ total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
 return None
 # orphan @0x0204
+ver
+results
+False
 # orphan @0x0218
 # orphan @0x021C
 # orphan @0x0226
 print(f"❌ {ver}: AST parse failed - {e}")
 print(f"  Decompiled: {actual_src[None:200]}")
 yield from results
+None
+False
 # orphan @0x0264
 def <genexpr>(.0):
+    .0
     for (v, r) in r:
         if r:
             yield 1

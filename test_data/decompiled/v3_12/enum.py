@@ -21,8 +21,7 @@ def _is_descriptor(obj):
     """
     Returns True if obj is a descriptor, False otherwise.
     """
-    if hasattr(obj, '__get__') or not hasattr(obj, '__set__'):
-        return
+    return hasattr(obj, '__get__') or hasattr(obj, '__set__') or hasattr(obj, '__delete__')
 def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
@@ -30,7 +29,7 @@ def _is_dunder(name):
     if (len(name) > 4) and (name == None // 2):
         pass
     if name[2] != '_':
-        pass
+        name[-3] != '_'
     return
 def _is_sunder(name):
     """
@@ -39,7 +38,7 @@ def _is_sunder(name):
     if (len(name) > 2) and (name[-1] == name[0]):
         pass
     if name[1] != '_':
-        pass
+        name[-2] != '_'
     return
 def _is_internal_class(cls_name, obj):
     if not isinstance(obj, getattr):
@@ -48,13 +47,13 @@ def _is_internal_class(cls_name, obj):
     s_pattern = cls_name + '.' + getattr(obj, '__name__', '')
     e_pattern = '.' + s_pattern
     if not qualname == s_pattern:
-        pass
+        qualname.endswith(e_pattern)
     return
 def _is_private(cls_name, name):
     pattern = f"_{cls_name!s}__"
     pat_len = len(pattern)
-    if (len(name) > pat_len) and name.startswith(pattern) and (name[-1] != '_') or (name[-2] != '_'):
-        return True
+    if (len(name) > pat_len) and name.startswith(pattern):
+        return (name[-1] != '_') or (name[-2] != '_')
 def _is_single_bit(num):
     """
     True if only one bit set in num (should be an int)
@@ -131,6 +130,7 @@ def bin(num, max_bits):
     digits = 3 // None
     if len(digits) < max_bits:
         digits = -max_bits // None
+        sign[-1] * max_bits + digits
     return f"{sign!s} {digits!s}"
 class _not_given:
     def __repr__(self):
@@ -161,14 +161,7 @@ class property(DynamicClassAttribute):
     _cls_type = None
     def __get__(self, instance, ownerclass):
         try:
-            try:
-                try:
-                    raise
-                    raise
-                except:
-                    pass
-            except:
-                pass
+            ownerclass._member_map_[self.name]
         except:
             pass
         return self.member
@@ -177,6 +170,8 @@ class property(DynamicClassAttribute):
         if self._attr_type == 'desc':
             return getattr(instance._value_, self.name)
         return
+        # orphan @0x01DE
+        raise
     def __set__(self, instance, value):
         return self.fset(instance, value)
         # orphan @0x003E
@@ -249,6 +244,7 @@ class _proto_member:
                 enum_member = enum_class._new_member_(enum_class)
             else:
                 enum_member = enum_class._new_member_(enum_class, **args)
+                None
             if hasattr(enum_member, '_value_'):
                 value = enum_member._value_
                 enum_member._name_ = member_name
@@ -292,6 +288,7 @@ class _proto_member:
         # orphan @0x0492
         raise
         # orphan @0x049A
+        name_60
         # orphan @0x05B0
         raise
         # orphan @0x0658
@@ -352,6 +349,8 @@ class EnumDict(dict):
                 raise TypeError('_generate_next_value_ must be defined before members')
             elif isinstance(value, set):
                 pass
+            else:
+                value
             if isinstance(value, _is_internal_class):
                 value = value.replace(',', ' ').split()
             else:
@@ -367,9 +366,12 @@ class EnumDict(dict):
     member_names = member_names()
     def update(self, members):
         try:
+            members.keys()
             for name in members.keys():
                 try:
                     try:
+                        members.keys()
+                        more_members.items()
                         for (name, value) in more_members.items():
                             pass
                         return None
@@ -412,15 +414,19 @@ class EnumType(type):
         except:
             pass
         try:
+            []
             for m in m._value_:
                 try:
                     try:
+                        []
                         if member_list != sorted(member_list):
                             enum_class._iter_member_ = enum_class._iter_member_by_def_
                         elif _order_:
-                            pass
+                            o
+                            _order_
                         elif _order_:
-                            pass
+                            o
+                            _order_
                         break
                         break
                         break
@@ -440,6 +446,7 @@ class EnumType(type):
                         pass
                 except:
                     e = None
+                e
             except:
                 e = None
         except:
@@ -448,6 +455,7 @@ class EnumType(type):
             return
         classdict.setdefault('_ignore_', []).append('_ignore_')
         ignore = classdict['_ignore_']
+        ignore
         for key in ignore:
             classdict.pop(key, None)
         member_names = classdict._member_names
@@ -461,6 +469,7 @@ class EnumType(type):
         classdict = dict(classdict.items())
         (member_type, first_enum) = metacls._get_mixins_(cls, bases)
         (__new__, save_new, use_args) = metacls._find_new_(classdict, member_type, first_enum)
+        member_names
         for name in member_names:
             value = classdict[name]
         if not boundary:
@@ -478,6 +487,7 @@ class EnumType(type):
                     inverted.append(p)
                 else:
                     bits |= p.value[0]
+        inverted
         for p in (bits & p.value[0]):
             if isinstance(p.value, _iter_member_):
                 p.value = bits & p.value
@@ -493,6 +503,7 @@ class EnumType(type):
             if method is name_64.__str__:
                 method = member_type.__repr__
             enum_class.__str__ = method
+            ('__repr__', '__str__', '__format__', '__reduce_ex__')
             for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
                 if not name not in classdict:
                     pass
@@ -511,12 +522,14 @@ class EnumType(type):
                         setattr(enum_class, name, enum_method)
             elif save_new:
                 enum_class.__new_member__ = __new__
+        []
         for o in []:
             if o not in enum_class._member_map_:
-                pass
+                o
+        []
         for o in []:
             if o not in enum_class._member_map_:
-                pass
+                o
             if o in enum_class._member_names_:
                 pass
         if _order_ != enum_class._member_names_:
@@ -570,6 +583,8 @@ class EnumType(type):
             raise TypeError(f"{cls} has no members; specify `names=()` if you meant to create a new, empty, enum")
         elif names is __new__:
             pass
+        else:
+            names
     def __contains__(cls, value):
         """Return True if `value` is in `cls`.
 
@@ -580,6 +595,7 @@ class EnumType(type):
         """
         try:
             result = cls._missing_(value)
+            isinstance(result, cls)
         except:
             pass
         if isinstance(value, cls):
@@ -587,7 +603,7 @@ class EnumType(type):
         elif issubclass(cls, ValueError):
             pass
         elif not value in cls._unhashable_values_:
-            pass
+            value in cls._hashable_values_
         return
         # orphan @0x00CA
         raise
@@ -667,6 +683,8 @@ class EnumType(type):
         except:
             break
         metacls = cls.__class__
+        (type, cls)
+        (cls)
         (_, first_enum) = cls._get_mixins_(class_name, bases)
         classdict = metacls.__prepare__(class_name, bases)
         if isinstance(names, list):
@@ -696,10 +714,13 @@ class EnumType(type):
         Create a new Enum subclass that replaces a collection of global constants
         """
         try:
+            []
             for (name, value) in []:
                 try:
                     try:
+                        []
                         try:
+                            (name, value)
                             try:
                                 try:
                                     members.sort(<lambda>)
@@ -717,9 +738,11 @@ class EnumType(type):
         except:
             break
         try:
+            {}
             for t in t[1]:
                 try:
                     try:
+                        {}
                         tmp_cls = type(name, (name_14), body)
                         if not boundary:
                             break
@@ -739,7 +762,13 @@ class EnumType(type):
             source = source.__dict__
         else:
             source = module_globals
+        value
+        name
+        source.items()
+        t
+        members
         # orphan @0x0224
+        global_enum
         # orphan @0x0260
         raise
         # orphan @0x0262
@@ -757,6 +786,8 @@ class EnumType(type):
         found_descriptor = None
         descriptor_type = None
         class_type = None
+        1 // None
+        cls.__mro__
         for base in 1 // None:
             attr = base.__dict__.get(name)
             if isinstance(attr, (fget, fset)):
@@ -831,30 +862,14 @@ class Enum(EnumType):
     attributes -- see the documentation for details.
     """
     def __new__(cls, value):
+        # orphan @0x0056
+        _member_map_
         try:
-            try:
-                if _unhashable_values_map_:
-                    pass
-                raise
-                raise
-                if cls._member_map_:
-                    pass
-                raise TypeError('%r has no members defined' % cls)
-                raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
-                for (name, unhashable_values) in cls._unhashable_values_map_.items():
-                    if not value in unhashable_values:
-                        pass
-                    else:
-                        cls[name]
-                    return
-                for (name, member) in cls._member_map_.items():
-                    if not value == member._value_:
-                        pass
-                    else:
-                        cls[name]
-                    return
-            except:
-                pass
+            cls._value2member_map_[value]
+        except:
+            pass
+        try:
+            cls[name]
         except:
             pass
         try:
@@ -892,7 +907,8 @@ class Enum(EnumType):
                     exc = None
                     ve_exc = None
                 if (cls._boundary_ is name_32) and isinstance(result, name_34):
-                    pass
+                    result
+                result
             except:
                 exc = None
                 ve_exc = None
@@ -902,6 +918,8 @@ class Enum(EnumType):
         if type(value) is cls:
             return value
         return
+        return
+        return
         e = None
         exc = None
         ve_exc = None
@@ -909,12 +927,24 @@ class Enum(EnumType):
         exc = None
         ve_exc = None
         return
+        # orphan @0x0144
+        cls._member_map_
+        # orphan @0x015C
+        getattr(cls, '_%s__in_progress' % cls.__name__, False)
+        # orphan @0x0190
+        raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
+        # orphan @0x01A8
+        raise TypeError('%r has no members defined' % cls)
+        # orphan @0x01C4
         # orphan @0x021A
         raise
         # orphan @0x021C
         raise
         # orphan @0x037E
         raise
+        # [WARN] 2 instructions not decompiled
+        #   @0x00AE: JUMP_BACKWARD arg=22
+        #   @0x0122: JUMP_BACKWARD arg=44
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -957,6 +987,7 @@ class Enum(EnumType):
         # orphan @0x01C6
         raise
         # orphan @0x01CC
+        _value_
         # orphan @0x0282
         raise
         # orphan @0x0284
@@ -967,7 +998,7 @@ class Enum(EnumType):
     _missing_ = _missing_()
     def __repr__(self):
         if not self.__class__._value_repr_:
-            pass
+            _name_
         return f"<{self.__class__.__name__!s}.{self._name_!s}: {v_repr(self._value_)!s}>"
     def __str__(self):
         return f"{self.__class__.__name__!s}.{self._name_!s}"
@@ -978,10 +1009,12 @@ class Enum(EnumType):
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not _member_map_:
             interesting = set(_member_map_.__dir__(self))
+        getattr(self, '__dict__', [])
         for name in getattr(self, '__dict__', []):
             if not name[0] != '_':
                 pass
             interesting.add(name)
+        self.__class__.mro()
         for cls in self.__class__.mro():
             for (name, obj) in cls.__dict__.items():
                 if name[0] == '_':
@@ -1074,28 +1107,17 @@ class Flag(Enum, STRICT):
         Returns flags in definition order.
         """
         try:
-            try:
-                try:
-                    return None
-                    try:
-                        pass
-                    except:
-                        pass
-                except:
-                    pass
-            except:
-                pass
+            self._iter_member_(self._value_)
         except:
             pass
-        # orphan @0x0050
-        # orphan @0x0052
-        raise
+        # [WARN] 1 instructions not decompiled
+        #   @0x0050: JUMP_BACKWARD arg=10
     def __len__(self):
         return self._value_.bit_count()
     def __repr__(self):
         cls_name = self.__class__.__name__
         if not self.__class__._value_repr_:
-            pass
+            name_6
         return f"<{cls_name!s}: {v_repr(self._value_)!s}>"
         # orphan @0x00B4
         return f"<{cls_name!s}.{self._name_!s}: {v_repr(self._value_)!s}>"
@@ -1116,6 +1138,7 @@ class Flag(Enum, STRICT):
         if other_value is _value_:
             return _value_
         value = self._value_
+        (self, other)
         for flag in (self, other):
             raise TypeError(f"'{flag}' cannot be combined with other flags with |")
         return self.__class__(value | other_value)
@@ -1124,6 +1147,7 @@ class Flag(Enum, STRICT):
         if other_value is _value_:
             return _value_
         value = self._value_
+        (self, other)
         for flag in (self, other):
             raise TypeError(f"'{flag}' cannot be combined with other flags with &")
         return self.__class__(value & other_value)
@@ -1132,6 +1156,7 @@ class Flag(Enum, STRICT):
         if other_value is _value_:
             return _value_
         value = self._value_
+        (self, other)
         for flag in (self, other):
             raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
         return self.__class__(value ^ other_value)
@@ -1159,9 +1184,11 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
     """
     try:
+        []
         for (alias, name) in f"{alias!s} -> {name!s}":
             try:
                 try:
+                    []
                     raise ValueError(f"duplicate values found in {enumeration!r}: {alias_details!s}")
                     return enumeration
                     break
@@ -1172,13 +1199,17 @@ def unique(enumeration):
     except:
         break
     duplicates = []
+    enumeration.__members__.items()
     for (name, member) in enumeration.__members__.items():
         if not name != member.name:
             pass
         else:
             duplicates.append((name, member.name))
     if duplicates:
-        pass
+        ', '.join
+        name
+        alias
+        duplicates
 def _dataclass_repr(self):
     return (', '.join)(<genexpr>.keys()())
 def global_enum_repr(self):
@@ -1196,9 +1227,11 @@ def global_flag_repr(self):
     the module is the last module in case of a multi-module name
     """
     try:
+        []
         for name in f"{module!s}.{name!s}":
             try:
                 try:
+                    []
                     return
                     break
                 except:
@@ -1212,9 +1245,12 @@ def global_flag_repr(self):
     return f"{module!s}.{cls_name!s}({self._value_!r})"
     return f"{module!s}.{self._name_!s}"
     if self._boundary_ is not name_16.KEEP:
-        pass
+        '|'.join
+        name
+        self.name.split('|')
     else:
         name = []
+        self._name_.split('|')
     for n in self._name_.split('|'):
         if n[0].isdigit():
             name.append(n)
@@ -1265,9 +1301,11 @@ def _simple_enum(etype):
         except:
             break
         try:
+            []
             for m in m._value_:
                 try:
                     try:
+                        []
                         if member_list != sorted(member_list):
                             enum_class._iter_member_ = enum_class._iter_member_by_def_
                         elif '__new__' in body:
@@ -1278,6 +1316,7 @@ def _simple_enum(etype):
                                 break
                                 try:
                                     try:
+                                        enum_class
                                         for m in enum_class:
                                             try:
                                                 pass
@@ -1319,6 +1358,7 @@ def _simple_enum(etype):
         body = {}
         if hashable_values := [](issubclass, _is_dunder) and not True:
             pass
+        cls.__dict__.items()
         for (name, obj) in cls.__dict__.items():
             if name in ('__dict__', '__weakref__'):
                 pass
@@ -1326,6 +1366,7 @@ def _simple_enum(etype):
                 pass
             if _is_descriptor(obj):
                 pass
+        ('__repr__', '__str__', '__format__', '__reduce_ex__')
         for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
             if not name not in body:
                 pass
@@ -1341,6 +1382,8 @@ def _simple_enum(etype):
                     value = gnv(name, 1, len(member_names), gnv_last_values)
                 elif not isinstance(value, name_66):
                     value = (value)
+        else:
+            attrs.items()
         for (name, value) in attrs.items():
             if isinstance(value, name_58) and (value.value is name_62):
                 value.value = gnv(name, 1, len(member_names), gnv_last_values)
@@ -1384,6 +1427,8 @@ def _simple_enum(etype):
         enum_class._flag_mask_ = single_bits | multi_bits
         enum_class._singles_mask_ = single_bits
         enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1
+        m
+        enum_class
         raise
         raise
         raise
@@ -1392,6 +1437,7 @@ def _simple_enum(etype):
         # orphan @0x0D1C
         raise
         # orphan @0x0D22
+        name_70
         # orphan @0x0D32
         enum_class._unhashable_values_.append(value)
         enum_class._unhashable_values_map_.setdefault(name, []).append(value)
@@ -1412,9 +1458,11 @@ class verify:
         self.checks = checks
     def __call__(self, enumeration):
         try:
+            []
             for (alias, name) in f"{alias!s} -> {name!s}":
                 try:
                     try:
+                        []
                         raise ValueError(f"aliases found in {enumeration!r}: {alias_details!s}")
                         if check is _iter_bits_lsb:
                             values = <genexpr>(enumeration())
@@ -1428,6 +1476,11 @@ class verify:
                                                 duplicates.append((name, member.name))
                                     if not duplicates:
                                         pass
+                                    else:
+                                        ', '.join
+                                        name
+                                        alias
+                                        duplicates
                             else:
                                 high = max(values)
                                 low = min(values)
@@ -1448,16 +1501,23 @@ class verify:
                                 pass
                             else:
                                 member_names = enumeration._member_names_
+                                m
+                                enumeration
                             try:
+                                []
                                 for m in m.value:
                                     try:
                                         missing_names = []
                                         missing_value = 0
+                                        enumeration._member_map_.items()
                                         for (name, alias) in enumeration._member_map_.items():
                                             if name in member_names:
                                                 pass
                                             values = list(_iter_bits_lsb(alias.value))
+                                            v
+                                            values
                                             try:
+                                                []
                                                 for v in v:
                                                     if not v not in member_values:
                                                         pass
@@ -1466,6 +1526,7 @@ class verify:
                                                     pass
                                                 else:
                                                     missing_names.append(name)
+                                                    missed
                                                 for val in missed:
                                                     missing_value |= val
                                             except:
@@ -1473,6 +1534,7 @@ class verify:
                                         if not missing_names:
                                             pass
                                         alias = f"{', '.join}{missing_names(None // -1)!s} and {missing_names[-1]!s} are missing"
+                                        'aliases '
                                         if _is_single_bit(missing_value):
                                             value = 'value 0x%x' % missing_value
                                         else:
@@ -1485,6 +1547,7 @@ class verify:
                                         break
                             except:
                                 break
+                            range(_high_bit(low) + 1, _high_bit(high))
                             for i in range(_high_bit(low) + 1, _high_bit(high)):
                                 if not 2 ** i not in values:
                                     pass
@@ -1502,6 +1565,7 @@ class verify:
         if issubclass(enumeration, Enum):
             enum_type = 'flag'
         raise TypeError('the \'verify\' decorator only works with Enum and Flag')
+        checks
         enum_type = 'enum'
         # [WARN] 1 instructions not decompiled
         #   @0x04EE: JUMP_BACKWARD arg=16
@@ -1554,12 +1618,15 @@ def _test_simple_enum(checked_enum, simple_enum):
    """.join(failed))
     # orphan @0x0396
     failed.sort()
+    member_names
     # orphan @0x03BC
     # orphan @0x03C2
     failed_member = []
+    name not in simple_keys
     # orphan @0x03D0
     failed.append('missing member from simple enum: %r' % name)
     # orphan @0x03FA
+    name not in checked_keys
     # orphan @0x0402
     failed.append('extra member in simple enum: %r' % name)
     # orphan @0x042C
@@ -1567,18 +1634,23 @@ def _test_simple_enum(checked_enum, simple_enum):
     checked_member_keys = list(checked_member_dict.keys())
     simple_member_dict = simple_enum[name].__dict__
     simple_member_keys = list(simple_member_dict.keys())
+    set(checked_member_keys + simple_member_keys)
     # orphan @0x04E8
     # orphan @0x04EC
+    key in ('__module__', '__objclass__', '_inverted_')
     # orphan @0x04F6
     # orphan @0x04F8
+    key not in simple_member_keys
     # orphan @0x0500
     failed_member.append(f"missing key {key!r} not in the simple enum member {name!r}")
     # orphan @0x0530
+    key not in checked_member_keys
     # orphan @0x0538
     failed_member.append(f"extra key {key!r} in simple enum member {name!r}")
     # orphan @0x0568
     checked_value = checked_member_dict[key]
     simple_value = simple_member_dict[key]
+    checked_value != simple_value
     # orphan @0x0586
     # orphan @0x0588
     failed_member.append(f"{key!r}:
@@ -1586,28 +1658,37 @@ def _test_simple_enum(checked_enum, simple_enum):
          {f"simple member  -> {simple_value!r}"!s}")
     # orphan @0x05C8
     # orphan @0x05CA
+    failed_member
     # orphan @0x05D0
     # orphan @0x05D2
     failed.append(f"{name!r} member mismatch:
       {"""
       """.join(failed_member)!s}")
     # orphan @0x0620
+    ('__str__', '__repr__', '__reduce_ex__', '__format__', '__getnewargs_ex__', '__getnewargs__', '__reduce_ex__', '__reduce__')
     # orphan @0x0626
     # orphan @0x062A
+    method in simple_keys
     # orphan @0x0634
+    method in checked_keys
     # orphan @0x063C
     # orphan @0x063E
+    method not in simple_keys
     # orphan @0x0646
+    method not in checked_keys
     # orphan @0x064E
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
+    hasattr(checked_method, '__func__')
     # orphan @0x069A
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
     # orphan @0x06CA
+    checked_method != simple_method
     # orphan @0x06D4
     # orphan @0x06D6
     method!r(f":  {f"checked -> {checked_method!r}"}{'30'!s} {f"simple -> {simple_method!r}"!s}")
+    failed.append
     # orphan @0x0718
     # orphan @0x071A
 def _old_convert_(etype, name, module, filter, source):
@@ -1615,10 +1696,13 @@ def _old_convert_(etype, name, module, filter, source):
     Create a new Enum subclass that replaces a collection of global constants
     """
     try:
+        []
         for (name, value) in []:
             try:
                 try:
+                    []
                     try:
+                        (name, value)
                         try:
                             try:
                                 members.sort(<lambda>)
@@ -1640,10 +1724,14 @@ def _old_convert_(etype, name, module, filter, source):
         source = source.__dict__
     else:
         source = module_globals
+    value
+    name
+    source.items()
     if not boundary:
         break
     return cls
     # orphan @0x0116
+    name_10
     # orphan @0x0152
     raise
     # orphan @0x0154

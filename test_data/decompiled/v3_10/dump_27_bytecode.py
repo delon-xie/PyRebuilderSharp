@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 # orphan @0x0144
+chr(next_type)
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
 data = open(path, 'rb').read()
@@ -22,6 +23,7 @@ pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
 if next_type <= next_type:
+    '?'
     pos += 1
     if (next_type in (115, 116, 122)) and (next_type == 122):
         length = data[pos]
@@ -47,10 +49,14 @@ if next_type <= next_type:
         else:
             if op >= HAVE_ARGUMENT:
                 pass
+            else:
+                1
             if not offset < len(bytecode):
                 for (off, op, name, arg) in instructions:
                     if arg is not None:
                         pass
+                    else:
+                        ''
                     break
             while op >= HAVE_ARGUMENT:
                 pass
@@ -60,4 +66,5 @@ print(f"
 Constants at {pos}:")
 const_type = data[pos]
 '  Type: '(f"{const_type}{'#x'}")
+print
 # [SUMMARY] 25 blocks · 24 processed · 2 orphan · 701 instr

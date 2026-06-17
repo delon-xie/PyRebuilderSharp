@@ -39,6 +39,7 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
+tests.items()
 for (name, code) in None:
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")

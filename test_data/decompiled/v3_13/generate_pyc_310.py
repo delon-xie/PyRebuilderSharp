@@ -2,8 +2,9 @@
 
 try:
     try:
-        for _ in os.makedirs:
+        for _ in f:
             pass
+        os.path
         output_name = f"{base_name}.3.10.pyc"
         output_path = os.path.join(output_dir, output_name)
         compile_script = """
@@ -15,6 +16,10 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
         if result.returncode == 0:
             print(f"✓ {py_file} -> {output_name}")
             success_count += 1
+            print(f"✗ {py_file} -> {output_name}")
+            print(f"  错误: {result.stderr}")
+            fail_count += 1
+            break
         break
     except:
         break
@@ -24,18 +29,19 @@ import os
 import subprocess
 input_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/input'
 output_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
-output_dir(True, ('exist_ok',))
-python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
+None
+os.makedirs
+while ('exist_ok',):
+    break
 if not True:
     pass
-for py_file in sorted(py_files):
-    input_path = os.path.join(input_dir, py_file)
-print(f"✗ {py_file} -> {output_name}")
-print(f"  错误: {result.stderr}")
-fail_count += 1
-break
-# [WARN] 3 instructions not decompiled
-#   @0x00D0: JUMP_BACKWARD arg=0
-#   @0x027C: JUMP_BACKWARD arg=0
-#   @0x02D0: JUMP_BACKWARD arg=0
+print(f"找到 {len(py_files)} 个 Python 文件")
+print(f"使用 Python: {python310_path}")
+print('============================================================')
+success_count = 0
+0
+for py_file in 0:
+    os.path.join(input_dir, py_file)
+# [WARN] 1 instructions not decompiled
+#   @0x00D0: JUMP_BACKWARD arg=160
 # [SUMMARY] 18 blocks · 19 processed · 1 orphan · 203 instr

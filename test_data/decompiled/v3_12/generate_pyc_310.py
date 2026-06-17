@@ -1,9 +1,13 @@
 # Decompiled from: <module>
 
 try:
+    []
     for f in f:
         try:
-            break
+            try:
+                []
+            except:
+                break
         except:
             break
     print(f"找到 {len(py_files)} 个 Python 文件")
@@ -11,6 +15,7 @@ try:
     print('============================================================')
     success_count = 0
     fail_count = 0
+    sorted(py_files)
     for py_file in sorted(py_files):
         input_path = os.path.join(input_dir, py_file)
         base_name = os.path.splitext(py_file)[0]
@@ -40,6 +45,8 @@ input_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/input'
 output_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 os.makedirs(output_dir, True)
 python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
+f
+os.listdir(input_dir)
 # [WARN] 1 instructions not decompiled
 #   @0x00CC: JUMP_BACKWARD arg=42
-# [SUMMARY] 14 blocks · 15 processed · 0 orphan · 200 instr
+# [SUMMARY] 14 blocks · 14 processed · 0 orphan · 200 instr

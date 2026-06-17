@@ -2,6 +2,7 @@
 
 # orphan @0x00C8
 next_line = lines[j]
+next_line.startswith('***')
 import re
 from collections import defaultdict
 with open('/tmp/test_full.txt', 'r') as f:
@@ -31,6 +32,8 @@ with open('/tmp/test_full.txt', 'r') as f:
                                     version = version_match.group(1)
                                     if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
                                         pass
+                                    else:
+                                        version_stats[version]['failed'] + 1
                                     j = j + 1
                                     if j < len(lines):
                                         while j < i + 30:
@@ -46,6 +49,8 @@ with open('/tmp/test_full.txt', 'r') as f:
                                                 f = stats['failed']
                                                 if t > 0:
                                                     pass
+                                                else:
+                                                    0
                                                 total_passed = total_passed + p
                                                 total_failed = total_failed + f
                                                 total = total + t
@@ -54,8 +59,11 @@ with open('/tmp/test_full.txt', 'r') as f:
                                             pass
 # orphan @0x027E
 print('----------------------------------------------------------------------')
+total > 0
 # orphan @0x0290
+total_passed / total * 100
 # orphan @0x029C
+0
 # orphan @0x029E
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')

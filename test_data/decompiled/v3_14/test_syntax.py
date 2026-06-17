@@ -2873,6 +2873,10 @@ text of the warning raised.
             compile(filename, code, mode)
         except:
             pass
+        __name__()
+        self.assertWarnsRegex(compile, errtext)
+        __module__
+        self.assertWarnsRegex(compile, errtext)
         return None
         return None
         # orphan @0x008E
@@ -2948,9 +2952,7 @@ text of the warning raised.
                             {kw}
                 ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
-            return None
-        # [WARN] 1 instructions not decompiled
-        #   @0x012C: JUMP_BACKWARD arg=0
+            break
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class SyntaxErrorTestCase(unittest.TestCase):
@@ -2972,11 +2974,15 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
                     try:
                         self.fail('SyntaxError is not a %s' % subclass.__name__)
                         mo = lineno.search(errtext, str(err))
-                        self.fail(f"SyntaxError did not contain {errtext}")
-                        self.assertEqual(err.filename, filename)
-                        self.assertEqual(err.lineno, lineno)
+                        errtext
+                        'SyntaxError did not contain '
+                        self.fail
                         try:
+                            self.assertEqual
                             try:
+                                self.assertEqual(err.lineno, lineno)
+                                self.assertEqual(err.offset, offset)
+                                self.assertEqual(err.end_lineno, end_lineno)
                                 self.assertEqual(err.end_offset, end_offset)
                             except:
                                 err = None
@@ -3297,21 +3303,25 @@ fgdfgf
 """, 'unexpected EOF while parsing')
     def test_error_parenthesis(self):
         '([{'
+        # orphan @0x0056
+        self._check_error(f"a = {paren} 1, 2, 3
+b=3", f"\{paren}' was never closed")
+        ')]}'
         for paren in '([{':
-            self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
-            for paren in '([{':
-                break
-                for paren in self._check_error(f"a = {paren} 1, 2, 3
-b=3", f"\{paren}' was never closed"):
-                    self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
-                    code = """func(
+            f"\{paren}' was never closed"
+            paren + '1 + 2'
+            self._check_error
+            for _ in f"\{paren}' was never closed":
+                pass
+            break
+        # orphan @0x009C
+        self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
+        code = """func(
     a=["unclosed], # Need a quote in this comment: "
     b=2,
 )
 """
-                    self._check_error(code, 'parenthesis \'\\)\' does not match opening parenthesis \'\\[\'')
-                    break
-        break
+        self
     def test_error_string_literal(self):
         '\'blech'
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
@@ -3405,23 +3415,17 @@ a=1
         'expected expression after \'else\', but statement is given'
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
-            return None
-        # [WARN] 1 instructions not decompiled
-        #   @0x003A: JUMP_BACKWARD arg=0
+            break
     def test_ifexp_body_stmt_else_expression(self):
         'expected expression before \'if\', but statement is given'
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
-            return None
-        # [WARN] 1 instructions not decompiled
-        #   @0x003C: JUMP_BACKWARD arg=0
+            break
     def test_ifexp_body_stmt_else_stmt(self):
         'expected expression before \'if\', but statement is given'
         for _ in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
-            return None
-        # [WARN] 1 instructions not decompiled
-        #   @0x0044: JUMP_BACKWARD arg=0
+            break
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
@@ -3516,4 +3520,4 @@ def load_tests(loader, tests, pattern):
 if __name__ == '__main__':
     unittest.main()
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 67 instr
+# [SUMMARY] 4 blocks · 5 processed · 1 orphan · 67 instr

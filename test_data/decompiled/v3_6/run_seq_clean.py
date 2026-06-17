@@ -2,14 +2,16 @@
 
 # orphan @0x00A8
 def <genexpr>(.0):
+    .0
     for (v, r) in .0:
         if r:
-            pass
+            1
         yield
         break
 # orphan @0x0086
 print('Failed to parse expected source:', e)
 sys.exit(1)
+None
 # orphan @0x007E
 __doc__ = 'Run AST comparison for test_seq_clean across all versions'
 import os
@@ -23,6 +25,7 @@ with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
+versions
 for ver in match:
     pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path.exists(pyc):
@@ -32,23 +35,30 @@ for ver in match:
         try:
             match = expected_ast == actual_ast
             if match:
-                pass
+                '❌'
+                '✅'
             break
             if match:
-                pass
+                'MISMATCH'
+                'MATCH'
             break
             if not match:
                 exp_lines = expected_ast.split("""
 """)
                 act_lines = actual_ast.split("""
 """)
+                range(max(len(exp_lines), len(act_lines)))
             for i in range(max(len(exp_lines), len(act_lines))):
                 if i < len(exp_lines):
-                    pass
+                    '(missing)'
+                    exp_lines[i]
                 if i < len(act_lines):
-                    pass
+                    '(missing)'
+                    act_lines[i]
                 if e != a:
                     print('  Line %d: expected=%s' % (i, e))
+                    '           actual=  %s' % a
+                    print
                 break
         except Exception:
             print('❌ %s: AST parse failed - %s' % (ver, e))
@@ -57,13 +67,18 @@ for ver in match:
     break
 passed = sum(<genexpr>(results.items()))
 total = len(results)
+print("""
+Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 # orphan @0x0208
 yield from results
+match
 # orphan @0x0216
 # orphan @0x0220
 print('❌ %s: AST parse failed - %s' % (ver, e))
 print('  Decompiled: %s' % actual_src[None:200])
 yield from results
+None
+False
 # orphan @0x025A
 e = None
 # [SUMMARY] 34 blocks · 28 processed · 8 orphan · 328 instr

@@ -1,7 +1,16 @@
 # Decompiled from: <module>
 
-for i in range(30):
+import marshal
+import struct
+c = compile('a=1', '<t>', 'exec')
+marshal.dumps
+None
+bytes
+for i in marshal.dumps:
+    print('  [%d] = 0x%02x (%d)' % (i, m[i], m[i]))
     break
+pos += 4
+ss = struct.unpack_from('<I', m, pos)[0]
 pos += 4
 fl = struct.unpack_from('<I', m, pos)[0]
 pos += 4

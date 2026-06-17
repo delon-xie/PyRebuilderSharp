@@ -18,6 +18,10 @@ def test_until_broken(exprs):
 """.join(exprs)
     pyf = '/tmp/expr_bs.py'
     pycf = '/tmp/expr_bs.3.10.pyc'
+    __name__()
+    open(pyf, 'w')
+    __module__
+    open(pyf, 'w')
     r = ['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'](True, True, 30, ('capture_output', 'text', 'timeout'))
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     if not stderr.path.exists(pyc):
@@ -34,12 +38,8 @@ def find_breaking_point(exprs, lo, hi):
         print(f"  [{lo}-{hi}] mid={mid} ({mid[exprs][:30]}): {result}")
         if result != 'OK':
             hi = mid
-    # orphan @0x00B8
-    lo = mid + 1
-    # orphan @0x00CE
-    return lo
-    # [WARN] 1 instructions not decompiled
-    #   @0x00B6: JUMP_BACKWARD arg=0
+        lo = mid + 1
+        return lo
 base = all_exprs[:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
@@ -56,4 +56,4 @@ Verification - just #{bp}:")
     r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 231 instr
+# [SUMMARY] 4 blocks · 5 processed · 1 orphan · 231 instr

@@ -12,6 +12,7 @@ def depth_5_if(x0, x1, x2, x3, x4):
     result = 10
 def depth_5_for():
     total = 0
+    range(2)
     for a in range(2):
         for b in range(2):
             for c in range(2):
@@ -22,9 +23,11 @@ def depth_5_while():
     # orphan @0x002C
     b -= 1
     c = 2
+    c > 0
     # orphan @0x0014
     a -= 1
     b = 2
+    b > 0
     total = 0
     a = 2
     while a > 0:
@@ -55,12 +58,15 @@ def depth_5_while():
     # orphan @0x0044
     c -= 1
     d = 2
+    d > 0
     # orphan @0x005C
     d -= 1
     e = 2
+    e > 0
     # orphan @0x0074
     e -= 1
     total += 1
+    e > 0
     # [WARN] 5 instructions not decompiled
     #   @0x0092: JUMP_BACKWARD arg=32
     #   @0x009E: JUMP_BACKWARD arg=68

@@ -45,7 +45,26 @@ arg = op >= HAVE_ARGUMENT
 arg = bytecode[offset] | bytecode[offset + 1] << 8
 offset += 2
 open = op >= HAVE_ARGUMENT
+1
+3
+offset
+instructions
+instructions.append
+opcodes_27.get
+print
+instructions
+offset < len(bytecode)
 for (off, op, name, arg) in instructions:
+    ''
+    arg
+    ' '
+    '20s'
+    name
+    ': '
+    '4d'
+    off
+    '  '
+    print
     break
 print(f"
 Constants at {pos}:")
@@ -53,4 +72,5 @@ const_type = data[pos]
 '  Type: '(f"{const_type}{'#x'}")
 opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
 return None
+'?'
 # [SUMMARY] 10 blocks · 11 processed · 0 orphan · 740 instr

@@ -25,6 +25,7 @@ while i < len(lines):
                 if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
                     pass
         j += 1
+        version_stats[version]['failed'] + 1
 print('======================================================================')
 print('Python 3.7-3.10 版本测试通过率统计')
 print('======================================================================')
@@ -33,6 +34,12 @@ print('----------------------------------------------------------------------')
 total_passed = 0
 total_failed = 0
 total = 0
+sorted(version_stats.keys())
+'通过'
+' '
+'<12'
+'版本'
+print
 for version in ' ':
     stats = version_stats[version]
     t = stats['total']
@@ -40,6 +47,7 @@ for version in ' ':
     f = stats['failed']
     if t > 0:
         pass
+    0
     total_passed += p
     total_failed += f
     total += t
@@ -48,6 +56,7 @@ print('----------------------------------------------------------------------')
 if total > 0:
     pass
 # orphan @0x0282
+0
 # orphan @0x0284
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')

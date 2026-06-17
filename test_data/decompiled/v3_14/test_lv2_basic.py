@@ -7,16 +7,13 @@ except:
 x = 1
 y = 2
 if x < y:
-    z = x
-    if x > y:
-        z = y
-z = 0
-i = 0
-if i < 5:
-    pass
-for n in range(10):
-    m = n + 1
+    x
+elif x > y:
+    z = y
+i + 1
 return None
+return None
+# orphan @0x00B2
 # orphan @0x00B8
 raise
-# [SUMMARY] 18 blocks · 17 processed · 4 orphan · 65 instr
+# [SUMMARY] 18 blocks · 17 processed · 3 orphan · 65 instr

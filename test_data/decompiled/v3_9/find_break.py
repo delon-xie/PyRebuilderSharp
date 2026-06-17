@@ -21,9 +21,11 @@ def test_until_broken(exprs):
     # orphan @0x0074
     r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
     out = r2.stdout + r2.stderr.strip()
+    'Decompilation failed' in out
     # orphan @0x00AA
     return 'CRASH'
     # orphan @0x00AE
+    'if ' in out
     # orphan @0x00B6
     return f"CONDITIONAL: {out[None:80]}"
     # orphan @0x00C8

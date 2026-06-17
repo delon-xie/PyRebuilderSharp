@@ -25,11 +25,16 @@ if match:
     j = i + 1
     found_versions = []
 # orphan @0x00B0
+j < len(lines)
 # orphan @0x00BC
+j < i + 30
 # orphan @0x00CA
 next_line = lines[j]
+next_line.startswith('***')
 # orphan @0x00DC
+'.pyc' in next_line
 # orphan @0x00E6
+next_line.startswith
 # orphan @0x0180
 # orphan @0x0182
 print()

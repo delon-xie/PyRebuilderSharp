@@ -1,11 +1,14 @@
 # Decompiled from: <module>
 
 try:
+    {}
     for (k, v) in {}:
         try:
             try:
+                {}
                 try:
                     try:
+                        v
                         try:
                             break
                             for start in '  Bytes: ':
@@ -53,6 +56,17 @@ print('Length:', len(m))
 print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
 known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': code.co_stacksize, 'argcount': code.co_flags}
+None
+print
+'Bytes:'
+None
+print
+None
+print
+'Known values:'
+v
+k
+known.items()
 # [WARN] 2 instructions not decompiled
 #   @0x0274: JUMP_BACKWARD arg=110
 #   @0x0286: JUMP_BACKWARD arg=128

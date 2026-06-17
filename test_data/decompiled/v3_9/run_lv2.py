@@ -19,8 +19,11 @@ with open(INPUT_FILE) as f:
             ok = expected_ast == actual_ast
             if ok:
                 pass
+            else:
+                '❌'
             if ok:
                 pass
+            'MISMATCH'
             break
             if not ok:
                 for i in e != a:

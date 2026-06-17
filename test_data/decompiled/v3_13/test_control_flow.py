@@ -7,11 +7,12 @@ except:
 i = 0
 if i < 5:
     j = i * 2
-    i += 1
-    if i < 5:
-        pass
-break
+    i + 1
+range(10)
 for n in range(10):
+    m = n + 1
+    break
+if i < 5:
     pass
 return None
 # orphan @0x0072

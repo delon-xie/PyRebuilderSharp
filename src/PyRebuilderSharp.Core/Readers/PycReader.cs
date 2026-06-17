@@ -842,44 +842,19 @@ public class PycReader
 
             // Python 3.10+ 使用 word 偏移
             // 3.10-3.12: arg 是 word 偏移 (×2 = 字节偏移)
-            // 3.13+: arg 是指令计数, 需要扫描计算实际字节偏移
+            // 3.13+: arg 是 codeunit 偏移量（从 next_instr 开始, 1 codeunit = 2 字节）
+            // CPython ceval.c: JUMPBY(oparg) = next_instr += oparg（codeunit 计数）
+            // next_instr = this_instr + 1 + cache_count（已越过当前指令及其 cache）
             if (_strategy.Version >= PythonVersion.Py313 && arg.HasValue && _strategy.IsJumpInstruction(op))
             {
-                // 3.13+: 从当前偏移开始, 跳过 arg 条指令 (含 cache)
-                int skipCount = arg.Value;
-                int scanPos = offset;
-
+                int cacheBytes = _strategy.GetCacheCount(rawOp) * 2;  // rawOp (103), not mapped op (115)
+                // 从当前指令之后（越过本条指令 + cache）加上 arg 个 codeunit = arg * 2 字节
+                int target = offset + 2 + cacheBytes;
                 if (op == Models.Bytecode.Opcode.JUMP_BACKWARD || op == Models.Bytecode.Opcode.JUMP_BACKWARD_NO_INTERRUPT)
-                {
-                    // Jump backward: scan negative direction from current offset
-                    while (skipCount > 0 && scanPos > 0)
-                    {
-                        scanPos -= 2; // walk backward by opcode+arg slot
-                        if (scanPos >= 0)
-                        {
-                            byte scanOp = bytecode[scanPos];
-                            if (scanOp != 0) // not a cache NOP
-                            {
-                                int cacheBytes = _strategy.GetCacheCount(scanOp) * 2;
-                                scanPos -= cacheBytes; // walk past cache entries
-                                skipCount--;
-                            }
-                        }
-                    }
-                }
+                    target -= arg.Value * 2;  // 后向跳转
                 else
-                {
-                    // Jump forward: scan positive direction
-                    while (skipCount > 0 && scanPos + 1 < bytecode.Length)
-                    {
-                        byte scanOp = bytecode[scanPos];
-                        if (scanOp == 0) { scanPos += 2; continue; } // skip cache NOP
-                        int cacheBytes = _strategy.GetCacheCount(scanOp) * 2;
-                        scanPos += 2 + cacheBytes; // opcode+arg + cache
-                        skipCount--;
-                    }
-                }
-                arg = scanPos;
+                    target += arg.Value * 2;  // 前向跳转
+                arg = target;
             }
             else if (_strategy.IsWordOffset && arg.HasValue && _strategy.IsJumpInstruction(op))
             {

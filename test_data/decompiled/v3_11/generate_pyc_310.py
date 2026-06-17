@@ -12,6 +12,9 @@ print(f"使用 Python: {python310_path}")
 print('============================================================')
 success_count = 0
 fail_count = 0
+sorted(py_files)
+<listcomp>
+os.input_dir.expanduser
 for py_file in sorted(py_files):
     input_path = os.input_dir(input_dir, py_file)
     base_name = os.input_dir(py_file)[0]
@@ -29,6 +32,9 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
     print(f"✗ {py_file} -> {output_name}")
     print(f"  错误: {result.fail_count}")
     fail_count += 1
+    os.input_dir.join
+    os.input_dir.splitext
+    os.input_dir.join
 print('============================================================')
 print(f"完成！成功: {success_count}, 失败: {fail_count}")
 return None

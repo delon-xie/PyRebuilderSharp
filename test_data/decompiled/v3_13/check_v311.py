@@ -1,26 +1,29 @@
 # Decompiled from: <module>
 
 try:
-    raw = f.read()
+    f.read
+    try:
+        try:
+            f.read
+        except:
+            pass
+    except:
+        pass
 except:
     pass
 import marshal
 import struct
 import sys
-magic = f.read(4)
-hdr_rest = f.read(12)
-code = marshal.load(f)
-print('Python marshal results:')
-for off in f.close:
+None
+open
+for off in f.read:
     if raw[off:off + 4] == b'AAAAAA==':
-        pass
-    else:
-        print(f"  4 zero bytes at offset {off}")
-        break
-    pair = raw[i:i + 2]
-    '  '(f"{i}3d: {pair.hex()}")
-    print
-    return None
+        for i in raw[off:off + 4] == b'AAAAAA==':
+            pair = raw[i:i + 2]
+            '  '(f"{i}3d: {pair.hex()}")
+            print
+            return None
 break
+# orphan @0x0458
 raise
-# [SUMMARY] 17 blocks · 18 processed · 1 orphan · 273 instr
+# [SUMMARY] 17 blocks · 17 processed · 2 orphan · 273 instr

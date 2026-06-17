@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+range(3)
 for i in range(3):
     name_3 = i == 1
     break

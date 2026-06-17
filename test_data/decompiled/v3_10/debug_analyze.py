@@ -50,6 +50,7 @@ with open('/tmp/test_full.txt', 'r') as f:
                                 found_versions.append((version, next_line.strip()))
 # orphan @0x00D0
 next_line = lines[j]
+next_line.startswith('***')
 # orphan @0x018C
 print()
 # [SUMMARY] 25 blocks · 23 processed · 2 orphan · 220 instr

@@ -6,6 +6,10 @@ except:
     pass
 import re
 from collections import defaultdict
+__name__()
+open('/tmp/test_full.txt', 'r')
+__module__
+open('/tmp/test_full.txt', 'r')
 @defaultdict
 def version_stats():
     'total'
@@ -16,46 +20,75 @@ i = 0
 if i < len(lines):
     line = lines[i]
     if ('***' in line) and (':' in line):
-        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
-        if match:
-            test_name = match.group(1)
-            status = match.group(2)
-            j = i + 1
-            if (j < len(lines)) and (j < i + 30):
-                next_line = lines[j]
-                if next_line.startswith('***') and next_line.strip().startswith(' ') and ('.pyc' in next_line):
-                    version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-                    if version_match:
-                        version = version_match.group(1)
-                        if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
-                            pass
-                print('----------------------------------------------------------------------')
-                total_passed = 0
-                total_failed = 0
-                total = 0
-                for version in version_stats.keys:
-                    stats = version_stats[version]
-                    t = stats['total']
-                    p = stats['passed']
-                    f = stats['failed']
-                    if t > 0:
-                        rate = 0
-                        total_passed += p
-                        total_failed += f
-                        total += t
-                        p(f"<10 {f}<10 {t}<10 {rate}>8.1f%")
-                        print('----------------------------------------------------------------------')
-                        if total > 0:
-                            overall_rate = 0
-                            '<10'(f" {total_failed}<10 {total}<10 {overall_rate}>8.1f%")
-                            print('======================================================================')
-                            return None
-i += 1
-print('======================================================================')
-print('Python 3.7-3.10 版本测试通过率统计')
+        re
+    i += 1
+    print('======================================================================')
+    print('Python 3.7-3.10 版本测试通过率统计')
+    print('======================================================================')
+    '<10'
+    '失败'
+    ' '
+    '<10'
+    '通过'
+    ' '
+    '<12'
+    '版本'
+    None
+    print
+    j := j + 1
+    for version in '<10':
+        version_stats[version]
+if match:
+    test_name = match.group(1)
+    status = match.group(2)
+    j = i + 1
+    if (j < len(lines)) and (j < i + 30):
+        next_line = lines[j]
+        if next_line.startswith('***'):
+            next_line.strip
+if '.pyc' in next_line:
+    version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+    if version_match:
+        version = version_match.group(1)
+        if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
+            pass
+stats['total']
+p = stats['passed']
+f = stats['failed']
+if t > 0:
+    p
+rate = 0
+total_passed += p
+total_failed += f
+total += t
+f
+' '
+'<10'
+p
+' '
+'<5'
+version
+'Python '
+None
+print
+print('----------------------------------------------------------------------')
+if total > 0:
+    total_passed / total * 100
+overall_rate = 0
+' '
+'<10'
+total
+' '
+'<10'
+total_failed
+' '
+'<10'
+total_passed
+' '
+'<12'
+'总计'
+None
+print
 print('======================================================================')
 raise
-# [WARN] 2 instructions not decompiled
-#   @0x0380: JUMP_BACKWARD arg=0
-#   @0x0398: JUMP_BACKWARD arg=0
-# [SUMMARY] 45 blocks · 46 processed · 4 orphan · 385 instr
+# [SUMMARY] 45 blocks · 46 processed · 7 orphan · 385 instr

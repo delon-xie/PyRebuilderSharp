@@ -8,12 +8,14 @@ def get_python_version(filepath):
         magic = fp.read(4)
     except:
         pass
+    open(filepath, 'rb')
     return name_4.get(magic, 'unknown')
     # orphan @0x008C
     raise
     # [WARN] 1 instructions not decompiled
     #   @0x008A: JUMP_BACKWARD arg=62
 def fix_pyc_names(directory):
+    os.listdir(directory)
     for filename in os.listdir(directory):
         if not filename.endswith('.pyc'):
             pass
@@ -24,6 +26,7 @@ def fix_pyc_names(directory):
             pass
         else:
             new_filename = filename
+            exists.values()
         for version in exists.values():
             if not f".{version}.pyc" in new_filename:
                 pass

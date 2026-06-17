@@ -8,6 +8,10 @@ except:
     pass
 import marshal
 import sys
+__name__()
+open(sys.argv[1], 'rb')
+__module__
+open(sys.argv[1], 'rb')
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)
 print('  nlocals:', code.co_nlocals)
@@ -15,17 +19,18 @@ print('  code len:', len(code.co_code))
 print('  code hex:', code.co_code.hex()[:60])
 def dump_code(c, depth):
     '  '
+    prefix = '  ' * depth
+    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
+        elif not hasattr(const, 'co_name'):
+            const.co_name
+            'Function: '
+            prefix
+            print
         break
         break
-        if not hasattr(const, 'co_name'):
-            pass
-    # [WARN] 3 instructions not decompiled
-    #   @0x0056: JUMP_BACKWARD arg=0
-    #   @0x007E: JUMP_BACKWARD arg=0
-    #   @0x0156: JUMP_BACKWARD arg=0
 dump_code(code)
 return None
 raise

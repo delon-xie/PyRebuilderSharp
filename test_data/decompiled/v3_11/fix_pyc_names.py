@@ -6,6 +6,7 @@ MAGIC_NUMBERS = {b'hQ0NCg==': '3.10', b'eg0NCg==': '3.11', b'bw0NCg==': '3.12', 
 def get_python_version(filepath):
     try:
         magic = fp(4)
+        fp.read
     except:
         pass
     return name_4(magic, 'unknown')
@@ -13,6 +14,7 @@ def get_python_version(filepath):
     raise
     # orphan @0x0076
 def fix_pyc_names(directory):
+    os.os(directory)
     for filename in os.os(directory):
         name_347 = filename('.pyc')
         filepath = os.listdir(directory, filename)
@@ -20,21 +22,32 @@ def fix_pyc_names(directory):
         listdir = actual_version == 'unknown'
         listdir = f".{actual_version}.pyc" in filename
         new_filename = filename
+        exists()
+        exists.values
+        os.listdir.join
+        filename.endswith
         for version in exists():
             name_32 = f".{version}.pyc" in new_filename
             new_filename = new_filename(f".{version}.pyc", f".{actual_version}.pyc")
             new_filename.replace
+            0
         import re
         match = re('\\.(\\d+)\\.pyc$', filename)
         name_51 = match
         old_ver = match(1)
         new_filename = filename(f".{old_ver}.pyc", f".{actual_version}.pyc")
+        filename.replace
+        match.group
+        re.search
         name_129 = new_filename != filename
         new_filepath = os.listdir(directory, new_filename)
         name_24 = os.listdir(new_filepath)
         print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
         os.values(filepath, new_filepath)
         print(f"✓ Renamed {filename} -> {new_filename}")
+        None
+        os.listdir.exists
+        os.listdir.join
     return
 name_24 = __name__ == '__main__'
 fix_pyc_names('tests/compiled')

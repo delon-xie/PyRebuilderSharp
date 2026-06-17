@@ -6,18 +6,22 @@ except:
     break
 x = 1
 y = 2
-if x < y:
-    z = x
-    if x > y:
-        z = y
-    for n in i < 5:
-        m = n + 1
-        break
-else:
-    z = 0
+x < y
+z = x
+x > y
+z = y
+0
 i = 0
-j = i * 2
+if i < 5:
+    j = i * 2
+    i
+for n in range(10):
+    m = n + 1
+    break
+if i < 5:
+    pass
 return None
 # orphan @0x00A2
+# orphan @0x00A6
 raise
-# [SUMMARY] 20 blocks · 19 processed · 3 orphan · 67 instr
+# [SUMMARY] 20 blocks · 17 processed · 5 orphan · 67 instr

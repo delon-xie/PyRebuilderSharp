@@ -1,11 +1,12 @@
 # Decompiled from: <module>
 
-for i in range(3):
-    if i == 1:
-        pass
-    a = i
-    break
-# [WARN] 2 instructions not decompiled
-#   @0x0024: JUMP_BACKWARD arg=0
-#   @0x002C: JUMP_BACKWARD arg=0
-# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 19 instr
+for _ in range(3):
+    pass
+# orphan @0x0016
+1
+i
+# orphan @0x001C
+# orphan @0x0024
+a = i
+return None
+# [SUMMARY] 7 blocks · 5 processed · 4 orphan · 19 instr

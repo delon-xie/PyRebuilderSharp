@@ -2,6 +2,7 @@
 
 try:
     f(test_code)
+    f.write
 except:
     pass
 __doc__ = 'Diagnose 3.5 crash'

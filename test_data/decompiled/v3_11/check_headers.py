@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 import struct
+('3.5', '3.6', '3.7', '3.8')
 for ver in ('3.5', '3.6', '3.7', '3.8'):
     path = f"/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.{ver}.pyc"
     data = open(path, 'rb')()
@@ -15,5 +16,11 @@ for ver in ('3.5', '3.6', '3.7', '3.8'):
     marshal16 = data[16]
     '  16-byte header: flags='(f"{fl16}, ts={ts16}, size={sz16}, marshal_start_byte={marshal16}{'#x'}")
     print()
+    None
+    print
+    print
+    ver
+    print
+    open(path, 'rb').read
 return
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 181 instr

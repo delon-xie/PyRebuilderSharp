@@ -3,9 +3,8 @@
 for i in range(10):
     if i == 5:
         break
+    elif i == 1:
+        a = i
+        return None
     return
-# orphan @0x003A
-# orphan @0x003C
-a = i
-# orphan @0x0044
-# [SUMMARY] 10 blocks · 8 processed · 5 orphan · 27 instr
+# [SUMMARY] 10 blocks · 11 processed · 1 orphan · 27 instr

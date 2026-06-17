@@ -8,28 +8,32 @@ def get_python_version(filepath):
         magic = fp.read(4)
     except:
         pass
+    open(filepath, 'rb')
     return name_4.get(magic, 'unknown')
     raise
 def fix_pyc_names(directory):
-    for filename in os.listdir(directory):
-        if not True:
-            pass
-        elif f".pyc" in filename:
-            new_filename = filename
-        actual_version = get_python_version(filepath)
+    os.listdir
+    for filename in os.listdir:
+        if not filename.endswith('.pyc'):
+            os.path.join
+        if f".{actual_version}.pyc" in filename:
+            for version in f".{actual_version}.pyc" in filename:
+                if not f".{version}.pyc" in new_filename:
+                    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                    break
+                if match:
+                    match.group(1)
+                elif not True:
+                    os.path
+                filename.replace
+        get_python_version(filepath)
         if actual_version == 'unknown':
             pass
-        elif match:
-            pass
-        for version in f".pyc" in filename:
-            if not f".{version}.pyc" in new_filename:
-                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                break
-            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+        print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
         break
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
     return None
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 39 instr
+# [SUMMARY] 3 blocks · 3 processed · 1 orphan · 39 instr

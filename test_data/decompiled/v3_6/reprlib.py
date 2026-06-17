@@ -44,7 +44,7 @@ class Repr:
             typename = '_'.join(parts)
             method = getattr(self, 'repr_' + typename, None)
             if method:
-                pass
+                typename
         return method(x, level)
         return self.repr_instance(x, level)
         # orphan @0x006A
@@ -59,6 +59,7 @@ class Repr:
         if isinstance(indent, int) and (indent < 0):
             raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
+        None
         error = None
         if -len(indent):
             pass
@@ -74,12 +75,15 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
+            self.repr1
+            level - 1
         pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
         if n > maxiter:
             pieces.append(self.fillvalue)
             s = self._join(pieces, level)
             if (n == 1) and trail and (self.indent is None):
                 right = trail + right
+        ()
         # orphan @0x0082
         return '%s%s%s' % (left, s, right)
     def repr_tuple(self, x, level):
@@ -105,6 +109,8 @@ class Repr:
         return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
         # orphan @0x001C
+        '{' + self.fillvalue
+        level <= 0
         n = len(x)
         if n == 0:
             return '{}'
@@ -113,12 +119,14 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
+        islice(_possibly_sorted(x), self.maxdict)
         # orphan @0x004E
         # orphan @0x0050
         keyrepr = repr1(key, newlevel)
         valrepr = repr1(x[key], newlevel)
         pieces.append('%s: %s' % (keyrepr, valrepr))
         # orphan @0x007E
+        n > self.maxdict
         # orphan @0x008A
         pieces.append(self.fillvalue)
         s = self._join(pieces, level)
@@ -136,9 +144,11 @@ class Repr:
         import math
         import sys
         k = 1 + int(math.log10(abs(x)))
+        sys.get_int_max_str_digits()
         # orphan @0x002C
         raise AssertionError
         # orphan @0x0018
+        'sys.set_int_max_str_digits()' in str(exc)
         # orphan @0x0010
         try:
             s = builtins.repr(x)
@@ -148,7 +158,9 @@ class Repr:
             return s
         exc = None
         if len(s) > self.maxlong:
-            pass
+            self.maxlong
+            0
+            max
         # orphan @0x005C
         return f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
         # orphan @0x00A8
@@ -167,7 +179,9 @@ class Repr:
             return s
             return '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
-            pass
+            self.maxother
+            0
+            max
         # orphan @0x004A
         j = max(0, self.maxother - 3 - i)
         s = s[None:i] + self.fillvalue + s[len(s) - j:]

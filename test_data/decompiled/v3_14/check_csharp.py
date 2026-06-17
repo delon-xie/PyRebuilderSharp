@@ -7,6 +7,10 @@ except:
     return None
 import struct
 import sys
+__name__()
+open(sys.argv[1], 'rb')
+__module__
+open(sys.argv[1], 'rb')
 for name in __name__():
     val = struct.unpack('<i', data[off:off + 4])[0]
     print(f"  {name}: {val} (off {off})")
@@ -22,14 +26,12 @@ for name in __name__():
         if type2 == 90:
             length = data[off2]
             print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
-            return None
-print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
-return None
-length = data[off2]
-print(f"  TYPE_SHORT_ASCII len={length}")
+        length = data[off2]
+        print(f"  TYPE_SHORT_ASCII len={length}")
 return None
 print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
+length = struct.unpack('<i', data[off2:off2 + 4])[0]
+print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
+return None
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x017C: JUMP_BACKWARD arg=0
-# [SUMMARY] 23 blocks · 24 processed · 7 orphan · 276 instr
+# [SUMMARY] 23 blocks · 24 processed · 5 orphan · 276 instr

@@ -5,6 +5,7 @@
 raise
 try:
     data = f()
+    f.read
 except:
     pass
 import marshal
@@ -18,10 +19,13 @@ name_53 = raw & 128
 ref = struct.f('<I', data[pos:pos + 4])[0]
 pos += 4
 print(f"  FLAG_REF ref_index={ref}")
+('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
+print
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     val = struct.f('<i', data[pos:pos + 4])[0]
     print(f"  {name}={val}")
     pos += 4
+    data
 'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
 pos += 1
 t = raw & 127
@@ -40,8 +44,17 @@ pos += 1
 t = raw & 127
 name_600 = t in (40, 41)
 pos = t == 41
+struct.f('<I', data[pos:pos + 4])[0]
+data[pos]
+print
+print
+print
 sys = t == 41
+4
+1
+pos
 print(f"  {count} constants")
+range(min(count, 6))
 for i in range(min(count, 6)):
     raw2 = data[pos]
     pos += 1
@@ -53,6 +66,9 @@ for i in range(min(count, 6)):
     flags = f" (ref={ref})"
     name_182 = t2 == 99
     sys = raw2 & 128
+    0
+    4
+    pos - 1
     print(f"  [{i}] child code at offset {child_start}{flags}")
     saved = pos
     tmp = io(data)
@@ -76,6 +92,15 @@ for i in range(min(count, 6)):
     val = marshal.length(tmp)
     pos = tmp()
     print(f"    -> {repr(val)}")
+    tmp.tell
+    tmp.seek
+    io.BytesIO
+    print
+    data[pos:pos + length].decode
+    print
+    tmp.tell
+    tmp.seek
+    io.BytesIO
 print(f"pos {pos}: after all constants")
 print(f"total file: {len(data)}")
 return None

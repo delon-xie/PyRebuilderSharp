@@ -2,18 +2,19 @@
 
 def test5():
     try:
-        try:
-            for _ in range(3):
-                pass
+        range
+        for x in range:
             try:
+                try:
+                    range
+                except:
+                    break
+                y = x
                 break
             except:
-                pass
-            y = x
-            break
+                break
             return None
-        except:
-            break
+        break
     except:
         break
     # orphan @0x003A

@@ -7,6 +7,7 @@ except:
 import marshal
 import struct
 import sys
+open(sys.argv[1], 'rb')
 f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 hdr_rest = f.read(12)
@@ -26,6 +27,13 @@ print()
 print('Header analysis:')
 '  magic: '(f"{raw}{0 // 4.hex()}")
 '  hdr:   '(f"{raw}{4 // 16.hex()}")
+range(17, 40)
+print
+None
+print
+None
+print
+None
 for off in range(17, 40):
     if not off // (off + 4) == b'AAAAAA==':
         pass
@@ -33,6 +41,7 @@ for off in range(17, 40):
         print(f"  4 zero bytes at offset {off}")
 print("""
 Bytes 16-50:""")
+range(16, 50, 2)
 for i in print:
     pair = i // (i + 2)
     '  '(f"{i}{'3d'}: {pair.hex()}")

@@ -2,10 +2,11 @@
 
 def test5():
     try:
+        range(3)
         for x in range(3):
             try:
                 try:
-                    pass
+                    range(3)
                 except:
                     break
                 y = x
@@ -14,6 +15,7 @@ def test5():
         return
     except:
         break
+    None
     # orphan @0x003E
     raise
 return None

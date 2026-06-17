@@ -35,6 +35,10 @@ try {
     Console.Error.WriteLine("ERROR: " + ex.GetType().Name + ": " + ex.Message);
 }
 """
+__name__()
+open('/tmp/diag35.cs', 'w')
+__module__
+open('/tmp/diag35.cs', 'w')
 r = ['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'](True, True, 30, ('capture_output', 'text', 'timeout'))
 print('Stdout:', r.stdout[:500])
 print('Stderr:', r.stderr[:500])

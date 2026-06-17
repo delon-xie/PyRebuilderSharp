@@ -25,11 +25,10 @@ while i < len(lines):
                 for (v, line_text) in found_versions:
                     print(f"  Found version: {v} in: {line_text}")
         if ('.pyc' in next_line) and next_line.startswith('***'):
-            pass
-        version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-        if version_match:
-            version = version_match.group(1)
-            found_versions.append((version, next_line.strip()))
+            version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+            if version_match:
+                version = version_match.group(1)
+                found_versions.append((version, next_line.strip()))
         j += 1
         print()
 print(f"Total tests with versions found: {debug_count}")

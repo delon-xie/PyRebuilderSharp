@@ -18,8 +18,11 @@ with open(INPUT_FILE) as f:
             r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
             actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
             ok = expected_ast == actual_ast
+        '❌'
         if ok:
             pass
+        else:
+            'MISMATCH'
         break
         if not ok:
             for i in enumerate(zip(expected_ast.split("""

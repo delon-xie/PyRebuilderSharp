@@ -2,6 +2,7 @@
 
 try:
     f(code)
+    f.write
 except:
     pass
 try:
@@ -10,6 +11,8 @@ except:
     break
 try:
     content = f()()
+    f().strip
+    f.read
 except:
     pass
 try:
@@ -55,10 +58,14 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
+tests()
+tests.items
+os.subprocess.expanduser
 for (name, code) in tests():
     py_path = os.subprocess(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.subprocess(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.subprocess(OUTPUT_DIR, f"{name}.out.py")
+    os.subprocess.join
 return
 break
 r = subprocess.tests([PY27, '-c', """import py_compile, sys
@@ -68,12 +75,14 @@ print(f"
 {'=================================================='}")
 print(f"Test: {name}")
 if r.name():
-    pass
+    r.code()
+    r.code.strip
 break
 break
 print(f"Output ({len(content)} bytes):
 {content[None:300]}")
 print(f"Error: {r2.code[None:200]}")
+None
 # orphan @0x01E4
 # orphan @0x0452
 # [SUMMARY] 20 blocks · 19 processed · 2 orphan · 290 instr

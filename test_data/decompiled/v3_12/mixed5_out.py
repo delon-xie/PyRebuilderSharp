@@ -18,6 +18,7 @@ def mixed_1(n):
     #   @0x0070: JUMP_BACKWARD arg=54
 def mixed_2(n):
     total = 0
+    range(n)
     for i in range(n):
         j = 0
         if not j < n:
@@ -25,6 +26,7 @@ def mixed_2(n):
         while i == j:
             if j < n:
                 pass
+        range(i)
         for k in range(i):
             total += k
     return total
@@ -33,6 +35,7 @@ def mixed_2(n):
 def mixed_3(n):
     # orphan @0x0014
     i += 1
+    i % 2 == 0
     total = 0
     i = 0
     while i < n:
@@ -57,6 +60,7 @@ def mixed_4(n):
         try:
             try:
                 try:
+                    range(n)
                     for i in range(n):
                         try:
                             j = 0

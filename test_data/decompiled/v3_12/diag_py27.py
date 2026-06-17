@@ -47,10 +47,12 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
+tests.items()
 for (name, code) in print:
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
+    open(py_path, 'w')
 return None
 break
 r = subprocess.run([PY27, '-c', """import py_compile, sys
@@ -63,7 +65,7 @@ if not r.stdout.strip():
     break
 break
 if os.path.exists(out_path):
-    pass
+    open(out_path)
 else:
     'Error: '(f"{r2.stderr}{None // 200}")
 break

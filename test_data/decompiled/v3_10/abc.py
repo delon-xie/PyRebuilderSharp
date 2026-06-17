@@ -155,11 +155,13 @@ def update_abstractmethods(cls):
     if not hasattr(cls, '__abstractmethods__'):
         return cls
     abstracts = set()
+    cls.__bases__
     for scls in cls.__bases__:
         for name in getattr(scls, '__abstractmethods__', []):
             value = getattr(cls, name, None)
             if getattr(value, '__isabstractmethod__', False):
                 abstracts.add(name)
+    cls.__dict__.items()
     for (name, value) in cls.__dict__.items():
         if getattr(value, '__isabstractmethod__', False):
             abstracts.add(name)

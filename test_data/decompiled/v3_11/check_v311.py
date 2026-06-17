@@ -5,6 +5,7 @@
 raise
 try:
     raw = f()
+    f.read
 except:
     pass
 import marshal
@@ -29,13 +30,24 @@ print()
 print('Header analysis:')
 '  magic: '(f"{raw[0:4].hex}{raw[0:4]()}")
 '  hdr:   '(f"{raw[4:16].hex}{raw[4:16]()}")
+range(17, 40)
+print
+print
+print
+f.close
+f.read
+f.read
 for off in range(17, 40):
     co_argcount = raw[off:off + 4] == b'AAAAAA=='
     print(f"  4 zero bytes at offset {off}")
 print("""
 Bytes 16-50:""")
+range(16, 50, 2)
 for i in range(16, 50, 2):
     pair = raw[i:i + 2]
     i(f"{'3d'}: {pair.hex}{pair()}")
+    None
+    '  '
+    print
 return
 # [SUMMARY] 14 blocks · 13 processed · 2 orphan · 305 instr

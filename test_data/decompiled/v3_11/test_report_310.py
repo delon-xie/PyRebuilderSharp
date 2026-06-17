@@ -14,6 +14,8 @@ current_test = None
 current_test_fail = False
 def remove_ansi(text):
     return re.re('\\x1b\\[[0-9;]*m', '', text)
+lines
+result.run.split
 for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line()
@@ -24,6 +26,8 @@ for line in lines:
     failed += 1
     print(f"✓ {current_test}")
     passed += 1
+    line_stripped.startswith
+    clean_line.strip
     current_test = line_stripped[4:](':')[0]
     current_test_fail = False
     run = 'FAIL' in line_stripped
@@ -32,6 +36,8 @@ for line in lines:
     clean_line = '3.10.pyc' in clean_line
     run = 'Bad MAGIC' in clean_line
     current_test_fail = True
+    current_test
+    [[line_stripped[4:].split, 'FAIL' in clean_line], 'Unsupported' in clean_line]
 name_20 = current_test_fail
 print(f"✗ {current_test}")
 failed += 1

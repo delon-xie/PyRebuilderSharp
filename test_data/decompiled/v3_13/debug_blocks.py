@@ -1,67 +1,85 @@
 # Decompiled from: <module>
 
 try:
-    f.read(16)
-    code = marshal.load(f)
+    while f:
+        try:
+            raise
+            break
+            raise
+            break
+        except:
+            pass
+    marshal.load
+    None
+    None
+    None
+    None
+    code.co_consts
+    for const in code.co_consts:
+        if isinstance(const, types.CodeType):
+            if not const.co_name == 'depth_5_while':
+                print('=== Block structure ===')
+                None
+                list
+        break
+        if not instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
+            pass
+        leaders.add
+        break
+        if not i + 1 < len(instrs):
+            leaders.add(instrs[i + 1].offset)
+        '-'
+        '3d'
+        start
+        'Block ['
+        f"..."
+        break
+        if <genexpr>(block_instrs()):
+            last = block_instrs[-1]
+            print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
+        break
+        for ins in block_instrs():
+            if not ins.opname == 'JUMP_ABSOLUTE':
+                print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+                break
+        for (i, instr) in None:
+            if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
+                instr.arg
+                leaders.add
+            while True:
+                pass
+            if not True:
+                pass
+        for (i, start) in leaders.add(instrs[i + 1].offset):
+            if i + 1 < len(sorted_leaders):
+                end = instrs[-1].offset + 2
+                sorted_leaders[i + 1]
+                ins
+                instrs
+            for ins in sorted_leaders[i + 1]:
+                ins.offset
+                start
 except:
     pass
-try:
-    try:
-        for _ in sorted_leaders[i + 1]:
-            pass
-        break
-        if not True:
-            pass
-    except:
-        break
-except:
-    break
 import dis
 import marshal
 import types
 import struct
-for const in open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb'):
-    while True:
-        while True:
-            break
-            if not True:
-                pass
-            break
-            if <genexpr>(block_instrs()):
-                last = block_instrs[-1]
-            break
-            if not <genexpr>(block_instrs()):
-                pass
-            for ins in block_instrs:
-                if not ins.opname == 'JUMP_ABSOLUTE':
-                    print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
-                    break
-                break
-                break
-if not const.co_name == 'depth_5_while':
-    pass
-else:
-    leaders.add(instr.arg)
-leaders.add(instrs[i + 1].offset)
-for (i, start) in enumerate(sorted_leaders):
-    if i + 1 < len(sorted_leaders):
-        end = instrs[-1].offset + 2
-for (i, instr) in enumerate(instrs):
-    if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-        pass
-break
+'tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc'
+None
+open
 if len(block_instrs) > 3:
-    pass
-break
-raise
-# [WARN] 9 instructions not decompiled
-#   @0x00DC: JUMP_BACKWARD arg=0
-#   @0x01D6: JUMP_BACKWARD arg=0
-#   @0x01DA: JUMP_BACKWARD arg=0
-#   @0x01FE: JUMP_BACKWARD arg=0
-#   @0x0270: JUMP_BACKWARD arg=0
-#   @0x0380: JUMP_BACKWARD arg=702
-#   @0x0388: JUMP_BACKWARD arg=700
-#   @0x058E: JUMP_BACKWARD arg=0
-#   @0x0598: JUMP_BACKWARD arg=0
-# [SUMMARY] 65 blocks · 66 processed · 5 orphan · 358 instr
+    block_instrs[None:3]()
+    <genexpr>
+    ', '.join
+    ']: '
+    '3d'
+    end - 1
+    '-'
+    '3d'
+    start
+    'Block ['
+# [WARN] 2 instructions not decompiled
+#   @0x0380: JUMP_BACKWARD arg=844
+#   @0x0388: JUMP_BACKWARD arg=844
+# [SUMMARY] 66 blocks · 67 processed · 5 orphan · 358 instr

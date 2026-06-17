@@ -14,6 +14,7 @@ current_test = None
 current_test_fail = False
 def remove_ansi(text):
     return re.sub('\\x1b\\[[0-9;]*m', '', text)
+lines
 for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()
@@ -23,6 +24,7 @@ for line in lines:
         print(f"✓ {current_test}")
         passed += 1
     break
+    print('=' * 60)
     break
     break
     break
@@ -38,4 +40,6 @@ for line in lines:
 if current_test and current_test_fail:
     print(f"✗ {current_test}")
     failed += 1
+    '✓ '
+    print
 # [SUMMARY] 27 blocks · 28 processed · 0 orphan · 192 instr

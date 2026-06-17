@@ -14,6 +14,7 @@ with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
+versions
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     if not os.path.exists(pyc):
@@ -25,19 +26,27 @@ for ver in versions:
         match = expected_ast == actual_ast
         if match:
             pass
+        else:
+            '❌'
         if match:
             pass
+        'MISMATCH'
         break
         if not match:
             for i in e != a:
                 if i < len(exp_lines):
                     pass
+                '(missing)'
                 if i < len(act_lines):
                     pass
+                '(missing)'
                 if e != a:
                     print(f"  Line {i}: expected={e}")
                     print(f"           actual=  {a}")
                     break
+        ver
+        results
+        True
     except Exception:
         pass
 print(f"

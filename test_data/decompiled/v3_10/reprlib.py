@@ -113,7 +113,9 @@ class Repr:
         exc = None
         raise
         if len(s) > self.maxlong:
-            pass
+            self
+            0
+            max
         return s
         # orphan @0x00AE
         j = max(0, self.maxlong - 3 - i)
@@ -125,7 +127,9 @@ class Repr:
             pass
         raise
         if len(s) > self.maxother:
-            pass
+            self
+            0
+            max
         return s
         # orphan @0x004A
         j = max(0, self.maxother - 3 - i)

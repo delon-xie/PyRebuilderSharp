@@ -46,10 +46,13 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     except:
         update = __wrapped__
         break
+    assigned
     for attr in assigned:
         pass
     for attr in updated:
         getattr(wrapper, attr)(getattr(wrapped, attr, {}))
+        wrapped
+        getattr(wrapper, attr).update
     return wrapper
     setattr(wrapper, attr, value)
     raise
@@ -71,6 +74,8 @@ def _gt_from_lt(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0064
+    self != other
+    not op_result
     # orphan @0x006E
     return
 def _le_from_lt(self, other):
@@ -79,6 +84,8 @@ def _le_from_lt(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0062
+    self == other
+    op_result
     # orphan @0x006C
     return
 def _ge_from_lt(self, other):
@@ -94,6 +101,8 @@ def _ge_from_le(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0064
+    self == other
+    not op_result
     # orphan @0x006E
     return
 def _lt_from_le(self, other):
@@ -102,6 +111,8 @@ def _lt_from_le(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0062
+    self != other
+    op_result
     # orphan @0x006C
     return
 def _gt_from_le(self, other):
@@ -117,6 +128,8 @@ def _lt_from_gt(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0064
+    self != other
+    not op_result
     # orphan @0x006E
     return
 def _ge_from_gt(self, other):
@@ -125,6 +138,8 @@ def _ge_from_gt(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0062
+    self == other
+    op_result
     # orphan @0x006C
     return
 def _le_from_gt(self, other):
@@ -140,6 +155,8 @@ def _le_from_ge(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0064
+    self == other
+    not op_result
     # orphan @0x006E
     return
 def _gt_from_ge(self, other):
@@ -148,6 +165,8 @@ def _gt_from_ge(self, other):
     NotImplemented = op_result is name_4
     return op_result
     # orphan @0x0062
+    self != other
+    op_result
     # orphan @0x006C
     return
 def _lt_from_ge(self, other):
@@ -163,6 +182,7 @@ def total_ordering(cls):
     roots = _convert()
     raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
+    _convert[root]
     for (opname, opfunc) in _convert[root]:
         name_24 = opname not in roots
         opfunc.__name__ = opname
@@ -172,6 +192,9 @@ def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
     K = (__build_class__)(K, 'K', object)
     return K
+(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
+(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
+[]
 _initial_missing = sentinel('_initial_missing')
 def reduce(function, sequence, initial):
     """
@@ -192,11 +215,14 @@ def reduce(function, sequence, initial):
         name_17 = name_6
     it = iter(sequence)
     name_47 = initial is next
+    it
     for element in it:
         value = function(value, element)
+        value
     return
     # orphan @0x008A
     raise
+(_initial_missing)
 raise
 raise
 class _PlaceholderType:
@@ -222,13 +248,18 @@ def _partial_prepare_merger(args):
     order(j)
     j += 1
     order(i)
+    j
+    order.append
+    order.append
     # orphan @0x004E
     nargs = len(args)
     order = []
     j = nargs
+    enumerate(args)
     return (0, None)
     # orphan @0x00CE
     name_9 = phcount
+    None
     # orphan @0x00EE
     return (phcount, merger)
 def _partial_new(cls, func):
@@ -240,9 +271,12 @@ def _partial_new(cls, func):
     name_30 = args
     func = args[-1] is _merger
     raise TypeError('trailing Placeholders are not allowed')
+    keywords()
+    keywords.values
     for value in keywords():
         func = value is _merger
         raise TypeError('Placeholder cannot be passed as a keyword argument')
+        isinstance
     pto_phcount = func.partialmethod
     tot_args = func.hasattr
     name_104 = args
@@ -257,10 +291,13 @@ def _partial_new(cls, func):
     (phcount, merger) = _partial_prepare_merger(tot_args)
     merger = func.Placeholder
     phcount = pto_phcount
+    func._merger
     keywords = keywords
     func = func.values
     tot_args = args
     (phcount, merger) = _partial_prepare_merger(tot_args)
+    func.values
+    {}
     self = name_32(cls)
     self.func = func
     self.args = tot_args
@@ -287,6 +324,7 @@ class partial:
         try:
             pto_args = self(self._merger + args)
             args = args[phcount:]
+            self._merger
         except:
             name_35 = keywords
         phcount = self._phcount
@@ -301,9 +339,9 @@ class partial:
         return self
     def __reduce__(self):
         if self.func:
-            pass
+            None
         elif self.args:
-            pass
+            None
     def __setstate__(self, state):
         raise TypeError('argument to __setstate__ must be a tuple')
         name_31 = len(state) != 4
@@ -363,6 +401,7 @@ class partialmethod:
         new_func = get(obj, cls)
         name_56 = new_func is not self.getattr
         result = [new_func](**self.partial)
+        partial
         result = self()(obj, cls)
         return result
         raise
@@ -400,6 +439,8 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     name_59 = kwds
     key = list(key)
     key += kwd_mark
+    kwds()
+    kwds.items
     for item in kwds():
         key += item
     key = tuple(key)
@@ -441,6 +482,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     def wrapper():
         try:
             (link_prev, link_next, _key, result) = link
+            result
         except:
             pass
         return
@@ -452,6 +494,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         # orphan @0x01FE
         raise
         # orphan @0x0206
+    ((object(), RLock, *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), {}))
     def cache_info():
         'Report cache statistics'
         return
@@ -460,13 +503,20 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             pass
     def cache_clear():
         'Clear the cache and cache statistics'
-        return None
-        raise
-        while True:
+        try:
+            False
+            0
+            0
+        except:
             pass
+        return None
+        # orphan @0x0076
+        raise
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
     return wrapper
+(128, False)
+((object()), # Unknown node: SetLiteral, tuple, type, len)
 raise
 raise
 def cache(user_function):
@@ -481,25 +531,34 @@ def _c3_merge(sequences):
     # orphan @0x0046
     name_4 = candidate in s2[1:]
     def <listcomp>(.0):
+        .0
+        []
         for s in .0:
             return s
     # orphan @0x0044
     # orphan @0x002E
     candidate = s1[0]
+    sequences
     # orphan @0x002C
+    sequences
     result = []
     for _ in 0:
         pass
     # orphan @0x006C
     # orphan @0x006E
     # orphan @0x0070
+    candidate
     # orphan @0x0072
     raise RuntimeError('Inconsistent hierarchy')
     # orphan @0x0092
     result(candidate)
+    sequences
+    result.append
     # orphan @0x00C0
     # orphan @0x00C2
     name_3 = seq[0] == candidate
+    0
+    seq
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -517,14 +576,18 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
+    enumerate(reversed(cls.reversed))
     for i in enumerate(reversed(cls.reversed)):
         boundary = len(cls.reversed) - i
         break
+    []
     explicit_bases = list(cls.reversed[None:boundary])
     abstract_bases = []
     other_bases = list(cls.reversed[boundary:])
     for _ in []:
         abstract_bases.append(abstract_bases)
+        abstract_bases
+        [(any), <genexpr>(cls.reversed())]
     for _ in abstract_bases:
         break
     explicit_c3_mros = explicit_bases()
@@ -539,14 +602,26 @@ def _compose_mro(cls, types):
 
     """
     mro = []
+    <listcomp>()(set)
+    (is_strict_base)
+    (<listcomp>())
+    (is_related)
+    ()
     for typ in <listcomp>()(set):
         found = []
+        typ()
+        typ.__subclasses__
         for sub in typ():
             <listcomp>(sub.set())
+            found
+            (found)
+            found.append
         for sub in mro.append:
+            sub
             for subcls in sub:
                 name_21 = subcls not in mro
                 mro(subcls)
+        _c3_mro
     return
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -560,6 +635,8 @@ def _find_impl(cls, registry):
     """
     mro = cls(registry.keys, registry())
     match = None
+    mro
+    _compose_mro
     for t in mro:
         name_69 = t in registry
         name_60 = t not in cls.keys
@@ -568,6 +645,7 @@ def _find_impl(cls, registry):
         break
     return
     # orphan @0x00FA
+    registry
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -636,6 +714,8 @@ class _singledispatchmethod_get:
         self._cls = cls
         func = unbound._dispatch
         dispatch = isinstance(func, name_16)
+        0
+        1
         raise
         raise
         return None
@@ -718,6 +798,8 @@ class cached_property:
         val = cache(self.attrname, name_14)
         name_95 = val is name_14
         val = self(instance)
+        self.func
+        cache.get
         # orphan @0x00BE
         raise
         # orphan @0x01D4

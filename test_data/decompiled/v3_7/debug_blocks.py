@@ -23,9 +23,13 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
         for (i, offset) in any(<lambda>(block_instrs)):
             if i + 1 < len(sorted_leaders):
                 pass
+            instrs[-1].end + 2
             block_instrs = <lambda>(instrs)
             if len(block_instrs) > 3:
                 pass
+            f"{'3d'}-{.0 - 1}{'3d'}]: {', '.join(<lambda>(block_instrs))}"
+            offset
+            'Block ['
         if any(<lambda>(block_instrs)):
             for debug_blocks.py in debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
                 if debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':

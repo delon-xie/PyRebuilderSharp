@@ -40,12 +40,17 @@ class Repr:
             parts = typename.split()
             typename = '_'.join(parts)
             method = getattr(self, 'repr_' + typename, None)
-            if method and (self not in typename._lookup):
-                return method(level, x)
-            return self.repr_instance(level, x)
+            if method:
+                typename
+                self
+        # orphan @0x00BA
+        # orphan @0x00D8
+        return method(level, x)
+        # orphan @0x0130
         module = getattr(cls, '__module__', None)
-        if self == module._lookup[typename]:
-            return method(level, x)
+        return method(level, x)
+        # orphan @0x01BC
+        return self.repr_instance(level, x)
     def _join(self, pieces, level):
         try:
             sep = """,
@@ -53,25 +58,23 @@ class Repr:
         except:
             pass
         try:
-            try:
-                try:
-                    error = None
-                except:
-                    pass
-            except:
-                error = None
-        except:
             error = None
+        except:
+            pass
         return ', '.join(pieces)
         return ''
         indent = self.indent
+        indent < 0
+        isinstance(indent, TypeError)
         raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
-        return
         indent *= ' '
-        if not -len(indent):
-            pass
-        # orphan @0x01D6
-        raise
+        len(indent)
+        1
+        [''](pieces)
+        sep.join
+        if not True:
+            return
+        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
             try:
@@ -84,15 +87,18 @@ class Repr:
                 break
         except:
             break
-        n = len(x)
+        len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        elif maxiter > n:
+            newlevel = level - 1
+            self.repr1
+        islice
+        elem
+        if maxiter > n:
             pieces.append(self.fillvalue)
             s = self._join(level, pieces)
             if (n == 1) and trail:
-                pass
-        repr1 = self.repr1
+                self.indent
     def repr_tuple(self, x, level):
         '('
         return self._repr_iterable(level, x, '(', ')', self.maxtuple, ',')
@@ -103,7 +109,6 @@ class Repr:
         'array(\'%s\')'
         if not x:
             return 'array(\'%s\')' % x.typecode
-        # orphan @0x0038
         header = 'array(\'%s\', [' % x.typecode
         return self._repr_iterable(level, x, header, '])', self.maxarray)
     def repr_set(self, x, level):
@@ -122,24 +127,21 @@ class Repr:
         'deque(['
         return self._repr_iterable(level, x, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
-        # orphan @0x0038
         n = len(x)
         if n == 0:
             return '{}'
+        self.fillvalue
+        '{'
+        level <= 0
         return
-        # orphan @0x00DC
-        newlevel = level - 1
-        repr1 = self.repr1
-        pieces = []
-        key = islice(_possibly_sorted(x), self.maxdict)
-        keyrepr = repr1(newlevel, key)
-        valrepr = repr1(key[x], newlevel)
-        # orphan @0x0110
-        # orphan @0x0144
-        # orphan @0x0164
-        pieces.append(self.fillvalue)
-        s = self._join(level, pieces)
-        return f"{{s}}"
+        for key in islice(_possibly_sorted(x), self.maxdict):
+            keyrepr = repr1(newlevel, key)
+            valrepr = repr1(key[x], newlevel)
+            pieces.append(f"{keyrepr}: {valrepr}")
+            if self > n.maxdict:
+                pieces.append(self.fillvalue)
+                s = self._join(level, pieces)
+                return f"{{s}}"
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -160,8 +162,15 @@ class Repr:
                     try:
                         import math
                         import sys
-                        k = 1 + int(math.log10(abs(x)))
-                        max_digits = sys.get_int_max_str_digits()
+                        math.log10
+                        int
+                        1
+                        try:
+                            max_digits = sys.get_int_max_str_digits()
+                            f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}x>"
+                            '<'
+                        except:
+                            exc = None
                     except:
                         exc = None
                 except:
@@ -184,7 +193,7 @@ class Repr:
         try:
             s = builtins.repr(x)
         except:
-            pass
+            '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
@@ -192,19 +201,17 @@ class Repr:
             return s
         return
         raise
+        # orphan @0x01B4
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
     __classdictcell__ = __classdict__
 def _possibly_sorted(x):
     try:
-        try:
-            if list:
-                pass
-        except:
-            pass
+        sorted(x)
     except:
-        pass
+        list(x)
     return
     return
+    raise
 aRepr = Repr()
 repr = aRepr.repr
 return None

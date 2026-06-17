@@ -13,6 +13,7 @@ i = 0
 while i < 5:
     j = i * 2
     i += 1
+range(10)
 for n in range(10):
     m = n + 1
 z = y
@@ -20,6 +21,7 @@ return None
 # orphan @0x003C
 j = i * 2
 i += 1
+i < 5
 # orphan @0x0094
 raise
 # [WARN] 1 instructions not decompiled

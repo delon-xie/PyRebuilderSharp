@@ -6,6 +6,8 @@ if x < y:
     z = x
     if x > y:
         z = y
+        0
+    range(10)
     for n in range(10):
         m = n + 1
     try:
@@ -15,6 +17,8 @@ if x < y:
 i = 0
 if i < 5:
     j = i * 2
+    1
+    i
 # orphan @0x006E
 a = 0
 # [SUMMARY] 13 blocks · 13 processed · 1 orphan · 65 instr

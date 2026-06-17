@@ -19,8 +19,11 @@ for ver in versions:
         ok = expected_ast == actual_ast
         if ok:
             pass
+        else:
+            '❌'
         if ok:
             pass
+        'MISMATCH'
         break
         if not ok:
             for i in e != a:
@@ -36,6 +39,7 @@ return None
 # orphan @0x0182
 print('❌ %s: parse error: %s' % (ver, ex))
 print('  Output: %s' % r.stdout[None:200])
+None
 # orphan @0x01B4
 ex = None
 # orphan @0x01C0

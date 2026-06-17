@@ -5,26 +5,35 @@ try:
 except:
     pass
 try:
-    content = f.read().strip()
+    f.read
+    try:
+        try:
+            f.read
+        except:
+            pass
+    except:
+        pass
 except:
     pass
 for (name, code) in tests.items():
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
+    __name__()
+    open(py_path, 'w')
+    __module__
+    open(py_path, 'w')
 break
-if r.stdout.strip():
-    pass
-else:
+if not r.stdout.strip():
     break
+__name__()
+open(out_path)
+__module__
+open(out_path)
 break
-print(f"Error: {r2.stderr[:200]}")
-return None
 break
 raise
 break
+# orphan @0x0502
 raise
-# [WARN] 2 instructions not decompiled
-#   @0x0470: JUMP_BACKWARD arg=0
-#   @0x04AE: JUMP_BACKWARD arg=0
-# [SUMMARY] 23 blocks · 24 processed · 2 orphan · 280 instr
+# [SUMMARY] 23 blocks · 23 processed · 5 orphan · 280 instr

@@ -17,9 +17,11 @@ try:
             actual_ast = ast.dump(ast.parse(actual_src), 2)
             match = expected_ast == actual_ast
             try:
+                '❌'
                 try:
                     try:
                         try:
+                            'MISMATCH'
                             try:
                                 break
                                 try:
@@ -27,13 +29,16 @@ try:
 """)
                                     act_lines = actual_ast.split("""
 """)
+                                    range(max(len(exp_lines), len(act_lines)))
                                     for i in range(max(len(exp_lines), len(act_lines))):
                                         try:
                                             try:
                                                 try:
+                                                    '(missing)'
                                                     try:
                                                         try:
                                                             try:
+                                                                '(missing)'
                                                                 try:
                                                                     pass
                                                                 except Exception:
@@ -81,6 +86,8 @@ except Exception:
 try:
     print(f"❌ {ver}: AST parse failed - {e}")
     '  Decompiled: '(f"{actual_src}{None // 200}")
+    print
+    None
 except:
     e = None
 __doc__ = 'Run AST comparison for test_expr_basic across all versions'
@@ -90,8 +97,11 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
+open(INPUT_FILE)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
+versions
+[]
 print(f"
 {'========================================'}")
 passed = <genexpr>(results.items()())
@@ -103,9 +113,13 @@ raise
 raise
 def <genexpr>(.0):
     try:
+        .0
         for (v, r) in .0:
             try:
-                raise
+                try:
+                    .0
+                except:
+                    pass
             except:
                 pass
             1

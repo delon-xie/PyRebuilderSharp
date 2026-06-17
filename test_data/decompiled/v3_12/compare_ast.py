@@ -33,11 +33,16 @@ exp_lines = expected_ast.split("""
 """)
 act_lines = actual_ast.split("""
 """)
+range(max(len(exp_lines), len(act_lines)))
 for i in range(max(len(exp_lines), len(act_lines))):
     if i < len(exp_lines):
         pass
+    else:
+        '(missing)'
     if i < len(act_lines):
         pass
+    else:
+        '(missing)'
     if not e != a:
         pass
     else:

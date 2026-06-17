@@ -1,7 +1,14 @@
 # Decompiled from: <module>
 
 try:
-    total += 1
+    total + 1
+    try:
+        try:
+            total + 1
+        except:
+            break
+    except:
+        break
 except:
     break
 for i in range(3):
@@ -10,6 +17,4 @@ return None
 # orphan @0x0040
 # orphan @0x0046
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0030: JUMP_BACKWARD arg=0
-# [SUMMARY] 10 blocks · 9 processed · 4 orphan · 27 instr
+# [SUMMARY] 10 blocks · 9 processed · 3 orphan · 27 instr

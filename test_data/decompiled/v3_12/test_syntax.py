@@ -2872,6 +2872,7 @@ class SyntaxWarningTest(unittest.TestCase):
             compile(code, filename, mode)
         except:
             pass
+        self.assertWarnsRegex(compile, errtext)
         return None
         return None
         raise
@@ -2907,6 +2908,7 @@ class SyntaxWarningTest(unittest.TestCase):
             """)
         self.check_warning(source, '\'return\' in a \'finally\' block')
     def test_break_and_continue_in_finally(self):
+        ('break', 'continue')
         for kw in ('break', 'continue'):
             source = textwrap.dedent(f"
                 for abc in range(10):
@@ -3212,11 +3214,14 @@ fgdfgf
         self._check_error("""A.μ\\
 """, 'unexpected EOF while parsing')
     def test_error_parenthesis(self):
+        '([{'
         for paren in '([{':
             self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
+        '([{'
         for paren in '([{':
             self._check_error(f"a = {paren} 1, 2, 3
 b=3", f"\{paren}' was never closed")
+        ')]}'
         for paren in ')]}':
             self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
         code = """func(
@@ -3285,14 +3290,17 @@ a=1
                 """), 'cannot use attribute as pattern target', 3, 3, 15, 15 + len('obj.attr'))
     def test_ifexp_else_stmt(self):
         msg = 'expected expression after \'else\', but statement is given'
+        ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
+        ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
+        (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (lhs_stmt, rhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):

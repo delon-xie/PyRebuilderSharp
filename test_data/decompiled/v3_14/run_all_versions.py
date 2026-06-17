@@ -7,23 +7,30 @@ except:
 try:
     import ast
     expected_ast = ast.parse(expected_src)(2, ('indent',))
+    ast.dump
 except:
-    print('Failed to parse expected source')
-    sys.exit(1)
+    break
 try:
     actual_ast = ast.parse(actual_src)(2, ('indent',))
     match = expected_ast == actual_ast
 except Exception:
     pass
 try:
+    f"❌ {ver}: AST parse failed - {e}"
+    None
+    print
     try:
         try:
+            f"❌ {ver}: AST parse failed - {e}"
+            None
+            print
             try:
-                break
+                print(f"  Decompiled: {actual_src[:200]}")
             except:
                 e = None
         except:
             e = None
+        break
     except:
         e = None
 except:
@@ -33,23 +40,25 @@ import os
 import subprocess
 import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
+os.path.expanduser
+while os.path:
+    __name__()
+    open(INPUT_FILE)
+    __module__
+    open(INPUT_FILE)
+break
 for ver in ast.dump:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-    while True:
-        pass
-    print(f"⏭ {ver}: .pyc not found")
-    r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-    actual_src = r.stdout
+    if not os.path.exists(pyc):
+        print(f"⏭ {ver}: .pyc not found")
+        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+        actual_src = r.stdout
+        subprocess.run
 if not True:
     pass
-print(f"
-========================================")
-passed = <genexpr>(results.items()())
-total = len(results)
-'Passed: '(f"{passed}/{total} ({passed / total * 100}.0f%)")
-return None
+print
+break
+break
 raise
 raise
 def <genexpr>(.0):
@@ -58,22 +67,20 @@ def <genexpr>(.0):
             for _ in .0:
                 pass
             raise
+            r
         except:
             pass
     except:
         pass
-    if not True:
+    while True:
         pass
-    # [WARN] 2 instructions not decompiled
-    #   @0x0022: JUMP_BACKWARD arg=0
-    #   @0x002E: JUMP_BACKWARD arg=0
+    # [WARN] 1 instructions not decompiled
+    #   @0x0022: JUMP_BACKWARD arg=8
 # orphan @0x0570
 # orphan @0x05EC
 raise
-# [WARN] 5 instructions not decompiled
-#   @0x0216: JUMP_BACKWARD arg=0
-#   @0x0408: JUMP_BACKWARD arg=578
-#   @0x0452: JUMP_BACKWARD arg=0
-#   @0x0462: JUMP_BACKWARD arg=0
-#   @0x05DE: JUMP_BACKWARD arg=0
-# [SUMMARY] 57 blocks · 56 processed · 15 orphan · 386 instr
+# [WARN] 3 instructions not decompiled
+#   @0x0408: JUMP_BACKWARD arg=916
+#   @0x0452: JUMP_BACKWARD arg=372
+#   @0x05DE: JUMP_BACKWARD arg=372
+# [SUMMARY] 56 blocks · 55 processed · 16 orphan · 386 instr

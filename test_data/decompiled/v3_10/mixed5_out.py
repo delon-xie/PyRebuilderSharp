@@ -16,8 +16,10 @@ def mixed_1(n):
     return result
     # orphan @0x0024
     j += 1
+    j > 5
 def mixed_2(n):
     total = 0
+    range(n)
     for i in range(n):
         j = 0
         while j < n:
@@ -50,6 +52,7 @@ def mixed_3(n):
     # orphan @0x003C
     k -= 1
     total += 1
+    k > 0
 def mixed_4(n):
     total = 0
     try:

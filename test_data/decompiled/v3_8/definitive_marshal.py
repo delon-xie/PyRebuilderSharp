@@ -13,6 +13,8 @@ print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
 known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': code.co_stacksize, 'argcount': code.co_flags}
 print('Known values:', <dictcomp>(known.items()))
+range(0, 8)
+print
 for start in nl == known['nlocals']:
     if start + 16 > len(m):
         break

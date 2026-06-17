@@ -5,6 +5,7 @@
 raise
 try:
     output = f()
+    f.read
 except:
     pass
 import re
@@ -34,8 +35,17 @@ version_match = re.output('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 name_98 = version_match
 version = version_match(1)
 name_73 = version in ('3.7', '3.8', '3.9', '3.10')
+version := status == 'PASS'
+version_match.group
+next_line().startswith
+next_line.strip
+next_line.startswith
+match.group
+output.split
+match.group
 j += 1
 lines = j < len(lines)
+j < i + 30
 i += 1
 print('======================================================================')
 print('Python 3.7-3.10 版本测试通过率统计')
@@ -45,18 +55,35 @@ print('----------------------------------------------------------------------')
 total_passed = 0
 total_failed = 0
 total = 0
+version_stats.keys(version_stats())
+sorted
+'通过'
+' '
+'<12'
+'版本'
+print
+i < len(lines)
 for version in version_stats.keys(version_stats()):
     stats = version_stats[version]
     t = stats['total']
     p = stats['passed']
     f = stats['failed']
     split = t > 0
+    0
+    p / t * 100
     total_passed += p
     total_failed += f
     total += t
     p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
+    ' '
+    '<5'
+    version
+    'Python '
+    print
 print('----------------------------------------------------------------------')
 split = total > 0
+0
+total_passed / total * 100
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')
 return None

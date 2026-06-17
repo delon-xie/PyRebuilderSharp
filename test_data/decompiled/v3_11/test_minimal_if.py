@@ -3,6 +3,7 @@
 try:
     f(src)
     py_path = f.src
+    f.write
 except:
     pass
 import py_compile

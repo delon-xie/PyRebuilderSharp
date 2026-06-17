@@ -7,6 +7,7 @@ def get_python_version(filepath):
     with open(filepath, 'rb') as fp:
         magic = fp.read(4)
 def fix_pyc_names(directory):
+    os.listdir(directory)
     for filename in new_filename != filename:
         if filename.endswith('.pyc'):
             filepath = os.path.join(directory, filename)

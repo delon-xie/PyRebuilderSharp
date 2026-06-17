@@ -18,6 +18,8 @@ def test_simple():
         x = 2
     return x
 """
+'.py'(False, 'w', ('suffix', 'delete', 'mode'))
+tempfile.NamedTemporaryFile
 py_path(py_path + 'c', True, ('cfile', 'doraise'))
 print('Compiled OK')
 r = ['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'](True, True, '/Users/admin/codes/Tools/PyRebuilderSharp', ('capture_output', 'text', 'cwd'))

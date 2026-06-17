@@ -14,14 +14,17 @@ current_test = None
 current_test_fail = False
 def remove_ansi(text):
     return re.sub('\\x1b\\[[0-9;]*m', '', text)
+lines
 for line in 'Bad MAGIC' in clean_line:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()
     if line_stripped.startswith('*** ') and current_test and current_test_fail:
         print(f"✗ {current_test}")
         failed += 1
-    if current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line) or ('Unsupported' in clean_line) or ('Bad MAGIC' in clean_line):
-        pass
+    if current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line):
+        if 'Unsupported' in clean_line:
+            if 'Bad MAGIC' in clean_line:
+                current_test_fail = True
     current_test = line_stripped[4:].split(':')[0]
     current_test_fail = False
     if 'FAIL' in line_stripped:

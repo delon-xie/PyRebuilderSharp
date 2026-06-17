@@ -2,8 +2,10 @@
 
 x = 10
 name_18 = x > 0
+range(x)
 for n in range(x):
     y = n
+    None
 return
 # orphan @0x0036
 y = -1

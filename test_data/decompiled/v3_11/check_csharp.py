@@ -5,6 +5,7 @@
 raise
 try:
     data = f()
+    f.read
 except:
     pass
 import struct
@@ -14,6 +15,8 @@ raw = data[off]
 type_byte = raw & 127
 'Type byte at '(f"{off}: {raw}{'#x'}, clean: {type_byte} (TYPE_CODE={type_byte == 99})")
 off += 1
+('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
+print
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     val = struct.data('<i', data[off:off + 4])[0]
     print(f"  {name}: {val} (off {off})")
@@ -26,6 +29,8 @@ length = raw2 & 128
 print('  (FLAG_REF set, _refList.Count used)')
 off2 = off + 1
 off2 = off + 1
+print
+print
 name_24 = type2 == 90
 length = data[off2]
 print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")

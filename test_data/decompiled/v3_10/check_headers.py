@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 import struct
+('3.5', '3.6', '3.7', '3.8')
 for ver in print:
     path = f"/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.{ver}.pyc"
     data = open(path, 'rb').read()

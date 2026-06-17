@@ -2,11 +2,16 @@
 
 try:
     magic = f.read(4)
+    magic_numbers.get
     try:
         try:
             magic = f.read(4)
+            magic_numbers.get
             try:
-                version_files[version].append(filename)
+                try:
+                    version_files[version].append(filename)
+                except:
+                    pass
             except:
                 pass
         except:
@@ -15,22 +20,45 @@ try:
         pass
 except:
     pass
-for filename in os.listdir(pyc_dir):
+import os
+'3.14'
+b'hw0NCg=='
+'3.13'
+b'eg0NCg=='
+'3.12'
+b'bw0NCg=='
+'3.11'
+b'Yg0NCg=='
+'3.10'
+b'Wg0NCg=='
+magic_numbers = {b'VQ0NCg==': '3.7', b'XQ0NCg==': '3.8', b'YQ0NCg==': '3.9'}
+pyc_dir = 'tests/compiled'
+version_files = {}
+os.listdir
+for filename in os.listdir:
     if not filename.endswith('.pyc'):
-        pass
-    filepath = os.path.join(pyc_dir, filename)
+        filepath = os.path.join(pyc_dir, filename)
+        __name__()
+        open(filepath, 'rb')
+        __module__
+        open(filepath, 'rb')
 break
-for (version, files) in sorted(version_files.items()):
-    print(f"  Python {version}: {len(files)} 个文件")
-    if version == '3.10':
-        pass
-    else:
-        print('    文件列表:')
-    break
+if not version == '3.10':
+    print('    文件列表:')
+    sorted(files)
+for (version, files) in version not in version_files:
+    files
+    None
+    len
+    ': '
+    version
+    '  Python '
+    None
+    print
+for f in sorted(files):
+    print(f"      {f}")
+    return None
 break
 # orphan @0x028C
 raise
-# [WARN] 2 instructions not decompiled
-#   @0x008E: JUMP_BACKWARD arg=0
-#   @0x0288: JUMP_BACKWARD arg=0
-# [SUMMARY] 25 blocks · 25 processed · 2 orphan · 173 instr
+# [SUMMARY] 25 blocks · 25 processed · 4 orphan · 173 instr

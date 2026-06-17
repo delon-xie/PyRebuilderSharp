@@ -23,12 +23,17 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
        are updated with the corresponding attribute from the wrapped
        function (defaults to functools.WRAPPER_UPDATES)
     """
+    assigned
     for attr in assigned:
         try:
             value = getattr(wrapped, attr)
         except AttributeError:
             pass
+    updated
     for attr in updated:
+        attr
+        wrapper
+        getattr
         break
     wrapper.__wrapped__ = wrapped
     return wrapper
@@ -50,7 +55,9 @@ def _gt_from_lt(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    not op_result
     # orphan @0x0022
+    self != other
     # orphan @0x0028
     return
 def _le_from_lt(self, other):
@@ -59,7 +66,9 @@ def _le_from_lt(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    op_result
     # orphan @0x0020
+    self == other
     # orphan @0x0026
     return
 def _ge_from_lt(self, other):
@@ -75,7 +84,9 @@ def _ge_from_le(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    not op_result
     # orphan @0x0022
+    self == other
     # orphan @0x0028
     return
 def _lt_from_le(self, other):
@@ -84,7 +95,9 @@ def _lt_from_le(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    op_result
     # orphan @0x0020
+    self != other
     # orphan @0x0026
     return
 def _gt_from_le(self, other):
@@ -100,7 +113,9 @@ def _lt_from_gt(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    not op_result
     # orphan @0x0022
+    self != other
     # orphan @0x0028
     return
 def _ge_from_gt(self, other):
@@ -109,7 +124,9 @@ def _ge_from_gt(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    op_result
     # orphan @0x0020
+    self == other
     # orphan @0x0026
     return
 def _le_from_gt(self, other):
@@ -125,7 +142,9 @@ def _le_from_ge(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    not op_result
     # orphan @0x0022
+    self == other
     # orphan @0x0028
     return
 def _gt_from_ge(self, other):
@@ -134,7 +153,9 @@ def _gt_from_ge(self, other):
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
+    op_result
     # orphan @0x0020
+    self != other
     # orphan @0x0026
     return
 def _lt_from_ge(self, other):
@@ -152,8 +173,10 @@ def total_ordering(cls):
         raise ValueError('must define at least one ordering operation: < > <= >=')
     # orphan @0x001E
     root = max(roots)
+    _convert[root]
     # orphan @0x002E
     # orphan @0x0030
+    opname not in roots
     # orphan @0x003E
     opfunc.__name__ = opname
     # orphan @0x0052
@@ -190,6 +213,7 @@ def reduce(function, sequence, initial):
     # orphan @0x003C
     value = initial
     # orphan @0x0040
+    it
     # orphan @0x0044
     # orphan @0x0046
     value = function(value, element)
@@ -220,11 +244,13 @@ class _PlaceholderType:
 Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
     # orphan @0x0022
+    a is Placeholder
     # orphan @0x0020
     # orphan @0x0008
     nargs = len(args)
     order = []
     j = nargs
+    enumerate(args)
     if not args:
         return (0, None)
     # orphan @0x0030
@@ -234,23 +260,31 @@ def _partial_prepare_merger(args):
     order.append(i)
     # orphan @0x0050
     phcount = j - nargs
+    phcount
     # orphan @0x005C
     # orphan @0x0064
+    None
     # orphan @0x0066
     return (phcount, merger)
 def _partial_new(cls, func):
     # orphan @0x0068
+    value is Placeholder
     # orphan @0x0066
     # orphan @0x005E
+    keywords.values()
     # orphan @0x0056
     raise TypeError('trailing Placeholders are not allowed')
     # orphan @0x004A
+    args[-1] is Placeholder
     # orphan @0x0046
+    args
     # orphan @0x0036
     raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
     # orphan @0x002C
+    hasattr(func, '__get__')
     # orphan @0x0020
     base_cls = partialmethod
+    callable(func)
     # orphan @0x001E
     if issubclass(cls, partial):
         base_cls = partial
@@ -260,17 +294,22 @@ def _partial_new(cls, func):
     raise TypeError('Placeholder cannot be passed as a keyword argument')
     # orphan @0x007A
     # orphan @0x007C
+    isinstance(func, base_cls)
     # orphan @0x0088
     pto_phcount = func._phcount
     tot_args = func.args
+    args
     # orphan @0x0098
     tot_args += args
+    pto_phcount
     # orphan @0x00A4
     nargs = len(args)
+    nargs < pto_phcount
     # orphan @0x00B4
     tot_args += (Placeholder) * (pto_phcount - nargs)
     # orphan @0x00C6
     tot_args = func._merger(tot_args)
+    nargs > pto_phcount
     # orphan @0x00D8
     tot_args += args[pto_phcount:]
     # orphan @0x00E8
@@ -281,6 +320,8 @@ def _partial_new(cls, func):
     # orphan @0x0102
     keywords = keywords
     func = func.func
+    func.keywords
+    {}
     # orphan @0x0118
     tot_args = args
     (phcount, merger) = _partial_prepare_merger(tot_args)
@@ -328,37 +369,53 @@ class partial:
         return MethodType(self, obj)
     def __reduce__(self):
         if self.keywords:
-            pass
-        elif self.__dict__:
-            pass
+            None
+        # orphan @0x001C
+        self.__dict__
+        # orphan @0x0022
+        None
+        # orphan @0x0024
+        return (())
     def __setstate__(self, state):
         # orphan @0x004E
+        kwds is not None
         # orphan @0x0044
+        isinstance(args, tuple)
         # orphan @0x0030
         (func, args, kwds, namespace) = state
+        callable(func)
         # orphan @0x001E
         raise TypeError(f"expected 4 items in state, got {len(state)}")
         # orphan @0x0012
+        len(state) != 4
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
         # orphan @0x0056
+        isinstance(kwds, dict)
         # orphan @0x0060
+        namespace is not None
         # orphan @0x0068
+        isinstance(namespace, dict)
         # orphan @0x0072
         raise TypeError('invalid partial state')
         # orphan @0x007A
+        args
         # orphan @0x007E
+        args[-1] is Placeholder
         # orphan @0x008A
         raise TypeError('trailing Placeholders are not allowed')
         # orphan @0x0092
         (phcount, merger) = _partial_prepare_merger(args)
         args = tuple(args)
+        kwds is None
         # orphan @0x00AE
         kwds = {}
         # orphan @0x00B4
+        type(kwds) is not dict
         # orphan @0x00C0
         kwds = dict(kwds)
         # orphan @0x00C8
+        namespace is None
         # orphan @0x00D0
         namespace = {}
         # orphan @0x00D4
@@ -395,6 +452,9 @@ class partialmethod:
             # orphan @0x0058
             # orphan @0x005E
             keywords = keywords
+            pto_args(**keywords)
+            [cls_or_self]
+            {}.keywords.func
             # orphan @0x0086
             return
         _method.__isabstractmethod__ = ().__isabstractmethod__
@@ -411,6 +471,7 @@ class partialmethod:
                 except AttributeError:
                     pass
         # orphan @0x0068
+        result is None
         # orphan @0x0070
         result = self._make_unbound_method().__get__(obj, cls)
         # orphan @0x0080
@@ -452,11 +513,14 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         for item in kwds.items():
             key += item
     # orphan @0x0036
+    typed
     # orphan @0x003A
     key += (tuple)(_make_key.<locals>.<listcomp>(args))
+    kwds
     # orphan @0x0058
     key += (tuple)(_make_key.<locals>.<listcomp>(kwds.values()))
     # orphan @0x0078
+    len(key) == 1
     # orphan @0x0084
     # orphan @0x0094
     return key[0]
@@ -498,12 +562,25 @@ def lru_cache(maxsize, typed):
     return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     # orphan @0x0010
+    # Unknown node: Slice == 0
+    [RLock(), [], None, None]
+    False.get.__len__
+    0
+    0
+    {}
+    *(0, 1, 2, 3)
+    *(0, 1, 2, 3)
+    *(0, 1, 2, 3)
+    *(0, 1, 2, 3)
+    _make_key
+    object()
     if not True:
         raise TypeError('the first argument must be callable')
     # orphan @0x0068
     def wrapper():
         result = 1(**kwds)
         return result
+    ()
     # orphan @0x0078
     # orphan @0x0080
     def wrapper():
@@ -511,6 +588,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         # orphan @0x002A
         result = 1(**kwds)
         return result
+    ()
     # orphan @0x009C
     def wrapper():
         with _:
@@ -524,11 +602,16 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             oldkey = result[oldroot[oldroot]]
             oldresult = key[oldroot]
             link = [last, key, result]
+            last >= key()
+            last
+            link
+            link
         # orphan @0x014C
         # orphan @0x0160
         # orphan @0x0162
         # orphan @0x016C
         return result
+    ()
     # orphan @0x00C6
     def cache_info():
         'Report cache statistics'
@@ -558,6 +641,7 @@ def _c3_merge(sequences):
     result = []
     for _ in 0:
         return result
+    sequences
     for s1 in sequences:
         for s2 in candidate in s2[1:]:
             if candidate in s2[1:]:
@@ -571,6 +655,7 @@ def _c3_merge(sequences):
         raise RuntimeError('Inconsistent hierarchy')
     # orphan @0x0062
     result.append(candidate)
+    sequences
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -593,6 +678,8 @@ def _c3_mro(cls, abcs):
     abstract_bases = []
     other_bases = list(cls.__bases__[boundary:])
     # orphan @0x0044
+    []
+    enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
         boundary = len(cls.__bases__) - i
         break
@@ -600,8 +687,10 @@ def _c3_mro(cls, abcs):
     # orphan @0x0074
     # orphan @0x0076
     # orphan @0x0082
+    (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__))
     # orphan @0x009A
     # orphan @0x00A6
+    abstract_bases
     # orphan @0x00AA
     # orphan @0x00AC
     # orphan @0x00BA
@@ -617,6 +706,9 @@ def _compose_mro(cls, types):
 
     """
     mro = []
+    (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set)
+    ((_compose_mro.<locals>.is_related)(_compose_mro.<locals>.<listcomp>))
+    ()
     for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
         for sub in typ.__subclasses__():
             found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
@@ -627,6 +719,7 @@ def _compose_mro(cls, types):
         if not found:
             mro.append(typ)
         found.sort(key=len, reverse=True)
+        found
     return
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -640,6 +733,7 @@ def _find_impl(cls, registry):
     """
     mro = _compose_mro(cls, registry.keys())
     match = None
+    mro
     for t in t in registry:
         if (match is not None) and (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
             raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
@@ -675,8 +769,9 @@ class singledispatchmethod:
     callables as instance methods.
     """
     def __init__(self, func):
-        if callable(func) or not hasattr(func, '__get__'):
-            pass
+        if callable(func):
+            if not hasattr(func, '__get__'):
+                raise TypeError(f"{func!r} is not callable or a descriptor")
         # orphan @0x0020
         self.dispatcher = singledispatch(func)
         self.func = func
@@ -700,6 +795,8 @@ class singledispatchmethod:
         # orphan @0x0028
         AttributeError
         name = '?'
+__build_class__(_singledispatchmethod_get, '_singledispatchmethod_get')
+(None,)
 _NOT_FOUND = object()
 class cached_property:
     def __init__(self, func):
@@ -712,6 +809,7 @@ class cached_property:
             self.attrname = name
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
         # orphan @0x0012
+        name != self.attrname
     def __get__(self, instance, owner):
         # orphan @0x002A
         AttributeError
@@ -722,14 +820,17 @@ class cached_property:
         # orphan @0x0016
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         # orphan @0x000C
+        self.attrname is None
         if instance is None:
             return self
         # orphan @0x005A
         # orphan @0x0060
         val = cache.get(self.attrname, _NOT_FOUND)
+        val is _NOT_FOUND
         # orphan @0x0076
         val = self.func(instance)
         yield from cache
+        val
         # orphan @0x008E
         # orphan @0x0090
         TypeError

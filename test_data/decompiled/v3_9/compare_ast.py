@@ -29,17 +29,27 @@ exp_lines = expected_ast.split("""
 """)
 act_lines = actual_ast.split("""
 """)
+range(max(len(exp_lines), len(act_lines)))
 # orphan @0x012E
 # orphan @0x0130
+i < len(exp_lines)
 # orphan @0x0140
+exp_lines[i]
 # orphan @0x0148
+'(missing)'
 # orphan @0x014A
+i < len(act_lines)
 # orphan @0x015A
+act_lines[i]
 # orphan @0x0162
+'(missing)'
 # orphan @0x0164
+e != a
 # orphan @0x0170
 print(f"Line {i}:")
 print(f"  expected: {e}")
+print
 # orphan @0x0190
+i > 5
 # orphan @0x01A6
 # [SUMMARY] 22 blocks · 7 processed · 15 orphan · 211 instr

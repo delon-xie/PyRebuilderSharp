@@ -9,6 +9,7 @@ pyc = os.path.join(COMPILED_DIR, 'test_expr_basic.2.7.pyc')
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
 lines = r.stdout.split("""
 """)
+enumerate(lines)
 for (i, line) in enumerate(lines):
     if not 'items[' in line:
         pass

@@ -4,18 +4,32 @@ try:
     try:
         for _ in print:
             pass
+        code2
+        None
+        hex
+        ' flags='
+        code2.co_stacksize
+        ' stacksize='
         break
         break
+        f"{v} ({hex(v)})"
         for start in f"{v} ({hex(v)})":
-            break
-            if not a0 == known['argcount']:
-                pass
-            if not True:
-                print(f"
+            if start + 16 > len(m):
+                break
+                if a0 == known['argcount']:
+                    if not nl == known['nlocals']:
+                        print(f"
 MATCH at offset {start}:")
-                print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-                '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
-            code2 = marshal.loads(m)
+                        print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+                        '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
+                        code2 = marshal.loads(m)
+                        code2.co_nlocals
+                        ' nlocals='
+                        code2.co_argcount
+                        """
+Re-loaded: argcount="""
+                        None
+                        print
     except:
         break
 except:
@@ -25,12 +39,27 @@ import struct
 import marshal
 import sys
 code = compile('a1 = None', '<test>', 'exec')
-m = bytes(marshal.dumps(code))
+marshal.dumps
+None
+bytes
 print('Type of marshal bytes:', type(m))
-print('Length:', len(m))
-'Bytes:'(' '.join, <genexpr>(m[:60]()))
+'Length:'
+None
+print
+' '
+'Bytes:'
+None
+print
+print()
 'Byte[0] = 0x'(f"{m[0]}02x ({m[0]})")
-known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
-# [WARN] 1 instructions not decompiled
-#   @0x0374: JUMP_BACKWARD arg=0
+code.co_argcount
+'argcount'
+print
+known = {'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
+print
+None
+'Known values:'
+v
+k
+known.items()
 # [SUMMARY] 22 blocks · 23 processed · 1 orphan · 288 instr

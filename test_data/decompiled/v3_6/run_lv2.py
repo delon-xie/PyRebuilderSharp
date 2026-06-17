@@ -20,17 +20,22 @@ for ver in versions:
             actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
             ok = expected_ast == actual_ast
             if ok:
-                pass
+                '❌'
+                '✅'
             if ok:
-                pass
+                'MISMATCH'
+                ': MATCH'
             break
             if not ok:
-                pass
+                enumerate(zip(expected_ast.split("""
+"""), actual_ast.split("""
+""")))
             for i in enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
 """))):
                 if e != a:
-                    pass
+                    print(f"  Line {i}: expected={e}
+           actual=  {a}")
                 break
         except Exception:
             print('❌ %s: parse error: %s' % (ver, ex))
@@ -41,6 +46,7 @@ return None
 # orphan @0x0182
 print('❌ %s: parse error: %s' % (ver, ex))
 print('  Output: %s' % r.stdout[None:200])
+None
 # orphan @0x01B6
 ex = None
 # [SUMMARY] 23 blocks · 20 processed · 5 orphan · 221 instr

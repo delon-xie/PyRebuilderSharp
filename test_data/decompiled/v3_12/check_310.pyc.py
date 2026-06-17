@@ -11,6 +11,7 @@ raw = f.read()
 code = marshal.loads(raw)
 def dump_bytecode(c, depth):
     p = '  ' * depth
+    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
@@ -18,6 +19,8 @@ def dump_bytecode(c, depth):
         et = getattr(const, 'co_exceptiontable', None)
         if et:
             pass
+        else:
+            '(none)'
         break
         if et:
             for i in name_22.from_bytes:

@@ -6,6 +6,8 @@ result = subprocess.run(['python3', 'tests/run_tests.py'], capture_output=True, 
 output = result.stdout + result.stderr
 test_groups = {}
 current_group = None
+output.split("""
+""")
 for line in line.strip().endswith('.3.10.pyc'):
     if line.startswith('***'):
         parts = line.split(':')
@@ -22,13 +24,16 @@ print('Python 3.10 版本测试报告')
 print('============================================================')
 passed_groups = []
 failed_groups = []
+test_groups.items()
 # orphan @0x0112
+'FAIL' in info['status']
 # orphan @0x011E
 failed_groups.append(group)
 # orphan @0x012A
 print(f"
 通过的测试组 ({len(passed_groups)}):")
 print('----------------------------------------')
+passed_groups
 # orphan @0x014A
 # orphan @0x014C
 print(f"  ✓ {group}")
@@ -36,9 +41,11 @@ print(f"  ✓ {group}")
 print(f"
 失败的测试组 ({len(failed_groups)}):")
 print('----------------------------------------')
+failed_groups
 # orphan @0x0180
 # orphan @0x0182
 print(f"  ✗ {group}")
+test_groups[group]['files']
 # orphan @0x019E
 # orphan @0x01A0
 print(f"    - {f}")

@@ -7,26 +7,30 @@ except:
 try:
     f = open('test.txt')
 except:
-    pass
-for _ in range(10):
-    while True:
+    IOError
+range(10)
+for i in range(10):
+    a = i
+    items
+    for x in items:
+        y = x
+    if not n == 1:
         pass
 for n in range(10):
     if n == 3:
+        break
+try:
+    try:
+        break
+    except:
         pass
-raise
-raise
-a = i
-for x in items:
-    y = x
-if not n == 1:
+    f = None
+except:
     pass
 return None
 raise
 return None
 # orphan @0x00AE
-# orphan @0x00C4
-f = None
-# [WARN] 1 instructions not decompiled
-#   @0x0032: JUMP_BACKWARD arg=32
-# [SUMMARY] 28 blocks · 27 processed · 3 orphan · 79 instr
+# orphan @0x00D2
+raise
+# [SUMMARY] 27 blocks · 26 processed · 3 orphan · 79 instr

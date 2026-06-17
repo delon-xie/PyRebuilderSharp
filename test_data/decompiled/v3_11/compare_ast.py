@@ -25,6 +25,8 @@ import ast
 import sys
 decompiled = open('/tmp/actual_expr.py')()
 expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')()
+open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read
+open('/tmp/actual_expr.py').read
 e = None
 e = None
 # orphan @0x017C
@@ -42,10 +44,17 @@ exp_lines = expected_ast("""
 """)
 act_lines = actual_ast("""
 """)
+range(max(len(exp_lines), len(act_lines)))
+actual_ast.split
+expected_ast.split
 # orphan @0x02DE
 parse = i < len(exp_lines)
+'(missing)'
+exp_lines[i]
 # orphan @0x0310
 parse = i < len(act_lines)
+'(missing)'
+act_lines[i]
 # orphan @0x0342
 name_52 = e != a
 print(f"Line {i}:")

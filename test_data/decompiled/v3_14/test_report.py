@@ -2,39 +2,52 @@
 
 import subprocess
 import os
-result = ['python3', 'tests/run_tests.py'](True, True, ('capture_output', 'text'))
-for line in result.stderr:
-    if line.startswith('***'):
-        parts = line.split(':')
-    break
-    for group in print(f"  ✓ {group}"):
-        for f in failed_groups:
-            print(f"    - {f}")
-            print(f"
-总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-            return None
-    for group in print('----------------------------------------'):
-        pass
-    status = parts[1].strip()
-    if not current_group:
-        pass
-    break
-    print(f"
-通过的测试组 ({len(passed_groups)}):")
-    if not line.strip().endswith('.3.10.pyc'):
-        pass
-    test_groups[current_group]['files'].append(line.strip())
-    for (group, info) in test_groups.items():
+subprocess.run
+'python3'
+None
+result = ['tests/run_tests.py'](True, True, ('capture_output', 'text'))
+result.stderr
+result.stdout
+test_groups = {}
+current_group = None
+output.split
+for line in output.split:
+    line.startswith
+    parts = line.split(':')
+    parts
+    None
+    len
+    print('Python 3.10 版本测试报告')
+    print('============================================================')
+    passed_groups = []
+    failed_groups = []
+    test_groups.items
+    for (group, info) in test_groups.items:
         if info['files']:
-            pass
-        passed_groups.append(group)
-        if not 'FAIL' in info['status']:
-            pass
-# [WARN] 6 instructions not decompiled
-#   @0x01A2: JUMP_BACKWARD arg=0
-#   @0x01A6: JUMP_BACKWARD arg=0
-#   @0x01BA: JUMP_BACKWARD arg=0
-#   @0x0208: JUMP_BACKWARD arg=0
-#   @0x0352: JUMP_BACKWARD arg=0
-#   @0x0378: JUMP_BACKWARD arg=0
-# [SUMMARY] 37 blocks · 38 processed · 1 orphan · 271 instr
+            if 'PASS' in info['status']:
+                passed_groups
+            break
+            if not 'FAIL' in info['status']:
+                failed_groups.append(group)
+        for group in failed_groups.append(group):
+            print(f"  ✓ {group}")
+            print(f"
+失败的测试组 ({len(failed_groups)}):")
+            print('----------------------------------------')
+            for group in passed_groups:
+                for f in failed_groups:
+                    print(f"    - {f}")
+                    print(f"
+总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
+                    return None
+    0
+    parts
+    1
+    parts
+    if not True:
+        test_groups[current_group]['files'].append(line.strip())
+        print('============================================================')
+break
+if not 'FAIL' in info['status']:
+    pass
+# [SUMMARY] 36 blocks · 37 processed · 1 orphan · 271 instr

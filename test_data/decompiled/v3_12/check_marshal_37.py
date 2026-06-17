@@ -12,6 +12,12 @@ Marshaled ({len(m)} bytes):")
 <genexpr>(m(None // 40()))
 """
 Byte 0 = """(f"{m[0]}{'02x'}")
+range(0, 8)
+print
+None
+' '.join
+print
+None
 for offset in '  Bytes: ':
     vals = struct.unpack_from('<IIII', m, offset)
     if not vals[0] == code.co_argcount:

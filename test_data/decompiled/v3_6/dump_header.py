@@ -36,6 +36,11 @@ if type_byte & 128:
     print("""
 --- Assuming 16-byte header (new format with flags) ---""")
     flags2 = struct.unpack('<I', data[4:8])[0]
+    '<I'
+    struct.unpack
+    print
+    print
+    print
 sz2 = struct.unpack('<I', data[12:16])[0]
 print(f"Flags={flags2}, Timestamp={ts2}, Size={sz2}")
 pos2 = 16

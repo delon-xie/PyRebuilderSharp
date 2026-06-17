@@ -107,6 +107,7 @@ class ABCMeta(type):
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         abstracts = ABCMeta.__new__.<locals>.<setcomp>(namespace.items())
+        bases
         for base in bases:
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
@@ -124,12 +125,14 @@ class ABCMeta(type):
         Returns the subclass, to allow usage as a class decorator.
         """
         # orphan @0x0012
+        issubclass(subclass, cls)
         if not isinstance(subclass, type):
             raise TypeError('Can only register classes')
         return subclass
         # orphan @0x002A
         raise RuntimeError('Refusing to create an inheritance cycle')
         # orphan @0x0032
+        cls._abc_registry.add(subclass)
         # orphan @0x003C
         ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
         return subclass
@@ -137,6 +140,7 @@ class ABCMeta(type):
         'Debug helper to print the ABC registry.'
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
         print('Inv.counter: %s' % ABCMeta._abc_invalidation_counter, file=file)
+        sorted(cls.__dict__)
         for name in sorted(cls.__dict__):
             if name.startswith('_abc_'):
                 value = getattr(cls, name)
@@ -144,6 +148,7 @@ class ABCMeta(type):
                     value = set(value)
                     print('%s: %r' % (name, value), file=file)
             return
+        None
     def __instancecheck__(cls, instance):
         'Override for isinstance(instance, cls).'
         subclass = instance.__class__
@@ -166,13 +171,17 @@ class ABCMeta(type):
                 return False
             return ok
         # orphan @0x005A
+        ok
         # orphan @0x005E
         cls._abc_cache.add(subclass)
+        cls._abc_negative_cache
         # orphan @0x008C
         cls._abc_cache.add(subclass)
         return True
         # orphan @0x00A4
+        cls._abc_registry
         # orphan @0x00A6
+        issubclass(subclass, rcls)
         # orphan @0x00C4
 class ABC:
     __doc__ = """Helper class that provides a standard way to create an ABC using

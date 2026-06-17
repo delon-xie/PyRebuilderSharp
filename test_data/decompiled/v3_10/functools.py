@@ -23,12 +23,17 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
        are updated with the corresponding attribute from the wrapped
        function (defaults to functools.WRAPPER_UPDATES)
     """
+    assigned
     for attr in assigned:
         try:
             value = getattr(wrapped, attr)
         except AttributeError:
             pass
+    updated
     for attr in updated:
+        attr
+        wrapper
+        getattr
         break
     wrapper.__wrapped__ = wrapped
     return wrapper
@@ -50,7 +55,7 @@ def _gt_from_lt(self, other):
     if op_result is NotImplemented:
         return op_result
     elif not not op_result:
-        pass
+        self != other
 def _le_from_lt(self, other):
     'Return a <= b.  Computed by @total_ordering from (a < b) or (a == b).'
     op_result = type(self).__lt__(self, other)
@@ -77,7 +82,7 @@ def _lt_from_le(self, other):
     if op_result is NotImplemented:
         return op_result
     elif not op_result:
-        pass
+        self != other
 def _gt_from_le(self, other):
     'Return a > b.  Computed by @total_ordering from (not a <= b).'
     op_result = type(self).__le__(self, other)
@@ -90,7 +95,7 @@ def _lt_from_gt(self, other):
     if op_result is NotImplemented:
         return op_result
     elif not not op_result:
-        pass
+        self != other
 def _ge_from_gt(self, other):
     'Return a >= b.  Computed by @total_ordering from (a > b) or (a == b).'
     op_result = type(self).__gt__(self, other)
@@ -117,7 +122,7 @@ def _gt_from_ge(self, other):
     if op_result is NotImplemented:
         return op_result
     elif not op_result:
-        pass
+        self != other
 def _lt_from_ge(self, other):
     'Return a < b.  Computed by @total_ordering from (not a >= b).'
     op_result = type(self).__ge__(self, other)
@@ -131,6 +136,7 @@ def total_ordering(cls):
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
+    _convert[root]
     for (opname, opfunc) in _convert[root]:
         if opname not in roots:
             opfunc.__name__ = opname
@@ -167,6 +173,7 @@ def reduce(function, sequence, initial):
             raise
             value = initial
     value = initial
+    it
     for element in it:
         value = function(value, element)
     return value
@@ -200,6 +207,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
+    enumerate(args)
     for (i, a) in enumerate(args):
         if a is Placeholder:
             order.append(j)
@@ -209,6 +217,8 @@ def _partial_prepare_merger(args):
     phcount = j - nargs
     if phcount:
         pass
+    else:
+        None
     return (phcount, merger)
 def _partial_new(cls, func):
     if issubclass(cls, partial):
@@ -258,8 +268,12 @@ class partial:
             return self
         return MethodType(self, obj)
     def __reduce__(self):
-        if self.keywords and self.__dict__:
-            return (())
+        if self.keywords:
+            if self.__dict__:
+                return (())
+            None
+        else:
+            None
     def __setstate__(self, state):
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
@@ -309,6 +323,7 @@ class partialmethod:
                 except AttributeError:
                     pass
         # orphan @0x0068
+        result is None
         # orphan @0x0070
         result = self._make_unbound_method().__get__(obj, cls)
         # orphan @0x0080
@@ -323,6 +338,7 @@ def _unwrap_partial(func):
     return func
     # orphan @0x000A
     func = func.func
+    isinstance(func, partial)
 def _unwrap_partialmethod(func):
     prev = None
     while func is not prev:
@@ -339,6 +355,7 @@ def _unwrap_partialmethod(func):
                 pass
     # orphan @0x0044
     func = getattr(func, 'func')
+    isinstance(func, partialmethod)
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -385,6 +402,7 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
+    0
     def decorating_function(user_function):
         wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
         return update_wrapper(wrapper, user_function)
@@ -412,6 +430,7 @@ def _c3_merge(sequences):
     result = []
     for _ in sequences:
         return result
+    sequences
     for s1 in sequences:
         for s2 in sequences:
             if candidate in s2[1:]:
@@ -421,9 +440,11 @@ def _c3_merge(sequences):
     if candidate is None:
         raise RuntimeError('Inconsistent hierarchy')
     result.append(candidate)
+    sequences
     for seq in sequences:
         if seq[0] == candidate:
-            pass
+            0
+            seq
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -441,6 +462,7 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
+    enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
         boundary = len(cls.__bases__) - i
         break
@@ -450,6 +472,7 @@ def _c3_mro(cls, abcs):
         for _ in []:
             if not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
                 break
+        abstract_bases
         for _ in abstract_bases:
             break
         explicit_c3_mros = _c3_mro.<locals>.<listcomp>(explicit_bases)
@@ -465,6 +488,9 @@ def _compose_mro(cls, types):
 
     """
     mro = []
+    (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set)
+    ((_compose_mro.<locals>.is_related)(_compose_mro.<locals>.<listcomp>))
+    ()
     for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
         for sub in typ.__subclasses__():
             found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
@@ -472,6 +498,7 @@ def _compose_mro(cls, types):
             mro.append(typ)
         else:
             found.sort(key=len, reverse=True)
+            found
         for sub in found:
             for subcls in sub:
                 if subcls not in mro:
@@ -489,6 +516,7 @@ def _find_impl(cls, registry):
     """
     mro = _compose_mro(cls, registry.keys())
     match = None
+    mro
     for t in mro:
         if match is not None:
             if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
@@ -524,9 +552,7 @@ class singledispatchmethod:
     callables as instance methods.
     """
     def __init__(self, func):
-        if callable(func) or not hasattr(func, '__get__'):
-            self.dispatcher = singledispatch(func)
-            self.func = func
+        pass
     def register(self, cls, method):
         """generic_method.register(cls, func) -> func
 
@@ -548,6 +574,8 @@ class singledispatchmethod:
         AttributeError
         name = '?'
         raise
+__build_class__(_singledispatchmethod_get, '_singledispatchmethod_get')
+(None,)
 _NOT_FOUND = object()
 class cached_property:
     def __init__(self, func):

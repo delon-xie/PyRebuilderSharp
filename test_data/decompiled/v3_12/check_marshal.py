@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 import struct
+('3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
     path = f"/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.{ver}.pyc"
     data = open(path, 'rb').read()
@@ -25,6 +26,8 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
             nlocals = '<I'(data, (fields_start + 12) // (fields_start + 16))[0]
         else:
             nlocals = '<I'(data, (fields_start + 4) // (fields_start + 8))[0]
+            struct.unpack
+            None
         print(f"  nlocals={nlocals}")
         print()
     else:
@@ -33,6 +36,8 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
         print(f"  fields_at={fields_start}")
         argcount = '<I'(data, fields_start // (fields_start + 4))[0]
         print(f"  argcount={argcount}")
+        struct.unpack
+        None
     hdr = 12
 return None
 # [SUMMARY] 15 blocks · 16 processed · 0 orphan · 266 instr

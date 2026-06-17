@@ -12,6 +12,7 @@ def test_until_broken(exprs):
     raise
     try:
         f(code)
+        f.write
     except:
         pass
     code = """

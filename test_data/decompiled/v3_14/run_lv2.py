@@ -5,15 +5,33 @@ try:
 except:
     pass
 try:
-    actual_ast = ast.parse(r.stdout)(2, ('indent',))
-    ok = expected_ast == actual_ast
+    ast
+    try:
+        try:
+            ast
+        except Exception:
+            pass
+        actual_ast = ast.parse(r.stdout)(2, ('indent',))
+        ok = expected_ast == actual_ast
+    except Exception:
+        pass
 except Exception:
     pass
 try:
-    print(f"❌ {ver}: parse error: {ex}")
+    ex
+    ': parse error: '
+    ver
+    '❌ '
+    None
+    print
     try:
         try:
-            print(f"❌ {ver}: parse error: {ex}")
+            ex
+            ': parse error: '
+            ver
+            '❌ '
+            None
+            print
         except:
             ex = None
         break
@@ -25,15 +43,24 @@ __doc__ = 'Run AST comparison for test_control_flow across all versions'
 import os
 import subprocess
 import ast
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-while __name__:
-    pass
+os.path
+while os.path:
+    __name__()
+    open(INPUT_FILE)
+    __module__
+    open(INPUT_FILE)
 for ver in __name__():
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)
-    r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+        30
+        True
+        True
+        ['dotnet', 'run', '--project', PROJECT, '--', pyc]
+        None
+        subprocess.run
+    while ('capture_output', 'text', 'timeout'):
+        pass
 if not True:
     pass
 return None
@@ -42,11 +69,8 @@ raise
 ex = None
 # orphan @0x0472
 raise
-# [WARN] 6 instructions not decompiled
-#   @0x0214: JUMP_BACKWARD arg=0
-#   @0x037E: JUMP_BACKWARD arg=732
-#   @0x03A8: JUMP_BACKWARD arg=0
-#   @0x03B2: JUMP_BACKWARD arg=0
-#   @0x03B8: JUMP_BACKWARD arg=0
-#   @0x0464: JUMP_BACKWARD arg=0
-# [SUMMARY] 46 blocks · 46 processed · 12 orphan · 256 instr
+# [WARN] 3 instructions not decompiled
+#   @0x037E: JUMP_BACKWARD arg=862
+#   @0x03A8: JUMP_BACKWARD arg=358
+#   @0x0464: JUMP_BACKWARD arg=358
+# [SUMMARY] 46 blocks · 46 processed · 13 orphan · 256 instr

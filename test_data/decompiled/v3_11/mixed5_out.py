@@ -3,6 +3,7 @@
 def mixed_1(n):
     result = 0
     name_54 = n > 0
+    range(n)
     for i in range(n):
         j = 0
         name_28 = j < i
@@ -10,16 +11,22 @@ def mixed_1(n):
         name_6 = j > 5
         result += j
         result += 1
+        result
+        j < i
     return
 def mixed_2(n):
     total = 0
+    range(n)
     for i in range(n):
         j = 0
         name_40 = j < n
         j += 1
         name_23 = i == j
+        range(i)
         for k in range(i):
             total += k
+            j
+        total
     return
 def mixed_3(n):
     total = 0
@@ -27,19 +34,24 @@ def mixed_3(n):
     name_62 = i < n
     i += 1
     name_42 = i % 2 == 0
+    range(i)
     for j in range(i):
         k = j
         name_16 = k > 0
         k -= 1
         total += 1
+        i
+        k > 0
     return total
 def mixed_4(n):
     try:
         name_1 = n > 0
+        range(n)
         for i in j < i:
             try:
                 try:
                     name_1 = n > 0
+                    range(n)
                 except:
                     break
                 j = 0
@@ -56,6 +68,7 @@ def mixed_4(n):
     except:
         break
     total = 0
+    None
     # orphan @0x0060
     # orphan @0x008E
     raise

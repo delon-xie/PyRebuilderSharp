@@ -1,13 +1,18 @@
 # Decompiled from: <module>
 
 try:
+    []
     for f in f:
         try:
-            break
+            try:
+                []
+            except:
+                break
         except:
             break
     print(f"
 Renaming {len(files_to_rename)} files...")
+    files_to_rename
     for (old_path, new_path) in files_to_rename:
         print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
         os.rename(old_path, new_path)
@@ -20,6 +25,7 @@ import os
 import re
 compiled_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 files_to_rename = []
+os.listdir(compiled_dir)
 for filename in os.listdir(compiled_dir):
     if not filename.endswith('.pyc'):
         pass
@@ -39,6 +45,7 @@ for filename in os.listdir(compiled_dir):
     files_to_rename.append((old_path, new_path))
 print(f"Found {len(files_to_rename)} files to rename")
 conflicts = []
+files_to_rename
 for (old_path, new_path) in files_to_rename:
     if not os.path.exists(new_path):
         pass
@@ -49,9 +56,12 @@ if conflicts:
         print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
 print("""
 Removing conflicting source files...""")
+conflicts
 for (old, new) in conflicts:
     print(f"  Removing {os.path.basename(old)}")
     os.remove(old)
+f
+files_to_rename
 # [WARN] 1 instructions not decompiled
 #   @0x0444: JUMP_BACKWARD arg=16
-# [SUMMARY] 34 blocks · 35 processed · 0 orphan · 291 instr
+# [SUMMARY] 34 blocks · 34 processed · 0 orphan · 291 instr

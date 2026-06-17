@@ -21,6 +21,8 @@ if type_byte & 128:
     ref_idx = '<I'(data, pos // (pos + 4))[0]
     print(f"  ref_index={ref_idx}")
     pos += 4
+    struct.unpack
+    None
 argcount = '<I'(data, pos // (pos + 4))[0]
 pos += 4
 nlocals = '<I'(data, pos // (pos + 4))[0]

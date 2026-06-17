@@ -19,9 +19,13 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
         for (i, start) in any(<genexpr>(block_instrs)):
             if i + 1 < len(sorted_leaders):
                 pass
+            instrs[-1].offset + 2
             block_instrs = <listcomp>(instrs)
             if len(block_instrs) > 3:
                 pass
+            f"{'3d'}-{end - 1}{'3d'}]: {', '.join(<genexpr>(block_instrs))}"
+            start
+            'Block ['
             break
             if any(<genexpr>(block_instrs)):
                 last = block_instrs[-1]

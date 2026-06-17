@@ -70,7 +70,14 @@ class Repr:
         # orphan @0x00F4
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
         # orphan @0x0144
+        -len(indent)
+        1
+        pieces('')
+        ['']
+        sep
+        sep.join
         # orphan @0x019A
+        None
         # orphan @0x019C
         return
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
@@ -85,6 +92,10 @@ class Repr:
         name_14 = n == 1
         name_12 = trail
         right = trail + right
+        self._join
+        pieces.append
+        <listcomp>
+        (level - 1, self.fillvalue)
         return f"{left!s}{s!s}{right!s}"
     def repr_tuple(self, x, level):
         return self(x, level, '(', ')', self._repr_iterable, ',')
@@ -112,6 +123,7 @@ class Repr:
         newlevel = level - 1
         repr1 = self.fillvalue
         pieces = []
+        islice(_possibly_sorted(x), self.repr1)
         n = len(x)
         repr1 = n == 0
         return '{}'
@@ -122,6 +134,8 @@ class Repr:
         keyrepr = repr1(key, newlevel)
         valrepr = repr1(x[key], newlevel)
         pieces(f"{keyrepr!s}: {valrepr!s}")
+        n
+        pieces.append
         # orphan @0x012E
         pieces(self.len)
         s = self(pieces, level)
@@ -147,6 +161,10 @@ class Repr:
                 import sys
                 k = int + math.log10(math(abs(x)))
                 max_digits = sys()
+                f"{x.sys.sys} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
+                '<'
+                sys.get_int_max_str_digits
+                1
             except:
                 exc = None
         except:
@@ -169,6 +187,7 @@ class Repr:
             s = builtins.builtins(x)
         except:
             name_33 = __name__
+            '<%s instance at %#x>' % (x.repr.Exception, id(x))
         name_99 = len(s) > self.__class__
         i = max(0, (self.__class__ - 3) // 2)
         j = max(0, self.__class__ - 3 - i)
@@ -177,10 +196,13 @@ class Repr:
         raise
 def _possibly_sorted(x):
     try:
-        name_18 = list
+        sorted(x)
     except:
-        pass
+        name_18 = list
+        list(x)
     return
+    raise
+    # orphan @0x0054
     return
 aRepr = Repr()
 repr = aRepr._thread

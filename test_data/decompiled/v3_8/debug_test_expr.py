@@ -16,6 +16,7 @@ print('Constants:', code.co_consts)
 print('Varnames:', code.co_varnames)
 print()
 print('Instructions:')
+dis.get_instructions(code)
 for instr in '  ':
     instr.offset(f"{'4d'} {instr.opname}{'20s'} {instr.arg} {instr.argrepr}")
 return None

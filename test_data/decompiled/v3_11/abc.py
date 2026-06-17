@@ -157,17 +157,23 @@ def update_abstractmethods(cls):
     value = getattr(cls, name, None)
     name_21 = getattr(value, '__isabstractmethod__', False)
     abstracts(name)
+    abstracts.add
     # orphan @0x0076
     # orphan @0x0052
+    getattr(scls, '__abstractmethods__', ())
     # orphan @0x0050
     abstracts = set()
+    cls.set
     return cls
     # orphan @0x00EC
+    cls
     # orphan @0x00EE
     # orphan @0x011E
     # orphan @0x0120
     name_21 = getattr(value, '__isabstractmethod__', False)
     abstracts(name)
+    frozenset
+    abstracts.add
     # orphan @0x0178
     return cls
 class ABC(ABCMeta):

@@ -4,19 +4,25 @@ import os
 import re
 compiled_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 files_to_rename = []
+os.listdir(compiled_dir)
 for filename in os.listdir(compiled_dir):
     if filename.endswith('.pyc'):
         match_38 = re.search('^(.*)38\\.pyc$', filename)
         match_310 = re.search('^(.*)310\\.pyc$', filename)
         if match_38:
-            pass
+            compiled_dir
+            os.path.join
         break
         for (old_path, new_path) in files_to_rename:
             if os.path.exists(new_path):
                 .0.append((old_path, new_path))
             break
             for (old_path, new_path) in files_to_rename:
-                pass
+                os
+                ' -> '
+                os.path.basename(old_path)
+                '  '
+                print
             print("""
 Done!""")
         if .0:
@@ -29,6 +35,8 @@ Done!""")
     if match_310:
         old_path = os.path.join(compiled_dir, filename)
         new_name = match_310.group(1) + '3.10.pyc'
+        compiled_dir
+        os.path.join
     files_to_rename.append((old_path, new_path))
     for (old, new) in .0:
         print(f"  Removing {os.path.basename(old)}")
@@ -36,4 +44,9 @@ Done!""")
     files_to_rename = <lambda>(files_to_rename)
     print(f"
 Renaming {len(files_to_rename)} files...")
+    files_to_rename
+' files to rename'
+len(files_to_rename)
+'Found '
+print
 # [SUMMARY] 26 blocks · 27 processed · 0 orphan · 259 instr

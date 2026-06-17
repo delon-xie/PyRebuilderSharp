@@ -5,37 +5,51 @@ try:
 except:
     pass
 try:
-    actual_ast = ast.parse(r.stdout)(2, ('indent',))
-    ok = expected_ast == actual_ast
+    ast.dump
     try:
         try:
-            actual_ast = ast.parse(r.stdout)(2, ('indent',))
-            ok = expected_ast == actual_ast
+            ast.dump
             try:
-                break
-                for i in ok:
+                try:
+                    ok
                     try:
-                        pass
+                        for i in []:
+                            try:
+                                e != a
+                            except Exception:
+                                pass
+                            if not True:
+                                pass
+                            print(f"  Line {i}: expected={e}
+           actual=  {a}")
+                            while True:
+                                pass
+                            raise
+                            try:
+                                ': parse error: '
+                                ver
+                                '❌ '
+                                None
+                                print
+                                try:
+                                    break
+                                except:
+                                    ex = None
+                            except:
+                                ex = None
+                            ex = None
+                        if Exception:
+                            pass
                     except Exception:
                         pass
-                    if not True:
-                        pass
-                    raise
-                    try:
-                        print(f"❌ {ver}: parse error: {ex}")
-                        try:
-                            break
-                        except:
-                            ex = None
-                    except:
-                        ex = None
-                    ex = None
-                if Exception:
+                except Exception:
                     pass
             except Exception:
                 pass
         except Exception:
             pass
+        actual_ast = ast.parse(r.stdout)(2, ('indent',))
+        ok = expected_ast == actual_ast
     except Exception:
         pass
 except Exception:
@@ -44,26 +58,26 @@ __doc__ = 'Run AST comparison for test_control_flow across all versions'
 import os
 import subprocess
 import ast
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-while open(INPUT_FILE):
-    pass
+while os:
+    open(INPUT_FILE)
 for ver in open(INPUT_FILE):
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)
-    r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+        ('capture_output', 'text', 'timeout')
+        30
+        True
+        True
+        ['dotnet', 'run', '--project', PROJECT, '--', pyc]
+        None
+        subprocess.run
 return None
 break
 raise
 # orphan @0x0414
 ex = None
 raise
-# [WARN] 6 instructions not decompiled
-#   @0x01EC: JUMP_BACKWARD arg=0
-#   @0x0342: JUMP_BACKWARD arg=666
-#   @0x036C: JUMP_BACKWARD arg=0
-#   @0x0376: JUMP_BACKWARD arg=0
-#   @0x037C: JUMP_BACKWARD arg=0
-#   @0x0410: JUMP_BACKWARD arg=0
-# [SUMMARY] 43 blocks · 43 processed · 6 orphan · 250 instr
+# [WARN] 2 instructions not decompiled
+#   @0x0342: JUMP_BACKWARD arg=804
+#   @0x036C: JUMP_BACKWARD arg=336
+# [SUMMARY] 43 blocks · 43 processed · 9 orphan · 250 instr

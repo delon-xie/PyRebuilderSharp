@@ -2191,11 +2191,13 @@ public class AstBuilder
                       && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
         // 3.10 特殊处理：ParseInstructionsWordcode 已将 arg *2 转为绝对字节偏移
         // 3.11+ wordcode: arg 是相对字节偏移，需加上 current_offset + 2
+        // 3.13+: PycReader 已解析为绝对字节偏移（见 PycReader.ParseInstructions311Plus）
         if (isWordcode
             && lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                 or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
                 or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38
-                && _codeObject.Version != PythonVersion.Py310)
+            && _codeObject.Version != PythonVersion.Py310
+            && _codeObject.Version < PythonVersion.Py313)
         {
             targetOffset = lastInstr.Offset + 2 + targetOffset;
         }
@@ -2206,6 +2208,12 @@ public class AstBuilder
         
         var bodyBranch = FindFallthrough(header);
         var afterBranch = FindBlockByOffset(targetOffset);
+        // 3.13+ OR 链: 跳转目标可能是共享 RETURN_VALUE 块但未被正确分块。回退：扫描包含 targetOffset 的块
+        if (afterBranch == null && _codeObject.Version >= PythonVersion.Py313)
+        {
+            afterBranch = _allBlocks.FirstOrDefault(b =>
+                b.StartOffset <= targetOffset && targetOffset < b.EndOffset + 2);
+        }
         
         // 检测 OR 短接链: POP_JUMP_IF_TRUE + fallthrough 为条件分支
         // if a or b: bytecode = "POP_JUMP_IF_TRUE → body ; POP_JUMP_IF_FALSE → after"
@@ -2214,7 +2222,7 @@ public class AstBuilder
             testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
 
         // OR 短接: POP_JUMP_IF_TRUE + fallthrough 为条件分支
-        if (isOrChain || lastInstr.Opcode is Opcode.JUMP_IF_TRUE_OR_POP)
+        if ((isOrChain || lastInstr.Opcode is Opcode.JUMP_IF_TRUE_OR_POP) && afterBranch != null)
         {
             // body 在 jump target (afterBranch), else 是 fallthrough (bodyBranch = 第二条件)
             var savedBody = bodyBranch;
@@ -2387,10 +2395,36 @@ public class AstBuilder
         // OR 短接合并: orChain + afterStmts/else 首条为 If → BoolOp(Or, ...)
         else if (isOrChain && orelse != null && orelse.Count > 0 && orelse[0] is If orInnerIf)
         {
-            var mergedTest = MergeBoolOpValues(BoolOperator.Or, new List<Expr> { testExpr, orInnerIf.Test });
-            result.Add(new If(mergedTest, bodyStmts, orInnerIf.Orelse));
-            if (orelse.Count > 1)
-                result.AddRange(orelse.Skip(1));
+            // 检测是否为 OR 链终端（bodyStmts 为共享 RETURN_VALUE 的空 Return）：
+            // 直接产出 Return(Or(a, b, c)) 而非 If(Or(a, Not(b)), [ExprStmt(c)], null)
+            if (bodyStmts.Count == 1 && bodyStmts[0] is Return bodyRet
+                && orInnerIf.Orelse == null
+                && (orInnerIf.Body.Count >= 1 && orInnerIf.Body[0] is ExprStmt terminalExpr
+                    || orInnerIf.Body.Count == 0 && bodyRet.Value != null))
+            {
+                // OR 链终端检测成功。直接从条件表达式和 terminal/return 值生成 Return(Or(...))
+                bool useBodyExpr = orInnerIf.Body.Count >= 1 && orInnerIf.Body[0] is ExprStmt;
+                Expr? termVal = useBodyExpr
+                    ? ((ExprStmt)orInnerIf.Body[0]).Value
+                    : bodyRet.Value;
+                if (termVal != null)
+                {
+                    var conditions = new List<Expr> { testExpr };
+                    conditions.Add(StripNot(orInnerIf.Test) ?? orInnerIf.Test);
+                    conditions.Add(termVal);
+                    result.Add(new Return(MergeBoolOpValues(BoolOperator.Or, conditions)));
+                    if (orelse.Count > 1)
+                        result.AddRange(orelse.Skip(1));
+                }
+                else
+                {
+                    // termVal null: 回退到普通 OR 合并
+                    var mergedTest = MergeBoolOpValues(BoolOperator.Or, new List<Expr> { testExpr, orInnerIf.Test });
+                    result.Add(new If(mergedTest, bodyStmts, orInnerIf.Orelse));
+                    if (orelse.Count > 1)
+                        result.AddRange(orelse.Skip(1));
+                }
+            }
         }
         else
         {
@@ -3244,6 +3278,11 @@ public class AstBuilder
         }
         return stmts;
     }
+
+    /// <summary>
+    /// 剥离单层 Not 包装。如果是 Not(expr) 返回 expr，否则返回 null。
+    /// </summary>
+    private static Expr? StripNot(Expr expr) => expr is UnaryOp { Op: UnaryOperator.Not } un ? un.Operand : null;
 
     /// <summary>
     /// 从 Assign(Name, Call(decorator_chain, FunctionRef)) 中提取 FunctionDef 和装饰器列表。

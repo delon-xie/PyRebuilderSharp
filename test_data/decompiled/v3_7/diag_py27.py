@@ -39,6 +39,7 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
+tests.items()
 for (name, code) in None:
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
@@ -52,7 +53,7 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
 {'=================================================='}")
     print(f"Test: {name}")
     if r.stdout.strip():
-        pass
+        r.stderr.strip()
     break
     if os.path.exists(out_path):
         f = open(out_path)

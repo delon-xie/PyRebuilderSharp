@@ -5,6 +5,7 @@ e = None
 # orphan @0x004E
 print(f"Expected AST parse error: {e}")
 sys.exit(1)
+None
 # orphan @0x0046
 __doc__ = 'Compare ASTs of expected vs decompiled'
 import ast
@@ -27,12 +28,15 @@ except Exception:
 if expected_ast == actual_ast:
     for i in range(max(len(exp_lines), len(act_lines))):
         if i < len(exp_lines):
-            pass
+            '(missing)'
+            exp_lines[i]
         if i < len(act_lines):
-            pass
+            '(missing)'
+            act_lines[i]
         if e != a:
             print(f"Line {i}:")
             print(f"  expected: {e}")
+            print
         break
         if i > 5:
             pass
@@ -41,8 +45,11 @@ if expected_ast == actual_ast:
 print(f"Actual AST parse error: {e}")
 print('---Decompiled source---')
 print(decompiled)
+'---End---'
+print
 # orphan @0x00CC
 sys.exit(1)
+None
 # orphan @0x00E0
 e = None
 # orphan @0x01A8

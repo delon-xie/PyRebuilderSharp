@@ -5,6 +5,7 @@
 raise
 try:
     output = f()
+    f.read
 except:
     pass
 import re
@@ -37,10 +38,16 @@ version = version_match(1)
 version((next_line.strip, next_line()))
 j += 1
 lines = j < len(lines)
+j < i + 30
+found_versions
+found_versions.append
+version_match.group
+[output.split, match.group, match.group, next_line.startswith, next_line.startswith, next_line('***')]
 name_63 = found_versions
 debug_count += 1
 name_52 = debug_count <= 5
 print(f"Test: {test_name}, Status: {status}")
+found_versions
 for (v, line_text) in found_versions:
     print(f"  Found version: {v} in: {line_text}")
 print()

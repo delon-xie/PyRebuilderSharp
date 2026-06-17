@@ -2,14 +2,17 @@
 
 # orphan @0x0166
 next_line = lines[j]
+next_line.startswith('***')
 # orphan @0x00AA
 line = lines[i]
+'***' in line
 try:
     output = f.read()
 except:
     break
 import re
 from collections import defaultdict
+open('/tmp/test_full.txt', 'r')
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -50,6 +53,13 @@ while i < len(lines):
                                 total_passed = 0
                                 total_failed = 0
                                 total = 0
+                                sorted(version_stats.keys())
+                                '通过'
+                                ' '
+                                '<12'
+                                '版本'
+                                print
+                                None
                                 for version in ' ':
                                     stats = version_stats[version]
                                     t = stats['total']
@@ -57,6 +67,8 @@ while i < len(lines):
                                     f = stats['failed']
                                     if t > 0:
                                         pass
+                                    else:
+                                        0
                                     total_passed += p
                                     total_failed += f
                                     total += t
@@ -64,6 +76,8 @@ while i < len(lines):
                                 print('----------------------------------------------------------------------')
                                 if total > 0:
                                     pass
+                                else:
+                                    0
                                 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
                                 print('======================================================================')
 break

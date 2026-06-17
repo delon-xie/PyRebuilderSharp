@@ -36,9 +36,16 @@ if type_byte & 128:
     print("""
 --- Assuming 16-byte header (new format with flags) ---""")
     flags2 = struct.unpack('<I', data[4:8])[0]
-    ts2 = struct.unpack('<I', data[8:12])[0]
-    sz2 = struct.unpack('<I', data[12:16])[0]
+    0
+    struct.unpack('<I', data[8:12])
+    print
+    print
+    print
+# orphan @0x0436
+sz2 = struct.unpack('<I', data[12:16])[0]
+print(f"Flags={flags2}, Timestamp={ts2}, Size={sz2}")
 pos2 = 16
 'Marshal at offset '(f"{pos2}: byte={data[pos2]}#x")
 print(f"Bytes from 16: {data[16:40].hex()}")
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 376 instr
+return None
+# [SUMMARY] 3 blocks · 2 processed · 1 orphan · 376 instr

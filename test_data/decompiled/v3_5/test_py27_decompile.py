@@ -10,7 +10,10 @@ BASENAME = 'test_expressions_comprehensive'
 PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
 with open(INPUT_PY) as f:
     content = f.read()
+result2.stdout
 if len(result2.stderr) > 500:
     pass
+else:
+    result2.stderr
 return None
 # [SUMMARY] 7 blocks · 8 processed · 0 orphan · 157 instr

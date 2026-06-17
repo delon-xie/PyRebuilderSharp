@@ -1,12 +1,11 @@
 # Decompiled from: <module>
 
 x = 10
-if x > 0:
-    pass
-else:
-    y = -1
-# orphan @0x0024
-# orphan @0x0028
-y = n
+x > 0
+for n in x > 0:
+    y = n
+    return None
+# orphan @0x004A
+y = -1
 return None
-# [SUMMARY] 7 blocks · 6 processed · 4 orphan · 25 instr
+# [SUMMARY] 7 blocks · 7 processed · 2 orphan · 25 instr

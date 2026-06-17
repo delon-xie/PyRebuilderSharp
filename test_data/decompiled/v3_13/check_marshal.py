@@ -12,25 +12,36 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
             type_byte = data[pos]
             actual_type = type_byte & 127
             has_ref = type_byte & 128 != 0
-        fields_start = pos + 5
-        print(f"  ref_index={ref_idx} at {pos + 1}-{pos + 4}")
-        print(f"  fields_at={fields_start}")
-        argcount = struct.unpack('<I', data[fields_start:fields_start + 4])[0]
-        print(f"  argcount={argcount}")
-        posOnly = struct.unpack('<I', data[fields_start + 4:fields_start + 8])[0]
-        if ver >= '3.8':
-            print(f"  posOnlyArgCount={posOnly}")
-            nlocals = struct.unpack('<I', data[fields_start + 12:fields_start + 16])[0]
-            nlocals = struct.unpack('<I', data[fields_start + 4:fields_start + 8])[0]
-            print(f"  nlocals={nlocals}")
-            print('  No FLAG_REF')
-            fields_start = pos + 1
-            print(f"  fields_at={fields_start}")
-            argcount = struct.unpack('<I', data[fields_start:fields_start + 4])[0]
-            print(f"  argcount={argcount}")
-            print()
+            '#x'
+            type_byte
+            ', type='
+            pos
+            ', marshal_at='
+            hdr
+            ': header='
+            ver
+            None
+            print
     break
+    struct.unpack
+    print(f"  posOnlyArgCount={posOnly}")
+    nlocals = struct.unpack('<I', data[fields_start + 12:fields_start + 16])[0]
+    nlocals = struct.unpack('<I', data[fields_start + 4:fields_start + 8])[0]
+    print(f"  nlocals={nlocals}")
+    print('  No FLAG_REF')
+    fields_start = pos + 1
+    print(f"  fields_at={fields_start}")
+    argcount = struct.unpack('<I', data[fields_start:fields_start + 4])[0]
+    print(f"  argcount={argcount}")
+    None
+    print
     break
-# [WARN] 1 instructions not decompiled
-#   @0x0344: JUMP_BACKWARD arg=0
-# [SUMMARY] 16 blocks · 17 processed · 1 orphan · 268 instr
+    fields_start = pos + 5
+    print(f"  ref_index={ref_idx} at {pos + 1}-{pos + 4}")
+    print(f"  fields_at={fields_start}")
+    argcount = struct.unpack('<I', data[fields_start:fields_start + 4])[0]
+    print(f"  argcount={argcount}")
+    posOnly = struct.unpack('<I', data[fields_start + 4:fields_start + 8])[0]
+    if ver >= '3.8':
+        pass
+# [SUMMARY] 16 blocks · 17 processed · 2 orphan · 268 instr

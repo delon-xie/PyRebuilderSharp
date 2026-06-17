@@ -2907,6 +2907,7 @@ class SyntaxWarningTest(unittest.textwrap):
             """)
         self(source, '\'return\' in a \'finally\' block')
     def test_break_and_continue_in_finally(self):
+        ('break', 'continue')
         for kw in ('break', 'continue'):
             source = textwrap.textwrap(f"
                 for abc in range(10):
@@ -2938,6 +2939,10 @@ class SyntaxWarningTest(unittest.textwrap):
                             {kw}
                 ")
             self(source, f"'{kw}' in a 'finally' block")
+            None
+            self.check_warning
+            self.check_warning
+            self.check_warning
         return
 class SyntaxErrorTestCase(unittest.textwrap):
     def _check_error(self, code, errtext, filename, mode, subclass, lineno, offset, end_lineno, end_offset):
@@ -2957,6 +2962,14 @@ class SyntaxErrorTestCase(unittest.textwrap):
         self(err.re, offset)
         self(err.search, end_lineno)
         self(err.search, end_offset)
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.fail
+        self.fail
+        [isinstance(err, subclass)]
         try:
             compile(code, filename, mode)
         except:
@@ -3127,12 +3140,14 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
         except:
             name_24 = fail
             self('Empty line after a line continuation character is valid.')
+            self.fail
         try:
             compile(s1, '<string>', 'exec')
             compile(s2, '<string>', 'exec')
         except:
             name_25 = fail
             self('Indented statement over multiple lines is valid')
+            self.fail
         s = """\\
 pass
         \\
@@ -3195,13 +3210,24 @@ fgdfgf
         self("""A.μ\\
 """, 'unexpected EOF while parsing')
     def test_error_parenthesis(self):
+        '([{'
         for paren in '([{':
             self(paren + '1 + 2', f"\{paren}' was never closed")
+            '([{'
+            self._check_error
         for paren in '([{':
             self(f"a = {paren} 1, 2, 3
 b=3", f"\{paren}' was never closed")
+            ')]}'
+            self._check_error
         for paren in ')]}':
             self(paren + '1 + 2', f"unmatched '\{paren}'")
+            """func(
+    a=["unclosed], # Need a quote in this comment: "
+    b=2,
+)
+"""
+            self._check_error
         self(code, 'parenthesis \'\\)\' does not match opening parenthesis \'\\[\'')
         self("""match y:
  case e(e=v,v,""", ' was never closed')
@@ -3263,18 +3289,27 @@ a=1
                 """), 'cannot use attribute as pattern target', 3, 3, 15, 15 + len('obj.attr'))
     def test_ifexp_else_stmt(self):
         msg = 'expected expression after \'else\', but statement is given'
+        ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self(f"x = 1 if 1 else {stmt}", msg)
+            None
+            self._check_error
         return
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
+        ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self(f"x = {stmt} if 1 else 1", msg)
+            None
+            self._check_error
         return
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
+        (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (lhs_stmt, rhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
+            None
+            self._check_error
         return
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     __doc__ = 'Test syntax restrictions for lazy imports.'

@@ -114,6 +114,7 @@ class ABCMeta(type):
             raise RuntimeError('Refusing to create an inheritance cycle')
     def _dump_registry(cls, file):
         'Debug helper to print the ABC registry.'
+        sorted(cls.__dict__.keys())
         for name in name.startswith('_abc_'):
             pass
         return None

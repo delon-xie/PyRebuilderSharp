@@ -11,28 +11,36 @@ raw = f.read()
 code = marshal.loads(raw)
 def dump_bytecode(c, depth):
     '  '
+    p = '  ' * depth
+    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
-            pass
+            co_name
+            const
+            isinstance
         break
         if et:
             pass
+        name_22
+        if not True:
+            '--- '
+            p
+            print
         print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
         name_26.dis(const)
-        dump_bytecode(depth, const + 1)
-        if not isinstance(const, co_name.CodeType):
-            pass
         break
         if et:
-            for i in et:
-                s = name_22.from_bytes(i[et:i + 2], 'little')
-                e = name_22.from_bytes(i[et + 2:i + 4], 'little')
-                t = name_22.from_bytes(i[et + 4:i + 6], 'little')
-    # [WARN] 4 instructions not decompiled
-    #   @0x0058: JUMP_BACKWARD arg=0
-    #   @0x009C: JUMP_BACKWARD arg=0
-    #   @0x02E4: JUMP_BACKWARD arg=0
-    #   @0x033E: JUMP_BACKWARD arg=0
+            len(et)
+            0
+            range
+        break
+        for i in len(et):
+            s = name_22.from_bytes(i[et:i + 2], 'little')
+            e = name_22.from_bytes(i[et + 2:i + 4], 'little')
+            i
+            et + 4
+            i
+            name_22.from_bytes
 dump_bytecode(code)
 return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 58 instr

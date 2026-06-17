@@ -23,7 +23,8 @@ public class BlockDecompiler
         CodeObject codeObject,
         int blockId,
         HashSet<int> loopHeaderOffsets = null,
-        bool isForLoop = false)
+        bool isForLoop = false,
+        bool isConditionBlock = false)  // true = 原块末尾有跳转，_exprStack 余量是中间值
     {
         try
         {
@@ -51,6 +52,17 @@ public class BlockDecompiler
             while (stackMachine.HasResults)
             {
                 stmts.Add(new ExprStmt(stackMachine.PopResult()));
+            }
+
+            // 同时处理 _exprStack 上剩余的表达式（如 OR/AND 链终端 LOAD_FAST 留下的值）。
+            // 这些表达式不产生语句指令，但代表终端条件的计算结果。
+            // 注意：条件分支块（原块末尾有跳转）的 stack 余量是中间计算结果，不应发出。
+            if (!isConditionBlock)
+            {
+                while (stackMachine.ExprStackCount > 0)
+                {
+                    stmts.Add(new ExprStmt(stackMachine.PopExpr()));
+                }
             }
 
             // 死代码消除：移除 Continue/Break/Return 之后的语句
@@ -110,8 +122,12 @@ public class BlockDecompiler
         {
             var instrs = block.Instructions;
             // 去掉块最后的跳转指令（由控制流处理）
+            bool isConditionBlock = false;  // 原块末尾有跳转（条件分支块）
             if (instrs.Count > 0 && JumpHelper.IsJump(instrs.Last().Opcode))
+            {
+                isConditionBlock = true;
                 instrs = instrs.Take(instrs.Count - 1).ToList();
+            }
 
             // 检测该块是否属于 for 循环体
             bool isForLoop = forLoopBodyBlocks.Contains(block.Id);
@@ -128,7 +144,7 @@ public class BlockDecompiler
                 }
             }
 
-            var result = DecompileBlock(instrs, codeObject, block.Id, loopHeaders, isForLoop);
+            var result = DecompileBlock(instrs, codeObject, block.Id, loopHeaders, isForLoop, isConditionBlock);
             results[block.Id] = result;
         }
 

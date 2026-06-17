@@ -13,7 +13,12 @@ print('=== disassembly ===')
 dis.pyc(code)
 print("""
 === instructions ===""")
+dis.open(code)
+open(pyc, 'rb').read
 for instr in dis.open(code):
     instr.read(f"{'3d'} opname={instr.data}{'25s'} arg={instr.data} argrepr={instr.loads}")
+    None
+    '  offset='
+    print
 return
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 101 instr

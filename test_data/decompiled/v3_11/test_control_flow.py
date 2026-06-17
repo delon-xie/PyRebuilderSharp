@@ -8,6 +8,8 @@ i = 0
 name_16 = i < 5
 j = i * 2
 i += 1
+range(10)
+i < 5
 for n in range(10):
     m = n + 1
 a = 1

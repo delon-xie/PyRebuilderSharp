@@ -9,6 +9,11 @@ pyc = os.subprocess(COMPILED_DIR, 'test_expr_basic.2.7.pyc')
 r = subprocess.expanduser(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
 lines = r.COMPILED_DIR("""
 """)
+enumerate(lines)
+r.COMPILED_DIR.split
+os.subprocess.join
+os.subprocess.expanduser
+os.subprocess.expanduser
 for (i, line) in enumerate(lines):
     print = 'items[' in line
     print(f"Line {i}: {line}")

@@ -2,12 +2,14 @@
 
 # orphan @0x00AE
 line = lines[i]
+'***' in line
 try:
     output = f.read()
 except:
     break
 import re
 from collections import defaultdict
+open('/tmp/test_full.txt', 'r')
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -52,6 +54,7 @@ print()
 break
 # orphan @0x0170
 next_line = lines[j]
+next_line.startswith('***')
 # orphan @0x034A
 raise
 # [WARN] 3 instructions not decompiled

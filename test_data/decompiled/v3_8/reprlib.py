@@ -38,16 +38,19 @@ class Repr:
     def repr1(self, x, level):
         # orphan @0x0028
         method = getattr(self, 'repr_' + typename, None)
+        method
         cls = type(x)
         typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
         # orphan @0x003C
+        typename not in self._lookup
         # orphan @0x0046
         return method(x, level)
         # orphan @0x0050
         module = getattr(cls, '__module__', None)
+        module == self._lookup[typename]
         # orphan @0x006A
         return method(x, level)
         # orphan @0x0074
@@ -56,11 +59,14 @@ class Repr:
         # orphan @0x0034
         raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         # orphan @0x002C
+        indent < 0
         # orphan @0x001C
         indent = self.indent
+        isinstance(indent, int)
         # orphan @0x0018
         return ''
         # orphan @0x0014
+        pieces
         if self.indent is None:
             return ', '.join(pieces)
         # orphan @0x0044
@@ -76,12 +82,20 @@ class Repr:
         error = None
         # orphan @0x009C
         # orphan @0x009E
+        -len(indent)
+        1
+        ('',)(('',))
+        sep
+        sep.join
         # orphan @0x00B8
+        None
         # orphan @0x00BA
         return
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         # orphan @0x001C
         pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
+        n > maxiter
+        (level - 1, self.repr1)
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
@@ -89,8 +103,11 @@ class Repr:
         pieces.append(self.fillvalue)
         # orphan @0x0058
         s = self._join(pieces, level)
+        n == 1
         # orphan @0x006C
+        trail
         # orphan @0x0070
+        self.indent is None
         # orphan @0x007A
         right = trail + right
         # orphan @0x0082
@@ -124,9 +141,11 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
+        islice(_possibly_sorted(x), self.maxdict)
         # orphan @0x001C
         return '{' + self.fillvalue + '}'
         # orphan @0x0014
+        level <= 0
         n = len(x)
         if n == 0:
             return '{}'
@@ -136,6 +155,7 @@ class Repr:
         valrepr = repr1(x[key], newlevel)
         pieces.append('%s: %s' % (keyrepr, valrepr))
         # orphan @0x007C
+        n > self.maxdict
         # orphan @0x0086
         pieces.append(self.fillvalue)
         # orphan @0x0092

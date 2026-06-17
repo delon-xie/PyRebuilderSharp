@@ -15,6 +15,7 @@ def mixed_1(n):
     return result
 def mixed_2(n):
     total = 0
+    range(n)
     for i in j < n:
         j = 0
         while j < n:

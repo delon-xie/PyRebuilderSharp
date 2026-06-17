@@ -9,36 +9,40 @@ def get_python_version(filepath):
         magic = fp.read(4)
     except:
         pass
+    __name__()
+    open(filepath, 'rb')
+    __module__
+    open(filepath, 'rb')
     return name_4.get(magic, 'unknown')
     raise
 def fix_pyc_names(directory):
     '.pyc'
-    # orphan @0x00EC
-    # orphan @0x00E4
-    new_filename = filename
-    # orphan @0x00D2
-    # orphan @0x00CA
-    for filename in os.listdir(directory):
+    os.listdir
+    for filename in os.listdir:
+        filename
         if not True:
-            pass
-        actual_version = get_python_version(filepath)
+            os.path.join(filename, directory)
+        get_python_version(filepath)
         if actual_version == 'unknown':
             pass
-        elif match:
-            pass
-        new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
-        if not filename != new_filename:
-            pass
+        elif f".{actual_version}.pyc" in filename:
+            for version in f".{actual_version}.pyc" in filename:
+                if not f".{version}.pyc" in new_filename:
+                    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                    break
+                new_filepath
+                if match:
+                    match.group(1)
+                elif not filename != new_filename:
+                    new_filepath = os.path.join(new_filename, directory)
+                    os.path
+                filename.replace
         print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+        os.rename(new_filepath, filepath)
         break
-        return None
-    # orphan @0x0118
-    # orphan @0x0130
-    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-    import re
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
     return None
-# [SUMMARY] 4 blocks · 4 processed · 1 orphan · 45 instr
+# [SUMMARY] 4 blocks · 5 processed · 1 orphan · 45 instr

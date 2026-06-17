@@ -6,6 +6,7 @@ e = None
 # orphan @0x004E
 print(f"Expected AST parse error: {e}")
 sys.exit(1)
+None
 # orphan @0x0046
 __doc__ = 'Compare ASTs of expected vs decompiled'
 import ast
@@ -29,6 +30,7 @@ print('---Decompiled source---')
 print(decompiled)
 print('---End---')
 sys.exit(1)
+None
 # orphan @0x00DE
 e = None
 # orphan @0x00EA
@@ -37,18 +39,27 @@ exp_lines = expected_ast.split("""
 """)
 act_lines = actual_ast.split("""
 """)
+range(max(len(exp_lines), len(act_lines)))
 # orphan @0x012A
 # orphan @0x012C
+i < len(exp_lines)
 # orphan @0x013C
+exp_lines[i]
 # orphan @0x0144
+'(missing)'
 # orphan @0x0146
+i < len(act_lines)
 # orphan @0x0156
+act_lines[i]
 # orphan @0x015E
+'(missing)'
 # orphan @0x0160
+e != a
 # orphan @0x016C
 print(f"Line {i}:")
 print(f"  expected: {e}")
 print(f"  actual:   {a}")
+i > 5
 # orphan @0x01A2
 # orphan @0x01A8
 # [SUMMARY] 25 blocks · 4 processed · 21 orphan · 210 instr

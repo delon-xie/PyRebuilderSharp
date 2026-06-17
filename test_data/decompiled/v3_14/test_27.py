@@ -3,9 +3,7 @@
 import ast
 import subprocess
 import os
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-pyc = os.path.join(COMPILED_DIR, 'test_expr_basic.2.7.pyc')
-for (i, line) in subprocess.run:
+for (i, line) in os:
     if not 'items[' in line:
         print(f"Line {i}: {line}")
         print("""

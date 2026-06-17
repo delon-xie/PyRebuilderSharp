@@ -2,10 +2,12 @@
 
 try:
     expected_ast = ast.parse(expected)(2, ('indent',))
+    ast.dump
 except Exception:
     pass
 try:
     actual_ast = ast.parse(decompiled)(2, ('indent',))
+    ast.dump
 except Exception:
     pass
 try:
@@ -25,27 +27,26 @@ __doc__ = 'Compare ASTs of expected vs decompiled'
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()
-expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read()
+open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read
 if expected_ast == actual_ast:
-    print('✅ AST MATCH - test_expr_basic 3.10')
-    return None
-break
-if not i > 5:
-    pass
-for i in range(max(len(exp_lines), len(act_lines))):
-    if i < len(exp_lines):
-        e = '(missing)'
-        if i < len(act_lines):
-            a = '(missing)'
-            if not e != a:
-                print(f"Line {i}:")
-                print(f"  expected: {e}")
-break
+    for i in expected_ast == actual_ast:
+        if i < len(exp_lines):
+            e = '(missing)'
+            if i < len(act_lines):
+                a = '(missing)'
+                if not e != a:
+                    print(f"Line {i}:")
+                    f"  expected: {e}"
+                    None
+                    print
+        break
+        if not i > 5:
+            break
 e = None
+[]
 raise
 e = None
+[]
 # orphan @0x033A
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0240: JUMP_BACKWARD arg=0
-# [SUMMARY] 35 blocks · 35 processed · 5 orphan · 233 instr
+# [SUMMARY] 33 blocks · 33 processed · 6 orphan · 233 instr
