@@ -1,8 +1,8 @@
 # PyRebuilderSharp Deep Analysis Report
 
-**Date**: 2026-06-21 23:47
+**Date**: 2026-06-22 01:08
 **Scope**: 942 outputs across 11 Python versions
-**Commit**: `f8b073d`
+**Commit**: `d1e7273`
 
 ---
 
@@ -12,8 +12,8 @@
 |:----:|:-----:|:--:|:--------|
 | 🟢 A | 29 | 3.1% | <=3% diff — near-perfect |
 | 🟡 B | 38 | 4.0% | <=15% diff — minor cosmetic |
-| 🟠 C | 160 | 17.0% | <=40% diff — notable formatting |
-| 🔴 D | 715 | 75.9% | >40% diff — formatting+structural |
+| 🟠 C | 161 | 17.1% | <=40% diff — notable formatting |
+| 🔴 D | 714 | 75.8% | >40% diff — formatting+structural |
 | **A+B** | **67** | **7.1%** | **Acceptable output** |
 
 **Key metric**: 0% crash rate across all decompilation attempts.
@@ -25,17 +25,17 @@ All D-class files produce structurally valid Python code — differences are cos
 
 | Version | Files | A | B | C | D | A+B% | Orphans | [WARN] |
 |:-------:|:-----:|:-:|:-:|:-:|:-:|:----:|:------:|:------:|
-| 2.7 | 51 | 3 | 4 | 15 | 29 | 14% | 43 | 0 |
-| 3.10 | 93 | 3 | 5 | 16 | 69 | 9% | 232 | 0 |
+| 2.7 | 51 | 3 | 4 | 15 | 29 | 14% | 36 | 0 |
+| 3.10 | 93 | 3 | 5 | 16 | 69 | 9% | 201 | 0 |
 | 3.11 | 93 | 1 | 2 | 10 | 80 | 3% | 257 | 22 |
 | 3.12 | 93 | 1 | 3 | 12 | 77 | 4% | 185 | 112 |
-| 3.13 | 93 | 3 | 3 | 10 | 77 | 6% | 250 | 27 |
-| 3.14 | 94 | 3 | 3 | 10 | 78 | 6% | 223 | 30 |
-| 3.5 | 57 | 3 | 4 | 17 | 33 | 12% | 47 | 0 |
-| 3.6 | 91 | 3 | 3 | 15 | 70 | 7% | 460 | 0 |
-| 3.7 | 91 | 3 | 3 | 17 | 68 | 7% | 970 | 0 |
-| 3.8 | 93 | 3 | 4 | 19 | 67 | 8% | 1098 | 0 |
-| 3.9 | 93 | 3 | 4 | 19 | 67 | 8% | 1175 | 0 |
+| 3.13 | 93 | 3 | 3 | 10 | 77 | 6% | 153 | 87 |
+| 3.14 | 94 | 3 | 3 | 11 | 77 | 6% | 135 | 91 |
+| 3.5 | 57 | 3 | 4 | 17 | 33 | 12% | 42 | 0 |
+| 3.6 | 91 | 3 | 3 | 15 | 70 | 7% | 426 | 0 |
+| 3.7 | 91 | 3 | 3 | 17 | 68 | 7% | 939 | 0 |
+| 3.8 | 93 | 3 | 4 | 19 | 67 | 8% | 1091 | 0 |
+| 3.9 | 93 | 3 | 4 | 19 | 67 | 8% | 1161 | 0 |
 
 ---
 
@@ -49,13 +49,13 @@ For each key stdlib file, compare construct counts between original (O) and deco
 |:-------:|:---:|:-----:|:--:|:---:|:----:|:---:|:---:|:----:|:---------:|:------:|:------:|
 | 2.7 | D | 95.7% | 0/0 | 0/0 | 0/0 | 1/0 | 2/1 | 4/0 | 0/0 | 0/0 | 0/2 |
 | 3.10 | D | 68.4% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/5 | 0/0 | 0/0 | 0/0 |
-| 3.11 | D | 83.7% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/5 | 0/0 | 0/0 | 0/0 |
-| 3.12 | D | 78.0% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/5 | 0/0 | 0/0 | 0/0 |
-| 3.13 | D | 144.0% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/7 | 0/0 | 0/0 | 0/0 |
-| 3.14 | D | 146.4% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/7 | 0/0 | 0/0 | 0/0 |
+| 3.11 | D | 82.8% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/5 | 0/0 | 0/0 | 0/0 |
+| 3.12 | D | 77.0% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/5 | 0/0 | 0/0 | 0/0 |
+| 3.13 | D | 143.1% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/7 | 0/0 | 0/0 | 0/0 |
+| 3.14 | D | 144.5% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/7 | 0/0 | 0/0 | 0/0 |
 | 3.5 | D | 124.4% | 0/0 | 0/0 | 0/0 | 1/0 | 2/2 | 4/4 | 0/0 | 0/0 | 0/1 |
 | 3.6 | D | 134.4% | 0/0 | 0/0 | 0/0 | 1/0 | 2/2 | 4/5 | 0/0 | 0/0 | 0/1 |
-| 3.7 | D | 107.2% | 0/0 | 0/0 | 0/0 | 1/1 | 2/1 | 4/5 | 0/0 | 0/0 | 0/1 |
+| 3.7 | D | 106.2% | 0/0 | 0/0 | 0/0 | 1/1 | 2/1 | 4/5 | 0/0 | 0/0 | 0/0 |
 | 3.8 | D | 72.2% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/5 | 0/0 | 0/0 | 0/0 |
 | 3.9 | D | 72.2% | 0/0 | 0/0 | 0/0 | 1/1 | 2/2 | 4/5 | 0/0 | 0/0 | 0/0 |
 
@@ -65,13 +65,13 @@ For each key stdlib file, compare construct counts between original (O) and deco
 
 | Version | Cat | Ratio | if | for | while | try | def | class | decorator | return | import |
 |:-------:|:---:|:-----:|:--:|:---:|:----:|:---:|:---:|:----:|:---------:|:------:|:------:|
-| 3.10 | D | 96.3% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
-| 3.11 | D | 127.4% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
-| 3.12 | D | 128.2% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
-| 3.13 | D | 153.3% | 0/2 | 0/0 | 0/0 | 0/0 | 22/22 | 18/14 | 1/0 | 0/0 | 3/3 |
-| 3.14 | D | 156.0% | 0/2 | 0/0 | 0/0 | 0/0 | 22/22 | 18/14 | 1/0 | 0/0 | 3/3 |
-| 3.6 | D | 115.8% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
-| 3.7 | D | 118.0% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
+| 3.10 | D | 95.0% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
+| 3.11 | D | 127.5% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
+| 3.12 | D | 128.0% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
+| 3.13 | D | 152.0% | 0/2 | 0/0 | 0/0 | 0/0 | 22/22 | 18/14 | 1/0 | 0/0 | 3/3 |
+| 3.14 | D | 154.0% | 0/2 | 0/0 | 0/0 | 0/0 | 22/22 | 18/14 | 1/0 | 0/0 | 3/3 |
+| 3.6 | D | 115.4% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
+| 3.7 | D | 117.8% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
 | 3.8 | D | 117.4% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
 | 3.9 | D | 119.7% | 0/0 | 0/0 | 0/0 | 0/0 | 22/22 | 18/17 | 1/0 | 0/0 | 3/3 |
 
@@ -81,12 +81,12 @@ For each key stdlib file, compare construct counts between original (O) and deco
 
 | Version | Cat | Ratio | if | for | while | try | def | class | decorator | return | import |
 |:-------:|:---:|:-----:|:--:|:---:|:----:|:---:|:---:|:----:|:---------:|:------:|:------:|
-| 3.10 | D | 86.1% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/5 | 0/0 | 0/0 | 6/6 |
-| 3.11 | D | 121.8% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/6 |
-| 3.12 | D | 122.9% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/6 |
-| 3.13 | D | 142.2% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/7 |
-| 3.14 | D | 145.0% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/7 |
-| 3.8 | D | 93.0% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/6 |
+| 3.10 | D | 85.8% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/5 | 0/0 | 0/0 | 6/6 |
+| 3.11 | D | 121.6% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/6 |
+| 3.12 | D | 122.7% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/6 |
+| 3.13 | D | 141.7% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/7 |
+| 3.14 | D | 141.9% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/7 |
+| 3.8 | D | 93.1% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/6 | 0/0 | 0/0 | 6/6 |
 | 3.9 | D | 94.5% | 0/0 | 0/0 | 0/0 | 4/4 | 31/31 | 6/5 | 0/0 | 0/0 | 6/6 |
 
 ⚠️  v3_10: class(6->5)
@@ -95,7 +95,7 @@ For each key stdlib file, compare construct counts between original (O) and deco
 
 | Version | Cat | Ratio | if | for | while | try | def | class | decorator | return | import |
 |:-------:|:---:|:-----:|:--:|:---:|:----:|:---:|:---:|:----:|:---------:|:------:|:------:|
-| 3.14 | D | 117.9% | 0/0 | 0/0 | 0/0 | 0/0 | 9/9 | 2/2 | 0/0 | 0/0 | 4/4 |
+| 3.14 | D | 107.0% | 0/0 | 0/0 | 0/0 | 0/0 | 9/9 | 2/2 | 0/0 | 0/0 | 4/4 |
 
 ### reprlib.py
 
@@ -104,10 +104,10 @@ For each key stdlib file, compare construct counts between original (O) and deco
 | 3.10 | D | 87.0% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
 | 3.11 | D | 139.0% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
 | 3.12 | D | 117.7% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
-| 3.13 | D | 134.2% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
-| 3.14 | D | 134.2% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
-| 3.6 | D | 97.4% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
-| 3.7 | D | 103.0% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
+| 3.13 | D | 121.6% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
+| 3.14 | D | 123.4% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
+| 3.6 | D | 95.2% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
+| 3.7 | D | 101.3% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
 | 3.8 | D | 100.4% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
 | 3.9 | D | 103.0% | 0/0 | 0/0 | 0/0 | 0/0 | 2/2 | 1/1 | 0/0 | 0/0 | 3/3 |
 
@@ -118,20 +118,20 @@ For each key stdlib file, compare construct counts between original (O) and deco
 
 | Anomaly Type | Total Count | Impact |
 |:-------------|:-----------:|:------:|
-| `# orphan @...` blocks | 4940 | Unreachable code fragments in output |
-| `# [WARN]` markers | 191 | Instructions that couldn't be decompiled |
-| `# Unknown node` | 36 | AST nodes the code generator can't handle |
-| `# not decompiled` | 191 | Instructions explicitly skipped |
+| `# orphan @...` blocks | 4626 | Unreachable code fragments in output |
+| `# [WARN]` markers | 312 | Instructions that couldn't be decompiled |
+| `# Unknown node` | 0 | AST nodes the code generator can't handle |
+| `# not decompiled` | 312 | Instructions explicitly skipped |
 
 ### Top Files by Total Orphans
 
 | File | Total Orphans |
 |:-----|:-------------:|
-| enum.py | 2917 |
-| functools.py | 526 |
-| reprlib.py | 208 |
-| abc.py | 76 |
-| pprint.py | 29 |
+| enum.py | 2823 |
+| functools.py | 487 |
+| reprlib.py | 196 |
+| abc.py | 56 |
+| pprint.py | 7 |
 
 ---
 
@@ -158,8 +158,8 @@ For each key stdlib file, compare construct counts between original (O) and deco
 
 ### 5.4 P3 — Output Polish
 
-- **`# [WARN]` markers** (191 total)
-- **`# Unknown node`** (36 total)
+- **`# [WARN]` markers** (312 total)
+- **`# Unknown node`** (0 total)
 - **Bare `raise`** after orphan blocks (19 remaining)
 - **`# [SUMMARY]`** now CLI-gated
 
@@ -172,7 +172,7 @@ For each key stdlib file, compare construct counts between original (O) and deco
 | A+B acceptable | 50 (5%) | 67 (7.1%) | +17 files |
 | For-loop iterable errors | 78 | 0 | ✅ Fixed |
 | Orphan raises | 460 | 19 | -96% |
-| Total orphans | 4989 | 4940 | -49 |
+| Total orphans | 4989 | 4626 | -363 |
 | Diff lines | 77071 | 75551 | -1520 |
 
 ---
@@ -186,7 +186,7 @@ For each key stdlib file, compare construct counts between original (O) and deco
 | **P2** | Docstring 'text' -> """text""" | Cosmetic, all files | 2h | Detect pattern, emit docstring |
 | **P2** | Default param values | Some lost params | 3h | Track LOAD_CONST before MAKE_FUNCTION |
 | **P3** | Blank line preservation | Readability | 3h | Track lnotab line gaps |
-| **P3** | Unknown node coverage | 36 instances | 2h | Add AST visitors for missing nodes |
+| **P3** | Unknown node coverage | 0 instances | 2h | Add AST visitors for missing nodes |
 | **P4** | 3.11+ with statement | New feature | 4h | Fix BEFORE_WITH_312 block boundaries |
 | **P4** | Try/except handler class edge | 12 orphans | 2h | Skip def-block successors |
 
@@ -216,4 +216,4 @@ For each key stdlib file, compare construct counts between original (O) and deco
 
 ---
 
-*Report generated by `tools/deep_analyze.py` on 2026-06-21 23:47*
+*Report generated by `tools/deep_analyze.py` on 2026-06-22 01:08*
