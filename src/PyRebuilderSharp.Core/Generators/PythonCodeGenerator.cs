@@ -237,6 +237,17 @@ public class PythonCodeGenerator : ICodeGenerator
         }
     }
 
+    /// <summary>检测 body 首句是否为字符串常量，发出 """...""" 格式 docstring。</summary>
+    private void EmitDocstringPrefix(List<Stmt> body)
+    {
+        if (body.Count > 0 && body[0] is ExprStmt { Value: Constant { Value: string docStr } })
+        {
+            WriteIndent();
+            _output.AppendLine($"\"\"\"{docStr}\"\"\"");
+            body.RemoveAt(0);  // 移除已被发出的 docstring，避免后续 Visit 重复输出
+        }
+    }
+
     private void VisitFunctionDef(FunctionDef func)
     {
         if (func.Decorators?.Count > 0)
@@ -272,6 +283,8 @@ public class PythonCodeGenerator : ICodeGenerator
         _output.AppendLine(":");
 
         _indentLevel++;
+        // 函数体 docstring: 首个语句若为字符串常量，用 """...""" 格式
+        EmitDocstringPrefix(func.Body);
         foreach (var stmt in func.Body)
             Visit(stmt);
         if (func.Body.Count == 0)
@@ -311,6 +324,8 @@ public class PythonCodeGenerator : ICodeGenerator
         _output.AppendLine(":");
 
         _indentLevel++;
+        // 类体 docstring: 首个语句若为字符串常量，用 """...""" 格式
+        EmitDocstringPrefix(cls.Body);
         foreach (var stmt in cls.Body)
             Visit(stmt);
         if (cls.Body.Count == 0)
