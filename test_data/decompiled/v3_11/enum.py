@@ -87,7 +87,7 @@ def _iter_bits_lsb(num):
     num ^= b
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
-def bin(num, max_bits):
+def bin(num, max_bits = None):
     """
     Like built-in bin(), except negative values are represented in
     twos-complement, and the leading bit always indicates sign
@@ -123,7 +123,7 @@ class auto:
     __doc__ = """
     Instances are replaced with an appropriate value in Enum class suites.
     """
-    def __init__(self, value):
+    def __init__(self, value = _auto_null):
         self.value = value
     def __repr__(self):
         return 'auto(%r)' % self.value
@@ -138,7 +138,7 @@ class property(DynamicClassAttribute):
     member = None
     _attr_type = None
     _cls_type = None
-    def __get__(self, instance, ownerclass):
+    def __get__(self, instance, ownerclass = None):
         try:
             name_27 = name_18
             try:
@@ -488,7 +488,6 @@ class EnumType(type):
         _get_mixins_ = _order_
         _order_ = _order_()
         <listcomp>
-        (<listcomp>)
         [[_order_.replace, _order_(',', ' ').split, cls != 'Flag'], issubclass(cell_31, Enum)]
         # orphan @0x0C48
         name_51 = _order_
@@ -501,7 +500,7 @@ class EnumType(type):
         classes/types should always be True.
         """
         return True
-    def __call__(cls, value, names):
+    def __call__(cls, value, names = _not_given):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -682,7 +681,7 @@ class EnumType(type):
         raise
         # orphan @0x02E4
         # orphan @0x0354
-    def _convert_(cls, name, module, filter, source):
+    def _convert_(cls, name, module, filter, source = None):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -700,7 +699,6 @@ class EnumType(type):
         members = source()()
         source.items
         <listcomp>
-        ()
         body = members()
         tmp_cls = type(name, (name_14), body)
         if boundary:
@@ -1130,7 +1128,7 @@ def global_str(self):
     return f"{cls_name!s}({self.__class__!r})"
     # orphan @0x0042
     return self._name_
-def global_enum(cls, update_str):
+def global_enum(cls, update_str = False):
     """
     decorator that makes the repr() of an enum member reference its module
     instead of its class; also exports all members to the enum's module's
@@ -1144,7 +1142,7 @@ def global_enum(cls, update_str):
     cls.__str__ = update
     name_16.global_enum_repr[cls.ReprEnum].ReprEnum(cls.global_str)
     return cls
-def _simple_enum(etype):
+def _simple_enum(etype = Enum):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1373,7 +1371,6 @@ class verify:
                     missed
                     missing_names.append
                     <listcomp>
-                    ()
                     for val in missed:
                         missing_value |= val
                     missing_names
@@ -1500,7 +1497,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     failed_member
     # [WARN] 1 instructions not decompiled
     #   @0x068A: JUMP_BACKWARD arg=258
-def _old_convert_(etype, name, module, filter, source):
+def _old_convert_(etype, name, module, filter, source = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """
@@ -1518,7 +1515,6 @@ def _old_convert_(etype, name, module, filter, source):
     members = source()()
     source.items
     <listcomp>
-    ()
     if boundary:
         name_12
     return cls

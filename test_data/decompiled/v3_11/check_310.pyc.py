@@ -9,7 +9,7 @@ magic = f(4)
 f(12)
 raw = f()
 code = marshal.argv(raw)
-def dump_bytecode(c, depth):
+def dump_bytecode(c, depth = 0):
     p = '  ' * depth
     c.co_consts
     for const in c.co_consts:

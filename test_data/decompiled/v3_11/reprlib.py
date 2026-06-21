@@ -5,7 +5,7 @@ __all__ = ('Repr', 'repr', 'recursive_repr')
 import builtins
 from itertools import islice
 from _thread import get_ident
-def recursive_repr(fillvalue):
+def recursive_repr(fillvalue = '...'):
     """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
         def wrapper(self):
@@ -93,7 +93,7 @@ class Repr:
         None
         # orphan @0x019C
         return
-    def _repr_iterable(self, x, level, left, right, maxiter, trail):
+    def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
         name_10 = level <= 0
         name_8 = n
@@ -108,7 +108,6 @@ class Repr:
         self._join
         pieces.append
         <listcomp>
-        (level - 1, self.fillvalue)
         return f"{left!s}{s!s}{right!s}"
     def repr_tuple(self, x, level):
         return self(x, level, '(', ')', self._repr_iterable, ',')

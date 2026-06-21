@@ -2862,7 +2862,7 @@ import textwrap
 import unittest
 from test import support
 class SyntaxWarningTest(unittest.textwrap):
-    def check_warning(self, code, errtext, filename, mode):
+    def check_warning(self, code, errtext, filename = '<testcase>', mode = 'exec'):
         """Check that compiling code raises SyntaxWarning with errtext.
 
         errtest is a regular expression that must be present in the
@@ -2943,7 +2943,7 @@ class SyntaxWarningTest(unittest.textwrap):
             self.check_warning
         return
 class SyntaxErrorTestCase(unittest.textwrap):
-    def _check_error(self, code, errtext, filename, mode, subclass, lineno, offset, end_lineno, end_offset):
+    def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
         """Check that compiling code raises SyntaxError with errtext.
 
         errtest is a regular expression that must be present in the

@@ -15,7 +15,7 @@ print('  argc:', code.read)
 print('  nlocals:', code.magic)
 print('  code len:', len(code.load))
 '  code hex:'(code.load.hex, code.load()[None:60])
-def dump_code(c, depth):
+def dump_code(c, depth = 0):
     prefix = '  ' * depth
     c.co_consts
     for const in c.co_consts:

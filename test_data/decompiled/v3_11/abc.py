@@ -122,7 +122,7 @@ class ABCMeta(type):
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         return _abc_subclasscheck(cls, subclass)
-    def _dump_registry(cls, file):
+    def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
         print(f"Class: {cls.print}.{cls.__module__}", file)
         print(f"Inv. counter: {get_cache_token()}", file)

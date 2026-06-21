@@ -109,7 +109,7 @@ def _iter_bits_lsb(num):
     #   @0x0094: JUMP_BACKWARD arg=42
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
-def bin(num, max_bits):
+def bin(num, max_bits = None):
     """
     Like built-in bin(), except negative values are represented in
     twos-complement, and the leading bit always indicates sign
@@ -144,7 +144,7 @@ class auto:
     __doc__ = """
     Instances are replaced with an appropriate value in Enum class suites.
     """
-    def __init__(self, value):
+    def __init__(self, value = _auto_null):
         self.value = value
     def __repr__(self):
         return 'auto(%r)' % self.value
@@ -159,7 +159,7 @@ class property(DynamicClassAttribute):
     member = None
     _attr_type = None
     _cls_type = None
-    def __get__(self, instance, ownerclass):
+    def __get__(self, instance, ownerclass = None):
         try:
             ownerclass._member_map_[self.name]
         except:
@@ -543,7 +543,7 @@ class EnumType(type):
         classes/types should always be True.
         """
         return True
-    def __call__(cls, value, names):
+    def __call__(cls, value, names = _not_given):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -702,7 +702,7 @@ class EnumType(type):
         #   @0x01D4: JUMP_BACKWARD arg=132
         #   @0x022E: JUMP_BACKWARD arg=76
         #   @0x0352: JUMP_BACKWARD arg=242
-    def _convert_(cls, name, module, filter, source):
+    def _convert_(cls, name, module, filter, source = None):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -1271,7 +1271,7 @@ def global_str(self):
     return f"{cls_name!s}({self._value_!r})"
     # orphan @0x006A
     return self._name_
-def global_enum(cls, update_str):
+def global_enum(cls, update_str = False):
     """
     decorator that makes the repr() of an enum member reference its module
     instead of its class; also exports all members to the enum's module's
@@ -1285,7 +1285,7 @@ def global_enum(cls, update_str):
         cls.__str__ = update
     name_16.modules[cls.__module__].__dict__.update(cls.__members__)
     return cls
-def _simple_enum(etype):
+def _simple_enum(etype = Enum):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1734,7 +1734,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     #   @0x0346: JUMP_BACKWARD arg=446
     #   @0x0352: JUMP_BACKWARD arg=458
     #   @0x0394: JUMP_BACKWARD arg=524
-def _old_convert_(etype, name, module, filter, source):
+def _old_convert_(etype, name, module, filter, source = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """

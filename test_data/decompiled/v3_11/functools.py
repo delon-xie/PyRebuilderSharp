@@ -29,7 +29,7 @@ from types import FunctionType, GenericAlias, MethodType, MappingProxyType, Unio
 from _thread import RLock
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
 WRAPPER_UPDATES = ('__dict__',)
-def update_wrapper(wrapper, wrapped, assigned, updated):
+def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Update a wrapper function to look like the wrapped function
 
        wrapper is the function to be updated
@@ -60,7 +60,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     # orphan @0x0064
     # [WARN] 1 instructions not decompiled
     #   @0x004E: JUMP_BACKWARD arg=74
-def wraps(wrapped, assigned, updated):
+def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
        Returns a decorator that invokes update_wrapper() with the decorated
@@ -193,13 +193,10 @@ def total_ordering(cls):
     return
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    K = (__build_class__)(K, 'K', object)
     return K
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
 []
 _initial_missing = sentinel('_initial_missing')
-def reduce(function, sequence, initial):
+def reduce(function, sequence, initial = _initial_missing):
     """
     reduce(function, iterable, /[, initial]) -> value
 
@@ -224,7 +221,6 @@ def reduce(function, sequence, initial):
         value
     return
     # orphan @0x008A
-(_initial_missing)
 raise
 raise
 class _PlaceholderType:
@@ -334,7 +330,7 @@ class partial:
         keywords = keywords
         return pto_args(**keywords)
         # orphan @0x00C0
-    def __get__(self, obj, objtype):
+    def __get__(self, obj, objtype = None):
         # orphan @0x000A
         return MethodType(self, obj)
         return self
@@ -395,7 +391,7 @@ class partialmethod:
         _method.__isabstractmethod__ = cell_0.__isabstractmethod__
         _method.__partialmethod__ = cell_0
         return _method
-    def __get__(self, obj, cls):
+    def __get__(self, obj, cls = None):
         try:
             result.__self__ = new_func.partial
         except:
@@ -428,7 +424,7 @@ def _unwrap_partialmethod(func):
     func = _unwrap_partial(func)
     return func
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
-def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
+def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
     """Make a cache key from optionally typed positional and keyword arguments
 
     The key is constructed in a way that is flat as possible rather than
@@ -449,14 +445,14 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         key += item
     key = tuple(key)
     name_73 = typed
-    key = (tuple) + <listcomp>(args())
+    key += <listcomp>(args())
     name_44 = kwds
     key = <listcomp> + kwds.values(kwds()())
     name_27 = len(key) == 1
     name_8 = cell_6(key[0]) in fasttypes
     return key[0]
     return key
-def lru_cache(maxsize, typed):
+def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
 
     If *maxsize* is set to None, the LRU features are disabled and the cache
@@ -519,7 +515,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         result = cell_27(**kwds)
         # orphan @0x01FE
         # orphan @0x0206
-    (object(), RLock, *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), ({}, 0, 0, False, cell_11.object, cell_11.object, RLock(), ([], cache_info := cell_1 == 0)))
     def cache_info():
         """Report cache statistics"""
         try:
@@ -542,8 +537,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
     return wrapper
-(128, False)
-((object()), {int, str}, tuple, type, len)
 raise
 raise
 def cache(user_function):
@@ -585,7 +578,7 @@ def _c3_merge(sequences):
     name_3 = seq[0] == candidate
     0
     seq
-def _c3_mro(cls, abcs):
+def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
 
     If no *abcs* are given, the algorithm works exactly like the built-in C3
@@ -619,7 +612,7 @@ def _c3_mro(cls, abcs):
         abstract_bases(cell_10)
         abstract_bases
         abstract_bases.append
-        [(any), <genexpr>(cls.reversed())]
+        [<genexpr>(cls.reversed())]
     for _ in abstract_bases:
         cell_1(cell_10)
         cell_1.remove
@@ -639,11 +632,7 @@ def _compose_mro(cls, types):
     set(cell_1)
     cell_1()
     <listcomp>
-    (is_strict_base)
-    (cell_1())
     <listcomp>
-    (is_related)
-    (set(cell_0.set))
     for typ in cell_1:
         found = []
         typ()
@@ -653,7 +642,6 @@ def _compose_mro(cls, types):
             name_38 = issubclass(cell_0, sub)
             <listcomp>(sub.set())
             found
-            (found)
             found.append
         for sub in found:
             sub
@@ -719,13 +707,13 @@ class singledispatchmethod:
         raise TypeError(f"{func!r} is not callable or a descriptor")
         self.dispatcher = singledispatch(func)
         self.func = func
-    def register(self, cls, method):
+    def register(self, cls, method = None):
         """generic_method.register(cls, func) -> func
 
         Registers a new implementation for the given *cls* on a *generic_method*.
         """
         return self.dispatcher(cls, method)
-    def __get__(self, obj, cls):
+    def __get__(self, obj, cls = None):
         return _singledispatchmethod_get(self, obj, cls)
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
@@ -818,7 +806,7 @@ class cached_property:
         self.attrname = name
         # orphan @0x006E
         name_27 = name != self.attrname
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner = None):
         try:
             cache = instance.TypeError
         except:

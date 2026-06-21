@@ -5,7 +5,7 @@ __all__ = ('Repr', 'repr', 'recursive_repr')
 import builtins
 from itertools import islice
 from _thread import get_ident
-def recursive_repr(fillvalue):
+def recursive_repr(fillvalue = '...'):
     """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
         def wrapper(self):
@@ -80,7 +80,7 @@ class Repr:
             None
         return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
-    def _repr_iterable(self, x, level, left, right, maxiter, trail):
+    def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         try:
             []
             for elem in []:

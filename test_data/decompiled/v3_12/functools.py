@@ -29,7 +29,7 @@ from types import FunctionType, GenericAlias, MethodType, MappingProxyType, Unio
 from _thread import RLock
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
 WRAPPER_UPDATES = ('__dict__',)
-def update_wrapper(wrapper, wrapped, assigned, updated):
+def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Update a wrapper function to look like the wrapped function
 
        wrapper is the function to be updated
@@ -60,7 +60,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     #   @0x0040: JUMP_BACKWARD arg=60
     #   @0x009A: JUMP_BACKWARD arg=84
     #   @0x00C4: JUMP_BACKWARD arg=192
-def wraps(wrapped, assigned, updated):
+def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
        Returns a decorator that invokes update_wrapper() with the decorated
@@ -185,13 +185,10 @@ def total_ordering(cls):
     #   @0x00E6: JUMP_BACKWARD arg=64
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    K = (__build_class__)(K, 'K', object)
     return K
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
 []
 _initial_missing = sentinel('_initial_missing')
-def reduce(function, sequence, initial):
+def reduce(function, sequence, initial = _initial_missing):
     """
     reduce(function, iterable, /[, initial]) -> value
 
@@ -220,7 +217,6 @@ def reduce(function, sequence, initial):
     # orphan @0x0096
     # [WARN] 1 instructions not decompiled
     #   @0x0062: JUMP_BACKWARD arg=26
-(_initial_missing)
 class _PlaceholderType:
     __doc__ = """The type of the Placeholder singleton.
 
@@ -303,7 +299,7 @@ class partial:
         keywords = keywords
         return pto_args(**keywords)
         # orphan @0x0116
-    def __get__(self, obj, objtype):
+    def __get__(self, obj, objtype = None):
         return self
         # orphan @0x000A
         return MethodType(self, obj)
@@ -346,7 +342,7 @@ class partialmethod:
         _method.__isabstractmethod__ = cell_0.__isabstractmethod__
         _method.__partialmethod__ = cell_0
         return _method
-    def __get__(self, obj, cls):
+    def __get__(self, obj, cls = None):
         try:
             result.__self__ = new_func.__self__
         except:
@@ -406,7 +402,7 @@ def _unwrap_partialmethod(func):
     #   @0x00F0: JUMP_BACKWARD arg=58
     #   @0x0110: JUMP_BACKWARD arg=260
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
-def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
+def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
     """Make a cache key from optionally typed positional and keyword arguments
 
     The key is constructed in a way that is flat as possible rather than
@@ -456,7 +452,7 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     #   @0x005A: JUMP_BACKWARD arg=18
     #   @0x009A: JUMP_BACKWARD arg=24
     #   @0x00F8: JUMP_BACKWARD arg=24
-def lru_cache(maxsize, typed):
+def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
 
     If *maxsize* is set to None, the LRU features are disabled and the cache
@@ -542,9 +538,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             # orphan @0x01C8
             # [WARN] 1 instructions not decompiled
             #   @0x01AC: JUMP_BACKWARD arg=238
-        (())
-(128, False)
-((object()), {int, str}, tuple, type, len)
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
     return lru_cache(None)(user_function)
@@ -592,7 +585,7 @@ def _c3_merge(sequences):
     #   @0x00C8: JUMP_BACKWARD arg=24
     #   @0x00D0: JUMP_BACKWARD arg=32
     #   @0x00D4: JUMP_BACKWARD arg=206
-def _c3_mro(cls, abcs):
+def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
 
     If no *abcs* are given, the algorithm works exactly like the built-in C3
@@ -708,7 +701,6 @@ def _compose_mro(cls, types):
             # [WARN] 2 instructions not decompiled
             #   @0x0018: JUMP_BACKWARD arg=18
             #   @0x0036: JUMP_BACKWARD arg=48
-        ()
         n
         cell_1
         []
@@ -749,7 +741,6 @@ def _compose_mro(cls, types):
         if (typ not in cell_1) and hasattr(typ, '__mro__') and not isinstance(typ, name_4):
             issubclass(cell_2, typ)
         return
-    (set(cell_0.__mro__))
     n
     cell_1
     # orphan @0x0244
@@ -817,13 +808,13 @@ class singledispatchmethod:
     """
     def __init__(self, func):
         pass
-    def register(self, cls, method):
+    def register(self, cls, method = None):
         """generic_method.register(cls, func) -> func
 
         Registers a new implementation for the given *cls* on a *generic_method*.
         """
         return self.dispatcher.register(cls, method)
-    def __get__(self, obj, cls):
+    def __get__(self, obj, cls = None):
         return _singledispatchmethod_get(self, obj, cls)
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
@@ -914,7 +905,7 @@ class cached_property:
         self.attrname = name
         if name != self.attrname:
             raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner = None):
         try:
             cache = instance.__dict__
         except:
