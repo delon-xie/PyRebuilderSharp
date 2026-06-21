@@ -18,7 +18,7 @@ try:
     from _functools import _lru_cache_wrapper
 except ImportError:
     pass
-__doc__ = """functools.py - Tools for working with functions and callable objects
+"""functools.py - Tools for working with functions and callable objects
 """
 __all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
 from abc import get_cache_token
@@ -42,17 +42,26 @@ are updated with the corresponding attribute from the wrapped
 function (defaults to functools.WRAPPER_UPDATES)
 """
     try:
-        while True:
+        try:
+            try:
+                pass
+            except:
+                pass
+            break
+        except:
             pass
-        raise
     except:
         pass
+    assigned
     for attr in assigned:
-        for _ in updated:
-            pass
-    getattr
-    return wrapper
-    # [WARN] 1 instructions not decompiled
+        break
+    break
+    for attr in updated:
+        break
+    break
+    # [WARN] 3 instructions not decompiled
+    #   @0x003C: JUMP_BACKWARD arg=6
+    #   @0x0096: JUMP_BACKWARD arg=72
     #   @0x00C4: JUMP_BACKWARD arg=6
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
@@ -65,115 +74,110 @@ update_wrapper().
 """
     return
 def _gt_from_lt(self, other):
-    'Return a > b.  Computed by @total_ordering from (not a < b) and (a != b).'
+    """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
     if op_result is name_4:
         return op_result
-    not op_result
-    return
+    elif not op_result:
+        pass
 def _le_from_lt(self, other):
-    'Return a <= b.  Computed by @total_ordering from (a < b) or (a == b).'
+    """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
     if op_result is name_4:
         return op_result
-    op_result
-    return
+    elif not op_result:
+        pass
 def _ge_from_lt(self, other):
-    'Return a >= b.  Computed by @total_ordering from (not a < b).'
+    """Return a >= b.  Computed by @total_ordering from (not a < b)."""
     if op_result is name_4:
         return op_result
     return not op_result
 def _ge_from_le(self, other):
-    'Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b).'
+    """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
     if op_result is name_4:
         return op_result
-    not op_result
-    return
+    elif not not op_result:
+        pass
 def _lt_from_le(self, other):
-    'Return a < b.  Computed by @total_ordering from (a <= b) and (a != b).'
+    """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     if op_result is name_4:
         return op_result
-    op_result
-    return
+    elif op_result:
+        pass
 def _gt_from_le(self, other):
-    'Return a > b.  Computed by @total_ordering from (not a <= b).'
+    """Return a > b.  Computed by @total_ordering from (not a <= b)."""
     if op_result is name_4:
         return op_result
     return not op_result
 def _lt_from_gt(self, other):
-    'Return a < b.  Computed by @total_ordering from (not a > b) and (a != b).'
+    """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
     if op_result is name_4:
         return op_result
-    not op_result
-    return
+    elif not op_result:
+        pass
 def _ge_from_gt(self, other):
-    'Return a >= b.  Computed by @total_ordering from (a > b) or (a == b).'
+    """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
     if op_result is name_4:
         return op_result
-    op_result
-    return
+    elif not op_result:
+        pass
 def _le_from_gt(self, other):
-    'Return a <= b.  Computed by @total_ordering from (not a > b).'
+    """Return a <= b.  Computed by @total_ordering from (not a > b)."""
     if op_result is name_4:
         return op_result
     return not op_result
 def _le_from_ge(self, other):
-    'Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b).'
+    """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
     if op_result is name_4:
         return op_result
-    not op_result
-    return
+    elif not not op_result:
+        pass
 def _gt_from_ge(self, other):
-    'Return a > b.  Computed by @total_ordering from (a >= b) and (a != b).'
+    """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     if op_result is name_4:
         return op_result
-    op_result
-    return
+    elif op_result:
+        pass
 def _lt_from_ge(self, other):
-    'Return a < b.  Computed by @total_ordering from (not a >= b).'
+    """Return a < b.  Computed by @total_ordering from (not a >= b)."""
     if op_result is name_4:
         return op_result
     return not op_result
 _convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
-    'Class decorator that fills in missing ordering methods'
+    """Class decorator that fills in missing ordering methods"""
     try:
-        # Unknown node: SetLiteral
-        for op in # Unknown node: SetLiteral:
+        {}
+        for op in {}:
             try:
                 try:
-                    # Unknown node: SetLiteral
-                    try:
-                        max
-                        while op:
-                            if not True:
-                                pass
-                            try:
-                                op
-                            except:
-                                break
-                            for _ in _convert[root]:
-                                if not True:
-                                    break
-                    except:
-                        break
+                    {}
                 except:
                     break
-                getattr
             except:
                 break
-        raise
+            if not True:
+                pass
+        break
+        if not roots:
+            raise ValueError('must define at least one ordering operation: < > <= >=')
         root = max(roots)
         _convert[root]
+        for _ in _convert[root]:
+            if not True:
+                pass
+            else:
+                break
         break
     except:
         break
     op
     _convert
-    if not roots:
-        ValueError
-    # [WARN] 1 instructions not decompiled
+    # [WARN] 4 instructions not decompiled
     #   @0x005A: JUMP_BACKWARD arg=24
+    #   @0x0062: JUMP_BACKWARD arg=24
+    #   @0x00CE: JUMP_BACKWARD arg=186
+    #   @0x00F6: JUMP_BACKWARD arg=186
 def cmp_to_key(mycmp):
-    'Convert a cmp= function into a key= function'
+    """Convert a cmp= function into a key= function"""
     K = (mycmp)(K, 'K', object)
     return K
 (WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
@@ -196,16 +200,19 @@ calculates ((((1 + 2) + 3) + 4) + 5).
     try:
         value = next(it)
     except:
-        TypeError
+        pass
     it = iter(sequence)
     if initial is next:
         pass
+    else:
+        value = initial
+    it
     for element in it:
-        break
-        return
-    # orphan @0x008C
-    # orphan @0x009A
+        pass
+    break
     # orphan @0x009C
+    # [WARN] 1 instructions not decompiled
+    #   @0x0062: JUMP_BACKWARD arg=76
 (_initial_missing)
 class _PlaceholderType:
     __firstlineno__ = 278
@@ -227,38 +234,40 @@ Used as a placeholder for partial arguments.
     __static_attributes__ = ()
 Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
-    # orphan @0x004A
-    a is itemgetter
-    # orphan @0x0020
+    if not args:
+        return (0, None)
+    nargs = len(args)
     order = []
     j = nargs
     enumerate(args)
-    if not args:
-        return (0, None)
-    # orphan @0x0062
-    order.append
-    # orphan @0x0070
-    j += 1
-    order.append(i)
-    phcount
-    # orphan @0x00D2
-    merger = None
-    return ()
-def _partial_new(cls, func):
-    # orphan @0x00C4
-    # orphan @0x00BE
-    TypeError
-    # orphan @0x009C
-    hasattr(func, '__get__')
-    issubclass(cls, callable)
-    base_cls = callable
-    if not callable(func):
-        raise TypeError('the first argument must be callable')
-    base_cls = isinstance
-    if not callable(func):
+    for j in enumerate(args):
+        if a is itemgetter:
+            order.append(j)
+            j += 1
+        else:
+            order.append(i)
+    break
+    if phcount:
         pass
-    elif args and (args[-1] is _merger):
-        raise TypeError('trailing Placeholders are not allowed')
+    else:
+        None
+    return ()
+    # [WARN] 2 instructions not decompiled
+    #   @0x008E: JUMP_BACKWARD arg=70
+    #   @0x00B4: JUMP_BACKWARD arg=70
+def _partial_new(cls, func):
+    if issubclass(cls, callable):
+        base_cls = callable
+        if not callable(func):
+            raise TypeError('the first argument must be callable')
+        elif args and (args[-1] is _merger):
+            raise TypeError('trailing Placeholders are not allowed')
+    else:
+        base_cls = isinstance
+    if not hasattr(func, '__get__'):
+        raise TypeError(f"the first argument {func} must be a callable or a descriptor")
+    # [WARN] 1 instructions not decompiled
+    #   @0x0152: JUMP_BACKWARD arg=314
 def _partial_repr(self):
     cls = type(self)
     module = cls.__module__
@@ -279,40 +288,33 @@ and keywords.
         try:
             pto_args = self._merger(self.args + args)
         except:
-            phcount
-            'missing positional arguments in \'partial\' call; expected at least '
-            TypeError
+            pass
         phcount = self._phcount
         if phcount:
             pass
-        pto_args = self.args
-        self.keywords
-        {}
+        else:
+            pto_args = self.args
         keywords = keywords
         return pto_args(**keywords)
-        # orphan @0x00F8
-        # orphan @0x011E
         # orphan @0x0120
     def __get__(self, obj, objtype):
         return self
         # orphan @0x000C
         return
     def __reduce__(self):
-        if self.keywords:
-            if not self.__dict__:
-                return ((None))
+        if not self.keywords:
+            None
+        elif not self.__dict__:
+            None
     def __setstate__(self, state):
-        # orphan @0x006C
         if not isinstance(state, TypeError):
             raise TypeError('argument to __setstate__ must be a tuple')
         elif len(state) != 4:
-            'expected 4 items in state, got '
-            TypeError
-        elif callable(func) and isinstance(args, TypeError):
-            isinstance
-        # orphan @0x00EC
-        # orphan @0x0112
-        isinstance(namespace, func)
+            raise TypeError(f"expected 4 items in state, got {len(state)}")
+        elif callable(func) and isinstance(args, TypeError) and isinstance(kwds, func) and not isinstance(namespace, func):
+            raise TypeError('invalid partial state')
+        elif args and (args[-1] is keywords):
+            raise TypeError('trailing Placeholders are not allowed')
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = ('__dict__', '_merger', '_phcount', 'args', 'func', 'keywords')
 class partialmethod:
@@ -330,18 +332,13 @@ callables as instance methods.
             try:
                 pto_args = cell_5._merger(cell_5.args + args)
             except:
-                phcount
-                'missing positional arguments in \'partialmethod\' call; expected at least '
-                TypeError
+                pass
             if phcount:
                 pass
-            pto_args = cell_5.args
-            cell_5.keywords
-            {}
+            else:
+                pto_args = cell_5.args
             keywords = keywords
             return pto_args(**keywords)
-            # orphan @0x00FC
-            # orphan @0x0122
             # orphan @0x0124
         cell_0.__isabstractmethod__.__isabstractmethod__ = _method
         cell_0.__partialmethod__ = _method
@@ -356,38 +353,49 @@ callables as instance methods.
         result = [new_func](**self.keywords)
         partial
         return result
-        raise
-        raise
+        # orphan @0x0130
+        # orphan @0x0132
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = ()
 def _unwrap_partial(func):
-    if isinstance(func, func):
+    while isinstance(func, func):
         func = func.func
     return func
-    # orphan @0x0044
+    # orphan @0x002C
+    func = func.func
     isinstance(func, func)
+    # [WARN] 1 instructions not decompiled
+    #   @0x006E: JUMP_BACKWARD arg=44
 def _unwrap_partialmethod(func):
-    # orphan @0x005A
-    isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
     # orphan @0x0052
-    func.__partialmethod__
-    # orphan @0x0044
-    prev = None
+    func = func.__partialmethod__
+    isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
+    # orphan @0x000E
     prev = func
     isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
-    return func
-    # orphan @0x00AA
-    isinstance(func, _unwrap_partial)
+    prev = None
+    while True:
+        prev = func
+        while isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial):
+            func = func.__partialmethod__
+            if isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial):
+                pass
+            else:
+                while isinstance(func, _unwrap_partial):
+                    func = getattr(func, 'func')
+                    if isinstance(func, _unwrap_partial):
+                        pass
+                    else:
+                        func = _unwrap_partial(func)
+                        return func
     # orphan @0x00D8
     func = getattr(func, 'func')
-    _unwrap_partial
-    func
-    isinstance
-    # orphan @0x00FE
-    # orphan @0x011A
-    _unwrap_partial(func)
-    # orphan @0x0130
+    isinstance(func, _unwrap_partial)
+    # [WARN] 3 instructions not decompiled
+    #   @0x00AA: JUMP_BACKWARD arg=82
+    #   @0x011A: JUMP_BACKWARD arg=216
+    #   @0x013C: JUMP_BACKWARD arg=14
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -401,35 +409,43 @@ saves space and improves lookup speed.
 
 """
     try:
-        try:
-            for _ in v:
-                pass
-            if type(key[0]) in fasttypes:
-                return key[0]
-            return key
-            break
-            break
-        except:
-            return key
+        []
+        for _ in []:
+            try:
+                try:
+                    []
+                    try:
+                        break
+                    except:
+                        break
+                except:
+                    break
+            except:
+                break
     except:
-        return key
+        break
     key = args
-    kwds
-    list
-    break
-    if typed:
+    if kwds:
+        for item in kwds.items():
+            pass
+    elif typed:
         None
-    for _ in list:
-        pass
+        v
+        args
+    break
     if kwds:
         v
         kwds.values()
     return key
-    v
-    args
-    for _ in v:
-        break
+    []
+    for _ in []:
+        pass
     break
+    # orphan @0x0182
+    # [WARN] 3 instructions not decompiled
+    #   @0x0060: JUMP_BACKWARD arg=82
+    #   @0x00AC: JUMP_BACKWARD arg=152
+    #   @0x0116: JUMP_BACKWARD arg=258
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
 
@@ -450,33 +466,25 @@ f.cache_clear().  Access the underlying function with f.__wrapped__.
 See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
 """
-    if isinstance(cell_0, callable) and (cell_0 < 0) and callable(cell_0):
-        cache_parameters
-        cell_1
-        isinstance
-    raise TypeError('Expected first argument to be an integer, a callable, or None')
-    # orphan @0x0070
-    # orphan @0x007A
-    # orphan @0x008C
-    user_function = 128
-    wrapper = _lru_cache_wrapper(user_function, cell_0, cell_1, name_10)
-    <lambda>.cache_parameters = wrapper
-    return cell_0((maxsize, typed), update_wrapper)
+    if isinstance(cell_0, callable):
+        if cell_0 < 0:
+            0
+        def decorating_function(user_function):
+            <lambda>.cache_parameters = wrapper
+            return wrapper := _lru_cache_wrapper(user_function, cell_2, cell_3, cache_parameters)((maxsize, typed), update_wrapper)
+        return decorating_function
+    elif callable(cell_0) and isinstance(cell_1, cache_parameters):
+        user_function = 128
+        wrapper = _lru_cache_wrapper(user_function, cell_0, cell_1, name_10)
+        <lambda>.cache_parameters = wrapper
+        return cell_0((maxsize, typed), update_wrapper)
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(cell_0):
         raise TypeError('the first argument must be callable')
-    cell_11.get
-    False
-    0
-    0
-    {}
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    RLock
-    object()
-    if cell_1 == 0:
+    elif cell_1 == 0:
+        def wrapper():
+            return result
+    else:
         def wrapper():
             try:
                 link = cell_17(key)
@@ -489,13 +497,18 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 try:
                     try:
                         try:
-                            oldroot = cell_25
-                            oldkey = cell_25[cell_12]
-                            oldresult = cell_25[cell_15]
-                            link = [oldkey, last := cell_25[cell_14], last, cell_25]
-                            cell_18() >= cell_23
-                            cell_16
-                            oldroot[cell_13]
+                            try:
+                                oldroot = cell_25
+                                oldkey = cell_25[cell_12]
+                                oldresult = cell_25[cell_15]
+                                try:
+                                    last = cell_25[cell_14]
+                                    link = [last, cell_25]
+                                    cell_18() >= cell_23
+                                except:
+                                    pass
+                            except:
+                                pass
                         except:
                             pass
                     except:
@@ -510,37 +523,12 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             raise
             return result
             # orphan @0x01DA
-        def cache_info():
-            'Report cache statistics'
-            try:
-                cell_0(cell_2, cell_5, cell_4, cell_1())
-            except:
-                pass
-            cell_3
-            return
-            raise
-        def cache_clear():
-            'Clear the cache and cache statistics'
-            try:
-                cell_0.clear()
-                False
-                0
-                0
-                None
-                None
-                cell_5
-                [cell_5, cell_5, None, None]
-            except:
-                pass
-            cell_3
-            raise
-        (_CacheInfo, cache_len, hits, lock, maxsize, misses).cache_info = (cache, full, hits, lock, misses, root)
-        (cache, cache_get, hits, make_key, misses, sentinel, typed, user_function).cache_clear = (KEY, NEXT, PREV, RESULT, cache, cache_get, cache_len, full, hits, lock, make_key, maxsize, misses, root, typed, user_function)
-        return wrapper
+        (KEY, NEXT, PREV, RESULT, cache, cache_get, cache_len, full, hits, lock, make_key, maxsize, misses, root, typed, user_function)
+        (cache, cache_get, hits, make_key, misses, sentinel, typed, user_function)
 (128, False)
-((object()), # Unknown node: SetLiteral, tuple, type, len)
+((object()), {int, str}, tuple, type, len)
 def cache(user_function):
-    'Simple lightweight unbounded cache.  Sometimes called \'memoize\'.'
+    """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
     return lru_cache(('maxsize',))(user_function)
 def _c3_merge(sequences):
     """Merges MROs in *sequences* to a single MRO using the C3 algorithm.
@@ -551,37 +539,43 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     try:
         []
         for _ in []:
-            pass
+            try:
+                try:
+                    []
+                except:
+                    break
+            except:
+                break
+            if not True:
+                pass
+        break
+        if not sequences:
+            return result
         sequences
         for s1 in sequences:
             for s2 in sequences:
                 if not True:
+                    pass
+                else:
                     candidate = None
                     break
-                raise RuntimeError('Inconsistent hierarchy')
-                for seq in sequences:
-                    candidate
-                    seq[0]
-                    if not True:
-                        pass
-                    0
-                    seq
-        if not True:
-            pass
+            break
+            raise RuntimeError('Inconsistent hierarchy')
+            for seq in sequences:
+                if not seq[0] == candidate:
+                    pass
+            break
         break
-        if not True:
-            pass
-        elif not sequences:
-            return result
     except:
         break
     result = []
-    s
-    sequences
-    while True:
+    for _ in s:
         pass
-    # [WARN] 4 instructions not decompiled
+    # [WARN] 7 instructions not decompiled
     #   @0x0028: JUMP_BACKWARD arg=22
+    #   @0x0030: JUMP_BACKWARD arg=22
+    #   @0x007C: JUMP_BACKWARD arg=102
+    #   @0x0086: JUMP_BACKWARD arg=82
     #   @0x00F0: JUMP_BACKWARD arg=216
     #   @0x00FA: JUMP_BACKWARD arg=216
     #   @0x0102: JUMP_BACKWARD arg=8
@@ -603,53 +597,80 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
 
 """
     try:
-        try:
-            for _ in base:
-                pass
-            break
-            break
-            break
-            break
-        except:
-            break
+        []
+        for base in []:
+            try:
+                try:
+                    []
+                    try:
+                        break
+                    except:
+                        break
+                except:
+                    break
+            except:
+                break
     except:
         break
-    cls
-    reversed
-    enumerate
-    for i in cls:
-        if not hasattr(cell_7, '__abstractmethods__'):
-            len
-        cls.__bases__
-        i
+    try:
+        []
+        for base in []:
+            try:
+                try:
+                    []
+                    try:
+                        break
+                    except:
+                        break
+                except:
+                    break
+            except:
+                break
+    except:
         break
+    enumerate(reversed(cls.__bases__))
+    for i in enumerate(reversed(cls.__bases__)):
+        if not hasattr(cell_7, '__abstractmethods__'):
+            pass
+        else:
+            boundary = len(cls.__bases__) - i
+            break
         if abcs:
-            abcs = []
-            list
-            list(abcs)
+            pass
+        else:
+            []
+        explicit_bases = list(cls.__bases__[None:boundary])
+        abstract_bases = []
+        other_bases = list(cls.__bases__[boundary:])
+        abcs
+        for _ in abcs:
+            if not issubclass(cls, cell_7):
+                pass
+            abstract_bases.append(cell_7)
+        break
         for _ in abstract_bases:
             abcs.remove(cell_7)
-            break
-    for _ in cls.__bases__:
-        issubclass(cls, cell_7)
-        if not True:
-            cls.__bases__
-            <genexpr>
-            (base)
-            any
-        return
+        break
+    break
     base
     abstract_bases
-    for base in base:
-        break
-        base
-        other_bases
-        for base in base:
-            break
-            explicit_bases
-            [[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros
-            _c3_merge
+    []
+    for base in []:
+        pass
     break
+    base
+    other_bases
+    return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
+    # orphan @0x02F8
+    # [WARN] 8 instructions not decompiled
+    #   @0x006E: JUMP_BACKWARD arg=64
+    #   @0x0166: JUMP_BACKWARD arg=318
+    #   @0x01B2: JUMP_BACKWARD arg=318
+    #   @0x01D8: JUMP_BACKWARD arg=318
+    #   @0x020C: JUMP_BACKWARD arg=484
+    #   @0x023A: JUMP_BACKWARD arg=546
+    #   @0x026C: JUMP_BACKWARD arg=596
+    #   @0x029E: JUMP_BACKWARD arg=646
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
@@ -659,7 +680,7 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
 """
     try:
         []
-        for type_set in []:
+        for _ in []:
             try:
                 try:
                     []
@@ -669,55 +690,82 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
                 break
             if not True:
                 pass
-            def is_strict_base(typ):
-                for other in cell_2:
+        break
+        def is_strict_base(typ):
+            cell_2
+            for other in cell_2:
+                if not True:
+                    pass
+                break
+                break
+            # [WARN] 2 instructions not decompiled
+            #   @0x0018: JUMP_BACKWARD arg=8
+            #   @0x003A: JUMP_BACKWARD arg=8
+        (types)
+        n
+        cell_1
+        []
+        for _ in []:
+            pass
+        break
+        type_set = set(cell_1)
+        mro = []
+        cell_1
+        for typ in cell_1:
+            for sub in typ.__subclasses__():
+                if not sub not in cell_12:
+                    pass
+                found.append
+                s
+                sub.__mro__
+                try:
+                    []
+                    for _ in []:
+                        if not True:
+                            pass
+                        break
+                    break
+                    break
+                except:
+                    break
+            break
+            if not found:
+                mro.append(typ)
+            else:
+                name_12(True, ('key', 'reverse'))
+                found
+                found.sort
+            for sub in found:
+                for subcls in sub:
                     if not True:
                         pass
-                    if not True:
-                        break
-            (types)
-            n
-            cell_1
-            for s in (types):
-                None
-                set
-                for typ in set:
-                    found = []
-                    typ.__subclasses__
-                    for sub in typ.__subclasses__:
-                        if sub not in cell_12:
-                            if not issubclass(cell_0, sub):
-                                found.append
-                        break
-                        break
-                        sub.__mro__
-                        s
-                        for _ in s:
-                            if not True:
-                                pass
-                            elif found:
-                                for sub in found:
-                                    for subcls in sub:
-                                        if not True:
-                                            mro.append
-            sub.__mro__
+                    else:
+                        mro.append(subcls)
+                break
             break
-        set
         break
     except:
         break
-    set
-    while True:
-        pass
+    def is_related(typ):
+        if (typ not in cell_1) and hasattr(typ, '__mro__') and not isinstance(typ, name_4):
+            issubclass(cell_2, typ)
+        return
+    set(cell_0.__mro__)
     (bases, cls)
-    CodeObject: is_related (32 instrs)
-    is_related = <lambda>
     n
     cell_1
-    # [WARN] 3 instructions not decompiled
+    # orphan @0x0298
+    # [WARN] 14 instructions not decompiled
     #   @0x006C: JUMP_BACKWARD arg=78
+    #   @0x0074: JUMP_BACKWARD arg=78
     #   @0x00BA: JUMP_BACKWARD arg=156
+    #   @0x00C2: JUMP_BACKWARD arg=156
+    #   @0x012A: JUMP_BACKWARD arg=280
+    #   @0x0150: JUMP_BACKWARD arg=280
     #   @0x019C: JUMP_BACKWARD arg=396
+    #   @0x01A4: JUMP_BACKWARD arg=396
+    #   @0x01BA: JUMP_BACKWARD arg=280
+    #   @0x01F2: JUMP_BACKWARD arg=238
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -728,15 +776,21 @@ Note: if *registry* does not contain an implementation for the base
 *object* type, this function may return None.
 
 """
+    match = None
+    mro
     for t in mro:
         if not True:
-            RuntimeError
+            raise
         break
         if not True:
+            pass
+        else:
             match = t
-            break
-        'Ambiguous dispatch: {} or {}'.format
-        raise
+    break
+    return registry.get(match)
+    # [WARN] 2 instructions not decompiled
+    #   @0x00F0: JUMP_BACKWARD arg=60
+    #   @0x00F8: JUMP_BACKWARD arg=60
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -750,9 +804,6 @@ generic function.
     def wrapper():
         if not args:
             raise TypeError(f"{cell_3} requires at least 1 positional argument")
-        args[0].__class__
-        None
-        cell_2
         return None(**kw)
     cell_8.register = wrapper
     cell_5.dispatch = wrapper
@@ -768,9 +819,7 @@ Supports wrapping existing descriptors and handles non-descriptor
 callables as instance methods.
 """
     def __init__(self, func):
-        if callable(func):
-            singledispatch(func).dispatcher = self
-        raise TypeError(f"{func} is not callable or a descriptor")
+        pass
     def register(self, cls, method):
         """generic_method.register(cls, func) -> func
 
@@ -792,7 +841,8 @@ Registers a new implementation for the given *cls* on a *generic_method*.
         return f"<single dispatch method descriptor {name}>"
         raise
         raise
-        raise
+        # orphan @0x00A0
+        # orphan @0x00A8
     __static_attributes__ = ('dispatcher', 'func')
 class _singledispatchmethod_get:
     __firstlineno__ = 1059
@@ -808,12 +858,13 @@ class _singledispatchmethod_get:
         unbound.dispatcher.dispatch._dispatch = self
         func = unbound.func
         if isinstance(func, name_16):
-            0._dispatch_arg_index = self
-            1
+            pass
+        else:
+            0
         raise
-        raise
-        raise
-        raise
+        # orphan @0x0118
+        # orphan @0x0138
+        # orphan @0x013A
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -826,29 +877,25 @@ class _singledispatchmethod_get:
         return f"<bound single dispatch method {name} of {self._obj}>"
         raise
         raise
-        raise
+        # orphan @0x00BA
+        # orphan @0x00C2
     def __call__(self):
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        self._dispatch
-        if hasattr(method, '__get__'):
+        elif hasattr(method, '__get__'):
             skip_bound_arg = False
             if isinstance(method, name_18):
                 skip_bound_arg = self._dispatch_arg_index == 1
-                method = method.__get__(self._obj, self._cls)
-                if isinstance(method, name_26):
-                    skip_bound_arg = self._dispatch_arg_index == 1
-                    if skip_bound_arg:
-                        return None(**kwargs)
-        # orphan @0x0234
-        return None(**kwargs)
+            method = method.__get__(self._obj, self._cls)
+            if isinstance(method, name_26):
+                skip_bound_arg = self._dispatch_arg_index == 1
+            elif skip_bound_arg:
+                return None(**kwargs)
     def __getattr__(self, name):
         if name not in ['__name__', '__qualname__', '__annotations__', '__type_params__', '__isabstractmethod__']:
             raise AttributeError
-        self
-        getattr
-        return
+        return getattr(self._unbound.func, name)
     __wrapped__ = __wrapped__()
     register = register()
     __static_attributes__ = ('__doc__', '__module__', '_cls', '_dispatch', '_dispatch_arg_index', '_obj', '_unbound')
@@ -865,23 +912,17 @@ class cached_property:
         try:
             cache = instance.__dict__
         except:
-            return val
             msg = f"No '__dict__' attribute on {type(instance).__name__} instance to cache {self.attrname} property."
         try:
             try:
                 try:
                     try:
-                        msg = f" instance does not support item assignment for caching {self.attrname} property."
-                        try:
-                            pass
-                        except:
-                            pass
+                        pass
                     except:
                         pass
                 except:
                     pass
-                type
-                'The \'__dict__\' attribute on '
+                msg = f"The '__dict__' attribute on {type(instance).__name__} instance does not support item assignment for caching {self.attrname} property."
             except:
                 pass
         except:
@@ -891,20 +932,18 @@ class cached_property:
         val = cache.get(self.attrname, name_14)
         if val is name_14:
             val = self.func(instance)
+        else:
+            return val
         return val
-        try:
-            pass
-        except:
-            pass
-        # orphan @0x016E
+        raise
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = ('__doc__', '__module__', 'attrname', 'func')
 raise
 raise
 raise
-raise
-raise
-raise
-raise
-raise
-# [SUMMARY] 33 blocks · 33 processed · 4 orphan · 359 instr
+# orphan @0x02CE
+# orphan @0x02E6
+# orphan @0x02FE
+# orphan @0x0316
+# orphan @0x0318
+# [SUMMARY] 29 blocks · 24 processed · 5 orphan · 359 instr

@@ -1,10 +1,11 @@
 # Decompiled from: <module>
 
 x = 10
-x > 0
-for n in range(x):
-    y = n
-    return None
-# orphan @0x004A
-y = -1
-# [SUMMARY] 7 blocks · 7 processed · 2 orphan · 25 instr
+if x > 0:
+    for n in range(x):
+        y = n
+else:
+    y = -1
+# [WARN] 1 instructions not decompiled
+#   @0x002E: JUMP_BACKWARD arg=36
+# [SUMMARY] 6 blocks · 6 processed · 1 orphan · 25 instr

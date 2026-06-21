@@ -23,6 +23,4 @@ except IOError:
 # orphan @0x0077
 x = 0
 # orphan @0x0098
-# orphan @0x00A3
-f = None
-# [SUMMARY] 18 blocks · 16 processed · 3 orphan · 75 instr
+# [SUMMARY] 18 blocks · 17 processed · 2 orphan · 75 instr

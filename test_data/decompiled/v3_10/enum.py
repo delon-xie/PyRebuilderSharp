@@ -34,10 +34,12 @@ def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
     """
+    pass
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
+    pass
 def _is_internal_class(cls_name, obj):
     if not isinstance(obj, type):
         return False
@@ -216,7 +218,6 @@ class _proto_member:
         # orphan @0x0170
         # orphan @0x0172
         # orphan @0x0176
-        # orphan @0x017C
         # orphan @0x0256
         # orphan @0x02C0
         TypeError
@@ -321,7 +322,7 @@ class EnumType(type):
         for key in ignore:
             classdict.pop(key, None)
         member_names = classdict._member_names
-        invalid_names = set(member_names) & # Unknown node: SetLiteral
+        invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise ValueError('invalid enum member name(s) %s' % ','.join(EnumType.__new__.<locals>.<genexpr>(invalid_names)))
         _order_ = classdict.pop('_order_', None)
@@ -394,8 +395,6 @@ class EnumType(type):
                         if name not in classdict:
                             enum_method = getattr(Flag, name)
                             break
-            e = None
-            raise
         else:
             getattr(first_enum, '_boundary_', None)
         # orphan @0x026A
@@ -468,8 +467,6 @@ class EnumType(type):
             return
         # orphan @0x004C
         value in cls._hashable_values_
-        # orphan @0x0054
-        return
     def __delattr__(cls, attr):
         if attr in cls._member_map_:
             raise AttributeError('%r cannot delete member %r.' % (cls.__name__, attr))
@@ -680,7 +677,7 @@ class EnumType(type):
             for method in ('__new_member__', '__new__'):
                 for possible in (member_type, first_enum):
                     target = getattr(possible, method, None)
-                    if target not in # Unknown node: SetLiteral:
+                    if target not in {None, None.__new__, object.__new__, Enum.__new__}:
                         __new__ = target
                         break
                 if __new__ is not None:
@@ -810,42 +807,6 @@ class Enum:
         result = cls._missing_(value)
         # orphan @0x00FE
         e = None
-        # orphan @0x0108
-        isinstance(result, cls)
-        # orphan @0x0114
-        exc = None
-        ve_exc = None
-        return
-        # orphan @0x0122
-        Flag is not None
-        # orphan @0x012A
-        issubclass(cls, Flag)
-        # orphan @0x0134
-        cls._boundary_ is EJECT
-        # orphan @0x013E
-        isinstance(result, int)
-        # orphan @0x0148
-        exc = None
-        ve_exc = None
-        return
-        # orphan @0x0156
-        ve_exc = ValueError('%r is not a valid %s' % (value, cls.__qualname__))
-        result is None
-        # orphan @0x0170
-        exc is None
-        # orphan @0x0178
-        # orphan @0x017C
-        exc is None
-        # orphan @0x0184
-        exc = TypeError('error in %s._missing_: returned %r instead of None or a valid member' % (cls.__name__, result))
-        # orphan @0x0196
-        isinstance(exc, ValueError)
-        # orphan @0x01A0
-        exc.__context__ = ve_exc
-        # orphan @0x01A6
-        # orphan @0x01AA
-        exc = None
-        ve_exc = None
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -887,8 +848,6 @@ class Enum:
             raise
         return
         return
-        raise
-        raise
     @classmethod
     def _missing_(cls, value):
         pass
@@ -933,11 +892,11 @@ class Enum:
         return self
     @property
     def name(self):
-        'The name of the Enum member.'
+        """The name of the Enum member."""
         return self._name_
     @property
     def value(self):
-        'The value of the Enum member.'
+        """The value of the Enum member."""
         return self._value_
 class ReprEnum(Enum):
     __doc__ = """
@@ -952,7 +911,7 @@ class StrEnum(str, ReprEnum):
     Enum where members are also (and must be) strings
     """
     def __new__(cls):
-        'values must already be of type `str`'
+        """values must already be of type `str`"""
         if len(values) > 3:
             raise TypeError('too many arguments for str(): %r' % (values))
         elif (len(values) == 1) and not isinstance(values[0], str):
@@ -1013,9 +972,6 @@ class Flag(Enum):
                 return 2 ** (high_bit + 1)
         return 1
         return start
-        # orphan @0x0044
-        # orphan @0x0046
-        return 2 ** (high_bit + 1)
     @classmethod
     def _iter_member_by_value_(cls, value):
         """
@@ -1380,11 +1336,11 @@ def _simple_enum(etype):
                         setattr(enum_class, name, member)
             except TypeError:
                 enum_class._unhashable_values_map_.setdefault(name, []).append(value)
-            if '__new__' in body:
-                enum_class.__new_member__ = enum_class.__new__
-            enum_class.__new__ = Enum.__new__
-            return enum_class
             setattr(enum_class, name, member)
+        if '__new__' in body:
+            enum_class.__new_member__ = enum_class.__new__
+        enum_class.__new__ = Enum.__new__
+        return enum_class
         # orphan @0x03C6
         enum_class._flag_mask_ = single_bits | multi_bits
         enum_class._singles_mask_ = single_bits

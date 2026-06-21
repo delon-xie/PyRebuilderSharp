@@ -13,7 +13,7 @@ except ImportError:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     'abc'.__module__ = ABCMeta
-__doc__ = 'Abstract Base Classes (ABCs) according to PEP 3119.'
+"""Abstract Base Classes (ABCs) according to PEP 3119."""
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 
@@ -119,13 +119,13 @@ Returns the subclass, to allow usage as a class decorator.
 """
         return _abc_register(subclass, cls)
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
+        """Override for isinstance(instance, cls)."""
         return _abc_instancecheck(instance, cls)
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
+        """Override for issubclass(subclass, cls)."""
         return _abc_subclasscheck(subclass, cls)
     def _dump_registry(cls, file):
-        'Debug helper to print the ABC registry.'
+        """Debug helper to print the ABC registry."""
         f"Class: {cls.__module__}.{cls.__qualname__}"(file, ('file',))
         f"Inv. counter: {get_cache_token()}"(file, ('file',))
         f"_abc_registry: {_abc_registry}"(file, ('file',))
@@ -133,10 +133,10 @@ Returns the subclass, to allow usage as a class decorator.
         f"_abc_negative_cache: {_abc_negative_cache}"(file, ('file',))
         f"_abc_negative_cache_version: {_abc_negative_cache_version}"(file, ('file',))
     def _abc_registry_clear(cls):
-        'Clear the registry (for debugging or testing).'
+        """Clear the registry (for debugging or testing)."""
         _reset_registry(cls)
     def _abc_caches_clear(cls):
-        'Clear the caches (for debugging or testing).'
+        """Clear the caches (for debugging or testing)."""
         _reset_caches(cls)
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
@@ -156,34 +156,32 @@ Returns cls, to allow usage as a class decorator.
 
 If cls is not an instance of ABCMeta, does nothing.
 """
-    # orphan @0x007A
-    value = getattr(name, cls, None)
-    # orphan @0x006C
-    # orphan @0x005A
-    ()
-    '__abstractmethods__'
-    scls
-    getattr
-    # orphan @0x004C
     if not hasattr(cls, '__abstractmethods__'):
         return cls
     abstracts = set()
     cls.__bases__
-    # orphan @0x0094
-    getattr(value, '__isabstractmethod__', False)
-    # orphan @0x00BA
-    abstracts.add(name)
+    for scls in cls.__bases__:
+        for name in getattr(scls, '__abstractmethods__', ()):
+            value = getattr(name, cls, None)
+            if not getattr(value, '__isabstractmethod__', False):
+                pass
+            else:
+                abstracts.add(name)
     cls.__dict__.items()
-    # orphan @0x0128
-    getattr(value, '__isabstractmethod__', False)
-    # orphan @0x0146
-    # orphan @0x0154
-    abstracts.add
-    # orphan @0x015E
-    # orphan @0x0174
+    for _ in cls.__dict__.items():
+        if not getattr(value, '__isabstractmethod__', False):
+            pass
+        else:
+            abstracts.add(name)
     frozenset(abstracts).__abstractmethods__ = cls
     return cls
+    # [WARN] 5 instructions not decompiled
+    #   @0x00BA: JUMP_BACKWARD arg=118
+    #   @0x00E0: JUMP_BACKWARD arg=118
+    #   @0x00E8: JUMP_BACKWARD arg=86
+    #   @0x0154: JUMP_BACKWARD arg=292
+    #   @0x017A: JUMP_BACKWARD arg=292
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
-raise
-raise
-# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 95 instr
+# orphan @0x00E0
+# orphan @0x00E2
+# [SUMMARY] 8 blocks · 7 processed · 2 orphan · 95 instr

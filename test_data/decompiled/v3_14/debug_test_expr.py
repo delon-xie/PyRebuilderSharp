@@ -1,41 +1,7 @@
 # Decompiled from: <module>
 
 try:
-    f.read
-    None
-    bytearray
-    try:
-        try:
-            f.read
-            None
-            bytearray
-            known_types = [33, 40, 41, 46, 60, 62, 63, 65, 70, 73, 74, 78, 82, 84, 91, 99, 102, 105, 108, 114, 115, 116, 117, 120, 122, 123, 218]
-            range
-            # Unknown node: SetLiteral
-            for i in range:
-                stripped = data[i] & 127
-                if stripped in known_types:
-                    if not data[i] != stripped:
-                        code = marshal.loads(bytes(data[16:]))
-                        print('Code name:', code.co_name)
-                        print('Names:', code.co_names)
-                        code.co_consts
-                        'Constants:'
-                        None
-                        print
-                for instr in print():
-                    instr.offset(f"4d {instr.opname}20s {instr.arg} {instr.argrepr}")
-                    return None
-            break
-            try:
-                raise
-                raise
-            except:
-                pass
-        except:
-            pass
-    except:
-        pass
+    data = bytearray(f.read())
 except:
     pass
 import struct
@@ -45,4 +11,27 @@ __name__()
 open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expressions.38.pyc', 'rb')
 __module__
 open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expressions.38.pyc', 'rb')
-# [SUMMARY] 20 blocks · 21 processed · 1 orphan · 175 instr
+known_types = [33, 40, 41, 46, 60, 62, 63, 65, 70, 73, 74, 78, 82, 84, 91, 99, 102, 105, 108, 114, 115, 116, 117, 120, 122, 123, 218]
+range(16, len(data))
+{}
+for i in range(16, len(data)):
+    stripped = data[i] & 127
+    if not stripped in known_types:
+        pass
+code = marshal.loads(bytes(data[16:]))
+print('Code name:', code.co_name)
+print('Names:', code.co_names)
+print('Constants:', code.co_consts)
+print('Varnames:', code.co_varnames)
+print()
+print('Instructions:')
+dis.get_instructions(code)
+for instr in dis.get_instructions(code):
+    instr.offset(f"4d {instr.opname}20s {instr.arg} {instr.argrepr}")
+raise
+# [WARN] 4 instructions not decompiled
+#   @0x00D4: JUMP_BACKWARD arg=160
+#   @0x00F4: JUMP_BACKWARD arg=160
+#   @0x0102: JUMP_BACKWARD arg=160
+#   @0x02A4: JUMP_BACKWARD arg=546
+# [SUMMARY] 18 blocks · 19 processed · 0 orphan · 175 instr

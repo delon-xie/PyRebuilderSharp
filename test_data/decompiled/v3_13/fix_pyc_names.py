@@ -12,28 +12,43 @@ def get_python_version(filepath):
     return name_4.get(magic, 'unknown')
     raise
 def fix_pyc_names(directory):
-    os.listdir
-    for filename in os.listdir:
+    os.listdir(directory)
+    for filename in os.listdir(directory):
         if not filename.endswith('.pyc'):
-            os.path.join
-        if f".{actual_version}.pyc" in filename:
-            for version in exists.values():
-                if not f".{version}.pyc" in new_filename:
-                    new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                    break
-                if match:
-                    match.group(1)
-                elif not True:
-                    os.path
-                filename.replace
-        get_python_version(filepath)
-        if actual_version == 'unknown':
             pass
-        print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+        else:
+            actual_version = get_python_version(filepath)
+        if f".{actual_version}.pyc" in filename:
+            pass
+        else:
+            new_filename = filename
+            exists.values()
+        for version in exists.values():
+            if not f".{version}.pyc" in new_filename:
+                pass
+            else:
+                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                break
+            if not True:
+                pass
+            break
+            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
         break
+        if match:
+            old_ver = match.group(1)
+            new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+    break
+    # [WARN] 7 instructions not decompiled
+    #   @0x0062: JUMP_BACKWARD arg=46
+    #   @0x00C6: JUMP_BACKWARD arg=46
+    #   @0x00DE: JUMP_BACKWARD arg=46
+    #   @0x0128: JUMP_BACKWARD arg=270
+    #   @0x0202: JUMP_BACKWARD arg=46
+    #   @0x02B2: JUMP_BACKWARD arg=46
+    #   @0x0306: JUMP_BACKWARD arg=46
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
     return None
-# [SUMMARY] 3 blocks · 3 processed · 1 orphan · 39 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 39 instr

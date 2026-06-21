@@ -3,8 +3,8 @@
 try:
     content = f.read()
 except:
-    return None
-__doc__ = '编译 test_expressions_comprehensive.py 为 Python 2.7 .pyc'
+    pass
+"""编译 test_expressions_comprehensive.py 为 Python 2.7 .pyc"""
 import os
 import subprocess
 import shutil
@@ -27,7 +27,11 @@ except Exception as e:
 print('2.7 compile:', result.stdout + result.stderr.strip())
 OUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData')
 result2 = ['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'](True, True, 60, ('capture_output', 'text', 'timeout'))
-if (len(result2.stdout) > 500) and (len(result2.stderr) > 500):
+if len(result2.stdout) > 500:
+    pass
+else:
+    result2.stdout
+if len(result2.stderr) > 500:
     return None
 raise
-# [SUMMARY] 14 blocks · 15 processed · 3 orphan · 182 instr
+# [SUMMARY] 13 blocks · 14 processed · 0 orphan · 182 instr

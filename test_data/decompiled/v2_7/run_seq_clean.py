@@ -51,8 +51,4 @@ total = len(results)
 return
 # orphan @0x0298
 # orphan @0x02AA
-# orphan @0x02B5
-ver
-results
-# orphan @0x02E3
-# [SUMMARY] 32 blocks · 27 processed · 6 orphan · 304 instr
+# [SUMMARY] 32 blocks · 29 processed · 4 orphan · 304 instr

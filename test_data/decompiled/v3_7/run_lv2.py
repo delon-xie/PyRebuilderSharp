@@ -30,11 +30,6 @@ for ver in versions:
 # orphan @0x0172
 # orphan @0x0174
 # orphan @0x0178
-# orphan @0x0182
-print('❌ %s: parse error: %s' % (ver, ex))
-print('  Output: %s' % r.stdout[None:200])
-None
 # orphan @0x01B4
 ex = None
-# orphan @0x01C0
-# [SUMMARY] 22 blocks · 17 processed · 6 orphan · 221 instr
+# [SUMMARY] 22 blocks · 19 processed · 4 orphan · 221 instr

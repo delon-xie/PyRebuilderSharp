@@ -57,13 +57,6 @@ Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 yield from results
 match
 # orphan @0x0216
-# orphan @0x0220
-print('❌ %s: AST parse failed - %s' % (ver, e))
-print('  Decompiled: %s' % actual_src[None:200])
-yield from results
-None
-False
 # orphan @0x0258
 e = None
-# orphan @0x0264
-# [SUMMARY] 33 blocks · 24 processed · 10 orphan · 328 instr
+# [SUMMARY] 33 blocks · 26 processed · 8 orphan · 328 instr

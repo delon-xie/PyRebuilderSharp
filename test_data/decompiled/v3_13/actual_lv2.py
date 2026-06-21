@@ -1,20 +1,26 @@
 # Decompiled from: <module>
 
+# orphan @0x0024
+j = i * 2
+i += 1
+i < 5
 try:
     a = 1
 except:
     break
 x = 1
 y = 2
-x + y
+z = x + y
+i = 0
 while i < 5:
-    break
-j = i * 2
-i += 1
-if i < 5:
-    for n in range(10):
-        m = n + 1
+    j = i * 2
+    i += 1
+range(10)
+for n in range(10):
+    m = n + 1
+break
 # orphan @0x0080
-# [WARN] 1 instructions not decompiled
+# [WARN] 2 instructions not decompiled
+#   @0x0044: JUMP_BACKWARD arg=36
 #   @0x0068: JUMP_BACKWARD arg=88
-# [SUMMARY] 14 blocks · 13 processed · 4 orphan · 53 instr
+# [SUMMARY] 12 blocks · 9 processed · 3 orphan · 53 instr

@@ -2,48 +2,65 @@
 
 def depth_5_if(x0, x1, x2, x3, x4):
     result = 0
-    if (x0 > 0) and (x1 > 1) and (x2 > 2) and (x3 > 3) and (x4 > 4):
-        result = 42
-        return None
-    result = 40
-    result = 20
-    # orphan @0x0084
-    result = 10
+    if x0 > 0:
+        if x1 > 1:
+            if x2 > 2:
+                if x3 > 3:
+                    if x4 > 4:
+                        result = 42
+                        return None
+                    result = 41
+                else:
+                    result = 40
+            else:
+                result = 30
+        else:
+            result = 20
+    else:
+        result = 10
 def depth_5_for():
     total = 0
     range(2)
     for a in range(2):
         for b in range(2):
             for c in range(2):
-                range
-                for d in range:
-                    range(2)
+                for d in range(2):
                     for e in range(2):
                         total += 1
+    # [WARN] 5 instructions not decompiled
+    #   @0x00A4: JUMP_BACKWARD arg=140
+    #   @0x00AC: JUMP_BACKWARD arg=112
+    #   @0x00B4: JUMP_BACKWARD arg=84
+    #   @0x00BC: JUMP_BACKWARD arg=56
+    #   @0x00C4: JUMP_BACKWARD arg=28
 def depth_5_while():
-    # orphan @0x003C
-    b -= 1
-    c = 2
-    c > 0
-    # orphan @0x0034
     total = 0
     a = 2
-    if a > 0:
+    while a > 0:
         a -= 1
         b = 2
-        b > 0
-    total += 1
-    # orphan @0x0064
-    c - 1
-    # orphan @0x0078
-    d = 2
-    d > 0
-    # orphan @0x008C
-    d -= 1
-    e = 2
-    e > 0
-    # orphan @0x00B4
-    e - 1
+        while b > 0:
+            pass
+        b -= 1
+        c = 2
+        while c > 0:
+            pass
+        c -= 1
+        d = 2
+        while d > 0:
+            pass
+        d -= 1
+        e = 2
+        while e > 0:
+            pass
+        e -= 1
+        total += 1
+    # [WARN] 5 instructions not decompiled
+    #   @0x003C: JUMP_BACKWARD arg=10
+    #   @0x0064: JUMP_BACKWARD arg=46
+    #   @0x008C: JUMP_BACKWARD arg=86
+    #   @0x00B4: JUMP_BACKWARD arg=126
+    #   @0x00DC: JUMP_BACKWARD arg=166
 def depth_5_try():
     # orphan @0x0020
     try:

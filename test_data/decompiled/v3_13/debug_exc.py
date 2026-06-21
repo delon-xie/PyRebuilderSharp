@@ -4,17 +4,12 @@ import sys
 import dis
 import marshal
 import types
-sys.argv
-None
-open
+f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 print(f"Magic: {magic.hex()}")
-int.from_bytes
-f.read
-f.read(4)
-int.from_bytes
-f.read
-int.from_bytes
+flags = int.from_bytes(f.read(4), 'little')
+ts = int.from_bytes(f.read(4), 'little')
+size = int.from_bytes(f.read(4), 'little')
 print(f"Header: flags={flags} ts={ts} size={size}")
 raw = f.read()
 code = marshal.loads(raw)
@@ -23,13 +18,30 @@ print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
     for i in range(0, len(et), 8):
         if i + 7 >= len(et):
-            for const in code.co_consts:
-                if isinstance(const, types.CodeType):
-                    print(f"
+            break
+        else:
+            start = int.from_bytes(et[i:i + 2], 'little')
+            end = int.from_bytes(et[i + 2:i + 4], 'little')
+            target = int.from_bytes(et[i + 4:i + 6], 'little')
+            dl = int.from_bytes(et[i + 6:i + 8], 'little')
+            print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
+        for const in code.co_consts:
+            if not isinstance(const, types.CodeType):
+                pass
+            else:
+                print(f"
 --- Nested: {const.co_name} ---")
-                    print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
-                    if hasattr(const, 'co_exceptiontable'):
-                        if not const.co_exceptiontable:
-                            print(f"  bytes: {const.co_exceptiontable.hex()}")
-                            break
-# [SUMMARY] 23 blocks · 24 processed · 5 orphan · 312 instr
+                print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
+            if not const.co_exceptiontable:
+                pass
+            else:
+                print(f"  bytes: {const.co_exceptiontable.hex()}")
+        break
+# orphan @0x0444
+# [WARN] 5 instructions not decompiled
+#   @0x0440: JUMP_BACKWARD arg=768
+#   @0x0496: JUMP_BACKWARD arg=1120
+#   @0x0506: JUMP_BACKWARD arg=1120
+#   @0x052C: JUMP_BACKWARD arg=1120
+#   @0x0576: JUMP_BACKWARD arg=1120
+# [SUMMARY] 18 blocks · 18 processed · 1 orphan · 312 instr

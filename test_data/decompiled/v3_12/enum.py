@@ -448,7 +448,7 @@ class EnumType(type):
         for key in ignore:
             classdict.pop(key, None)
         member_names = classdict._member_names
-        invalid_names = set(member_names) & # Unknown node: SetLiteral
+        invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise 'invalid enum member name(s) %s'(','.join % <genexpr>(invalid_names()))
         _order_ = classdict.pop('_order_', None)
@@ -1052,7 +1052,7 @@ class StrEnum(str, ReprEnum):
     Enum where members are also (and must be) strings
     """
     def __new__(cls):
-        'values must already be of type `str`'
+        """values must already be of type `str`"""
         if len(values) > 3:
             raise TypeError(f"too many arguments for str(): {values!r}")
         elif (len(values) == 1) and not isinstance(values[0], name_6):

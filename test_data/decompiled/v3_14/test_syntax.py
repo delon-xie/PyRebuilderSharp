@@ -2917,7 +2917,8 @@ text of the warning raised.
             """)
         self.check_warning(source, '\'return\' in a \'finally\' block')
     def test_break_and_continue_in_finally(self):
-        'break'
+        """break"""
+        ('break', 'continue')
         for kw in ('break', 'continue'):
             source = textwrap.dedent(f"
                 for abc in range(10):
@@ -2949,7 +2950,8 @@ text of the warning raised.
                             {kw}
                 ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
-            break
+        # [WARN] 1 instructions not decompiled
+        #   @0x012C: JUMP_BACKWARD arg=6
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class SyntaxErrorTestCase(unittest.TestCase):
@@ -2970,20 +2972,14 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
                 try:
                     try:
                         self.fail('SyntaxError is not a %s' % subclass.__name__)
-                        mo = lineno.search(errtext, str(err))
-                        errtext
-                        'SyntaxError did not contain '
-                        self.fail
                         try:
-                            self.assertEqual
-                            try:
-                                self.assertEqual(err.lineno, lineno)
-                                self.assertEqual(err.offset, offset)
-                                self.assertEqual(err.end_lineno, end_lineno)
-                                self.assertEqual(err.end_offset, end_offset)
-                            except:
-                                err = None
-                                return None
+                            mo = lineno.search(errtext, str(err))
+                            self.fail(f"SyntaxError did not contain {errtext}")
+                            self.assertEqual(err.filename, filename)
+                            self.assertEqual(err.lineno, lineno)
+                            self.assertEqual(err.offset, offset)
+                            self.assertEqual(err.end_lineno, end_lineno)
+                            self.assertEqual(err.end_offset, end_offset)
                         except:
                             err = None
                             return None
@@ -3001,18 +2997,19 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
             return None
         self.fail('compile() did not raise SyntaxError')
         err = None
+        # orphan @0x029A
         # orphan @0x029C
     def test_expression_with_assignment(self):
-        'print(end1 + end2 = \' \')'
+        """print(end1 + end2 = ' ')"""
         'print(end1 + end2 = \' \')'('expression cannot contain assignment, perhaps you meant \'==\'?', 7, ('offset',))
     def test_curly_brace_after_primary_raises_immediately(self):
-        'f{}'
+        """f{}"""
         'f{}'('invalid syntax', 'single', ('mode',))
     def test_assign_call(self):
-        'f() = 1'
+        """f() = 1"""
         self._check_error('f() = 1', 'assign')
     def test_assign_del(self):
-        'del (,)'
+        """del (,)"""
         self._check_error('del (,)', 'invalid syntax')
         self._check_error('del 1', 'cannot delete literal')
         self._check_error('del (1, 2)', 'cannot delete literal')
@@ -3083,7 +3080,7 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
         """
         source('invalid syntax', 3, ('lineno',))
     def test_yield_outside_function(self):
-        'if 0: yield'
+        """if 0: yield"""
         self._check_error('if 0: yield', 'outside function')
         self._check_error("""if 0: yield
 else:  x=1""", 'outside function')
@@ -3103,7 +3100,7 @@ else:  x=1""", 'outside function')
   while 0: yield
   else:  x = 1""", 'outside function')
     def test_return_outside_function(self):
-        'if 0: return'
+        """if 0: return"""
         self._check_error('if 0: return', 'outside function')
         self._check_error("""if 0: return
 else:  x=1""", 'outside function')
@@ -3124,7 +3121,7 @@ else: return""", 'outside function')
   if 1: pass
   else: return""", 'outside function')
     def test_break_outside_loop(self):
-        'outside loop'
+        """outside loop"""
         msg = 'outside loop'
         'break'(msg, 1, ('lineno',))
         'if 0: break'(msg, 1, ('lineno',))
@@ -3140,7 +3137,7 @@ else: break"""(msg, 2, ('lineno',))
         """with object() as obj:
  break"""(msg, 2, ('lineno',))
     def test_continue_outside_loop(self):
-        'not properly in loop'
+        """not properly in loop"""
         msg = 'not properly in loop'
         'if 0: continue'(msg, 1, ('lineno',))
         """if 0: continue
@@ -3174,16 +3171,16 @@ foo()"""('expected an indented block', name_2, ('subclass',))
   foo()
  bar()"""('unindent does not match .* level', name_2, ('subclass',))
     def test_kwargs_last(self):
-        'int(base=10, \'2\')'
+        """int(base=10, '2')"""
         self._check_error('int(base=10, \'2\')', 'positional argument follows keyword argument')
     def test_kwargs_last2(self):
-        'int(**{\'base\': 10}, \'2\')'
+        """int(**{'base': 10}, '2')"""
         self._check_error('int(**{\'base\': 10}, \'2\')', 'positional argument follows keyword argument unpacking')
     def test_kwargs_last3(self):
-        'int(**{\'base\': 10}, *[\'2\'])'
+        """int(**{'base': 10}, *['2'])"""
         self._check_error('int(**{\'base\': 10}, *[\'2\'])', 'iterable argument unpacking follows keyword argument unpacking')
     def test_generator_in_function_call(self):
-        'foo(x,    y for y in range(3) for z in range(2) if z    , p)'
+        """foo(x,    y for y in range(3) for z in range(2) if z    , p)"""
         'foo(x,    y for y in range(3) for z in range(2) if z    , p)'('Generator expression must be parenthesized', 1, 1, 11, 53, ('lineno', 'end_lineno', 'offset', 'end_offset'))
     def test_except_then_except_star(self):
         """try: pass
@@ -3200,9 +3197,9 @@ except TypeError: pass"""
 except* ValueError: pass
 except TypeError: pass"""('cannot have both \'except\' and \'except\\*\' on the same \'try\'', 3, 3, 1, 7, ('lineno', 'end_lineno', 'offset', 'end_offset'))
     def test_empty_line_after_linecont(self):
-        """\\
+        """\
 pass
-        \\
+        \
 
 pass
 """
@@ -3234,13 +3231,14 @@ def fib(n):
     a, b = 0, 1
 """
         raise
-        raise
-        raise
+        # orphan @0x00A0
+        # orphan @0x00E6
+        # orphan @0x00E8
     def test_continuation_bad_indentation(self):
-        """\\
+        """\
 if x:
     y = 1
-  \\
+  \
   foo = 1
         """
         code = """\\
@@ -3279,7 +3277,7 @@ def func2():
 """
         self._check_error(code, 'expected \':\'')
     def test_invalid_line_continuation_error_position(self):
-        'a = 3 \\ 4'
+        """a = 3 \ 4"""
         'a = 3 \\ 4'('unexpected character after line continuation character', 1, 8, ('lineno', 'offset'))
         """1,\\#
 2"""('unexpected character after line continuation character', 1, 4, ('lineno', 'offset'))
@@ -3289,33 +3287,37 @@ fgdfgf
 2
 """('unexpected character after line continuation character', 3, 4, ('lineno', 'offset'))
     def test_invalid_line_continuation_left_recursive(self):
-        'A.Ɗ\\ '
+        """A.Ɗ\ """
         self._check_error('A.Ɗ\\ ', 'unexpected character after line continuation character')
         self._check_error("""A.μ\\
 """, 'unexpected EOF while parsing')
     def test_error_parenthesis(self):
+        """([{"""
+        for paren in '([{':
+            self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
         '([{'
-        # orphan @0x0056
-        self._check_error(f"a = {paren} 1, 2, 3
+        for paren in '([{':
+            self._check_error(f"a = {paren} 1, 2, 3
 b=3", f"\{paren}' was never closed")
         ')]}'
-        for paren in '([{':
-            f"\{paren}' was never closed"
-            paren + '1 + 2'
-            self._check_error
-            for _ in f"\{paren}' was never closed":
-                pass
-            break
-        # orphan @0x009C
-        self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
+        for paren in ')]}':
+            self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
         code = """func(
     a=["unclosed], # Need a quote in this comment: "
     b=2,
 )
 """
-        self
+        self._check_error(code, 'parenthesis \'\\)\' does not match opening parenthesis \'\\[\'')
+        self._check_error("""match y:
+ case e(e=v,v,""", ' was never closed')
+        s = b'IyBjb2Rpbmc9bGF0aW4KKGFhYWFhYWFhYWFhYWFhYWFhCmFhYWFhYWFhYWFhtQ=='
+        self._check_error(s, '\'\\(\' was never closed')
+        # [WARN] 3 instructions not decompiled
+        #   @0x0046: JUMP_BACKWARD arg=6
+        #   @0x008C: JUMP_BACKWARD arg=82
+        #   @0x00D8: JUMP_BACKWARD arg=152
     def test_error_string_literal(self):
-        '\'blech'
+        """'blech"""
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
         self._check_error('\'blech\\\'', 'unterminated string literal \\(.*\\); perhaps you escaped the end quote')
@@ -3323,7 +3325,7 @@ b=3", f"\{paren}' was never closed")
         self._check_error('\'\'\'blech', 'unterminated triple-quoted string literal')
         self._check_error('\'\'\'blech', 'unterminated triple-quoted string literal')
     def test_invisible_characters(self):
-        'print\x17(\'Hello\')'
+        """print("Hello")"""
         self._check_error('print\x17(\'Hello\')', 'invalid non-printable character')
         self._check_error(b'd2l0aCgwLCwpOgoB', 'invalid non-printable character')
     def test_match_call_does_not_raise_syntax_error(self):
@@ -3404,27 +3406,36 @@ a=1
                         ...
                 """)('cannot use attribute as pattern target', 3, 3, 15, 15 + len('obj.attr'), ('errtext', 'lineno', 'end_lineno', 'offset', 'end_offset'))
     def test_ifexp_else_stmt(self):
-        'expected expression after \'else\', but statement is given'
+        """expected expression after 'else', but statement is given"""
+        msg = 'expected expression after \'else\', but statement is given'
+        ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
-            break
+        # [WARN] 1 instructions not decompiled
+        #   @0x003A: JUMP_BACKWARD arg=10
     def test_ifexp_body_stmt_else_expression(self):
-        'expected expression before \'if\', but statement is given'
+        """expected expression before 'if', but statement is given"""
+        msg = 'expected expression before \'if\', but statement is given'
+        ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
-            break
+        # [WARN] 1 instructions not decompiled
+        #   @0x003C: JUMP_BACKWARD arg=10
     def test_ifexp_body_stmt_else_stmt(self):
-        'expected expression before \'if\', but statement is given'
+        """expected expression before 'if', but statement is given"""
+        msg = 'expected expression before \'if\', but statement is given'
+        (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for _ in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
-            break
+        # [WARN] 1 instructions not decompiled
+        #   @0x0044: JUMP_BACKWARD arg=10
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     __firstlineno__ = 3509
     __doc__ = 'Test syntax restrictions for lazy imports.'
     def test_lazy_import_in_try_block(self):
-        'Test that lazy imports are not allowed inside try blocks.'
+        """Test that lazy imports are not allowed inside try blocks."""
         self._check_error("""try:
     lazy import os
 except:
@@ -3436,7 +3447,7 @@ except ImportError:
     pass
 """, 'lazy from ... import not allowed inside try/except blocks')
     def test_lazy_import_in_trystar_block(self):
-        'Test that lazy imports are not allowed inside try* blocks.'
+        """Test that lazy imports are not allowed inside try* blocks."""
         self._check_error("""try:
     lazy import json
 except* Exception:
@@ -3448,14 +3459,14 @@ except* ImportError:
     pass
 """, 'lazy from ... import not allowed inside try/except blocks')
     def test_lazy_import_in_except_block(self):
-        'Test that lazy imports are not allowed inside except blocks.'
+        """Test that lazy imports are not allowed inside except blocks."""
         self._check_error("""try:
     sys.modules # trigger the except block
 except* Exception:
    lazy import sys
 """, 'lazy import not allowed inside try/except blocks')
     def test_lazy_import_in_function(self):
-        'Test that lazy imports are not allowed inside functions.'
+        """Test that lazy imports are not allowed inside functions."""
         self._check_error("""def func():
     lazy import math
 """, 'lazy import not allowed inside functions')
@@ -3463,7 +3474,7 @@ except* Exception:
     lazy from datetime import datetime
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_in_async_function(self):
-        'Test that lazy imports are not allowed inside async functions.'
+        """Test that lazy imports are not allowed inside async functions."""
         self._check_error("""async def async_func():
     lazy import asyncio
 """, 'lazy import not allowed inside functions')
@@ -3471,7 +3482,7 @@ except* Exception:
     lazy from json import loads
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_in_class(self):
-        'Test that lazy imports are not allowed inside classes.'
+        """Test that lazy imports are not allowed inside classes."""
         self._check_error("""class MyClass:
     lazy import typing
 """, 'lazy import not allowed inside classes')
@@ -3479,13 +3490,13 @@ except* Exception:
     lazy from abc import ABC
 """, 'lazy from ... import not allowed inside classes')
     def test_lazy_import_star_forbidden(self):
-        'Test that \'lazy from ... import *\' is forbidden everywhere.'
+        """Test that 'lazy from ... import *' is forbidden everywhere."""
         self._check_error('lazy from os import *', 'lazy from ... import \\* is not allowed')
         self._check_error("""def func():
     lazy from sys import *
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_nested_scopes(self):
-        'Test lazy imports in nested scopes.'
+        """Test lazy imports in nested scopes."""
         self._check_error("""class Outer:
     def method(self):
         lazy import sys
@@ -3499,7 +3510,7 @@ except* Exception:
         lazy from collections import deque
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_valid_cases(self):
-        'Test that lazy imports work at module level.'
+        """Test that lazy imports work at module level."""
         compile('lazy import os', '<test>', 'exec')
         compile('lazy from sys import path', '<test>', 'exec')
         compile('lazy import json as j', '<test>', 'exec')
@@ -3512,4 +3523,4 @@ def load_tests(loader, tests, pattern):
 if __name__ == '__main__':
     unittest.main()
     return None
-# [SUMMARY] 4 blocks · 5 processed · 1 orphan · 67 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 67 instr

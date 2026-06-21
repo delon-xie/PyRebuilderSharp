@@ -5,70 +5,49 @@ try:
 except:
     pass
 try:
-    ast
-    try:
-        try:
-            ast
-        except Exception:
-            pass
-        actual_ast = ast.parse(r.stdout)(2, ('indent',))
-        ok = expected_ast == actual_ast
-    except Exception:
-        pass
+    actual_ast = ast.parse(r.stdout)(2, ('indent',))
+    ok = expected_ast == actual_ast
 except Exception:
     pass
 try:
-    ex
-    ': parse error: '
-    ver
-    '❌ '
-    None
-    print
-    try:
-        try:
-            ex
-            ': parse error: '
-            ver
-            '❌ '
-            None
-            print
-        except:
-            ex = None
-        break
-    except:
-        ex = None
+    print(f"❌ {ver}: parse error: {ex}")
+    print('  Output: %s' % r.stdout[:200])
 except:
     ex = None
-__doc__ = 'Run AST comparison for test_control_flow across all versions'
+"""Run AST comparison for test_control_flow across all versions"""
 import os
 import subprocess
 import ast
-os.path
-while os.path:
-    __name__()
-    open(INPUT_FILE)
-    __module__
-    open(INPUT_FILE)
-for ver in __name__():
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
+__name__()
+open(INPUT_FILE)
+__module__
+open(INPUT_FILE)
+expected_ast = ast.parse(expected_src)(2, ('indent',))
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+versions
+[]
+ast.dump
+for ver in versions:
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)
-        30
-        True
-        True
-        ['dotnet', 'run', '--project', PROJECT, '--', pyc]
-        None
+    else:
+        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
         subprocess.run
-    while ('capture_output', 'text', 'timeout'):
-        pass
 if not True:
     pass
-break
 raise
 ex = None
+# orphan @0x0470
 # orphan @0x0472
-# [WARN] 3 instructions not decompiled
+# [WARN] 6 instructions not decompiled
+#   @0x0214: JUMP_BACKWARD arg=358
 #   @0x037E: JUMP_BACKWARD arg=862
 #   @0x03A8: JUMP_BACKWARD arg=358
+#   @0x03B2: JUMP_BACKWARD arg=358
+#   @0x03B8: JUMP_BACKWARD arg=358
 #   @0x0464: JUMP_BACKWARD arg=358
-# [SUMMARY] 46 blocks · 46 processed · 13 orphan · 256 instr
+# [SUMMARY] 40 blocks · 39 processed · 5 orphan · 256 instr

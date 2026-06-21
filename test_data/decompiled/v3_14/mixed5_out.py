@@ -3,51 +3,62 @@
 def mixed_1(n):
     result = 0
     if n > 0:
-        for i in range:
+        for i in range(n):
             j = 0
-            if not i < j:
+            while i < j:
                 pass
             j += 1
-            j
-            result = j + result
-            result + 1
-            return result
-    # [WARN] 1 instructions not decompiled
+            if j > 5:
+                result = j + result
+            else:
+                result += 1
+    return result
+    # orphan @0x008E
+    # [WARN] 3 instructions not decompiled
     #   @0x0040: JUMP_BACKWARD arg=42
+    #   @0x0074: JUMP_BACKWARD arg=52
+    #   @0x008A: JUMP_BACKWARD arg=52
 def mixed_2(n):
     total = 0
     range(n)
     for i in range(n):
         j = 0
-        if not n < j:
+        while n < j:
             pass
         j += 1
         if not j == i:
-            i
-            range
-        for k in i:
+            pass
+        else:
+            range(i)
+        for k in range(i):
             total = k + total
-            return total
+    return total
+    # [WARN] 4 instructions not decompiled
+    #   @0x0032: JUMP_BACKWARD arg=28
+    #   @0x0054: JUMP_BACKWARD arg=38
+    #   @0x0084: JUMP_BACKWARD arg=110
+    #   @0x008C: JUMP_BACKWARD arg=38
 def mixed_3(n):
-    # orphan @0x0038
-    # orphan @0x001A
-    i % 2
     total = 0
     i = 0
-    if n < i:
-        1
-        i
+    while n < i:
+        i += 1
+        if not i % 2 == 0:
+            pass
+        else:
+            range(i)
+        for j in range(i):
+            k = j
+            while k > 0:
+                pass
+            k -= 1
+            total += 1
     return total
-    # orphan @0x003C
-    # orphan @0x0044
-    range(i)
-    # orphan @0x0062
-    k = j
-    k > 0
-    # orphan @0x0076
-    k - 1
-    # orphan @0x0088
-    total += 1
+    # [WARN] 4 instructions not decompiled
+    #   @0x0044: JUMP_BACKWARD arg=10
+    #   @0x0076: JUMP_BACKWARD arg=94
+    #   @0x009E: JUMP_BACKWARD arg=104
+    #   @0x00A6: JUMP_BACKWARD arg=10
 def mixed_4(n):
     try:
         try:
@@ -56,23 +67,23 @@ def mixed_4(n):
                     range(n)
                     for i in range(n):
                         try:
-                            0
-                            try:
-                                i < j
-                            except:
-                                break
+                            j = 0
+                            while j:
+                                try:
+                                    pass
+                                except:
+                                    break
+                                j += 1
+                                try:
+                                    total = j + total
+                                except:
+                                    break
+                                return None
+                                raise
+                                raise
                         except:
                             break
-                        if not True:
-                            pass
-                        while j + 1:
-                            try:
-                                total = j + total
-                            except:
-                                pass
-                            return None
-                            raise
-                    break
+                    return None
                 except:
                     break
             except:
@@ -83,8 +94,8 @@ def mixed_4(n):
         break
     total = 0
     # orphan @0x0078
-    # orphan @0x0096
-    # [WARN] 2 instructions not decompiled
+    # [WARN] 3 instructions not decompiled
     #   @0x0044: JUMP_BACKWARD arg=46
+    #   @0x006C: JUMP_BACKWARD arg=56
     #   @0x007E: JUMP_BACKWARD arg=56
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

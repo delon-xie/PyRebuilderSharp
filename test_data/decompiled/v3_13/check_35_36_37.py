@@ -1,16 +1,27 @@
 # Decompiled from: <module>
 
+'Show actual decompiled output for 3.5, 3.6, 3.7'
+import os
+import subprocess
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+('3.5', '3.6', '3.7')
 for ver in ('3.5', '3.6', '3.7'):
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-    """
-=== """
-    None
-    print
-    subprocess.run
+    print(f"
+=== {ver} ===")
+    if r.stdout:
+        pass
+    else:
+        '(empty)'
     break
-    r.stdout[None:500]('(empty)')
     if not r.stderr:
+        pass
+    else:
         print(f"STDERR: {r.stderr[None:200]}")
-        break
-# [SUMMARY] 10 blocks · 11 processed · 2 orphan · 99 instr
+break
+# [WARN] 2 instructions not decompiled
+#   @0x0188: JUMP_BACKWARD arg=134
+#   @0x01BC: JUMP_BACKWARD arg=134
+# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 99 instr

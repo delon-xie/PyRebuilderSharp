@@ -6,7 +6,7 @@ import builtins
 from itertools import islice
 from _thread import get_ident
 def recursive_repr(fillvalue):
-    'Decorator to make a repr function return fillvalue for a recursive call'
+    """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
         getattr(cell_0, '__module__').__module__ = wrapper
         getattr(cell_0, '__doc__').__doc__ = wrapper
@@ -30,57 +30,58 @@ class Repr:
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
-            method = getattr(self, 'repr_' + typename, None)
-            if method:
-                pass
-        # orphan @0x00B8
-        # orphan @0x00CA
-        return
-        # orphan @0x0118
-        module = getattr(cls, '__module__', None)
-        return
-        # orphan @0x01A2
-        return
+        method = getattr(self, 'repr_' + typename, None)
+        if method:
+            return
+            module = getattr(cls, '__module__', None)
+            return
+            return
     def _join(self, pieces, level):
         try:
             sep = """,
 """ + (self.maxlevel - level + 1) * indent
         except:
-            name_12
+            pass
         try:
             error = None
         except:
             pass
         return ', '.join(pieces)
         return ''
-        if isinstance(indent, TypeError):
-            indent < 0
+        indent = self.indent
+        if isinstance(indent, TypeError) and (indent < 0):
+            raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
         indent *= ' '
-        raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
         if not -len(indent):
-            return
+            None
+        return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
-            try:
-                for _ in elem:
-                    pass
-                return f"{left}{s}{right}"
-                break
-                break
-            except:
-                break
+            []
+            for _ in []:
+                try:
+                    try:
+                        []
+                        try:
+                            break
+                        except:
+                            break
+                    except:
+                        break
+                except:
+                    break
         except:
             break
-        len(x)
+        n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-            newlevel = level - 1
-            repr1 = self.repr1
+        newlevel = level - 1
+        repr1 = self.repr1
         elem
         pieces.append(self.fillvalue)
-        if (n == 1) and trail:
-            self.indent
+        # [WARN] 1 instructions not decompiled
+        #   @0x00A2: JUMP_BACKWARD arg=142
     def repr_tuple(self, x, level):
         return
     def repr_list(self, x, level):
@@ -93,33 +94,23 @@ class Repr:
     def repr_set(self, x, level):
         if not x:
             return 'set()'
-        # orphan @0x0020
+        x = _possibly_sorted(x)
         return
     def repr_frozenset(self, x, level):
         if not x:
             return 'frozenset()'
-        # orphan @0x0020
+        x = _possibly_sorted(x)
         return
     def repr_deque(self, x, level):
         return
     def repr_dict(self, x, level):
-        # orphan @0x0048
-        return
         n = len(x)
         if n == 0:
             return '{}'
-            if level <= 0:
-                self.fillvalue
-                '{'
-            newlevel = level - 1
-            repr1 = self.repr1
-            pieces = []
-            islice
-            for key in islice:
-                pieces.append(f"{keyrepr}: {valrepr}")
-                break
-                pieces.append(self.fillvalue)
-                return f"{{s}}"
+        elif level <= 0:
+            return '{' + self.fillvalue + '}'
+        # [WARN] 1 instructions not decompiled
+        #   @0x0116: JUMP_BACKWARD arg=186
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -127,7 +118,7 @@ class Repr:
             j = max(0, self.maxstring - 3 - i)
             s = builtins.repr(x[None:i] + x[len(x) - j:])
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-            return s
+        return s
     def repr_int(self, x, level):
         try:
             s = builtins.repr(x)
@@ -139,15 +130,10 @@ class Repr:
                     try:
                         import math
                         import sys
-                        math.log10
-                        int
-                        1
-                        try:
-                            max_digits = sys.get_int_max_str_digits()
-                            f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}x>"
-                            '<'
-                        except:
-                            exc = None
+                        k = 1 + int(math.log10(abs(x)))
+                        max_digits = sys.get_int_max_str_digits()
+                        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}x>"
+                        '<'
                     except:
                         exc = None
                 except:
@@ -160,9 +146,10 @@ class Repr:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-            return s
+        return s
         exc = None
         return
+        # orphan @0x023C
         # orphan @0x023E
     def repr_instance(self, x, level):
         try:
@@ -173,9 +160,10 @@ class Repr:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-            return s
+        return s
         return
-        raise
+        # orphan @0x017E
+        # orphan @0x0180
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
 def _possibly_sorted(x):
     try:
@@ -184,7 +172,8 @@ def _possibly_sorted(x):
         list(x)
     return
     return
-    raise
+    # orphan @0x0048
+    # orphan @0x004A
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

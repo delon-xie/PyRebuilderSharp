@@ -2,7 +2,7 @@
 
 # orphan @0x0078
 e = None
-__doc__ = 'Compare ASTs of expected vs decompiled'
+"""Compare ASTs of expected vs decompiled"""
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()
@@ -24,12 +24,6 @@ if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
 # orphan @0x00E6
 e = None
-# orphan @0x0104
-exp_lines = expected_ast.split("""
-""")
-act_lines = actual_ast.split("""
-""")
-range(max(len(exp_lines), len(act_lines)))
 # orphan @0x012E
 # orphan @0x0130
 i < len(exp_lines)
@@ -52,4 +46,4 @@ print
 # orphan @0x0190
 i > 5
 # orphan @0x01A6
-# [SUMMARY] 22 blocks · 7 processed · 15 orphan · 211 instr
+# [SUMMARY] 22 blocks · 9 processed · 13 orphan · 211 instr

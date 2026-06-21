@@ -6,30 +6,27 @@ except:
     break
 try:
     f = open('test.txt')
-except:
-    IOError
+except IOError:
+    break
 range(10)
 for i in range(10):
     a = i
-    items
-    for x in items:
-        y = x
-    if not n == 1:
-        pass
+items
+for x in items:
+    y = x
+range(5)
 for n in range(5):
     if n == 3:
         break
-try:
-    try:
-        break
-    except:
+    elif not n == 1:
         pass
-    f = None
-except:
-    pass
 raise
 # orphan @0x00AE
+# orphan @0x00D0
 # orphan @0x00D2
-# [WARN] 1 instructions not decompiled
+# [WARN] 4 instructions not decompiled
+#   @0x001C: JUMP_BACKWARD arg=18
 #   @0x0032: JUMP_BACKWARD arg=40
-# [SUMMARY] 27 blocks · 26 processed · 3 orphan · 79 instr
+#   @0x0070: JUMP_BACKWARD arg=74
+#   @0x0074: JUMP_BACKWARD arg=74
+# [SUMMARY] 27 blocks · 25 processed · 3 orphan · 79 instr

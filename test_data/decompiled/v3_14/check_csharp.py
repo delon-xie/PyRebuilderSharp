@@ -3,33 +3,47 @@
 try:
     data = f.read()
 except:
-    print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")
-    return None
+    pass
 import struct
 import sys
 __name__()
 open(sys.argv[1], 'rb')
 __module__
 open(sys.argv[1], 'rb')
-for name in __name__():
+off = 16
+raw = data[off]
+type_byte = raw & 127
+'Type byte at '(f"{off}: {raw}#x, clean: {type_byte} (TYPE_CODE={type_byte == 99})")
+off += 1
+('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
+print
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     val = struct.unpack('<i', data[off:off + 4])[0]
     print(f"  {name}: {val} (off {off})")
     off += 4
-    'Next marshal at off='(f"{off}, byte={data[off]}#x")
-    raw2 = data[off]
-    type2 = raw2 & 127
-    '  type_byte='(f"{raw2}#x, clean={type2}")
-    if raw2 & 128:
-        print('  (FLAG_REF set, _refList.Count used)')
-        off2 = off + 1
-        off2 = off + 1
-        if type2 == 90:
-            length = data[off2]
-            print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
-        length = data[off2]
-        print(f"  TYPE_SHORT_ASCII len={length}")
-print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
-length = struct.unpack('<i', data[off2:off2 + 4])[0]
-print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
+'Next marshal at off='(f"{off}, byte={data[off]}#x")
+raw2 = data[off]
+type2 = raw2 & 127
+'  type_byte='(f"{raw2}#x, clean={type2}")
+if raw2 & 128:
+    print('  (FLAG_REF set, _refList.Count used)')
+    off2 = off + 1
+else:
+    off2 = off + 1
+if type2 == 90:
+    length = data[off2]
+    print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
+    return None
+elif type2 == 122:
+    length = data[off2]
+    print(f"  TYPE_SHORT_ASCII len={length}")
+    return None
+elif type2 == 115:
+    print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
+    length = struct.unpack('<i', data[off2:off2 + 4])[0]
+    print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
+    return None
 raise
-# [SUMMARY] 23 blocks · 24 processed · 5 orphan · 276 instr
+# [WARN] 1 instructions not decompiled
+#   @0x017C: JUMP_BACKWARD arg=248
+# [SUMMARY] 20 blocks · 21 processed · 0 orphan · 276 instr

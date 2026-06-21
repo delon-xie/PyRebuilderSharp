@@ -5,35 +5,31 @@ import struct
 import marshal
 code = compile('a1 = None', '<test>', 'exec')
 print('Python 3.7 says:')
-code.co_argcount
-'  argcount='
-None
-print
-code.co_stacksize
-' stacksize='
-code.co_nlocals
-' nlocals='
-hex(code.co_flags)
-' flags='
+print(f"  argcount={code.co_argcount} nlocals={code.co_nlocals} stacksize={code.co_stacksize} flags={hex(code.co_flags)}")
 m = bytes(marshal.dumps(code))
 print(f"
 Marshaled ({len(m)} bytes):")
 ' '.join(<genexpr>(m[None:40]()))
-m[0]
 """
-Byte 0 = """
-None
+Byte 0 = """(f"{m[0]}02x")
+range(0, 8)
 print
 print
-for offset in m[0]:
+for offset in range(0, 8):
     vals = struct.unpack_from('<IIII', m, offset)
-    if vals[0] == code.co_argcount:
-        if vals[2] == code.co_stacksize:
-            if not vals[3] == code.co_flags:
-                print(f"
+    if not vals[0] == code.co_argcount:
+        pass
+    if not vals[3] == code.co_flags:
+        pass
+    else:
+        print(f"
 Fields found at offset {offset}:")
-                print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
-                '  Bytes: '(f"{' '.join}{<genexpr>(m[offset:offset + 16]())}")
-                print
-                return None
-# [SUMMARY] 13 blocks · 14 processed · 1 orphan · 196 instr
+        print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
+        '  Bytes: '(f"{' '.join}{<genexpr>(m[offset:offset + 16]())}")
+break
+# [WARN] 4 instructions not decompiled
+#   @0x01D8: JUMP_BACKWARD arg=388
+#   @0x0202: JUMP_BACKWARD arg=388
+#   @0x022C: JUMP_BACKWARD arg=388
+#   @0x02E4: JUMP_BACKWARD arg=388
+# [SUMMARY] 10 blocks · 11 processed · 0 orphan · 196 instr

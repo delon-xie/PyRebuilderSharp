@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
 def greet(name):
-    'Hello, '
+    """Hello, """
     return f"Hello, {name}!"
 def add(a, b):
     result = b + a

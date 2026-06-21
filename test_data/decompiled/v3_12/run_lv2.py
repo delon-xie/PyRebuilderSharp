@@ -64,7 +64,7 @@ try:
     None
 except:
     ex = None
-__doc__ = 'Run AST comparison for test_control_flow across all versions'
+"""Run AST comparison for test_control_flow across all versions"""
 import os
 import subprocess
 import ast

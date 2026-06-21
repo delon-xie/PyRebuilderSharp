@@ -113,14 +113,14 @@ class ABCMeta(type):
         elif issubclass(cls, subclass):
             raise RuntimeError('Refusing to create an inheritance cycle')
     def _dump_registry(cls, file):
-        'Debug helper to print the ABC registry.'
+        """Debug helper to print the ABC registry."""
         sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
             pass
         # orphan @0x0062
         value = getattr(cls, name)
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
+        """Override for isinstance(instance, cls)."""
         subclass = instance.__class__
         return True
         subtype = type(instance)
@@ -128,9 +128,9 @@ class ABCMeta(type):
             return False
             return
         else:
-            return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'(# Unknown node: SetLiteral))
+            return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'({subclass, subtype}))
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
+        """Override for issubclass(subclass, cls)."""
         if subclass in cls._abc_cache:
             return True
         elif cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:

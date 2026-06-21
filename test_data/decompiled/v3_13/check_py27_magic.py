@@ -31,4 +31,4 @@ print('Marshal dump:', result3.stdout)
 if result3.stderr:
     print('Stderr:', result3.stderr)
     return None
-# [SUMMARY] 3 blocks · 3 processed · 1 orphan · 127 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 127 instr

@@ -166,8 +166,6 @@ class property(DynamicClassAttribute):
         return getattr(self._cls_type, self.name)
         # orphan @0x0060
         return getattr(instance._value_, self.name)
-        # orphan @0x0084
-        # orphan @0x009E
     def __set__(self, instance, value):
         if self.fset is not None:
             return self.fset(instance, value)
@@ -242,8 +240,6 @@ class _proto_member:
         enum_class
         # orphan @0x0146
         # orphan @0x014E
-        # orphan @0x0158
-        enum_class._member_map_.items()
         # orphan @0x016A
         # orphan @0x016C
         canonical_member._value_ == value
@@ -253,8 +249,6 @@ class _proto_member:
         # orphan @0x018E
         # orphan @0x0194
         # orphan @0x0198
-        # orphan @0x01A2
-        Flag is None
         # orphan @0x01B2
         not issubclass(enum_class, Flag)
         # orphan @0x01C0
@@ -391,7 +385,6 @@ class EnumDict(dict):
         value
         # orphan @0x026E
         # orphan @0x0272
-        # orphan @0x027C
         # orphan @0x02AC
         super().__setitem__(key, value)
     @property
@@ -405,8 +398,6 @@ class EnumDict(dict):
                 pass
         except AttributeError:
             pass
-        # orphan @0x002C
-        members
         # orphan @0x0038
         # orphan @0x003A
         name
@@ -460,7 +451,7 @@ class EnumType(type):
         for key in ignore:
             classdict.pop(key, None)
         member_names = classdict._member_names
-        invalid_names = set(member_names) & # Unknown node: SetLiteral
+        invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise ValueError('invalid enum member name(s) %s' % ','.join(EnumType.__new__.<locals>.<genexpr>(invalid_names)))
         member_names
@@ -668,7 +659,6 @@ class EnumType(type):
             return isinstance(result, cls)
         except ValueError:
             pass
-        # orphan @0x0036
         # orphan @0x0042
         value in cls._unhashable_values_
         # orphan @0x004C
@@ -792,7 +782,6 @@ class EnumType(type):
         module = sys._getframemodulename(2)
         # orphan @0x0124
         # orphan @0x014A
-        # orphan @0x015A
         # orphan @0x0188
         qualname is not None
         # orphan @0x0192
@@ -826,8 +815,6 @@ class EnumType(type):
         sys.modules
         return cls
         # orphan @0x0048
-        # orphan @0x0050
-        members.sort(key=EnumType._convert_.<locals>.<lambda>)
     @classmethod
     def _check_for_existing_members_(mcls, class_name, bases):
         bases
@@ -906,7 +893,7 @@ class EnumType(type):
         if first_enum is not None:
             for possible in (member_type, first_enum):
                 target = getattr(possible, method, None)
-                if target not in # Unknown node: SetLiteral:
+                if target not in {None, None.__new__, object.__new__, Enum.__new__}:
                     __new__ = target
                 __new__
                 return (save_new, use_args)
@@ -1079,7 +1066,6 @@ class Enum:
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
-        # orphan @0x0046
         # orphan @0x003E
         cls = self.__class__
         try:
@@ -1115,7 +1101,6 @@ class Enum:
         except TypeError:
             cls._unhashable_values_.append(value)
         # orphan @0x00B2
-        # orphan @0x00BA
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         """
@@ -1138,14 +1123,6 @@ class Enum:
             return last_value + 1
         except TypeError:
             pass
-        # orphan @0x0022
-        # orphan @0x0032
-        # orphan @0x004A
-        (last_value)
-        'unable to increment %r'
-        TypeError
-        # orphan @0x0058
-        # orphan @0x0060
     @classmethod
     def _missing_(cls, value):
         pass
@@ -1187,11 +1164,11 @@ class Enum:
         return self
     @property
     def name(self):
-        'The name of the Enum member.'
+        """The name of the Enum member."""
         return self._name_
     @property
     def value(self):
-        'The value of the Enum member.'
+        """The value of the Enum member."""
         return self._value_
 class ReprEnum(Enum):
     __doc__ = """
@@ -1206,7 +1183,7 @@ class StrEnum(str, ReprEnum):
     Enum where members are also (and must be) strings
     """
     def __new__(cls):
-        'values must already be of type `str`'
+        """values must already be of type `str`"""
         # orphan @0x001A
         len(values) == 1
         if len(values) > 3:
@@ -1277,8 +1254,6 @@ class Flag(Enum):
         last_values
         max
         # orphan @0x002A
-        # orphan @0x0032
-        # orphan @0x0046
     @classmethod
     def _iter_member_by_value_(cls, value):
         """
@@ -1750,14 +1725,6 @@ def _simple_enum(etype):
         # orphan @0x02D2
         value
         # orphan @0x02EA
-        # orphan @0x02F4
-        def <listcomp>(.0):
-            .0
-            []
-            for m in .0:
-                pass
-            return
-        member._value_ in unhashable_values
         # orphan @0x030A
         member
         # orphan @0x03D2
@@ -1791,7 +1758,12 @@ def _simple_enum(etype):
         contained = value2member_map.get(member._value_)
         # orphan @0x04DA
         # orphan @0x04E4
-        contained = None
+        def <listcomp>(.0):
+            .0
+            []
+            for m in .0:
+                pass
+            return
         member._value_ in unhashable_values
         # orphan @0x04FA
         member._value_ in hashable_values
@@ -2079,6 +2051,4 @@ def _old_convert_(etype, name, module, filter, source):
     else:
         return cls
     # orphan @0x0048
-    # orphan @0x0050
-    members.sort(key=_old_convert_.<locals>.<lambda>)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 334 instr

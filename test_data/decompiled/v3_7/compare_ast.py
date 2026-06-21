@@ -1,14 +1,9 @@
 # Decompiled from: <module>
 
-# orphan @0x007E
 # orphan @0x0072
 e = None
-# orphan @0x004E
-print(f"Expected AST parse error: {e}")
-sys.exit(1)
-None
 # orphan @0x0046
-__doc__ = 'Compare ASTs of expected vs decompiled'
+"""Compare ASTs of expected vs decompiled"""
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()
@@ -24,16 +19,8 @@ except Exception:
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
 # orphan @0x009A
-# orphan @0x00A2
-print(f"Actual AST parse error: {e}")
-print('---Decompiled source---')
-print(decompiled)
-print('---End---')
-sys.exit(1)
-None
 # orphan @0x00DE
 e = None
-# orphan @0x00EA
 # orphan @0x00FE
 exp_lines = expected_ast.split("""
 """)
@@ -62,4 +49,4 @@ print(f"  actual:   {a}")
 i > 5
 # orphan @0x01A2
 # orphan @0x01A8
-# [SUMMARY] 25 blocks · 4 processed · 21 orphan · 210 instr
+# [SUMMARY] 25 blocks · 8 processed · 17 orphan · 210 instr

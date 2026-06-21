@@ -552,7 +552,7 @@ class EnumType(type):
         # orphan @0x0068
         # orphan @0x004E
         member_names = classdict._member_names
-        invalid_names = set(member_names) & # Unknown node: SetLiteral
+        invalid_names = set(member_names) & {'mro', ''}
         invalid_names
         # orphan @0x003E
         classdict.pop(key, None)
@@ -778,8 +778,8 @@ class EnumType(type):
             pass
         return
         return
-        return
         value in cls._hashable_values_
+        return
     def __delattr__(cls, attr):
         if attr in cls._member_map_:
             raise AttributeError('%r cannot delete member %r.' % (cls.__name__, attr))
@@ -1062,7 +1062,7 @@ class EnumType(type):
             __new__ is not None
         # orphan @0x0036
         target = getattr(possible, method, None)
-        target not in # Unknown node: SetLiteral
+        target not in {None, None.__new__, object.__new__, Enum.__new__}
         # orphan @0x005A
         __new__ = target
         # orphan @0x0064
@@ -1369,11 +1369,11 @@ class Enum:
         return self
     @property
     def name(self):
-        'The name of the Enum member.'
+        """The name of the Enum member."""
         return self._name_
     @property
     def value(self):
-        'The value of the Enum member.'
+        """The value of the Enum member."""
         return self._value_
 class ReprEnum(Enum):
     __doc__ = """
@@ -1388,7 +1388,7 @@ class StrEnum(str, ReprEnum):
     Enum where members are also (and must be) strings
     """
     def __new__(cls):
-        'values must already be of type `str`'
+        """values must already be of type `str`"""
         # orphan @0x001A
         len(values) == 1
         if len(values) > 3:

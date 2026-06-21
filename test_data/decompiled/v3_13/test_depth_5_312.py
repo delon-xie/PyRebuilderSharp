@@ -4,56 +4,86 @@ def depth_5_if(x0, x1, x2, x3, x4):
     result = 0
     if (x0 > 0) and (x1 > 1) and (x2 > 2) and (x3 > 3) and (x4 > 4):
         result = 42
+        return None
+    result = 41
+    result = 40
+    result = 30
+    result = 20
+    result = 10
 def depth_5_for():
     total = 0
-    2
-    range
-    for a in 2:
-        range(2)
+    range(2)
+    for a in range(2):
         for b in range(2):
             for c in range(2):
                 for d in range(2):
-                    range
-                    for e in range:
+                    for e in range(2):
                         total += 1
-                        break
+                    break
+                break
+            break
+        break
+    break
+    # [WARN] 5 instructions not decompiled
+    #   @0x009C: JUMP_BACKWARD arg=140
+    #   @0x00A4: JUMP_BACKWARD arg=112
+    #   @0x00AC: JUMP_BACKWARD arg=84
+    #   @0x00B4: JUMP_BACKWARD arg=56
+    #   @0x00BC: JUMP_BACKWARD arg=28
 def depth_5_while():
     # orphan @0x004A
-    c
+    c -= 1
+    d = 2
+    d > 0
     # orphan @0x0030
     b -= 1
     c = 2
     c > 0
-    # orphan @0x0022
+    # orphan @0x0016
+    a -= 1
+    b = 2
     b > 0
     total = 0
     a = 2
-    if a > 0:
+    while a > 0:
         a -= 1
-        2
-    # orphan @0x004C
-    d = 2
-    d > 0
+        b = 2
+        while b > 0:
+            b -= 1
+            c = 2
+            while c > 0:
+                c -= 1
+                d = 2
+                while d > 0:
+                    d -= 1
+                    e = 2
+                    while e > 0:
+                        e -= 1
+                        total += 1
+                        if e > 0:
+                            pass
+                        elif d > 0:
+                            pass
+                        elif c > 0:
+                            pass
+                        elif b > 0:
+                            pass
+                        elif a > 0:
+                            pass
     # orphan @0x0064
     d -= 1
     e = 2
-    0
-    e
-    # orphan @0x0076
+    e > 0
     # orphan @0x007E
     e -= 1
     total += 1
     e > 0
-    # orphan @0x009E
-    # orphan @0x00A0
-    d > 0
-    # orphan @0x00AE
-    c > 0
-    # orphan @0x00BE
-    b > 0
-    # orphan @0x00CA
-    # orphan @0x00CE
-    a > 0
+    # [WARN] 5 instructions not decompiled
+    #   @0x009E: JUMP_BACKWARD arg=126
+    #   @0x00AE: JUMP_BACKWARD arg=100
+    #   @0x00BE: JUMP_BACKWARD arg=74
+    #   @0x00CE: JUMP_BACKWARD arg=48
+    #   @0x00DE: JUMP_BACKWARD arg=22
 def depth_5_try():
     # orphan @0x001E
     try:

@@ -23,29 +23,45 @@ try:
     sys.exit(1)
 except:
     e = None
-__doc__ = 'Compare ASTs of expected vs decompiled'
+"""Compare ASTs of expected vs decompiled"""
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()
-open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read
+expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read()
 if expected_ast == actual_ast:
-    for i in range(max(len(exp_lines), len(act_lines))):
-        if i < len(exp_lines):
-            e = '(missing)'
-            if i < len(act_lines):
-                a = '(missing)'
-                if not e != a:
-                    print(f"Line {i}:")
-                    f"  expected: {e}"
-                    None
-                    print
-        break
-        if not i > 5:
-            break
+    print('✅ AST MATCH - test_expr_basic 3.10')
+    return None
+exp_lines = expected_ast.split("""
+""")
+act_lines = actual_ast.split("""
+""")
+range(max(len(exp_lines), len(act_lines)))
+for i in range(max(len(exp_lines), len(act_lines))):
+    if i < len(exp_lines):
+        pass
+    else:
+        '(missing)'
+    if i < len(act_lines):
+        pass
+    else:
+        '(missing)'
+    if not e != a:
+        pass
+    else:
+        print(f"Line {i}:")
+        print(f"  expected: {e}")
+        print(f"  actual:   {a}")
+    break
+    break
 e = None
 []
 raise
 e = None
 []
+# orphan @0x02A6
+# orphan @0x0338
 # orphan @0x033A
-# [SUMMARY] 33 blocks · 33 processed · 6 orphan · 233 instr
+# [WARN] 2 instructions not decompiled
+#   @0x01EC: JUMP_BACKWARD arg=398
+#   @0x0240: JUMP_BACKWARD arg=398
+# [SUMMARY] 34 blocks · 31 processed · 3 orphan · 233 instr

@@ -65,16 +65,12 @@ def depth_5_try():
             pass
     except:
         result = -5
-    # orphan @0x002C
     # orphan @0x0030
     result = -2
-    # orphan @0x003E
     # orphan @0x0042
     result = -3
-    # orphan @0x0050
     # orphan @0x0054
     result = -4
-    # orphan @0x0062
     # orphan @0x0066
     result = -5
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

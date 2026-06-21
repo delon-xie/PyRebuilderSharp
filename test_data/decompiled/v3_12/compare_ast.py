@@ -21,7 +21,7 @@ try:
     sys.exit(1)
 except:
     e = None
-__doc__ = 'Compare ASTs of expected vs decompiled'
+"""Compare ASTs of expected vs decompiled"""
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()

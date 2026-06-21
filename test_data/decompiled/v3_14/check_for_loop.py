@@ -7,8 +7,15 @@ import struct
 import marshal
 pyc = '/tmp/lv2_eval_comp/lv2_eval.3.10.pyc'
 data = open(pyc, 'rb').read()
-marshal.loads(data[16:])
-for instr in marshal.loads(data[16:]):
+code = marshal.loads(data[16:])
+import dis
+print('=== disassembly ===')
+dis.dis(code)
+print("""
+=== instructions ===""")
+dis.get_instructions(code)
+for instr in dis.get_instructions(code):
     instr.offset(f"3d opname={instr.opname}25s arg={instr.arg} argrepr={instr.argrepr}")
-    return None
-# [SUMMARY] 4 blocks · 5 processed · 1 orphan · 93 instr
+# [WARN] 1 instructions not decompiled
+#   @0x017C: JUMP_BACKWARD arg=250
+# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 93 instr

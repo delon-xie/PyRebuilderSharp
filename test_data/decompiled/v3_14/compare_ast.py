@@ -1,27 +1,13 @@
 # Decompiled from: <module>
 
 try:
+    expected_ast = ast.parse(expected)(2, ('indent',))
     ast.dump
-    try:
-        try:
-            ast.dump
-        except Exception:
-            return None
-        expected_ast = ast.parse(expected)(2, ('indent',))
-    except Exception:
-        return None
 except Exception:
-    return None
+    pass
 try:
+    actual_ast = ast.parse(decompiled)(2, ('indent',))
     ast.dump
-    try:
-        try:
-            ast.dump
-        except Exception:
-            pass
-        actual_ast = ast.parse(decompiled)(2, ('indent',))
-    except Exception:
-        pass
 except Exception:
     pass
 try:
@@ -37,7 +23,7 @@ try:
     sys.exit(1)
 except:
     e = None
-__doc__ = 'Compare ASTs of expected vs decompiled'
+"""Compare ASTs of expected vs decompiled"""
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()
@@ -45,20 +31,36 @@ expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderShar
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
     return None
-for e in range(max(len(exp_lines), len(act_lines))):
-    e = '(missing)'
+exp_lines = expected_ast.split("""
+""")
+act_lines = actual_ast.split("""
+""")
+range(max(len(exp_lines), len(act_lines)))
+for i in range(max(len(exp_lines), len(act_lines))):
+    if i < len(exp_lines):
+        pass
+    else:
+        '(missing)'
     if i < len(act_lines):
-        a = '(missing)'
-        if not e != a:
-            print(f"Line {i}:")
-            print
+        pass
+    else:
+        '(missing)'
+    if not e != a:
+        pass
+    else:
+        print(f"Line {i}:")
+        print(f"  expected: {e}")
+        print(f"  actual:   {a}")
     break
-    if not i > 5:
-        break
 e = None
 []
+raise
 e = None
 []
-# orphan @0x02D8
+# orphan @0x02D6
+# orphan @0x036A
 # orphan @0x036C
-# [SUMMARY] 37 blocks · 36 processed · 7 orphan · 236 instr
+# [WARN] 2 instructions not decompiled
+#   @0x0212: JUMP_BACKWARD arg=414
+#   @0x0268: JUMP_BACKWARD arg=414
+# [SUMMARY] 34 blocks · 32 processed · 3 orphan · 236 instr

@@ -3,37 +3,12 @@
 import marshal
 import struct
 c = compile('a=1', '<t>', 'exec')
-marshal.dumps
-None
-bytes
-for i in marshal.dumps:
+m = bytes(marshal.dumps(c))
+print('Marshal length:', len(m))
+range(30)
+for i in range(30):
     print('  [%d] = 0x%02x (%d)' % (i, m[i], m[i]))
-    break
-pos += 4
-ss = struct.unpack_from('<I', m, pos)[0]
-pos += 4
-fl = struct.unpack_from('<I', m, pos)[0]
-pos += 4
-print('  argcount=%d, nlocals=%d, stacksize=%d, flags=0x%x' % (arg, nl, ss, fl))
-t = m[pos]
-pos += 1
-cl = struct.unpack_from('<I', m, pos)[0]
-pos += 4
-print('  TYPE_STRING (0x%02x) at pos=%d, len=%d' % (t, pos - 5, cl))
-'  Code bytes: '(' '.join + <genexpr>(m[pos:pos + cl]()))
-pos += cl
-print('  Next byte at pos=%d: 0x%02x' % (pos, m[pos]))
-print()
-print('=== WITHOUT ref_index skip ===')
-pos = 1
-arg2 = struct.unpack_from('<I', m, pos)[0]
-pos += 4
-nl2 = struct.unpack_from('<I', m, pos)[0]
-pos += 4
-ss2 = struct.unpack_from('<I', m, pos)[0]
-pos += 4
-fl2 = struct.unpack_from('<I', m, pos)[0]
-pos += 4
-print('  argcount=%d, nlocals=%d, stacksize=%d, flags=0x%x' % (arg2, nl2, ss2, fl2))
-print('  Next byte at pos=%d: 0x%02x -> Should be TYPE_STRING (0x73)' % (pos, m[pos]))
+break
+# [WARN] 1 instructions not decompiled
+#   @0x00B2: JUMP_BACKWARD arg=132
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 294 instr

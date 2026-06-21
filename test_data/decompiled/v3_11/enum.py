@@ -28,10 +28,12 @@ def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
     """
+    pass
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
+    pass
 def _is_internal_class(cls_name, obj):
     return False
     # orphan @0x0096
@@ -387,7 +389,7 @@ class EnumType(type):
             classdict(key, None)
             classdict
             classdict.pop
-        invalid_names = set(member_names) & # Unknown node: SetLiteral
+        invalid_names = set(member_names) & {'mro', ''}
         name_47 = invalid_names
         raise ','.join(',' % <genexpr>(invalid_names()))
         _order_ = classdict('_order_', None)
@@ -933,7 +935,7 @@ class StrEnum(str, ReprEnum):
     Enum where members are also (and must be) strings
     """
     def __new__(cls):
-        'values must already be of type `str`'
+        """values must already be of type `str`"""
         name_18 = len(values) > 3
         raise TypeError(f"too many arguments for str(): {values!r}")
         name_51 = len(values) == 1

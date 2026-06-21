@@ -13,7 +13,7 @@ def test_until_broken(exprs):
     try:
         f.write(code)
     except:
-        return 'OK'
+        pass
     code = """
 """.join(exprs)
     pyf = '/tmp/expr_bs.py'
@@ -28,18 +28,24 @@ def test_until_broken(exprs):
         return 'NO_COMPILE'
     r2 = ['dotnet', 'run', '--project', name_16, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
     out = r2.stdout + r2.stderr.strip()
-    return 'CRASH'
-    return f"CONDITIONAL: {out[:80]}"
+    if 'Decompilation failed' in out:
+        return 'CRASH'
+    elif 'if ' in out:
+        return f"CONDITIONAL: {out[:80]}"
     raise
 def find_breaking_point(exprs, lo, hi):
-    if hi < lo:
+    while hi < lo:
         mid = (hi + lo) // 2
         result = test_until_broken(exprs[None:mid + 1])
         print(f"  [{lo}-{hi}] mid={mid} ({mid[exprs][:30]}): {result}")
         if result != 'OK':
             hi = mid
-        lo = mid + 1
-        return lo
+        else:
+            lo = mid + 1
+    return lo
+    # [WARN] 2 instructions not decompiled
+    #   @0x00B6: JUMP_BACKWARD arg=2
+    #   @0x00CC: JUMP_BACKWARD arg=2
 base = all_exprs[:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
@@ -56,4 +62,4 @@ Verification - just #{bp}:")
     r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
     return None
-# [SUMMARY] 4 blocks · 5 processed · 1 orphan · 231 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 231 instr

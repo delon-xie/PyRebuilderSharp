@@ -1,16 +1,12 @@
 # Decompiled from: <module>
 
+# orphan @0x00B0
+line = lines[i]
+'***' in line
 try:
-    try:
-        try:
-            pass
-        except:
-            pass
-        output = f.read()
-    except:
-        pass
+    output = f.read()
 except:
-    pass
+    break
 import re
 from collections import defaultdict
 open('/tmp/test_full.txt', 'r')
@@ -21,38 +17,47 @@ lines = output.split("""
 """)
 i = 0
 debug_count = 0
-if i < len(lines):
+while i < len(lines):
     line = lines[i]
-    if ('***' in line) and (':' in line):
-        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
-        if match:
-            test_name = match.group(1)
-            match.group
-        print(f"  Found version: {v} in: {line_text}")
-        break
-        if i < len(lines):
-            debug_count
-            'Total tests with versions found: '
-            None
-            print
-j = i + 1
-found_versions = []
-if (j < len(lines)) and (j < i + 30):
-    next_line = lines[j]
-    if next_line.startswith('***') and ('.pyc' in next_line) and next_line.startswith('***'):
-        version = version_match.group(1)
-        found_versions.append((version, next_line.strip()))
-        j += 1
-        if j < len(lines):
-            j < i + 30
-        elif found_versions:
-            debug_count += 1
-            if debug_count <= 5:
-                for _ in found_versions:
-                    pass
-    else:
-        version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+    if '***' in line:
+        if ':' in line:
+            match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+            if match:
+                test_name = match.group(1)
+                status = match.group(2)
+                j = i + 1
+                found_versions = []
+                if j < len(lines):
+                    while j < i + 30:
+                        next_line = lines[j]
+                        if next_line.startswith('***'):
+                            pass
+                        else:
+                            if ('.pyc' in next_line) and next_line.startswith('***'):
+                                j += 1
+                                if (j < len(lines)) and (j < i + 30):
+                                    pass
+                                elif found_versions:
+                                    debug_count += 1
+                                    if debug_count <= 5:
+                                        for (v, line_text) in found_versions:
+                                            print(f"  Found version: {v} in: {line_text}")
+                                    i += 1
+                                    if i < len(lines):
+                                        pass
+                                    print(f"Total tests with versions found: {debug_count}")
+                            else:
+                                version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+                            version = version_match.group(1)
+                            found_versions.append((version, next_line.strip()))
 break
 break
-# orphan @0x03A8
-# [SUMMARY] 44 blocks · 44 processed · 17 orphan · 243 instr
+raise
+# orphan @0x0188
+next_line = lines[j]
+next_line.startswith('***')
+# [WARN] 3 instructions not decompiled
+#   @0x02C4: JUMP_BACKWARD arg=392
+#   @0x0334: JUMP_BACKWARD arg=780
+#   @0x036E: JUMP_BACKWARD arg=176
+# [SUMMARY] 31 blocks · 30 processed · 2 orphan · 243 instr

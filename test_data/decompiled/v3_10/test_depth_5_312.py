@@ -81,7 +81,6 @@ def depth_5_while():
                                     while e > 0:
                                         pass
 def depth_5_try():
-    # orphan @0x0022
     # orphan @0x0016
     result = -1
     result = 0
@@ -103,7 +102,6 @@ def depth_5_try():
         result = -5
     # orphan @0x0026
     result = -2
-    # orphan @0x0032
     # orphan @0x0036
     result = -3
     # orphan @0x0052

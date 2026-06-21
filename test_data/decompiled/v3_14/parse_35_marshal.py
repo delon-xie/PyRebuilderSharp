@@ -3,18 +3,17 @@
 import marshal
 import struct
 c = compile('a=1', '<t>', 'exec')
-marshal.dumps(c)
-bytes
-for i in marshal.dumps(c):
+m = bytes(marshal.dumps(c))
+print('Marshal length:', len(m))
+range(30)
+for i in range(30):
     print('  [%d] = 0x%02x (%d)' % (i, m[i], m[i]))
-    print()
-    print('=== Manual parse ===')
-    pos = 5
-    arg = struct.unpack_from('<I', m, pos)[0]
-    pos += 4
-    '<I'
-    None
-    struct.unpack_from
+print()
+print('=== Manual parse ===')
+pos = 5
+arg = struct.unpack_from('<I', m, pos)[0]
+pos += 4
+nl = struct.unpack_from('<I', m, pos)[0]
 pos += 4
 ss = struct.unpack_from('<I', m, pos)[0]
 pos += 4
@@ -42,4 +41,6 @@ fl2 = struct.unpack_from('<I', m, pos)[0]
 pos += 4
 print('  argcount=%d, nlocals=%d, stacksize=%d, flags=0x%x' % (arg2, nl2, ss2, fl2))
 print('  Next byte at pos=%d: 0x%02x -> Should be TYPE_STRING (0x73)' % (pos, m[pos]))
+# [WARN] 1 instructions not decompiled
+#   @0x00CA: JUMP_BACKWARD arg=132
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 295 instr

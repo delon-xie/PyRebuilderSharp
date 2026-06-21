@@ -3,7 +3,7 @@
 try:
     expected_src = f.read()
 except:
-    pass
+    break
 try:
     expected_ast = ast.parse(expected_src)(2, ('indent',))
     ast.dump
@@ -17,44 +17,67 @@ try:
             actual_ast = ast.parse(actual_src)(2, ('indent',))
             match = expected_ast == actual_ast
             try:
+                '❌'
                 try:
-                    break
-                    for i in range(max(len(exp_lines), len(act_lines))):
+                    try:
                         try:
+                            'MISMATCH'
                             try:
-                                e = '(missing)'
+                                break
                                 try:
-                                    a = '(missing)'
-                                    e != a
-                                    act_lines[i]
+                                    exp_lines = expected_ast.split("""
+""")
+                                    act_lines = actual_ast.split("""
+""")
+                                    range(max(len(exp_lines), len(act_lines)))
+                                    for i in range(max(len(exp_lines), len(act_lines))):
+                                        try:
+                                            try:
+                                                try:
+                                                    '(missing)'
+                                                    try:
+                                                        try:
+                                                            try:
+                                                                '(missing)'
+                                                                try:
+                                                                    e != a
+                                                                except Exception:
+                                                                    pass
+                                                            except Exception:
+                                                                pass
+                                                        except Exception:
+                                                            pass
+                                                    except Exception:
+                                                        pass
+                                                except Exception:
+                                                    pass
+                                            except Exception:
+                                                pass
+                                        except Exception:
+                                            pass
+                                        if not True:
+                                            pass
+                                        else:
+                                            print('  Line %d: expected=%s' % (i, e))
+                                            print('           actual=  %s' % a)
+                                            break
+                                        for ver in versions:
+                                            pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
+                                            if not os.path.exists(pyc):
+                                                print('⏭ %s: .pyc not found' % ver)
+                                            else:
+                                                r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+                                                actual_src = r.stdout
+                                                subprocess.run
+                                        break
+                                    break
                                 except Exception:
                                     pass
                             except Exception:
                                 pass
                         except Exception:
                             pass
-                        if not True:
-                            pass
-                        print('  Line %d: expected=%s' % (i, e))
-                        break
-                        break
-                        try:
-                            print(f"❌ {ver}: AST parse failed - {e}")
-                            actual_src[None:200]
-                            '  Decompiled: %s'
-                            None
-                            print
-                            try:
-                                try:
-                                    break
-                                except:
-                                    e = None
-                            except:
-                                e = None
-                        except:
-                            e = None
-                        e = None
-                    if Exception:
+                    except Exception:
                         pass
                 except Exception:
                     pass
@@ -62,11 +85,6 @@ try:
                 pass
         except Exception:
             pass
-        status = '❌'
-        status
-        None
-        print
-        '✅'
     except Exception:
         pass
 except Exception:
@@ -76,46 +94,57 @@ try:
     sys.exit(1)
 except:
     e = None
-__doc__ = 'Run AST comparison for test_seq_clean across all versions'
+try:
+    print(f"❌ {ver}: AST parse failed - {e}")
+    print('  Decompiled: %s' % actual_src[None:200])
+except:
+    e = None
+"""Run AST comparison for test_seq_clean across all versions"""
 import os
 import subprocess
 import ast
 import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-os.path
-while os:
-    open(INPUT_FILE)
-break
-for ver in ast.dump:
-    pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
-    if not os.path.exists(pyc):
-        print('⏭ %s: .pyc not found' % ver)
-        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-        actual_src = r.stdout
-        subprocess.run
-raise
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+open(INPUT_FILE)
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+results = {}
+versions
+[]
 break
 raise
 def <genexpr>(.0):
     try:
-        try:
-            for _ in .0:
+        .0
+        for _ in .0:
+            try:
+                try:
+                    .0
+                except:
+                    pass
+                r
+            except:
                 pass
-            raise
-            r
-        except:
-            pass
+            if not True:
+                pass
+            else:
+                1
+        break
     except:
         pass
-    if not True:
-        pass
-    # [WARN] 1 instructions not decompiled
+    # [WARN] 2 instructions not decompiled
     #   @0x0022: JUMP_BACKWARD arg=10
+    #   @0x002E: JUMP_BACKWARD arg=10
 []
 raise
-# orphan @0x0570
 e = None
-# [WARN] 2 instructions not decompiled
+# orphan @0x0508
+# orphan @0x0578
+# orphan @0x057A
+# [WARN] 4 instructions not decompiled
+#   @0x01FA: JUMP_BACKWARD arg=350
 #   @0x03CA: JUMP_BACKWARD arg=876
+#   @0x0412: JUMP_BACKWARD arg=350
 #   @0x056C: JUMP_BACKWARD arg=350
-# [SUMMARY] 53 blocks · 53 processed · 9 orphan · 370 instr
+# [SUMMARY] 51 blocks · 48 processed · 3 orphan · 370 instr

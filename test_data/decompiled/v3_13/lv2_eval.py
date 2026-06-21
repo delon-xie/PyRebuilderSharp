@@ -11,20 +11,23 @@ except IOError:
 range(10)
 for i in range(10):
     a = i
-    break
-    items
-    for x in items:
-        y = x
-    if not True:
-        break
+break
+for x in items:
+    y = x
+break
 for n in range(5):
     if n == 3:
         break
-    return None
-    raise
-raise
+    elif not n == 1:
+        pass
+break
 raise
 # orphan @0x00A0
-# [WARN] 1 instructions not decompiled
+# orphan @0x00BE
+# orphan @0x00C0
+# [WARN] 4 instructions not decompiled
+#   @0x001C: JUMP_BACKWARD arg=18
 #   @0x0032: JUMP_BACKWARD arg=40
-# [SUMMARY] 27 blocks · 27 processed · 2 orphan · 77 instr
+#   @0x006C: JUMP_BACKWARD arg=74
+#   @0x0070: JUMP_BACKWARD arg=74
+# [SUMMARY] 27 blocks · 24 processed · 3 orphan · 77 instr

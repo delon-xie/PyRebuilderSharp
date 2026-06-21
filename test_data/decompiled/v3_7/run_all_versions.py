@@ -54,12 +54,6 @@ results
 False
 # orphan @0x0218
 # orphan @0x021C
-# orphan @0x0226
-print(f"❌ {ver}: AST parse failed - {e}")
-print(f"  Decompiled: {actual_src[None:200]}")
-yield from results
-None
-False
 # orphan @0x0264
 def <genexpr>(.0):
     .0
@@ -67,5 +61,4 @@ def <genexpr>(.0):
         if r:
             yield 1
             break
-# orphan @0x0270
-# [SUMMARY] 31 blocks · 25 processed · 7 orphan · 347 instr
+# [SUMMARY] 31 blocks · 27 processed · 5 orphan · 347 instr

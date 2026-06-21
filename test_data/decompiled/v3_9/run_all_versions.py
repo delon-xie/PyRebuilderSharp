@@ -6,11 +6,6 @@ print(f"⏭ {ver}: .pyc not found")
 pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
 os.path.exists(pyc)
 # orphan @0x00C0
-# orphan @0x00B0
-versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-results = {}
-versions
-[]
 with open(INPUT_FILE) as f:
     expected_src = f.read()
     try:
@@ -94,4 +89,4 @@ print(f"
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-# [SUMMARY] 33 blocks · 6 processed · 28 orphan · 350 instr
+# [SUMMARY] 33 blocks · 7 processed · 27 orphan · 350 instr

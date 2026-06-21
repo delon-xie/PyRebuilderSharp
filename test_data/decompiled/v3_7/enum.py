@@ -208,14 +208,10 @@ class _proto_member:
         """
         convert each quasi-member into an instance of the new enum class
         """
-        # orphan @0x00B8
         # orphan @0x00AC
         exc = None
         # orphan @0x00A8
         None
-        # orphan @0x008E
-        new_exc = TypeError('_value_ not set in __new__, unable to create it')
-        new_exc.__cause__ = exc
         # orphan @0x0086
         # orphan @0x0048
         enum_member = enum_class._new_member_(enum_class, **args)
@@ -445,15 +441,12 @@ class EnumDict(dict):
                 pass
         except AttributeError:
             pass
-        # orphan @0x002C
-        members
         # orphan @0x0038
         # orphan @0x003A
         name
         self
         value
         # orphan @0x004A
-        # orphan @0x0050
         # orphan @0x0052
         more_members.items()
         # orphan @0x005C
@@ -569,7 +562,7 @@ class EnumType(type):
         # orphan @0x0068
         # orphan @0x004C
         member_names = classdict._member_names
-        invalid_names = set(member_names) & # Unknown node: SetLiteral
+        invalid_names = set(member_names) & {'mro', ''}
         invalid_names
         # orphan @0x003C
         classdict.pop(key, None)
@@ -792,8 +785,6 @@ class EnumType(type):
             return isinstance(result, cls)
         except ValueError:
             pass
-        # orphan @0x0036
-        # orphan @0x0040
         # orphan @0x0042
         value in cls._unhashable_values_
         # orphan @0x004C
@@ -1081,7 +1072,7 @@ class EnumType(type):
         # orphan @0x0038
         # orphan @0x003A
         target = getattr(possible, method, None)
-        target not in # Unknown node: SetLiteral
+        target not in {None, None.__new__, object.__new__, Enum.__new__}
         # orphan @0x005E
         __new__ = target
         # orphan @0x0066
@@ -1265,8 +1256,6 @@ class Enum:
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
-        # orphan @0x0046
-        cls._member_map_.values()
         # orphan @0x003E
         cls = self.__class__
         try:
@@ -1283,10 +1272,6 @@ class Enum:
         m is not self
         # orphan @0x006E
         # orphan @0x008A
-        # orphan @0x0090
-        # orphan @0x0092
-        cls._value2member_map_.setdefault(value, self)
-        cls._hashable_values_.append(value)
         # orphan @0x00B2
         # orphan @0x00BA
         cls._unhashable_values_.append(value)
@@ -1381,11 +1366,11 @@ class Enum:
         return self
     @property
     def name(self):
-        'The name of the Enum member.'
+        """The name of the Enum member."""
         return self._name_
     @property
     def value(self):
-        'The value of the Enum member.'
+        """The value of the Enum member."""
         return self._value_
 class ReprEnum(Enum):
     __doc__ = """
@@ -1400,7 +1385,7 @@ class StrEnum(str, ReprEnum):
     Enum where members are also (and must be) strings
     """
     def __new__(cls):
-        'values must already be of type `str`'
+        """values must already be of type `str`"""
         # orphan @0x001A
         len(values) == 1
         if len(values) > 3:

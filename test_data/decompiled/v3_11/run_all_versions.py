@@ -74,7 +74,7 @@ try:
         name_55 = Exception
 except:
     name_55 = Exception
-__doc__ = 'Run AST comparison for test_expr_basic across all versions'
+"""Run AST comparison for test_expr_basic across all versions"""
 import os
 import subprocess
 import sys

@@ -47,7 +47,7 @@ def wraps(wrapped, assigned, updated):
     """
     return partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)
 def _gt_from_lt(self, other):
-    'Return a > b.  Computed by @total_ordering from (not a < b) and (a != b).'
+    """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -58,7 +58,7 @@ def _gt_from_lt(self, other):
     # orphan @0x0028
     return
 def _le_from_lt(self, other):
-    'Return a <= b.  Computed by @total_ordering from (a < b) or (a == b).'
+    """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -69,14 +69,14 @@ def _le_from_lt(self, other):
     # orphan @0x0026
     return
 def _ge_from_lt(self, other):
-    'Return a >= b.  Computed by @total_ordering from (not a < b).'
+    """Return a >= b.  Computed by @total_ordering from (not a < b)."""
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
     return not op_result
 def _ge_from_le(self, other):
-    'Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b).'
+    """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -87,7 +87,7 @@ def _ge_from_le(self, other):
     # orphan @0x0028
     return
 def _lt_from_le(self, other):
-    'Return a < b.  Computed by @total_ordering from (a <= b) and (a != b).'
+    """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -98,14 +98,14 @@ def _lt_from_le(self, other):
     # orphan @0x0026
     return
 def _gt_from_le(self, other):
-    'Return a > b.  Computed by @total_ordering from (not a <= b).'
+    """Return a > b.  Computed by @total_ordering from (not a <= b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
     return not op_result
 def _lt_from_gt(self, other):
-    'Return a < b.  Computed by @total_ordering from (not a > b) and (a != b).'
+    """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -116,7 +116,7 @@ def _lt_from_gt(self, other):
     # orphan @0x0028
     return
 def _ge_from_gt(self, other):
-    'Return a >= b.  Computed by @total_ordering from (a > b) or (a == b).'
+    """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -127,14 +127,14 @@ def _ge_from_gt(self, other):
     # orphan @0x0026
     return
 def _le_from_gt(self, other):
-    'Return a <= b.  Computed by @total_ordering from (not a > b).'
+    """Return a <= b.  Computed by @total_ordering from (not a > b)."""
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
     # orphan @0x001C
     return not op_result
 def _le_from_ge(self, other):
-    'Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b).'
+    """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -145,7 +145,7 @@ def _le_from_ge(self, other):
     # orphan @0x0028
     return
 def _gt_from_ge(self, other):
-    'Return a > b.  Computed by @total_ordering from (a >= b) and (a != b).'
+    """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -156,7 +156,7 @@ def _gt_from_ge(self, other):
     # orphan @0x0026
     return
 def _lt_from_ge(self, other):
-    'Return a < b.  Computed by @total_ordering from (not a >= b).'
+    """Return a < b.  Computed by @total_ordering from (not a >= b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
@@ -164,7 +164,7 @@ def _lt_from_ge(self, other):
     return not op_result
 _convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
-    'Class decorator that fills in missing ordering methods'
+    """Class decorator that fills in missing ordering methods"""
     roots = total_ordering.<locals>.<setcomp>(_convert)
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
@@ -179,7 +179,7 @@ def total_ordering(cls):
     # orphan @0x0052
     return
 def cmp_to_key(mycmp):
-    'Convert a cmp= function into a key= function'
+    """Convert a cmp= function into a key= function"""
     K = (__build_class__)(K, 'K', object)
     return K
 try:
@@ -206,7 +206,6 @@ def reduce(function, sequence, initial):
             value = next(it)
         except StopIteration:
             pass
-    # orphan @0x0036
     # orphan @0x003E
     value = initial
     # orphan @0x0042
@@ -349,7 +348,6 @@ class partial:
                 args = args[phcount:]
             except IndexError:
                 pass
-        # orphan @0x0052
         # orphan @0x005A
         pto_args = self.args
         # orphan @0x0060
@@ -438,7 +436,6 @@ class partialmethod:
                     args = args[phcount:]
                 except IndexError:
                     pass
-            # orphan @0x0052
             # orphan @0x005A
             # orphan @0x0060
             keywords = keywords
@@ -547,7 +544,7 @@ def lru_cache(maxsize, typed):
     return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     # orphan @0x0010
-    # Unknown node: Slice == 0
+    None: == 0
     [[], root, None, None]
     lock
     RLock()
@@ -620,10 +617,10 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     ()
     # orphan @0x00C6
     def cache_info():
-        'Report cache statistics'
+        """Report cache statistics"""
         return
     def cache_clear():
-        'Clear the cache and cache statistics'
+        """Clear the cache and cache statistics"""
         yield from False
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
@@ -633,7 +630,7 @@ try:
 except ImportError:
     pass
 def cache(user_function):
-    'Simple lightweight unbounded cache.  Sometimes called \'memoize\'.'
+    """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
     return lru_cache(maxsize=None)(user_function)
 def _c3_merge(sequences):
     """Merges MROs in *sequences* to a single MRO using the C3 algorithm.

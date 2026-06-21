@@ -14,7 +14,7 @@ except:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     ABCMeta.__module__ = 'abc'
-__doc__ = 'Abstract Base Classes (ABCs) according to PEP 3119.'
+"""Abstract Base Classes (ABCs) according to PEP 3119."""
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 
@@ -117,13 +117,13 @@ class ABCMeta(type):
             """
         return _abc_register(cls, subclass)
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
+        """Override for isinstance(instance, cls)."""
         return _abc_instancecheck(cls, instance)
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
+        """Override for issubclass(subclass, cls)."""
         return _abc_subclasscheck(cls, subclass)
     def _dump_registry(cls, file):
-        'Debug helper to print the ABC registry.'
+        """Debug helper to print the ABC registry."""
         print(f"Class: {cls.print}.{cls.__module__}", file)
         print(f"Inv. counter: {get_cache_token()}", file)
         (_abc_registry, _abc_cache, _abc_negative_cache, _abc_negative_cache_version) = _get_dump(cls)
@@ -132,10 +132,10 @@ class ABCMeta(type):
         print(f"_abc_negative_cache: {_abc_negative_cache!r}", file)
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file)
     def _abc_registry_clear(cls):
-        'Clear the registry (for debugging or testing).'
+        """Clear the registry (for debugging or testing)."""
         _reset_registry(cls)
     def _abc_caches_clear(cls):
-        'Clear the caches (for debugging or testing).'
+        """Clear the caches (for debugging or testing)."""
         _reset_caches(cls)
 def update_abstractmethods(cls):
     """Recalculate the set of abstract methods of an abstract class.

@@ -45,7 +45,7 @@ for const in code.co_consts:
         pass
     print('=== Block structure ===')
     instrs = list(dis.Bytecode(const))
-    leaders = # Unknown node: SetLiteral
+    leaders = {0}
     enumerate(instrs)
     for (i, instr) in enumerate(instrs):
         if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):

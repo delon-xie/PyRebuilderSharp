@@ -4,7 +4,7 @@ try:
     f.write(test_code)
 except:
     pass
-__doc__ = 'Diagnose 3.5 crash'
+"""Diagnose 3.5 crash"""
 import subprocess
 import tempfile
 import os

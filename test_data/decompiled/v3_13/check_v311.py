@@ -1,28 +1,48 @@
 # Decompiled from: <module>
 
 try:
-    f.read
-    try:
-        try:
-            f.read
-        except:
-            pass
-    except:
-        pass
+    raw = f.read()
 except:
-    pass
+    break
 import marshal
 import struct
 import sys
-None
-open
-for off in f.read:
-    if raw[off:off + 4] == b'AAAAAA==':
-        for i in range(16, 50, 2):
-            pair = raw[i:i + 2]
-            '  '(f"{i}3d: {pair.hex()}")
-            print
-            return None
+open(sys.argv[1], 'rb')
+f = open(sys.argv[1], 'rb')
+magic = f.read(4)
+hdr_rest = f.read(12)
+code = marshal.load(f)
+f.close()
+print('Python marshal results:')
+print(f"  argcount={code.co_argcount}")
+print(f"  posonly={code.co_posonlyargcount}")
+print(f"  kwonly={code.co_kwonlyargcount}")
+print(f"  nlocals={code.co_nlocals}")
+print(f"  stacksize={code.co_stacksize}")
+'  flags='(f"{code.co_flags}#x")
+print(f"  bytecode len={len(code.co_code)}")
+print(f"  consts count={len(code.co_consts)}")
+print(f"  names={list(code.co_names)}")
+print()
+print('Header analysis:')
+print(f"  magic: {raw[0:4].hex()}")
+print(f"  hdr:   {raw[4:16].hex()}")
+range(17, 40)
+print
+for off in range(17, 40):
+    if not raw[off:off + 4] == b'AAAAAA==':
+        pass
+    else:
+        print(f"  4 zero bytes at offset {off}")
 break
-# orphan @0x0458
-# [SUMMARY] 17 blocks · 17 processed · 2 orphan · 273 instr
+for i in range(16, 50, 2):
+    pair = raw[i:i + 2]
+    '  '(f"{i}3d: {pair.hex()}")
+break
+break
+raise
+# [WARN] 3 instructions not decompiled
+#   @0x039A: JUMP_BACKWARD arg=892
+#   @0x03B4: JUMP_BACKWARD arg=892
+#   @0x0430: JUMP_BACKWARD arg=992
+# [SUMMARY] 16 blocks · 17 processed · 0 orphan · 273 instr

@@ -1,41 +1,29 @@
 # Decompiled from: <module>
 
 try:
-    f.read
-    None
-    bytearray
-    try:
-        try:
-            f.read
-            None
-            bytearray
-        except:
-            pass
-    except:
-        pass
+    data = bytearray(f.read())
 except:
-    pass
+    break
 import struct
 import marshal
 import dis
 open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expressions.38.pyc', 'rb')
 known_types = [33, 40, 41, 46, 60, 62, 63, 65, 70, 73, 74, 78, 82, 84, 91, 99, 102, 105, 108, 114, 115, 116, 117, 120, 122, 123, 218]
-len(data)
-16
-None
-range
-# Unknown node: SetLiteral
-for i in len(data):
+range(16, len(data))
+{}
+for i in range(16, len(data)):
     stripped = data[i] & 127
-    if stripped in known_types:
-        if not data[i] != stripped:
-            break
-    code.co_consts
-    for instr in code.co_varnames:
-        instr.offset(f"4d {instr.opname}20s {instr.arg} {instr.argrepr}")
-        '  '
-        return None
+    if not stripped in known_types:
+        pass
+break
+for instr in dis.get_instructions(code):
+    instr.offset(f"4d {instr.opname}20s {instr.arg} {instr.argrepr}")
 break
 break
-# orphan @0x0298
-# [SUMMARY] 20 blocks · 20 processed · 3 orphan · 169 instr
+raise
+# [WARN] 4 instructions not decompiled
+#   @0x00B2: JUMP_BACKWARD arg=144
+#   @0x00C8: JUMP_BACKWARD arg=144
+#   @0x00D6: JUMP_BACKWARD arg=144
+#   @0x0270: JUMP_BACKWARD arg=494
+# [SUMMARY] 18 blocks · 19 processed · 0 orphan · 169 instr

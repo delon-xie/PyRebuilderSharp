@@ -6,7 +6,7 @@ import builtins
 from itertools import islice
 from _thread import get_ident
 def recursive_repr(fillvalue):
-    'Decorator to make a repr function return fillvalue for a recursive call'
+    """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
@@ -180,8 +180,6 @@ class Repr:
         max_digits = sys.get_int_max_str_digits()
         return f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
         # orphan @0x002C
-        # orphan @0x0018
-        'sys.set_int_max_str_digits()' in str(exc)
         # orphan @0x0010
         try:
             s = builtins.repr(x)
@@ -191,13 +189,9 @@ class Repr:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-        # orphan @0x0092
-        exc = None
         # orphan @0x00F0
         return s
     def repr_instance(self, x, level):
-        # orphan @0x0018
-        return '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         # orphan @0x0010
         try:
             s = builtins.repr(x)
@@ -207,7 +201,6 @@ class Repr:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-        # orphan @0x0032
         # orphan @0x0090
         return s
 def _possibly_sorted(x):
@@ -216,8 +209,6 @@ def _possibly_sorted(x):
     except Exception:
         return None
         return list(x)
-    # orphan @0x0012
-    return list(x)
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 47 instr

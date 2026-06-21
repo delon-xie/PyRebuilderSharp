@@ -1,52 +1,54 @@
 # Decompiled from: <module>
 
+import subprocess
+import re
+result = ['python3', 'tests/run_tests.py'](True, True, '/Users/admin/codes/Tools/PyRebuild/ref/pycdc', ('capture_output', 'text', 'cwd'))
+lines = result.stdout.split("""
+""")
+print('============================================================')
+print('Python 3.10 版本测试报告')
+print('============================================================')
+passed = 0
+failed = 0
+current_test = None
+current_test_fail = False
+def remove_ansi(text):
+    return re.sub('\\x1b\\[[0-9;]*m', '', text)
+lines
+subprocess.run
 for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()
-    line_stripped.startswith
-# orphan @0x0108
-# orphan @0x011A
-# orphan @0x011E
-current_test
-# orphan @0x012C
-current_test_fail
-# orphan @0x013A
-print(f"✗ {current_test}")
-failed
-# orphan @0x0152
-# orphan @0x015A
-print(f"✓ {current_test}")
-passed += 1
-current_test = line_stripped[4:].split(':')[0]
-current_test_fail = False
-'FAIL' in line_stripped
-# orphan @0x01BA
-current_test_fail = True
-current_test
-# orphan @0x01D4
-'3.10.pyc' in clean_line
-# orphan @0x01E4
-'FAIL' in clean_line
-# orphan @0x01F4
-'Unsupported' in clean_line
-# orphan @0x0200
-'Bad MAGIC' in clean_line
-# orphan @0x020C
-current_test_fail = True
-current_test
-# orphan @0x022A
-current_test_fail
-# orphan @0x0238
-print(f"✗ {current_test}")
-failed += 1
-print(f"✓ {current_test}")
-passed += 1
+    if line_stripped.startswith('*** ') and current_test and current_test_fail:
+        print(f"✗ {current_test}")
+        failed += 1
+    else:
+        print(f"✓ {current_test}")
+        passed += 1
+    current_test = line_stripped[4:].split(':')[0]
+    current_test_fail = False
+    if 'FAIL' in line_stripped:
+        current_test_fail = True
+    if not '3.10.pyc' in clean_line:
+        pass
+    current_test_fail = True
+    if 'Unsupported' in clean_line:
+        pass
+break
+if current_test and current_test_fail:
+    print(f"✗ {current_test}")
+    failed += 1
+else:
+    print(f"✓ {current_test}")
+    passed += 1
 print('============================================================')
-passed
-'总计: '
-None
-print
-# orphan @0x0294
-# orphan @0x02A6
+print(f"总计: {passed} PASS, {failed} FAIL")
 print('============================================================')
-# [SUMMARY] 32 blocks · 16 processed · 28 orphan · 204 instr
+# [WARN] 6 instructions not decompiled
+#   @0x01BE: JUMP_BACKWARD arg=188
+#   @0x01C2: JUMP_BACKWARD arg=188
+#   @0x01D4: JUMP_BACKWARD arg=188
+#   @0x01E4: JUMP_BACKWARD arg=188
+#   @0x020C: JUMP_BACKWARD arg=188
+#   @0x0214: JUMP_BACKWARD arg=188
+# [SUMMARY] 24 blocks · 25 processed · 0 orphan · 204 instr

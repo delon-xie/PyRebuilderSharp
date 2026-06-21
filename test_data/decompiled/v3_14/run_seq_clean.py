@@ -20,83 +20,72 @@ try:
 except:
     e = None
 try:
-    f"❌ {ver}: AST parse failed - {e}"
-    None
-    print
-    try:
-        try:
-            f"❌ {ver}: AST parse failed - {e}"
-            None
-            print
-            try:
-                print('  Decompiled: %s' % actual_src[:200])
-                ver
-                results
-                False
-                try:
-                    pass
-                except:
-                    e = None
-            except:
-                e = None
-        except:
-            e = None
-        break
-    except:
-        e = None
+    print(f"❌ {ver}: AST parse failed - {e}")
+    print('  Decompiled: %s' % actual_src[:200])
 except:
     e = None
-__doc__ = 'Run AST comparison for test_seq_clean across all versions'
+"""Run AST comparison for test_seq_clean across all versions"""
 import os
 import subprocess
 import ast
 import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-os.path.expanduser
-while os.path:
-    __name__()
-    open(INPUT_FILE)
-    __module__
-    open(INPUT_FILE)
-break
-for ver in ast.dump:
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+__name__()
+open(INPUT_FILE)
+__module__
+open(INPUT_FILE)
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+results = {}
+versions
+[]
+for ver in versions:
     pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: .pyc not found' % ver)
+    else:
         r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
         actual_src = r.stdout
         subprocess.run
-def <genexpr>(.0):
-    try:
-        try:
-            for _ in .0:
-                pass
-            raise
-            r
-        except:
-            pass
-    except:
-        pass
-    while True:
-        pass
-    # [WARN] 1 instructions not decompiled
-    #   @0x0022: JUMP_BACKWARD arg=8
+passed = <genexpr>(results.items()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 if not True:
     pass
-results.items
-<genexpr>
-None
-sum
-break
 raise
-e = None
+def <genexpr>(.0):
+    try:
+        .0
+        for _ in .0:
+            try:
+                try:
+                    .0
+                except:
+                    pass
+                r
+            except:
+                pass
+            if not True:
+                pass
+            else:
+                1
+        return None
+    except:
+        pass
+    # [WARN] 2 instructions not decompiled
+    #   @0x0022: JUMP_BACKWARD arg=8
+    #   @0x002E: JUMP_BACKWARD arg=8
 []
 raise
+e = None
+# orphan @0x0588
+# orphan @0x060A
 # orphan @0x060C
-# [WARN] 2 instructions not decompiled
+# [WARN] 4 instructions not decompiled
+#   @0x0222: JUMP_BACKWARD arg=372
 #   @0x041A: JUMP_BACKWARD arg=934
+#   @0x0472: JUMP_BACKWARD arg=372
 #   @0x05FE: JUMP_BACKWARD arg=372
-# [SUMMARY] 57 blocks · 57 processed · 16 orphan · 376 instr
+# [SUMMARY] 54 blocks · 52 processed · 6 orphan · 376 instr

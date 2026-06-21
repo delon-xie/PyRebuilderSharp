@@ -1,11 +1,6 @@
 # Decompiled from: <module>
 
 # orphan @0x00DA
-# orphan @0x00CA
-versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-results = {}
-versions
-[]
 # orphan @0x00C0
 def <genexpr>(.0):
     .0
@@ -91,4 +86,4 @@ passed = sum(<genexpr>(results.items()))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-# [SUMMARY] 34 blocks · 6 processed · 29 orphan · 331 instr
+# [SUMMARY] 34 blocks · 7 processed · 28 orphan · 331 instr

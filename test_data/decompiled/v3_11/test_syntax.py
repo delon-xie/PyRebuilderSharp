@@ -3204,7 +3204,7 @@ fgdfgf
         self("""A.μ\\
 """, 'unexpected EOF while parsing')
     def test_error_parenthesis(self):
-        '([{'
+        """([{"""
         for paren in '([{':
             self(paren + '1 + 2', f"\{paren}' was never closed")
             '([{'
@@ -3308,7 +3308,7 @@ a=1
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     __doc__ = 'Test syntax restrictions for lazy imports.'
     def test_lazy_import_in_try_block(self):
-        'Test that lazy imports are not allowed inside try blocks.'
+        """Test that lazy imports are not allowed inside try blocks."""
         self("""try:
     lazy import os
 except:
@@ -3320,7 +3320,7 @@ except ImportError:
     pass
 """, 'lazy from ... import not allowed inside try/except blocks')
     def test_lazy_import_in_trystar_block(self):
-        'Test that lazy imports are not allowed inside try* blocks.'
+        """Test that lazy imports are not allowed inside try* blocks."""
         self("""try:
     lazy import json
 except* Exception:
@@ -3332,14 +3332,14 @@ except* ImportError:
     pass
 """, 'lazy from ... import not allowed inside try/except blocks')
     def test_lazy_import_in_except_block(self):
-        'Test that lazy imports are not allowed inside except blocks.'
+        """Test that lazy imports are not allowed inside except blocks."""
         self("""try:
     sys.modules # trigger the except block
 except* Exception:
    lazy import sys
 """, 'lazy import not allowed inside try/except blocks')
     def test_lazy_import_in_function(self):
-        'Test that lazy imports are not allowed inside functions.'
+        """Test that lazy imports are not allowed inside functions."""
         self("""def func():
     lazy import math
 """, 'lazy import not allowed inside functions')
@@ -3347,7 +3347,7 @@ except* Exception:
     lazy from datetime import datetime
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_in_async_function(self):
-        'Test that lazy imports are not allowed inside async functions.'
+        """Test that lazy imports are not allowed inside async functions."""
         self("""async def async_func():
     lazy import asyncio
 """, 'lazy import not allowed inside functions')
@@ -3355,7 +3355,7 @@ except* Exception:
     lazy from json import loads
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_in_class(self):
-        'Test that lazy imports are not allowed inside classes.'
+        """Test that lazy imports are not allowed inside classes."""
         self("""class MyClass:
     lazy import typing
 """, 'lazy import not allowed inside classes')
@@ -3363,13 +3363,13 @@ except* Exception:
     lazy from abc import ABC
 """, 'lazy from ... import not allowed inside classes')
     def test_lazy_import_star_forbidden(self):
-        'Test that \'lazy from ... import *\' is forbidden everywhere.'
+        """Test that 'lazy from ... import *' is forbidden everywhere."""
         self('lazy from os import *', 'lazy from ... import \\* is not allowed')
         self("""def func():
     lazy from sys import *
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_nested_scopes(self):
-        'Test lazy imports in nested scopes.'
+        """Test lazy imports in nested scopes."""
         self("""class Outer:
     def method(self):
         lazy import sys
@@ -3383,7 +3383,7 @@ except* Exception:
         lazy from collections import deque
 """, 'lazy from ... import not allowed inside functions')
     def test_lazy_import_valid_cases(self):
-        'Test that lazy imports work at module level.'
+        """Test that lazy imports work at module level."""
         compile('lazy import os', '<test>', 'exec')
         compile('lazy from sys import path', '<test>', 'exec')
         compile('lazy import json as j', '<test>', 'exec')

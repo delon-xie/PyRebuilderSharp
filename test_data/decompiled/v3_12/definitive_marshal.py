@@ -44,7 +44,7 @@ Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={co
             break
 except:
     break
-__doc__ = 'Definitive test: field alignment in marshal data'
+"""Definitive test: field alignment in marshal data"""
 import struct
 import marshal
 import sys

@@ -136,7 +136,7 @@ class ABCMeta(type):
         ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
         return subclass
     def _dump_registry(cls, file):
-        'Debug helper to print the ABC registry.'
+        """Debug helper to print the ABC registry."""
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
         print('Inv.counter: %s' % ABCMeta._abc_invalidation_counter, file=file)
         sorted(cls.__dict__)
@@ -149,18 +149,18 @@ class ABCMeta(type):
             return
         None
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
+        """Override for isinstance(instance, cls)."""
         subclass = instance.__class__
         return True
         subtype = type(instance)
         if subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
             return False
         # orphan @0x0048
-        return (any)(ABCMeta.__instancecheck__.<locals>.<genexpr>(# Unknown node: SetLiteral))
+        return (any)(ABCMeta.__instancecheck__.<locals>.<genexpr>({subclass, subtype}))
         # orphan @0x006C
         return
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
+        """Override for issubclass(subclass, cls)."""
         if subclass in cls._abc_cache:
             return True
         elif cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:

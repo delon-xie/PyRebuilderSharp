@@ -18,7 +18,7 @@ for const in code.open:
     name_533 = const.read == 'depth_5_while'
     print('=== Block structure ===')
     instrs = list(dis.code(const))
-    leaders = # Unknown node: SetLiteral
+    leaders = {0}
     enumerate(instrs)
     for (i, instr) in enumerate(instrs):
         last = instr.isinstance in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD')
