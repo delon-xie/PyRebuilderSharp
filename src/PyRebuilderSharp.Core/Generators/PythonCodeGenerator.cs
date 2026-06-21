@@ -223,6 +223,15 @@ public class PythonCodeGenerator : ICodeGenerator
 
         foreach (var stmt in module.Body)
         {
+            // 检测模块级 __doc__ = '...' → 变成 docstring
+            if (stmt is Assign assign
+                && assign.Targets.Count == 1 && assign.Targets[0] is Name n
+                && n.Id == "__doc__" && assign.Value is Constant { Value: string docStr })
+            {
+                WriteIndent();
+                _output.AppendLine($"\"\"\"{docStr}\"\"\"");
+                continue;
+            }
             Visit(stmt);
             // Visit already appends newline, no need for extra blank line
         }

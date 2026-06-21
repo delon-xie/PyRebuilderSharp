@@ -2916,6 +2916,16 @@ public class AstBuilder
 
     private Expr ExtractLoopVariable(BasicBlock header, List<BasicBlock> bodyBlocks)
     {
+        // 先检查 header 块自身是否包含 UNPACK_SEQUENCE（3.13+ 可能在 FOR_ITER 同一块）
+        var headerUnpack = header.Instructions.FindIndex(i => i.Opcode == Opcode.UNPACK_SEQUENCE);
+        if (headerUnpack >= 0 && header.Instructions[headerUnpack].Argument.HasValue)
+        {
+            int count = header.Instructions[headerUnpack].Argument.Value;
+            var names = ExtractUnpackNames(header.Instructions, headerUnpack, count);
+            if (names.Count == count)
+                return new ListLiteral(names, ContainerKind.Tuple);
+        }
+
         foreach (var bodyBlock in bodyBlocks)
         {
             // 检测 UNPACK_SEQUENCE n → 元组解包循环变量（如 for a, b in ...）
@@ -2923,19 +2933,7 @@ public class AstBuilder
             if (unpackIdx >= 0 && bodyBlock.Instructions[unpackIdx].Argument.HasValue)
             {
                 int count = bodyBlock.Instructions[unpackIdx].Argument.Value;
-                var names = new List<Expr>();
-                // UNPACK_SEQUENCE 后跟 count 个 STORE_FAST/STORE_NAME
-                for (int i = unpackIdx + 1; i < bodyBlock.Instructions.Count && names.Count < count; i++)
-                {
-                    var instr = bodyBlock.Instructions[i];
-                    if (instr.Opcode == Opcode.STORE_FAST && instr.Argument.HasValue
-                        && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Varnames.Count)
-                        names.Add(new Name(_codeObject.Varnames[instr.Argument.Value], ExpressionContext.Store));
-                    else if (instr.Opcode == Opcode.STORE_NAME && instr.Argument.HasValue
-                        && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Names.Count)
-                        names.Add(new Name(_codeObject.Names[instr.Argument.Value], ExpressionContext.Store));
-                    else break;
-                }
+                var names = ExtractUnpackNames(bodyBlock.Instructions, unpackIdx, count);
                 if (names.Count == count)
                     return new ListLiteral(names, ContainerKind.Tuple);
             }
@@ -2964,6 +2962,35 @@ public class AstBuilder
             }
         }
         return new Name("_", ExpressionContext.Store);
+    }
+
+    /// <summary>从指令列表中的 UNPACK_SEQUENCE 后提取 N 个变量名</summary>
+    private List<Expr> ExtractUnpackNames(List<Instruction> instrs, int unpackIdx, int count)
+    {
+        var names = new List<Expr>();
+        for (int i = unpackIdx + 1; i < instrs.Count && names.Count < count; i++)
+        {
+            var instr = instrs[i];
+            // 3.13+ 合并 STORE_FAST_STORE_FAST: 一次存储两个局部变量
+            if (instr.Opcode == Opcode.STORE_FAST_STORE_FAST_313 && instr.Argument.HasValue)
+            {
+                int lo = instr.Argument.Value & 0xFF;
+                int hi = (instr.Argument.Value >> 8) & 0xFF;
+                if (hi >= 0 && hi < _codeObject.Varnames.Count)
+                    names.Add(new Name(_codeObject.Varnames[hi], ExpressionContext.Store));
+                if (lo >= 0 && lo < _codeObject.Varnames.Count)
+                    names.Add(new Name(_codeObject.Varnames[lo], ExpressionContext.Store));
+                break;
+            }
+            if (instr.Opcode == Opcode.STORE_FAST && instr.Argument.HasValue
+                && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Varnames.Count)
+                names.Add(new Name(_codeObject.Varnames[instr.Argument.Value], ExpressionContext.Store));
+            else if (instr.Opcode == Opcode.STORE_NAME && instr.Argument.HasValue
+                && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Names.Count)
+                names.Add(new Name(_codeObject.Names[instr.Argument.Value], ExpressionContext.Store));
+            else break;
+        }
+        return names;
     }
 
     private void CollectBodyBlocks(
