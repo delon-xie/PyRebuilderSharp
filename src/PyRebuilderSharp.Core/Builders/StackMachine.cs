@@ -147,12 +147,14 @@ public class StackMachine
                 //   arg & 0x0F = var1 index (low 4 bits)
                 //   arg >> 4   = var2 index (high 4 bits)
                 var packedArg = instr.Argument ?? 0;
-                int idxA = packedArg & 0x0F;
-                int idxB = packedArg >> 4;
-                var nameA = idxA < _code.Varnames.Count ? _code.Varnames[idxA] : $"v_{idxA}";
-                var nameB = idxB < _code.Varnames.Count ? _code.Varnames[idxB] : $"v_{idxB}";
-                _exprStack.Push(new Name(nameA, ExpressionContext.Load));
-                _exprStack.Push(new Name(nameB, ExpressionContext.Load));
+                // CPython 3.14: low nibble = second load (TOS), high nibble = first load (deep)
+                // 参考 CPython 3.14: Python/compile.c LOAD_FAST_BORROW_LOAD_FAST_BORROW
+                int idxDeep = packedArg >> 4;              // 先加载（栈底）
+                int idxTos = packedArg & 0x0F;             // 后加载（栈顶）
+                var nameDeep = idxDeep < _code.Varnames.Count ? _code.Varnames[idxDeep] : $"v_{idxDeep}";
+                var nameTos = idxTos < _code.Varnames.Count ? _code.Varnames[idxTos] : $"v_{idxTos}";
+                _exprStack.Push(new Name(nameDeep, ExpressionContext.Load));  // 先推 → 栈底
+                _exprStack.Push(new Name(nameTos, ExpressionContext.Load));   // 后推 → 栈顶
                 return null;
 
             case Opcode.POP_ITER_314:
