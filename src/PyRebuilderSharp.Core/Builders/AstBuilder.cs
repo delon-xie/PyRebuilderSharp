@@ -242,15 +242,11 @@ public class AstBuilder
                     var blockResult = blockDecomp.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
                     if (blockResult.IsSuccess)
                     {
-                        // 跳过残留的 handler 块：DUP_TOP/POP_TOP/END_FINALLY/RERAISE 等是
-                        // try/except 处理器前导指令，其内容已包含在 try/except AST 中。
-                        bool hasHandlerPreamble = orphan.Instructions.Any(i =>
-                            i.Opcode == Opcode.DUP_TOP
-                            || i.Opcode == Opcode.POP_EXCEPT
-                            || i.Opcode == Opcode.END_FINALLY
-                            || i.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH
-                            || i.Opcode == Opcode.CHECK_EXC_MATCH
-                            || i.Opcode == Opcode.CHECK_EG_MATCH);
+                        // === 孤儿块诊断分类 ===
+                        string classification = ClassifyOrphanBlock(orphan);
+                        Console.Error.WriteLine($"[ORPHAN] @0x{orphan.StartOffset:X4} func={_codeObject.Name} ver={_codeObject.Version} class={classification} instrs={orphan.Instructions.Count}");
+                        bool hasHandlerPreamble = classification == "handler_pre" || classification == "handler_chain";
+
                         if (hasHandlerPreamble)
                         {
                             _processedBlockIds.Add(orphan.Id);
@@ -261,6 +257,26 @@ public class AstBuilder
                         bool isEmptyReturn = blockResult.Statements.Count == 1
                             && blockResult.Statements[0] is Return r
                             && r.Value is Constant { Value: null };
+
+                        // 跳过终端跳转块：POP_JUMP_IF_*/JUMP_FORWARD/JUMP_ABSOLUTE/FOR_ITER/GEN_START
+                        // 这些块的语义已包含在 if/else/for/while 等控制流 AST 中，
+                        // 其指令的 StackMachine 结果已通过 BuildIfElse/BuildForLoop 等消费。
+                        bool isTerminalJump = orphan.Instructions.Count > 0 && 
+                            orphan.Instructions.Last().Opcode switch
+                            {
+                                Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+                                    or Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE
+                                    or Opcode.FOR_ITER or Opcode.GET_ITER
+                                    or Opcode.JUMP_IF_FALSE_OR_POP or Opcode.JUMP_IF_TRUE_OR_POP
+                                    => true,
+                                _ => false
+                            };
+
+                        if (isTerminalJump)
+                        {
+                            _processedBlockIds.Add(orphan.Id);
+                            continue;
+                        }
 
                         if (!isEmptyReturn && _options.ShowOrphanBlocks)
                         {
@@ -3034,6 +3050,35 @@ public class AstBuilder
             else break;
         }
         return names;
+    }
+
+    /// <summary>孤儿块分类诊断：分析块的原因类型</summary>
+    private string ClassifyOrphanBlock(BasicBlock orphan)
+    {
+        var instrs = orphan.Instructions;
+        if (instrs.Count == 0) return "empty";
+        bool hasHandlerPre = instrs.Any(i =>
+            i.Opcode == Opcode.DUP_TOP || i.Opcode == Opcode.POP_EXCEPT
+            || i.Opcode == Opcode.END_FINALLY || i.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH
+            || i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH
+            || i.Opcode == Opcode.RERAISE);
+        if (hasHandlerPre) return "handler_pre";
+        if (instrs.Any(i => i.Opcode == Opcode.JUMP_BACKWARD || i.Opcode == Opcode.JUMP_BACKWARD_NO_INTERRUPT))
+            return "jump_back_loop";
+        if (instrs.Any(i => i.Opcode == Opcode.FOR_ITER)) return "for_iter";
+        if (instrs.Any(i => i.Opcode == Opcode.GET_ITER)) return "get_iter_precursor";
+        if (instrs.Any(i => i.Opcode == Opcode.POP_JUMP_IF_FALSE || i.Opcode == Opcode.POP_JUMP_IF_TRUE
+            || i.Opcode == Opcode.JUMP_FORWARD || i.Opcode == Opcode.JUMP_ABSOLUTE))
+            return "jump_cond";
+        if (instrs.Any(i => i.Opcode == Opcode.MAKE_FUNCTION)) return "make_function";
+        if (instrs.All(i => i.Opcode == Opcode.LOAD_FAST || i.Opcode == Opcode.LOAD_NAME
+            || i.Opcode == Opcode.LOAD_CONST || i.Opcode == Opcode.LOAD_ATTR
+            || i.Opcode == Opcode.LOAD_GLOBAL || i.Opcode == Opcode.LOAD_DEREF))
+            return "flat_expr_loads";
+        if (instrs.Any(i => i.Opcode == Opcode.STORE_FAST || i.Opcode == Opcode.STORE_NAME
+            || i.Opcode == Opcode.STORE_ATTR))
+            return "flat_expr_store";
+        return "other";
     }
 
     private void CollectBodyBlocks(
