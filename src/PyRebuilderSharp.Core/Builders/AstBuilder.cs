@@ -1693,14 +1693,24 @@ public class AstBuilder
                 result.Add(cur);
                 // 只跟随 handler 链内的跳转：
                 // 1. 不跟随 Exit 块的后缀（避免跳转到 handler 以外的代码）
-                // 2. 不跟随 POP_EXCEPT 块的后缀（POP_EXCEPT 退出 handler 区域，后续块属于 try/except 后的正常代码）
-                // 3. 不跟随 END_FINALLY 块的后缀（同 POP_EXCEPT）
+                // 2. POP_EXCEPT/END_FINALLY 后，仅当后继是 handler 前导块时才继续跟随（支持多 except 链）
+                // 3. 非 POP_EXCEPT 时正常跟随所有后继
                 bool hasPopExcept = cur.Instructions.Any(i =>
                     i.Opcode == Opcode.POP_EXCEPT || i.Opcode == Opcode.END_FINALLY);
                 foreach (var succ in cur.Successors)
                 {
                     if (cur.Flags.HasFlag(BlockFlags.Exit)) continue;
-                    if (hasPopExcept) continue;
+                    if (hasPopExcept)
+                    {
+                        // POP_EXCEPT 后仅跟踪 handler 前导块（DUP_TOP/CHECK_EXC_MATCH/JUMP_IF_NOT_EXC_MATCH）
+                        // 支持 try: except A: ... POP_EXCEPT → except B: ... POP_EXCEPT 链
+                        bool isHandlerPreamble = succ.Instructions.Any(i =>
+                            i.Opcode == Opcode.DUP_TOP
+                            || i.Opcode == Opcode.CHECK_EXC_MATCH
+                            || i.Opcode == Opcode.CHECK_EG_MATCH
+                            || i.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH);
+                        if (!isHandlerPreamble) continue;
+                    }
                     queue.Enqueue(succ);
                 }
             }
