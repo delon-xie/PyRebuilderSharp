@@ -326,7 +326,8 @@ public class AstBuilder
             {
                 Opcode.JUMP_FORWARD, Opcode.JUMP_ABSOLUTE, Opcode.POP_JUMP_IF_FALSE,
                 Opcode.POP_JUMP_IF_TRUE, Opcode.FOR_ITER, Opcode.JUMP_IF_FALSE_OR_POP,
-                Opcode.JUMP_IF_TRUE_OR_POP
+                Opcode.JUMP_IF_TRUE_OR_POP, Opcode.JUMP_BACKWARD,
+                Opcode.JUMP_BACKWARD_NO_INTERRUPT
             };
             var missed = _codeObject.Instructions
                 .Where(i => !_codeObject.DecompiledInstructionOffsets.Contains(i.Offset)
