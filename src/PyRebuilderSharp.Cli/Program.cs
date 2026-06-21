@@ -82,7 +82,8 @@ class Program
         {
             ShowHeader = !noHeader,
             ShowSummary = !noSummary,
-            ShowOrphanBlocks = !noOrphans
+            ShowOrphanBlocks = !noOrphans,
+            VerboseErrors = inputFiles.Count == 1  // 单文件模式启动诊断输出
         };
         if (inputFiles.Count > 1 || batchMode)
             RunBatch(inputFiles, outputDir, statsOnly, opts);
