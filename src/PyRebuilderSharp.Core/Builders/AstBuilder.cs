@@ -2956,6 +2956,22 @@ public class AstBuilder
 
             foreach (var instr in bodyBlock.Instructions)
             {
+                // 3.13+ 合并 STORE_FAST_STORE_FAST: 一次存储两个局部变量（无 UNPACK_SEQUENCE）
+                if (instr.Opcode == Opcode.STORE_FAST_STORE_FAST_313 && instr.Argument.HasValue)
+                {
+                    // CPython 3.13 编码：低4位=第一变量(idx1), 高4位=第二变量(idx2)
+                    // 参考 CPython 3.13: Python/compile.c STORE_FAST_STORE_FAST
+                    int idx1 = instr.Argument.Value & 0xF;
+                    int idx2 = (instr.Argument.Value >> 4) & 0xF;
+                    var names = new List<Expr>();
+                    if (idx1 >= 0 && idx1 < _codeObject.Varnames.Count)
+                        names.Add(new Name(_codeObject.Varnames[idx1], ExpressionContext.Store));
+                    if (idx2 >= 0 && idx2 < _codeObject.Varnames.Count)
+                        names.Add(new Name(_codeObject.Varnames[idx2], ExpressionContext.Store));
+                    if (names.Count == 2)
+                        return new ListLiteral(names, ContainerKind.Tuple);
+                }
+
                 if ((instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME)
                     && instr.Argument.HasValue)
                 {
@@ -2990,12 +3006,13 @@ public class AstBuilder
             // 3.13+ 合并 STORE_FAST_STORE_FAST: 一次存储两个局部变量
             if (instr.Opcode == Opcode.STORE_FAST_STORE_FAST_313 && instr.Argument.HasValue)
             {
-                int lo = instr.Argument.Value & 0xFF;
-                int hi = (instr.Argument.Value >> 8) & 0xFF;
-                if (hi >= 0 && hi < _codeObject.Varnames.Count)
-                    names.Add(new Name(_codeObject.Varnames[hi], ExpressionContext.Store));
-                if (lo >= 0 && lo < _codeObject.Varnames.Count)
-                    names.Add(new Name(_codeObject.Varnames[lo], ExpressionContext.Store));
+                // CPython 3.13 编码：低4位=第一变量, 高4位=第二变量
+                int idx1 = instr.Argument.Value & 0xF;
+                int idx2 = (instr.Argument.Value >> 4) & 0xF;
+                if (idx1 >= 0 && idx1 < _codeObject.Varnames.Count)
+                    names.Add(new Name(_codeObject.Varnames[idx1], ExpressionContext.Store));
+                if (idx2 >= 0 && idx2 < _codeObject.Varnames.Count)
+                    names.Add(new Name(_codeObject.Varnames[idx2], ExpressionContext.Store));
                 break;
             }
             if (instr.Opcode == Opcode.STORE_FAST && instr.Argument.HasValue
