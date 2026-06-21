@@ -471,7 +471,7 @@ public class AstBuilder
             else if (stmt is ClassDef classDef)
             {
                 result.Add(new ClassDef(classDef.Name, classDef.Bases,
-                    ConvertAugAssign(classDef.Body)));
+                    ConvertAugAssign(classDef.Body), classDef.Decorators, classDef.Keywords));
             }
             else
             {
@@ -3578,6 +3578,31 @@ public class AstBuilder
         for (int i = 2; i < buildClassCall.Args.Count; i++)
             bases.Add(buildClassCall.Args[i]);
 
+        // Keywords: metaclass=... 等（来自 Call.Keywords 或从 last arg 中提取关键词名元组）
+        List<Keyword>? keywords = null;
+        if (buildClassCall.Keywords.Count > 0)
+        {
+            // 3.10-: CALL_FUNCTION_KW 已正确分离关键词
+            keywords = buildClassCall.Keywords;
+        }
+        else if (bases.Count > 0 && bases[^1] is Constant { Value: System.Collections.IList kwList }
+            && kwList.Count > 0 && kwList[0] is string)
+        {
+            // 3.11+ CALL/CALL_KW_313: 关键词名元组在最后一个 arg 中
+            // 倒数第二个 arg 是关键词值
+            int kwCount = kwList.Count;
+            if (bases.Count >= kwCount + 1)
+            {
+                var kwValues = bases.GetRange(bases.Count - 1 - kwCount, kwCount);
+                keywords = new List<Keyword>();
+                for (int i = 0; i < kwCount; i++)
+                {
+                    keywords.Add(new Keyword(kwList[i]?.ToString() ?? "", kwValues[i]));
+                }
+                bases.RemoveRange(bases.Count - 1 - kwCount, kwCount + 1);
+            }
+        }
+
         // Decompile class body from the child code object
         var body = DecompileChildCode(funcRef.Code);
 
@@ -3590,7 +3615,7 @@ public class AstBuilder
         // 过滤 class body 中的 return 语句（class body 无 return）
         body = body.Where(s => s is not Return).ToList();
 
-        return new ClassDef(className, bases, body);
+        return new ClassDef(className, bases, body, null, keywords);
     }
 
     /// <summary>

@@ -310,13 +310,24 @@ public class PythonCodeGenerator : ICodeGenerator
         _output.Append("class ");
         _output.Append(cls.Name);
 
-        if (cls.Bases.Count > 0)
+        if (cls.Bases.Count > 0 || cls.Keywords?.Count > 0)
         {
             _output.Append("(");
             for (int i = 0; i < cls.Bases.Count; i++)
             {
                 if (i > 0) _output.Append(", ");
                 Visit(cls.Bases[i]);
+            }
+            if (cls.Keywords != null)
+            {
+                foreach (var kw in cls.Keywords)
+                {
+                    if (cls.Bases.Count > 0)
+                        _output.Append(", ");
+                    _output.Append(kw.Arg ?? "");
+                    _output.Append("=");
+                    Visit(kw.Value);
+                }
             }
             _output.Append(")");
         }

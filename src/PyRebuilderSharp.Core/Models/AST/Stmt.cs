@@ -66,7 +66,8 @@ public record ClassDef(
     string Name,
     List<Expr> Bases,
     List<Stmt> Body,
-    List<Expr>? Decorators = null
+    List<Expr>? Decorators = null,
+    List<Keyword>? Keywords = null
 ) : Stmt;
 
 public record Parameter(string Name, Expr? Annotation = null, Expr? Default = null);
