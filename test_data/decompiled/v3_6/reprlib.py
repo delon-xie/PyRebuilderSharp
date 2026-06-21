@@ -112,18 +112,6 @@ class Repr:
         if n == 0:
             return '{}'
         return '}'
-        # orphan @0x0046
-        newlevel = level - 1
-        repr1 = self.repr1
-        pieces = []
-        islice(_possibly_sorted(x), self.maxdict)
-        # orphan @0x004E
-        # orphan @0x0050
-        keyrepr = repr1(key, newlevel)
-        valrepr = repr1(x[key], newlevel)
-        pieces.append('%s: %s' % (keyrepr, valrepr))
-        # orphan @0x007E
-        n > self.maxdict
         # orphan @0x008A
         pieces.append(self.fillvalue)
         s = self._join(pieces, level)

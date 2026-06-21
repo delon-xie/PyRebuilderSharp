@@ -35,14 +35,6 @@ for (old_path, new_path) in files_to_rename:
     os.rename(old_path, new_path)
 print("""
 Done!""")
-# orphan @0x0150
-print("""
-Removing conflicting source files...""")
-conflicts
-# orphan @0x015C
-# orphan @0x015E
-print(f"  Removing {os.path.basename(old)}")
-os.remove(old)
 # orphan @0x0186
 files_to_rename = <listcomp>(files_to_rename)
-# [SUMMARY] 25 blocks · 22 processed · 4 orphan · 249 instr
+# [SUMMARY] 25 blocks · 25 processed · 4 orphan · 249 instr

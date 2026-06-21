@@ -245,11 +245,6 @@ def _partial_prepare_merger(args):
     j
     order.append
     order.append
-    # orphan @0x004E
-    nargs = len(args)
-    order = []
-    j = nargs
-    enumerate(args)
     return (0, None)
     # orphan @0x00CE
     name_9 = phcount
@@ -542,25 +537,13 @@ def _c3_merge(sequences):
         []
         for s in .0:
             return s
-    # orphan @0x0044
-    # orphan @0x002E
-    candidate = s1[0]
-    sequences
-    # orphan @0x002C
-    sequences
     result = []
     for _ in [<listcomp>, sequences]:
         pass
-    # orphan @0x006C
     # orphan @0x006E
     # orphan @0x0070
     candidate
     # orphan @0x0072
-    # orphan @0x0092
-    result(candidate)
-    sequences
-    result.append
-    # orphan @0x00C0
     # orphan @0x00C2
     name_3 = seq[0] == candidate
     0

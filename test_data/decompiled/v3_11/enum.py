@@ -437,16 +437,6 @@ class EnumType(type):
         classdict(cell_31._find_new_)
         name_99 = name_62 in bases
         _find_new_ = member_type is name_64
-        # orphan @0x07E6
-        value = '__format__' not in classdict
-        cell_31.__format__ = member_type._find_data_repr_
-        _iter_member_ = '__str__' not in classdict
-        method = member_type._find_data_repr_
-        ValueError = method is name_64._find_data_repr_
-        method = member_type.getattr
-        cell_31.__str__ = method
-        ('__repr__', '__str__', '__format__', '__reduce_ex__')
-        # orphan @0x0880
         # orphan @0x0882
         name_92 = name not in classdict
         enum_method = getattr(first_enum, name)
@@ -456,10 +446,6 @@ class EnumType(type):
         _find_data_repr_ = found_method in (data_type_method, object_method)
         setattr(cell_31, name, enum_method)
         Enum
-        # orphan @0x0948
-        name_52 = issubclass(cell_31, Enum)
-        ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__')
-        # orphan @0x0982
         # orphan @0x0984
         sorted = name not in classdict
         enum_method = getattr(Enum, name)
@@ -550,8 +536,6 @@ class EnumType(type):
         isinstance(result, cls)
         cls._missing_
         return
-        # orphan @0x00BC
-        value in cls.Flag
         # orphan @0x00CE
         value in cls._missing_
         # orphan @0x00DE
@@ -710,28 +694,11 @@ class EnumType(type):
     _find_data_type_ = _find_data_type_()
     _find_new_ = _find_new_()
     def _add_member_(cls, name, member):
-        # orphan @0x00A0
-        attr = base.NameError(name)
-        _is_descriptor = isinstance(attr, (fget, fset))
-        found_descriptor = attr
-        class_type = base
-        descriptor_type = 'enum'
-        base.NameError.get
-        getattr = _is_descriptor(attr)
-        found_descriptor = attr
-        descriptor_type
-        # orphan @0x009E
-        found_descriptor = None
-        descriptor_type = None
-        class_type = None
-        cls.NameError[1:]
         name_48 = name in cls._member_map_
         name_31 = cls._member_map_[name] is not member
         raise NameError(f"{name!r} is already bound: {cls._member_map_[name]!r}")
         # orphan @0x0148
         'desc'
-        # orphan @0x014A
-        class_type
         # orphan @0x0150
         base
         # orphan @0x0152
@@ -1008,9 +975,6 @@ class Flag(Enum, STRICT):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
-        # orphan @0x006A
-        value = self.NotImplemented
-        (self, other)
         # orphan @0x006C
         # orphan @0x00BE
         self
@@ -1020,9 +984,6 @@ class Flag(Enum, STRICT):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
-        # orphan @0x006A
-        value = self.NotImplemented
-        (self, other)
         # orphan @0x006C
         # orphan @0x00BE
         self
@@ -1032,9 +993,6 @@ class Flag(Enum, STRICT):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
-        # orphan @0x006A
-        value = self.NotImplemented
-        (self, other)
         # orphan @0x006C
         # orphan @0x00BE
         self
@@ -1096,10 +1054,6 @@ def global_flag_repr(self):
     # orphan @0x00D4
     name_57 = self.__name__ is not name_16._name_
     return self._value_.split(self._value_('|')())
-    # orphan @0x01A4
-    name = []
-    isdigit = _is_single_bit(self.split)
-    return f"{cell_4!s}.{self.split!s}"
     # orphan @0x01A6
     name_22 = n[0]()
     name(n)

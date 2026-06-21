@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0208
-chr(next_type)
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
 data = open(path, 'rb').read()
@@ -69,10 +67,4 @@ if print <= print:
                 break
             break
             opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
-# orphan @0x032C
-op = bytecode[offset]
-offset += 1
-instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
-arg = None
-op >= HAVE_ARGUMENT
-# [SUMMARY] 24 blocks · 23 processed · 2 orphan · 714 instr
+# [SUMMARY] 24 blocks · 25 processed · 2 orphan · 714 instr

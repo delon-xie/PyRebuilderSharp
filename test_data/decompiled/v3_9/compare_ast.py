@@ -24,26 +24,12 @@ if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
 # orphan @0x00E6
 e = None
-# orphan @0x012E
-# orphan @0x0130
-i < len(exp_lines)
-# orphan @0x0140
-exp_lines[i]
 # orphan @0x0148
 '(missing)'
-# orphan @0x014A
-i < len(act_lines)
-# orphan @0x015A
-act_lines[i]
 # orphan @0x0162
 '(missing)'
-# orphan @0x0164
-e != a
 # orphan @0x0170
 print(f"Line {i}:")
 print(f"  expected: {e}")
 print
-# orphan @0x0190
-i > 5
-# orphan @0x01A6
-# [SUMMARY] 22 blocks · 9 processed · 13 orphan · 211 instr
+# [SUMMARY] 22 blocks · 17 processed · 13 orphan · 211 instr

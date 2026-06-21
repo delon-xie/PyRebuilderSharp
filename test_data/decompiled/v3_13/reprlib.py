@@ -145,7 +145,6 @@ class Repr:
         return s
         exc = None
         return
-        # orphan @0x023C
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -157,7 +156,6 @@ class Repr:
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
         return s
         return
-        # orphan @0x017E
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
 def _possibly_sorted(x):
     try:
@@ -166,7 +164,6 @@ def _possibly_sorted(x):
         list(x)
     return
     return
-    # orphan @0x0048
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

@@ -169,7 +169,6 @@ class Repr:
         return s
         exc = None
         return
-        # orphan @0x0282
     def repr_instance(self, x, level):
         """<%s instance at %#x>"""
         try:
@@ -182,7 +181,6 @@ class Repr:
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
         return s
         return
-        # orphan @0x01C2
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
     __classdictcell__ = __classdict__
 def _possibly_sorted(x):
@@ -192,7 +190,6 @@ def _possibly_sorted(x):
         list(x)
     return
     return
-    # orphan @0x004A
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 47 instr

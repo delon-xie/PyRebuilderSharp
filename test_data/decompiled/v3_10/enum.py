@@ -80,11 +80,6 @@ def _iter_bits_lsb(num):
         num = num.value
     elif num < 0:
         raise ValueError('%r is not a positive integer' % original)
-    # orphan @0x002E
-    b = num & ~num + 1
-    yield b
-    num ^= b
-    num
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
 def bin(num, max_bits):
@@ -207,14 +202,7 @@ class _proto_member:
                             return None
                     finally:
                         pass
-        # orphan @0x0156
-        # orphan @0x0158
-        canonical_member._value_ == value
-        # orphan @0x0168
-        enum_member = canonical_member
-        # orphan @0x0170
         # orphan @0x0172
-        # orphan @0x0256
 class EnumDict(dict):
     __doc__ = """
     Track enum member order and ensure member names are not reused.
@@ -269,17 +257,10 @@ class EnumDict(dict):
                     pass
             if key == '__order__':
                 key = '_order_'
-        # orphan @0x0226
-        single
-        # orphan @0x022C
-        value = auto_valued[0]
-        # orphan @0x0236
-        value = t(auto_valued)
     @property
     def member_names(self):
         return list(self._member_names)
     def update(self, members):
-        # orphan @0x001C
         try:
             for name in members.keys():
                 pass
@@ -387,15 +368,6 @@ class EnumType(type):
                             break
         else:
             getattr(first_enum, '_boundary_', None)
-        # orphan @0x026A
-        inverted
-        # orphan @0x026E
-        # orphan @0x0270
-        isinstance(p.value, int)
-        # orphan @0x0280
-        p.value = bits & p.value
-        # orphan @0x0290
-        p.value = (bits & p.value[0]) + p.value[1:]
     def __bool__(cls):
         """
         classes/types should always be True.
@@ -546,16 +518,10 @@ class EnumType(type):
                 names.append((name, value))
         elif names is None:
             names = []
-        # orphan @0x015A
-        module is None
-        # orphan @0x0162
-        _make_class_unpicklable(classdict)
         # orphan @0x016C
         '__module__'
         classdict
         module
-        # orphan @0x0174
-        qualname is not None
         # orphan @0x017C
         '__qualname__'
         classdict
@@ -791,10 +757,6 @@ class Enum:
         value in unhashable_values
         cls[name]
         return
-        # orphan @0x00CC
-        result = cls._missing_(value)
-        # orphan @0x00FE
-        e = None
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -810,7 +772,6 @@ class Enum:
             cls._hashable_values_.append(value)
         except TypeError:
             cls._unhashable_values_map_.setdefault(self.name, []).append(value)
-        # orphan @0x01A2
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         """
@@ -983,8 +944,6 @@ class Flag(Enum):
 
         If non-member values are present, result depends on `_boundary_` setting.
         """
-        # orphan @0x004C
-        value & (all_bits ^ flag_mask)
         if not isinstance(value, int):
             raise ValueError('%r is not a valid %s' % (value, cls.__qualname__))
         flag_mask = cls._flag_mask_
@@ -998,36 +957,10 @@ class Flag(Enum):
             return
         if value <= value:
             pass
-        # orphan @0x01D4
-        aliases
-        # orphan @0x01DA
-        value = member_value | aliases
-        cls._member_map_.items()
-        # orphan @0x01EC
-        # orphan @0x01EE
-        pm not in members
-        # orphan @0x01FE
-        pm._value_
-        # orphan @0x0206
-        pm._value_ & value == pm._value_
         # orphan @0x0218
         members.append(pm)
         combined_value |= pm._value_
-        # orphan @0x022C
-        # orphan @0x022E
-        unknown = value ^ combined_value
-        pseudo_member._name_ = '|'.join(Flag._missing_.<locals>.<listcomp>(members))
-        combined_value
-        # orphan @0x0252
-        pseudo_member._name_ = None
-        # orphan @0x025A
-        unknown
-        # orphan @0x0260
-        cls._boundary_ is STRICT
         # orphan @0x026C
-        # orphan @0x027C
-        unknown
-        # orphan @0x029A
     def __contains__(self, other):
         """
         Returns True if self has at least the same flags set as other.
@@ -1327,15 +1260,8 @@ def _simple_enum(etype):
             enum_class.__new_member__ = enum_class.__new__
         enum_class.__new__ = Enum.__new__
         return enum_class
-        # orphan @0x03C6
-        enum_class._flag_mask_ = single_bits | multi_bits
-        enum_class._singles_mask_ = single_bits
-        enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1
-        member_list = _simple_enum.<locals>.convert_class.<locals>.<listcomp>(enum_class)
-        member_list != sorted(member_list)
         # orphan @0x0408
         enum_class._iter_member_ = enum_class._iter_member_by_def_
-        # orphan @0x0410
     return convert_class
 EnumCheck = _simple_enum(StrEnum)(__build_class__(EnumCheck, 'EnumCheck'))
 CONTINUOUS = *EnumCheck
@@ -1401,78 +1327,19 @@ def _test_simple_enum(checked_enum, simple_enum):
         raise TypeError("""enum mismatch:
    %s""" % """
    """.join(failed))
-    # orphan @0x0158
-    failed.sort()
-    member_names
-    # orphan @0x0164
-    # orphan @0x0166
-    failed_member = []
-    name not in simple_keys
-    # orphan @0x0174
-    failed.append('missing member from simple enum: %r' % name)
-    # orphan @0x0184
-    name not in checked_keys
-    # orphan @0x018C
-    failed.append('extra member in simple enum: %r' % name)
-    # orphan @0x019C
-    checked_member_dict = checked_enum[name].__dict__
-    checked_member_keys = list(checked_member_dict.keys())
-    simple_member_dict = simple_enum[name].__dict__
-    simple_member_keys = list(simple_member_dict.keys())
-    set(checked_member_keys + simple_member_keys)
-    # orphan @0x01D4
-    # orphan @0x01D6
-    key in ('__module__', '__objclass__', '_inverted_')
-    # orphan @0x01E0
-    # orphan @0x01E2
-    key not in simple_member_keys
-    # orphan @0x01EA
-    failed_member.append('missing key %r not in the simple enum member %r' % (key, name))
-    # orphan @0x01FE
-    key not in checked_member_keys
-    # orphan @0x0208
-    failed_member.append('extra key %r in simple enum member %r' % (key, name))
-    # orphan @0x021C
-    checked_value = checked_member_dict[key]
-    simple_value = simple_member_dict[key]
-    checked_value != simple_value
     # orphan @0x0236
     failed_member.append("""%r:
          %s
          %s""" % (key, 'checked member -> %r' % (checked_value), 'simple member  -> %r' % (simple_value)))
-    # orphan @0x0256
-    # orphan @0x0258
-    failed_member
     # orphan @0x025E
     failed.append("""%r member mismatch:
       %s""" % (name, """
       """.join(failed_member)))
-    # orphan @0x0276
-    # orphan @0x0278
-    ('__str__', '__repr__', '__reduce_ex__', '__format__', '__getnewargs_ex__', '__getnewargs__', '__reduce_ex__', '__reduce__')
-    # orphan @0x027C
-    # orphan @0x027E
-    method in simple_keys
-    # orphan @0x028A
-    method in checked_keys
-    # orphan @0x0296
-    # orphan @0x0298
-    method not in simple_keys
-    # orphan @0x02A2
-    method not in checked_keys
-    # orphan @0x02AC
-    checked_method = getattr(checked_enum, method, None)
-    simple_method = getattr(simple_enum, method, None)
-    hasattr(checked_method, '__func__')
     # orphan @0x02D0
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
-    # orphan @0x02DC
-    checked_method != simple_method
     # orphan @0x02E6
     failed.append('%r:  %-30s %s' % (method, 'checked -> %r' % (checked_method), 'simple -> %r' % (simple_method)))
-    # orphan @0x0306
-    # orphan @0x030A
 def _old_convert_(etype, name, module, filter, source):
     """
     Create a new Enum subclass that replaces a collection of global constants

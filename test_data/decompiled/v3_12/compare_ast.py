@@ -54,6 +54,4 @@ for i in range(max(len(exp_lines), len(act_lines))):
 e = None
 raise
 e = None
-# orphan @0x02A0
-# orphan @0x0330
-# [SUMMARY] 34 blocks · 32 processed · 3 orphan · 232 instr
+# [SUMMARY] 34 blocks · 34 processed · 3 orphan · 232 instr

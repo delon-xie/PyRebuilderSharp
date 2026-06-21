@@ -2975,7 +2975,6 @@ class SyntaxErrorTestCase(unittest.TestCase):
             err = None
         self.fail('compile() did not raise SyntaxError')
         err = None
-        # orphan @0x025C
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', 7)
     def test_curly_brace_after_primary_raises_immediately(self):
@@ -3158,8 +3157,6 @@ def fib(n):
     a, b = 0, 1
 """
         raise
-        # orphan @0x009A
-        # orphan @0x00DA
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:

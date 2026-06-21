@@ -129,6 +129,4 @@ def <genexpr>(.0):
         pass
 raise
 e = None
-# orphan @0x04D0
-# orphan @0x0538
-# [SUMMARY] 51 blocks · 49 processed · 3 orphan · 358 instr
+# [SUMMARY] 51 blocks · 51 processed · 3 orphan · 358 instr

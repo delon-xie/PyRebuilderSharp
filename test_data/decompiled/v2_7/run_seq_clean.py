@@ -47,5 +47,4 @@ for ver in versions:
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 return
-# orphan @0x0298
-# [SUMMARY] 32 blocks · 32 processed · 4 orphan · 304 instr
+# [SUMMARY] 32 blocks · 33 processed · 4 orphan · 304 instr

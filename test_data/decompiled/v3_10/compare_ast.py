@@ -1,8 +1,6 @@
 # Decompiled from: <module>
 
-# orphan @0x0078
-e = None
-"""Compare ASTs of expected vs decompiled"""
+'Compare ASTs of expected vs decompiled'
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()
@@ -46,6 +44,4 @@ for i in range(max(len(exp_lines), len(act_lines))):
     break
     if i > 5:
         break
-# orphan @0x00E6
-e = None
-# [SUMMARY] 23 blocks · 22 processed · 2 orphan · 213 instr
+# [SUMMARY] 23 blocks · 24 processed · 2 orphan · 213 instr

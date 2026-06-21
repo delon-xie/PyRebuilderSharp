@@ -29,7 +29,4 @@ with open(INPUT_FILE) as f:
         except Exception:
             print('❌ %s: parse error: %s' % (ver, ex))
             print('  Output: %s' % r.stdout[None:200])
-# orphan @0x017A
-# orphan @0x01C0
-ex = None
-# [SUMMARY] 23 blocks · 20 processed · 4 orphan · 224 instr
+# [SUMMARY] 23 blocks · 22 processed · 4 orphan · 224 instr

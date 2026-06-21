@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0144
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
 data = open(path, 'rb').read()
@@ -56,11 +55,6 @@ opcodes_27 = {131: 'BINARY_MODULO', 130: 'BINARY_ADD', 126: 'BINARY_SUBTRACT', 1
 # orphan @0x0148
 '?'
 chr(next_type)
-# orphan @0x0152
-pos += 1
-next_type in (115, 116, 122)
-# orphan @0x016E
-next_type == 122
 # orphan @0x0178
 length = data[pos]
 pos += 1
@@ -74,22 +68,7 @@ print(f"Bytecode hex: {bytecode.hex()}")
 HAVE_ARGUMENT = 90
 offset = 0
 instructions = []
-# orphan @0x01F4
-offset < len(bytecode)
-# orphan @0x0202
-op = bytecode[offset]
-offset += 1
-instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
-arg = None
-op >= HAVE_ARGUMENT
-# orphan @0x0232
-arg = bytecode[offset] | bytecode[offset + 1] << 8
-offset += 2
-op >= HAVE_ARGUMENT
-offset
-instructions.append
 # orphan @0x0262
 1
 3
-# orphan @0x0268
-# [SUMMARY] 26 blocks · 16 processed · 15 orphan · 484 instr
+# [SUMMARY] 26 blocks · 23 processed · 15 orphan · 484 instr

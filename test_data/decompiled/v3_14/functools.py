@@ -54,7 +54,6 @@ function (defaults to functools.WRAPPER_UPDATES)
     wrapped.__wrapped__ = wrapper
     return wrapper
     setattr(wrapper, attr, value)
-    # orphan @0x00CA
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -356,7 +355,6 @@ callables as instance methods.
             partial
         result = self._make_unbound_method().__get__(obj, cls)
         return result
-        # orphan @0x0138
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = []
@@ -704,7 +702,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
     (bases, cls)
     n
     cell_1
-    # orphan @0x02AC
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -780,8 +777,6 @@ Registers a new implementation for the given *cls* on a *generic_method*.
         return f"<single dispatch method descriptor {name}>"
         raise
         raise
-        # orphan @0x00A4
-        # orphan @0x00AC
     __static_attributes__ = ('dispatcher', 'func')
     __classdictcell__ = __classdict__
 class _singledispatchmethod_get:
@@ -805,8 +800,6 @@ class _singledispatchmethod_get:
         else:
             0
         raise
-        # orphan @0x0120
-        # orphan @0x0144
     def __repr__(self):
         """?"""
         try:
@@ -820,8 +813,6 @@ class _singledispatchmethod_get:
         return f"<bound single dispatch method {name} of {self._obj}>"
         raise
         raise
-        # orphan @0x00C0
-        # orphan @0x00C8
     def __call__(self):
         """__name__"""
         if not args:
@@ -891,8 +882,4 @@ class cached_property:
 raise
 raise
 raise
-# orphan @0x02D8
-# orphan @0x02F2
-# orphan @0x030C
-# orphan @0x0326
-# [SUMMARY] 29 blocks · 26 processed · 5 orphan · 363 instr
+# [SUMMARY] 29 blocks · 30 processed · 5 orphan · 363 instr

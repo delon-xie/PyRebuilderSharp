@@ -71,5 +71,4 @@ def <genexpr>(.0):
                 1
     except:
         pass
-# orphan @0x05EA
-# [SUMMARY] 52 blocks · 52 processed · 6 orphan · 386 instr
+# [SUMMARY] 52 blocks · 53 processed · 6 orphan · 386 instr

@@ -34,8 +34,6 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
         getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     wrapper.__wrapped__ = wrapped
     return wrapper
-    # orphan @0x002C
-    setattr(wrapper, attr, value)
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -51,8 +49,6 @@ def _gt_from_lt(self, other):
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    not op_result
     # orphan @0x0022
     self != other
     # orphan @0x0028
@@ -62,8 +58,6 @@ def _le_from_lt(self, other):
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    op_result
     # orphan @0x0020
     self == other
     # orphan @0x0026
@@ -80,8 +74,6 @@ def _ge_from_le(self, other):
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    not op_result
     # orphan @0x0022
     self == other
     # orphan @0x0028
@@ -91,8 +83,6 @@ def _lt_from_le(self, other):
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    op_result
     # orphan @0x0020
     self != other
     # orphan @0x0026
@@ -109,8 +99,6 @@ def _lt_from_gt(self, other):
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    not op_result
     # orphan @0x0022
     self != other
     # orphan @0x0028
@@ -120,8 +108,6 @@ def _ge_from_gt(self, other):
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    op_result
     # orphan @0x0020
     self == other
     # orphan @0x0026
@@ -138,8 +124,6 @@ def _le_from_ge(self, other):
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    not op_result
     # orphan @0x0022
     self == other
     # orphan @0x0028
@@ -149,8 +133,6 @@ def _gt_from_ge(self, other):
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    # orphan @0x001C
-    op_result
     # orphan @0x0020
     self != other
     # orphan @0x0026
@@ -168,14 +150,6 @@ def total_ordering(cls):
     roots = total_ordering.<locals>.<setcomp>(_convert)
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
-    # orphan @0x001E
-    root = max(roots)
-    _convert[root]
-    # orphan @0x002E
-    # orphan @0x0030
-    opname not in roots
-    # orphan @0x003E
-    opfunc.__name__ = opname
     # orphan @0x0052
     return
 def cmp_to_key(mycmp):
@@ -208,11 +182,6 @@ def reduce(function, sequence, initial):
             pass
     # orphan @0x003E
     value = initial
-    # orphan @0x0042
-    it
-    # orphan @0x0046
-    # orphan @0x0048
-    value = function(value, element)
     # orphan @0x0056
     return value
 try:
@@ -239,81 +208,27 @@ class _PlaceholderType:
         return 'Placeholder'
 Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
-    # orphan @0x0022
-    a is Placeholder
-    # orphan @0x0020
-    # orphan @0x0008
-    nargs = len(args)
-    order = []
-    j = nargs
-    enumerate(args)
     if not args:
         return (0, None)
-    # orphan @0x0030
-    order.append(j)
-    j += 1
-    # orphan @0x0044
-    order.append(i)
-    # orphan @0x0050
-    phcount = j - nargs
-    phcount
-    # orphan @0x005C
     # orphan @0x0064
     None
     # orphan @0x0066
     return (phcount, merger)
 def _partial_new(cls, func):
-    # orphan @0x0068
-    value is Placeholder
-    # orphan @0x0066
-    # orphan @0x005E
-    keywords.values()
     # orphan @0x0056
-    # orphan @0x004A
-    args[-1] is Placeholder
-    # orphan @0x0046
-    args
     # orphan @0x0036
-    # orphan @0x002C
-    hasattr(func, '__get__')
-    # orphan @0x0020
-    base_cls = partialmethod
-    callable(func)
-    # orphan @0x001E
     if issubclass(cls, partial):
         base_cls = partial
         if not callable(func):
             raise TypeError('the first argument must be callable')
     # orphan @0x0072
-    # orphan @0x007A
-    # orphan @0x007C
-    isinstance(func, base_cls)
-    # orphan @0x0088
-    pto_phcount = func._phcount
-    tot_args = func.args
-    args
-    # orphan @0x0098
-    tot_args += args
-    pto_phcount
-    # orphan @0x00A4
-    nargs = len(args)
-    nargs < pto_phcount
     # orphan @0x00B4
     tot_args += (Placeholder) * (pto_phcount - nargs)
-    # orphan @0x00C6
-    tot_args = func._merger(tot_args)
-    nargs > pto_phcount
     # orphan @0x00D8
     tot_args += args[pto_phcount:]
-    # orphan @0x00E8
-    (phcount, merger) = _partial_prepare_merger(tot_args)
     # orphan @0x00F6
     phcount = func._merger
     merger = pto_phcount
-    # orphan @0x0102
-    keywords = keywords
-    func = func.func
-    func.keywords
     # orphan @0x0114
     tot_args = args
     (phcount, merger) = _partial_prepare_merger(tot_args)
@@ -361,49 +276,18 @@ class partial:
     def __reduce__(self):
         if self.keywords:
             None
-        # orphan @0x001C
-        self.__dict__
         # orphan @0x0022
         None
         # orphan @0x0024
         return (())
     def __setstate__(self, state):
-        # orphan @0x004E
-        kwds is not None
-        # orphan @0x0044
-        isinstance(args, tuple)
-        # orphan @0x0030
-        (func, args, kwds, namespace) = state
-        callable(func)
         # orphan @0x001E
-        # orphan @0x0012
-        len(state) != 4
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
-        # orphan @0x0056
-        isinstance(kwds, dict)
-        # orphan @0x0060
-        namespace is not None
-        # orphan @0x0068
-        isinstance(namespace, dict)
         # orphan @0x0072
-        # orphan @0x007A
-        args
-        # orphan @0x007E
-        args[-1] is Placeholder
         # orphan @0x008A
-        # orphan @0x0092
-        (phcount, merger) = _partial_prepare_merger(args)
-        args = tuple(args)
-        kwds is None
-        # orphan @0x00AE
-        kwds = {}
-        # orphan @0x00B4
-        type(kwds) is not dict
         # orphan @0x00C0
         kwds = dict(kwds)
-        # orphan @0x00C8
-        namespace is None
         # orphan @0x00D0
         namespace = {}
         # orphan @0x00D4
@@ -453,8 +337,6 @@ class partialmethod:
                     result.__self__ = new_func.__self__
                 except AttributeError:
                     pass
-        # orphan @0x0064
-        result is None
         # orphan @0x006C
         result = self._make_unbound_method().__get__(obj, cls)
         # orphan @0x007C
@@ -495,16 +377,6 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     if kwds:
         for item in kwds.items():
             key += item
-    # orphan @0x0036
-    typed
-    # orphan @0x003A
-    key += (tuple)(_make_key.<locals>.<listcomp>(args))
-    kwds
-    # orphan @0x0058
-    key += (tuple)(_make_key.<locals>.<listcomp>(kwds.values()))
-    # orphan @0x0078
-    len(key) == 1
-    # orphan @0x0084
     # orphan @0x0094
     return key[0]
     # orphan @0x009C
@@ -529,13 +401,10 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    # orphan @0x0020
-    # orphan @0x0018
     # orphan @0x002A
     user_function = 128
     wrapper.cache_parameters = lru_cache.<locals>.<lambda>
     return update_wrapper(wrapper, user_function)
-    # orphan @0x005C
     # orphan @0x0064
     # orphan @0x006C
     def decorating_function(user_function):
@@ -545,19 +414,6 @@ def lru_cache(maxsize, typed):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
-    # orphan @0x0068
-    def wrapper():
-        result = misses(**kwds)
-        return result
-    ()
-    # orphan @0x0078
-    # orphan @0x0080
-    def wrapper():
-        return result
-        # orphan @0x002A
-        result = misses(**kwds)
-        return result
-    ()
     # orphan @0x009C
     def wrapper():
         if link is not None:
@@ -565,8 +421,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             last = link_prev[link_next]
             yield from hits
             return last
-        # orphan @0x00A8
-        # orphan @0x00AA
     ()
     # orphan @0x00C6
     def cache_info():
@@ -606,9 +460,6 @@ def _c3_merge(sequences):
         break
     if candidate is None:
         raise RuntimeError('Inconsistent hierarchy')
-    # orphan @0x0062
-    result.append(candidate)
-    sequences
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -626,11 +477,6 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
-    # orphan @0x0046
-    explicit_bases = list(cls.__bases__[None:boundary])
-    abstract_bases = []
-    other_bases = list(cls.__bases__[boundary:])
-    abcs
     # orphan @0x0044
     []
     enumerate(reversed(cls.__bases__))
@@ -639,16 +485,6 @@ def _c3_mro(cls, abcs):
             boundary = len(cls.__bases__) - i
             break
     boundary = 0
-    # orphan @0x0074
-    # orphan @0x0076
-    base(issubclass, cls)
-    # orphan @0x0082
-    (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__))
-    # orphan @0x009A
-    # orphan @0x00A6
-    abstract_bases
-    # orphan @0x00AA
-    # orphan @0x00AC
     # orphan @0x00BA
     explicit_c3_mros = _c3_mro.<locals>.<listcomp>(explicit_bases)
     abstract_c3_mros = _c3_mro.<locals>.<listcomp>(abstract_bases)
@@ -764,10 +600,6 @@ class _singledispatchmethod_get:
             pass
         # orphan @0x0038
         0
-        # orphan @0x003A
-        self.__module__ = func.__module__
-        # orphan @0x0060
-        self.__doc__ = func.__doc__
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -778,24 +610,13 @@ class _singledispatchmethod_get:
         # orphan @0x0062
         return f"<single dispatch method {name}>"
     def __call__(self):
-        # orphan @0x0022
-        method = self._dispatch(args[self._dispatch_arg_index].__class__)
-        hasattr(method, '__get__')
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        # orphan @0x003E
-        skip_bound_arg = False
-        isinstance(method, staticmethod)
         # orphan @0x004C
         skip_bound_arg = self._dispatch_arg_index == 1
-        # orphan @0x0056
-        method = method.__get__(self._obj, self._cls)
-        isinstance(method, MethodType)
         # orphan @0x0070
         skip_bound_arg = self._dispatch_arg_index == 1
-        # orphan @0x007A
-        skip_bound_arg
         # orphan @0x007E
         return method(**kwargs)
         # orphan @0x0090
@@ -822,25 +643,12 @@ class cached_property:
         if self.attrname is None:
             self.attrname = name
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
-        # orphan @0x0012
-        name != self.attrname
     def __get__(self, instance, owner):
         # orphan @0x0032
         msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
-        # orphan @0x001E
-        cache = instance.__dict__
         # orphan @0x0016
-        # orphan @0x000C
-        self.attrname is None
         if instance is None:
             return self
-        # orphan @0x0062
-        val = cache.get(self.attrname, _NOT_FOUND)
-        val is _NOT_FOUND
-        # orphan @0x0078
-        val = self.func(instance)
-        yield from cache
-        val
         # orphan @0x009A
         msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
         # orphan @0x00CA

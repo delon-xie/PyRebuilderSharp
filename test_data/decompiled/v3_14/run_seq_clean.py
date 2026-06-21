@@ -76,6 +76,4 @@ def <genexpr>(.0):
 []
 raise
 e = None
-# orphan @0x0588
-# orphan @0x060A
-# [SUMMARY] 54 blocks · 53 processed · 6 orphan · 376 instr
+# [SUMMARY] 54 blocks · 55 processed · 6 orphan · 376 instr

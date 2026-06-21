@@ -2870,7 +2870,6 @@ class SyntaxWarningTest(unittest.TestCase):
         """
         with self.assertWarnsRegex(SyntaxWarning, errtext):
             compile(code, filename, mode)
-        # orphan @0x002E
     def test_return_in_finally(self):
         source = textwrap.dedent("""
             def f():
@@ -3136,7 +3135,6 @@ def fib(n):
             compile(s1, '<string>', 'exec')
         finally:
             pass
-        # orphan @0x0076
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:
@@ -3367,7 +3365,6 @@ while 1:
     def test_deep_invalid_rule(self):
         with self.assertRaises(SyntaxError):
             compile(source, '<string>', 'exec')
-        # orphan @0x0030
     def test_except_stmt_invalid_as_expr(self):
         self._check_error(textwrap.dedent("""
                 try:

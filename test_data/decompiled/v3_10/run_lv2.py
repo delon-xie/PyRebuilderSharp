@@ -25,6 +25,4 @@ with open(INPUT_FILE) as f:
                     print(f"  Line {i}: expected={e}
            actual=  {a}")
                     break
-# orphan @0x01B0
-ex = None
-# [SUMMARY] 24 blocks · 22 processed · 4 orphan · 223 instr
+# [SUMMARY] 24 blocks · 23 processed · 4 orphan · 223 instr

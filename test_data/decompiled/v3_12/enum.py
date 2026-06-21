@@ -274,9 +274,6 @@ class _proto_member:
         except:
             pass
         raise
-        # orphan @0x03FE
-        # orphan @0x0492
-        # orphan @0x0658
 class EnumDict(dict):
     __doc__ = """
     Track enum member order and ensure member names are not reused.
@@ -335,7 +332,6 @@ class EnumDict(dict):
                 value = list(value)
         if single:
             value = auto_valued[0]
-        # orphan @0x0656
     member_names = member_names()
     def update(self, members):
         try:
@@ -347,7 +343,6 @@ class EnumDict(dict):
                         more_members.items()
                         for (name, value) in more_members.items():
                             pass
-                        return None
                         try:
                             try:
                                 break
@@ -369,7 +364,6 @@ class EnumDict(dict):
                     pass
         except:
             pass
-        # orphan @0x00B0
 _EnumDict = EnumDict
 class EnumType(type):
     __doc__ = """
@@ -504,7 +498,6 @@ class EnumType(type):
             raise TypeError(f"member order does not match _order_:
   {enum_class._member_names_!r}
   {_order_!r}")
-        # orphan @0x0C68
     def __bool__(cls):
         """
         classes/types should always be True.
@@ -568,7 +561,6 @@ class EnumType(type):
         elif not value in cls._unhashable_values_:
             value in cls._hashable_values_
         return
-        # orphan @0x00CA
     def __delattr__(cls, attr):
         if attr in cls._member_map_:
             raise AttributeError(f"{cls.__name__!r} cannot delete member {attr!r}.")
@@ -659,8 +651,6 @@ class EnumType(type):
         except:
             pass
         raise
-        # orphan @0x0348
-        # orphan @0x0354
     def _convert_(cls, name, module, filter, source = None):
         """
         Create a new Enum subclass that replaces a collection of global constants
@@ -721,7 +711,6 @@ class EnumType(type):
         members
         # orphan @0x0234
         members.sort(<lambda>)
-        # orphan @0x0260
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -872,14 +861,9 @@ class Enum(EnumType):
         exc = None
         ve_exc = None
         return
-        # orphan @0x0144
-        cls._member_map_
-        # orphan @0x015C
-        getattr(cls, '_%s__in_progress' % cls.__name__, False)
         # orphan @0x0190
         # orphan @0x01A8
         # orphan @0x01C4
-        # orphan @0x021A
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -915,8 +899,6 @@ class Enum(EnumType):
         except:
             pass
         cls = self.__class__
-        # orphan @0x01C4
-        # orphan @0x0282
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
     def __repr__(self):
@@ -1366,7 +1348,6 @@ def _simple_enum(etype = Enum):
         raise
         raise
         raise
-        # orphan @0x0C6C
         # orphan @0x0D32
         enum_class._unhashable_values_.append(value)
         enum_class._unhashable_values_map_.setdefault(name, []).append(value)
@@ -1539,69 +1520,25 @@ def _test_simple_enum(checked_enum, simple_enum):
         raise TypeError("""enum mismatch:
    %s""" % """
    """.join(failed))
-    # orphan @0x03BC
-    # orphan @0x03C2
-    failed_member = []
-    name not in simple_keys
-    # orphan @0x03D0
-    failed.append('missing member from simple enum: %r' % name)
-    # orphan @0x03FA
-    name not in checked_keys
-    # orphan @0x0402
-    failed.append('extra member in simple enum: %r' % name)
-    # orphan @0x042C
-    checked_member_dict = checked_enum[name].__dict__
-    checked_member_keys = list(checked_member_dict.keys())
-    simple_member_dict = simple_enum[name].__dict__
-    simple_member_keys = list(simple_member_dict.keys())
-    set(checked_member_keys + simple_member_keys)
-    # orphan @0x04E8
-    # orphan @0x04EC
-    key in ('__module__', '__objclass__', '_inverted_')
     # orphan @0x04F6
-    # orphan @0x04F8
-    key not in simple_member_keys
     # orphan @0x0500
     failed_member.append(f"missing key {key!r} not in the simple enum member {name!r}")
-    # orphan @0x0530
-    key not in checked_member_keys
     # orphan @0x0538
     failed_member.append(f"extra key {key!r} in simple enum member {name!r}")
-    # orphan @0x0568
-    checked_value = checked_member_dict[key]
-    simple_value = simple_member_dict[key]
-    checked_value != simple_value
     # orphan @0x0586
     # orphan @0x0588
     failed_member.append(f"{key!r}:
          {f"checked member -> {checked_value!r}"!s}
          {f"simple member  -> {simple_value!r}"!s}")
-    # orphan @0x05CA
-    failed_member
     # orphan @0x05D0
     # orphan @0x05D2
     failed.append(f"{name!r} member mismatch:
       {"""
       """.join(failed_member)!s}")
-    # orphan @0x0626
-    # orphan @0x062A
-    method in simple_keys
-    # orphan @0x0634
-    method in checked_keys
     # orphan @0x063C
-    # orphan @0x063E
-    method not in simple_keys
-    # orphan @0x0646
-    method not in checked_keys
-    # orphan @0x064E
-    checked_method = getattr(checked_enum, method, None)
-    simple_method = getattr(simple_enum, method, None)
-    hasattr(checked_method, '__func__')
     # orphan @0x069A
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
-    # orphan @0x06CA
-    checked_method != simple_method
     # orphan @0x06D4
     # orphan @0x06D6
     method!r(f":  {f"checked -> {checked_method!r}"}{'30'!s} {f"simple -> {simple_method!r}"!s}")
@@ -1648,5 +1585,4 @@ def _old_convert_(etype, name, module, filter, source = None):
     return cls
     # orphan @0x0126
     members.sort(<lambda>)
-    # orphan @0x0152
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 285 instr

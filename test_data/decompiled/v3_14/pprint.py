@@ -69,7 +69,6 @@ _safe_key applied to both the key and the value.
             (str(type(self.obj)), id(self.obj)) < (str(type(other.obj)), id(other.obj))
         return
         return
-        # orphan @0x011E
     __static_attributes__ = ['obj']
     __classdictcell__ = __classdict__
 def _safe_tuple(t):
@@ -166,15 +165,6 @@ underscore_numbers
             p(self, object, stream, indent, allowance, context, level + 1)
             return None
         stream.write(rep)
-        # orphan @0x01B2
-        isinstance(object, _pprint_dataclass)
-        is_dataclass(object)
-        # orphan @0x01DE
-        object.__dataclass_params__.repr
-        # orphan @0x0216
-        hasattr(object.__repr__, '__wrapped__')
-        # orphan @0x024E
-        '__create_fn__' in object.__repr__.__wrapped__.__qualname__
         # orphan @0x0298
         self._pprint_dataclass(object, stream, indent, allowance, context, level + 1)
     def _format_block_start(self, start_str, indent):

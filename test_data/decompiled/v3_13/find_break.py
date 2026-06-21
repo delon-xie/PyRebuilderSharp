@@ -29,9 +29,6 @@ def test_until_broken(exprs):
         return f"CONDITIONAL: {out[None:80]}"
     raise
 def find_breaking_point(exprs, lo, hi):
-    # orphan @0x000C
-    result = test_until_broken(exprs[None:mid + 1])
-    result != 'OK'
     while True:
         result = test_until_broken(exprs[None:mid + 1])
         if result != 'OK':
@@ -39,7 +36,6 @@ def find_breaking_point(exprs, lo, hi):
         else:
             lo = mid + 1
     return lo
-    # orphan @0x0096
     # orphan @0x00A0
 base = all_exprs[None:6]
 r = test_until_broken(base)

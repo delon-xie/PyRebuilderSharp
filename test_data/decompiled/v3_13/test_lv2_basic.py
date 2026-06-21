@@ -18,8 +18,4 @@ for n in range(10):
     m = n + 1
 break
 z = y
-# orphan @0x0042
-j = i * 2
-i += 1
-i < 5
-# [SUMMARY] 17 blocks · 16 processed · 3 orphan · 67 instr
+# [SUMMARY] 17 blocks · 17 processed · 3 orphan · 67 instr

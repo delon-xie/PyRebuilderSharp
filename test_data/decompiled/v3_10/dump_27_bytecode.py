@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0144
-chr(next_type)
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
 data = open(path, 'rb').read()
@@ -67,4 +65,4 @@ Constants at {pos}:")
 const_type = data[pos]
 '  Type: '(f"{const_type}{'#x'}")
 print
-# [SUMMARY] 25 blocks · 24 processed · 2 orphan · 701 instr
+# [SUMMARY] 25 blocks · 25 processed · 2 orphan · 701 instr

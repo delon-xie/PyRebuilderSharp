@@ -25,9 +25,6 @@ def mixed_2(n):
             break
     break
 def mixed_3(n):
-    # orphan @0x0014
-    i += 1
-    i % 2 == 0
     total = 0
     i = 0
     while True:

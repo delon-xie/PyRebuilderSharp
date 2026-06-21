@@ -3164,8 +3164,6 @@ def fib(n):
     a, b = 0, 1
 """
         raise
-        # orphan @0x009C
-        # orphan @0x00DE
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:

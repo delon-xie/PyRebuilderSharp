@@ -58,6 +58,4 @@ e = None
 raise
 e = None
 []
-# orphan @0x02A6
-# orphan @0x0338
-# [SUMMARY] 34 blocks · 32 processed · 3 orphan · 233 instr
+# [SUMMARY] 34 blocks · 34 processed · 3 orphan · 233 instr

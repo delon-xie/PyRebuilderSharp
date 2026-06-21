@@ -264,9 +264,6 @@ convert each quasi-member into an instance of the new enum class
         raise
         if not True:
             pass
-        # orphan @0x0436
-        # orphan @0x04D0
-        # orphan @0x06CA
     __static_attributes__ = ['value']
 class EnumDict(dict):
     __firstlineno__ = 328
@@ -318,7 +315,6 @@ Single underscore (sunder) names are reserved.
         break
         if single:
             value = auto_valued[0]
-        # orphan @0x072A
     member_names = member_names()
     def update(self, members):
         try:
@@ -341,10 +337,8 @@ Single underscore (sunder) names are reserved.
         for (value, name) in more_members.items():
             pass
         break
-        # orphan @0x0092
         # orphan @0x0096
         # orphan @0x00A8
-        # orphan @0x00B0
     __static_attributes__ = ('_auto_called', '_cls_name', '_ignore', '_last_values', '_member_names')
 _EnumDict = EnumDict
 class EnumType(type):
@@ -501,8 +495,6 @@ Metaclass for Enum
             if not True:
                 pass
         break
-        # orphan @0x0DB4
-        # orphan @0x0DC6
     def __bool__(cls):
         """
 classes/types should always be True.
@@ -560,7 +552,6 @@ If this is not correct, unpickling will fail in some circumstances.
             pass
         return True
         return
-        # orphan @0x00E6
     def __delattr__(cls, attr):
         raise AttributeError(f"{cls.__name__} cannot delete member {attr}.")
     def __dir__(cls):
@@ -645,8 +636,6 @@ Convenience method to create a new Enum class.
         except:
             pass
         raise
-        # orphan @0x037E
-        # orphan @0x0386
     def _convert_(cls, name, module, filter, source):
         """
 Create a new Enum subclass that replaces a collection of global constants
@@ -703,7 +692,6 @@ Create a new Enum subclass that replaces a collection of global constants
         except:
             pass
         raise
-        # orphan @0x0284
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -1065,8 +1053,6 @@ using :func:`_simple_enum`.
             pass
         if not True:
             pass
-        # orphan @0x0D44
-        # orphan @0x0EB8
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1193,7 +1179,6 @@ Check an enumeration for various constraints. (see EnumCheck)
             value = 'combined values of 0x%x' % missing_value
         raise ValueError(f"invalid Flag {cls_name}: {alias} {value} [use enum.show_flag_values(value) for details]")
         alias = 'alias %s is missing' % missing_names[0]
-        # orphan @0x06D0
     __static_attributes__ = ['checks']
 def _test_simple_enum(checked_enum, simple_enum):
     """
@@ -1236,69 +1221,26 @@ If differences are found, a :exc:`TypeError` is raised.
         raise TypeError("""enum mismatch:
    %s""" % """
    """.join(failed))
-    # orphan @0x03DE
-    failed.sort()
-    member_names
-    # orphan @0x0406
-    # orphan @0x040C
-    failed_member = []
-    # orphan @0x041C
-    failed.append('missing member from simple enum: %r' % name)
-    # orphan @0x0446
-    # orphan @0x0450
-    failed.append('extra member in simple enum: %r' % name)
-    # orphan @0x047A
-    checked_member_keys = list(checked_member_dict.keys())
-    simple_member_keys = list(simple_member_dict.keys())
-    set(checked_member_keys + simple_member_keys)
-    # orphan @0x0532
-    # orphan @0x0536
-    key in ('__module__', '__objclass__', '_inverted_')
     # orphan @0x0544
-    # orphan @0x0548
-    key not in simple_member_keys
     # orphan @0x0554
     failed_member.append(f"missing key {key} not in the simple enum member {name}")
-    # orphan @0x058A
-    key not in checked_member_keys
     # orphan @0x0596
     failed_member.append(f"extra key {key} in simple enum member {name}")
-    # orphan @0x05CC
-    simple_value = simple_member_dict[key]
     # orphan @0x05E8
     # orphan @0x05EC
     failed_member.append(f"{key}:
          {f"checked member -> {checked_value}"}
          {f"simple member  -> {simple_value}"}")
     # orphan @0x0638
-    # orphan @0x063C
-    failed_member
     # orphan @0x064C
     # orphan @0x0650
     failed.append(f"{name} member mismatch:
       {"""
       """.join(failed_member)}")
-    # orphan @0x06A4
-    ('__str__', '__repr__', '__reduce_ex__', '__format__', '__getnewargs_ex__', '__getnewargs__', '__reduce_ex__', '__reduce__')
-    # orphan @0x06AC
-    # orphan @0x06B0
-    method in simple_keys
-    # orphan @0x06BE
-    method in checked_keys
     # orphan @0x06CA
-    # orphan @0x06CE
-    method not in simple_keys
-    # orphan @0x06DA
-    method not in checked_keys
-    # orphan @0x06E6
-    checked_method = getattr(checked_enum, method, None)
-    simple_method = getattr(simple_enum, method, None)
-    hasattr(checked_method, '__func__')
     # orphan @0x073C
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
-    # orphan @0x076C
-    checked_method != simple_method
     # orphan @0x0778
     method(f":  {f"checked -> {checked_method}"}30 {f"simple -> {simple_method}"}")
     failed.append

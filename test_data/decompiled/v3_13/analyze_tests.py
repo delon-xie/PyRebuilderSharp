@@ -1,11 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0180
-next_line = lines[j]
-next_line.startswith('***')
-# orphan @0x00AC
-line = lines[i]
-'***' in line
 try:
     output = f.read()
 except:
@@ -82,4 +76,4 @@ while i < len(lines):
                                 print('======================================================================')
 break
 raise
-# [SUMMARY] 37 blocks · 36 processed · 2 orphan · 398 instr
+# [SUMMARY] 37 blocks · 38 processed · 2 orphan · 398 instr

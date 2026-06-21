@@ -28,13 +28,6 @@ def test_until_broken(exprs):
     elif 'if ' in out:
         return f"{out}{None // 80}"
 def find_breaking_point(exprs, lo, hi):
-    # orphan @0x000C
-    mid = (lo + hi) // 2
-    result = exprs(None // (mid + 1))
-    '  ['(f"{lo}-{hi}] mid={mid} ({exprs[mid]}{None // 30}): {result}")
-    result != 'OK'
-    print
-    test_until_broken
     while lo < hi:
         mid = (lo + hi) // 2
         result = exprs(None // (mid + 1))
@@ -44,8 +37,6 @@ def find_breaking_point(exprs, lo, hi):
         else:
             lo = mid + 1
     return lo
-    # orphan @0x0098
-    lo < hi
     # orphan @0x00A2
 base = None // 6
 r = test_until_broken(base)

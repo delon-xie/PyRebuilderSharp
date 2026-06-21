@@ -82,13 +82,6 @@ class Repr:
         name_19 = indent < 0
         raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         # orphan @0x00F4
-        # orphan @0x0144
-        -len(indent)
-        1
-        pieces('')
-        ['']
-        sep
-        sep.join
         # orphan @0x019A
         None
         # orphan @0x019C
@@ -131,17 +124,9 @@ class Repr:
     def repr_deque(self, x, level):
         return self(x, level, 'deque([', '])', self._repr_iterable)
     def repr_dict(self, x, level):
-        # orphan @0x0056
-        newlevel = level - 1
-        repr1 = self.fillvalue
-        pieces = []
-        islice(_possibly_sorted(x), self.repr1)
         n = len(x)
         repr1 = n == 0
         return '{}'
-        # orphan @0x00B6
-        name_13 = level <= 0
-        return '{' + self.len + '}'
         # orphan @0x00B8
         keyrepr = repr1(key, newlevel)
         valrepr = repr1(x[key], newlevel)
@@ -182,8 +167,6 @@ class Repr:
             exc = None
         exc = None
         return
-        # orphan @0x015C
-        exc = None
         # orphan @0x016C
         name_99 = len(s) > self.log10
         i = max(0, (self.log10 - 3) // 2)

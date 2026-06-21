@@ -22,5 +22,4 @@ for n in range(5):
         pass
 break
 raise
-# orphan @0x00BE
-# [SUMMARY] 27 blocks · 26 processed · 3 orphan · 77 instr
+# [SUMMARY] 27 blocks · 27 processed · 3 orphan · 77 instr

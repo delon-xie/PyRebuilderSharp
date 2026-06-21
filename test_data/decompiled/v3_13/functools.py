@@ -334,7 +334,6 @@ callables as instance methods.
         result = [new_func](**self.keywords)
         partial
         return result
-        # orphan @0x0130
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = ()
@@ -342,16 +341,7 @@ def _unwrap_partial(func):
     while isinstance(func, func):
         func = func.func
     return func
-    # orphan @0x002C
-    func = func.func
-    isinstance(func, func)
 def _unwrap_partialmethod(func):
-    # orphan @0x0052
-    func = func.__partialmethod__
-    isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
-    # orphan @0x000E
-    prev = func
-    isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
     prev = None
     while True:
         prev = func
@@ -367,9 +357,6 @@ def _unwrap_partialmethod(func):
                     else:
                         func = _unwrap_partial(func)
                         return func
-    # orphan @0x00D8
-    func = getattr(func, 'func')
-    isinstance(func, _unwrap_partial)
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -415,7 +402,6 @@ saves space and improves lookup speed.
     for _ in []:
         pass
     break
-    # orphan @0x0182
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
 
@@ -622,7 +608,6 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
     base
     other_bases
     return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
-    # orphan @0x02F8
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
@@ -703,7 +688,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
     (bases, cls)
     n
     cell_1
-    # orphan @0x0298
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -776,8 +760,6 @@ Registers a new implementation for the given *cls* on a *generic_method*.
         return f"<single dispatch method descriptor {name}>"
         raise
         raise
-        # orphan @0x00A0
-        # orphan @0x00A8
     __static_attributes__ = ('dispatcher', 'func')
 class _singledispatchmethod_get:
     __firstlineno__ = 1059
@@ -797,8 +779,6 @@ class _singledispatchmethod_get:
         else:
             0
         raise
-        # orphan @0x0118
-        # orphan @0x0138
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -811,8 +791,6 @@ class _singledispatchmethod_get:
         return f"<bound single dispatch method {name} of {self._obj}>"
         raise
         raise
-        # orphan @0x00BA
-        # orphan @0x00C2
     def __call__(self):
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
@@ -875,8 +853,4 @@ class cached_property:
 raise
 raise
 raise
-# orphan @0x02CE
-# orphan @0x02E6
-# orphan @0x02FE
-# orphan @0x0316
-# [SUMMARY] 29 blocks · 25 processed · 5 orphan · 359 instr
+# [SUMMARY] 29 blocks · 29 processed · 5 orphan · 359 instr

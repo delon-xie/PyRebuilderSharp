@@ -21,5 +21,4 @@ for n in range(5):
     elif not n == 1:
         pass
 raise
-# orphan @0x00AA
-# [SUMMARY] 27 blocks · 26 processed · 3 orphan · 74 instr
+# [SUMMARY] 27 blocks · 27 processed · 3 orphan · 74 instr

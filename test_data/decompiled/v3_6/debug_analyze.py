@@ -22,15 +22,6 @@ if match:
     status = match.group(2)
     j = i + 1
     found_versions = []
-# orphan @0x00B0
-j < len(lines)
-# orphan @0x00BC
-j < i + 30
-# orphan @0x00CA
-next_line = lines[j]
-next_line.startswith('***')
-# orphan @0x00DC
-'.pyc' in next_line
 # orphan @0x00E6
 next_line.startswith
 # orphan @0x0180
@@ -38,4 +29,4 @@ next_line.startswith
 print()
 i += 1
 print(f"Total tests with versions found: {debug_count}")
-# [SUMMARY] 29 blocks · 23 processed · 10 orphan · 201 instr
+# [SUMMARY] 29 blocks · 27 processed · 10 orphan · 201 instr

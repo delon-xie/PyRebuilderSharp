@@ -84,5 +84,4 @@ ast.dump
 break
 raise
 ex = None
-# orphan @0x041C
-# [SUMMARY] 37 blocks · 36 processed · 2 orphan · 250 instr
+# [SUMMARY] 37 blocks · 37 processed · 2 orphan · 250 instr

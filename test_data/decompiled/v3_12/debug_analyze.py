@@ -1,8 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x00AE
-line = lines[i]
-'***' in line
 try:
     output = f.read()
 except:
@@ -52,7 +49,4 @@ while i < len(lines):
                             found_versions.append((version, next_line.strip()))
 print()
 break
-# orphan @0x0170
-next_line = lines[j]
-next_line.startswith('***')
-# [SUMMARY] 32 blocks · 30 processed · 3 orphan · 236 instr
+# [SUMMARY] 32 blocks · 32 processed · 3 orphan · 236 instr

@@ -140,7 +140,6 @@ def _possibly_sorted(x):
     finally:
         pass
     return
-    # orphan @0x0024
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

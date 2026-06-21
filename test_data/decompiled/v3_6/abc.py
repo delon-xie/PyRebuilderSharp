@@ -124,8 +124,6 @@ class ABCMeta(type):
 
         Returns the subclass, to allow usage as a class decorator.
         """
-        # orphan @0x0012
-        issubclass(subclass, cls)
         if not isinstance(subclass, type):
             raise TypeError('Can only register classes')
         return subclass
@@ -166,16 +164,12 @@ class ABCMeta(type):
             if subclass in cls._abc_negative_cache:
                 return False
             return ok
-        # orphan @0x005A
-        ok
         # orphan @0x005E
         cls._abc_cache.add(subclass)
         cls._abc_negative_cache
         # orphan @0x008C
         cls._abc_cache.add(subclass)
         return True
-        # orphan @0x00A4
-        cls._abc_registry
         # orphan @0x00A6
         issubclass(subclass, rcls)
         # orphan @0x00C4

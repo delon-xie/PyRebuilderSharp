@@ -20,14 +20,6 @@ def depth_5_for():
                     for e in range(2):
                         total += 1
 def depth_5_while():
-    # orphan @0x002C
-    b -= 1
-    c = 2
-    c > 0
-    # orphan @0x0014
-    a -= 1
-    b = 2
-    b > 0
     total = 0
     a = 2
     while a > 0:
@@ -55,18 +47,6 @@ def depth_5_while():
                             pass
                         elif a > 0:
                             pass
-    # orphan @0x0044
-    c -= 1
-    d = 2
-    d > 0
-    # orphan @0x005C
-    d -= 1
-    e = 2
-    e > 0
-    # orphan @0x0074
-    e -= 1
-    total += 1
-    e > 0
 def depth_5_try():
     try:
         result = 42

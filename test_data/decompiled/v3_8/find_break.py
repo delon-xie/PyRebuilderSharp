@@ -15,8 +15,6 @@ def test_until_broken(exprs):
     if 'Decompilation failed' in out:
         return 'CRASH'
     return 'NO_COMPILE'
-    # orphan @0x009A
-    'if ' in out
     # orphan @0x00A2
     return f"CONDITIONAL: {out[None:80]}"
     # orphan @0x00B4

@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x001C
-j = i * 2
-i += 1
-i < 5
 x = 1
 y = 2
 z = x + y
@@ -18,4 +14,4 @@ try:
     a = 1
 except:
     a = 0
-# [SUMMARY] 7 blocks · 7 processed · 1 orphan · 51 instr
+# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 51 instr

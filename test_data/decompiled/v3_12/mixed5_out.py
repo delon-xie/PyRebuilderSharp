@@ -28,9 +28,6 @@ def mixed_2(n):
             total += k
     return total
 def mixed_3(n):
-    # orphan @0x0014
-    i += 1
-    i % 2 == 0
     total = 0
     i = 0
     while i < n:

@@ -44,7 +44,4 @@ total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 # orphan @0x0208
-# orphan @0x020A
-yield from results
-match
-# [SUMMARY] 33 blocks · 31 processed · 8 orphan · 328 instr
+# [SUMMARY] 33 blocks · 32 processed · 8 orphan · 328 instr

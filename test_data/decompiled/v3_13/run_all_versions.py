@@ -129,5 +129,4 @@ def <genexpr>(.0):
         break
     except:
         pass
-# orphan @0x058A
-# [SUMMARY] 49 blocks · 48 processed · 3 orphan · 380 instr
+# [SUMMARY] 49 blocks · 49 processed · 3 orphan · 380 instr

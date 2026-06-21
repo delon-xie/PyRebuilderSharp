@@ -196,13 +196,6 @@ class _proto_member:
         # orphan @0x008E
         new_exc = TypeError('_value_ not set in __new__, unable to create it')
         new_exc.__cause__ = exc
-        # orphan @0x0084
-        # orphan @0x0066
-        # orphan @0x0030
-        args = (args)
-        enum_class._use_args_
-        # orphan @0x0026
-        enum_class._member_type_ is tuple
         delattr(enum_class, member_name)
         value = self.value
         if not isinstance(value, tuple):
@@ -220,42 +213,17 @@ class _proto_member:
                 pass
         except KeyError:
             pass
-        # orphan @0x00E0
-        Flag is not None
-        # orphan @0x00EA
-        issubclass(enum_class, Flag)
-        # orphan @0x00F6
-        isinstance(value, int)
         # orphan @0x011A
         enum_class
-        # orphan @0x0146
-        # orphan @0x016A
-        # orphan @0x016C
-        canonical_member._value_ == value
-        # orphan @0x017E
-        enum_member = canonical_member
         # orphan @0x0188
-        # orphan @0x0194
-        # orphan @0x01B2
-        not issubclass(enum_class, Flag)
-        # orphan @0x01C0
-        enum_class._member_names_.append(member_name)
-        Flag is not None
         # orphan @0x01D8
         enum_class
         issubclass
-        # orphan @0x01DC
-        # orphan @0x01E4
-        isinstance(value, int)
-        # orphan @0x01F0
-        _is_single_bit(value)
         # orphan @0x01FA
         enum_class._member_names_.append(member_name)
         # orphan @0x022A
-        # orphan @0x0232
         # orphan @0x0234
         enum_class._hashable_values_.append(value)
-        # orphan @0x0242
 class EnumDict(dict):
     __doc__ = """
     Track enum member order and ensure member names are not reused.
@@ -279,19 +247,12 @@ class EnumDict(dict):
 
         Single underscore (sunder) names are reserved.
         """
-        # orphan @0x00E0
-        key == '__order__'
-        # orphan @0x00D4
-        _is_dunder(key)
         # orphan @0x00CE
         # orphan @0x00C8
         (already)
         # orphan @0x00C4
         '_ignore_ cannot specify already set names: %r'
         ValueError
-        # orphan @0x00AC
-        already = set(value) & set(self._member_names)
-        already
         # orphan @0x00A8
         self
         value
@@ -299,13 +260,7 @@ class EnumDict(dict):
         # orphan @0x0064
         value
         value.__func__
-        # orphan @0x005A
-        isinstance(value, staticmethod)
         # orphan @0x0052
-        # orphan @0x004C
-        self._auto_called
-        # orphan @0x0044
-        key == '_generate_next_value_'
         if (self._cls_name is not None) and _is_private(self._cls_name, key) and _is_sunder(key):
             key
         raise TypeError('%r already defined as %r' % (key, self[key]))
@@ -336,56 +291,25 @@ class EnumDict(dict):
         key = '_order_'
         self._member_names
         key
-        # orphan @0x0114
-        key in self._ignore
         # orphan @0x0124
         isinstance(value, nonmember)
-        # orphan @0x0186
-        isinstance(value, member)
         # orphan @0x0194
         value
         # orphan @0x0196
-        # orphan @0x019A
-        non_auto_store = True
-        single = False
-        isinstance(value, auto)
-        # orphan @0x01AE
-        single = True
-        value = (value)
-        isinstance(value, tuple)
         # orphan @0x01C4
         EnumDict.__setitem__.<locals>.<genexpr>(value)
         any
-        # orphan @0x01D2
-        # orphan @0x01D8
-        auto_valued = []
-        t = type(value)
-        value
-        # orphan @0x026E
         # orphan @0x02AC
         super().__setitem__(key, value)
     @property
     def member_names(self):
         return list(self._member_names)
     def update(self, members):
-        # orphan @0x001E
         try:
             for name in members.keys():
                 pass
         except AttributeError:
             pass
-        # orphan @0x0038
-        # orphan @0x003A
-        name
-        self
-        value
-        # orphan @0x0052
-        more_members.items()
-        # orphan @0x005C
-        # orphan @0x005E
-        name
-        self
-        value
 _EnumDict = EnumDict
 class EnumType(type):
     __doc__ = """
@@ -408,16 +332,6 @@ class EnumType(type):
         '_generate_next_value_'
         classdict
         _gnv
-        # orphan @0x00AE
-        _gnv = staticmethod(_gnv)
-        classdict = dict(classdict.items())
-        _gnv is not None
-        # orphan @0x00A2
-        type(_gnv) is not staticmethod
-        # orphan @0x0084
-        _order_ = classdict.pop('_order_', None)
-        _gnv = classdict.get('_generate_next_value_')
-        _gnv is not None
         if _simple:
             return super().__new__(metacls, cls, bases, classdict, **kwds)
         classdict.setdefault('_ignore_', []).append('_ignore_')
@@ -518,40 +432,11 @@ class EnumType(type):
                         if () != _order_._member_names_:
                             raise
                     return
-        # orphan @0x0278
-        inverted
-        # orphan @0x0280
-        # orphan @0x0282
-        isinstance(p.value, int)
         # orphan @0x0292
         p.value = bits & p.value
         p.value = (bits & p.value[0]) + p.value[1:]
-        # orphan @0x02C0
-        # orphan @0x0312
-        hasattr(e, '__notes__')
         # orphan @0x0326
-        # orphan @0x033E
-        ReprEnum is not None
-        # orphan @0x0354
-        ReprEnum in bases
-        # orphan @0x035E
-        member_type is object
         # orphan @0x0368
-        # orphan @0x0370
-        '__format__' not in classdict
-        # orphan @0x037A
-        '__str__' not in classdict
-        '__format__'
-        classdict
-        # orphan @0x0396
-        method = member_type.__str__
-        method is object.__str__
-        # orphan @0x03A8
-        method = member_type.__repr__
-        ('__repr__', '__str__', '__format__', '__reduce_ex__')
-        '__str__'
-        '__str__'
-        classdict
     def __bool__(cls):
         """
         classes/types should always be True.
@@ -591,10 +476,6 @@ class EnumType(type):
         names is _not_given
         if type is None:
             raise TypeError(f"{cls} has no members; specify `names=()` if you meant to create a new, empty, enum")
-        # orphan @0x0044
-        names is _not_given
-        value
-        cls._create_
         # orphan @0x0052
         names
         None
@@ -615,8 +496,6 @@ class EnumType(type):
             return isinstance(result, cls)
         except ValueError:
             pass
-        # orphan @0x0042
-        value in cls._unhashable_values_
         # orphan @0x004C
         return value in cls._hashable_values_
     def __delattr__(cls, attr):
@@ -732,10 +611,6 @@ class EnumType(type):
                     member_value = item
                     (member_name, member_value) = item
         return
-        # orphan @0x0108
-        module is None
-        # orphan @0x0188
-        qualname is not None
         # orphan @0x0192
         metacls
         metacls.__new__
@@ -788,8 +663,6 @@ class EnumType(type):
         first_enum = bases[-1]
         if not isinstance(first_enum, EnumType):
             raise TypeError('new enumerations should be created as `EnumName([mixin_type, ...] [data_type,] enum_type)`')
-        # orphan @0x0026
-        mcls._find_data_type_(class_name, bases)
         # orphan @0x0032
         member_type = object
         return (member_type, first_enum)
@@ -811,7 +684,6 @@ class EnumType(type):
         base
         '__dataclass_fields__'
         '__repr__' in base.__dict__
-        # orphan @0x006A
     @classmethod
     def _find_data_type_(mcls, class_name, bases):
         data_types = set()
@@ -857,9 +729,6 @@ class EnumType(type):
         if first_enum is None:
             pass
         False
-        # orphan @0x0066
-        __new__ is not None
-        # orphan @0x0070
         # orphan @0x009A
         use_args = True
     def _add_member_(cls, name, member):
@@ -952,11 +821,6 @@ class Enum:
     def __new__(cls, value):
         # orphan @0x0082
         return cls[name]
-        # orphan @0x0072
-        value == member._value_
-        # orphan @0x0070
-        # orphan @0x0062
-        cls._member_map_.items()
         if type(value) is cls:
             return value
         try:
@@ -974,8 +838,6 @@ class Enum:
         finally:
             exc = None
             ve_exc = None
-        # orphan @0x0094
-        cls._member_map_
         # orphan @0x009A
         '_%s__in_progress'
         cls
@@ -984,24 +846,10 @@ class Enum:
         # orphan @0x00E0
         exc = e
         result = None
-        # orphan @0x011E
-        issubclass(cls, Flag)
-        Flag is not None
-        # orphan @0x012A
-        cls._boundary_ is EJECT
-        # orphan @0x0136
-        isinstance(result, int)
         # orphan @0x0142
         return result
-        # orphan @0x015C
-        ve_exc = ValueError('%r is not a valid %s' % (value, cls.__qualname__))
-        result is None
-        # orphan @0x0170
-        exc is None
         # orphan @0x017C
         exc = TypeError('error in %s._missing_: returned %r instead of None or a valid member' % (cls.__name__, result))
-        # orphan @0x018E
-        isinstance(exc, ValueError)
         # orphan @0x019A
         exc.__context__ = ve_exc
         # orphan @0x01A4
@@ -1080,7 +928,6 @@ class Enum:
         """
         # orphan @0x0032
         name
-        # orphan @0x0030
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
@@ -1089,9 +936,6 @@ class Enum:
             interesting.add(name)
         elif (name[0] == '_') and isinstance(obj, property) and (obj.fget is not None):
             pass
-        # orphan @0x0056
-        self.__class__.mro()
-        # orphan @0x00D4
     def __format__(self, format_spec):
         return str.__format__(str(self), format_spec)
     def __hash__(self):
@@ -1124,18 +968,12 @@ class StrEnum(str, ReprEnum):
     """
     def __new__(cls):
         """values must already be of type `str`"""
-        # orphan @0x001A
-        len(values) == 1
         if len(values) > 3:
             raise TypeError('too many arguments for str(): %r' % (values))
         elif not isinstance(values[0], str):
             raise TypeError('%r is not a string' % (values[0]))
         elif not isinstance(values[2], str):
             raise TypeError('errors must be a string, not %r' % values[2])
-        # orphan @0x0046
-        len(values) >= 2
-        # orphan @0x0052
-        isinstance(values[1], str)
         # orphan @0x0060
         (values[1])
         'encoding must be a string, not %r'
@@ -1218,13 +1056,8 @@ class Flag(Enum):
         """
         # orphan @0x00CC
         value = max(all_bits + 1, 2 ** value.bit_length()) + value
-        # orphan @0x00C4
-        value < 0
-        cls._boundary_ is KEEP
         # orphan @0x00B6
         return value
-        # orphan @0x00A8
-        cls._boundary_ is EJECT
         # orphan @0x0064
         max_bits = max(value.bit_length(), flag_mask.bit_length())
         bin(value, max_bits)
@@ -1234,11 +1067,6 @@ class Flag(Enum):
     given %s
   allowed %s"""
         ValueError
-        # orphan @0x005A
-        cls._boundary_ is STRICT
-        # orphan @0x004E
-        value & (all_bits ^ flag_mask)
-        # orphan @0x004A
         # orphan @0x001C
         flag_mask = cls._flag_mask_
         cls._singles_mask_
@@ -1261,10 +1089,6 @@ class Flag(Enum):
         return pseudo_member
         # orphan @0x00FA
         value
-        # orphan @0x00FC
-        # orphan @0x0104
-        neg_value = value
-        cls._boundary_ in (EJECT, KEEP)
         # orphan @0x0118
         value = all_bits + 1 + value
         value = singles_mask & value
@@ -1273,64 +1097,25 @@ class Flag(Enum):
         aliases = value & ~singles_mask
         member_value = value & singles_mask
         unknown
-        # orphan @0x0154
         # orphan @0x015C
         (cls.__name__, value, unknown, bin(unknown))
         '%s(%r) -->  unknown values %r [%s]'
         ValueError
         # orphan @0x0170
-        # orphan @0x0176
-        cls._member_type_ is object
         # orphan @0x0182
         pseudo_member = object.__new__(cls)
         pseudo_member = cls._member_type_.__new__(cls, value)
-        # orphan @0x019C
-        hasattr(pseudo_member, '_value_')
         # orphan @0x01A8
         pseudo_member
         value
-        # orphan @0x01AC
-        member_value
-        # orphan @0x01B4
-        aliases
         # orphan @0x01BA
         members = []
         combined_value = 0
         cls
-        # orphan @0x01C6
-        # orphan @0x01CE
-        # orphan @0x01D0
-        members.append(m)
-        combined_value |= m._value_
-        # orphan @0x01EA
-        aliases
-        # orphan @0x01F2
-        value = member_value | aliases
-        cls._member_map_.items()
-        # orphan @0x0206
-        # orphan @0x0208
-        pm not in members
-        # orphan @0x0218
-        pm._value_
-        # orphan @0x0220
-        pm._value_ & value == pm._value_
         # orphan @0x0232
         members.append(pm)
         combined_value
-        # orphan @0x023E
-        combined_value = pm._value_
-        # orphan @0x024A
-        unknown = value ^ combined_value
-        pseudo_member._name_ = '|'.join(Flag._missing_.<locals>.<listcomp>(members))
-        combined_value
-        # orphan @0x0270
-        pseudo_member._name_ = None
-        unknown
-        # orphan @0x027E
-        cls._boundary_ is STRICT
         # orphan @0x028A
-        # orphan @0x029A
-        unknown
         # orphan @0x02BA
         pseudo_member._name_ = None
         # orphan @0x02C2
@@ -1431,8 +1216,6 @@ class Flag(Enum):
         # orphan @0x005A
         return self.__class__(value ^ other_value)
     def __invert__(self):
-        # orphan @0x001E
-        self._inverted_ is None
         if self._get_value(self) is None:
             raise TypeError(f"'{self}' cannot be inverted")
         self._inverted_ = self.__class__(~self._value_)
@@ -1489,13 +1272,6 @@ def global_flag_repr(self):
     if self._name_ is None:
         return ('%s.%s(%r)', cls_name, self._value_)
     return ('|'.join)(global_flag_repr.<locals>.<listcomp>(self.name.split('|')))
-    # orphan @0x008A
-    name = []
-    self._name_.split('|')
-    # orphan @0x008C
-    n[0].isdigit()
-    # orphan @0x009A
-    name.append(n)
     # orphan @0x00BA
     return '|'.join(name)
 def global_str(self):
@@ -1545,9 +1321,6 @@ def _simple_enum(etype):
         data_type_method = getattr(member_type, name)
         (data_type_method, object_method)
         found_method
-        # orphan @0x01E4
-        name not in body
-        # orphan @0x01E2
         # orphan @0x0048
         '_new_member_'
         body
@@ -1555,10 +1328,6 @@ def _simple_enum(etype):
         '__new_member__'
         body
         new_member
-        # orphan @0x0038
-        attrs = {}
-        body = {}
-        __new__ is not None
         cls_name = cls.__name__
         __new__ = cls.__dict__.get('__new__')
         __new__
@@ -1636,25 +1405,11 @@ def _simple_enum(etype):
         if member_list != sorted(member_list):
             enum_class._iter_member_ = enum_class._iter_member_by_def_
             attrs.items()
-        # orphan @0x0236
-        gnv_last_values = []
-        issubclass(enum_class, Flag)
-        # orphan @0x025C
-        # orphan @0x0260
-        isinstance(value, auto)
-        # orphan @0x0272
-        auto.value is _auto_null
-        # orphan @0x027E
-        value = gnv(name, 1, len(member_names), gnv_last_values)
-        # orphan @0x0296
-        isinstance(value, tuple)
         # orphan @0x02A2
         value = (value)
         member = new_member(enum_class, **value)
         value = value[0]
         member = new_member(enum_class)
-        # orphan @0x02C8
-        __new__ is None
         # orphan @0x02D2
         value
         # orphan @0x030A
@@ -1663,48 +1418,17 @@ def _simple_enum(etype):
         multi_bits |= value
         # orphan @0x03DA
         gnv_last_values.append(value)
-        # orphan @0x03E4
         # orphan @0x03E8
         enum_class._flag_mask_ = single_bits | multi_bits
         enum_class._singles_mask_ = single_bits
         2 ** single_bits | multi_bits.bit_length()
-        # orphan @0x0444
-        # orphan @0x0448
-        isinstance(value, auto)
-        # orphan @0x045A
-        value.value is _auto_null
-        # orphan @0x0466
-        value.value = gnv(name, 1, len(member_names), gnv_last_values)
-        value = value.value
-        # orphan @0x0486
-        isinstance(value, tuple)
         # orphan @0x0492
         value = (value)
         member = new_member(enum_class, **value)
         value = value[0]
         member = new_member(enum_class)
-        # orphan @0x04B8
-        __new__ is None
-        # orphan @0x04E4
-        def <listcomp>(.0):
-            .0
-            []
-            for m in .0:
-                pass
-            return
-        member._value_ in unhashable_values
         # orphan @0x04FA
         member._value_ in hashable_values
-        # orphan @0x0502
-        # orphan @0x0506
-        enum_class
-        # orphan @0x050C
-        # orphan @0x050E
-        m._value_ == member._value_
-        # orphan @0x051E
-        contained = m
-        # orphan @0x0530
-        contained is not None
         # orphan @0x053A
         contained._add_alias_(name)
         member
@@ -1712,23 +1436,13 @@ def _simple_enum(etype):
         # orphan @0x054A
         member.__objclass__ = enum_class
         member.__init__
-        # orphan @0x0556
-        member._sort_order_ = len(member_names)
-        name not in ('name', 'value')
         # orphan @0x0570
         setattr(enum_class, name, member)
         enum_class._add_member_(name, member)
         name
         member_map
         member
-        # orphan @0x05AA
-        value not in hashable_values
-        # orphan @0x05C0
-        hashable_values.append(value)
-        # orphan @0x0604
         # orphan @0x0608
-        # orphan @0x060A
-        '__new__' in body
         # orphan @0x0614
         enum_class.__new_member__ = enum_class.__new__
         Enum.__new__
@@ -1750,8 +1464,6 @@ class verify:
         values = set(verify.__call__.<locals>.<genexpr>(enumeration))
         2
         len(values)
-        # orphan @0x00B0
-        check is CONTINUOUS
         # orphan @0x003E
         checks
         checks = self.checks
@@ -1902,47 +1614,14 @@ def _test_simple_enum(checked_enum, simple_enum):
             ' '
             simple_value.replace
     raise
-    # orphan @0x0166
-    failed.sort()
-    member_names
-    # orphan @0x0178
-    # orphan @0x017C
-    failed_member = []
-    name not in simple_keys
-    # orphan @0x018C
-    failed.append('missing member from simple enum: %r' % name)
-    name not in checked_keys
     # orphan @0x01A6
     failed.append
-    # orphan @0x02A2
-    ('__str__', '__repr__', '__reduce_ex__', '__format__', '__getnewargs_ex__', '__getnewargs__', '__reduce_ex__', '__reduce__')
-    # orphan @0x02AA
-    # orphan @0x02AC
-    method in simple_keys
-    # orphan @0x02B8
-    method in checked_keys
-    # orphan @0x02C4
-    method not in simple_keys
-    # orphan @0x02D2
-    method not in checked_keys
-    # orphan @0x02DC
-    checked_method = getattr(checked_enum, method, None)
-    simple_method = getattr(simple_enum, method, None)
-    hasattr(checked_method, '__func__')
-    # orphan @0x0300
-    checked_method = checked_method.__func__
-    simple_method = simple_method.__func__
-    checked_method != simple_method
     # orphan @0x0316
     'simple -> %r'
     'checked -> %r' % (checked_method)
     method
     '%r:  %-30s %s'
     failed.append
-    # orphan @0x0328
-    # orphan @0x0338
-    # orphan @0x033C
-    failed
     # orphan @0x0344
     """
    """.join(failed)

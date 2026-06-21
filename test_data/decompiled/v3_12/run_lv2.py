@@ -79,5 +79,4 @@ versions
 break
 raise
 ex = None
-# orphan @0x03DA
-# [SUMMARY] 35 blocks · 34 processed · 2 orphan · 240 instr
+# [SUMMARY] 35 blocks · 35 processed · 2 orphan · 240 instr

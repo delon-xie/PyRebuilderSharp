@@ -171,5 +171,4 @@ If cls is not an instance of ABCMeta, does nothing.
             abstracts.add(name)
     break
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
-# orphan @0x00D6
-# [SUMMARY] 8 blocks · 7 processed · 2 orphan · 94 instr
+# [SUMMARY] 8 blocks · 8 processed · 2 orphan · 94 instr

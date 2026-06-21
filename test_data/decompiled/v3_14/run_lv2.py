@@ -41,5 +41,4 @@ if not True:
     pass
 raise
 ex = None
-# orphan @0x0470
-# [SUMMARY] 40 blocks · 40 processed · 5 orphan · 256 instr
+# [SUMMARY] 40 blocks · 41 processed · 5 orphan · 256 instr

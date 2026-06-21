@@ -1,11 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0166
-next_line = lines[j]
-next_line.startswith('***')
-# orphan @0x00AA
-line = lines[i]
-'***' in line
 try:
     output = f.read()
 except:
@@ -81,4 +75,4 @@ while i < len(lines):
                                 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
                                 print('======================================================================')
 break
-# [SUMMARY] 38 blocks · 36 processed · 3 orphan · 392 instr
+# [SUMMARY] 38 blocks · 38 processed · 3 orphan · 392 instr

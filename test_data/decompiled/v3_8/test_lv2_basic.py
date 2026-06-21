@@ -2,26 +2,10 @@
 
 # orphan @0x0024
 z = 0
-# orphan @0x001E
-z = y
-# orphan @0x0016
-x > y
 x = 1
 y = 2
 if x < y:
     z = x
 # orphan @0x0028
 i = 0
-# orphan @0x002C
-i < 5
-# orphan @0x0034
-j = i * 2
-i += 1
-# orphan @0x0046
-range(10)
-# orphan @0x004E
-# orphan @0x0050
-m = n + 1
-# orphan @0x005C
-a = 1
-# [SUMMARY] 14 blocks · 3 processed · 12 orphan · 61 instr
+# [SUMMARY] 14 blocks · 11 processed · 12 orphan · 61 instr

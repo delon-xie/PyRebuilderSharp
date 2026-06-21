@@ -117,8 +117,6 @@ class ABCMeta(type):
         sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
             pass
-        # orphan @0x0062
-        value = getattr(cls, name)
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         subclass = instance.__class__

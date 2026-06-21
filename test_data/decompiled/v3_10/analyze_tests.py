@@ -1,8 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x00C8
-next_line = lines[j]
-next_line.startswith('***')
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
     raise
@@ -55,14 +52,9 @@ with open('/tmp/test_full.txt', 'r') as f:
                                                 p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
                                         while '***' in line:
                                             pass
-# orphan @0x027E
-print('----------------------------------------------------------------------')
-total > 0
-# orphan @0x0290
-total_passed / total * 100
 # orphan @0x029C
 0
 # orphan @0x029E
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')
-# [SUMMARY] 31 blocks · 26 processed · 5 orphan · 364 instr
+# [SUMMARY] 31 blocks · 29 processed · 5 orphan · 364 instr

@@ -1,10 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x01D0
-versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-results = {}
-versions
-[]
 # orphan @0x017E
 print('Failed to parse expected source:', e)
 sys.open(1)
@@ -112,4 +107,4 @@ raise
 # orphan @0x04B2
 print(f"❌ {ver!s}: AST parse failed - {e!s}")
 print('  Decompiled: %s' % actual_src[None:200])
-# [SUMMARY] 34 blocks · 32 processed · 6 orphan · 393 instr
+# [SUMMARY] 34 blocks · 33 processed · 6 orphan · 393 instr

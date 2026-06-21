@@ -26,32 +26,7 @@ print('============================================================')
 passed_groups = []
 failed_groups = []
 test_groups.items()
-# orphan @0x0112
-'FAIL' in info['status']
-# orphan @0x011E
-failed_groups.append(group)
-# orphan @0x012A
-print(f"
-通过的测试组 ({len(passed_groups)}):")
-print('----------------------------------------')
-passed_groups
-# orphan @0x014A
-# orphan @0x014C
-print(f"  ✓ {group}")
-# orphan @0x0160
-print(f"
-失败的测试组 ({len(failed_groups)}):")
-print('----------------------------------------')
-failed_groups
-# orphan @0x0180
-# orphan @0x0182
-print(f"  ✗ {group}")
-test_groups[group]['files']
-# orphan @0x019E
-# orphan @0x01A0
-print(f"    - {f}")
-# orphan @0x01B4
 # orphan @0x01B8
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-# [SUMMARY] 26 blocks · 14 processed · 12 orphan · 233 instr
+# [SUMMARY] 26 blocks · 25 processed · 12 orphan · 233 instr

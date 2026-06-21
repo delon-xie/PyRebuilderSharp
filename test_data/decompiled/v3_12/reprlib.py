@@ -177,7 +177,6 @@ class Repr:
         return s
         exc = None
         return
-        # orphan @0x0232
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -191,7 +190,6 @@ class Repr:
             s
         return s
         return
-        # orphan @0x0178
 def _possibly_sorted(x):
     try:
         sorted(x)
@@ -199,7 +197,6 @@ def _possibly_sorted(x):
         list(x)
     return
     return
-    # orphan @0x0046
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 45 instr

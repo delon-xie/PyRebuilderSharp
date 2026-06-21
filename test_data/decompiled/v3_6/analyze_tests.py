@@ -2,13 +2,6 @@
 
 # orphan @0x00D4
 next_line.strip().startswith(' ')
-# orphan @0x00C2
-next_line = lines[j]
-next_line.startswith('***')
-# orphan @0x00B4
-j < i + 30
-# orphan @0x00A8
-j < len(lines)
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 while i < len(lines):
@@ -64,9 +57,6 @@ if match:
     test_name = match.group(1)
     status = match.group(2)
     j = i + 1
-# orphan @0x015C
-j += 1
-i += 1
 # orphan @0x0172
 print('=' * 70)
 print('Python 3.7-3.10 版本测试通过率统计')
@@ -82,4 +72,4 @@ print('=' * 70)
 print
 # orphan @0x01AA
 print('-' * 70)
-# [SUMMARY] 37 blocks · 31 processed · 7 orphan · 354 instr
+# [SUMMARY] 37 blocks · 35 processed · 7 orphan · 354 instr

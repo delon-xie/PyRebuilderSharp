@@ -54,7 +54,6 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
     wrapper.__wrapped__ = wrapped
     return wrapper
     setattr(wrapper, attr, value)
-    # orphan @0x00C6
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -335,23 +334,13 @@ class partialmethod:
             partial
         result = self._make_unbound_method().__get__(obj, cls)
         return result
-        # orphan @0x012E
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
 def _unwrap_partial(func):
     while isinstance(func, func):
         func = func.func
     return func
-    # orphan @0x0022
-    func = func.func
-    isinstance(func, func)
 def _unwrap_partialmethod(func):
-    # orphan @0x0048
-    func = func.__partialmethod__
-    isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
-    # orphan @0x000E
-    prev = func
-    isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
     prev = None
     while func is not prev:
         prev = func
@@ -369,9 +358,6 @@ def _unwrap_partialmethod(func):
                         if func is not prev:
                             pass
                         return func
-    # orphan @0x00B8
-    func = getattr(func, 'func')
-    isinstance(func, _unwrap_partial)
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -687,7 +673,6 @@ def _compose_mro(cls, types):
         return
     n
     cell_1
-    # orphan @0x0244
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -759,8 +744,6 @@ class singledispatchmethod:
         return f"<single dispatch method descriptor {name}>"
         raise
         raise
-        # orphan @0x0098
-        # orphan @0x00A4
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
@@ -781,8 +764,6 @@ class _singledispatchmethod_get:
         else:
             0
         raise
-        # orphan @0x0110
-        # orphan @0x012E
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -795,8 +776,6 @@ class _singledispatchmethod_get:
         return f"<bound single dispatch method {name} of {self._obj!r}>"
         raise
         raise
-        # orphan @0x00AE
-        # orphan @0x00BA
     def __call__(self):
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
@@ -860,8 +839,4 @@ class cached_property:
 raise
 raise
 raise
-# orphan @0x02C0
-# orphan @0x02D6
-# orphan @0x02EC
-# orphan @0x0302
-# [SUMMARY] 29 blocks · 25 processed · 5 orphan · 353 instr
+# [SUMMARY] 29 blocks · 29 processed · 5 orphan · 353 instr

@@ -17,12 +17,6 @@ except Exception as e:
         pass
 # orphan @0x0114
 result2.stdout
-# orphan @0x0118
-len(result2.stderr) > 500
-'Decompile stderr:'
-print
-# orphan @0x0130
-result2.stderr[-500:]
 # orphan @0x013E
 result2.stderr
-# [SUMMARY] 10 blocks · 5 processed · 5 orphan · 163 instr
+# [SUMMARY] 10 blocks · 7 processed · 5 orphan · 163 instr

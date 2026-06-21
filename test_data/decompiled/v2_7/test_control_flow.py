@@ -11,6 +11,4 @@ try:
     a = 1
 except:
     a = 0
-# orphan @0x005A
-a = 0
-# [SUMMARY] 9 blocks · 9 processed · 1 orphan · 44 instr
+# [SUMMARY] 9 blocks · 10 processed · 1 orphan · 44 instr

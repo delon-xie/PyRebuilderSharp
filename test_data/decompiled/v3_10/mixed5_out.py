@@ -14,9 +14,6 @@ def mixed_1(n):
             if not j < i:
                 pass
     return result
-    # orphan @0x0024
-    j += 1
-    j > 5
 def mixed_2(n):
     total = 0
     range(n)
@@ -49,10 +46,6 @@ def mixed_3(n):
                 return total
             while i % 2 == 0:
                 pass
-    # orphan @0x003C
-    k -= 1
-    total += 1
-    k > 0
 def mixed_4(n):
     total = 0
     try:
@@ -71,7 +64,4 @@ def mixed_4(n):
                     pass
     except:
         total = -1
-    # orphan @0x0028
-    j += 1
-    total += j
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

@@ -48,7 +48,4 @@ passed = sum(<genexpr>(results.items()))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-# orphan @0x0208
-yield from results
-match
-# [SUMMARY] 34 blocks · 34 processed · 7 orphan · 328 instr
+# [SUMMARY] 34 blocks · 35 processed · 7 orphan · 328 instr

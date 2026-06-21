@@ -2994,7 +2994,6 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
             return None
         self.fail('compile() did not raise SyntaxError')
         err = None
-        # orphan @0x029A
     def test_expression_with_assignment(self):
         """print(end1 + end2 = ' ')"""
         'print(end1 + end2 = \' \')'('expression cannot contain assignment, perhaps you meant \'==\'?', 7, ('offset',))
@@ -3227,8 +3226,6 @@ def fib(n):
     a, b = 0, 1
 """
         raise
-        # orphan @0x00A0
-        # orphan @0x00E6
     def test_continuation_bad_indentation(self):
         """\
 if x:
