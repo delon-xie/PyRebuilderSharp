@@ -3522,6 +3522,23 @@ public class AstBuilder
             args.Add(new Parameter(childCode.Varnames[i]));
         }
 
+        // 1.5 设置默认参数值（从 FunctionRef.DefaultExprs 获取）
+        //    defaults 列表对应最后 N 个位置参数（从后往前）
+        if (funcRef.DefaultExprs != null && funcRef.DefaultExprs.Count > 0)
+        {
+            int startIdx = args.Count - funcRef.DefaultExprs.Count;
+            for (int i = 0; i < funcRef.DefaultExprs.Count; i++)
+            {
+                int argIdx = startIdx + i;
+                if (argIdx >= 0 && argIdx < args.Count)
+                {
+                    var existing = args[argIdx];
+                    args[argIdx] = new Parameter(existing.Name, existing.Annotation,
+                        funcRef.DefaultExprs[i]);
+                }
+            }
+        }
+
         // 2. 递归反编译函数体
         var body = DecompileChildCode(childCode);
 

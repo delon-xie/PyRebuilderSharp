@@ -1,3 +1,4 @@
+using System.Linq;
 using PyRebuilderSharp.Core.Models.AST;
 using AstAttribute = PyRebuilderSharp.Core.Models.AST.Attribute;
 using PyRebuilderSharp.Core.Models.Bytecode;
@@ -1253,17 +1254,35 @@ public class StackMachine
                     case PythonVersion.Py313:
                     case PythonVersion.Py314:
                         // Python 3.11+: MAKE_FUNCTION pops only code object
-                        // 参考 CPython 3.11: Python/ceval.c TARGET(MAKE_FUNCTION)
-                        //     ONLY pops code object. qualname no longer on stack.
-                        //     PyFunction_New() reads co_qualname from code object.
+                        // 但 arg 携带标志位：0x01=defaults, 0x02=kwdefaults, 0x04=annotations, 0x08=closure
+                        // 参考 CPython 3.11: TARGET(MAKE_FUNCTION) in Python/ceval.c
+                        // 3.13+ HAVE_ARGUMENT=72, MAKE_FUNCTION(raw 72)仍在阈值上，arg 仍有效
                     {
+                        int flags = instr.Argument ?? 0;
+                        Expr? defaultsTuple = (flags & 0x01) != 0 ? SafePop() : null;
+                        Expr? kwDefaults = (flags & 0x02) != 0 ? SafePop() : null;
+                        Expr? annotations = (flags & 0x04) != 0 ? SafePop() : null;
+                        Expr? closureExpr = (flags & 0x08) != 0 ? SafePop() : null;
+
                         var codeExpr = SafePop();
                         if (codeExpr is Constant c2 && c2.Value is CodeObject co)
                         {
                             childCode = co;
                             funcName = co.Name ?? "<lambda>";
                         }
-                        break;
+
+                        var funcRef = new FunctionRef(childCode, funcName);
+                        if (defaultsTuple != null)
+                        {
+                            if (defaultsTuple is ListLiteral dl && dl.Kind == ContainerKind.Tuple)
+                                funcRef.DefaultExprs = dl.Elts;
+                            else if (defaultsTuple is Constant dc
+                                && dc.Value is System.Collections.IList list)
+                                funcRef.DefaultExprs = list.Cast<object>()
+                                    .Select(v => new Constant(v) as Expr).ToList();
+                        }
+                        _exprStack.Push(funcRef);
+                        return null;
                     }
 
                     default:

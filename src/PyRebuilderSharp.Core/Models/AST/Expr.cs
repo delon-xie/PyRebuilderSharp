@@ -79,7 +79,11 @@ public record FormattedValue(Expr Value, int Conversion = -1, Expr? FormatSpec =
 public record JoinedStr(List<Expr> Values) : Expr;
 
 // --- 函数引用（中间表示，用于Assign→FunctionDef转换） ---
-public record FunctionRef(Bytecode.CodeObject? Code, string Name) : Expr;
+public record FunctionRef(Bytecode.CodeObject? Code, string Name) : Expr
+{
+    /// <summary>默认参数值表达式列表，对应最后 N 个位置参数</summary>
+    public List<Expr>? DefaultExprs { get; set; }
+}
 
 // --- Walrus (NamedExpr) ---
 public record NamedExpr(Expr Target, Expr Value) : Expr;
