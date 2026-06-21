@@ -15,7 +15,7 @@ known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': cod
 print('Known values:', <dictcomp>(known.items()))
 range(0, 8)
 print
-for start in nl == known['nlocals']:
+for start in range(0, 8):
     if start + 16 > len(m):
         break
     vals = struct.unpack_from('<IIII', m, start)
@@ -32,5 +32,4 @@ code2 = marshal.loads(m)
 print(f"
 Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
 print(f"Match: {code2.co_argcount == code.co_argcount}")
-return None
 # [SUMMARY] 8 blocks · 9 processed · 0 orphan · 230 instr

@@ -47,7 +47,7 @@ def mixed_4(n):
     try:
         name_1 = n > 0
         range(n)
-        for i in j < i:
+        for i in range(n):
             try:
                 try:
                     name_1 = n > 0
@@ -71,6 +71,6 @@ def mixed_4(n):
     None
     # orphan @0x0060
     # orphan @0x008E
-    raise
-return None
+    # [WARN] 1 instructions not decompiled
+    #   @0x007A: JUMP_BACKWARD arg=72
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

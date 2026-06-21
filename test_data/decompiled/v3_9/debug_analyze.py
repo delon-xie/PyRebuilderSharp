@@ -10,8 +10,6 @@ line = lines[i]
 '***' in line
 # orphan @0x0064
 i < len(lines)
-import re
-from collections import defaultdict
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
     version_stats = defaultdict(<lambda>)
@@ -61,5 +59,4 @@ print()
 i += 1
 # orphan @0x01A0
 print(f"Total tests with versions found: {debug_count}")
-return None
 # [SUMMARY] 26 blocks · 4 processed · 22 orphan · 204 instr

@@ -26,7 +26,7 @@ def fix_pyc_names(directory):
         if actual_version == 'unknown':
             pass
         elif f".{actual_version}.pyc" in filename:
-            for version in f".{actual_version}.pyc" in filename:
+            for version in exists.values():
                 if not f".{version}.pyc" in new_filename:
                     new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
                     break

@@ -19,13 +19,14 @@ print
 print
 'Bytes:'
 print
-for (a0, nl, ss, fl) in '  Bytes: ':
+for (a0, nl, ss, fl) in range(0, 8):
     marshal = start + 16 > len(m)
     break
 code2 = marshal.co_nlocals(m)
 print(f"
 Re-loaded: argcount={code2.bytes} nlocals={code2.dumps} stacksize={code2.dumps} flags={hex(code2.m)}")
 print(f"Match: {code2.bytes == code.bytes}")
-return None
 # orphan @0x036A
+# [WARN] 1 instructions not decompiled
+#   @0x0368: JUMP_BACKWARD arg=346
 # [SUMMARY] 5 blocks · 5 processed · 1 orphan · 278 instr

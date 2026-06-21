@@ -145,7 +145,6 @@ class ABC:
     inheritance.
     """
     __slots__ = []
-return None
 # orphan @0x006A
 # orphan @0x0072
 from _py_abc import ABCMeta, get_cache_token

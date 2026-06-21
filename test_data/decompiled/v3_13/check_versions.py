@@ -36,11 +36,11 @@ if not version == '3.10':
     for f in sorted(files):
         print(f"      {f}")
         break
-for (version, files) in version_files:
+for (version, files) in sorted(version_files.items()):
     None
     print
 # orphan @0x024A
-raise
 # orphan @0x025A
-raise
+# [WARN] 1 instructions not decompiled
+#   @0x0256: JUMP_BACKWARD arg=76
 # [SUMMARY] 26 blocks · 25 processed · 6 orphan · 159 instr

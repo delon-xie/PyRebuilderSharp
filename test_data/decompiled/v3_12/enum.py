@@ -171,15 +171,12 @@ class property(DynamicClassAttribute):
             return getattr(instance._value_, self.name)
         return
         # orphan @0x01DE
-        raise
     def __set__(self, instance, value):
         return self.fset(instance, value)
         # orphan @0x003E
-        raise AttributeError(f"<enum {self.clsname!r}> cannot set attribute {self.name!r}")
     def __delete__(self, instance):
         return self.fdel(instance)
         # orphan @0x003C
-        raise AttributeError(f"<enum {self.clsname!r}> cannot delete attribute {self.name!r}")
     def __set_name__(self, ownerclass, name):
         self.name = name
         self.clsname = ownerclass.__name__
@@ -257,8 +254,6 @@ class _proto_member:
                         enum_class._singles_mask_ | value._singles_mask_ = enum_class
                     enum_class._all_bits_ = 2 ** enum_class._flag_mask_.bit_length() - 1
         enum_class._add_member_(member_name, enum_member)
-        return None
-        return None
         raise
         try:
             break
@@ -282,19 +277,13 @@ class _proto_member:
         except:
             pass
         raise
-        return None
         # orphan @0x03FE
-        raise
         # orphan @0x0492
-        raise
         # orphan @0x049A
         name_60
         # orphan @0x05B0
-        raise
         # orphan @0x0658
-        raise
         # orphan @0x065A
-        raise
         # [WARN] 3 instructions not decompiled
         #   @0x0476: JUMP_BACKWARD arg=44
         #   @0x0490: JUMP_BACKWARD arg=394
@@ -358,10 +347,9 @@ class EnumDict(dict):
         if single:
             value = auto_valued[0]
         # orphan @0x0656
-        raise
         # orphan @0x0658
-        raise
-        # [WARN] 1 instructions not decompiled
+        # [WARN] 2 instructions not decompiled
+        #   @0x0596: JUMP_BACKWARD arg=322
         #   @0x0654: JUMP_BACKWARD arg=154
     member_names = member_names()
     def update(self, members):
@@ -397,10 +385,11 @@ class EnumDict(dict):
         except:
             pass
         # orphan @0x00B0
-        raise
         # orphan @0x00B2
-        raise
-        # [WARN] 1 instructions not decompiled
+        # [WARN] 4 instructions not decompiled
+        #   @0x003A: JUMP_BACKWARD arg=24
+        #   @0x0076: JUMP_BACKWARD arg=24
+        #   @0x00A8: JUMP_BACKWARD arg=24
         #   @0x00AE: JUMP_BACKWARD arg=112
 _EnumDict = EnumDict
 class EnumType(type):
@@ -415,7 +404,7 @@ class EnumType(type):
             pass
         try:
             []
-            for m in m._value_:
+            for m in []:
                 try:
                     try:
                         []
@@ -488,7 +477,7 @@ class EnumType(type):
                 else:
                     bits |= p.value[0]
         inverted
-        for p in (bits & p.value[0]):
+        for p in inverted:
             if isinstance(p.value, _iter_member_):
                 p.value = bits & p.value
             else:
@@ -537,10 +526,17 @@ class EnumType(type):
   {enum_class._member_names_!r}
   {_order_!r}")
         # orphan @0x0C68
-        raise
         # orphan @0x0C6A
-        raise
-        # [WARN] 1 instructions not decompiled
+        # [WARN] 19 instructions not decompiled
+        #   @0x00A8: JUMP_BACKWARD arg=44
+        #   @0x028E: JUMP_BACKWARD arg=46
+        #   @0x041E: JUMP_BACKWARD arg=134
+        #   @0x043E: JUMP_BACKWARD arg=166
+        #   @0x048E: JUMP_BACKWARD arg=246
+        #   @0x04A8: JUMP_BACKWARD arg=272
+        #   @0x04E4: JUMP_BACKWARD arg=332
+        #   @0x052C: JUMP_BACKWARD arg=404
+        #   @0x0552: JUMP_BACKWARD arg=442
         #   @0x05BC: JUMP_BACKWARD arg=100
     def __bool__(cls):
         """
@@ -606,9 +602,7 @@ class EnumType(type):
             value in cls._hashable_values_
         return
         # orphan @0x00CA
-        raise
         # orphan @0x00CC
-        raise
         # [WARN] 1 instructions not decompiled
         #   @0x00C8: JUMP_BACKWARD arg=82
     def __delattr__(cls, attr):
@@ -635,7 +629,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return <genexpr>._member_names_()
+        return cell_0._member_names_()
     def __len__(cls):
         """
         Return the number of members (no aliases)
@@ -650,7 +644,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return <genexpr>(reversed._member_names_)()
+        return reversed(cell_0._member_names_)()
     def __setattr__(cls, name, value):
         """
         Block attempts to reassign Enum members.
@@ -690,7 +684,7 @@ class EnumType(type):
         if isinstance(names, list):
             names = names.replace(',', ' ').split()
         elif isinstance(names, (AttributeError, f_globals)) and names and isinstance(names[0], list):
-            for (count, name) in first_enum._generate_next_value_:
+            for (count, name) in enumerate(original_names):
                 value = name(start, count, last_values, None // None)
                 last_values.append(value)
                 names.append((name, value))
@@ -702,12 +696,11 @@ class EnumType(type):
             pass
         raise
         # orphan @0x0348
-        raise
         # orphan @0x0354
-        raise
         # orphan @0x0356
-        raise
-        # [WARN] 1 instructions not decompiled
+        # [WARN] 3 instructions not decompiled
+        #   @0x01D4: JUMP_BACKWARD arg=132
+        #   @0x022E: JUMP_BACKWARD arg=76
         #   @0x0352: JUMP_BACKWARD arg=242
     def _convert_(cls, name, module, filter, source):
         """
@@ -725,7 +718,7 @@ class EnumType(type):
                                 try:
                                     members.sort(<lambda>)
                                 except:
-                                    break
+                                    pass
                                 break
                             except:
                                 break
@@ -739,7 +732,7 @@ class EnumType(type):
             break
         try:
             {}
-            for t in t[1]:
+            for t in {}:
                 try:
                     try:
                         {}
@@ -769,11 +762,13 @@ class EnumType(type):
         members
         # orphan @0x0224
         global_enum
+        # orphan @0x0234
+        members.sort(<lambda>)
         # orphan @0x0260
-        raise
         # orphan @0x0262
-        raise
-        # [WARN] 1 instructions not decompiled
+        # [WARN] 3 instructions not decompiled
+        #   @0x00AC: JUMP_BACKWARD arg=38
+        #   @0x0102: JUMP_BACKWARD arg=26
         #   @0x025E: JUMP_BACKWARD arg=386
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
@@ -820,6 +815,9 @@ class EnumType(type):
                 setattr(cls, name, redirect)
             else:
                 setattr(cls, name, member)
+        # [WARN] 2 instructions not decompiled
+        #   @0x0156: JUMP_BACKWARD arg=178
+        #   @0x0160: JUMP_BACKWARD arg=188
     __signature__ = __signature__()
 EnumMeta = EnumType
 class Enum(EnumType):
@@ -932,16 +930,11 @@ class Enum(EnumType):
         # orphan @0x015C
         getattr(cls, '_%s__in_progress' % cls.__name__, False)
         # orphan @0x0190
-        raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
         # orphan @0x01A8
-        raise TypeError('%r has no members defined' % cls)
         # orphan @0x01C4
         # orphan @0x021A
-        raise
         # orphan @0x021C
-        raise
         # orphan @0x037E
-        raise
         # [WARN] 2 instructions not decompiled
         #   @0x00AE: JUMP_BACKWARD arg=22
         #   @0x0122: JUMP_BACKWARD arg=44
@@ -980,19 +973,14 @@ class Enum(EnumType):
         except:
             pass
         cls = self.__class__
-        return None
-        return None
         # orphan @0x01C4
-        raise
         # orphan @0x01C6
-        raise
         # orphan @0x01CC
         _value_
         # orphan @0x0282
-        raise
         # orphan @0x0284
-        raise
-        # [WARN] 1 instructions not decompiled
+        # [WARN] 2 instructions not decompiled
+        #   @0x0174: JUMP_BACKWARD arg=38
         #   @0x01C2: JUMP_BACKWARD arg=300
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
@@ -1029,6 +1017,16 @@ class Enum(EnumType):
                     interesting.discard(name)
         names = set([](('__class__', '__doc__', '__eq__', '__hash__', '__module__')) | interesting)
         return names
+        # [WARN] 9 instructions not decompiled
+        #   @0x00BC: JUMP_BACKWARD arg=24
+        #   @0x00DA: JUMP_BACKWARD arg=54
+        #   @0x00FE: JUMP_BACKWARD arg=90
+        #   @0x018C: JUMP_BACKWARD arg=30
+        #   @0x0204: JUMP_BACKWARD arg=150
+        #   @0x0228: JUMP_BACKWARD arg=186
+        #   @0x0246: JUMP_BACKWARD arg=216
+        #   @0x026A: JUMP_BACKWARD arg=252
+        #   @0x026E: JUMP_BACKWARD arg=314
     def __format__(self, format_spec):
         return str.__format__(str(self), format_spec)
     def __hash__(self):
@@ -1185,7 +1183,7 @@ def unique(enumeration):
     """
     try:
         []
-        for (alias, name) in f"{alias!s} -> {name!s}":
+        for (alias, name) in []:
             try:
                 try:
                     []
@@ -1210,8 +1208,12 @@ def unique(enumeration):
         name
         alias
         duplicates
+    # [WARN] 3 instructions not decompiled
+    #   @0x0064: JUMP_BACKWARD arg=44
+    #   @0x00A0: JUMP_BACKWARD arg=104
+    #   @0x00E6: JUMP_BACKWARD arg=28
 def _dataclass_repr(self):
-    return (', '.join)(<genexpr>.keys()())
+    return <genexpr>(cell_1.keys()())
 def global_enum_repr(self):
     """
     use module.enum_name instead of class.enum_name
@@ -1228,7 +1230,7 @@ def global_flag_repr(self):
     """
     try:
         []
-        for name in f"{module!s}.{name!s}":
+        for name in []:
             try:
                 try:
                     []
@@ -1257,6 +1259,10 @@ def global_flag_repr(self):
         else:
             name.append(f"{module!s}.{n!s}")
     return '|'.join(name)
+    # [WARN] 3 instructions not decompiled
+    #   @0x01AC: JUMP_BACKWARD arg=22
+    #   @0x0246: JUMP_BACKWARD arg=80
+    #   @0x0274: JUMP_BACKWARD arg=126
 def global_str(self):
     """
     use enum_name instead of class.enum_name
@@ -1302,7 +1308,7 @@ def _simple_enum(etype):
             break
         try:
             []
-            for m in m._value_:
+            for m in []:
                 try:
                     try:
                         []
@@ -1354,10 +1360,12 @@ def _simple_enum(etype):
         cls_name = cls.__name__
         __new__ = cls.__dict__.get('__new__')
         new_member = __new__.__func__
+        new_member = cell_29._member_type_.__new__
+        cell_29._use_args_
         attrs = {}
         body = {}
-        if hashable_values := [](issubclass, _is_dunder) and not True:
-            pass
+        if issubclass(cell_29, _is_dunder) and not cell_28:
+            cell_29._boundary_
         cls.__dict__.items()
         for (name, obj) in cls.__dict__.items():
             if name in ('__dict__', '__weakref__'):
@@ -1366,11 +1374,13 @@ def _simple_enum(etype):
                 pass
             if _is_descriptor(obj):
                 pass
+        enum_class = type(cls_name, (cell_29), body, cell_28, True)
         ('__repr__', '__str__', '__format__', '__reduce_ex__')
         for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
             if not name not in body:
                 pass
             else:
+                enum_method = getattr(cell_29, name)
                 found_method = getattr(enum_class, name)
                 object_method = getattr(setdefault, name)
                 data_type_method = getattr(member_type, name)
@@ -1380,34 +1390,43 @@ def _simple_enum(etype):
             for (name, value) in attrs.items():
                 if isinstance(value, name_58) and (name_58.value is name_62):
                     value = gnv(name, 1, len(member_names), gnv_last_values)
-                elif not isinstance(value, name_66):
-                    value = (value)
+                elif cell_30:
+                    if not isinstance(value, name_66):
+                        value = (value)
+                    member = new_member(enum_class, **value)
+                    value = value[0]
+                    member._value_ = value
+                else:
+                    member = new_member(enum_class)
         else:
             attrs.items()
         for (name, value) in attrs.items():
             if isinstance(value, name_58) and (value.value is name_62):
                 value.value = gnv(name, 1, len(member_names), gnv_last_values)
             value = value.value
-            if not isinstance(value, name_66):
-                value = (value)
-            member = new_member(enum_class, **value)
-            value = value[0]
-            member._value_ = value
-            contained = value2member_map.get(member._value_)
-            contained._add_alias_(name)
-            member._name_ = name
-            member.__objclass__ = enum_class
-            member.__init__(value)
-            member._sort_order_ = len(member_names)
-            if name not in ('name', 'value'):
-                setattr(enum_class, name, member)
+            if cell_30:
+                if not isinstance(value, name_66):
+                    value = (value)
+                member = new_member(enum_class, **value)
+                value = value[0]
+                member._value_ = value
+                contained = value2member_map.get(member._value_)
+                contained._add_alias_(name)
+                member._name_ = name
+                member.__objclass__ = enum_class
+                member.__init__(value)
+                member._sort_order_ = len(member_names)
+                if name not in ('name', 'value'):
+                    setattr(enum_class, name, member)
+                else:
+                    enum_class._add_member_(name, member)
+                member_names.append(name)
+                gnv_last_values.append(value)
+                enum_class._value2member_map_.setdefault(value, member)
+                if value not in hashable_values:
+                    hashable_values.append(value)
             else:
-                enum_class._add_member_(name, member)
-            member_names.append(name)
-            gnv_last_values.append(value)
-            enum_class._value2member_map_.setdefault(value, member)
-            if value not in hashable_values:
-                hashable_values.append(value)
+                member = new_member(enum_class)
         contained._add_alias_(name)
         member._name_ = name
         member.__objclass__ = enum_class
@@ -1433,18 +1452,23 @@ def _simple_enum(etype):
         raise
         raise
         # orphan @0x0C6C
-        raise
         # orphan @0x0D1C
-        raise
         # orphan @0x0D22
         name_70
         # orphan @0x0D32
         enum_class._unhashable_values_.append(value)
         enum_class._unhashable_values_map_.setdefault(name, []).append(value)
-        # [WARN] 3 instructions not decompiled
+        # [WARN] 14 instructions not decompiled
+        #   @0x0354: JUMP_BACKWARD arg=22
+        #   @0x03BA: JUMP_BACKWARD arg=124
+        #   @0x03C6: JUMP_BACKWARD arg=136
+        #   @0x043E: JUMP_BACKWARD arg=16
+        #   @0x04B4: JUMP_BACKWARD arg=134
+        #   @0x04D0: JUMP_BACKWARD arg=162
+        #   @0x07BC: JUMP_BACKWARD arg=668
+        #   @0x0848: JUMP_BACKWARD arg=32
+        #   @0x0B74: JUMP_BACKWARD arg=706
         #   @0x0C5A: JUMP_BACKWARD arg=58
-        #   @0x0C6A: JUMP_BACKWARD arg=1574
-        #   @0x0D18: JUMP_BACKWARD arg=808
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1459,7 +1483,7 @@ class verify:
     def __call__(self, enumeration):
         try:
             []
-            for (alias, name) in f"{alias!s} -> {name!s}":
+            for (alias, name) in []:
                 try:
                     try:
                         []
@@ -1505,7 +1529,7 @@ class verify:
                                 enumeration
                             try:
                                 []
-                                for m in m.value:
+                                for m in []:
                                     try:
                                         missing_names = []
                                         missing_value = 0
@@ -1518,7 +1542,7 @@ class verify:
                                             values
                                             try:
                                                 []
-                                                for v in v:
+                                                for v in []:
                                                     if not v not in member_values:
                                                         pass
                                                     break
@@ -1567,8 +1591,17 @@ class verify:
         raise TypeError('the \'verify\' decorator only works with Enum and Flag')
         checks
         enum_type = 'enum'
-        # [WARN] 1 instructions not decompiled
-        #   @0x04EE: JUMP_BACKWARD arg=16
+        # [WARN] 20 instructions not decompiled
+        #   @0x011E: JUMP_BACKWARD arg=44
+        #   @0x015A: JUMP_BACKWARD arg=104
+        #   @0x0162: JUMP_BACKWARD arg=192
+        #   @0x01A2: JUMP_BACKWARD arg=28
+        #   @0x0228: JUMP_BACKWARD arg=390
+        #   @0x02BA: JUMP_BACKWARD arg=22
+        #   @0x02E4: JUMP_BACKWARD arg=64
+        #   @0x0320: JUMP_BACKWARD arg=16
+        #   @0x0344: JUMP_BACKWARD arg=52
+        #   @0x036C: JUMP_BACKWARD arg=714
 def _test_simple_enum(checked_enum, simple_enum):
     """
     A function that can be used to test an enum created with :func:`_simple_enum`
@@ -1691,6 +1724,16 @@ def _test_simple_enum(checked_enum, simple_enum):
     failed.append
     # orphan @0x0718
     # orphan @0x071A
+    # [WARN] 9 instructions not decompiled
+    #   @0x019A: JUMP_BACKWARD arg=18
+    #   @0x01A4: JUMP_BACKWARD arg=28
+    #   @0x01D6: JUMP_BACKWARD arg=78
+    #   @0x0208: JUMP_BACKWARD arg=128
+    #   @0x0268: JUMP_BACKWARD arg=224
+    #   @0x0306: JUMP_BACKWARD arg=382
+    #   @0x0346: JUMP_BACKWARD arg=446
+    #   @0x0352: JUMP_BACKWARD arg=458
+    #   @0x0394: JUMP_BACKWARD arg=524
 def _old_convert_(etype, name, module, filter, source):
     """
     Create a new Enum subclass that replaces a collection of global constants
@@ -1707,7 +1750,7 @@ def _old_convert_(etype, name, module, filter, source):
                             try:
                                 members.sort(<lambda>)
                             except:
-                                break
+                                pass
                             break
                         except:
                             break
@@ -1732,11 +1775,11 @@ def _old_convert_(etype, name, module, filter, source):
     return cls
     # orphan @0x0116
     name_10
+    # orphan @0x0126
+    members.sort(<lambda>)
     # orphan @0x0152
-    raise
     # orphan @0x0154
-    raise
-    # [WARN] 1 instructions not decompiled
+    # [WARN] 2 instructions not decompiled
+    #   @0x00AC: JUMP_BACKWARD arg=38
     #   @0x0150: JUMP_BACKWARD arg=116
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 285 instr

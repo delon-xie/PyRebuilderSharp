@@ -1,12 +1,5 @@
 # Decompiled from: <module>
 
-'Run AST comparison for test_control_flow across all versions'
-import os
-import subprocess
-import ast
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 for ver in versions:
@@ -40,7 +33,6 @@ for ver in versions:
         except Exception:
             print('❌ %s: parse error: %s' % (ver, ex))
             print('  Output: %s' % r.stdout[None:200])
-return None
 # orphan @0x0172
 # orphan @0x0178
 # orphan @0x0182

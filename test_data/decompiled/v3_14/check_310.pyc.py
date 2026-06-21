@@ -42,5 +42,4 @@ def dump_bytecode(c, depth):
             i
             name_22.from_bytes
 dump_bytecode(code)
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 58 instr

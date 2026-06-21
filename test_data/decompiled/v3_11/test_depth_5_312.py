@@ -8,19 +8,14 @@ def depth_5_if(x0, x1, x2, x3, x4):
     name_14 = x3 > 3
     name_4 = x4 > 4
     result = 42
-    return None
     # orphan @0x004A
     result = 41
-    return None
     # orphan @0x0052
     result = 40
-    return None
     # orphan @0x005A
     result = 30
-    return None
     # orphan @0x0062
     result = 20
-    return None
     # orphan @0x006A
     result = 10
 def depth_5_for():
@@ -35,6 +30,11 @@ def depth_5_for():
                         total += 1
         None
     return
+    # [WARN] 4 instructions not decompiled
+    #   @0x00BC: JUMP_BACKWARD arg=52
+    #   @0x00BE: JUMP_BACKWARD arg=88
+    #   @0x00C0: JUMP_BACKWARD arg=124
+    #   @0x00C2: JUMP_BACKWARD arg=160
 def depth_5_while():
     total = 0
     a = 2
@@ -80,16 +80,10 @@ def depth_5_try():
     except:
         pass
     result = 0
-    return None
-    return None
-    return None
     # orphan @0x0046
     # orphan @0x004A
-    raise
     # orphan @0x0058
     result = -4
     # orphan @0x0060
     # orphan @0x0066
-    raise
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

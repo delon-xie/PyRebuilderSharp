@@ -25,9 +25,6 @@ pos += 4
 # orphan @0x00B8
 # orphan @0x00B4
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
-import marshal
-import struct
-import sys
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
     pos = 16
@@ -115,5 +112,4 @@ print
 # orphan @0x041E
 print(f"pos {pos}: after all constants")
 print(f"total file: {len(data)}")
-return None
 # [SUMMARY] 35 blocks · 5 processed · 30 orphan · 534 instr

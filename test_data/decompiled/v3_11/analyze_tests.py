@@ -2,7 +2,6 @@
 
 # orphan @0x0080
 # orphan @0x0078
-raise
 try:
     output = f()
     f.read
@@ -86,5 +85,4 @@ split = total > 0
 total_passed / total * 100
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')
-return None
 # [SUMMARY] 15 blocks · 14 processed · 2 orphan · 418 instr

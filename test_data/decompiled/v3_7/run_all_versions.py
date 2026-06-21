@@ -3,13 +3,6 @@
 # orphan @0x007E
 print('Failed to parse expected source')
 sys.exit(1)
-__doc__ = 'Run AST comparison for test_expr_basic across all versions'
-import os
-import subprocess
-import sys
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
@@ -33,7 +26,7 @@ for ver in versions:
         'MISMATCH'
         break
         if not match:
-            for i in e != a:
+            for i in range(max(len(exp_lines), len(act_lines))):
                 if i < len(exp_lines):
                     pass
                 '(missing)'
@@ -55,7 +48,6 @@ print(f"
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-return None
 # orphan @0x0204
 ver
 results
@@ -71,7 +63,7 @@ False
 # orphan @0x0264
 def <genexpr>(.0):
     .0
-    for (v, r) in r:
+    for (v, r) in .0:
         if r:
             yield 1
             break

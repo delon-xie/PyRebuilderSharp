@@ -17,7 +17,7 @@ struct.unpack
 print
 print
 while print <= print:
-    for (off, op, name, arg) in print <= print:
+    for (off, op, name, arg) in instructions:
         '4d'
         off
         '  '

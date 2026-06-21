@@ -12,11 +12,9 @@ while i < 5:
 j = i * 2
 i += 1
 if i < 5:
-    for n in i < 5:
+    for n in range(10):
         m = n + 1
-return None
 # orphan @0x0084
-raise
 # [WARN] 1 instructions not decompiled
 #   @0x0068: JUMP_BACKWARD arg=88
 # [SUMMARY] 14 blocks · 13 processed · 4 orphan · 55 instr

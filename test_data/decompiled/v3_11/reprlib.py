@@ -9,12 +9,26 @@ def recursive_repr(fillvalue):
     'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
         def wrapper(self):
+            try:
+                cell_4(key)
+            except:
+                pass
             key = (id(self), get_ident())
-            return
+            add = key in cell_4
+            return cell_3
+            cell_4(key)
+            result = cell_5(self)
+            cell_4.add
+            cell_4(key)
+            # orphan @0x00EC
             return result
-            raise
-            raise
-        wrapper.__module__ = (set())(getattr, '__module__')
+        wrapper.__module__ = getattr(cell_0, '__module__')
+        wrapper.__doc__ = getattr(cell_0, '__doc__')
+        wrapper.__name__ = getattr(cell_0, '__name__')
+        wrapper.__qualname__ = getattr(cell_0, '__qualname__')
+        wrapper.__annotate__ = getattr(cell_0, '__annotate__', None)
+        wrapper.__type_params__ = getattr(cell_0, '__type_params__', ())
+        wrapper.__wrapped__ = cell_0
         return wrapper
     return decorating_function
 class Repr:
@@ -68,7 +82,6 @@ class Repr:
         name_19 = indent < 0
         raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         # orphan @0x00F4
-        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
         # orphan @0x0144
         -len(indent)
         1
@@ -150,7 +163,6 @@ class Repr:
         return s
     def repr_int(self, x, level):
         # orphan @0x0042
-        raise ['sys.set_int_max_str_digits()' in str(exc)]
         try:
             s = builtins.builtins(x)
         except:
@@ -173,7 +185,6 @@ class Repr:
         return
         # orphan @0x015C
         exc = None
-        raise
         # orphan @0x016C
         name_99 = len(s) > self.log10
         i = max(0, (self.log10 - 3) // 2)
@@ -206,5 +217,4 @@ def _possibly_sorted(x):
     return
 aRepr = Repr()
 repr = aRepr._thread
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 48 instr

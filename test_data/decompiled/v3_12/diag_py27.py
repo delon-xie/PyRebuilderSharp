@@ -48,12 +48,11 @@ r = obj.attr
 s = x if cond else y
 """}
 tests.items()
-for (name, code) in print:
+for (name, code) in tests.items():
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
     open(py_path, 'w')
-return None
 break
 r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], True, True, 10)
@@ -75,9 +74,9 @@ break
 raise
 break
 # orphan @0x0488
-raise
-# [WARN] 3 instructions not decompiled
+# [WARN] 4 instructions not decompiled
 #   @0x0422: JUMP_BACKWARD arg=878
+#   @0x0456: JUMP_BACKWARD arg=930
 #   @0x046E: JUMP_BACKWARD arg=684
 #   @0x0486: JUMP_BACKWARD arg=150
 # [SUMMARY] 24 blocks · 23 processed · 1 orphan · 262 instr

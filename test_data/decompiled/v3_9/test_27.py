@@ -10,12 +10,11 @@ r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_o
 lines = r.stdout.split("""
 """)
 enumerate(lines)
-for (i, line) in 'items[' in line:
+for (i, line) in enumerate(lines):
     if 'items[' in line:
         print(f"Line {i}: {line}")
 print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
 print(actual_ast)
-return None
 # [SUMMARY] 5 blocks · 6 processed · 0 orphan · 96 instr

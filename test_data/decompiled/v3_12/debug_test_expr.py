@@ -25,12 +25,14 @@ print('Instructions:')
 dis.get_instructions(code)
 marshal.loads
 None
-for instr in '  ':
+for instr in dis.get_instructions(code):
     instr.offset(f"{'4d'} {instr.opname}{'20s'} {instr.arg} {instr.argrepr}")
-return None
 break
 # orphan @0x027C
-raise
-# [WARN] 1 instructions not decompiled
+# [WARN] 5 instructions not decompiled
+#   @0x00AE: JUMP_BACKWARD arg=32
+#   @0x00C0: JUMP_BACKWARD arg=50
+#   @0x00CC: JUMP_BACKWARD arg=62
+#   @0x0262: JUMP_BACKWARD arg=132
 #   @0x027A: JUMP_BACKWARD arg=530
 # [SUMMARY] 19 blocks · 18 processed · 1 orphan · 166 instr

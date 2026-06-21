@@ -1,11 +1,8 @@
 # Decompiled from: <module>
 
-import struct
-import marshal
-import dis
 with open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expressions.38.pyc', 'rb') as f:
     data = bytearray(f.read())
-for i in i:
+for i in range(16, len(data)):
     stripped = data[i] & 127
     if (stripped in known_types) and (data[i] != stripped):
         pass

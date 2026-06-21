@@ -1,8 +1,5 @@
 # Decompiled from: <module>
 
-import marshal
-import struct
-import sys
 with open(sys.argv[1], 'rb') as f:
     raw = f.read()
     raise

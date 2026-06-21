@@ -24,8 +24,6 @@ line = lines[i]
 '***' in line
 # orphan @0x0060
 i < len(lines)
-import re
-from collections import defaultdict
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
     version_stats = defaultdict(<lambda>)
@@ -97,5 +95,4 @@ total_passed / total * 100
 # orphan @0x0298
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')
-return None
 # [SUMMARY] 32 blocks · 4 processed · 28 orphan · 348 instr

@@ -13,5 +13,4 @@ print(result2.stdout.strip())
 print("""
 Instructions:""")
 print(result3.stdout.strip())
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 97 instr

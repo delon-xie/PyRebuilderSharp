@@ -46,7 +46,7 @@ break
 if not version == '3.10':
     print('    文件列表:')
     sorted(files)
-for (version, files) in version not in version_files:
+for (version, files) in sorted(version_files.items()):
     files
     None
     len
@@ -60,5 +60,6 @@ for f in sorted(files):
     return None
 break
 # orphan @0x028C
-raise
+# [WARN] 1 instructions not decompiled
+#   @0x0288: JUMP_BACKWARD arg=90
 # [SUMMARY] 25 blocks · 25 processed · 4 orphan · 173 instr

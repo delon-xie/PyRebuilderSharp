@@ -1,12 +1,5 @@
 # Decompiled from: <module>
 
-'Run AST comparison for test_control_flow across all versions'
-import os
-import subprocess
-import ast
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 for ver in versions:
@@ -26,13 +19,14 @@ for ver in versions:
         'MISMATCH'
         break
         if not ok:
-            for i in e != a:
+            for i in enumerate(zip(expected_ast.split("""
+"""), actual_ast.split("""
+"""))):
                 if e != a:
                     print(f"  Line {i}: expected={e}
            actual=  {a}")
                     break
     except Exception:
         pass
-return None
 # orphan @0x0170
 # [SUMMARY] 21 blocks · 21 processed · 1 orphan · 218 instr

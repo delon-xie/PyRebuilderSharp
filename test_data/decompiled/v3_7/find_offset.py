@@ -7,7 +7,7 @@ print('stacksize:', code.co_stacksize, 'flags:', hex(code.co_flags))
 m = bytes(marshal.dumps(code))
 n = len(m)
 range(1, 21, 1)
-for offset_start in val4 == 64:
+for offset_start in range(1, 21, 1):
     if offset_start + 16 > n:
         pass
     val1 = struct.unpack('<I', m[offset_start:offset_start + 4])[0]
@@ -17,5 +17,4 @@ for offset_start in val4 == 64:
     print(f"start={offset_start}: {val1} {val2} {val3} {val4}")
     if (val1 == 0) and (val2 == 0) and (val3 == 1) and (val4 == 64):
         print('  -> FOUND!')
-return None
 # [SUMMARY] 10 blocks · 11 processed · 0 orphan · 157 instr

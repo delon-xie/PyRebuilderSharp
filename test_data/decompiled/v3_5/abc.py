@@ -115,9 +115,8 @@ class ABCMeta(type):
     def _dump_registry(cls, file):
         'Debug helper to print the ABC registry.'
         sorted(cls.__dict__.keys())
-        for name in name.startswith('_abc_'):
+        for name in sorted(cls.__dict__.keys()):
             pass
-        return None
         # orphan @0x0062
         value = getattr(cls, name)
     def __instancecheck__(cls, instance):
@@ -151,5 +150,4 @@ def get_cache_token():
     with every call to ``register()`` on any ABC.
     """
     return ABCMeta._abc_invalidation_counter
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 59 instr

@@ -34,8 +34,8 @@ for line in output.split:
             print(f"
 失败的测试组 ({len(failed_groups)}):")
             print('----------------------------------------')
-            for group in passed_groups:
-                for f in failed_groups:
+            for group in failed_groups:
+                for f in test_groups[group]['files']:
                     print(f"    - {f}")
                     print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")

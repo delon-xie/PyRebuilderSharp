@@ -29,5 +29,4 @@ break
 raise
 break
 # orphan @0x04A4
-raise
 # [SUMMARY] 23 blocks · 23 processed · 5 orphan · 267 instr

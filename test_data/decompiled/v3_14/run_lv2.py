@@ -63,12 +63,10 @@ for ver in __name__():
         pass
 if not True:
     pass
-return None
 break
 raise
 ex = None
 # orphan @0x0472
-raise
 # [WARN] 3 instructions not decompiled
 #   @0x037E: JUMP_BACKWARD arg=862
 #   @0x03A8: JUMP_BACKWARD arg=358

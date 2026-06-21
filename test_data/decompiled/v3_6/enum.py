@@ -167,7 +167,6 @@ class property(DynamicClassAttribute):
         # orphan @0x0060
         return getattr(instance._value_, self.name)
         # orphan @0x0084
-        raise AttributeError('%r has no attribute %r' % (ownerclass, self.name)) from None
         # orphan @0x009E
     def __set__(self, instance, value):
         if self.fset is not None:
@@ -203,7 +202,6 @@ class _proto_member:
         # orphan @0x008E
         new_exc = TypeError('_value_ not set in __new__, unable to create it')
         new_exc.__cause__ = exc
-        raise new_exc
         # orphan @0x0086
         # orphan @0x0084
         # orphan @0x006C
@@ -252,7 +250,6 @@ class _proto_member:
         # orphan @0x017E
         enum_member = canonical_member
         # orphan @0x0188
-        raise KeyError
         # orphan @0x018E
         # orphan @0x0194
         # orphan @0x0198
@@ -315,7 +312,6 @@ class EnumDict(dict):
         # orphan @0x00D4
         _is_dunder(key)
         # orphan @0x00CE
-        raise
         # orphan @0x00C8
         (already)
         # orphan @0x00C4
@@ -334,7 +330,6 @@ class EnumDict(dict):
         # orphan @0x005A
         isinstance(value, staticmethod)
         # orphan @0x0052
-        raise TypeError('_generate_next_value_ must be defined before members')
         # orphan @0x004C
         self._auto_called
         # orphan @0x0044
@@ -406,7 +401,7 @@ class EnumDict(dict):
         # orphan @0x0024
         # orphan @0x001E
         try:
-            for name in name:
+            for name in members.keys():
                 pass
         except AttributeError:
             pass
@@ -476,7 +471,7 @@ class EnumType(type):
         '_new_member_'
         classdict
         __new__
-        for name in name:
+        for name in member_names:
             value = classdict[name]
         '_unhashable_values_map_'
         classdict
@@ -540,7 +535,7 @@ class EnumType(type):
                     setattr
                     enum_method = getattr(Flag, name)
                     break
-                    for name in name:
+                    for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
                         name not in classdict
                     if (Enum is not None) and save_new:
                         pass
@@ -571,6 +566,7 @@ class EnumType(type):
         '_%s__in_progress' % cls
         classdict
         False
+        enum_class
         super().__new__(metacls, cls, bases, classdict, **kwds)
         '_%s__in_progress' % cls
         classdict
@@ -579,7 +575,6 @@ class EnumType(type):
         # orphan @0x0312
         hasattr(e, '__notes__')
         # orphan @0x0326
-        raise
         # orphan @0x032C
         None
         # orphan @0x0332
@@ -595,7 +590,6 @@ class EnumType(type):
         # orphan @0x035E
         member_type is object
         # orphan @0x0368
-        raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
         # orphan @0x0370
         '__format__' not in classdict
         # orphan @0x037A
@@ -786,7 +780,7 @@ class EnumType(type):
         for (count, name) in enumerate(original_names):
             first_enum
         if names is None:
-            for item in member_name:
+            for item in names:
                 if isinstance(item, str):
                     member_name = names[item]
                     member_value = item
@@ -875,7 +869,6 @@ class EnumType(type):
                 if base.__dict__['__dataclass_params__'].repr:
                     _dataclass_repr
             return base.__dict__['__repr__']
-        return None
         # orphan @0x003C
         base
         '__dataclass_fields__'
@@ -1051,7 +1044,6 @@ class Enum:
         cls
         getattr
         # orphan @0x00B6
-        raise TypeError('%r has no members defined' % cls)
         # orphan @0x00C2
         exc = None
         # orphan @0x00D6
@@ -1082,7 +1074,6 @@ class Enum:
         isinstance(exc, ValueError)
         # orphan @0x019A
         exc.__context__ = ve_exc
-        raise exc
         # orphan @0x01A4
         None
     def _add_alias_(self, name):
@@ -1148,14 +1139,12 @@ class Enum:
         except TypeError:
             pass
         # orphan @0x0022
-        raise TypeError('unable to sort non-numeric values') from None
         # orphan @0x0032
         # orphan @0x004A
         (last_value)
         'unable to increment %r'
         TypeError
         # orphan @0x0058
-        raise
         # orphan @0x0060
     @classmethod
     def _missing_(cls, value):
@@ -1235,7 +1224,6 @@ class StrEnum(str, ReprEnum):
         'encoding must be a string, not %r'
         TypeError
         # orphan @0x006C
-        raise
         # orphan @0x0072
         3
         len(values)
@@ -1290,7 +1278,6 @@ class Flag(Enum):
         max
         # orphan @0x002A
         # orphan @0x0032
-        raise TypeError('invalid flag value %r' % last_value) from None
         # orphan @0x0046
     @classmethod
     def _iter_member_by_value_(cls, value):
@@ -1317,7 +1304,6 @@ class Flag(Enum):
         """
         # orphan @0x00CC
         value = max(all_bits + 1, 2 ** value.bit_length()) + value
-        raise ValueError('%r unknown flag boundary %r' % (cls, cls._boundary_))
         # orphan @0x00C4
         value < 0
         cls._boundary_ is KEEP
@@ -1348,7 +1334,7 @@ class Flag(Enum):
         def <listcomp>(.0):
             .0
             []
-            for m in m._name_:
+            for m in .0:
                 pass
             return
         if not value <= value:
@@ -1379,7 +1365,6 @@ class Flag(Enum):
         '%s(%r) -->  unknown values %r [%s]'
         ValueError
         # orphan @0x0170
-        raise
         # orphan @0x0176
         cls._member_type_ is object
         # orphan @0x0182
@@ -1430,7 +1415,6 @@ class Flag(Enum):
         # orphan @0x027E
         cls._boundary_ is STRICT
         # orphan @0x028A
-        raise ValueError('%r: no members with value %r' % (cls, unknown))
         # orphan @0x029A
         unknown
         # orphan @0x02A2
@@ -1666,6 +1650,7 @@ def _simple_enum(etype):
         cls_name = cls.__name__
         __new__ = cls.__dict__.get('__new__')
         __new__
+        use_args
         new_member = __new__.__func__
         gnv = '_generate_next_value_'
         member_names = '_member_names_'
@@ -1769,7 +1754,7 @@ def _simple_enum(etype):
         def <listcomp>(.0):
             .0
             []
-            for m in m._value_:
+            for m in .0:
                 pass
             return
         member._value_ in unhashable_values
@@ -1934,7 +1919,8 @@ class verify:
                     missing_names = []
                     missing_value = 0
                     enumeration._member_map_.items()
-                    verify.__call__.<locals>.<listcomp>(enumeration)
+                    member_values
+                    member_values
                     verify.__call__.<locals>.<listcomp>(enumeration)
                 return enumeration
                 alias = 'aliases %s and %s are missing' % (', '.join(missing_names[None:-1]), missing_names[-1])
@@ -1949,7 +1935,6 @@ class verify:
                         missing.append(i)
         raise
         # orphan @0x0172
-        raise Exception('verify: unknown type %r' % enum_type)
 def _test_simple_enum(checked_enum, simple_enum):
     """
     A function that can be used to test an enum created with :func:`_simple_enum`
@@ -2096,5 +2081,4 @@ def _old_convert_(etype, name, module, filter, source):
     # orphan @0x0048
     # orphan @0x0050
     members.sort(key=_old_convert_.<locals>.<lambda>)
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 334 instr

@@ -32,6 +32,5 @@ def dump_code(c, depth):
         break
         break
 dump_code(code)
-return None
 raise
 # [SUMMARY] 8 blocks · 9 processed · 0 orphan · 113 instr

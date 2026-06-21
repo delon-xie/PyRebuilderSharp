@@ -17,13 +17,14 @@ for i in range(10):
         y = x
     if not True:
         break
-for n in range(10):
+for n in range(5):
     if n == 3:
         break
     return None
     raise
 raise
-return None
 raise
 # orphan @0x00A0
+# [WARN] 1 instructions not decompiled
+#   @0x0032: JUMP_BACKWARD arg=40
 # [SUMMARY] 27 blocks · 27 processed · 2 orphan · 77 instr

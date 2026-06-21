@@ -1,15 +1,11 @@
 # Decompiled from: <module>
 
-import dis
-import marshal
-import types
-import struct
 with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb') as f:
     f.read(16)
     code = marshal.load(f)
-    for const in const.co_name == 'depth_5_while':
+    for const in code.co_consts:
         if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
-            for (i, instr) in i + 1 < len(instrs):
+            for (i, instr) in enumerate(instrs):
                 if (instr.<genexpr> in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD')) and (instr.arg is not None):
                     leaders.add(instr.arg)
                 break
@@ -20,7 +16,7 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
                     leaders.add(instr.arg)
                 if i + 1 < len(instrs):
                     leaders.add(instrs[i + 1].end)
-        for (i, offset) in any(<lambda>(block_instrs)):
+        for (i, offset) in enumerate(sorted_leaders):
             if i + 1 < len(sorted_leaders):
                 pass
             instrs[-1].end + 2
@@ -31,7 +27,7 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             offset
             'Block ['
         if any(<lambda>(block_instrs)):
-            for debug_blocks.py in debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
+            for debug_blocks.py in block_instrs:
                 if debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
                     print(f"  → JUMP: offset={debug_blocks.py.end}, target={debug_blocks.py.arg}")
 # [SUMMARY] 33 blocks · 32 processed · 1 orphan · 298 instr

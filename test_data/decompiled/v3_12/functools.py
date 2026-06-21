@@ -55,9 +55,11 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     return wrapper
     setattr(wrapper, attr, value)
     # orphan @0x00C6
-    raise
     # orphan @0x00C8
-    raise
+    # [WARN] 3 instructions not decompiled
+    #   @0x0040: JUMP_BACKWARD arg=60
+    #   @0x009A: JUMP_BACKWARD arg=84
+    #   @0x00C4: JUMP_BACKWARD arg=192
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -153,7 +155,7 @@ def total_ordering(cls):
     'Class decorator that fills in missing ordering methods'
     try:
         # Unknown node: SetLiteral
-        for op in op:
+        for op in # Unknown node: SetLiteral:
             try:
                 try:
                     # Unknown node: SetLiteral
@@ -176,8 +178,11 @@ def total_ordering(cls):
         break
     op
     _convert
-    # [WARN] 1 instructions not decompiled
+    # [WARN] 4 instructions not decompiled
     #   @0x0058: JUMP_BACKWARD arg=68
+    #   @0x005E: JUMP_BACKWARD arg=74
+    #   @0x00BC: JUMP_BACKWARD arg=22
+    #   @0x00E6: JUMP_BACKWARD arg=64
 def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
     K = (__build_class__)(K, 'K', object)
@@ -213,7 +218,8 @@ def reduce(function, sequence, initial):
         value = function(value, element)
     return value
     # orphan @0x0096
-    raise
+    # [WARN] 1 instructions not decompiled
+    #   @0x0062: JUMP_BACKWARD arg=26
 (_initial_missing)
 class _PlaceholderType:
     __doc__ = """The type of the Placeholder singleton.
@@ -251,6 +257,9 @@ def _partial_prepare_merger(args):
     else:
         None
     return (phcount, merger)
+    # [WARN] 2 instructions not decompiled
+    #   @0x0084: JUMP_BACKWARD arg=74
+    #   @0x00A8: JUMP_BACKWARD arg=110
 def _partial_new(cls, func):
     if issubclass(cls, callable):
         base_cls = callable
@@ -262,6 +271,8 @@ def _partial_new(cls, func):
     if callable(func):
         pass
     raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
+    # [WARN] 1 instructions not decompiled
+    #   @0x0118: JUMP_BACKWARD arg=24
 def _partial_repr(self):
     cls = type(self)
     module = cls.__module__
@@ -292,7 +303,6 @@ class partial:
         keywords = keywords
         return pto_args(**keywords)
         # orphan @0x0116
-        raise
     def __get__(self, obj, objtype):
         return self
         # orphan @0x000A
@@ -320,17 +330,21 @@ class partialmethod:
     def _make_unbound_method(self):
         def _method(cls_or_self):
             try:
+                pto_args = cell_5._merger(cell_5.args + args)
                 args = phcount // None
                 args
             except:
                 pass
+            phcount = cell_5._phcount
             if phcount:
                 pass
+            else:
+                pto_args = cell_5.args
             keywords = keywords
             return pto_args(**keywords)
             # orphan @0x011A
-            raise
-        _method.__isabstractmethod__ = ().__isabstractmethod__
+        _method.__isabstractmethod__ = cell_0.__isabstractmethod__
+        _method.__partialmethod__ = cell_0
         return _method
     def __get__(self, obj, cls):
         try:
@@ -346,9 +360,7 @@ class partialmethod:
         result = self._make_unbound_method().__get__(obj, cls)
         return result
         # orphan @0x012E
-        raise
         # orphan @0x0130
-        raise
         # [WARN] 1 instructions not decompiled
         #   @0x012C: JUMP_BACKWARD arg=94
     __isabstractmethod__ = __isabstractmethod__()
@@ -407,7 +419,7 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """
     try:
         []
-        for v in type(v):
+        for v in []:
             try:
                 try:
                     []
@@ -438,8 +450,12 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         args
     key = tuple(key)
     []
-    for v in type(v):
+    for v in []:
         pass
+    # [WARN] 3 instructions not decompiled
+    #   @0x005A: JUMP_BACKWARD arg=18
+    #   @0x009A: JUMP_BACKWARD arg=24
+    #   @0x00F8: JUMP_BACKWARD arg=24
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
 
@@ -460,22 +476,34 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    def decorating_function(user_function):
+    if isinstance(cell_0, callable):
+        if cell_0 < 0:
+            pass
+        def decorating_function(user_function):
+            wrapper = _lru_cache_wrapper(user_function, cell_2, cell_3, cache_parameters)
+            wrapper.cache_parameters = <lambda>
+            return update_wrapper(wrapper, user_function)
+        return decorating_function
+    elif callable(cell_0) and isinstance(cell_1, cache_parameters):
+        user_function = 128
+        wrapper = _lru_cache_wrapper(user_function, cell_0, cell_1, name_10)
         wrapper.cache_parameters = <lambda>
         return update_wrapper(wrapper, user_function)
-    return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
-    if not True:
+    if not callable(cell_0):
         raise TypeError('the first argument must be callable')
-    elif None / None == 0:
+    elif cell_1 == 0:
         def wrapper():
-            result = None(**kwds)
+            result = cell_4(**kwds)
             return result
     else:
         def wrapper():
             try:
+                link = cell_17(key)
                 (link_prev, link_next, _key, result) = link
+                last = cell_25[cell_14]
                 result
+                cell_20 + 1
             except:
                 pass
             try:
@@ -483,8 +511,13 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                     try:
                         try:
                             try:
+                                oldroot = cell_25
+                                oldkey = cell_25[cell_12]
+                                oldresult = cell_25[cell_15]
                                 try:
-                                    link = [last, key, result]
+                                    last = cell_25[cell_14]
+                                    link = [last, cell_25, key, result]
+                                    cell_18() >= cell_23
                                 except:
                                     pass
                             except:
@@ -497,13 +530,16 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                     pass
             except:
                 pass
+            key = cell_22(args, kwds, cell_26)
+            cell_21
             return
-            result = None(**kwds)
+            result = cell_27(**kwds)
+            cell_21
+            None
             return result
             raise
             return result
             # orphan @0x01C8
-            raise
             # [WARN] 1 instructions not decompiled
             #   @0x01AC: JUMP_BACKWARD arg=238
         (())
@@ -520,7 +556,7 @@ def _c3_merge(sequences):
     """
     try:
         []
-        for s in s:
+        for s in []:
             try:
                 try:
                     []
@@ -540,7 +576,7 @@ def _c3_merge(sequences):
                     break
             break
             raise RuntimeError('Inconsistent hierarchy')
-            for seq in 0:
+            for seq in sequences:
                 if not seq[0] == candidate:
                     pass
     except:
@@ -548,9 +584,14 @@ def _c3_merge(sequences):
     result = []
     for _ in s:
         pass
-    # [WARN] 2 instructions not decompiled
+    # [WARN] 7 instructions not decompiled
     #   @0x001E: JUMP_BACKWARD arg=12
+    #   @0x0024: JUMP_BACKWARD arg=18
+    #   @0x0060: JUMP_BACKWARD arg=22
+    #   @0x0068: JUMP_BACKWARD arg=50
     #   @0x00C8: JUMP_BACKWARD arg=24
+    #   @0x00D0: JUMP_BACKWARD arg=32
+    #   @0x00D4: JUMP_BACKWARD arg=206
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -570,7 +611,7 @@ def _c3_mro(cls, abcs):
     """
     try:
         []
-        for base in _c3_mro(base, abcs):
+        for base in []:
             try:
                 try:
                     []
@@ -578,13 +619,13 @@ def _c3_mro(cls, abcs):
                     abstract_bases
                     try:
                         []
-                        for base in _c3_mro(base, abcs):
+                        for base in []:
                             try:
                                 base
                                 other_bases
                                 try:
                                     []
-                                    for base in _c3_mro(base, abcs):
+                                    for base in []:
                                         try:
                                             return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
                                             break
@@ -606,7 +647,7 @@ def _c3_mro(cls, abcs):
         break
     enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
-        if not True:
+        if not hasattr(cell_7, '__abstractmethods__'):
             pass
         else:
             boundary = len(cls.__bases__) - i
@@ -622,15 +663,24 @@ def _c3_mro(cls, abcs):
         list
         list
         for _ in abcs:
-            if not True:
+            if not issubclass(cls, cell_7):
                 pass
-            break
+            abstract_bases.append(cell_7)
         abstract_bases
         for _ in abstract_bases:
-            break
+            abcs.remove(cell_7)
         base
         explicit_bases
     boundary = 0
+    # [WARN] 8 instructions not decompiled
+    #   @0x0064: JUMP_BACKWARD arg=38
+    #   @0x0144: JUMP_BACKWARD arg=32
+    #   @0x0182: JUMP_BACKWARD arg=94
+    #   @0x01A6: JUMP_BACKWARD arg=130
+    #   @0x01D6: JUMP_BACKWARD arg=42
+    #   @0x0206: JUMP_BACKWARD arg=34
+    #   @0x023A: JUMP_BACKWARD arg=34
+    #   @0x026E: JUMP_BACKWARD arg=34
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
@@ -640,7 +690,7 @@ def _compose_mro(cls, types):
     """
     try:
         []
-        for n in n:
+        for n in []:
             try:
                 try:
                     []
@@ -649,28 +699,35 @@ def _compose_mro(cls, types):
             except:
                 break
         def is_strict_base(typ):
-            for other in iterable:
+            cell_2
+            for other in cell_2:
                 if not typ != other:
                     pass
                 break
                 return False
-        n
+            # [WARN] 2 instructions not decompiled
+            #   @0x0018: JUMP_BACKWARD arg=18
+            #   @0x0036: JUMP_BACKWARD arg=48
         ()
+        n
+        cell_1
         []
-        for n in n:
+        for n in []:
             if is_strict_base(n):
                 pass
+        type_set = set(cell_1)
         mro = []
-        for typ in n:
+        cell_1
+        for typ in cell_1:
             for sub in typ.__subclasses__():
-                if not True:
+                if not sub not in cell_12:
                     pass
                 found.append
                 s
                 sub.__mro__
                 try:
                     []
-                    for s in s:
+                    for s in []:
                         if not s in type_set:
                             pass
                         break
@@ -688,21 +745,28 @@ def _compose_mro(cls, types):
                         pass
                     else:
                         mro.append(subcls)
-        return
+        return _c3_mro(cell_0, mro)
     except:
         break
     def is_related(typ):
-        if hasattr(typ, '__mro__') and not isinstance(typ, name_4):
-            pass
+        if (typ not in cell_1) and hasattr(typ, '__mro__') and not isinstance(typ, name_4):
+            issubclass(cell_2, typ)
         return
+    (set(cell_0.__mro__))
     n
-    ()
+    cell_1
     # orphan @0x0244
-    raise
-    # [WARN] 3 instructions not decompiled
+    # [WARN] 14 instructions not decompiled
     #   @0x0060: JUMP_BACKWARD arg=24
+    #   @0x0066: JUMP_BACKWARD arg=30
     #   @0x009C: JUMP_BACKWARD arg=24
+    #   @0x00A2: JUMP_BACKWARD arg=30
+    #   @0x0102: JUMP_BACKWARD arg=16
+    #   @0x011C: JUMP_BACKWARD arg=42
     #   @0x0162: JUMP_BACKWARD arg=16
+    #   @0x0168: JUMP_BACKWARD arg=22
+    #   @0x017A: JUMP_BACKWARD arg=136
+    #   @0x01A4: JUMP_BACKWARD arg=220
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -725,6 +789,9 @@ def _find_impl(cls, registry):
         else:
             match = t
     return registry.get(match)
+    # [WARN] 2 instructions not decompiled
+    #   @0x00E2: JUMP_BACKWARD arg=166
+    #   @0x00E8: JUMP_BACKWARD arg=172
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -737,9 +804,12 @@ def singledispatch(func):
     import weakref
     def wrapper():
         if not args:
-            raise
-        return None(args[0].__class__)(**kw)
-    wrapper.register = ((({}, weakref.WeakKeyDictionary(), None), dispatch, _is_valid_dispatch_type, (None,)), register)
+            raise TypeError(f"{cell_3} requires at least 1 positional argument")
+        return cell_2(args[0].__class__)(**kw)
+    wrapper.register = cell_8
+    wrapper.dispatch = cell_5
+    wrapper.registry = MappingProxyType(cell_9)
+    wrapper._clear_cache = cell_6.clear
     update_wrapper(wrapper, func)
     return wrapper
 class singledispatchmethod:
@@ -772,9 +842,7 @@ class singledispatchmethod:
         raise
         raise
         # orphan @0x0098
-        raise
         # orphan @0x00A4
-        raise
         # [WARN] 1 instructions not decompiled
         #   @0x00A2: JUMP_BACKWARD arg=116
 class _singledispatchmethod_get:
@@ -796,15 +864,10 @@ class _singledispatchmethod_get:
             pass
         else:
             0
-        return None
         raise
-        return None
         # orphan @0x0110
-        raise
         # orphan @0x012E
-        raise
         # orphan @0x0130
-        raise
         # [WARN] 1 instructions not decompiled
         #   @0x010E: JUMP_BACKWARD arg=60
     def __repr__(self):
@@ -820,9 +883,7 @@ class _singledispatchmethod_get:
         raise
         raise
         # orphan @0x00AE
-        raise
         # orphan @0x00BA
-        raise
         # [WARN] 1 instructions not decompiled
         #   @0x00B8: JUMP_BACKWARD arg=158
     def __call__(self):
@@ -885,20 +946,14 @@ class cached_property:
         return val
         raise
     __class_getitem__ = classmethod(GenericAlias)
-return None
 raise
 raise
 raise
 # orphan @0x02C0
-raise
 # orphan @0x02D6
-raise
 # orphan @0x02EC
-raise
 # orphan @0x0302
-raise
 # orphan @0x0304
-raise
 # [WARN] 4 instructions not decompiled
 #   @0x02BE: JUMP_BACKWARD arg=374
 #   @0x02D4: JUMP_BACKWARD arg=356

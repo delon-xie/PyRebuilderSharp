@@ -3,8 +3,6 @@
 # orphan @0x00C8
 next_line = lines[j]
 next_line.startswith('***')
-import re
-from collections import defaultdict
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
     raise
@@ -42,7 +40,7 @@ with open('/tmp/test_full.txt', 'r') as f:
                                                 pass
                                         i = i + 1
                                         if not i < len(lines):
-                                            for version in ' ':
+                                            for version in sorted(version_stats.keys()):
                                                 stats = version_stats[version]
                                                 t = stats['total']
                                                 p = stats['passed']
@@ -67,5 +65,4 @@ total_passed / total * 100
 # orphan @0x029E
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')
-return None
 # [SUMMARY] 31 blocks · 26 processed · 5 orphan · 364 instr

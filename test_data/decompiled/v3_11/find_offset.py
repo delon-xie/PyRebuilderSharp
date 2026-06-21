@@ -20,5 +20,4 @@ name_23 = val2 == 0
 val2 = val3 == 1
 len = val4 == 64
 print('  -> FOUND!')
-return None
 # [SUMMARY] 5 blocks · 6 processed · 1 orphan · 184 instr

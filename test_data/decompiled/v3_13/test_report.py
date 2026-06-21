@@ -72,5 +72,4 @@ test_groups[group]['files']
 print(f"    - {f}")
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-return None
 # [SUMMARY] 35 blocks · 11 processed · 33 orphan · 269 instr

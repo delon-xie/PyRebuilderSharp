@@ -1,11 +1,9 @@
 # Decompiled from: <module>
 
 # orphan @0x01B2
-raise
 # orphan @0x01AE
 # orphan @0x0122
 # orphan @0x011A
-raise
 try:
     expected_src = f()
     f.read
@@ -99,7 +97,6 @@ print(f"
 passed = results.items(results()())
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-return None
 def <genexpr>(.0):
     .0
     for (v, r) in .0:
@@ -113,5 +110,8 @@ raise
 print(f"❌ {ver}: AST parse failed - {e}")
 print(f"  Decompiled: {actual_src[None:200]}")
 # orphan @0x051A
-raise
+# [WARN] 3 instructions not decompiled
+#   @0x0486: JUMP_BACKWARD arg=184
+#   @0x04A0: JUMP_BACKWARD arg=730
+#   @0x050E: JUMP_BACKWARD arg=840
 # [SUMMARY] 32 blocks · 27 processed · 6 orphan · 409 instr

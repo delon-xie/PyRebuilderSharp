@@ -273,13 +273,11 @@ def _partial_new(cls, func):
     # orphan @0x005E
     keywords.values()
     # orphan @0x0056
-    raise TypeError('trailing Placeholders are not allowed')
     # orphan @0x004A
     args[-1] is Placeholder
     # orphan @0x0046
     args
     # orphan @0x0036
-    raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
     # orphan @0x002C
     hasattr(func, '__get__')
     # orphan @0x0020
@@ -291,7 +289,6 @@ def _partial_new(cls, func):
         if not callable(func):
             raise TypeError('the first argument must be callable')
     # orphan @0x0072
-    raise TypeError('Placeholder cannot be passed as a keyword argument')
     # orphan @0x007A
     # orphan @0x007C
     isinstance(func, base_cls)
@@ -385,7 +382,6 @@ class partial:
         (func, args, kwds, namespace) = state
         callable(func)
         # orphan @0x001E
-        raise TypeError(f"expected 4 items in state, got {len(state)}")
         # orphan @0x0012
         len(state) != 4
         if not isinstance(state, tuple):
@@ -397,13 +393,11 @@ class partial:
         # orphan @0x0068
         isinstance(namespace, dict)
         # orphan @0x0072
-        raise TypeError('invalid partial state')
         # orphan @0x007A
         args
         # orphan @0x007E
         args[-1] is Placeholder
         # orphan @0x008A
-        raise TypeError('trailing Placeholders are not allowed')
         # orphan @0x0092
         (phcount, merger) = _partial_prepare_merger(args)
         args = tuple(args)
@@ -554,7 +548,6 @@ def lru_cache(maxsize, typed):
     return update_wrapper(wrapper, user_function)
     # orphan @0x005C
     # orphan @0x0064
-    raise TypeError('Expected first argument to be an integer, a callable, or None')
     # orphan @0x006C
     def decorating_function(user_function):
         wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
@@ -563,22 +556,36 @@ def lru_cache(maxsize, typed):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     # orphan @0x0010
     # Unknown node: Slice == 0
-    [RLock(), [], None, None]
-    False.get.__len__
+    [[], root, None, None]
+    lock
+    RLock()
+    cache_len
+    cache_get.__len__
+    full.get
+    False
+    misses
+    hits
     0
     0
+    cache
     {}
+    RESULT
+    KEY
+    NEXT
+    PREV
     *(0, 1, 2, 3)
     *(0, 1, 2, 3)
     *(0, 1, 2, 3)
     *(0, 1, 2, 3)
+    make_key
     _make_key
+    sentinel
     object()
     if not True:
         raise TypeError('the first argument must be callable')
     # orphan @0x0068
     def wrapper():
-        result = 1(**kwds)
+        result = misses(**kwds)
         return result
     ()
     # orphan @0x0078
@@ -586,26 +593,40 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     def wrapper():
         return result
         # orphan @0x002A
-        result = 1(**kwds)
+        result = misses(**kwds)
         return result
     ()
     # orphan @0x009C
     def wrapper():
-        with _:
+        if link is not None:
             (link_prev, link_next, _key, result) = link
             last = link_prev[link_next]
-            yield from link + 1
-            link(None, None, None)
-            return last
-            if not True:
-                pass
-            oldkey = result[oldroot[oldroot]]
-            oldresult = key[oldroot]
-            link = [last, key, result]
-            last >= key()
-            last
-            link
-            link
+            yield from hits
+            link + 1(None, None, None)
+            return link
+        # orphan @0x0080
+        yield from 1
+        # orphan @0x009A
+        # orphan @0x009C
+        # orphan @0x00A6
+        # orphan @0x00C2
+        # orphan @0x00C4
+        # orphan @0x00CA
+        oldkey = oldroot[oldroot][root]
+        oldresult = oldroot[result]
+        key
+        oldroot
+        oldkey
+        None
+        None
+        key
+        # orphan @0x0116
+        link = [last, key, result]
+        full
+        last >= key()
+        last
+        link
+        link
         # orphan @0x014C
         # orphan @0x0160
         # orphan @0x0162
@@ -615,13 +636,15 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     # orphan @0x00C6
     def cache_info():
         'Report cache statistics'
-        with _:
-            pass
+        return
         # orphan @0x0028
     def cache_clear():
         'Clear the cache and cache statistics'
-        with _:
-            return None
+        yield from False
+        misses(None, None, None)
+        if not # Unknown node: Slice:
+            pass
+        # orphan @0x0042
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
     return wrapper
@@ -639,15 +662,15 @@ def _c3_merge(sequences):
 
     """
     result = []
-    for _ in 0:
+    for _ in sequences:
         return result
     sequences
     for s1 in sequences:
-        for s2 in candidate in s2[1:]:
+        for s2 in sequences:
             if candidate in s2[1:]:
                 candidate = None
                 break
-            for seq in 0:
+            for seq in sequences:
                 if seq[0] == candidate:
                     pass
         break
@@ -677,15 +700,18 @@ def _c3_mro(cls, abcs):
     explicit_bases = list(cls.__bases__[None:boundary])
     abstract_bases = []
     other_bases = list(cls.__bases__[boundary:])
+    abcs
     # orphan @0x0044
     []
     enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
-        boundary = len(cls.__bases__) - i
-        break
+        if base(hasattr, '__abstractmethods__'):
+            boundary = len(cls.__bases__) - i
+            break
     boundary = 0
     # orphan @0x0074
     # orphan @0x0076
+    base(issubclass, cls)
     # orphan @0x0082
     (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__))
     # orphan @0x009A
@@ -706,14 +732,19 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set)
-    ((_compose_mro.<locals>.is_related)(_compose_mro.<locals>.<listcomp>))
-    ()
-    for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
+    type_set
+    types(set)
+    (is_strict_base)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_strict_base
+    (types)
+    (is_related)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_related
+    (bases)
+    for typ in type_set:
         for sub in typ.__subclasses__():
             found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
             for sub in found:
-                for subcls in subcls not in mro:
+                for subcls in sub:
                     if subcls not in mro:
                         mro.append(subcls)
         if not found:
@@ -734,7 +765,7 @@ def _find_impl(cls, registry):
     mro = _compose_mro(cls, registry.keys())
     match = None
     mro
-    for t in t in registry:
+    for t in mro:
         if (match is not None) and (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
             raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
         if t in registry:
@@ -758,8 +789,8 @@ def singledispatch(func):
         return
     wrapper.register = object
     wrapper.dispatch = func
-    wrapper.registry = getattr(func, '__name__', 'singledispatch function')(MappingProxyType)
-    wrapper._clear_cache = ((({}, weakref.WeakKeyDictionary(), None), singledispatch.<locals>.dispatch, singledispatch.<locals>._is_valid_dispatch_type, (None,)), singledispatch.<locals>.register).clear
+    wrapper.registry = funcname(MappingProxyType)
+    wrapper._clear_cache = getattr(func, '__name__', 'singledispatch function').clear
     update_wrapper(wrapper, func)
     return wrapper
 class singledispatchmethod:
@@ -814,11 +845,9 @@ class cached_property:
         # orphan @0x002A
         AttributeError
         msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
-        raise TypeError(msg) from None
         # orphan @0x001E
         cache = instance.__dict__
         # orphan @0x0016
-        raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         # orphan @0x000C
         self.attrname is None
         if instance is None:
@@ -835,10 +864,8 @@ class cached_property:
         # orphan @0x0090
         TypeError
         msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
-        raise TypeError(msg) from None
         # orphan @0x00C0
         # orphan @0x00C6
         return val
     __class_getitem__ = classmethod(GenericAlias)
-return None
 # [SUMMARY] 13 blocks · 14 processed · 3 orphan · 378 instr

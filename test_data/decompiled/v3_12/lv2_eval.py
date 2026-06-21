@@ -20,12 +20,13 @@ for n in range(5):
         break
     elif not n == 1:
         pass
-return None
 raise
-return None
 # orphan @0x008E
 # orphan @0x00AA
-raise
 # orphan @0x00AC
-raise
+# [WARN] 4 instructions not decompiled
+#   @0x001C: JUMP_BACKWARD arg=12
+#   @0x002E: JUMP_BACKWARD arg=12
+#   @0x0060: JUMP_BACKWARD arg=32
+#   @0x0062: JUMP_BACKWARD arg=34
 # [SUMMARY] 27 blocks · 24 processed · 3 orphan · 74 instr

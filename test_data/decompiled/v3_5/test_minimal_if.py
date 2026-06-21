@@ -13,7 +13,11 @@ def test_simple():
         x = 2
     return x
 """
-with _ as f:
-    f.write(src)
-    py_path = f.name
+f.write(src)
+py_path = f.name
+print('Compiled OK')
+print('=== Decompiled ===')
+print(r.stdout.strip())
+os.unlink(py_path)
+os.unlink(py_path + 'c')
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 100 instr

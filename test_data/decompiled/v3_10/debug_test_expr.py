@@ -1,8 +1,5 @@
 # Decompiled from: <module>
 
-import struct
-import marshal
-import dis
 with open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expressions.38.pyc', 'rb') as f:
     data = bytearray(f.read())
     raise

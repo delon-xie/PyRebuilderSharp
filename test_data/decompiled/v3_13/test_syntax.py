@@ -2965,7 +2965,6 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
         except:
             pass
         self.fail('compile() did not raise SyntaxError')
-        return None
         if subclass and not True:
             self.fail('SyntaxError is not a %s' % subclass.__name__)
             mo = lineno.search(errtext, str(err))
@@ -3159,10 +3158,8 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
-        return None
         raise
         raise
-        return None
         raise
         raise
     def test_continuation_bad_indentation(self):

@@ -20,5 +20,10 @@ for offset_start in range(1, 21, 1):
     if not val3 == 1:
         pass
     print('  -> FOUND!')
-return None
+# [WARN] 5 instructions not decompiled
+#   @0x0208: JUMP_BACKWARD arg=326
+#   @0x0214: JUMP_BACKWARD arg=338
+#   @0x0220: JUMP_BACKWARD arg=350
+#   @0x022C: JUMP_BACKWARD arg=362
+#   @0x023E: JUMP_BACKWARD arg=380
 # [SUMMARY] 14 blocks · 15 processed · 0 orphan · 170 instr

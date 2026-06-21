@@ -6,5 +6,4 @@ for i in range(10):
     break
 i = i == 1
 a = i
-return None
 # [SUMMARY] 5 blocks · 6 processed · 1 orphan · 26 instr

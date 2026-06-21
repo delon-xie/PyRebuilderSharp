@@ -38,5 +38,4 @@ for i in len(data):
 break
 break
 # orphan @0x0298
-raise
 # [SUMMARY] 20 blocks · 20 processed · 3 orphan · 169 instr

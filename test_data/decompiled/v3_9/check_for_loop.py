@@ -14,7 +14,6 @@ dis.dis(code)
 print("""
 === instructions ===""")
 dis.get_instructions(code)
-for instr in '  offset=':
+for instr in dis.get_instructions(code):
     instr.offset(f"{'3d'} opname={instr.opname}{'25s'} arg={instr.arg} argrepr={instr.argrepr}")
-return None
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 85 instr

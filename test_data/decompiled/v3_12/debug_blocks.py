@@ -64,7 +64,6 @@ for const in code.co_consts:
             instrs[-1].offset + 2
         ins
         instrs
-return None
 if len(block_instrs) > 3:
     pass
 else:
@@ -82,6 +81,15 @@ else:
     block_instrs
 break
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0552: JUMP_BACKWARD arg=1224
+# [WARN] 14 instructions not decompiled
+#   @0x00D2: JUMP_BACKWARD arg=48
+#   @0x00F2: JUMP_BACKWARD arg=80
+#   @0x01C2: JUMP_BACKWARD arg=122
+#   @0x01E0: JUMP_BACKWARD arg=152
+#   @0x024C: JUMP_BACKWARD arg=260
+#   @0x0290: JUMP_BACKWARD arg=328
+#   @0x034E: JUMP_BACKWARD arg=50
+#   @0x035A: JUMP_BACKWARD arg=62
+#   @0x04BE: JUMP_BACKWARD arg=524
+#   @0x04E8: JUMP_BACKWARD arg=38
 # [SUMMARY] 55 blocks · 55 processed · 0 orphan · 348 instr

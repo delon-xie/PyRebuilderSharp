@@ -107,7 +107,6 @@ print(f"
 passed = <genexpr>(results.items()())
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-return None
 break
 raise
 raise
@@ -123,13 +122,19 @@ def <genexpr>(.0):
             except:
                 pass
             1
+        return None
     except:
         pass
+    # [WARN] 2 instructions not decompiled
+    #   @0x0018: JUMP_BACKWARD arg=18
+    #   @0x0022: JUMP_BACKWARD arg=28
 # orphan @0x04E6
 # orphan @0x0552
-raise
 # orphan @0x0554
-raise
-# [WARN] 1 instructions not decompiled
+# [WARN] 5 instructions not decompiled
+#   @0x01FA: JUMP_BACKWARD arg=152
+#   @0x03AA: JUMP_BACKWARD arg=90
+#   @0x03FC: JUMP_BACKWARD arg=666
 #   @0x04A6: JUMP_BACKWARD arg=934
+#   @0x0548: JUMP_BACKWARD arg=998
 # [SUMMARY] 48 blocks · 45 processed · 3 orphan · 373 instr

@@ -11,7 +11,7 @@ try:
                         v
                         try:
                             break
-                            for start in '  Bytes: ':
+                            for start in range(0, 8):
                                 if start + 16 > len(m):
                                     break
                                 else:
@@ -67,7 +67,9 @@ print
 v
 k
 known.items()
-# [WARN] 2 instructions not decompiled
+# [WARN] 4 instructions not decompiled
+#   @0x01E2: JUMP_BACKWARD arg=58
 #   @0x0274: JUMP_BACKWARD arg=110
 #   @0x0286: JUMP_BACKWARD arg=128
+#   @0x0322: JUMP_BACKWARD arg=284
 # [SUMMARY] 20 blocks · 21 processed · 0 orphan · 285 instr

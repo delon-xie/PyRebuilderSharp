@@ -215,12 +215,9 @@ class _proto_member:
         enum_member = canonical_member
         # orphan @0x0170
         # orphan @0x0172
-        raise KeyError
         # orphan @0x0176
-        raise
         # orphan @0x017C
         # orphan @0x0256
-        raise
         # orphan @0x02C0
         TypeError
         enum_class._unhashable_values_.append(value)
@@ -287,19 +284,18 @@ class EnumDict(dict):
         value = t(auto_valued)
         # orphan @0x0244
         TypeError
-        raise
     @property
     def member_names(self):
         return list(self._member_names)
     def update(self, members):
         # orphan @0x001C
         try:
-            for name in name:
+            for name in members.keys():
                 pass
         except AttributeError:
             pass
         more_members.items()
-        for (name, value) in name:
+        for (name, value) in more_members.items():
             pass
 _EnumDict = EnumDict
 class EnumType(type):
@@ -346,7 +342,7 @@ class EnumType(type):
         '_new_member_'
         classdict
         __new__
-        for name in name:
+        for name in member_names:
             value = classdict[name]
         if boundary:
             if (Flag is not None) and bases and issubclass(bases[-1], Flag):
@@ -565,7 +561,6 @@ class EnumType(type):
             names = []
         # orphan @0x013C
         (AttributeError, ValueError, KeyError)
-        raise
         # orphan @0x015A
         module is None
         # orphan @0x0162
@@ -815,7 +810,6 @@ class Enum:
         result = cls._missing_(value)
         # orphan @0x00FE
         e = None
-        raise
         # orphan @0x0108
         isinstance(result, cls)
         # orphan @0x0114
@@ -840,7 +834,6 @@ class Enum:
         # orphan @0x0170
         exc is None
         # orphan @0x0178
-        raise ve_exc
         # orphan @0x017C
         exc is None
         # orphan @0x0184
@@ -850,11 +843,9 @@ class Enum:
         # orphan @0x01A0
         exc.__context__ = ve_exc
         # orphan @0x01A6
-        raise exc
         # orphan @0x01AA
         exc = None
         ve_exc = None
-        raise
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -870,10 +861,7 @@ class Enum:
             cls._hashable_values_.append(value)
         except TypeError:
             cls._unhashable_values_map_.setdefault(self.name, []).append(value)
-        return None
-        return None
         # orphan @0x01A2
-        raise
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         """
@@ -1026,7 +1014,6 @@ class Flag(Enum):
         return 1
         return start
         # orphan @0x0044
-        raise
         # orphan @0x0046
         return 2 ** (high_bit + 1)
     @classmethod
@@ -1062,7 +1049,7 @@ class Flag(Enum):
         def <listcomp>(.0):
             .0
             []
-            for m in m._name_:
+            for m in .0:
                 pass
             return
         if value <= value:
@@ -1094,7 +1081,6 @@ class Flag(Enum):
         # orphan @0x0260
         cls._boundary_ is STRICT
         # orphan @0x026C
-        raise ValueError('%r: no members with value %r' % (cls, unknown))
         # orphan @0x027C
         unknown
         # orphan @0x0282
@@ -1258,6 +1244,7 @@ def _simple_enum(etype):
     """
     def convert_class(cls):
         cls_name = cls.__name__
+        use_args
         __new__ = cls.__dict__.get('__new__')
         if __new__ is not None:
             new_member = __new__.__func__
@@ -1311,7 +1298,7 @@ def _simple_enum(etype):
             '_boundary_'
             body
         cls.__dict__.items()
-        for (name, obj) in name:
+        for (name, obj) in cls.__dict__.items():
             if name in ('__dict__', '__weakref__'):
                 pass
             if _is_private(cls_name, name):
@@ -1561,5 +1548,4 @@ def _old_convert_(etype, name, module, filter, source):
     if boundary:
         return cls
     KEEP
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 304 instr

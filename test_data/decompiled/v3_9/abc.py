@@ -182,5 +182,4 @@ class ABC:
     inheritance.
     """
     __slots__ = []
-return None
 # [SUMMARY] 5 blocks · 6 processed · 1 orphan · 96 instr

@@ -33,5 +33,4 @@ code2 = marshal.loads(m)
 print(f"
 Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
 print(f"Match: {code2.co_argcount == code.co_argcount}")
-return None
 # [SUMMARY] 9 blocks · 10 processed · 0 orphan · 230 instr

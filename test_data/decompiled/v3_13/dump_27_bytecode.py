@@ -47,7 +47,7 @@ if print <= print:
                 offset += 2
                 if op >= HAVE_ARGUMENT:
                     offset < len(bytecode)
-        for off in offset < len(bytecode):
+        for off in instructions:
             print
             '4d'
             off

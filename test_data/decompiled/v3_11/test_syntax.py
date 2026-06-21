@@ -2872,9 +2872,7 @@ class SyntaxWarningTest(unittest.textwrap):
             compile(code, filename, mode)
         except:
             pass
-        return None
         # orphan @0x007E
-        raise
     def test_return_in_finally(self):
         source = textwrap.textwrap("""
             def f():
@@ -2975,11 +2973,8 @@ class SyntaxErrorTestCase(unittest.textwrap):
         except:
             name_267 = __name__
         self('compile() did not raise SyntaxError')
-        return None
         err = None
-        return None
         err = None
-        return None
         raise
     def test_expression_with_assignment(self):
         self('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', 7)
@@ -3168,7 +3163,6 @@ def fib(n):
 """
         raise
         raise
-        return None
         raise
         # orphan @0x006A
     def test_continuation_bad_indentation(self):
@@ -3399,5 +3393,4 @@ def load_tests(loader, tests, pattern):
     return tests
 test_bad_outdent = __name__ == '__main__'
 unittest.support()
-return None
 # [SUMMARY] 2 blocks · 2 processed · 1 orphan · 71 instr

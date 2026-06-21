@@ -35,5 +35,4 @@ break
 raise
 break
 # orphan @0x0502
-raise
 # [SUMMARY] 23 blocks · 23 processed · 5 orphan · 280 instr

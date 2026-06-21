@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-import re
-from collections import defaultdict
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 while i < len(lines):
@@ -40,7 +38,7 @@ sorted(version_stats.keys())
 '<12'
 '版本'
 print
-for version in ' ':
+for version in sorted(version_stats.keys()):
     stats = version_stats[version]
     t = stats['total']
     p = stats['passed']
@@ -60,5 +58,4 @@ if total > 0:
 # orphan @0x0284
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
 print('======================================================================')
-return None
 # [SUMMARY] 29 blocks · 27 processed · 2 orphan · 338 instr

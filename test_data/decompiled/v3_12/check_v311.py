@@ -42,13 +42,14 @@ for off in range(17, 40):
 print("""
 Bytes 16-50:""")
 range(16, 50, 2)
-for i in print:
+for i in range(16, 50, 2):
     pair = i // (i + 2)
     '  '(f"{i}{'3d'}: {pair.hex()}")
-return None
 break
 # orphan @0x0442
-raise
-# [WARN] 1 instructions not decompiled
+# [WARN] 4 instructions not decompiled
+#   @0x0398: JUMP_BACKWARD arg=30
+#   @0x03B0: JUMP_BACKWARD arg=54
+#   @0x0428: JUMP_BACKWARD arg=82
 #   @0x0440: JUMP_BACKWARD arg=970
 # [SUMMARY] 17 blocks · 16 processed · 1 orphan · 270 instr

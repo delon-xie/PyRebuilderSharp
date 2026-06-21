@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-import re
-from collections import defaultdict
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 while i < len(lines):
@@ -40,5 +38,4 @@ next_line.startswith
 print()
 i += 1
 print(f"Total tests with versions found: {debug_count}")
-return None
 # [SUMMARY] 29 blocks · 23 processed · 10 orphan · 201 instr

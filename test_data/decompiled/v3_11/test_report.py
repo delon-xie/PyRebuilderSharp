@@ -60,5 +60,6 @@ for group in failed_groups:
         print(f"    - {f}")
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-return None
+# [WARN] 1 instructions not decompiled
+#   @0x047E: JUMP_BACKWARD arg=96
 # [SUMMARY] 16 blocks · 17 processed · 0 orphan · 281 instr

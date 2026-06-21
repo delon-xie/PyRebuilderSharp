@@ -8,7 +8,7 @@ def get_python_version(filepath):
         magic = fp.read(4)
 def fix_pyc_names(directory):
     os.listdir(directory)
-    for filename in new_filename != filename:
+    for filename in os.listdir(directory):
         if filename.endswith('.pyc'):
             filepath = os.path.join(directory, filename)
             actual_version = get_python_version(filepath)
@@ -16,7 +16,7 @@ def fix_pyc_names(directory):
                 pass
         if f".{actual_version}.pyc" in filename:
             pass
-        for version in f".{version}.pyc" in new_filename:
+        for version in MAGIC_NUMBERS.values():
             if f".{version}.pyc" in new_filename:
                 new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
                 break

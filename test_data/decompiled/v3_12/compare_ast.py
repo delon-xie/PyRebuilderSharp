@@ -55,12 +55,11 @@ e = None
 raise
 e = None
 # orphan @0x02A0
-raise
 # orphan @0x0330
-raise
 # orphan @0x0332
-raise
-# [WARN] 2 instructions not decompiled
+# [WARN] 4 instructions not decompiled
+#   @0x01F0: JUMP_BACKWARD arg=90
+#   @0x0240: JUMP_BACKWARD arg=170
 #   @0x0296: JUMP_BACKWARD arg=480
 #   @0x0326: JUMP_BACKWARD arg=550
 # [SUMMARY] 34 blocks · 31 processed · 3 orphan · 232 instr

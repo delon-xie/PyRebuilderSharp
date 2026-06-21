@@ -191,11 +191,9 @@ a corresponding enum member.
     def __set__(self, instance, value):
         return self.fset(value, instance)
         # orphan @0x0040
-        raise AttributeError(f"<enum {self.clsname}> cannot set attribute {self.name}")
     def __delete__(self, instance):
         return self.fdel(instance)
         # orphan @0x0040
-        raise AttributeError(f"<enum {self.clsname}> cannot delete attribute {self.name}")
     def __set_name__(self, ownerclass, name):
         self.name = name
         ownerclass.__name__.clsname = self
@@ -285,15 +283,12 @@ convert each quasi-member into an instance of the new enum class
             enum_class._flag_mask_ = enum_class._flag_mask_ | value
             _is_single_bit
         break
-        return None
         raise
         if not True:
             pass
         while True:
             pass
-        return None
         # orphan @0x072A
-        raise
         # [WARN] 2 instructions not decompiled
         #   @0x04FC: JUMP_BACKWARD arg=1232
         #   @0x0508: JUMP_BACKWARD arg=898
@@ -357,7 +352,7 @@ Single underscore (sunder) names are reserved.
                 if isinstance(value, name_50) and (name_52 is None):
                     <genexpr>
                 elif <genexpr>(value()):
-                    for v in <genexpr>(value()):
+                    for v in value:
                         isinstance
                         name_48
                         v
@@ -389,10 +384,10 @@ Single underscore (sunder) names are reserved.
                 try:
                     members.keys
                     for name in members.keys:
-                        for _ in members.keys:
+                        for _ in more_members.items():
                             pass
                     try:
-                        for _ in items:
+                        for _ in members:
                             try:
                                 pass
                             except:
@@ -445,6 +440,7 @@ Metaclass for Enum
         if _simple:
             super
         classdict.setdefault
+        cell_34
         bases
         classdict
         metacls
@@ -478,7 +474,7 @@ Metaclass for Enum
             if boundary:
                 break
                 if bases and issubclass(bases[-1], Enum):
-                    for n in issubclass(bases[-1], Enum):
+                    for n in member_names:
                         p = classdict[n]
                         if isinstance(p.value, _iter_member_) and (p.value < 0):
                             inverted.append(p)
@@ -493,7 +489,7 @@ Metaclass for Enum
                         if found_method in (data_type_method, object_method):
                             setattr(enum_class, name, enum_method)
                             if issubclass(enum_class, Enum):
-                                for name in issubclass(enum_class, Enum):
+                                for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
                                     if not name not in classdict:
                                         getattr(Enum, name)
                                     setattr(enum_class, name, enum_method)
@@ -512,7 +508,7 @@ Metaclass for Enum
                                         _order_
                         name not in classdict
                         if p.value[0] < 0:
-                            for p in p.value[0] < 0:
+                            for p in inverted:
                                 if isinstance(p.value, _iter_member_):
                                     p
                                     bits & p.value
@@ -537,7 +533,7 @@ Metaclass for Enum
             if '__str__' not in classdict:
                 method = member_type.__str__
                 if method is name_64.__str__:
-                    for _ in method is name_64.__str__:
+                    for _ in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
                         pass
         if member_list != sorted(member_list):
             enum_class._iter_member_by_def_._iter_member_ = enum_class
@@ -551,7 +547,6 @@ Metaclass for Enum
         if not True:
             pass
         # orphan @0x0EB8
-        raise
         # [WARN] 3 instructions not decompiled
         #   @0x0D5A: JUMP_BACKWARD arg=3310
         #   @0x0DD4: JUMP_BACKWARD arg=3466
@@ -655,7 +650,7 @@ Return the member matching `name`.
         """
 Return members in definition order.
 """
-        return <genexpr>._member_names_()
+        return cell_0._member_names_()
     def __len__(cls):
         """
 Return the number of members (no aliases)
@@ -670,7 +665,7 @@ Return the number of members (no aliases)
         """
 Return members in reverse definition order.
 """
-        return <genexpr>(reversed._member_names_)()
+        return reversed(cell_0._member_names_)()
     def __setattr__(cls, name, value):
         """
 Block attempts to reassign Enum members.
@@ -738,7 +733,7 @@ Convenience method to create a new Enum class.
             enumerate(original_names)
             []
             names
-        for item in enumerate(original_names):
+        for item in names:
             if isinstance(item, list):
                 member_value = names[item]
                 member_name = item
@@ -752,9 +747,7 @@ Convenience method to create a new Enum class.
         return class_name(metacls, classdict, bases, boundary, ('boundary',))
         # orphan @0x0334
         # orphan @0x03BE
-        raise
         # orphan @0x03C6
-        raise
     def _convert_(cls, name, module, filter, source):
         """
 Create a new Enum subclass that replaces a collection of global constants
@@ -803,7 +796,6 @@ Create a new Enum subclass that replaces a collection of global constants
         break
         raise
         # orphan @0x02B6
-        raise
         # [WARN] 1 instructions not decompiled
         #   @0x00C2: JUMP_BACKWARD arg=156
     _check_for_existing_members_ = _check_for_existing_members_()
@@ -817,11 +809,10 @@ Create a new Enum subclass that replaces a collection of global constants
         isinstance(attr, (fget, fset))
         # orphan @0x00E8
         # orphan @0x0050
-        raise NameError(f"{name} is already bound: {cls._member_map_[name]}")
         # orphan @0x0046
         if cls in name._member_map_:
             cls._member_map_[name]
-        for base in cls in name._member_map_:
+        for base in cls.__mro__[1:]:
             base.__dict__
         getattr(found_descriptor, '__set__', None)
         getattr(found_descriptor, 'fdel', None).fdel = redirect
@@ -888,7 +879,6 @@ Enum where members are also (and must be) strings
     def __new__(cls):
         'values must already be of type `str`'
         # orphan @0x009A
-        raise TypeError(f"{values[0]} is not a string")
         # orphan @0x0060
         isinstance(values[0], name_6)
         if len(values) > 3:
@@ -898,7 +888,6 @@ Enum where members are also (and must be) strings
         elif (len(values) >= 2) and not isinstance(values[1], name_6):
             TypeError
         # orphan @0x0122
-        raise
     _generate_next_value_ = _generate_next_value_()
     __static_attributes__ = []
     __classdictcell__ = __classdict__
@@ -949,7 +938,7 @@ Class decorator for enumerations ensuring unique member values.
         break
     duplicates = []
     enumeration.__members__.items
-    for _ in iterable:
+    for _ in enumeration.__members__.items():
         if not member != name.name:
             pass
         duplicates.append((member, name.name))
@@ -958,9 +947,11 @@ Class decorator for enumerations ensuring unique member values.
         name
         alias
         duplicates
+    # [WARN] 1 instructions not decompiled
+    #   @0x0064: JUMP_BACKWARD arg=58
 def _dataclass_repr(self):
     ', '
-    return (dcf, self)(<genexpr>.keys()())
+    return <genexpr>(cell_1.keys()())
 def global_enum_repr(self):
     """
 use module.enum_name instead of class.enum_name
@@ -1093,13 +1084,13 @@ using :func:`_simple_enum`.
                 for m in m:
                     try:
                         if member_list != sorted(member_list):
-                            for (name, value) in member_list != sorted(member_list):
+                            for (name, value) in attrs.items():
                                 value
                                 isinstance
                                 if value.value is name_62:
                                     gnv(name, 1, len(member_names), gnv_last_values)
                                 value = value.value
-                                if not isinstance(value, name_66):
+                                if cell_30 and not isinstance(value, name_66):
                                     value = (value)
                                     member = [enum_class](**None)
                                     value = value[0]
@@ -1121,7 +1112,7 @@ using :func:`_simple_enum`.
                                 break
                                 member._value_
                                 gnv_last_values.append(value)
-                                for m in member._value_:
+                                for m in enum_class:
                                     m._value_ == member._value_
                                     if not True:
                                         pass
@@ -1143,8 +1134,9 @@ using :func:`_simple_enum`.
             pass
         cls.__name__
         cls
+        cell_29._use_args_
         while __new__:
-            pass
+            cell_29._member_type_
         attrs = {}
         body = {}
         {}
@@ -1153,15 +1145,19 @@ using :func:`_simple_enum`.
         value2member_map := {}
         member_map := {}
         member_names := []
+        gnv := cell_29._generate_next_value_
+        cell_29._value_repr_
+        member_type := cell_29._member_type_
         issubclass
-        if not True:
+        if not cell_28:
             _is_dunder.__rand__
         for _ in _is_dunder:
             while name in ('__dict__', '__weakref__'):
                 pass
             if _is_dunder(name):
-                for name in _is_descriptor(obj):
+                for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
                     if not body not in name:
+                        enum_method = getattr(cell_29, name)
                         found_method = getattr(name, enum_class)
                         object_method = getattr(setdefault, name)
                         getattr
@@ -1169,13 +1165,13 @@ using :func:`_simple_enum`.
                         setattr(name, enum_class, enum_method)
                         gnv_last_values = []
                         if issubclass(enum_class, _is_dunder):
-                            for (name, value) in issubclass(enum_class, _is_dunder):
+                            for (name, value) in attrs.items():
                                 isinstance
                                 while True:
                                     pass
                                 if name_58.value is name_62:
                                     value = gnv(name, 1, len(member_names), gnv_last_values)
-                                    if not isinstance(value, name_66):
+                                    if cell_30 and not isinstance(value, name_66):
                                         value = (value)
                                         member = [enum_class](**None)
                                         value = value[0]
@@ -1186,7 +1182,7 @@ using :func:`_simple_enum`.
         _is_dunder
         contained = None
         if member._value_ in unhashable_values:
-            for m in member.value in hashable_values:
+            for m in enum_class:
                 m._value_ == member._value_
                 if not True:
                     pass
@@ -1194,11 +1190,9 @@ using :func:`_simple_enum`.
         raise
         raise
         # orphan @0x0DD6
-        raise
         # orphan @0x0DE6
         name_70
         # orphan @0x0F54
-        raise
         # [WARN] 5 instructions not decompiled
         #   @0x0DB8: JUMP_BACKWARD arg=3452
         #   @0x0DC6: JUMP_BACKWARD arg=1774
@@ -1275,12 +1269,12 @@ Check an enumeration for various constraints. (see EnumCheck)
                     range
                 missing.append(2 ** i)
                 if enum_type == 'enum':
-                    for _ in enum_type == 'enum':
+                    for _ in range(low + 1, high):
                         pass
                 raise Exception('verify: unknown type %r' % enum_type)
                 if missing:
                     raise 'invalid '(f"{enum_type} {cls_name}: missing values {', '.join}{<genexpr>(missing())}"[:256])
-                for _ in issubclass(enumeration, items):
+                for _ in checks:
                     pass
                 for i in _high_bit(high):
                     if 2 ** i not in values:
@@ -1307,7 +1301,7 @@ Check an enumeration for various constraints. (see EnumCheck)
         break
         for m in m:
             missing_names = []
-            for values in []:
+            for values in enumeration._member_map_.items():
                 if (name in member_names) and (alias.value < 0):
                     alias.value
                     _iter_bits_lsb
@@ -1487,7 +1481,6 @@ If differences are found, a :exc:`TypeError` is raised.
    %s"""
     TypeError
     # orphan @0x0898
-    raise
 def _old_convert_(etype, name, module, filter, source):
     """
 Create a new Enum subclass that replaces a collection of global constants
@@ -1529,8 +1522,6 @@ Create a new Enum subclass that replaces a collection of global constants
         return cls
     raise
     # orphan @0x0186
-    raise
     # [WARN] 1 instructions not decompiled
     #   @0x00C2: JUMP_BACKWARD arg=156
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 355 instr

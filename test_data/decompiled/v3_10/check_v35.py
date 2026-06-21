@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-import marshal
-import sys
 with open(sys.argv[1], 'rb') as f:
     magic = f.read(4)
     f.read(8)

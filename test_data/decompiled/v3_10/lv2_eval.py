@@ -20,11 +20,8 @@ try:
     f = open('test.txt')
 finally:
     pass
-return None
 # orphan @0x0084
-raise
 # orphan @0x00F8
 IOError
 f = None
-return None
 # [SUMMARY] 19 blocks · 18 processed · 2 orphan · 67 instr

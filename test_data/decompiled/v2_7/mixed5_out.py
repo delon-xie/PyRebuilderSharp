@@ -67,5 +67,4 @@ def mixed_4(n):
     # orphan @0x0068
     # orphan @0x006D
     total = -1
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

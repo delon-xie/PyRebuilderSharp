@@ -9,19 +9,10 @@ versions
 # orphan @0x00C0
 def <genexpr>(.0):
     .0
-    for (v, r) in r:
+    for (v, r) in .0:
         if r:
             yield 1
             break
-raise
-__doc__ = 'Run AST comparison for test_seq_clean across all versions'
-import os
-import subprocess
-import ast
-import sys
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
 with open(INPUT_FILE) as f:
     expected_src = f.read()
     raise
@@ -95,11 +86,9 @@ e = None
 False
 # orphan @0x0252
 e = None
-raise
 # orphan @0x025C
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-return None
 # [SUMMARY] 34 blocks · 6 processed · 29 orphan · 331 instr

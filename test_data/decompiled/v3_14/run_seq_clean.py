@@ -84,7 +84,6 @@ def <genexpr>(.0):
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-return None
 if not True:
     pass
 results.items
@@ -97,7 +96,6 @@ e = None
 []
 raise
 # orphan @0x060C
-raise
 # [WARN] 2 instructions not decompiled
 #   @0x041A: JUMP_BACKWARD arg=934
 #   @0x05FE: JUMP_BACKWARD arg=372

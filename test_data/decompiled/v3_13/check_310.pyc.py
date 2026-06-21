@@ -20,7 +20,7 @@ def dump_bytecode(c, depth):
             pass
         break
         if et:
-            for i in et:
+            for i in range(0, len(et), 8):
                 name_22
                 print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
                 break
@@ -28,5 +28,4 @@ def dump_bytecode(c, depth):
         if not True:
             print
 dump_bytecode(code)
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 57 instr

@@ -67,8 +67,5 @@ def depth_5_try():
     except:
         pass
     result = 0
-    return None
-    return None
     raise
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

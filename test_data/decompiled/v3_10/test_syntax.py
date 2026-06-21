@@ -2871,7 +2871,6 @@ class SyntaxWarningTest(unittest.TestCase):
         with self.assertWarnsRegex(SyntaxWarning, errtext):
             compile(code, filename, mode)
         # orphan @0x002E
-        raise
     def test_return_in_finally(self):
         source = textwrap.dedent("""
             def f():
@@ -3138,7 +3137,6 @@ def fib(n):
         finally:
             pass
         # orphan @0x0076
-        raise
         # orphan @0x00D6
         SyntaxError
         self.fail('Indented statement over multiple lines is valid')
@@ -3370,11 +3368,9 @@ while 1:
     @support.skip_wasi_stack_overflow()
     @support.cpython_only
     def test_deep_invalid_rule(self):
-        source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
         with self.assertRaises(SyntaxError):
             compile(source, '<string>', 'exec')
         # orphan @0x0030
-        raise
     def test_except_stmt_invalid_as_expr(self):
         self._check_error(textwrap.dedent("""
                 try:

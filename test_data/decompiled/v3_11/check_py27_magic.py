@@ -30,5 +30,4 @@ dis.disassemble(code)
 print('Marshal dump:', result3.path)
 name_19 = result3.path
 print('Stderr:', result3.path)
-return None
 # [SUMMARY] 2 blocks · 2 processed · 1 orphan · 146 instr

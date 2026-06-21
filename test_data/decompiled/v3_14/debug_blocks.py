@@ -27,11 +27,11 @@ try:
                             '3d'
                             leaders.add(instr.arg)
                             if i + 1 < len(instrs):
-                                for _ in i + 1 < len(instrs):
+                                for _ in enumerate(sorted_leaders):
                                     pass
                             '3d'(f"-{end - 1}3d]: {', '.join}{<genexpr>(block_instrs())}")
                             if any is None:
-                                for last in any is None:
+                                for last in block_instrs:
                                     if not True:
                                         block_instrs
                                         <genexpr>
@@ -40,13 +40,13 @@ try:
                                     last = block_instrs[-1]
                                     print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
                                     if any is None:
-                                        for ins in any is None:
+                                        for ins in block_instrs:
                                             if not True:
                                                 CodeObject: <genexpr> (19 instrs)
                                                 None
                                                 False
                                             if <lambda>(block_instrs()):
-                                                for ins in <lambda>(block_instrs()):
+                                                for ins in block_instrs:
                                                     if not ins.opname == 'JUMP_ABSOLUTE':
                                                         print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
                             for (i, instr) in list:
@@ -102,7 +102,6 @@ if len(block_instrs) > 3:
     '3d'
     start
     'Block ['
-return None
 # [WARN] 3 instructions not decompiled
 #   @0x03E2: JUMP_BACKWARD arg=938
 #   @0x03EA: JUMP_BACKWARD arg=938

@@ -8,7 +8,8 @@ test_groups = {}
 current_group = None
 output.split("""
 """)
-for line in line.strip().endswith('.3.10.pyc'):
+for line in output.split("""
+"""):
     if line.startswith('***'):
         parts = line.split(':')
         if len(parts) >= 2:
@@ -17,7 +18,7 @@ for line in line.strip().endswith('.3.10.pyc'):
     if current_group and line.strip().endswith('.3.10.pyc'):
         test_groups[current_group]['files'].append(line.strip())
     elif info['files'] and ('PASS' in info['status']):
-        for _ in 'FAIL' in info['status']:
+        for _ in test_groups.items():
             pass
 print('============================================================')
 print('Python 3.10 版本测试报告')
@@ -53,5 +54,4 @@ print(f"    - {f}")
 # orphan @0x01B8
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-return None
 # [SUMMARY] 26 blocks · 14 processed · 12 orphan · 233 instr

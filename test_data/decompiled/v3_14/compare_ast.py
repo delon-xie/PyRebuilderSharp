@@ -60,7 +60,5 @@ e = None
 e = None
 []
 # orphan @0x02D8
-raise
 # orphan @0x036C
-raise
 # [SUMMARY] 37 blocks · 36 processed · 7 orphan · 236 instr

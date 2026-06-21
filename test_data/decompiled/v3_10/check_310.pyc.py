@@ -31,5 +31,4 @@ def dump_bytecode(c, depth):
             dis.dis(const)
             dump_bytecode(const, depth + 1)
 dump_bytecode(code)
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 54 instr

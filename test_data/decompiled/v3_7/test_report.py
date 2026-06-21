@@ -8,7 +8,8 @@ test_groups = {}
 current_group = None
 output.split("""
 """)
-for line in line.strip().endswith('.3.10.pyc'):
+for line in output.split("""
+"""):
     if line.startswith('***'):
         parts = line.split(':')
         if len(parts) >= 2:
@@ -16,7 +17,7 @@ for line in line.strip().endswith('.3.10.pyc'):
             status = parts[1].strip()
     if current_group and line.strip().endswith('.3.10.pyc'):
         test_groups[current_group]['files'].append(line.strip())
-    for (group, info) in 'FAIL' in info['status']:
+    for (group, info) in test_groups.items():
         if info['files'] and ('PASS' in info['status']):
             passed_groups.append(group)
         if 'FAIL' in info['status']:

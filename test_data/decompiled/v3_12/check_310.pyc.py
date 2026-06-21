@@ -23,7 +23,7 @@ def dump_bytecode(c, depth):
             '(none)'
         break
         if et:
-            for i in name_22.from_bytes:
+            for i in range(0, len(et), 8):
                 s = et(i // (i + 2), 'little')
                 e = et((i + 2) // (i + 4), 'little')
                 t = et((i + 4) // (i + 6), 'little')
@@ -31,6 +31,10 @@ def dump_bytecode(c, depth):
                 print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
         dis.dis(const)
         dump_bytecode(const, depth + 1)
+    # [WARN] 4 instructions not decompiled
+    #   @0x0044: JUMP_BACKWARD arg=34
+    #   @0x007A: JUMP_BACKWARD arg=88
+    #   @0x0270: JUMP_BACKWARD arg=306
+    #   @0x02BE: JUMP_BACKWARD arg=668
 dump_bytecode(code)
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 56 instr

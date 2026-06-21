@@ -6,12 +6,12 @@ except:
     break
 try:
     []
-    for c in repr(c):
+    for c in []:
         try:
             try:
                 []
                 break
-                for i in print:
+                for i in range(min(count, 6)):
                     raw2 = data[pos]
                     pos += 1
                     t2 = raw2 & 127
@@ -51,7 +51,7 @@ if raw & 128:
     struct.unpack
     None
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
-for name in struct.unpack:
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     val = '<i'(data, pos // (pos + 4))[0]
     print(f"  {name}={val}")
     pos += 4
@@ -75,9 +75,12 @@ elif t in (90, 122):
     data
 break
 raise
-# [WARN] 4 instructions not decompiled
+# [WARN] 7 instructions not decompiled
+#   @0x0178: JUMP_BACKWARD arg=102
+#   @0x0548: JUMP_BACKWARD arg=24
 #   @0x0564: JUMP_BACKWARD arg=526
 #   @0x058E: JUMP_BACKWARD arg=568
 #   @0x0616: JUMP_BACKWARD arg=704
+#   @0x06F6: JUMP_BACKWARD arg=928
 #   @0x0748: JUMP_BACKWARD arg=1746
 # [SUMMARY] 46 blocks · 47 processed · 0 orphan · 575 instr

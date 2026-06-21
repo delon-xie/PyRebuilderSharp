@@ -6,5 +6,4 @@ for i in range(3):
         continue
     else:
         a = i
-return None
 # [SUMMARY] 7 blocks · 8 processed · 0 orphan · 19 instr

@@ -76,14 +76,15 @@ expected_ast = ast.dump(ast.parse(expected_src), 2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 versions
 []
-return None
 break
 raise
 ex = None
 # orphan @0x03DA
-raise
 # orphan @0x03DC
-raise
-# [WARN] 1 instructions not decompiled
+# [WARN] 5 instructions not decompiled
+#   @0x01E6: JUMP_BACKWARD arg=146
+#   @0x0326: JUMP_BACKWARD arg=30
+#   @0x0350: JUMP_BACKWARD arg=508
 #   @0x0368: JUMP_BACKWARD arg=616
+#   @0x03D0: JUMP_BACKWARD arg=636
 # [SUMMARY] 35 blocks · 33 processed · 2 orphan · 240 instr

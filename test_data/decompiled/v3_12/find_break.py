@@ -28,7 +28,6 @@ def test_until_broken(exprs):
     elif 'if ' in out:
         return f"{out}{None // 80}"
     # orphan @0x01C0
-    raise
     # [WARN] 1 instructions not decompiled
     #   @0x01BE: JUMP_BACKWARD arg=328
 def find_breaking_point(exprs, lo, hi):

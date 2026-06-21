@@ -9,12 +9,24 @@ def recursive_repr(fillvalue):
     'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
         def wrapper(self):
+            try:
+                result = cell_5(self)
+            except:
+                cell_4.discard(key)
             key = (id(self), get_ident())
-            return
+            if key in cell_4:
+                return cell_3
+            cell_4.add(key)
+            cell_4.discard(key)
             return result
-            raise
-            raise
-        wrapper.__module__ = (set())(getattr, '__module__')
+            # orphan @0x00BA
+        wrapper.__module__ = getattr(cell_0, '__module__')
+        wrapper.__doc__ = getattr(cell_0, '__doc__')
+        wrapper.__name__ = getattr(cell_0, '__name__')
+        wrapper.__qualname__ = getattr(cell_0, '__qualname__')
+        wrapper.__annotate__ = getattr(cell_0, '__annotate__', None)
+        wrapper.__type_params__ = getattr(cell_0, '__type_params__', ())
+        wrapper.__wrapped__ = cell_0
         return wrapper
     return decorating_function
 class Repr:
@@ -71,7 +83,7 @@ class Repr:
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         try:
             []
-            for elem in repr1(elem, newlevel):
+            for elem in []:
                 try:
                     try:
                         []
@@ -95,6 +107,8 @@ class Repr:
         repr1 = self.repr1
         elem
         islice(x, maxiter)
+        # [WARN] 1 instructions not decompiled
+        #   @0x009A: JUMP_BACKWARD arg=26
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
@@ -122,6 +136,8 @@ class Repr:
             return '{}'
         elif level <= 0:
             return '{' + self.fillvalue + '}'
+        # [WARN] 1 instructions not decompiled
+        #   @0x0112: JUMP_BACKWARD arg=94
     def repr_str(self, x, level):
         s = x(None // self.maxstring)
         if len(s) > self.maxstring:
@@ -167,9 +183,7 @@ class Repr:
         exc = None
         return
         # orphan @0x0232
-        raise
         # orphan @0x0234
-        raise
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -184,9 +198,7 @@ class Repr:
         return s
         return
         # orphan @0x0178
-        raise
         # orphan @0x017A
-        raise
 def _possibly_sorted(x):
     try:
         sorted(x)
@@ -195,10 +207,7 @@ def _possibly_sorted(x):
     return
     return
     # orphan @0x0046
-    raise
     # orphan @0x0048
-    raise
 aRepr = Repr()
 repr = aRepr.repr
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 45 instr

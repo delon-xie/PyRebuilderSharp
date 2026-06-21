@@ -27,5 +27,4 @@ for (version, files) in sorted(version_files.items()):
     if version == '3.10':
         for f in sorted(files):
             print(f"      {f}")
-return None
 # [SUMMARY] 17 blocks · 18 processed · 0 orphan · 138 instr

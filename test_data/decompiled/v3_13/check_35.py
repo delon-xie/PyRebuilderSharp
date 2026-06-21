@@ -16,5 +16,4 @@ result3 = [py35, '-c', 'import dis; c=compile(\'a=1\',\'<t>\',\'exec\'); [print(
 print("""
 Instructions:""")
 print(result3.stdout.strip())
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 100 instr

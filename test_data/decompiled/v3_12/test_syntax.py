@@ -2873,8 +2873,6 @@ class SyntaxWarningTest(unittest.TestCase):
         except:
             pass
         self.assertWarnsRegex(compile, errtext)
-        return None
-        return None
         raise
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -2940,6 +2938,8 @@ class SyntaxWarningTest(unittest.TestCase):
                             {kw}
                 ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
+        # [WARN] 1 instructions not decompiled
+        #   @0x0126: JUMP_BACKWARD arg=290
 class SyntaxErrorTestCase(unittest.TestCase):
     def _check_error(self, code, errtext, filename, mode, subclass, lineno, offset, end_lineno, end_offset):
         """Check that compiling code raises SyntaxError with errtext.
@@ -2976,13 +2976,9 @@ class SyntaxErrorTestCase(unittest.TestCase):
         except:
             err = None
         self.fail('compile() did not raise SyntaxError')
-        return None
         err = None
-        return None
         # orphan @0x025C
-        raise
         # orphan @0x025E
-        raise
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', 7)
     def test_curly_brace_after_primary_raises_immediately(self):
@@ -3164,15 +3160,10 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
-        return None
         raise
-        return None
         # orphan @0x009A
-        raise
         # orphan @0x00DA
-        raise
         # orphan @0x00DC
-        raise
         # [WARN] 1 instructions not decompiled
         #   @0x0098: JUMP_BACKWARD arg=120
     def test_continuation_bad_indentation(self):
@@ -3234,6 +3225,10 @@ b=3", f"\{paren}' was never closed")
  case e(e=v,v,""", ' was never closed')
         s = b'IyBjb2Rpbmc9bGF0aW4KKGFhYWFhYWFhYWFhYWFhYWFhCmFhYWFhYWFhYWFhtQ=='
         self._check_error(s, '\'\\(\' was never closed')
+        # [WARN] 3 instructions not decompiled
+        #   @0x003E: JUMP_BACKWARD arg=58
+        #   @0x0080: JUMP_BACKWARD arg=60
+        #   @0x00C0: JUMP_BACKWARD arg=58
     def test_error_string_literal(self):
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
@@ -3293,16 +3288,22 @@ a=1
         ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
+        # [WARN] 1 instructions not decompiled
+        #   @0x003A: JUMP_BACKWARD arg=50
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
         ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
+        # [WARN] 1 instructions not decompiled
+        #   @0x003C: JUMP_BACKWARD arg=52
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
         (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (lhs_stmt, rhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0046: JUMP_BACKWARD arg=62
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     __doc__ = 'Test syntax restrictions for lazy imports.'
     def test_lazy_import_in_try_block(self):

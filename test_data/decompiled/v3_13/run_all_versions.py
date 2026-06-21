@@ -25,7 +25,7 @@ try:
                 try:
                     try:
                         break
-                        for i in match:
+                        for i in range(max(len(exp_lines), len(act_lines))):
                             try:
                                 try:
                                     e = '(missing)'
@@ -118,9 +118,7 @@ def <genexpr>(.0):
         pass
     # [WARN] 1 instructions not decompiled
     #   @0x0022: JUMP_BACKWARD arg=10
-raise
 # orphan @0x058C
-raise
 # [WARN] 3 instructions not decompiled
 #   @0x03C8: JUMP_BACKWARD arg=874
 #   @0x0412: JUMP_BACKWARD arg=350

@@ -56,9 +56,9 @@ break
 next_line = lines[j]
 next_line.startswith('***')
 # orphan @0x034A
-raise
-# [WARN] 3 instructions not decompiled
+# [WARN] 4 instructions not decompiled
 #   @0x0286: JUMP_BACKWARD arg=280
+#   @0x02E8: JUMP_BACKWARD arg=42
 #   @0x031C: JUMP_BACKWARD arg=624
 #   @0x0348: JUMP_BACKWARD arg=752
 # [SUMMARY] 32 blocks · 29 processed · 3 orphan · 236 instr

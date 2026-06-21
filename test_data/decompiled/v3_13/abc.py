@@ -179,7 +179,6 @@ If cls is not an instance of ABCMeta, does nothing.
     frozenset(abstracts).__abstractmethods__ = cls
     return cls
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
-return None
 raise
 raise
 # [SUMMARY] 9 blocks · 10 processed · 0 orphan · 94 instr

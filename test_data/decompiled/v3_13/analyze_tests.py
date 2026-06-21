@@ -15,7 +15,7 @@ lines = output.split("""
 i = 0
 i < len(lines)
 while True:
-    for version in i < len(lines):
+    for version in sorted(version_stats.keys()):
         stats = version_stats[version]
         t = stats['total']
         p = stats['passed']
@@ -103,5 +103,6 @@ break
 break
 raise
 # orphan @0x0522
-raise
+# [WARN] 1 instructions not decompiled
+#   @0x0490: JUMP_BACKWARD arg=1002
 # [SUMMARY] 51 blocks · 51 processed · 10 orphan · 398 instr

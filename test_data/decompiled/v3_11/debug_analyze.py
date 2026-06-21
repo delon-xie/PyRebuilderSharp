@@ -2,7 +2,6 @@
 
 # orphan @0x0080
 # orphan @0x0078
-raise
 try:
     output = f()
     f.read
@@ -53,5 +52,4 @@ for (v, line_text) in found_versions:
 print()
 i += 1
 print(f"Total tests with versions found: {debug_count}")
-return None
 # [SUMMARY] 12 blocks · 11 processed · 2 orphan · 256 instr

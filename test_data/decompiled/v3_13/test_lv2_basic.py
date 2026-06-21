@@ -20,8 +20,6 @@ for n in range(10):
     break
 if i < 5:
     pass
-return None
 # orphan @0x00A2
 # orphan @0x00A6
-raise
 # [SUMMARY] 20 blocks · 17 processed · 5 orphan · 67 instr

@@ -14,7 +14,5 @@ for n in range(10):
     break
 if i < 5:
     pass
-return None
 # orphan @0x0072
-raise
 # [SUMMARY] 12 blocks · 10 processed · 3 orphan · 47 instr

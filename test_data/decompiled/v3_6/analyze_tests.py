@@ -9,8 +9,6 @@ next_line.startswith('***')
 j < i + 30
 # orphan @0x00A8
 j < len(lines)
-import re
-from collections import defaultdict
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 while i < len(lines):

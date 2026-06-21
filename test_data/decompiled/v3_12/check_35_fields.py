@@ -17,5 +17,4 @@ print('len(m):', len(m))
 print('m:', ' '.join('{:02x}'.format(b) for b in m), end='')
 """], True, True, 10)
 print(r.stdout)
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 41 instr

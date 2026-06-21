@@ -2,7 +2,7 @@
 
 try:
     []
-    for f in f:
+    for f in []:
         try:
             try:
                 []
@@ -62,6 +62,15 @@ for (old, new) in conflicts:
     os.remove(old)
 f
 files_to_rename
-# [WARN] 1 instructions not decompiled
+# [WARN] 11 instructions not decompiled
+#   @0x0066: JUMP_BACKWARD arg=42
+#   @0x0176: JUMP_BACKWARD arg=314
+#   @0x017C: JUMP_BACKWARD arg=320
+#   @0x023E: JUMP_BACKWARD arg=514
+#   @0x02B0: JUMP_BACKWARD arg=68
+#   @0x02D8: JUMP_BACKWARD arg=108
+#   @0x0396: JUMP_BACKWARD arg=144
+#   @0x0426: JUMP_BACKWARD arg=122
 #   @0x0444: JUMP_BACKWARD arg=16
+#   @0x044A: JUMP_BACKWARD arg=22
 # [SUMMARY] 34 blocks · 34 processed · 0 orphan · 291 instr

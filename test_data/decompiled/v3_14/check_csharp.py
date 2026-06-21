@@ -28,10 +28,8 @@ for name in __name__():
             print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
         length = data[off2]
         print(f"  TYPE_SHORT_ASCII len={length}")
-return None
 print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
 length = struct.unpack('<i', data[off2:off2 + 4])[0]
 print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
-return None
 raise
 # [SUMMARY] 23 blocks · 24 processed · 5 orphan · 276 instr

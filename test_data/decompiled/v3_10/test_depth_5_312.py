@@ -106,8 +106,6 @@ def depth_5_try():
     # orphan @0x0032
     # orphan @0x0036
     result = -3
-    return None
     # orphan @0x0052
     result = -4
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

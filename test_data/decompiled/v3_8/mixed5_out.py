@@ -3,7 +3,7 @@
 def mixed_1(n):
     result = 0
     if n > 0:
-        for i in j < i:
+        for i in range(n):
             j = 0
             while j < i:
                 j += 1
@@ -16,7 +16,7 @@ def mixed_1(n):
 def mixed_2(n):
     total = 0
     range(n)
-    for i in j < n:
+    for i in range(n):
         j = 0
         while j < n:
             j += 1
@@ -31,7 +31,7 @@ def mixed_3(n):
     while i < n:
         i += 1
         if i % 2 == 0:
-            for j in k > 0:
+            for j in range(i):
                 k = j
                 while k > 0:
                     k -= 1
@@ -42,7 +42,7 @@ def mixed_4(n):
     total = 0
     try:
         if n > 0:
-            for i in j < i:
+            for i in range(n):
                 j = 0
                 while j < i:
                     j += 1
@@ -53,7 +53,5 @@ def mixed_4(n):
                     continue
     except:
         total = -1
-    return None
     # orphan @0x004C
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

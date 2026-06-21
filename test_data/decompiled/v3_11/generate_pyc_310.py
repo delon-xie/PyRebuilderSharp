@@ -37,5 +37,4 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
     os.input_dir.join
 print('============================================================')
 print(f"完成！成功: {success_count}, 失败: {fail_count}")
-return None
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 198 instr

@@ -46,5 +46,4 @@ passed += 1
 print('============================================================')
 print(f"总计: {passed} PASS, {failed} FAIL")
 print('============================================================')
-return None
 # [SUMMARY] 6 blocks · 7 processed · 0 orphan · 210 instr

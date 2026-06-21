@@ -2,7 +2,6 @@
 
 # orphan @0x0078
 e = None
-raise
 __doc__ = 'Compare ASTs of expected vs decompiled'
 import ast
 import sys
@@ -49,5 +48,4 @@ for i in range(max(len(exp_lines), len(act_lines))):
         break
 # orphan @0x00E6
 e = None
-raise
 # [SUMMARY] 23 blocks · 22 processed · 2 orphan · 213 instr

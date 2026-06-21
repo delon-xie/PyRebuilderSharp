@@ -47,5 +47,4 @@ n3 = x + y * z
 n4 = x * y + z
 n5 = a + b + c
 n6 = a * b * c
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 187 instr

@@ -64,5 +64,4 @@ for (old_path, new_path) in files_to_rename:
     print
 print("""
 Done!""")
-return None
 # [SUMMARY] 16 blocks · 17 processed · 0 orphan · 298 instr

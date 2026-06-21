@@ -13,7 +13,9 @@ try:
                 try:
                     ok
                     try:
-                        for i in []:
+                        for i in enumerate(zip(expected_ast.split("""
+"""), actual_ast.split("""
+"""))):
                             try:
                                 e != a
                             except Exception:
@@ -71,13 +73,12 @@ for ver in open(INPUT_FILE):
         ['dotnet', 'run', '--project', PROJECT, '--', pyc]
         None
         subprocess.run
-return None
 break
 raise
 # orphan @0x0414
 ex = None
-raise
-# [WARN] 2 instructions not decompiled
+# [WARN] 3 instructions not decompiled
 #   @0x0342: JUMP_BACKWARD arg=804
 #   @0x036C: JUMP_BACKWARD arg=336
+#   @0x0410: JUMP_BACKWARD arg=336
 # [SUMMARY] 43 blocks · 43 processed · 9 orphan · 250 instr

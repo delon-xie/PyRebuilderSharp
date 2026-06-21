@@ -41,5 +41,4 @@ else:
 print('============================================================')
 print(f"总计: {passed} PASS, {failed} FAIL")
 print('============================================================')
-return None
 # [SUMMARY] 22 blocks · 23 processed · 0 orphan · 182 instr

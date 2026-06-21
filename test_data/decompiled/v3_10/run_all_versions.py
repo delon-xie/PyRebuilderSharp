@@ -11,13 +11,6 @@ versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 versions
 []
-__doc__ = 'Run AST comparison for test_expr_basic across all versions'
-import os
-import subprocess
-import sys
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
 with open(INPUT_FILE) as f:
     expected_src = f.read()
     raise
@@ -90,19 +83,17 @@ print(f"  Decompiled: {actual_src[None:200]}")
 yield from results
 def <genexpr>(.0):
     .0
-    for (v, r) in r:
+    for (v, r) in .0:
         if r:
             yield 1
             break
 False
 # orphan @0x0258
 e = None
-raise
 # orphan @0x0262
 print(f"
 {'========================================'}")
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-return None
 # [SUMMARY] 34 blocks · 6 processed · 29 orphan · 347 instr

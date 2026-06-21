@@ -78,7 +78,6 @@ def <genexpr>(.0):
     #   @0x0022: JUMP_BACKWARD arg=8
 # orphan @0x0570
 # orphan @0x05EC
-raise
 # [WARN] 3 instructions not decompiled
 #   @0x0408: JUMP_BACKWARD arg=916
 #   @0x0452: JUMP_BACKWARD arg=372

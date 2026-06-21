@@ -16,7 +16,7 @@ def recursive_repr(fillvalue):
             finally:
                 raise
             return result
-        wrapper.__module__ = (set())(getattr, '__module__')
+        wrapper.__module__ = (set(), repr_running)(getattr, '__module__')
         return wrapper
     return decorating_function
 class Repr:
@@ -141,11 +141,9 @@ def _possibly_sorted(x):
         pass
     return
     # orphan @0x0024
-    raise
     # orphan @0x0036
     Exception
     return list(x)
 aRepr = Repr()
 repr = aRepr.repr
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

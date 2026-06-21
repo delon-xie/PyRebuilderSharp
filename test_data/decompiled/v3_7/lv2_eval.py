@@ -7,7 +7,7 @@ items
 for x in items:
     y = x
 range(5)
-for n in n == 1:
+for n in range(5):
     if n == 3:
         pass
     if n == 1:
@@ -21,7 +21,6 @@ try:
     f = open('test.txt')
 except IOError:
     pass
-return None
 # orphan @0x005C
 x = 0
 # orphan @0x0090

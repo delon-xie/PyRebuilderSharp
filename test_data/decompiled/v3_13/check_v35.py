@@ -29,6 +29,5 @@ def dump_code(c, depth):
     # [WARN] 1 instructions not decompiled
     #   @0x004C: JUMP_BACKWARD arg=36
 dump_code(code)
-return None
 raise
 # [SUMMARY] 8 blocks · 9 processed · 0 orphan · 107 instr

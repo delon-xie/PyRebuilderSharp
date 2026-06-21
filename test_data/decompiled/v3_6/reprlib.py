@@ -15,7 +15,7 @@ def recursive_repr(fillvalue):
                 pass
             finally:
                 pass
-        wrapper.__module__ = (set())(getattr, '__module__')
+        wrapper.__module__ = (set(), repr_running)(getattr, '__module__')
         return wrapper
     return decorating_function
 class Repr:
@@ -75,7 +75,9 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
+            repr1
             self.repr1
+            newlevel
             level - 1
         pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
         if n > maxiter:
@@ -146,7 +148,6 @@ class Repr:
         k = 1 + int(math.log10(abs(x)))
         sys.get_int_max_str_digits()
         # orphan @0x002C
-        raise AssertionError
         # orphan @0x0018
         'sys.set_int_max_str_digits()' in str(exc)
         # orphan @0x0010
@@ -195,5 +196,4 @@ def _possibly_sorted(x):
     return list(x)
 aRepr = Repr()
 repr = aRepr.repr
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 47 instr

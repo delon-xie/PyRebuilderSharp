@@ -18,12 +18,11 @@ None
 open
 for off in f.read:
     if raw[off:off + 4] == b'AAAAAA==':
-        for i in raw[off:off + 4] == b'AAAAAA==':
+        for i in range(16, 50, 2):
             pair = raw[i:i + 2]
             '  '(f"{i}3d: {pair.hex()}")
             print
             return None
 break
 # orphan @0x0458
-raise
 # [SUMMARY] 17 blocks · 17 processed · 2 orphan · 273 instr

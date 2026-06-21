@@ -21,9 +21,9 @@ code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
-    for i in code.co_exceptiontable:
+    for i in range(0, len(et), 8):
         if i + 7 >= len(et):
-            for const in i + 7 >= len(et):
+            for const in code.co_consts:
                 if isinstance(const, types.CodeType):
                     print(f"
 --- Nested: {const.co_name} ---")

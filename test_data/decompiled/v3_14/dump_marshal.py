@@ -32,7 +32,7 @@ raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}02X")
 pos += 1
 if raw & 128:
-    for name in raw & 128:
+    for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
         val = struct.unpack('<i', data[pos:pos + 4])[0]
         print(f"  {name}={val}")
         pos += 4
@@ -109,5 +109,4 @@ for i in '  ':
         0
         struct.unpack('<I', data[pos:pos + 4])
 # orphan @0x0926
-raise
 # [SUMMARY] 48 blocks · 48 processed · 6 orphan · 590 instr

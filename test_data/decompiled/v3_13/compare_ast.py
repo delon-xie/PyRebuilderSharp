@@ -29,7 +29,7 @@ import sys
 decompiled = open('/tmp/actual_expr.py').read()
 open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read
 if expected_ast == actual_ast:
-    for i in expected_ast == actual_ast:
+    for i in range(max(len(exp_lines), len(act_lines))):
         if i < len(exp_lines):
             e = '(missing)'
             if i < len(act_lines):
@@ -48,5 +48,4 @@ raise
 e = None
 []
 # orphan @0x033A
-raise
 # [SUMMARY] 33 blocks · 33 processed · 6 orphan · 233 instr

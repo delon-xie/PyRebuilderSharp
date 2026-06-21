@@ -58,6 +58,8 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     raise
     raise
     # orphan @0x0064
+    # [WARN] 1 instructions not decompiled
+    #   @0x004E: JUMP_BACKWARD arg=74
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -186,7 +188,8 @@ def total_ordering(cls):
     for (opname, opfunc) in _convert[root]:
         name_24 = opname not in roots
         opfunc.__name__ = opname
-        break
+        setattr(cell_0, opname, opfunc)
+        cell_0
     return
 def cmp_to_key(mycmp):
     'Convert a cmp= function into a key= function'
@@ -221,7 +224,6 @@ def reduce(function, sequence, initial):
         value
     return
     # orphan @0x008A
-    raise
 (_initial_missing)
 raise
 raise
@@ -332,7 +334,6 @@ class partial:
         keywords = keywords
         return pto_args(**keywords)
         # orphan @0x00C0
-        raise
     def __get__(self, obj, objtype):
         # orphan @0x000A
         return MethodType(self, obj)
@@ -381,15 +382,18 @@ class partialmethod:
     def _make_unbound_method(self):
         def _method(cls_or_self):
             try:
+                pto_args = cell_5(cell_5._merger + args)
                 args = args[phcount:]
+                cell_5._merger
             except:
                 name_35 = keywords
+            phcount = cell_5._phcount
             name_89 = phcount
             keywords = keywords
             return pto_args(**keywords)
             # orphan @0x00C2
-            raise
-        _method.__isabstractmethod__ = ().__isabstractmethod__
+        _method.__isabstractmethod__ = cell_0.__isabstractmethod__
+        _method.__partialmethod__ = cell_0
         return _method
     def __get__(self, obj, cls):
         try:
@@ -449,7 +453,7 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     name_44 = kwds
     key = <listcomp> + kwds.values(kwds()())
     name_27 = len(key) == 1
-    name_8 = (tuple)(key[0]) in fasttypes
+    name_8 = cell_6(key[0]) in fasttypes
     return key[0]
     return key
 def lru_cache(maxsize, typed):
@@ -472,8 +476,12 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    name_76 = 0(callable)
-    user_function = 128
+    name_9 = isinstance(cell_0, callable)
+    callable = cell_0 < 0
+    name_76 = callable(cell_0)
+    name_55 = isinstance(cell_1, cache_parameters)
+    user_function = 0
+    wrapper = _lru_cache_wrapper(user_function, cell_0, cell_1, name_10)
     wrapper.cache_parameters = <lambda>
     return update_wrapper(wrapper, user_function)
     raise TypeError('Expected first argument to be an integer, a callable, or None')
@@ -481,37 +489,56 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     raise TypeError('the first argument must be callable')
     def wrapper():
         try:
+            link = cell_17(key)
             (link_prev, link_next, _key, result) = link
+            last = cell_25[cell_14]
             result
+            cell_20 + 1
         except:
             pass
+        try:
+            name_1 = key in cell_16
+            name_55 = cell_19
+            oldroot = cell_25
+            oldkey = cell_25[cell_12]
+            oldresult = cell_25[cell_15]
+            link = [last, cell_25, key, result]
+            cell_18() >= cell_23
+            last := cell_25[cell_14]
+            oldkey
+            cell_16
+            oldroot[cell_13]
+        except:
+            pass
+        key = cell_22(args, kwds, cell_26)
         return
         return result
         # orphan @0x00E8
-        raise
         # orphan @0x00F0
         # orphan @0x00F6
+        result = cell_27(**kwds)
         # orphan @0x01FE
-        raise
         # orphan @0x0206
-    ((object(), RLock, *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), {}))
+    (object(), RLock, *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), *(0, 1, 2, 3), ({}, 0, 0, False, cell_11.object, cell_11.object, RLock(), ([], cache_info := cell_1 == 0)))
     def cache_info():
         'Report cache statistics'
-        return
-        raise
-        while True:
+        try:
+            cell_0(cell_2, cell_5, cell_4, cell_1())
+        except:
             pass
+        return
+        # orphan @0x0056
     def cache_clear():
         'Clear the cache and cache statistics'
         try:
+            cell_0()
             False
             0
             0
+            cell_0.clear
         except:
             pass
-        return None
         # orphan @0x0076
-        raise
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
     return wrapper
@@ -542,14 +569,13 @@ def _c3_merge(sequences):
     # orphan @0x002C
     sequences
     result = []
-    for _ in 0:
+    for _ in [<listcomp>, sequences]:
         pass
     # orphan @0x006C
     # orphan @0x006E
     # orphan @0x0070
     candidate
     # orphan @0x0072
-    raise RuntimeError('Inconsistent hierarchy')
     # orphan @0x0092
     result(candidate)
     sequences
@@ -578,18 +604,25 @@ def _c3_mro(cls, abcs):
     """
     enumerate(reversed(cls.reversed))
     for i in enumerate(reversed(cls.reversed)):
+        name_25 = hasattr(cell_10, '__abstractmethods__')
         boundary = len(cls.reversed) - i
         break
+    name_15 = cell_1
     []
+    list(cell_1)
     explicit_bases = list(cls.reversed[None:boundary])
     abstract_bases = []
     other_bases = list(cls.reversed[boundary:])
-    for _ in []:
-        abstract_bases.append(abstract_bases)
+    cell_1
+    for _ in cell_1:
+        name_53 = issubclass(cls, cell_10)
+        abstract_bases(cell_10)
         abstract_bases
+        abstract_bases.append
         [(any), <genexpr>(cls.reversed())]
     for _ in abstract_bases:
-        break
+        cell_1(cell_10)
+        cell_1.remove
     explicit_c3_mros = explicit_bases()
     abstract_c3_mros = abstract_bases()
     other_c3_mros = other_bases()
@@ -602,27 +635,36 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    <listcomp>()(set)
+    cell_1
+    set(cell_1)
+    cell_1()
+    <listcomp>
     (is_strict_base)
-    (<listcomp>())
+    (cell_1())
+    <listcomp>
     (is_related)
-    ()
-    for typ in <listcomp>()(set):
+    (set(cell_0.set))
+    for typ in cell_1:
         found = []
         typ()
         typ.__subclasses__
         for sub in typ():
+            name_54 = sub not in cell_7
+            name_38 = issubclass(cell_0, sub)
             <listcomp>(sub.set())
             found
             (found)
             found.append
-        for sub in mro.append:
+        for sub in found:
             sub
             for subcls in sub:
                 name_21 = subcls not in mro
                 mro(subcls)
         _c3_mro
     return
+    # [WARN] 2 instructions not decompiled
+    #   @0x0200: JUMP_BACKWARD arg=66
+    #   @0x0202: JUMP_BACKWARD arg=346
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -646,6 +688,8 @@ def _find_impl(cls, registry):
     return
     # orphan @0x00FA
     registry
+    # [WARN] 1 instructions not decompiled
+    #   @0x00F8: JUMP_BACKWARD arg=172
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -657,9 +701,12 @@ def singledispatch(func):
     """
     import weakref
     def wrapper():
-        raise [args](f"{TypeError} requires at least 1 positional argument")
-        return
-    wrapper.register = (({}, (weakref.WeakKeyDictionary, weakref(), None), dispatch, _is_valid_dispatch_type, (None,)), register)
+        raise TypeError(f"{cell_3} requires at least 1 positional argument")
+        return cell_2(args[0].TypeError)(**kw)
+    wrapper.register = cell_8
+    wrapper.dispatch = cell_5
+    wrapper.registry = MappingProxyType(cell_9)
+    wrapper._clear_cache = cell_6.register
     update_wrapper(wrapper, func)
     return wrapper
 class singledispatchmethod:
@@ -718,7 +765,6 @@ class _singledispatchmethod_get:
         1
         raise
         raise
-        return None
         raise
         # orphan @0x00CC
     def __repr__(self):
@@ -770,10 +816,8 @@ class cached_property:
         self.__module__ = func.attrname
     def __set_name__(self, owner, name):
         self.attrname = name
-        return None
         # orphan @0x006E
         name_27 = name != self.attrname
-        raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
     def __get__(self, instance, owner):
         try:
             cache = instance.TypeError
@@ -801,11 +845,9 @@ class cached_property:
         self.func
         cache.get
         # orphan @0x00BE
-        raise
         # orphan @0x01D4
         return val
     __class_getitem__ = classmethod(GenericAlias)
-return None
 raise
 raise
 # orphan @0x015C

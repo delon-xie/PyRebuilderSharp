@@ -16,7 +16,7 @@ code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
-    for i in int.from_bytes:
+    for i in range(0, len(et), 8):
         if i + 7 >= len(et):
             break
         else:
@@ -38,4 +38,10 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
                 print(f"  bytes: {const.co_exceptiontable.hex()}")
         return None
 # orphan @0x042A
+# [WARN] 5 instructions not decompiled
+#   @0x0428: JUMP_BACKWARD arg=320
+#   @0x0470: JUMP_BACKWARD arg=46
+#   @0x04D4: JUMP_BACKWARD arg=146
+#   @0x04EE: JUMP_BACKWARD arg=172
+#   @0x0536: JUMP_BACKWARD arg=244
 # [SUMMARY] 18 blocks · 18 processed · 1 orphan · 305 instr

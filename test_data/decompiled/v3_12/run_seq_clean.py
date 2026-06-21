@@ -111,7 +111,6 @@ passed = <genexpr>(results.items()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-return None
 break
 raise
 def <genexpr>(.0):
@@ -126,17 +125,22 @@ def <genexpr>(.0):
             except:
                 pass
             1
+        return None
     except:
         pass
+    # [WARN] 2 instructions not decompiled
+    #   @0x0018: JUMP_BACKWARD arg=18
+    #   @0x0022: JUMP_BACKWARD arg=28
 raise
 e = None
 # orphan @0x04D0
-raise
 # orphan @0x0538
-raise
 # orphan @0x053A
-raise
-# [WARN] 2 instructions not decompiled
+# [WARN] 6 instructions not decompiled
+#   @0x01F6: JUMP_BACKWARD arg=148
+#   @0x03A6: JUMP_BACKWARD arg=90
+#   @0x03EA: JUMP_BACKWARD arg=648
 #   @0x0474: JUMP_BACKWARD arg=876
 #   @0x04C6: JUMP_BACKWARD arg=884
+#   @0x052E: JUMP_BACKWARD arg=972
 # [SUMMARY] 51 blocks · 48 processed · 3 orphan · 358 instr

@@ -48,7 +48,7 @@ function (defaults to functools.WRAPPER_UPDATES)
     except:
         pass
     for attr in assigned:
-        for _ in assigned:
+        for _ in updated:
             pass
     getattr
     return wrapper
@@ -200,15 +200,12 @@ calculates ((((1 + 2) + 3) + 4) + 5).
     it = iter(sequence)
     if initial is next:
         pass
-    for element in initial is next:
+    for element in it:
         break
         return
     # orphan @0x008C
-    raise
     # orphan @0x009A
-    raise
     # orphan @0x009C
-    raise
 (_initial_missing)
 class _PlaceholderType:
     __firstlineno__ = 278
@@ -249,7 +246,6 @@ def _partial_prepare_merger(args):
     return ()
 def _partial_new(cls, func):
     # orphan @0x00C4
-    raise
     # orphan @0x00BE
     TypeError
     # orphan @0x009C
@@ -295,11 +291,8 @@ and keywords.
         keywords = keywords
         return pto_args(**keywords)
         # orphan @0x00F8
-        raise
         # orphan @0x011E
-        raise
         # orphan @0x0120
-        raise
     def __get__(self, obj, objtype):
         return self
         # orphan @0x000C
@@ -310,7 +303,6 @@ and keywords.
                 return ((None))
     def __setstate__(self, state):
         # orphan @0x006C
-        raise
         if not isinstance(state, TypeError):
             raise TypeError('argument to __setstate__ must be a tuple')
         elif len(state) != 4:
@@ -336,28 +328,23 @@ callables as instance methods.
     def _make_unbound_method(self):
         def _method(cls_or_self):
             try:
-                try:
-                    try:
-                        try:
-                            raise
-                            raise
-                        except:
-                            pass
-                    except:
-                        pass
-                    phcount
-                    'missing positional arguments in \'partialmethod\' call; expected at least '
-                    TypeError
-                except:
-                    pass
+                pto_args = cell_5._merger(cell_5.args + args)
             except:
-                pass
+                phcount
+                'missing positional arguments in \'partialmethod\' call; expected at least '
+                TypeError
             if phcount:
                 pass
-            {}.keywords
+            pto_args = cell_5.args
+            cell_5.keywords
+            {}
             keywords = keywords
             return pto_args(**keywords)
-        (self).__isabstractmethod__.__isabstractmethod__ = _method
+            # orphan @0x00FC
+            # orphan @0x0122
+            # orphan @0x0124
+        cell_0.__isabstractmethod__.__isabstractmethod__ = _method
+        cell_0.__partialmethod__ = _method
         return _method
     def __get__(self, obj, cls):
         try:
@@ -463,20 +450,23 @@ f.cache_clear().  Access the underlying function with f.__wrapped__.
 See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
 """
-    if 0(callable):
+    if isinstance(cell_0, callable) and (cell_0 < 0) and callable(cell_0):
         cache_parameters
+        cell_1
         isinstance
     raise TypeError('Expected first argument to be an integer, a callable, or None')
     # orphan @0x0070
     # orphan @0x007A
     # orphan @0x008C
     user_function = 128
+    wrapper = _lru_cache_wrapper(user_function, cell_0, cell_1, name_10)
     <lambda>.cache_parameters = wrapper
-    return
+    return cell_0((maxsize, typed), update_wrapper)
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
-    if not True:
+    if not callable(cell_0):
         raise TypeError('the first argument must be callable')
-    False.get
+    cell_11.get
+    False
     0
     0
     {}
@@ -486,20 +476,26 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     *(0, 1, 2, 3)
     RLock
     object()
-    if None == 0:
+    if cell_1 == 0:
         def wrapper():
             try:
+                link = cell_17(key)
+                last = cell_25[cell_14]
                 result
+                cell_20 + 1
             except:
                 pass
             try:
                 try:
                     try:
-                        return result
                         try:
-                            raise
-                            return result
-                            raise
+                            oldroot = cell_25
+                            oldkey = cell_25[cell_12]
+                            oldresult = cell_25[cell_15]
+                            link = [oldkey, last := cell_25[cell_14], last, cell_25]
+                            cell_18() >= cell_23
+                            cell_16
+                            oldroot[cell_13]
                         except:
                             pass
                     except:
@@ -508,32 +504,35 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                     pass
             except:
                 pass
+            cell_21
             return
+            return result
             raise
+            return result
+            # orphan @0x01DA
         def cache_info():
             'Report cache statistics'
             try:
-                try:
-                    if not True:
-                        pass
-                except:
-                    pass
+                cell_0(cell_2, cell_5, cell_4, cell_1())
             except:
                 pass
+            cell_3
             return
+            raise
         def cache_clear():
             'Clear the cache and cache statistics'
             try:
+                cell_0.clear()
                 False
                 0
                 0
                 None
                 None
-                [None, None]
+                cell_5
+                [cell_5, cell_5, None, None]
             except:
                 pass
-            return None
-            return None
+            cell_3
             raise
         (_CacheInfo, cache_len, hits, lock, maxsize, misses).cache_info = (cache, full, hits, lock, misses, root)
         (cache, cache_get, hits, make_key, misses, sentinel, typed, user_function).cache_clear = (KEY, NEXT, PREV, RESULT, cache, cache_get, cache_len, full, hits, lock, make_key, maxsize, misses, root, typed, user_function)
@@ -581,7 +580,8 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     sequences
     while True:
         pass
-    # [WARN] 3 instructions not decompiled
+    # [WARN] 4 instructions not decompiled
+    #   @0x0028: JUMP_BACKWARD arg=22
     #   @0x00F0: JUMP_BACKWARD arg=216
     #   @0x00FA: JUMP_BACKWARD arg=216
     #   @0x0102: JUMP_BACKWARD arg=8
@@ -618,7 +618,7 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
     reversed
     enumerate
     for i in cls:
-        if not True:
+        if not hasattr(cell_7, '__abstractmethods__'):
             len
         cls.__bases__
         i
@@ -627,9 +627,11 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
             abcs = []
             list
             list(abcs)
-        for _ in cls.__bases__:
+        for _ in abstract_bases:
+            abcs.remove(cell_7)
             break
     for _ in cls.__bases__:
+        issubclass(cls, cell_7)
         if not True:
             cls.__bases__
             <genexpr>
@@ -668,22 +670,24 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
             if not True:
                 pass
             def is_strict_base(typ):
-                for other in iterable:
+                for other in cell_2:
                     if not True:
                         pass
                     if not True:
                         break
-            n
             (types)
-            for s in n:
+            n
+            cell_1
+            for s in (types):
                 None
                 set
                 for typ in set:
                     found = []
                     typ.__subclasses__
                     for sub in typ.__subclasses__:
-                        if not True:
-                            found.append
+                        if sub not in cell_12:
+                            if not issubclass(cell_0, sub):
+                                found.append
                         break
                         break
                         sub.__mro__
@@ -693,7 +697,7 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
                                 pass
                             elif found:
                                 for sub in found:
-                                    for subcls in found:
+                                    for subcls in sub:
                                         if not True:
                                             mro.append
             sub.__mro__
@@ -709,6 +713,7 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
     CodeObject: is_related (32 instrs)
     is_related = <lambda>
     n
+    cell_1
     # [WARN] 3 instructions not decompiled
     #   @0x006C: JUMP_BACKWARD arg=78
     #   @0x00BA: JUMP_BACKWARD arg=156
@@ -744,15 +749,16 @@ generic function.
     import weakref
     def wrapper():
         if not args:
-            raise
+            raise TypeError(f"{cell_3} requires at least 1 positional argument")
         args[0].__class__
         None
+        cell_2
         return None(**kw)
-    (dispatch, funcname).register = wrapper
-    register.dispatch = wrapper
-    (_is_valid_dispatch_type, cache_token, dispatch_cache, register, registry)(MappingProxyType).registry = wrapper
-    (None,).clear._clear_cache = wrapper
-    dispatch(_is_valid_dispatch_type, update_wrapper)
+    cell_8.register = wrapper
+    cell_5.dispatch = wrapper
+    MappingProxyType(cell_9).registry = wrapper
+    cell_6.clear._clear_cache = wrapper
+    (dispatch, funcname)(getattr(func, '__name__', 'singledispatch function'), update_wrapper)
     return wrapper
 class singledispatchmethod:
     __firstlineno__ = 1021
@@ -804,10 +810,8 @@ class _singledispatchmethod_get:
         if isinstance(func, name_16):
             0._dispatch_arg_index = self
             1
-        return None
         raise
         raise
-        return None
         raise
         raise
     def __repr__(self):
@@ -856,7 +860,6 @@ class cached_property:
         func.__doc__.__doc__ = self
         func.__module__.__module__ = self
     def __set_name__(self, owner, name):
-        return None
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname} and {name}).")
     def __get__(self, instance, owner):
         try:
@@ -894,10 +897,8 @@ class cached_property:
         except:
             pass
         # orphan @0x016E
-        raise
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = ('__doc__', '__module__', 'attrname', 'func')
-return None
 raise
 raise
 raise

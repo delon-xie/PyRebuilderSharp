@@ -2877,10 +2877,7 @@ text of the warning raised.
         self.assertWarnsRegex(compile, errtext)
         __module__
         self.assertWarnsRegex(compile, errtext)
-        return None
-        return None
         # orphan @0x008E
-        raise
     def test_return_in_finally(self):
         """
             def f():
@@ -3003,11 +3000,8 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
             err = None
             return None
         self.fail('compile() did not raise SyntaxError')
-        return None
         err = None
-        return None
         # orphan @0x029C
-        raise
     def test_expression_with_assignment(self):
         'print(end1 + end2 = \' \')'
         'print(end1 + end2 = \' \')'('expression cannot contain assignment, perhaps you meant \'==\'?', 7, ('offset',))
@@ -3239,10 +3233,8 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
-        return None
         raise
         raise
-        return None
         raise
     def test_continuation_bad_indentation(self):
         """\\

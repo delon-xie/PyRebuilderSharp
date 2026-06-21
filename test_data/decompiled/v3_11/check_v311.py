@@ -2,7 +2,6 @@
 
 # orphan @0x009A
 # orphan @0x0092
-raise
 try:
     raw = f()
     f.read

@@ -3332,7 +3332,6 @@ while 1:
     @support.skip_wasi_stack_overflow()
     @support.cpython_only
     def test_deep_invalid_rule(self):
-        source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
         with self.assertRaises(SyntaxError):
             compile(source, '<string>', 'exec')
     def test_except_stmt_invalid_as_expr(self):

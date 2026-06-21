@@ -36,4 +36,6 @@ for (version, files) in version_files.items(version_files()):
 return
 break
 # orphan @0x018C
+# [WARN] 1 instructions not decompiled
+#   @0x027E: JUMP_BACKWARD arg=156
 # [SUMMARY] 17 blocks · 17 processed · 1 orphan · 166 instr

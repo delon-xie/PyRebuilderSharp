@@ -130,7 +130,6 @@ class ABCMeta(type):
             raise TypeError('Can only register classes')
         return subclass
         # orphan @0x002A
-        raise RuntimeError('Refusing to create an inheritance cycle')
         # orphan @0x0032
         cls._abc_registry.add(subclass)
         # orphan @0x003C
@@ -195,5 +194,4 @@ def get_cache_token():
     with every call to ``register()`` on any ABC.
     """
     return ABCMeta._abc_invalidation_counter
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 59 instr

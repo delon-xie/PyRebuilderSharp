@@ -45,5 +45,4 @@ for group in failed_groups:
         print(f"    - {f}")
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-return None
 # [SUMMARY] 28 blocks · 29 processed · 0 orphan · 233 instr

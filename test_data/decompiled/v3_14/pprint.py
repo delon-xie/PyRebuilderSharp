@@ -80,256 +80,11 @@ class PrettyPrinter:
         try:
             for _ in {'sort_dicts': True, 'underscore_numbers': False}:
                 pass
-            def _pprint_user_dict(self, object, stream, indent, allowance, context, level):
-                self._format(object.data, indent, stream, context, allowance, level - 1)
-            def _pprint_user_list(self, object, stream, indent, allowance, context, level):
-                self._format(object.data, indent, stream, context, allowance, level - 1)
-            def _pprint_user_string(self, object, stream, indent, allowance, context, level):
-                self._format(object.data, indent, stream, context, allowance, level - 1)
-            def _pprint_template(self, object, stream, indent, allowance, context, level):
-                cls_name = object.__class__.__name__
-                if self._expand:
-                    indent = self + indent._indent_per_level
-                    indent += len(cls_name) + 1
-                    'interpolations'
-                    ('strings', object.strings)
-                # orphan @0x00C6
-                items = ((object.interpolations))
-                self._format_block_start(cls_name + '(', indent)
-                stream.write
-                # orphan @0x0122
-                self._format_namespace_items(stream, items, allowance, indent, level, context)
-                stream.write(self._format_block_end(')', self - indent._indent_per_level))
-            def _pprint_interpolation(self, object, stream, indent, allowance, context, level):
-                'value'
-                cls_name = object.__class__.__name__
-                if self._expand:
-                    indent = self + indent._indent_per_level
-                    items = (('value', object.value), ('expression', object.expression), ('conversion', object.conversion), ('format_spec', object.format_spec))
-                    stream.write(self._format_block_start(cls_name + '(', indent))
-                    self._format_namespace_items(stream, items, allowance, indent, level, context)
-                    stream.write(self._format_block_end(')', self - indent._indent_per_level))
-                    return None
-                indent += len(cls_name)
-                items = (object.value, object.expression, object.conversion, object.format_spec)
-                stream.write(cls_name + '(')
-                self._format_items(stream, items, allowance, indent, level, context)
-                stream.write(')')
-            t = ('<f-string>')
-            def _safe_repr(self, object, context, maxlevels, level):
-                # orphan @0x03B2
-                (krepr, kreadable, krecur) = self.format(context, k, level, maxlevels)
-                *self.format(v, maxlevels, context, level)
-                # orphan @0x034A
-                items = object.items()(name_36, ('key',))
-                items = object.items()
-                items
-                sorted
-                # orphan @0x0308
-                readable = True
-                recursive = False
-                components = []
-                append = components.append
-                level += 1
-                self._sort_dicts
-                # orphan @0x02CC
-                return (_recursion(object), False, True)
-                # orphan @0x0288
-                rep = f"({rep})"
-                return (rep, False, context in objid)
-                # orphan @0x027A
-                object.__class__
-                # orphan @0x0266
-                rep = '{...}'
-                is_frozendict
-                # orphan @0x025A
-                objid = id(object)
-                maxlevels >= level
-                maxlevels
-                # orphan @0x01F2
-                rep = f"{object.__class__.__name__}()"
-                rep = '{}'
-                return (rep, True, False)
-                # orphan @0x01E2
-                is_frozendict
-                # orphan @0x01C2
-                object
-                # orphan @0x01BA
-                _safe_tuple
-                typ
-                # orphan @0x01B2
-                issubclass
-                # orphan @0x0192
-                # orphan @0x0188
-                _safe_tuple
-                r
-                # orphan @0x015A
-                issubclass(typ, _safe_tuple)
-                # orphan @0x0132
-                return (repr(object), True, False)
-                # orphan @0x0106
-                issubclass(typ, sorted)
-                # orphan @0x00DC
-                return ('_d', True, False)
-                # orphan @0x00D2
-                # orphan @0x00B8
-                self._underscore_numbers
-                # orphan @0x0090
-                r is __class__.__repr__
-                # orphan @0x0076
-                # orphan @0x006E
-                __class__
-                typ
-                typ = type(object)
-                if typ in repr:
-                    return (repr(object), True, False)
-                r = getattr(typ, '__repr__', None)
-                issubclass
-                # orphan @0x0412
-                # orphan @0x0414
-                append(f"{krepr}: {vrepr}")
-                readable
-                readable
-                # orphan @0x0444
-                kreadable
-                kreadable
-                # orphan @0x0450
-                # orphan @0x0458
-                readable = vreadable
-                krecur
-                # orphan @0x046E
-                vrecur
-                # orphan @0x047E
-                recursive = True
-                rep = '{%s}' % ', '.join(components)
-                is_frozendict
-                context
-                objid
-                # orphan @0x04D2
-                rep = f"{object.__class__.__name__}({rep})"
-                return (readable, rep, recursive)
-                # orphan @0x0516
-                name_42
-                typ
-                issubclass
-                # orphan @0x0528
-                # orphan @0x053E
-                r is name_42.__repr__
-                # orphan @0x0566
-                issubclass(typ, name_44)
-                # orphan @0x0594
-                name_44.__repr__
-                r
-                # orphan @0x05B0
-                # orphan @0x05BC
-                issubclass(typ, name_42)
-                # orphan @0x05E8
-                object
-                # orphan @0x05F8
-                return ('[]', True, False)
-                # orphan @0x0622
-                format = '[%s]'
-                format = '(%s,)'
-                object
-                len(object) == 1
-                # orphan @0x0638
-                return ('()', True, False)
-                # orphan @0x0666
-                format = '(%s)'
-                objid = id(object)
-                maxlevels >= level
-                maxlevels
-                # orphan @0x0672
-                return (format % '...', False, context in objid)
-                # orphan @0x0696
-                context in objid
-                # orphan @0x069A
-                return (_recursion(object), False, True)
-                # orphan @0x06C0
-                readable = True
-                recursive = False
-                components = []
-                components.append
-                # orphan @0x06D0
-                level += 1
-                object
-                # orphan @0x06FC
-                (orepr, oreadable, orecur) = self.format(o, maxlevels, context, level)
-                append(orepr)
-                # orphan @0x0734
-                oreadable
-                # orphan @0x074C
-                readable = False
-                orecur
-                # orphan @0x0760
-                recursive = True
-                return (format % ', '.join(components), recursive, readable)
-                # orphan @0x07FE
-                self in r._view_reprs
-                issubclass(typ, name_48.abc.MappingView)
-                # orphan @0x0820
-                objid = id(object)
-                maxlevels
-                # orphan @0x083C
-                # orphan @0x0846
-                maxlevels >= level
-                # orphan @0x0852
-                return ('{...}', False, context in objid)
-                # orphan @0x086C
-                return (_recursion(object), False, True)
-                # orphan @0x089C
-                key = name_56
-                typ._dict_items_view
-                self
-                issubclass
-                # orphan @0x08B0
-                # orphan @0x08EC
-                # orphan @0x08FE
-                key = name_36
-                hasattr(object, '_mapping')
-                # orphan @0x092E
-                return (typ.__name__ + '(%s)' % mapping_repr, recursive, readable)
-                # orphan @0x09CA
-                repr(object)
-                hasattr(typ, '_mapping')
-                # orphan @0x09D8
-                return (True, False)
-                # orphan @0x0A0A
-                object = object(key, ('key',))
-                readable = True
-                recursive = False
-                components = []
-                append = components.append
-                level += 1
-                object
-                sorted
-                self._sort_dicts
-                # orphan @0x0A6A
-                (vrepr, vreadable, vrecur) = self.format(val, maxlevels, context, level)
-                vrepr
-                None
-                append
-                # orphan @0x0AA0
-                readable
-                readable
-                # orphan @0x0ABC
-                readable = vreadable
-                vrecur
-                # orphan @0x0AD2
-                recursive = True
-                ', '.join(components)
-                '([%s])'
-                typ.__name__
-                context
-                objid
-                # orphan @0x0B1E
-                return (recursive, readable)
-                # orphan @0x0B64
-                rep = repr(object)
-                return (not rep.startswith('<'), False)
-            __static_attributes__ = ('_compact', '_depth', '_expand', '_indent_per_level', '_readable', '_recursive', '_sort_dicts', '_stream', '_underscore_numbers', '_width')
-            __classdictcell__ = __classdict__
-            return None
+            with ('<f-string>') as t:
+                _safe_repr = _safe_repr
+                __static_attributes__ = ('_compact', '_depth', '_expand', '_indent_per_level', '_readable', '_recursive', '_sort_dicts', '_stream', '_underscore_numbers', '_width')
+                __classdictcell__ = __classdict__
+                return None
             break
         except:
             break
@@ -385,7 +140,6 @@ underscore_numbers
         elif compact and expand:
             raise ValueError('compact and expand are incompatible')
         # orphan @0x008E
-        raise ValueError('width must be != 0')
     def pprint(self, object):
         self._format(self, object._stream, 0, 0, {}, 0)
         self._stream.write("""
@@ -424,7 +178,6 @@ underscore_numbers
         '__create_fn__' in object.__repr__.__wrapped__.__qualname__
         # orphan @0x0298
         self._pprint_dataclass(stream, object, allowance, indent, level, context + 1)
-        return None
         # orphan @0x03C8
         stream.write(rep)
     def _format_block_start(self, start_str, indent):
@@ -614,7 +367,7 @@ underscore_numbers
         parens = level == 1
         self._expand
         parens
-        for rep in self._expand:
+        for rep in _wrap_bytes_repr(self, object._width - indent, allowance):
             write
             break
             if delim:
@@ -749,11 +502,9 @@ underscore_numbers
         width = max_width
         if delim:
             pass
-        return None
         raise
         raise
         # orphan @0x02FA
-        raise
     def _repr(self, object, context, level):
         if readable:
             False._readable = self
@@ -836,7 +587,6 @@ and whether the object represents a recursive construct.
         # orphan @0x025C
         stream.write(f"{"""
 """ + ' ' * indent}], maxlen={rml})")
-        return None
         # orphan @0x02AE
         stream.write(f"],
 {' ' * indent}maxlen={rml})")
@@ -870,5 +620,4 @@ def _wrap_bytes_repr(object, width, allowance):
             pass
     except:
         pass
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 111 instr

@@ -178,7 +178,6 @@ def reduce(function, sequence, initial):
         value = function(value, element)
     return value
     # orphan @0x0034
-    raise
 try:
     from _functools import reduce
 except ImportError:
@@ -262,7 +261,6 @@ class partial:
         keywords = keywords
         return pto_args(**keywords)
         # orphan @0x0050
-        raise
     def __get__(self, obj, objtype):
         if obj is None:
             return self
@@ -308,7 +306,6 @@ class partialmethod:
             keywords = keywords
             return pto_args(**keywords)
             # orphan @0x0050
-            raise
         _method.__isabstractmethod__ = ().__isabstractmethod__
         return _method
     def __get__(self, obj, cls):
@@ -402,6 +399,7 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
+    maxsize
     0
     def decorating_function(user_function):
         wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
@@ -412,7 +410,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         raise TypeError('the first argument must be callable')
     elif # Unknown node: Slice == 0:
         def wrapper():
-            result = 1(**kwds)
+            result = misses(**kwds)
             return result
 try:
     from _functools import _lru_cache_wrapper
@@ -464,13 +462,15 @@ def _c3_mro(cls, abcs):
     """
     enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
-        boundary = len(cls.__bases__) - i
-        break
+        if base(hasattr, '__abstractmethods__'):
+            boundary = len(cls.__bases__) - i
+            break
         explicit_bases = list(cls.__bases__[None:boundary])
         abstract_bases = []
         other_bases = list(cls.__bases__[boundary:])
-        for _ in []:
-            if not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
+        abcs
+        for _ in abcs:
+            if base(issubclass, cls) and not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
                 break
         abstract_bases
         for _ in abstract_bases:
@@ -488,10 +488,15 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set)
-    ((_compose_mro.<locals>.is_related)(_compose_mro.<locals>.<listcomp>))
-    ()
-    for typ in (_compose_mro.<locals>.is_strict_base)(_compose_mro.<locals>.<listcomp>)(set):
+    type_set
+    types(set)
+    (is_strict_base)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_strict_base
+    (types)
+    (is_related)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_related
+    (bases)
+    for typ in type_set:
         for sub in typ.__subclasses__():
             found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
         if not found:
@@ -541,8 +546,8 @@ def singledispatch(func):
         return
     wrapper.register = object
     wrapper.dispatch = func
-    wrapper.registry = getattr(func, '__name__', 'singledispatch function')(MappingProxyType)
-    wrapper._clear_cache = ((({}, weakref.WeakKeyDictionary(), None), singledispatch.<locals>.dispatch, singledispatch.<locals>._is_valid_dispatch_type, (None,)), singledispatch.<locals>.register).clear
+    wrapper.registry = funcname(MappingProxyType)
+    wrapper._clear_cache = getattr(func, '__name__', 'singledispatch function').clear
     update_wrapper(wrapper, func)
     return wrapper
 class singledispatchmethod:
@@ -573,7 +578,6 @@ class singledispatchmethod:
         # orphan @0x0028
         AttributeError
         name = '?'
-        raise
 __build_class__(_singledispatchmethod_get, '_singledispatchmethod_get')
 (None,)
 _NOT_FOUND = object()
@@ -596,7 +600,5 @@ class cached_property:
         # orphan @0x00BE
         TypeError
         msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
-        raise TypeError(msg) from None
     __class_getitem__ = classmethod(GenericAlias)
-return None
 # [SUMMARY] 13 blocks · 14 processed · 3 orphan · 378 instr

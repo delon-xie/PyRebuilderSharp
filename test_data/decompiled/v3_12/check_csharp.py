@@ -15,7 +15,7 @@ off += 1
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
 print
 None
-for name in struct.unpack:
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     val = '<i'(data, off // (off + 4))[0]
     print(f"  {name}: {val} (off {off})")
     off += 4
@@ -43,7 +43,7 @@ elif type2 == 115:
     return None
 break
 # orphan @0x030E
-raise
-# [WARN] 1 instructions not decompiled
+# [WARN] 2 instructions not decompiled
+#   @0x0134: JUMP_BACKWARD arg=110
 #   @0x030C: JUMP_BACKWARD arg=670
 # [SUMMARY] 21 blocks · 20 processed · 1 orphan · 263 instr

@@ -181,7 +181,6 @@ class ABC(ABCMeta):
     inheritance.
     """
     __slots__ = ()
-return None
 raise
 raise
 # orphan @0x00D0

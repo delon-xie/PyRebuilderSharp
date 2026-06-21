@@ -17,13 +17,12 @@ range(10)
 for n in range(10):
     m = n + 1
 z = y
-return None
 # orphan @0x003C
 j = i * 2
 i += 1
 i < 5
 # orphan @0x0094
-raise
-# [WARN] 1 instructions not decompiled
+# [WARN] 2 instructions not decompiled
 #   @0x005A: JUMP_BACKWARD arg=32
+#   @0x007C: JUMP_BACKWARD arg=18
 # [SUMMARY] 17 blocks · 14 processed · 3 orphan · 66 instr

@@ -1,8 +1,5 @@
 # Decompiled from: <module>
 
-import marshal
-import struct
-import sys
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
 t = 127
@@ -70,6 +67,7 @@ t2 = raw2 & 127
 flags = ''
 raw2 & 128
 # orphan @0x025E
+struct
 # orphan @0x02AE
 print(f"  [{i}] child code at offset {child_start}{flags}")
 saved = pos
@@ -79,5 +77,4 @@ tmp.seek(child_start)
 # orphan @0x0412
 print(f"pos {pos}: after all constants")
 print(f"total file: {len(data)}")
-return None
 # [SUMMARY] 33 blocks · 25 processed · 10 orphan · 528 instr

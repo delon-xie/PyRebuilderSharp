@@ -26,8 +26,6 @@ print('=== Decompiled ===')
 r.write.strip(r.write())
 os.name(py_path)
 os.name(py_path + 'c')
-return None
 # orphan @0x00A6
-raise
 # orphan @0x00AE
 # [SUMMARY] 8 blocks · 7 processed · 2 orphan · 127 instr

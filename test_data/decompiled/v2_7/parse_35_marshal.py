@@ -23,6 +23,6 @@ fl2 = struct.unpack_from('<I', m, pos)[0]
 pos += 4
 return
 for i in range(30):
-    for _ in range(30):
+    for _ in iterable:
         pass
 # [SUMMARY] 5 blocks · 5 processed · 2 orphan · 257 instr

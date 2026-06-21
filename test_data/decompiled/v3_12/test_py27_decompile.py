@@ -31,7 +31,6 @@ else:
 if len(result2.stderr) > 500:
     return None
 # orphan @0x0390
-raise
 # [WARN] 1 instructions not decompiled
 #   @0x038E: JUMP_BACKWARD arg=650
 # [SUMMARY] 14 blocks · 13 processed · 1 orphan · 173 instr

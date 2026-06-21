@@ -167,16 +167,19 @@ def update_abstractmethods(cls):
             abstracts.add(name)
     cls.__abstractmethods__ = frozenset(abstracts)
     return cls
+    # [WARN] 5 instructions not decompiled
+    #   @0x00A4: JUMP_BACKWARD arg=60
+    #   @0x00C8: JUMP_BACKWARD arg=96
+    #   @0x00CC: JUMP_BACKWARD arg=132
+    #   @0x012A: JUMP_BACKWARD arg=40
+    #   @0x014E: JUMP_BACKWARD arg=76
 class ABC(ABCMeta):
     __doc__ = """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
     __slots__ = ()
-return None
 # orphan @0x00DA
-raise
 # orphan @0x00DC
-raise
 # [WARN] 1 instructions not decompiled
 #   @0x00D8: JUMP_BACKWARD arg=76
 # [SUMMARY] 9 blocks · 7 processed · 2 orphan · 94 instr

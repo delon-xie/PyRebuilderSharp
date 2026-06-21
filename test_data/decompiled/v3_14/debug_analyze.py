@@ -42,7 +42,7 @@ if j < i + 30:
 elif found_versions:
     debug_count += 1
     if debug_count <= 5:
-        for _ in debug_count <= 5:
+        for _ in found_versions:
             pass
 raise
 # [WARN] 1 instructions not decompiled

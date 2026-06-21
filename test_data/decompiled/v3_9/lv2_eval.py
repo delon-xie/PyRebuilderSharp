@@ -7,7 +7,7 @@ items
 for x in items:
     y = x
 range(5)
-for n in n == 1:
+for n in range(5):
     if n == 3:
         break
     if n == 1:
@@ -20,5 +20,4 @@ try:
     f = open('test.txt')
 except IOError:
     f = None
-return None
 # [SUMMARY] 18 blocks · 19 processed · 1 orphan · 69 instr

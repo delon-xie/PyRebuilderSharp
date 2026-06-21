@@ -8,9 +8,13 @@ from _thread import get_ident
 def recursive_repr(fillvalue):
     'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
-        wrapper := wrapper(getattr, '__module__').__module__ = wrapper
-        (fillvalue, repr_running, user_function)(getattr, '__doc__').__doc__ = wrapper
-        set()(getattr, '__name__').__name__ = wrapper
+        getattr(cell_0, '__module__').__module__ = wrapper
+        getattr(cell_0, '__doc__').__doc__ = wrapper
+        getattr(cell_0, '__name__').__name__ = wrapper
+        getattr(cell_0, '__qualname__').__qualname__ = wrapper
+        getattr(cell_0, '__annotate__', None).__annotate__ = wrapper
+        getattr(cell_0, '__type_params__', ()).__type_params__ = wrapper
+        cell_0.__wrapped__ = wrapper
         return wrapper
     return decorating_function
 class Repr:
@@ -160,7 +164,6 @@ class Repr:
         exc = None
         return
         # orphan @0x023E
-        raise
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -184,5 +187,4 @@ def _possibly_sorted(x):
     raise
 aRepr = Repr()
 repr = aRepr.repr
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

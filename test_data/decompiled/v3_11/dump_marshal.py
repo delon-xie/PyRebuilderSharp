@@ -2,7 +2,6 @@
 
 # orphan @0x009A
 # orphan @0x0092
-raise
 try:
     data = f()
     f.read
@@ -103,5 +102,4 @@ for i in range(min(count, 6)):
     io.BytesIO
 print(f"pos {pos}: after all constants")
 print(f"total file: {len(data)}")
-return None
 # [SUMMARY] 17 blocks · 16 processed · 2 orphan · 605 instr

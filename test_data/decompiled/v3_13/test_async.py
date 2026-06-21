@@ -11,5 +11,4 @@ async def worker():
         test_async()
     except:
         pass
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 12 instr

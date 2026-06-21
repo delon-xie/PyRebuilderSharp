@@ -12,9 +12,7 @@ while i < 5:
 i * 2
 for n in i * 2:
     m = n + 1
-return None
 # orphan @0x009A
-raise
 # [WARN] 1 instructions not decompiled
 #   @0x007E: JUMP_BACKWARD arg=102
 # [SUMMARY] 12 blocks · 11 processed · 3 orphan · 51 instr

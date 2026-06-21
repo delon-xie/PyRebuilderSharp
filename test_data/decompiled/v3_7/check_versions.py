@@ -5,7 +5,7 @@ magic_numbers = {b'YQ0NCg==': '3.10', b'XQ0NCg==': '3.11', b'VQ0NCg==': '3.12', 
 pyc_dir = 'tests/compiled'
 version_files = {}
 os.listdir(pyc_dir)
-for filename in None:
+for filename in os.listdir(pyc_dir):
     if filename.endswith('.pyc'):
         filepath = os.path.join(pyc_dir, filename)
         f = open(filepath, 'rb')
@@ -18,10 +18,9 @@ for filename in None:
     version_files[version].append(filename)
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())
-for (version, files) in version == '3.10':
+for (version, files) in sorted(version_files.items()):
     print(f"  Python {version}: {len(files)} 个文件")
     if version == '3.10':
         for f in sorted(files):
             print(f"      {f}")
-return None
 # [SUMMARY] 14 blocks · 15 processed · 0 orphan · 134 instr

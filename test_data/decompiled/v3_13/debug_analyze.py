@@ -48,12 +48,11 @@ if (j < len(lines)) and (j < i + 30):
         elif found_versions:
             debug_count += 1
             if debug_count <= 5:
-                for _ in debug_count <= 5:
+                for _ in found_versions:
                     pass
     else:
         version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 break
 break
 # orphan @0x03A8
-raise
 # [SUMMARY] 44 blocks · 44 processed · 17 orphan · 243 instr

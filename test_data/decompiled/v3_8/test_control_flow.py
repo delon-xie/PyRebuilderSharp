@@ -11,5 +11,4 @@ try:
     a = 1
 except:
     a = 0
-return None
 # [SUMMARY] 9 blocks · 10 processed · 0 orphan · 41 instr

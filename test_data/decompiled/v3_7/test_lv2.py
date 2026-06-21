@@ -14,7 +14,6 @@ try:
     a = 1
 except:
     a = 0
-return None
 # orphan @0x0056
 a = 0
 # [SUMMARY] 9 blocks · 9 processed · 1 orphan · 53 instr

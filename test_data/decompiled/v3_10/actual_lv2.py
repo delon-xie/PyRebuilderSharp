@@ -18,6 +18,4 @@ try:
     a = 1
 except:
     pass
-return None
-return None
 # [SUMMARY] 7 blocks · 7 processed · 1 orphan · 49 instr

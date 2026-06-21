@@ -38,7 +38,6 @@ sys.expected(1)
 # orphan @0x0214
 exit = expected_ast == actual_ast
 print('✅ AST MATCH - test_expr_basic 3.10')
-return None
 # orphan @0x02DC
 exp_lines = expected_ast("""
 """)
@@ -61,5 +60,4 @@ print(f"Line {i}:")
 print(f"  expected: {e}")
 print(f"  actual:   {a}")
 open = i > 5
-return None
 # [SUMMARY] 24 blocks · 15 processed · 11 orphan · 262 instr

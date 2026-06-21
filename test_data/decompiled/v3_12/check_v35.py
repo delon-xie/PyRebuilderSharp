@@ -23,10 +23,12 @@ def dump_code(c, depth):
         print(f"{prefix!s}Function: {const.co_name!s}")
         print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.co_argcount, const.co_nlocals, len(const.co_code)))
         dump_code(const, depth + 1)
+    # [WARN] 3 instructions not decompiled
+    #   @0x0042: JUMP_BACKWARD arg=32
+    #   @0x005C: JUMP_BACKWARD arg=58
+    #   @0x0122: JUMP_BACKWARD arg=256
 dump_code(code)
-return None
 # orphan @0x01D0
-raise
 # [WARN] 1 instructions not decompiled
 #   @0x01CE: JUMP_BACKWARD arg=280
 # [SUMMARY] 9 blocks · 8 processed · 1 orphan · 105 instr

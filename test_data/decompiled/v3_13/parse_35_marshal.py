@@ -36,5 +36,4 @@ fl2 = struct.unpack_from('<I', m, pos)[0]
 pos += 4
 print('  argcount=%d, nlocals=%d, stacksize=%d, flags=0x%x' % (arg2, nl2, ss2, fl2))
 print('  Next byte at pos=%d: 0x%02x -> Should be TYPE_STRING (0x73)' % (pos, m[pos]))
-return None
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 294 instr

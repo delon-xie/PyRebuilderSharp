@@ -17,7 +17,7 @@ def fix_pyc_names(directory):
         if not filename.endswith('.pyc'):
             os.path.join
         if f".{actual_version}.pyc" in filename:
-            for version in f".{actual_version}.pyc" in filename:
+            for version in exists.values():
                 if not f".{version}.pyc" in new_filename:
                     new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
                     break

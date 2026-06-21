@@ -21,5 +21,4 @@ print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.run(ast.run(r.COMPILED_DIR), 2)
 print(actual_ast)
-return None
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 115 instr

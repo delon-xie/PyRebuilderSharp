@@ -42,6 +42,5 @@ open('/tmp/diag35.cs', 'w')
 r = ['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'](True, True, 30, ('capture_output', 'text', 'timeout'))
 print('Stdout:', r.stdout[:500])
 print('Stderr:', r.stderr[:500])
-return None
 raise
 # [SUMMARY] 8 blocks · 9 processed · 0 orphan · 102 instr

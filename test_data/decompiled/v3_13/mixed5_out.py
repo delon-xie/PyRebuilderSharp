@@ -77,7 +77,7 @@ def mixed_4(n):
     except:
         break
     total = 0
-    # [WARN] 1 instructions not decompiled
+    # [WARN] 2 instructions not decompiled
     #   @0x0040: JUMP_BACKWARD arg=44
-return None
+    #   @0x0062: JUMP_BACKWARD arg=68
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

@@ -2,7 +2,7 @@
 
 try:
     []
-    for f in f:
+    for f in []:
         try:
             try:
                 []
@@ -47,6 +47,9 @@ os.makedirs(output_dir, True)
 python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 f
 os.listdir(input_dir)
-# [WARN] 1 instructions not decompiled
+# [WARN] 4 instructions not decompiled
 #   @0x00CC: JUMP_BACKWARD arg=42
+#   @0x00D2: JUMP_BACKWARD arg=48
+#   @0x0276: JUMP_BACKWARD arg=314
+#   @0x02C8: JUMP_BACKWARD arg=396
 # [SUMMARY] 14 blocks · 14 processed · 0 orphan · 200 instr

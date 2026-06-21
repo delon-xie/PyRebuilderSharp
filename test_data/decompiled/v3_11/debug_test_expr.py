@@ -2,7 +2,6 @@
 
 # orphan @0x0096
 # orphan @0x008E
-raise
 try:
     data = f.read(f())
     bytearray

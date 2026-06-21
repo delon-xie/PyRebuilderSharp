@@ -82,6 +82,7 @@ offset += 1
 instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
 arg = None
 op >= HAVE_ARGUMENT
-# [WARN] 1 instructions not decompiled
+# [WARN] 2 instructions not decompiled
 #   @0x03EC: JUMP_BACKWARD arg=206
+#   @0x0430: JUMP_BACKWARD arg=64
 # [SUMMARY] 24 blocks · 23 processed · 2 orphan · 713 instr

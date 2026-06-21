@@ -1,12 +1,5 @@
 # Decompiled from: <module>
 
-'Run AST comparison for test_control_flow across all versions'
-import os
-import subprocess
-import ast
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
 with open(INPUT_FILE) as f:
     expected_src = f.read()
     raise
@@ -39,5 +32,4 @@ print('  Output: %s' % r.stdout[None:200])
 ex = None
 # orphan @0x01B0
 ex = None
-raise
 # [SUMMARY] 24 blocks · 21 processed · 4 orphan · 223 instr

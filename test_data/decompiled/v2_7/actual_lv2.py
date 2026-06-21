@@ -14,6 +14,5 @@ try:
     a = 1
 except:
     pass
-return None
 # orphan @0x0070
 # [SUMMARY] 9 blocks · 9 processed · 1 orphan · 50 instr

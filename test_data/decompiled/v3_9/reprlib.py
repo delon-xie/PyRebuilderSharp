@@ -15,7 +15,7 @@ def recursive_repr(fillvalue):
             # orphan @0x003C
             # orphan @0x0048
             return result
-        wrapper.__module__ = (set())(getattr, '__module__')
+        wrapper.__module__ = (set(), repr_running)(getattr, '__module__')
         return wrapper
     return decorating_function
 class Repr:
@@ -58,7 +58,6 @@ class Repr:
         return self.repr_instance(x, level)
     def _join(self, pieces, level):
         # orphan @0x0034
-        raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         # orphan @0x002C
         indent < 0
         # orphan @0x001C
@@ -77,7 +76,6 @@ class Repr:
 """ + (self.maxlevel - level + 1) * indent
         # orphan @0x0068
         TypeError
-        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
         # orphan @0x008A
         error = None
         # orphan @0x0096
@@ -96,7 +94,9 @@ class Repr:
         # orphan @0x001C
         pieces = Repr._repr_iterable.<locals>.<listcomp>(islice(x, maxiter))
         n > maxiter
-        (level - 1, self.repr1)
+        (self.repr1, repr1)
+        newlevel
+        level - 1
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
@@ -212,5 +212,4 @@ def _possibly_sorted(x):
     return
 aRepr = Repr()
 repr = aRepr.repr
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

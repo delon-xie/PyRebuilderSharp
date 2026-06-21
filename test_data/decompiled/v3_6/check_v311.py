@@ -1,8 +1,5 @@
 # Decompiled from: <module>
 
-import marshal
-import struct
-import sys
 with open(sys.argv[1], 'rb') as f:
     raw = f.read()
 for off in range(17, 40):
@@ -11,8 +8,7 @@ for off in range(17, 40):
 print("""
 Bytes 16-50:""")
 range(16, 50, 2)
-for i in print:
+for i in range(16, 50, 2):
     pair = raw[i:i + 2]
     '  '(f"{i}{'3d'}: {pair.hex()}")
-return None
 # [SUMMARY] 9 blocks · 10 processed · 0 orphan · 238 instr

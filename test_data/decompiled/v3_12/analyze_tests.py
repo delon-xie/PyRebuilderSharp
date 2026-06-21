@@ -60,7 +60,7 @@ while i < len(lines):
                                 '版本'
                                 print
                                 None
-                                for version in ' ':
+                                for version in sorted(version_stats.keys()):
                                     stats = version_stats[version]
                                     t = stats['total']
                                     p = stats['passed']
@@ -82,9 +82,9 @@ while i < len(lines):
                                 print('======================================================================')
 break
 # orphan @0x04D2
-raise
-# [WARN] 3 instructions not decompiled
+# [WARN] 4 instructions not decompiled
 #   @0x02CA: JUMP_BACKWARD arg=358
 #   @0x02EE: JUMP_BACKWARD arg=582
+#   @0x0442: JUMP_BACKWARD arg=166
 #   @0x04D0: JUMP_BACKWARD arg=1144
 # [SUMMARY] 38 blocks · 35 processed · 3 orphan · 392 instr

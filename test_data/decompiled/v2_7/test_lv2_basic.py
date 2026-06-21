@@ -16,7 +16,6 @@ try:
     a = 1
 except:
     a = 0
-return None
 z = y
 # orphan @0x0096
 a = 0

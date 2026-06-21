@@ -18,9 +18,8 @@ while i < 5:
 range(10)
 for n in range(10):
     m = n + 1
-return None
 # orphan @0x0076
-raise
-# [WARN] 1 instructions not decompiled
+# [WARN] 2 instructions not decompiled
 #   @0x0040: JUMP_BACKWARD arg=32
+#   @0x0062: JUMP_BACKWARD arg=18
 # [SUMMARY] 12 blocks · 9 processed · 3 orphan · 52 instr

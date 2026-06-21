@@ -15,7 +15,7 @@ current_test_fail = False
 def remove_ansi(text):
     return re.sub('\\x1b\\[[0-9;]*m', '', text)
 lines
-for line in 'Bad MAGIC' in clean_line:
+for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()
     if line_stripped.startswith('*** ') and current_test and current_test_fail:
@@ -41,5 +41,4 @@ passed += 1
 print('============================================================')
 print(f"总计: {passed} PASS, {failed} FAIL")
 print('============================================================')
-return None
 # [SUMMARY] 21 blocks · 19 processed · 2 orphan · 184 instr

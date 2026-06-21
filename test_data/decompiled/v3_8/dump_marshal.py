@@ -8,9 +8,6 @@ pos += length
 print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
 # orphan @0x013E
 t in (90, 122)
-import marshal
-import struct
-import sys
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
@@ -105,5 +102,4 @@ print
 # orphan @0x040A
 print(f"pos {pos}: after all constants")
 print(f"total file: {len(data)}")
-return None
 # [SUMMARY] 32 blocks · 7 processed · 25 orphan · 524 instr

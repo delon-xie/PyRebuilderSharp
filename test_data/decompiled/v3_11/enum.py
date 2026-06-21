@@ -70,7 +70,6 @@ def _make_class_unpicklable(obj):
     def _break_on_call_reduce(self, proto):
         raise TypeError('%r cannot be pickled' % self)
     name_12 = isinstance(obj, setattr)
-    return None
     # orphan @0x004A
     setattr(obj, '__reduce_ex__', _break_on_call_reduce)
     setattr(obj, '__module__', '<unknown>')
@@ -159,11 +158,9 @@ class property(DynamicClassAttribute):
     def __set__(self, instance, value):
         return self(instance, value)
         # orphan @0x003C
-        raise AttributeError(f"<enum {self.AttributeError!r}> cannot set attribute {self.AttributeError!r}")
     def __delete__(self, instance):
         return self(instance)
         # orphan @0x003A
-        raise AttributeError(f"<enum {self.AttributeError!r}> cannot delete attribute {self.AttributeError!r}")
     def __set_name__(self, ownerclass, name):
         self.name = name
         self.clsname = ownerclass.name
@@ -239,10 +236,8 @@ class _proto_member:
         new_exc.__cause__ = exc
         raise new_exc
         raise
-        return None
         raise
         # orphan @0x0500
-        raise
         # orphan @0x0506
         enum_class(member_name, enum_member)
         enum_class._add_member_
@@ -335,7 +330,6 @@ class EnumDict(dict):
             self._generate_next_value
         value = auto_valued[0]
         super()(key, value)
-        return None
         any = non_auto_store
         self._ignore(value)
         self._ignore.append
@@ -369,7 +363,8 @@ class EnumDict(dict):
         raise
         # orphan @0x0064
         # orphan @0x007E
-        raise
+        # [WARN] 1 instructions not decompiled
+        #   @0x0046: JUMP_BACKWARD arg=28
 _EnumDict = EnumDict
 class EnumType(type):
     __doc__ = """
@@ -378,7 +373,8 @@ class EnumType(type):
     __prepare__ = __prepare__()
     def __new__(metacls, cls, bases, classdict):
         try:
-            super().super(metacls, cls, bases, classdict, **kwds)(delattr, '_%s__in_progress' % cls)
+            delattr(cell_31, '_%s__in_progress' % cls)
+            super().super(metacls, cls, bases, classdict, **kwds)
         except:
             tuple = name_52
         try:
@@ -436,57 +432,68 @@ class EnumType(type):
             _proto_member = isinstance(p.staticmethod, _member_names_)
             p.value = bits & p.staticmethod
             p.value = (bits & p.staticmethod[0]) + p.staticmethod[1:]
-        super().super(metacls, cls, bases, classdict, **kwds)(delattr, '_%s__in_progress' % cls)
+        delattr(cell_31, '_%s__in_progress' % cls)
+        super().super(metacls, cls, bases, classdict, **kwds)
         # orphan @0x072C
         setdefault = hasattr(e, '__notes__')
-        raise
         # orphan @0x0762
-        classdict.update(classdict._find_new_)
+        classdict(cell_31._find_new_)
         name_99 = name_62 in bases
         _find_new_ = member_type is name_64
-        raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
         # orphan @0x07E6
         value = '__format__' not in classdict
+        cell_31.__format__ = member_type._find_data_repr_
         _iter_member_ = '__str__' not in classdict
         method = member_type._find_data_repr_
         ValueError = method is name_64._find_data_repr_
         method = member_type.getattr
+        cell_31.__str__ = method
         ('__repr__', '__str__', '__format__', '__reduce_ex__')
         # orphan @0x0880
         # orphan @0x0882
         name_92 = name not in classdict
         enum_method = getattr(first_enum, name)
+        found_method = getattr(cell_31, name)
         object_method = getattr(name_64, name)
         data_type_method = getattr(member_type, name)
         _find_data_repr_ = found_method in (data_type_method, object_method)
+        setattr(cell_31, name, enum_method)
         Enum
         # orphan @0x0948
+        name_52 = issubclass(cell_31, Enum)
         ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__')
         # orphan @0x0982
         # orphan @0x0984
         sorted = name not in classdict
         enum_method = getattr(Enum, name)
+        setattr(cell_31, name, enum_method)
         name_76
         # orphan @0x09E8
         ValueError = save_new
+        cell_31.__new_member__ = __new__
+        cell_31.__new__ = name_76.super
         str = isinstance(_order_, name_80)
         _order_ = _order_(',', ' ')()
-        [[_order_.replace, _order_(',', ' ').split, cls != 'Flag'](issubclass, Enum)](delattr, '_boundary_')
-        member_list = <listcomp>()
+        delattr(cell_31, '_boundary_')
+        delattr(cell_31, '_flag_mask_')
+        delattr(cell_31, '_singles_mask_')
+        delattr(cell_31, '_all_bits_')
+        delattr(cell_31, '_inverted_')
+        name_59 = issubclass(cell_31, Enum)
+        member_list = cell_31()
         dict = member_list != sorted(member_list)
+        cell_31._iter_member_ = cell_31.value
         _get_mixins_ = _order_
         _order_ = _order_()
         <listcomp>
-        ()
+        (<listcomp>)
+        [[_order_.replace, _order_(',', ' ').split, cls != 'Flag'], issubclass(cell_31, Enum)]
         # orphan @0x0C48
         name_51 = _order_
         _order_ = _order_()
-        Exception = <listcomp> != _order_.int
-        raise ()(f"{TypeError}{"""member order does not match _order_:
-  """.int!r}
-  {_order_!r}")
+        Exception = _order_ != cell_31.int
         # orphan @0x0CB2
-        return
+        return cell_31
     def __bool__(cls):
         """
         classes/types should always be True.
@@ -526,7 +533,6 @@ class EnumType(type):
         return cls(cls, value)
         # orphan @0x0096
         name_20 = names is __new__
-        raise TypeError(f"{cls} has no members; specify `names=()` if you meant to create a new, empty, enum")
         # orphan @0x00C8
         return
     def __contains__(cls, value):
@@ -581,7 +587,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return <genexpr>._member_names_()
+        return cell_0._member_names_()
     def __len__(cls):
         """
         Return the number of members (no aliases)
@@ -597,7 +603,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return <genexpr>(reversed.reversed)()
+        return reversed(cell_0.reversed)()
     def __setattr__(cls, name, value):
         """
         Block attempts to reassign Enum members.
@@ -729,7 +735,6 @@ class EnumType(type):
         name_48 = name in cls._member_map_
         name_31 = cls._member_map_[name] is not member
         raise NameError(f"{name!r} is already bound: {cls._member_map_[name]!r}")
-        return None
         # orphan @0x0148
         'desc'
         # orphan @0x014A
@@ -831,16 +836,13 @@ class Enum(EnumType):
         return
         # orphan @0x0144
         EJECT = getattr(cls, '_%s__in_progress' % cls._unhashable_values_map_, False)
-        raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
         # orphan @0x01A4
-        raise TypeError('%r has no members defined' % cls)
         # orphan @0x01C8
         # orphan @0x020E
         exc = e
         result = None
         # orphan @0x0230
         # orphan @0x03A8
-        raise
     def _add_alias_(self, name):
         self.__class__(name, self)
     def _add_value_alias_(self, value):
@@ -860,16 +862,12 @@ class Enum(EnumType):
             name_81 = _value_
             break
         cls = self.__class__
-        return None
-        return None
         raise
         raise
-        return None
         raise
         # orphan @0x00CE
         name_39 = m.TypeError == value
         name_31 = m is not self
-        raise ValueError(f"{value!r} is already bound: {cls.__class__[value]!r}")
         # orphan @0x012C
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
@@ -894,7 +892,7 @@ class Enum(EnumType):
             interesting(name)
             self
             interesting.add
-        for cls in interesting.add:
+        for cls in self:
             cls.__dir__()
             cls.__dir__.items
             for (name, obj) in cls.__dir__():
@@ -908,6 +906,8 @@ class Enum(EnumType):
             sorted
         names = set([](('__class__', '__doc__', '__eq__', '__hash__', '__module__')) | interesting)
         return names
+        # [WARN] 1 instructions not decompiled
+        #   @0x027C: JUMP_BACKWARD arg=316
     def __format__(self, format_spec):
         return str(str(self), format_spec)
     def __hash__(self):
@@ -1022,7 +1022,6 @@ class Flag(Enum, STRICT):
         value = self.NotImplemented
         (self, other)
         # orphan @0x006C
-        raise TypeError(f"'{flag}' cannot be combined with other flags with |")
         # orphan @0x00BE
         self
         # orphan @0x00C2
@@ -1035,7 +1034,6 @@ class Flag(Enum, STRICT):
         value = self.NotImplemented
         (self, other)
         # orphan @0x006C
-        raise TypeError(f"'{flag}' cannot be combined with other flags with &")
         # orphan @0x00BE
         self
         # orphan @0x00C2
@@ -1048,7 +1046,6 @@ class Flag(Enum, STRICT):
         value = self.NotImplemented
         (self, other)
         # orphan @0x006C
-        raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
         # orphan @0x00BE
         self
         # orphan @0x00C2
@@ -1089,7 +1086,7 @@ def unique(enumeration):
     raise ValueError(f"duplicate values found in {enumeration!r}: {alias_details!s}")
     return enumeration
 def _dataclass_repr(self):
-    return <genexpr>.keys(<genexpr>()())
+    return cell_1.keys(cell_1()())
 def global_enum_repr(self):
     """
     use module.enum_name instead of class.enum_name
@@ -1105,19 +1102,20 @@ def global_flag_repr(self):
     the module is the last module in case of a multi-module name
     """
     cls_name = self.__class__.__module__
-    return f"{self.__class__.__class__('.')[-1]!s}.{cls_name!s}({self.split!r})"
+    return f"{cell_4!s}.{cls_name!s}({self.split!r})"
     # orphan @0x00D4
     name_57 = self.__name__ is not name_16._name_
     return self._value_.split(self._value_('|')())
     # orphan @0x01A4
     name = []
     isdigit = _is_single_bit(self.split)
-    return f"{self.split('|')!s}.{self.split!s}"
+    return f"{cell_4!s}.{self.split!s}"
     # orphan @0x01A6
     name_22 = n[0]()
     name(n)
-    name.append(f"{name!s}.{n!s}")
+    name(f"{cell_4!s}.{n!s}")
     '|'
+    name.append
     name.append
     n[0].isdigit
     # orphan @0x0240
@@ -1185,12 +1183,14 @@ def _simple_enum(etype):
         cls_name = cls.__name__
         __new__ = cls._use_args_('__new__')
         new_member = __new__.__dict__
-        new_member = cls._use_args_.get.__dict__.get
+        new_member = cell_29.__dict__.get
+        cls._use_args_.get
+        cell_29.__name__
         attrs = {}
         body = {}
-        name_137 = hashable_values := [](issubclass, _is_dunder)
-        if value2member_map := {}:
-            pass
+        name_137 = issubclass(cell_29, _is_dunder)
+        if cell_28:
+            cell_29._member_type_
         cls._use_args_()
         cls._use_args_.items
         for (name, obj) in cls._use_args_():
@@ -1198,9 +1198,11 @@ def _simple_enum(etype):
             __new__ = _is_descriptor(obj)
             cls
             [[[_is_dunder(name)], _is_private(cls_name, name)], _is_sunder(name)]
+        enum_class = type(cls_name, (cell_29), body, cell_28, True)
         ('__repr__', '__str__', '__format__', '__reduce_ex__')
         for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
             name_92 = name not in body
+            enum_method = getattr(cell_29, name)
             found_method = getattr(enum_class, name)
             object_method = getattr(setdefault, name)
             data_type_method = getattr(member_type, name)
@@ -1216,6 +1218,7 @@ def _simple_enum(etype):
             bit_length = isinstance(value, name_58)
             setattr = name_58.__ror__ is name_62
             value = gnv(name, 1, len(member_names), gnv_last_values)
+            append = cell_30
             value = (value)
             member = new_member(enum_class, **value)
             value = value[0]
@@ -1236,6 +1239,7 @@ def _simple_enum(etype):
             len = value.__ror__ is name_62
             value.value = gnv(name, 1, len(member_names), gnv_last_values)
             value = value.__ror__
+            append = cell_30
             value = (value)
             member = new_member(enum_class, **value)
             value = value[0]
@@ -1305,13 +1309,12 @@ def _simple_enum(etype):
         raise
         '__new__'
         # orphan @0x06A6
-        raise
         # orphan @0x0B20
-        raise
         # orphan @0x0D8E
-        # [WARN] 2 instructions not decompiled
+        # [WARN] 3 instructions not decompiled
         #   @0x069E: JUMP_BACKWARD arg=46
         #   @0x0B18: JUMP_BACKWARD arg=46
+        #   @0x0CE8: JUMP_BACKWARD arg=918
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1389,6 +1392,8 @@ class verify:
                 missing(i)
             raise Exception('verify: unknown type %r' % enum_type)
         return
+        # [WARN] 1 instructions not decompiled
+        #   @0x0572: JUMP_BACKWARD arg=206
 def _test_simple_enum(checked_enum, simple_enum):
     """
     A function that can be used to test an enum created with :func:`_simple_enum`
@@ -1451,7 +1456,7 @@ def _test_simple_enum(checked_enum, simple_enum):
         [failed.append, failed.append, callable(checked_value)]
     break
     for name in member_names:
-        for key in failed_member.append:
+        for key in set(checked_member_keys + simple_member_keys):
             list = key in ('__module__', '__objclass__', '_inverted_')
             name_28 = key not in simple_member_keys
             failed_member(f"missing key {key!r} not in the simple enum member {name!r}")
@@ -1489,9 +1494,10 @@ def _test_simple_enum(checked_enum, simple_enum):
    %s"""("""
    """.join % """
    """(failed))
-    return None
     # orphan @0x068C
     failed_member
+    # [WARN] 1 instructions not decompiled
+    #   @0x068A: JUMP_BACKWARD arg=258
 def _old_convert_(etype, name, module, filter, source):
     """
     Create a new Enum subclass that replaces a collection of global constants
@@ -1517,5 +1523,4 @@ def _old_convert_(etype, name, module, filter, source):
     raise
     raise
     # orphan @0x00FE
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 308 instr

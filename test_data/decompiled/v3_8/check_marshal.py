@@ -34,5 +34,4 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
     print()
     nlocals = struct.unpack('<I', data[fields_start + 4:fields_start + 8])[0]
     print(f"  nlocals={nlocals}")
-return None
 # [SUMMARY] 15 blocks · 16 processed · 0 orphan · 254 instr

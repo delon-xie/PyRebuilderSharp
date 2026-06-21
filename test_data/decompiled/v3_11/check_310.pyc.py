@@ -39,5 +39,4 @@ def dump_bytecode(c, depth):
         break
     return
 dump_bytecode(code)
-return None
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 63 instr

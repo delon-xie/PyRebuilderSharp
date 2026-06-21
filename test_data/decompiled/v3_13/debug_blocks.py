@@ -38,7 +38,7 @@ try:
             last = block_instrs[-1]
             print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
         break
-        for ins in block_instrs():
+        for ins in block_instrs:
             if not ins.opname == 'JUMP_ABSOLUTE':
                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
                 break
@@ -79,7 +79,8 @@ if len(block_instrs) > 3:
     '3d'
     start
     'Block ['
-# [WARN] 2 instructions not decompiled
+# [WARN] 3 instructions not decompiled
+#   @0x01FE: JUMP_BACKWARD arg=346
 #   @0x0380: JUMP_BACKWARD arg=844
 #   @0x0388: JUMP_BACKWARD arg=844
 # [SUMMARY] 66 blocks · 67 processed · 5 orphan · 358 instr

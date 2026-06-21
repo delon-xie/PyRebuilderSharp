@@ -10,7 +10,6 @@ print('Failed to parse expected source:', e)
 sys.open(1)
 # orphan @0x012A
 # orphan @0x0122
-raise
 try:
     expected_src = f()
     f.read
@@ -109,7 +108,6 @@ passed = results.items(results()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-return None
 e = None
 e = None
 raise
@@ -117,5 +115,8 @@ raise
 print(f"❌ {ver!s}: AST parse failed - {e!s}")
 print('  Decompiled: %s' % actual_src[None:200])
 # orphan @0x0520
-raise
+# [WARN] 3 instructions not decompiled
+#   @0x0498: JUMP_BACKWARD arg=182
+#   @0x04A6: JUMP_BACKWARD arg=712
+#   @0x0514: JUMP_BACKWARD arg=822
 # [SUMMARY] 34 blocks · 29 processed · 6 orphan · 393 instr
