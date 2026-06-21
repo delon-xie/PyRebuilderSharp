@@ -973,6 +973,16 @@ public class AstBuilder
             return null;
         }
 
+        // 3.11+ for 循环体有隐式 ET 条目（清理/异常安全），
+        // 应跳过 try/except 检测 — for 循环已有独立块处理。
+        bool isForLoopBody = _codeObject.Instructions
+            .Any(i => i.Opcode == Opcode.FOR_ITER && i.Argument.HasValue
+                && i.Argument.Value == matchingEntry.StartOffset);
+        if (isForLoopBody)
+        {
+            return null;
+        }
+
         var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
         if (handlerBlock == null || visited.Contains(handlerBlock))
         {

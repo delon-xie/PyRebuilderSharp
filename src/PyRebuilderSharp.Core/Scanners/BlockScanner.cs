@@ -124,6 +124,12 @@ public class BlockScanner : IBlockScanner
 
         return instr.Opcode switch
         {
+            // 3.13+ 在 ParseInstructions311Plus 中已解析为绝对字节偏移，不复算
+            Opcode.JUMP_BACKWARD or Opcode.JUMP_BACKWARD_NO_INTERRUPT
+                or Opcode.FOR_ITER or Opcode.JUMP_FORWARD
+                or Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                when codeObj?.Version >= PythonVersion.Py313 => instr.Argument.Value,
             Opcode.JUMP_ABSOLUTE => is36To39Wordcode ? instr.Argument.Value : instr.Argument.Value,
             // 参考 CPython 3.8: Include/opcode.h wordcode 格式
             //     JUMPTO(x) = first_instr + x / sizeof(_Py_CODEUNIT)
