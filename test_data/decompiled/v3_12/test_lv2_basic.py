@@ -21,8 +21,4 @@ z = y
 j = i * 2
 i += 1
 i < 5
-# orphan @0x0094
-# [WARN] 2 instructions not decompiled
-#   @0x005A: JUMP_BACKWARD arg=32
-#   @0x007C: JUMP_BACKWARD arg=18
-# [SUMMARY] 17 blocks · 14 processed · 3 orphan · 66 instr
+# [SUMMARY] 17 blocks · 16 processed · 3 orphan · 66 instr

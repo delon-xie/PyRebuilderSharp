@@ -545,33 +545,6 @@ def lru_cache(maxsize, typed):
         return update_wrapper(wrapper, user_function)
     return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
-    # orphan @0x0010
-    None: == 0
-    [[], root, None, None]
-    lock
-    RLock()
-    cache_len
-    cache_get.__len__
-    full.get
-    False
-    misses
-    hits
-    0
-    0
-    cache
-    {}
-    RESULT
-    KEY
-    NEXT
-    PREV
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    make_key
-    _make_key
-    sentinel
-    object()
     if not True:
         raise TypeError('the first argument must be callable')
     # orphan @0x0068
@@ -595,32 +568,11 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             yield from hits
             link + 1(None, None, None)
             return link
-        # orphan @0x0080
-        yield from 1
         # orphan @0x009A
-        # orphan @0x009C
         # orphan @0x00A6
         # orphan @0x00C2
         # orphan @0x00C4
-        # orphan @0x00CA
-        oldkey = oldroot[oldroot][root]
-        oldresult = oldroot[result]
-        key
-        oldroot
-        oldkey
-        None
-        None
-        key
-        # orphan @0x0116
-        link = [last, key, result]
-        full
-        last >= key()
-        last
-        link
-        link
-        # orphan @0x014C
         # orphan @0x0160
-        # orphan @0x0162
         # orphan @0x016C
         return result
     ()
@@ -635,7 +587,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         misses(None, None, None)
         if not None::
             pass
-        # orphan @0x0042
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
     return wrapper
@@ -814,9 +765,6 @@ class singledispatchmethod:
         except AttributeError:
             name = self.func.__name__
         return f"<single dispatch method descriptor {name}>"
-        # orphan @0x0028
-        AttributeError
-        name = '?'
 __build_class__(_singledispatchmethod_get, '_singledispatchmethod_get')
 (None,)
 _NOT_FOUND = object()
@@ -833,9 +781,6 @@ class cached_property:
         # orphan @0x0012
         name != self.attrname
     def __get__(self, instance, owner):
-        # orphan @0x002A
-        AttributeError
-        msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
         # orphan @0x001E
         cache = instance.__dict__
         # orphan @0x0016
@@ -843,7 +788,6 @@ class cached_property:
         self.attrname is None
         if instance is None:
             return self
-        # orphan @0x005A
         # orphan @0x0060
         val = cache.get(self.attrname, _NOT_FOUND)
         val is _NOT_FOUND
@@ -852,10 +796,6 @@ class cached_property:
         yield from cache
         val
         # orphan @0x008E
-        # orphan @0x0090
-        TypeError
-        msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
-        # orphan @0x00C0
         # orphan @0x00C6
         return val
     __class_getitem__ = classmethod(GenericAlias)

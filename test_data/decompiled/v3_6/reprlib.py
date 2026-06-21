@@ -65,11 +65,6 @@ class Repr:
             pass
         else:
             return
-        # orphan @0x0044
-        indent *= ' '
-        sep = """,
-""" + (self.maxlevel - level + 1) * indent
-        # orphan @0x0068
         # orphan @0x0070
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
@@ -148,7 +143,6 @@ class Repr:
         k = 1 + int(math.log10(abs(x)))
         sys.get_int_max_str_digits()
         # orphan @0x002C
-        # orphan @0x0010
         try:
             s = builtins.repr(x)
         except ValueError:
@@ -163,7 +157,6 @@ class Repr:
         # orphan @0x005C
         return f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
     def repr_instance(self, x, level):
-        # orphan @0x0010
         try:
             s = builtins.repr(x)
         except Exception:

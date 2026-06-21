@@ -75,15 +75,4 @@ else:
     block_instrs
 break
 raise
-# [WARN] 14 instructions not decompiled
-#   @0x00DC: JUMP_BACKWARD arg=164
-#   @0x0100: JUMP_BACKWARD arg=164
-#   @0x01DA: JUMP_BACKWARD arg=346
-#   @0x01FE: JUMP_BACKWARD arg=346
-#   @0x0270: JUMP_BACKWARD arg=346
-#   @0x02B6: JUMP_BACKWARD arg=346
-#   @0x0380: JUMP_BACKWARD arg=844
-#   @0x0388: JUMP_BACKWARD arg=844
-#   @0x0390: JUMP_BACKWARD arg=844
-#   @0x050E: JUMP_BACKWARD arg=734
 # [SUMMARY] 55 blocks · 55 processed · 0 orphan · 358 instr

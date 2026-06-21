@@ -64,15 +64,4 @@ for (old, new) in conflicts:
     os.remove(old)
 f
 files_to_rename
-# [WARN] 11 instructions not decompiled
-#   @0x0074: JUMP_BACKWARD arg=62
-#   @0x019A: JUMP_BACKWARD arg=62
-#   @0x01AE: JUMP_BACKWARD arg=62
-#   @0x027A: JUMP_BACKWARD arg=62
-#   @0x02FC: JUMP_BACKWARD arg=686
-#   @0x0326: JUMP_BACKWARD arg=686
-#   @0x03F4: JUMP_BACKWARD arg=870
-#   @0x0488: JUMP_BACKWARD arg=1040
-#   @0x04AE: JUMP_BACKWARD arg=1180
-#   @0x04B6: JUMP_BACKWARD arg=1180
 # [SUMMARY] 35 blocks · 35 processed · 0 orphan · 302 instr

@@ -38,15 +38,4 @@ for group in failed_groups:
         print(f"    - {f}")
     break
 break
-# [WARN] 12 instructions not decompiled
-#   @0x017E: JUMP_BACKWARD arg=150
-#   @0x0182: JUMP_BACKWARD arg=150
-#   @0x0194: JUMP_BACKWARD arg=150
-#   @0x01E0: JUMP_BACKWARD arg=150
-#   @0x022E: JUMP_BACKWARD arg=150
-#   @0x02AE: JUMP_BACKWARD arg=654
-#   @0x02E6: JUMP_BACKWARD arg=654
-#   @0x02FC: JUMP_BACKWARD arg=654
-#   @0x0322: JUMP_BACKWARD arg=654
-#   @0x037E: JUMP_BACKWARD arg=866
 # [SUMMARY] 30 blocks · 31 processed · 0 orphan · 269 instr

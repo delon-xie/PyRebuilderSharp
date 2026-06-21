@@ -164,19 +164,12 @@ If cls is not an instance of ABCMeta, does nothing.
                 abstracts.add(name)
         break
     break
-    for _ in cls.__dict__.items():
+    for (value, name) in cls.__dict__.items():
         if not getattr(value, '__isabstractmethod__', False):
             pass
         else:
             abstracts.add(name)
     break
-    # [WARN] 5 instructions not decompiled
-    #   @0x00B6: JUMP_BACKWARD arg=116
-    #   @0x00DC: JUMP_BACKWARD arg=116
-    #   @0x00E4: JUMP_BACKWARD arg=84
-    #   @0x014E: JUMP_BACKWARD arg=288
-    #   @0x0174: JUMP_BACKWARD arg=288
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
 # orphan @0x00D6
-# orphan @0x00D8
-# [SUMMARY] 8 blocks · 6 processed · 2 orphan · 94 instr
+# [SUMMARY] 8 blocks · 7 processed · 2 orphan · 94 instr

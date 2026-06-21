@@ -23,10 +23,6 @@ def dump_code(c, depth):
         print(f"{prefix}Function: {const.co_name}")
         break
     break
-    # [WARN] 3 instructions not decompiled
-    #   @0x004C: JUMP_BACKWARD arg=36
-    #   @0x0072: JUMP_BACKWARD arg=36
-    #   @0x013A: JUMP_BACKWARD arg=36
 dump_code(code)
 raise
 # [SUMMARY] 8 blocks · 9 processed · 0 orphan · 107 instr

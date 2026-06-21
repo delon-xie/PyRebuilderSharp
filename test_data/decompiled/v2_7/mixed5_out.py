@@ -63,7 +63,6 @@ def mixed_4(n):
                     continue
     except:
         total = -1
-    # orphan @0x005A
     # orphan @0x0068
     # orphan @0x006D
     total = -1

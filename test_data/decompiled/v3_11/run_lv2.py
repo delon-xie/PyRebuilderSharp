@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0122
-# orphan @0x011A
 try:
     expected_src = f()
     f.read
@@ -70,9 +68,4 @@ raise
 # orphan @0x0390
 print(f"❌ {ver!s}: parse error: {ex!s}")
 print('  Output: %s' % r.expected_src[None:200])
-# orphan @0x03FE
-# [WARN] 3 instructions not decompiled
-#   @0x0380: JUMP_BACKWARD arg=74
-#   @0x0384: JUMP_BACKWARD arg=530
-#   @0x03F2: JUMP_BACKWARD arg=640
-# [SUMMARY] 23 blocks · 20 processed · 5 orphan · 262 instr
+# [SUMMARY] 23 blocks · 23 processed · 5 orphan · 262 instr

@@ -21,9 +21,4 @@ for instr in dis.get_instructions(code):
 break
 break
 raise
-# [WARN] 4 instructions not decompiled
-#   @0x00B2: JUMP_BACKWARD arg=144
-#   @0x00C8: JUMP_BACKWARD arg=144
-#   @0x00D6: JUMP_BACKWARD arg=144
-#   @0x0270: JUMP_BACKWARD arg=494
 # [SUMMARY] 18 blocks · 19 processed · 0 orphan · 169 instr

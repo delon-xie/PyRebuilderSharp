@@ -566,9 +566,6 @@ class singledispatchmethod:
         except AttributeError:
             name = self.func.__name__
         return f"<single dispatch method descriptor {name}>"
-        # orphan @0x0028
-        AttributeError
-        name = '?'
 __build_class__(_singledispatchmethod_get, '_singledispatchmethod_get')
 (None,)
 _NOT_FOUND = object()

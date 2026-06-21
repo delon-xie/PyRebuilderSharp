@@ -48,8 +48,4 @@ while i < len(lines):
         print()
 print(f"Total tests with versions found: {debug_count}")
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x02E6: JUMP_BACKWARD arg=390
-#   @0x0362: JUMP_BACKWARD arg=826
-#   @0x038C: JUMP_BACKWARD arg=166
 # [SUMMARY] 30 blocks · 31 processed · 0 orphan · 230 instr

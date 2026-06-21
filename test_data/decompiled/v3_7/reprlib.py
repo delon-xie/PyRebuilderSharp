@@ -13,8 +13,6 @@ def recursive_repr(fillvalue):
             return
             # orphan @0x001A
             None
-            # orphan @0x0032
-            return result
         wrapper.__module__ = (set(), repr_running)(getattr, '__module__')
         return wrapper
     return decorating_function
@@ -71,16 +69,9 @@ class Repr:
             return ', '.join(pieces)
         # orphan @0x0044
         indent *= ' '
-        # orphan @0x004C
-        sep = """,
-""" + (self.maxlevel - level + 1) * indent
-        # orphan @0x0068
         # orphan @0x0070
         # orphan @0x008C
         None
-        # orphan @0x0090
-        error = None
-        # orphan @0x009C
         # orphan @0x009E
         -len(indent)
         1
@@ -180,7 +171,6 @@ class Repr:
         max_digits = sys.get_int_max_str_digits()
         return f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
         # orphan @0x002C
-        # orphan @0x0010
         try:
             s = builtins.repr(x)
         except ValueError:
@@ -192,7 +182,6 @@ class Repr:
         # orphan @0x00F0
         return s
     def repr_instance(self, x, level):
-        # orphan @0x0010
         try:
             s = builtins.repr(x)
         except Exception:

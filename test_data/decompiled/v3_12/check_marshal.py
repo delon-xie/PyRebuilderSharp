@@ -39,6 +39,4 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
         struct.unpack
         None
     hdr = 12
-# [WARN] 1 instructions not decompiled
-#   @0x0330: JUMP_BACKWARD arg=804
 # [SUMMARY] 15 blocks · 16 processed · 0 orphan · 266 instr

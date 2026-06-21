@@ -73,10 +73,4 @@ break
 break
 raise
 break
-# orphan @0x0488
-# [WARN] 4 instructions not decompiled
-#   @0x0422: JUMP_BACKWARD arg=878
-#   @0x0456: JUMP_BACKWARD arg=930
-#   @0x046E: JUMP_BACKWARD arg=684
-#   @0x0486: JUMP_BACKWARD arg=150
-# [SUMMARY] 24 blocks · 23 processed · 1 orphan · 262 instr
+# [SUMMARY] 24 blocks · 24 processed · 1 orphan · 262 instr

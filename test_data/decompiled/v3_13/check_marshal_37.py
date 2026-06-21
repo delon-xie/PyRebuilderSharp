@@ -27,9 +27,4 @@ Fields found at offset {offset}:")
         print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
         '  Bytes: '(f"{' '.join}{<genexpr>(m[offset:offset + 16]())}")
 break
-# [WARN] 4 instructions not decompiled
-#   @0x01D8: JUMP_BACKWARD arg=388
-#   @0x0202: JUMP_BACKWARD arg=388
-#   @0x022C: JUMP_BACKWARD arg=388
-#   @0x02E4: JUMP_BACKWARD arg=388
 # [SUMMARY] 10 blocks · 11 processed · 0 orphan · 196 instr

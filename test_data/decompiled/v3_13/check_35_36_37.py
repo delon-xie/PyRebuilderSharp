@@ -21,7 +21,4 @@ for ver in ('3.5', '3.6', '3.7'):
     else:
         print(f"STDERR: {r.stderr[None:200]}")
 break
-# [WARN] 2 instructions not decompiled
-#   @0x0188: JUMP_BACKWARD arg=134
-#   @0x01BC: JUMP_BACKWARD arg=134
 # [SUMMARY] 9 blocks · 10 processed · 0 orphan · 99 instr

@@ -27,6 +27,4 @@ def dump_code(c, depth = 0):
         None
     return
 dump_code(code)
-# orphan @0x00D6
-# orphan @0x00DE
-# [SUMMARY] 8 blocks · 7 processed · 2 orphan · 120 instr
+# [SUMMARY] 8 blocks · 9 processed · 2 orphan · 120 instr

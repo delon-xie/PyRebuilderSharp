@@ -42,8 +42,4 @@ elif type2 == 115:
     '  Raw bytes: len='(f"{length} data={data}{(off2 + 4) // (off2 + 14).hex()}")
     return None
 break
-# orphan @0x030E
-# [WARN] 2 instructions not decompiled
-#   @0x0134: JUMP_BACKWARD arg=110
-#   @0x030C: JUMP_BACKWARD arg=670
-# [SUMMARY] 21 blocks · 20 processed · 1 orphan · 263 instr
+# [SUMMARY] 21 blocks · 21 processed · 1 orphan · 263 instr

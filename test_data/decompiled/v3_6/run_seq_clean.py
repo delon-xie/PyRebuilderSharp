@@ -1,18 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x00A8
-def <genexpr>(.0):
-    .0
-    for (v, r) in .0:
-        if r:
-            1
-        yield
-        break
-# orphan @0x0086
-print('Failed to parse expected source:', e)
-sys.exit(1)
-None
-# orphan @0x007E
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
@@ -64,7 +51,4 @@ Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 # orphan @0x0208
 yield from results
 match
-# orphan @0x0216
-# orphan @0x025A
-e = None
-# [SUMMARY] 34 blocks · 29 processed · 7 orphan · 328 instr
+# [SUMMARY] 34 blocks · 34 processed · 7 orphan · 328 instr

@@ -49,9 +49,4 @@ python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 os.makedirs
 f
 os.listdir(input_dir)
-# [WARN] 4 instructions not decompiled
-#   @0x00D0: JUMP_BACKWARD arg=160
-#   @0x00D8: JUMP_BACKWARD arg=160
-#   @0x027C: JUMP_BACKWARD arg=328
-#   @0x02D0: JUMP_BACKWARD arg=328
 # [SUMMARY] 15 blocks · 15 processed · 0 orphan · 203 instr

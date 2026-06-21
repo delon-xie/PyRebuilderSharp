@@ -2870,14 +2870,13 @@ errtest is a regular expression that must be present in the
 text of the warning raised.
 """
         try:
-            compile(filename, code, mode)
+            compile(code, filename, mode)
         except:
             pass
         __name__()
         self.assertWarnsRegex(compile, errtext)
         __module__
         self.assertWarnsRegex(compile, errtext)
-        # orphan @0x008E
     def test_return_in_finally(self):
         """
             def f():
@@ -2950,8 +2949,6 @@ text of the warning raised.
                             {kw}
                 ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
-        # [WARN] 1 instructions not decompiled
-        #   @0x012C: JUMP_BACKWARD arg=6
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class SyntaxErrorTestCase(unittest.TestCase):
@@ -2964,7 +2961,7 @@ text of the exception raised.  If subclass is specified it
 is the expected subclass of SyntaxError (e.g. IndentationError).
 """
         try:
-            compile(filename, code, mode)
+            compile(code, filename, mode)
         except:
             pass
         try:
@@ -2998,7 +2995,6 @@ is the expected subclass of SyntaxError (e.g. IndentationError).
         self.fail('compile() did not raise SyntaxError')
         err = None
         # orphan @0x029A
-        # orphan @0x029C
     def test_expression_with_assignment(self):
         """print(end1 + end2 = ' ')"""
         'print(end1 + end2 = \' \')'('expression cannot contain assignment, perhaps you meant \'==\'?', 7, ('offset',))
@@ -3233,7 +3229,6 @@ def fib(n):
         raise
         # orphan @0x00A0
         # orphan @0x00E6
-        # orphan @0x00E8
     def test_continuation_bad_indentation(self):
         """\
 if x:
@@ -3312,10 +3307,6 @@ b=3", f"\{paren}' was never closed")
  case e(e=v,v,""", ' was never closed')
         s = b'IyBjb2Rpbmc9bGF0aW4KKGFhYWFhYWFhYWFhYWFhYWFhCmFhYWFhYWFhYWFhtQ=='
         self._check_error(s, '\'\\(\' was never closed')
-        # [WARN] 3 instructions not decompiled
-        #   @0x0046: JUMP_BACKWARD arg=6
-        #   @0x008C: JUMP_BACKWARD arg=82
-        #   @0x00D8: JUMP_BACKWARD arg=152
     def test_error_string_literal(self):
         """'blech"""
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
@@ -3411,24 +3402,18 @@ a=1
         ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
-        # [WARN] 1 instructions not decompiled
-        #   @0x003A: JUMP_BACKWARD arg=10
     def test_ifexp_body_stmt_else_expression(self):
         """expected expression before 'if', but statement is given"""
         msg = 'expected expression before \'if\', but statement is given'
         ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
-        # [WARN] 1 instructions not decompiled
-        #   @0x003C: JUMP_BACKWARD arg=10
     def test_ifexp_body_stmt_else_stmt(self):
         """expected expression before 'if', but statement is given"""
         msg = 'expected expression before \'if\', but statement is given'
         (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
-        for _ in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
+        for (rhs_stmt, lhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
-        # [WARN] 1 instructions not decompiled
-        #   @0x0044: JUMP_BACKWARD arg=10
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):

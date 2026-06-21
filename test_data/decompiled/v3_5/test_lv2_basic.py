@@ -17,6 +17,4 @@ try:
 except:
     a = 0
 z = y
-# orphan @0x0096
-a = 0
-# [SUMMARY] 14 blocks · 14 processed · 1 orphan · 65 instr
+# [SUMMARY] 14 blocks · 15 processed · 1 orphan · 65 instr

@@ -81,10 +81,4 @@ while i < len(lines):
                                 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
                                 print('======================================================================')
 break
-# orphan @0x04D2
-# [WARN] 4 instructions not decompiled
-#   @0x02CA: JUMP_BACKWARD arg=358
-#   @0x02EE: JUMP_BACKWARD arg=582
-#   @0x0442: JUMP_BACKWARD arg=166
-#   @0x04D0: JUMP_BACKWARD arg=1144
-# [SUMMARY] 38 blocks · 35 processed · 3 orphan · 392 instr
+# [SUMMARY] 38 blocks · 36 processed · 3 orphan · 392 instr

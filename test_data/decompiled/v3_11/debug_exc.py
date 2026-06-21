@@ -46,6 +46,4 @@ for const in code:
 return
 # orphan @0x04E0
 code
-# [WARN] 1 instructions not decompiled
-#   @0x04DE: JUMP_BACKWARD arg=410
 # [SUMMARY] 8 blocks · 8 processed · 1 orphan · 341 instr

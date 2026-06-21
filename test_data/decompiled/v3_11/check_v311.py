@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x009A
-# orphan @0x0092
 try:
     raw = f()
     f.read
@@ -49,4 +47,4 @@ for i in range(16, 50, 2):
     '  '
     print
 return
-# [SUMMARY] 14 blocks · 13 processed · 2 orphan · 305 instr
+# [SUMMARY] 14 blocks · 15 processed · 2 orphan · 305 instr

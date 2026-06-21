@@ -59,10 +59,6 @@ function (defaults to functools.WRAPPER_UPDATES)
     for attr in updated:
         break
     break
-    # [WARN] 3 instructions not decompiled
-    #   @0x003C: JUMP_BACKWARD arg=6
-    #   @0x0096: JUMP_BACKWARD arg=72
-    #   @0x00C4: JUMP_BACKWARD arg=6
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -161,7 +157,7 @@ def total_ordering(cls):
             raise ValueError('must define at least one ordering operation: < > <= >=')
         root = max(roots)
         _convert[root]
-        for _ in _convert[root]:
+        for (opfunc, opname) in _convert[root]:
             if not True:
                 pass
             else:
@@ -171,11 +167,6 @@ def total_ordering(cls):
         break
     op
     _convert
-    # [WARN] 4 instructions not decompiled
-    #   @0x005A: JUMP_BACKWARD arg=24
-    #   @0x0062: JUMP_BACKWARD arg=24
-    #   @0x00CE: JUMP_BACKWARD arg=186
-    #   @0x00F6: JUMP_BACKWARD arg=186
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     K = (mycmp)(K, 'K', object)
@@ -210,9 +201,6 @@ calculates ((((1 + 2) + 3) + 4) + 5).
     for element in it:
         pass
     break
-    # orphan @0x009C
-    # [WARN] 1 instructions not decompiled
-    #   @0x0062: JUMP_BACKWARD arg=76
 (_initial_missing)
 class _PlaceholderType:
     __firstlineno__ = 278
@@ -240,7 +228,7 @@ def _partial_prepare_merger(args):
     order = []
     j = nargs
     enumerate(args)
-    for j in enumerate(args):
+    for (a, i) in enumerate(args):
         if a is itemgetter:
             order.append(j)
             j += 1
@@ -252,9 +240,6 @@ def _partial_prepare_merger(args):
     else:
         None
     return ()
-    # [WARN] 2 instructions not decompiled
-    #   @0x008E: JUMP_BACKWARD arg=70
-    #   @0x00B4: JUMP_BACKWARD arg=70
 def _partial_new(cls, func):
     if issubclass(cls, callable):
         base_cls = callable
@@ -266,8 +251,6 @@ def _partial_new(cls, func):
         base_cls = isinstance
     if not hasattr(func, '__get__'):
         raise TypeError(f"the first argument {func} must be a callable or a descriptor")
-    # [WARN] 1 instructions not decompiled
-    #   @0x0152: JUMP_BACKWARD arg=314
 def _partial_repr(self):
     cls = type(self)
     module = cls.__module__
@@ -296,7 +279,6 @@ and keywords.
             pto_args = self.args
         keywords = keywords
         return pto_args(**keywords)
-        # orphan @0x0120
     def __get__(self, obj, objtype):
         return self
         # orphan @0x000C
@@ -339,7 +321,6 @@ callables as instance methods.
                 pto_args = cell_5.args
             keywords = keywords
             return pto_args(**keywords)
-            # orphan @0x0124
         cell_0.__isabstractmethod__.__isabstractmethod__ = _method
         cell_0.__partialmethod__ = _method
         return _method
@@ -354,7 +335,6 @@ callables as instance methods.
         partial
         return result
         # orphan @0x0130
-        # orphan @0x0132
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
     __static_attributes__ = ()
@@ -365,8 +345,6 @@ def _unwrap_partial(func):
     # orphan @0x002C
     func = func.func
     isinstance(func, func)
-    # [WARN] 1 instructions not decompiled
-    #   @0x006E: JUMP_BACKWARD arg=44
 def _unwrap_partialmethod(func):
     # orphan @0x0052
     func = func.__partialmethod__
@@ -392,10 +370,6 @@ def _unwrap_partialmethod(func):
     # orphan @0x00D8
     func = getattr(func, 'func')
     isinstance(func, _unwrap_partial)
-    # [WARN] 3 instructions not decompiled
-    #   @0x00AA: JUMP_BACKWARD arg=82
-    #   @0x011A: JUMP_BACKWARD arg=216
-    #   @0x013C: JUMP_BACKWARD arg=14
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -442,10 +416,6 @@ saves space and improves lookup speed.
         pass
     break
     # orphan @0x0182
-    # [WARN] 3 instructions not decompiled
-    #   @0x0060: JUMP_BACKWARD arg=82
-    #   @0x00AC: JUMP_BACKWARD arg=152
-    #   @0x0116: JUMP_BACKWARD arg=258
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
 
@@ -522,7 +492,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
             raise
             return result
-            # orphan @0x01DA
         (KEY, NEXT, PREV, RESULT, cache, cache_get, cache_len, full, hits, lock, make_key, maxsize, misses, root, typed, user_function)
         (cache, cache_get, hits, make_key, misses, sentinel, typed, user_function)
 (128, False)
@@ -571,14 +540,6 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     result = []
     for _ in s:
         pass
-    # [WARN] 7 instructions not decompiled
-    #   @0x0028: JUMP_BACKWARD arg=22
-    #   @0x0030: JUMP_BACKWARD arg=22
-    #   @0x007C: JUMP_BACKWARD arg=102
-    #   @0x0086: JUMP_BACKWARD arg=82
-    #   @0x00F0: JUMP_BACKWARD arg=216
-    #   @0x00FA: JUMP_BACKWARD arg=216
-    #   @0x0102: JUMP_BACKWARD arg=8
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -662,15 +623,6 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
     other_bases
     return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
     # orphan @0x02F8
-    # [WARN] 8 instructions not decompiled
-    #   @0x006E: JUMP_BACKWARD arg=64
-    #   @0x0166: JUMP_BACKWARD arg=318
-    #   @0x01B2: JUMP_BACKWARD arg=318
-    #   @0x01D8: JUMP_BACKWARD arg=318
-    #   @0x020C: JUMP_BACKWARD arg=484
-    #   @0x023A: JUMP_BACKWARD arg=546
-    #   @0x026C: JUMP_BACKWARD arg=596
-    #   @0x029E: JUMP_BACKWARD arg=646
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
@@ -698,9 +650,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
                     pass
                 break
                 break
-            # [WARN] 2 instructions not decompiled
-            #   @0x0018: JUMP_BACKWARD arg=8
-            #   @0x003A: JUMP_BACKWARD arg=8
         (types)
         n
         cell_1
@@ -755,17 +704,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
     n
     cell_1
     # orphan @0x0298
-    # [WARN] 14 instructions not decompiled
-    #   @0x006C: JUMP_BACKWARD arg=78
-    #   @0x0074: JUMP_BACKWARD arg=78
-    #   @0x00BA: JUMP_BACKWARD arg=156
-    #   @0x00C2: JUMP_BACKWARD arg=156
-    #   @0x012A: JUMP_BACKWARD arg=280
-    #   @0x0150: JUMP_BACKWARD arg=280
-    #   @0x019C: JUMP_BACKWARD arg=396
-    #   @0x01A4: JUMP_BACKWARD arg=396
-    #   @0x01BA: JUMP_BACKWARD arg=280
-    #   @0x01F2: JUMP_BACKWARD arg=238
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -788,9 +726,6 @@ Note: if *registry* does not contain an implementation for the base
             match = t
     break
     return registry.get(match)
-    # [WARN] 2 instructions not decompiled
-    #   @0x00F0: JUMP_BACKWARD arg=60
-    #   @0x00F8: JUMP_BACKWARD arg=60
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -864,7 +799,6 @@ class _singledispatchmethod_get:
         raise
         # orphan @0x0118
         # orphan @0x0138
-        # orphan @0x013A
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -945,5 +879,4 @@ raise
 # orphan @0x02E6
 # orphan @0x02FE
 # orphan @0x0316
-# orphan @0x0318
-# [SUMMARY] 29 blocks · 24 processed · 5 orphan · 359 instr
+# [SUMMARY] 29 blocks · 25 processed · 5 orphan · 359 instr

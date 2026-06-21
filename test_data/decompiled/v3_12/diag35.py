@@ -39,7 +39,4 @@ open('/tmp/diag35.cs', 'w')
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], True, True, 30)
 'Stdout:'(r.stdout, None // 500)
 'Stderr:'(r.stderr, None // 500)
-# orphan @0x017A
-# [WARN] 1 instructions not decompiled
-#   @0x0178: JUMP_BACKWARD arg=164
-# [SUMMARY] 9 blocks · 8 processed · 1 orphan · 96 instr
+# [SUMMARY] 9 blocks · 9 processed · 1 orphan · 96 instr

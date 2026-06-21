@@ -29,9 +29,4 @@ dis.get_instructions(code)
 for instr in dis.get_instructions(code):
     instr.offset(f"4d {instr.opname}20s {instr.arg} {instr.argrepr}")
 raise
-# [WARN] 4 instructions not decompiled
-#   @0x00D4: JUMP_BACKWARD arg=160
-#   @0x00F4: JUMP_BACKWARD arg=160
-#   @0x0102: JUMP_BACKWARD arg=160
-#   @0x02A4: JUMP_BACKWARD arg=546
 # [SUMMARY] 18 blocks · 19 processed · 0 orphan · 175 instr

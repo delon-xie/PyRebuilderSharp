@@ -207,9 +207,6 @@ class _proto_member:
                             return None
                     finally:
                         pass
-        # orphan @0x0140
-        TypeError
-        enum_class._member_map_.items()
         # orphan @0x0156
         # orphan @0x0158
         canonical_member._value_ == value
@@ -217,12 +214,7 @@ class _proto_member:
         enum_member = canonical_member
         # orphan @0x0170
         # orphan @0x0172
-        # orphan @0x0176
         # orphan @0x0256
-        # orphan @0x02C0
-        TypeError
-        enum_class._unhashable_values_.append(value)
-        enum_class._unhashable_values_map_.setdefault(member_name, []).append(value)
 class EnumDict(dict):
     __doc__ = """
     Track enum member order and ensure member names are not reused.
@@ -283,8 +275,6 @@ class EnumDict(dict):
         value = auto_valued[0]
         # orphan @0x0236
         value = t(auto_valued)
-        # orphan @0x0244
-        TypeError
     @property
     def member_names(self):
         return list(self._member_names)
@@ -556,8 +546,6 @@ class EnumType(type):
                 names.append((name, value))
         elif names is None:
             names = []
-        # orphan @0x013C
-        (AttributeError, ValueError, KeyError)
         # orphan @0x015A
         module is None
         # orphan @0x0162
@@ -1039,8 +1027,6 @@ class Flag(Enum):
         # orphan @0x026C
         # orphan @0x027C
         unknown
-        # orphan @0x0282
-        pseudo_member._name_ + '|%s' % cls._numeric_repr_(unknown)._name_ = pseudo_member
         # orphan @0x029A
     def __contains__(self, other):
         """

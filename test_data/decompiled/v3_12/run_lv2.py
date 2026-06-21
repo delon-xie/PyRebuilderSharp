@@ -80,11 +80,4 @@ break
 raise
 ex = None
 # orphan @0x03DA
-# orphan @0x03DC
-# [WARN] 5 instructions not decompiled
-#   @0x01E6: JUMP_BACKWARD arg=146
-#   @0x0326: JUMP_BACKWARD arg=30
-#   @0x0350: JUMP_BACKWARD arg=508
-#   @0x0368: JUMP_BACKWARD arg=616
-#   @0x03D0: JUMP_BACKWARD arg=636
-# [SUMMARY] 35 blocks · 33 processed · 2 orphan · 240 instr
+# [SUMMARY] 35 blocks · 34 processed · 2 orphan · 240 instr

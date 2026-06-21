@@ -20,7 +20,4 @@ print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.parse(r.stdout)(2, ('indent',))
 print(actual_ast)
-# [WARN] 2 instructions not decompiled
-#   @0x0156: JUMP_BACKWARD arg=316
-#   @0x0176: JUMP_BACKWARD arg=316
 # [SUMMARY] 6 blocks · 7 processed · 0 orphan · 107 instr

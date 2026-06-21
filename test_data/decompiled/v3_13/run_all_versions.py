@@ -113,7 +113,7 @@ raise
 def <genexpr>(.0):
     try:
         .0
-        for _ in .0:
+        for (r, v) in .0:
             try:
                 try:
                     .0
@@ -129,16 +129,5 @@ def <genexpr>(.0):
         break
     except:
         pass
-    # [WARN] 2 instructions not decompiled
-    #   @0x0022: JUMP_BACKWARD arg=10
-    #   @0x002E: JUMP_BACKWARD arg=10
-# orphan @0x051A
 # orphan @0x058A
-# orphan @0x058C
-# [WARN] 5 instructions not decompiled
-#   @0x01FE: JUMP_BACKWARD arg=350
-#   @0x03C8: JUMP_BACKWARD arg=874
-#   @0x0412: JUMP_BACKWARD arg=350
-#   @0x0422: JUMP_BACKWARD arg=350
-#   @0x057E: JUMP_BACKWARD arg=350
-# [SUMMARY] 49 blocks · 46 processed · 3 orphan · 380 instr
+# [SUMMARY] 49 blocks · 48 processed · 3 orphan · 380 instr

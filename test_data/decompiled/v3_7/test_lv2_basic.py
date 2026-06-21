@@ -22,8 +22,4 @@ range(10)
 # orphan @0x0054
 # orphan @0x0056
 m = n + 1
-# orphan @0x0062
-a = 1
-# orphan @0x006E
-a = 0
-# [SUMMARY] 14 blocks · 2 processed · 12 orphan · 65 instr
+# [SUMMARY] 14 blocks · 4 processed · 12 orphan · 65 instr

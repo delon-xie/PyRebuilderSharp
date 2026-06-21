@@ -26,7 +26,4 @@ print('=== Decompiled ===')
 print(r.stdout.strip())
 os.unlink(py_path)
 os.unlink(py_path + 'c')
-# orphan @0x01CA
-# [WARN] 1 instructions not decompiled
-#   @0x01C8: JUMP_BACKWARD arg=302
-# [SUMMARY] 9 blocks · 8 processed · 1 orphan · 115 instr
+# [SUMMARY] 9 blocks · 9 processed · 1 orphan · 115 instr

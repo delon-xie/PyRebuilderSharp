@@ -13,11 +13,6 @@ def mixed_1(n):
                     pass
             result += j
     return result
-    # orphan @0x0074
-    # [WARN] 3 instructions not decompiled
-    #   @0x003A: JUMP_BACKWARD arg=22
-    #   @0x0070: JUMP_BACKWARD arg=54
-    #   @0x0072: JUMP_BACKWARD arg=78
 def mixed_2(n):
     total = 0
     range(n)
@@ -32,11 +27,6 @@ def mixed_2(n):
         for k in range(i):
             total += k
     return total
-    # [WARN] 4 instructions not decompiled
-    #   @0x0030: JUMP_BACKWARD arg=22
-    #   @0x006C: JUMP_BACKWARD arg=18
-    #   @0x007A: JUMP_BACKWARD arg=74
-    #   @0x007C: JUMP_BACKWARD arg=98
 def mixed_3(n):
     # orphan @0x0014
     i += 1
@@ -56,12 +46,6 @@ def mixed_3(n):
             if i < n:
                 pass
             return total
-    # orphan @0x007C
-    # [WARN] 4 instructions not decompiled
-    #   @0x0058: JUMP_BACKWARD arg=22
-    #   @0x0078: JUMP_BACKWARD arg=32
-    #   @0x007A: JUMP_BACKWARD arg=56
-    #   @0x0088: JUMP_BACKWARD arg=118
 def mixed_4(n):
     try:
         try:
@@ -92,10 +76,4 @@ def mixed_4(n):
         break
     total = 0
     # orphan @0x0068
-    # orphan @0x0082
-    # [WARN] 4 instructions not decompiled
-    #   @0x003E: JUMP_BACKWARD arg=22
-    #   @0x0060: JUMP_BACKWARD arg=34
-    #   @0x0062: JUMP_BACKWARD arg=58
-    #   @0x006E: JUMP_BACKWARD arg=26
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

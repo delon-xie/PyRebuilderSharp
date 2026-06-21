@@ -67,9 +67,4 @@ print
 v
 k
 known.items()
-# [WARN] 4 instructions not decompiled
-#   @0x01E2: JUMP_BACKWARD arg=58
-#   @0x0274: JUMP_BACKWARD arg=110
-#   @0x0286: JUMP_BACKWARD arg=128
-#   @0x0322: JUMP_BACKWARD arg=284
 # [SUMMARY] 20 blocks · 21 processed · 0 orphan · 285 instr

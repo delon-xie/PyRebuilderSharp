@@ -57,9 +57,6 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
     setattr(wrapper, attr, value)
     raise
     raise
-    # orphan @0x0064
-    # [WARN] 1 instructions not decompiled
-    #   @0x004E: JUMP_BACKWARD arg=74
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -220,7 +217,6 @@ def reduce(function, sequence, initial = _initial_missing):
         value = function(value, element)
         value
     return
-    # orphan @0x008A
 raise
 raise
 class _PlaceholderType:
@@ -329,7 +325,6 @@ class partial:
         name_89 = phcount
         keywords = keywords
         return pto_args(**keywords)
-        # orphan @0x00C0
     def __get__(self, obj, objtype = None):
         # orphan @0x000A
         return MethodType(self, obj)
@@ -387,7 +382,6 @@ class partialmethod:
             name_89 = phcount
             keywords = keywords
             return pto_args(**keywords)
-            # orphan @0x00C2
         _method.__isabstractmethod__ = cell_0.__isabstractmethod__
         _method.__partialmethod__ = cell_0
         return _method
@@ -406,7 +400,6 @@ class partialmethod:
         return result
         raise
         raise
-        # orphan @0x00C4
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
 def _unwrap_partial(func):
@@ -509,12 +502,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         key = cell_22(args, kwds, cell_26)
         return
         return result
-        # orphan @0x00E8
-        # orphan @0x00F0
         # orphan @0x00F6
         result = cell_27(**kwds)
-        # orphan @0x01FE
-        # orphan @0x0206
     def cache_info():
         """Report cache statistics"""
         try:
@@ -522,7 +511,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         except:
             pass
         return
-        # orphan @0x0056
     def cache_clear():
         """Clear the cache and cache statistics"""
         try:
@@ -533,7 +521,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             cell_0.clear
         except:
             pass
-        # orphan @0x0076
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
     return wrapper
@@ -650,9 +637,6 @@ def _compose_mro(cls, types):
                 mro(subcls)
         _c3_mro
     return
-    # [WARN] 2 instructions not decompiled
-    #   @0x0200: JUMP_BACKWARD arg=66
-    #   @0x0202: JUMP_BACKWARD arg=346
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -676,8 +660,6 @@ def _find_impl(cls, registry):
     return
     # orphan @0x00FA
     registry
-    # [WARN] 1 instructions not decompiled
-    #   @0x00F8: JUMP_BACKWARD arg=172
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -732,7 +714,6 @@ class singledispatchmethod:
         raise
         raise
         # orphan @0x0032
-        # orphan @0x0066
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
@@ -754,7 +735,6 @@ class _singledispatchmethod_get:
         raise
         raise
         raise
-        # orphan @0x00CC
     def __repr__(self):
         # orphan @0x0028
         try:
@@ -771,7 +751,6 @@ class _singledispatchmethod_get:
         raise
         raise
         raise
-        # orphan @0x0052
         # orphan @0x0094
         return f"<single dispatch method {name}>"
     def __call__(self):
@@ -832,14 +811,9 @@ class cached_property:
         val = self(instance)
         self.func
         cache.get
-        # orphan @0x00BE
         # orphan @0x01D4
         return val
     __class_getitem__ = classmethod(GenericAlias)
 raise
 raise
-# orphan @0x015C
-# orphan @0x01A2
-# orphan @0x022A
-# orphan @0x02C4
-# [SUMMARY] 29 blocks · 26 processed · 4 orphan · 370 instr
+# [SUMMARY] 29 blocks · 30 processed · 4 orphan · 370 instr

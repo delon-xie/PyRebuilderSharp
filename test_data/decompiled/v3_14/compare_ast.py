@@ -59,8 +59,4 @@ e = None
 []
 # orphan @0x02D6
 # orphan @0x036A
-# orphan @0x036C
-# [WARN] 2 instructions not decompiled
-#   @0x0212: JUMP_BACKWARD arg=414
-#   @0x0268: JUMP_BACKWARD arg=414
-# [SUMMARY] 34 blocks · 32 processed · 3 orphan · 236 instr
+# [SUMMARY] 34 blocks · 33 processed · 3 orphan · 236 instr

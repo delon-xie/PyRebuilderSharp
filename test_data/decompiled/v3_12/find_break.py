@@ -27,9 +27,6 @@ def test_until_broken(exprs):
         return 'CRASH'
     elif 'if ' in out:
         return f"{out}{None // 80}"
-    # orphan @0x01C0
-    # [WARN] 1 instructions not decompiled
-    #   @0x01BE: JUMP_BACKWARD arg=328
 def find_breaking_point(exprs, lo, hi):
     # orphan @0x000C
     mid = (lo + hi) // 2

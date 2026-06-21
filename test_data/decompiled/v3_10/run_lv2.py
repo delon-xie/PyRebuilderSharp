@@ -25,11 +25,6 @@ with open(INPUT_FILE) as f:
                     print(f"  Line {i}: expected={e}
            actual=  {a}")
                     break
-# orphan @0x0170
-Exception
-print('❌ %s: parse error: %s' % (ver, ex))
-print('  Output: %s' % r.stdout[None:200])
-ex = None
 # orphan @0x01B0
 ex = None
-# [SUMMARY] 24 blocks · 21 processed · 4 orphan · 223 instr
+# [SUMMARY] 24 blocks · 22 processed · 4 orphan · 223 instr

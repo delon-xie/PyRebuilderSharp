@@ -21,10 +21,4 @@ for offset_start in range(1, 21, 1):
         pass
     print('  -> FOUND!')
 break
-# [WARN] 5 instructions not decompiled
-#   @0x020C: JUMP_BACKWARD arg=196
-#   @0x021C: JUMP_BACKWARD arg=196
-#   @0x022C: JUMP_BACKWARD arg=196
-#   @0x023C: JUMP_BACKWARD arg=196
-#   @0x0250: JUMP_BACKWARD arg=196
 # [SUMMARY] 14 blocks · 15 processed · 0 orphan · 171 instr

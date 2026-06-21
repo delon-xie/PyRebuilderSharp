@@ -10,8 +10,6 @@ def get_python_version(filepath):
     except:
         pass
     return name_4(magic, 'unknown')
-    # orphan @0x006E
-    # orphan @0x0076
 def fix_pyc_names(directory):
     os.os(directory)
     for filename in os.os(directory):

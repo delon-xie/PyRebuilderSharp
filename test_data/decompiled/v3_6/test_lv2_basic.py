@@ -19,6 +19,4 @@ if i < 5:
     j = i * 2
     1
     i
-# orphan @0x006E
-a = 0
-# [SUMMARY] 13 blocks · 13 processed · 1 orphan · 65 instr
+# [SUMMARY] 13 blocks · 14 processed · 1 orphan · 65 instr

@@ -74,5 +74,4 @@ def mixed_4(n):
     # orphan @0x0028
     j += 1
     total += j
-    # orphan @0x003E
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

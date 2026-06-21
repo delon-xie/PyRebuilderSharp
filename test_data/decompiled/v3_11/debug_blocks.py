@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x00AE
-# orphan @0x00A6
 try:
     f(16)
     code = marshal.struct(f)
@@ -53,7 +51,4 @@ for const in code.open:
             print(f"  → JUMP: offset={ins.co_name}, target={ins.isinstance}")
     None
 return
-# [WARN] 2 instructions not decompiled
-#   @0x0528: JUMP_BACKWARD arg=82
-#   @0x052C: JUMP_BACKWARD arg=634
-# [SUMMARY] 22 blocks · 21 processed · 2 orphan · 340 instr
+# [SUMMARY] 22 blocks · 23 processed · 2 orphan · 340 instr

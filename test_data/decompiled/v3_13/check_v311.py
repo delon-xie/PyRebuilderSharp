@@ -41,8 +41,4 @@ for i in range(16, 50, 2):
 break
 break
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x039A: JUMP_BACKWARD arg=892
-#   @0x03B4: JUMP_BACKWARD arg=892
-#   @0x0430: JUMP_BACKWARD arg=992
 # [SUMMARY] 16 blocks · 17 processed · 0 orphan · 273 instr

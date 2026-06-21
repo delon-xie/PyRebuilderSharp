@@ -24,7 +24,4 @@ for (ver, py_path) in versions.items():
         print(f"  {line}")
     break
 break
-# [WARN] 2 instructions not decompiled
-#   @0x0144: JUMP_BACKWARD arg=296
-#   @0x014C: JUMP_BACKWARD arg=76
 # [SUMMARY] 7 blocks · 8 processed · 0 orphan · 85 instr

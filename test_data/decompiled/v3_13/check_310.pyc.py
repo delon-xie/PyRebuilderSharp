@@ -29,10 +29,5 @@ def dump_bytecode(c, depth):
         break
         break
     break
-    # [WARN] 4 instructions not decompiled
-    #   @0x004E: JUMP_BACKWARD arg=36
-    #   @0x0090: JUMP_BACKWARD arg=36
-    #   @0x0294: JUMP_BACKWARD arg=364
-    #   @0x02E6: JUMP_BACKWARD arg=36
 dump_bytecode(code)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 57 instr

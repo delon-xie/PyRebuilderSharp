@@ -3137,9 +3137,6 @@ def fib(n):
         finally:
             pass
         # orphan @0x0076
-        # orphan @0x00D6
-        SyntaxError
-        self.fail('Indented statement over multiple lines is valid')
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:

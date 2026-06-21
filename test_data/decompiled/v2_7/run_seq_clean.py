@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x00BC
-# orphan @0x00B1
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
@@ -50,5 +48,4 @@ passed = sum(<genexpr>(results.items()))
 total = len(results)
 return
 # orphan @0x0298
-# orphan @0x02AA
-# [SUMMARY] 32 blocks · 29 processed · 4 orphan · 304 instr
+# [SUMMARY] 32 blocks · 32 processed · 4 orphan · 304 instr

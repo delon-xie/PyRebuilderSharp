@@ -2872,7 +2872,6 @@ class SyntaxWarningTest(unittest.textwrap):
             compile(code, filename, mode)
         except:
             pass
-        # orphan @0x007E
     def test_return_in_finally(self):
         source = textwrap.textwrap("""
             def f():
@@ -3164,7 +3163,6 @@ def fib(n):
         raise
         raise
         raise
-        # orphan @0x006A
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:

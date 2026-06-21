@@ -2,7 +2,7 @@
 
 try:
     {}
-    for (k, v) in {}:
+    for (v, k) in {}:
         try:
             try:
                 {}
@@ -64,9 +64,4 @@ None
 v
 k
 known.items()
-# [WARN] 4 instructions not decompiled
-#   @0x0200: JUMP_BACKWARD arg=456
-#   @0x02AE: JUMP_BACKWARD arg=554
-#   @0x02CE: JUMP_BACKWARD arg=554
-#   @0x0374: JUMP_BACKWARD arg=554
 # [SUMMARY] 20 blocks · 21 processed · 0 orphan · 288 instr

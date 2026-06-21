@@ -14,5 +14,4 @@ try:
     a = 1
 except:
     pass
-# orphan @0x0056
-# [SUMMARY] 9 blocks · 9 processed · 1 orphan · 51 instr
+# [SUMMARY] 9 blocks · 10 processed · 1 orphan · 51 instr

@@ -182,11 +182,6 @@ class property(DynamicClassAttribute):
         self._attr_type == 'desc'
         # orphan @0x0060
         return getattr(instance._value_, self.name)
-        # orphan @0x006E
-        return ownerclass._member_map_[self.name]
-        # orphan @0x0084
-        # orphan @0x009E
-        # orphan @0x00A2
     def __set__(self, instance, value):
         if self.fset is not None:
             return self.fset(instance, value)
@@ -208,11 +203,8 @@ class _proto_member:
         """
         convert each quasi-member into an instance of the new enum class
         """
-        # orphan @0x00AC
-        exc = None
         # orphan @0x00A8
         None
-        # orphan @0x0086
         # orphan @0x0048
         enum_member = enum_class._new_member_(enum_class, **args)
         # orphan @0x0036
@@ -245,9 +237,6 @@ class _proto_member:
         enum_member._value_ = value
         # orphan @0x012A
         enum_class._all_bits_ = 2 ** enum_class._flag_mask_.bit_length() - 1
-        # orphan @0x013E
-        enum_member = enum_class._value2member_map_[value]
-        # orphan @0x0150
         # orphan @0x015A
         enum_class._member_map_.items()
         # orphan @0x016C
@@ -256,10 +245,7 @@ class _proto_member:
         # orphan @0x0180
         enum_member = canonical_member
         # orphan @0x018A
-        # orphan @0x0190
-        # orphan @0x0194
         # orphan @0x0196
-        # orphan @0x019A
         # orphan @0x01A4
         Flag is None
         # orphan @0x01B4
@@ -276,20 +262,9 @@ class _proto_member:
         _is_single_bit(value)
         # orphan @0x01FA
         enum_class._member_names_.append(member_name)
-        # orphan @0x0206
-        # orphan @0x020A
-        # orphan @0x020C
-        enum_class._add_member_(member_name, enum_member)
-        enum_class._value2member_map_.setdefault(value, enum_member)
-        value not in enum_class._hashable_values_
         # orphan @0x0234
         enum_class._hashable_values_.append(value)
         # orphan @0x0240
-        # orphan @0x0244
-        # orphan @0x024E
-        enum_class._unhashable_values_.append(value)
-        enum_class._unhashable_values_map_.setdefault(member_name, []).append(value)
-        # orphan @0x0278
 class EnumDict(dict):
     __doc__ = """
     Track enum member order and ensure member names are not reused.
@@ -416,11 +391,6 @@ class EnumDict(dict):
         single
         # orphan @0x0254
         value = auto_valued[0]
-        # orphan @0x025E
-        value = t(auto_valued)
-        # orphan @0x026C
-        # orphan @0x0276
-        # orphan @0x0288
         # orphan @0x028A
         non_auto_store
         key
@@ -434,7 +404,6 @@ class EnumDict(dict):
     def member_names(self):
         return list(self._member_names)
     def update(self, members):
-        # orphan @0x0024
         # orphan @0x001E
         try:
             for name in members.keys():
@@ -446,7 +415,6 @@ class EnumDict(dict):
         name
         self
         value
-        # orphan @0x004A
         # orphan @0x0052
         more_members.items()
         # orphan @0x005C
@@ -607,15 +575,6 @@ class EnumType(type):
         p.value = (bits & p.value[0]) + p.value[1:]
         # orphan @0x02C0
         # orphan @0x02C4
-        # orphan @0x02C6
-        '_%s__in_progress' % cls(delattr, '_%s__in_progress' % cls)
-        yield from False
-        enum_class
-        super().__new__(metacls, cls, bases, classdict, **kwds)
-        '_%s__in_progress' % cls
-        classdict
-        True
-        # orphan @0x0308
         # orphan @0x0312
         hasattr(e, '__notes__')
         # orphan @0x0326
@@ -623,13 +582,6 @@ class EnumType(type):
         # orphan @0x032A
         # orphan @0x032C
         None
-        # orphan @0x0330
-        def <genexpr>(.0):
-            .0
-            for n in .0:
-                yield repr(n)
-                break
-        # orphan @0x033C
         # orphan @0x033E
         ReprEnum is not None
         # orphan @0x0354
@@ -923,16 +875,6 @@ class EnumType(type):
         member_value
         # orphan @0x0108
         module is None
-        # orphan @0x0114
-        module = sys._getframemodulename(2)
-        # orphan @0x0124
-        # orphan @0x012E
-        module = sys._getframe(2).f_globals['__name__']
-        # orphan @0x014A
-        # orphan @0x015A
-        # orphan @0x0164
-        # orphan @0x0166
-        # orphan @0x016A
         # orphan @0x016C
         module is None
         # orphan @0x0176
@@ -953,18 +895,11 @@ class EnumType(type):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
-        # orphan @0x001C
-        members = EnumType._convert_.<locals>.<listcomp>(source.items())
-        members.sort(key=EnumType._convert_.<locals>.<lambda>)
         # orphan @0x0018
         source = module_globals
         module_globals = sys.modules[module].__dict__
         if source:
             source = source.__dict__
-        # orphan @0x0048
-        # orphan @0x0050
-        members.sort(key=EnumType._convert_.<locals>.<lambda>)
-        # orphan @0x006A
         # orphan @0x006C
         body = EnumType._convert_.<locals>.<dictcomp>(members)
         tmp_cls = type(name, (object), body)
@@ -1191,7 +1126,6 @@ class Enum:
     attributes -- see the documentation for details.
     """
     def __new__(cls, value):
-        # orphan @0x008C
         # orphan @0x0082
         return cls[name]
         # orphan @0x0072
@@ -1199,8 +1133,6 @@ class Enum:
         # orphan @0x0070
         # orphan @0x0062
         cls._member_map_.items()
-        # orphan @0x0010
-        return cls._value2member_map_[value]
         if type(value) is cls:
             return value
         elif cls._member_map_:
@@ -1208,19 +1140,11 @@ class Enum:
                 raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
             elif exc is None:
                 raise ve_exc
-        # orphan @0x0092
         # orphan @0x00B6
-        # orphan @0x00C2
-        exc = None
-        result = cls._missing_(value)
-        # orphan @0x00D6
         # orphan @0x00E0
         exc = e
         result = None
         None
-        # orphan @0x00F4
-        e = None
-        # orphan @0x0100
         # orphan @0x0102
         isinstance(result, cls)
         # orphan @0x0110
@@ -1250,13 +1174,9 @@ class Enum:
         # orphan @0x01A0
         # orphan @0x01A4
         None
-        # orphan @0x01A8
-        exc = None
-        ve_exc = None
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
-        # orphan @0x003E
         cls = self.__class__
         try:
             if value in cls._value2member_map_:
@@ -1271,12 +1191,6 @@ class Enum:
         # orphan @0x0066
         m is not self
         # orphan @0x006E
-        # orphan @0x008A
-        # orphan @0x00B2
-        # orphan @0x00BA
-        cls._unhashable_values_.append(value)
-        cls._unhashable_values_map_.setdefault(self.name, []).append(value)
-        # orphan @0x00E6
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         """
@@ -1287,19 +1201,9 @@ class Enum:
         count: the number of existing members
         last_values: the list of values assigned
         """
-        # orphan @0x001A
-        # orphan @0x0008
-        last_value = sorted(last_values).pop()
         if not last_values:
             return start
         # orphan @0x0022
-        # orphan @0x0032
-        # orphan @0x0036
-        # orphan @0x0038
-        return last_value + 1
-        # orphan @0x004A
-        # orphan @0x0060
-        # orphan @0x0064
     @classmethod
     def _missing_(cls, value):
         pass
@@ -1448,18 +1352,12 @@ class Flag(Enum):
         count: the number of existing members
         last_values: the last value assigned or None
         """
-        # orphan @0x0014
-        last_value = max(last_values)
-        high_bit = _high_bit(last_value)
         # orphan @0x0010
         return 1
         if count:
             if start is not None:
                 return start
-        # orphan @0x002A
         # orphan @0x0032
-        # orphan @0x0046
-        # orphan @0x004A
         # orphan @0x004C
         return 2 ** (high_bit + 1)
     @classmethod
@@ -1510,18 +1408,6 @@ class Flag(Enum):
         # orphan @0x0048
         # orphan @0x0046
         # orphan @0x0040
-        # orphan @0x001C
-        flag_mask = cls._flag_mask_
-        singles_mask = cls._singles_mask_
-        all_bits = cls._all_bits_
-        def <listcomp>(.0):
-            .0
-            []
-            for m in .0:
-                pass
-            return
-        value <= value
-        ~all_bits
         if not isinstance(value, int):
             raise ValueError('%r is not a valid %s' % (value, cls.__qualname__))
         # orphan @0x00F8
@@ -1593,8 +1479,6 @@ class Flag(Enum):
         # orphan @0x0298
         # orphan @0x029A
         unknown
-        # orphan @0x02A0
-        pseudo_member._name_ + '|%s' % cls._numeric_repr_(unknown)._name_ = pseudo_member
         # orphan @0x02B8
         # orphan @0x02BA
         pseudo_member._name_ = None
@@ -1906,43 +1790,6 @@ def _simple_enum(etype):
         body
         # orphan @0x00DA
         # orphan @0x00D6
-        # orphan @0x0050
-        gnv = '_generate_next_value_'
-        member_names = '_member_names_'
-        member_map = '_member_map_'
-        value2member_map = '_value2member_map_'
-        hashable_values = '_hashable_values_'
-        unhashable_values = '_unhashable_values_'
-        member_type = '_member_type_'
-        '_value_repr_'(issubclass, Flag)
-        body
-        body._value_repr_
-        '_unhashable_values_map_'._member_type_
-        '_unhashable_values_map_'._member_type_
-        body
-        {}
-        body
-        []
-        []
-        body
-        []
-        []
-        body
-        {}
-        {}
-        body
-        {}
-        {}
-        body
-        []
-        []
-        body
-        '_use_args_'._generate_next_value_
-        '_use_args_'._generate_next_value_
-        body
-        '_new_member_'
-        body
-        new_member
         # orphan @0x0048
         '__new_member__'
         body
@@ -1964,10 +1811,6 @@ def _simple_enum(etype):
         # orphan @0x0236
         gnv_last_values = []
         issubclass(enum_class, Flag)
-        # orphan @0x0248
-        single_bits = 0
-        multi_bits = 0
-        attrs.items()
         # orphan @0x025C
         # orphan @0x0260
         isinstance(value, auto)
@@ -1989,9 +1832,6 @@ def _simple_enum(etype):
         __new__ is None
         # orphan @0x02D2
         member._value_ = value
-        # orphan @0x02D8
-        contained = value2member_map.get(member._value_)
-        # orphan @0x02EA
         # orphan @0x02F4
         def <listcomp>(.0):
             .0
@@ -2010,8 +1850,6 @@ def _simple_enum(etype):
         # orphan @0x032E
         contained = m
         # orphan @0x0338
-        # orphan @0x033A
-        # orphan @0x033E
         # orphan @0x0340
         contained is not None
         # orphan @0x034A
@@ -2076,9 +1914,6 @@ def _simple_enum(etype):
         __new__ is None
         # orphan @0x04C2
         member._value_ = value
-        # orphan @0x04C8
-        contained = value2member_map.get(member._value_)
-        # orphan @0x04DA
         # orphan @0x04E4
         contained = None
         member._value_ in unhashable_values
@@ -2092,8 +1927,6 @@ def _simple_enum(etype):
         # orphan @0x051E
         contained = m
         # orphan @0x0528
-        # orphan @0x052A
-        # orphan @0x052E
         # orphan @0x0530
         contained is not None
         # orphan @0x053A
@@ -2111,19 +1944,9 @@ def _simple_enum(etype):
         member
         # orphan @0x0586
         enum_class._add_member_(name, member)
-        # orphan @0x0592
-        member_names.append(name)
-        gnv_last_values.append(value)
-        enum_class._value2member_map_.setdefault(value, member)
-        value not in hashable_values
         # orphan @0x05C0
         hashable_values.append(value)
         # orphan @0x05CA
-        # orphan @0x05CE
-        # orphan @0x05D8
-        enum_class._unhashable_values_.append(value)
-        enum_class._unhashable_values_map_.setdefault(name, []).append(value)
-        # orphan @0x0602
         # orphan @0x0604
         # orphan @0x0608
         # orphan @0x060A
@@ -2376,18 +2199,11 @@ def _old_convert_(etype, name, module, filter, source):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """
-    # orphan @0x001C
-    members = _old_convert_.<locals>.<listcomp>(source.items())
-    members.sort(key=_old_convert_.<locals>.<lambda>)
     # orphan @0x0018
     source = module_globals
     module_globals = sys.modules[module].__dict__
     if source:
         source = source.__dict__
-    # orphan @0x0048
-    # orphan @0x0050
-    members.sort(key=_old_convert_.<locals>.<lambda>)
-    # orphan @0x006A
     # orphan @0x006C
     boundary
     module

@@ -19,7 +19,6 @@ def recursive_repr(fillvalue = '...'):
             cell_4.add(key)
             cell_4.discard(key)
             return result
-            # orphan @0x00BA
         wrapper.__module__ = getattr(cell_0, '__module__')
         wrapper.__doc__ = getattr(cell_0, '__doc__')
         wrapper.__name__ = getattr(cell_0, '__name__')
@@ -107,8 +106,6 @@ class Repr:
         repr1 = self.repr1
         elem
         islice(x, maxiter)
-        # [WARN] 1 instructions not decompiled
-        #   @0x009A: JUMP_BACKWARD arg=26
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
@@ -136,8 +133,6 @@ class Repr:
             return '{}'
         elif level <= 0:
             return '{' + self.fillvalue + '}'
-        # [WARN] 1 instructions not decompiled
-        #   @0x0112: JUMP_BACKWARD arg=94
     def repr_str(self, x, level):
         s = x(None // self.maxstring)
         if len(s) > self.maxstring:
@@ -183,7 +178,6 @@ class Repr:
         exc = None
         return
         # orphan @0x0232
-        # orphan @0x0234
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -198,7 +192,6 @@ class Repr:
         return s
         return
         # orphan @0x0178
-        # orphan @0x017A
 def _possibly_sorted(x):
     try:
         sorted(x)
@@ -207,7 +200,6 @@ def _possibly_sorted(x):
     return
     return
     # orphan @0x0046
-    # orphan @0x0048
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 45 instr

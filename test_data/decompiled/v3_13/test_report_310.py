@@ -44,11 +44,4 @@ else:
 print('============================================================')
 print(f"总计: {passed} PASS, {failed} FAIL")
 print('============================================================')
-# [WARN] 6 instructions not decompiled
-#   @0x01BE: JUMP_BACKWARD arg=188
-#   @0x01C2: JUMP_BACKWARD arg=188
-#   @0x01D4: JUMP_BACKWARD arg=188
-#   @0x01E4: JUMP_BACKWARD arg=188
-#   @0x020C: JUMP_BACKWARD arg=188
-#   @0x0214: JUMP_BACKWARD arg=188
 # [SUMMARY] 24 blocks · 25 processed · 0 orphan · 204 instr

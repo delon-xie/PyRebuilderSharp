@@ -59,15 +59,4 @@ for (old, new) in conflicts:
     print(f"  Removing {os.path.basename(old)}")
     os.remove(old)
 break
-# [WARN] 11 instructions not decompiled
-#   @0x0072: JUMP_BACKWARD arg=62
-#   @0x018E: JUMP_BACKWARD arg=62
-#   @0x01A0: JUMP_BACKWARD arg=62
-#   @0x0264: JUMP_BACKWARD arg=62
-#   @0x02E4: JUMP_BACKWARD arg=664
-#   @0x030E: JUMP_BACKWARD arg=664
-#   @0x03DA: JUMP_BACKWARD arg=844
-#   @0x046E: JUMP_BACKWARD arg=1014
-#   @0x0494: JUMP_BACKWARD arg=1156
-#   @0x049C: JUMP_BACKWARD arg=1156
 # [SUMMARY] 35 blocks · 35 processed · 0 orphan · 302 instr

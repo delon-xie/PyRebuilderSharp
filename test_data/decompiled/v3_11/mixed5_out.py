@@ -70,7 +70,4 @@ def mixed_4(n):
     total = 0
     None
     # orphan @0x0060
-    # orphan @0x008E
-    # [WARN] 1 instructions not decompiled
-    #   @0x007A: JUMP_BACKWARD arg=72
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

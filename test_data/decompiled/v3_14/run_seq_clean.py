@@ -58,7 +58,7 @@ raise
 def <genexpr>(.0):
     try:
         .0
-        for _ in .0:
+        for (r, v) in .0:
             try:
                 try:
                     .0
@@ -71,21 +71,11 @@ def <genexpr>(.0):
                 pass
             else:
                 1
-        return None
     except:
         pass
-    # [WARN] 2 instructions not decompiled
-    #   @0x0022: JUMP_BACKWARD arg=8
-    #   @0x002E: JUMP_BACKWARD arg=8
 []
 raise
 e = None
 # orphan @0x0588
 # orphan @0x060A
-# orphan @0x060C
-# [WARN] 4 instructions not decompiled
-#   @0x0222: JUMP_BACKWARD arg=372
-#   @0x041A: JUMP_BACKWARD arg=934
-#   @0x0472: JUMP_BACKWARD arg=372
-#   @0x05FE: JUMP_BACKWARD arg=372
-# [SUMMARY] 54 blocks · 52 processed · 6 orphan · 376 instr
+# [SUMMARY] 54 blocks · 53 processed · 6 orphan · 376 instr

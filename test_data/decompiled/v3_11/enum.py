@@ -239,7 +239,6 @@ class _proto_member:
         raise new_exc
         raise
         raise
-        # orphan @0x0500
         # orphan @0x0506
         enum_class(member_name, enum_member)
         enum_class._add_member_
@@ -337,7 +336,6 @@ class EnumDict(dict):
         self._ignore.append
         raise
         raise
-        # orphan @0x0668
     member_names = member_names()
     def update(self, members):
         try:
@@ -364,9 +362,6 @@ class EnumDict(dict):
         return
         raise
         # orphan @0x0064
-        # orphan @0x007E
-        # [WARN] 1 instructions not decompiled
-        #   @0x0046: JUMP_BACKWARD arg=28
 _EnumDict = EnumDict
 class EnumType(type):
     __doc__ = """
@@ -680,7 +675,6 @@ class EnumType(type):
         raise
         raise
         # orphan @0x02E4
-        # orphan @0x0354
     def _convert_(cls, name, module, filter, source = None):
         """
         Create a new Enum subclass that replaces a collection of global constants
@@ -710,7 +704,6 @@ class EnumType(type):
         return cls
         raise
         raise
-        # orphan @0x00FE
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -842,7 +835,6 @@ class Enum(EnumType):
         exc = e
         result = None
         # orphan @0x0230
-        # orphan @0x03A8
     def _add_alias_(self, name):
         self.__class__(name, self)
     def _add_value_alias_(self, value):
@@ -906,8 +898,6 @@ class Enum(EnumType):
             sorted
         names = set([](('__class__', '__doc__', '__eq__', '__hash__', '__module__')) | interesting)
         return names
-        # [WARN] 1 instructions not decompiled
-        #   @0x027C: JUMP_BACKWARD arg=316
     def __format__(self, format_spec):
         return str(str(self), format_spec)
     def __hash__(self):
@@ -1308,13 +1298,6 @@ def _simple_enum(etype = Enum):
         raise
         raise
         '__new__'
-        # orphan @0x06A6
-        # orphan @0x0B20
-        # orphan @0x0D8E
-        # [WARN] 3 instructions not decompiled
-        #   @0x069E: JUMP_BACKWARD arg=46
-        #   @0x0B18: JUMP_BACKWARD arg=46
-        #   @0x0CE8: JUMP_BACKWARD arg=918
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1391,8 +1374,6 @@ class verify:
                 missing(i)
             raise Exception('verify: unknown type %r' % enum_type)
         return
-        # [WARN] 1 instructions not decompiled
-        #   @0x0572: JUMP_BACKWARD arg=206
 def _test_simple_enum(checked_enum, simple_enum):
     """
     A function that can be used to test an enum created with :func:`_simple_enum`
@@ -1495,8 +1476,6 @@ def _test_simple_enum(checked_enum, simple_enum):
    """(failed))
     # orphan @0x068C
     failed_member
-    # [WARN] 1 instructions not decompiled
-    #   @0x068A: JUMP_BACKWARD arg=258
 def _old_convert_(etype, name, module, filter, source = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
@@ -1520,5 +1499,4 @@ def _old_convert_(etype, name, module, filter, source = None):
     return cls
     raise
     raise
-    # orphan @0x00FE
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 308 instr

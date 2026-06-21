@@ -29,7 +29,4 @@ for ver in versions:
         pass
 # orphan @0x0172
 # orphan @0x0174
-# orphan @0x0178
-# orphan @0x01B4
-ex = None
-# [SUMMARY] 22 blocks · 19 processed · 4 orphan · 221 instr
+# [SUMMARY] 22 blocks · 21 processed · 4 orphan · 221 instr

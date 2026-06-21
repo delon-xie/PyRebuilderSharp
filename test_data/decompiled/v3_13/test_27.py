@@ -17,7 +17,4 @@ for (i, line) in enumerate(lines):
     else:
         print(f"Line {i}: {line}")
 break
-# [WARN] 2 instructions not decompiled
-#   @0x014E: JUMP_BACKWARD arg=310
-#   @0x016E: JUMP_BACKWARD arg=310
 # [SUMMARY] 6 blocks · 7 processed · 0 orphan · 106 instr

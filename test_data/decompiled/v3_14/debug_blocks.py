@@ -67,15 +67,4 @@ for const in code.co_consts:
     sorted_leaders = sorted(leaders)
     enumerate(sorted_leaders)
 raise
-# [WARN] 16 instructions not decompiled
-#   @0x00EE: JUMP_BACKWARD arg=180
-#   @0x0114: JUMP_BACKWARD arg=180
-#   @0x01F2: JUMP_BACKWARD arg=366
-#   @0x0218: JUMP_BACKWARD arg=366
-#   @0x0296: JUMP_BACKWARD arg=366
-#   @0x02EC: JUMP_BACKWARD arg=366
-#   @0x03E2: JUMP_BACKWARD arg=938
-#   @0x03EA: JUMP_BACKWARD arg=938
-#   @0x03F2: JUMP_BACKWARD arg=938
-#   @0x0510: JUMP_BACKWARD arg=1278
 # [SUMMARY] 71 blocks · 72 processed · 0 orphan · 405 instr

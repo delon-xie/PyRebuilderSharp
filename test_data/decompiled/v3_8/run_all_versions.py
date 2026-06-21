@@ -1,8 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x007E
-print('Failed to parse expected source')
-sys.exit(1)
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
@@ -48,4 +45,4 @@ passed = sum(<genexpr>(results.items()))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
 # orphan @0x0214
-# [SUMMARY] 31 blocks · 30 processed · 2 orphan · 344 instr
+# [SUMMARY] 31 blocks · 31 processed · 2 orphan · 344 instr

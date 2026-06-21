@@ -75,12 +75,4 @@ elif t in (90, 122):
     data
 break
 raise
-# [WARN] 7 instructions not decompiled
-#   @0x0178: JUMP_BACKWARD arg=102
-#   @0x0548: JUMP_BACKWARD arg=24
-#   @0x0564: JUMP_BACKWARD arg=526
-#   @0x058E: JUMP_BACKWARD arg=568
-#   @0x0616: JUMP_BACKWARD arg=704
-#   @0x06F6: JUMP_BACKWARD arg=928
-#   @0x0748: JUMP_BACKWARD arg=1746
 # [SUMMARY] 46 blocks · 47 processed · 0 orphan · 575 instr

@@ -83,6 +83,4 @@ print(f"Output ({len(content)} bytes):
 {content[None:300]}")
 print(f"Error: {r2.code[None:200]}")
 None
-# orphan @0x01E4
-# orphan @0x0452
-# [SUMMARY] 20 blocks · 19 processed · 2 orphan · 290 instr
+# [SUMMARY] 20 blocks · 21 processed · 2 orphan · 290 instr

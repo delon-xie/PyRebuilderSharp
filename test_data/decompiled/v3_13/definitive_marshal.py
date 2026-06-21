@@ -2,7 +2,7 @@
 
 try:
     {}
-    for (k, v) in {}:
+    for (v, k) in {}:
         try:
             try:
                 {}
@@ -68,9 +68,4 @@ Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={co
     print(f"Match: {code2.co_argcount == code.co_argcount}")
     return None
 break
-# [WARN] 4 instructions not decompiled
-#   @0x01E2: JUMP_BACKWARD arg=428
-#   @0x027C: JUMP_BACKWARD arg=524
-#   @0x0292: JUMP_BACKWARD arg=524
-#   @0x0330: JUMP_BACKWARD arg=524
 # [SUMMARY] 20 blocks · 20 processed · 0 orphan · 286 instr

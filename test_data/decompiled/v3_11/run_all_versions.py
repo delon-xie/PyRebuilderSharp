@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x01B2
-# orphan @0x01AE
-# orphan @0x0122
-# orphan @0x011A
 try:
     expected_src = f()
     f.read
@@ -109,9 +105,4 @@ raise
 # orphan @0x04AC
 print(f"❌ {ver}: AST parse failed - {e}")
 print(f"  Decompiled: {actual_src[None:200]}")
-# orphan @0x051A
-# [WARN] 3 instructions not decompiled
-#   @0x0486: JUMP_BACKWARD arg=184
-#   @0x04A0: JUMP_BACKWARD arg=730
-#   @0x050E: JUMP_BACKWARD arg=840
-# [SUMMARY] 32 blocks · 27 processed · 6 orphan · 409 instr
+# [SUMMARY] 32 blocks · 32 processed · 6 orphan · 409 instr

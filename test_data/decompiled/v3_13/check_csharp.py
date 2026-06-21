@@ -39,6 +39,4 @@ elif type2 == 115:
     return None
 break
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x0134: JUMP_BACKWARD arg=200
 # [SUMMARY] 20 blocks · 21 processed · 0 orphan · 266 instr

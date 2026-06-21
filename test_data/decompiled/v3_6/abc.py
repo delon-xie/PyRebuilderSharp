@@ -132,9 +132,6 @@ class ABCMeta(type):
         # orphan @0x002A
         # orphan @0x0032
         cls._abc_registry.add(subclass)
-        # orphan @0x003C
-        ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
-        return subclass
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)

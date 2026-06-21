@@ -81,8 +81,6 @@ def depth_5_while():
                                     while e > 0:
                                         pass
 def depth_5_try():
-    # orphan @0x0016
-    result = -1
     result = 0
     try:
         try:
@@ -91,19 +89,13 @@ def depth_5_try():
                     try:
                         result = 42
                     except:
-                        return None
+                        pass
                 except:
-                    return None
+                    pass
             except:
                 pass
         except:
             pass
     except:
         result = -5
-    # orphan @0x0026
-    result = -2
-    # orphan @0x0036
-    result = -3
-    # orphan @0x0052
-    result = -4
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

@@ -71,24 +71,17 @@ ver
 results
 True
 # orphan @0x0206
-# orphan @0x020A
-Exception
-print(f"❌ {ver}: AST parse failed - {e}")
-print(f"  Decompiled: {actual_src[None:200]}")
-yield from results
+# orphan @0x0258
 def <genexpr>(.0):
     .0
     for (v, r) in .0:
         if r:
             yield 1
             break
-False
-# orphan @0x0258
-e = None
 # orphan @0x0262
 print(f"
 {'========================================'}")
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-# [SUMMARY] 34 blocks · 7 processed · 28 orphan · 347 instr
+# [SUMMARY] 34 blocks · 8 processed · 28 orphan · 347 instr

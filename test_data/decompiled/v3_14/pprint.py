@@ -32,11 +32,11 @@ from io import StringIO as _StringIO
 __all__ = ('pprint', 'pformat', 'isreadable', 'isrecursive', 'saferepr', 'PrettyPrinter', 'pp')
 def pprint(object, stream, indent, width, depth):
     """Pretty-print a Python object to a stream [default is sys.stdout]."""
-    printer = indent(stream, depth, width, expand, compact, sort_dicts, underscore_numbers, ('stream', 'indent', 'width', 'depth', 'compact', 'expand', 'sort_dicts', 'underscore_numbers'))
+    printer = stream(indent, width, depth, compact, expand, sort_dicts, underscore_numbers, ('stream', 'indent', 'width', 'depth', 'compact', 'expand', 'sort_dicts', 'underscore_numbers'))
     printer.pprint(object)
 def pformat(object, indent, width, depth):
     """Format a Python object into a pretty-printed representation."""
-    return width(indent, depth, expand, compact, sort_dicts, underscore_numbers, ('indent', 'width', 'depth', 'compact', 'expand', 'sort_dicts', 'underscore_numbers')).pformat(object)
+    return indent(width, depth, compact, expand, sort_dicts, underscore_numbers, ('indent', 'width', 'depth', 'compact', 'expand', 'sort_dicts', 'underscore_numbers')).pformat(object)
 def pp(object):
     """Pretty-print a Python object"""
     [object](**kwargs)
@@ -61,7 +61,7 @@ _safe_key applied to both the key and the value.
 """
     __slots__ = ['obj']
     def __init__(self, obj):
-        self.obj = obj
+        obj.obj = self
     def __lt__(self, other):
         try:
             self.obj < other.obj
@@ -70,7 +70,6 @@ _safe_key applied to both the key and the value.
         return
         return
         # orphan @0x011E
-        # orphan @0x0120
     __static_attributes__ = ['obj']
     __classdictcell__ = __classdict__
 def _safe_tuple(t):
@@ -139,12 +138,12 @@ underscore_numbers
         elif compact and expand:
             raise ValueError('compact and expand are incompatible')
     def pprint(self, object):
-        self._format(self, object._stream, 0, 0, {}, 0)
+        self._format(object, self._stream, 0, 0, {}, 0)
         self._stream.write("""
 """)
     def pformat(self, object):
         sio = _StringIO()
-        self._format(sio, object, 0, 0, {}, 0)
+        self._format(object, sio, 0, 0, {}, 0)
         return sio.getvalue()
     def isrecursive(self, object):
         return self.format(object, {}, 0, 0)[2]
@@ -154,17 +153,17 @@ underscore_numbers
         return
     def _format(self, object, stream, indent, allowance, context, level):
         objid = id(object)
-        if context in objid:
+        if objid in context:
             stream.write(_recursion(object))
             True._recursive = self
             False._readable = self
             return None
-        rep = self._repr(context, object, level)
+        rep = self._repr(object, context, level)
         max_width = self._width - indent - allowance
         if len(rep) > max_width:
             p = self._dispatch.get(type(object).__repr__, None)
             from dataclasses import is_dataclass
-            p(object, self, indent, stream, context, allowance, level + 1)
+            p(self, object, stream, indent, allowance, context, level + 1)
             return None
         stream.write(rep)
         # orphan @0x01B2
@@ -177,7 +176,7 @@ underscore_numbers
         # orphan @0x024E
         '__create_fn__' in object.__repr__.__wrapped__.__qualname__
         # orphan @0x0298
-        self._pprint_dataclass(stream, object, allowance, indent, level, context + 1)
+        self._pprint_dataclass(object, stream, indent, allowance, context, level + 1)
     def _format_block_start(self, start_str, indent):
         """
 """
@@ -195,7 +194,7 @@ underscore_numbers
     def _child_indent(self, indent, prefix_len):
         if self._expand:
             return indent
-        return prefix_len + indent
+        return indent + prefix_len
     def _write_indent_padding(self, write):
         if self._expand and (self._indent_per_level > 0):
             write(self._indent_per_level * ' ')
@@ -215,22 +214,19 @@ underscore_numbers
                 if not True:
                     pass
             stream.write(self._format_block_start(cls_name + '(', indent))
-            self._format_namespace_items(stream, items, allowance, indent, level, context)
-            stream.write(self._format_block_end(')', self - indent._indent_per_level))
+            self._format_namespace_items(items, stream, indent, allowance, context, level)
+            stream.write(self._format_block_end(')', indent - self._indent_per_level))
             return None
         except:
             break
         from dataclasses import fields as dataclass_fields
         cls_name = object.__class__.__name__
         if self._expand:
-            indent = self + indent._indent_per_level
+            indent += self._indent_per_level
         else:
             indent += len(cls_name) + 1
         f
         dataclass_fields(object)
-        # [WARN] 2 instructions not decompiled
-        #   @0x00F6: JUMP_BACKWARD arg=206
-        #   @0x013C: JUMP_BACKWARD arg=206
     _dispatch = {}
     def _pprint_dict(self, object, stream, indent, allowance, context, level):
         """{"""
@@ -242,7 +238,7 @@ underscore_numbers
             items = object.items()(name_14, ('key',))
         else:
             items = object.items()
-        self._format_dict_items(stream, items, allowance, indent + 1, level, context)
+        self._format_dict_items(items, stream, indent, allowance + 1, context, level)
         write(self._format_block_end('}', indent))
     def _pprint_frozendict(self, object, stream, indent, allowance, context, level):
         write = stream.write
@@ -268,23 +264,23 @@ underscore_numbers
         stream.write(')')
     def _pprint_dict_view(self, object, stream, indent, allowance, context, level):
         """Pretty print dict views (keys, values, items)."""
-        if isinstance(self, object._dict_items_view):
+        if isinstance(object, self._dict_items_view):
             key = write
         else:
             key = __class__
         write = stream.write
         write(self._format_block_start(object.__class__.__name__ + '([', indent))
         if len(object) and self._sort_dicts:
-            entries = key(object, ('key',))
+            entries = object(key, ('key',))
         else:
             entries = object
-        self._format_items(stream, entries, allowance, indent + 2, level, context)
+        self._format_items(entries, stream, indent, allowance + 2, context, level)
         write(self._format_block_end('])', indent))
     def _pprint_mapping_abc_view(self, object, stream, indent, allowance, context, level):
         """Pretty print mapping views from collections.abc."""
         write = stream.write
         write(object.__class__.__name__ + '(')
-        self._format(object._mapping, indent, stream, context, allowance, level)
+        self._format(object._mapping, stream, indent, allowance, context, level)
         write(')')
     _dict_keys_view = type({}.keys())
     _dict_values_view = type({}.values())
@@ -293,8 +289,6 @@ underscore_numbers
     {'compact': False, 'expand': False, 'sort_dicts': True, 'underscore_numbers': False}
     cls
     (_dict_keys_view, _dict_values_view, _dict_items_view, _collections.abc.MappingView)
-    # [WARN] 1 instructions not decompiled
-    #   @0x027A: JUMP_BACKWARD arg=606
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})
 def _recursion(object):
     """<Recursion on """
@@ -311,7 +305,7 @@ def _wrap_bytes_repr(object, width, allowance):
                     last = len(object) // 4 * 4
                     range(0, len(object), 4)
                     try:
-                        width = allowance - width
+                        width -= allowance
                         try:
                             try:
                                 pass
@@ -323,8 +317,8 @@ def _wrap_bytes_repr(object, width, allowance):
                         pass
                 except:
                     pass
-                part = i[object:i + 4]
-                candidate = part + current
+                part = object[i:i + 4]
+                candidate = current + part
             except:
                 pass
             current = candidate
@@ -333,7 +327,4 @@ def _wrap_bytes_repr(object, width, allowance):
             pass
     except:
         pass
-    # [WARN] 2 instructions not decompiled
-    #   @0x0110: JUMP_BACKWARD arg=104
-    #   @0x0118: JUMP_BACKWARD arg=104
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 111 instr

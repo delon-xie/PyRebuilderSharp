@@ -145,5 +145,4 @@ class ABC:
     inheritance.
     """
     __slots__ = []
-# orphan @0x006A
-# [SUMMARY] 6 blocks · 6 processed · 1 orphan · 93 instr
+# [SUMMARY] 6 blocks · 7 processed · 1 orphan · 93 instr

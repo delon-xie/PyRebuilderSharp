@@ -7,5 +7,4 @@ for i in range(3):
         total += 1
     except:
         pass
-# orphan @0x0020
-# [SUMMARY] 5 blocks · 5 processed · 1 orphan · 26 instr
+# [SUMMARY] 5 blocks · 6 processed · 1 orphan · 26 instr

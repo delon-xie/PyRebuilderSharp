@@ -82,8 +82,4 @@ while i < len(lines):
                                 print('======================================================================')
 break
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x0310: JUMP_BACKWARD arg=384
-#   @0x0338: JUMP_BACKWARD arg=172
-#   @0x0490: JUMP_BACKWARD arg=1002
 # [SUMMARY] 37 blocks · 36 processed · 2 orphan · 398 instr

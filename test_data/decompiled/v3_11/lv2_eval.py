@@ -20,8 +20,4 @@ for n in range(5):
     a = n == 3
     break
 raise
-# orphan @0x0080
-# orphan @0x0084
-# [WARN] 1 instructions not decompiled
-#   @0x0068: JUMP_BACKWARD arg=36
-# [SUMMARY] 22 blocks · 20 processed · 3 orphan · 77 instr
+# [SUMMARY] 22 blocks · 23 processed · 3 orphan · 77 instr

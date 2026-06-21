@@ -10,9 +10,6 @@ def get_python_version(filepath):
         pass
     open(filepath, 'rb')
     return name_4.get(magic, 'unknown')
-    # orphan @0x008C
-    # [WARN] 1 instructions not decompiled
-    #   @0x008A: JUMP_BACKWARD arg=62
 def fix_pyc_names(directory):
     os.listdir(directory)
     for filename in os.listdir(directory):
@@ -44,14 +41,6 @@ def fix_pyc_names(directory):
         if match:
             old_ver = match.group(1)
             new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
-    # [WARN] 7 instructions not decompiled
-    #   @0x0056: JUMP_BACKWARD arg=44
-    #   @0x00B8: JUMP_BACKWARD arg=142
-    #   @0x00CA: JUMP_BACKWARD arg=160
-    #   @0x010E: JUMP_BACKWARD arg=24
-    #   @0x01DA: JUMP_BACKWARD arg=432
-    #   @0x0280: JUMP_BACKWARD arg=598
-    #   @0x02D2: JUMP_BACKWARD arg=680
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

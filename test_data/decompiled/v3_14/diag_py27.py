@@ -73,7 +73,4 @@ break
 raise
 break
 raise
-# [WARN] 2 instructions not decompiled
-#   @0x0470: JUMP_BACKWARD arg=188
-#   @0x04AE: JUMP_BACKWARD arg=188
 # [SUMMARY] 22 blocks · 23 processed · 0 orphan · 280 instr

@@ -22,5 +22,4 @@ except IOError:
     pass
 # orphan @0x007D
 x = 0
-# orphan @0x009D
-# [SUMMARY] 18 blocks · 17 processed · 2 orphan · 75 instr
+# [SUMMARY] 18 blocks · 18 processed · 2 orphan · 75 instr

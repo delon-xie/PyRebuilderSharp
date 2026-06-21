@@ -30,11 +30,6 @@ def depth_5_for():
                         total += 1
         None
     return
-    # [WARN] 4 instructions not decompiled
-    #   @0x00BC: JUMP_BACKWARD arg=52
-    #   @0x00BE: JUMP_BACKWARD arg=88
-    #   @0x00C0: JUMP_BACKWARD arg=124
-    #   @0x00C2: JUMP_BACKWARD arg=160
 def depth_5_while():
     total = 0
     a = 2
@@ -54,7 +49,6 @@ def depth_5_while():
     e -= 1
     total += 1
 def depth_5_try():
-    # orphan @0x001E
     try:
         result = 42
     except:
@@ -80,10 +74,6 @@ def depth_5_try():
     except:
         pass
     result = 0
-    # orphan @0x0046
-    # orphan @0x004A
     # orphan @0x0058
     result = -4
-    # orphan @0x0060
-    # orphan @0x0066
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

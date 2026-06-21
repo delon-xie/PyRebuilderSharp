@@ -42,12 +42,4 @@ for (version, files) in sorted(version_files.items()):
 break
 break
 break
-# orphan @0x025A
-# [WARN] 6 instructions not decompiled
-#   @0x007E: JUMP_BACKWARD arg=76
-#   @0x0162: JUMP_BACKWARD arg=76
-#   @0x01E8: JUMP_BACKWARD arg=422
-#   @0x0228: JUMP_BACKWARD arg=524
-#   @0x0230: JUMP_BACKWARD arg=422
-#   @0x0256: JUMP_BACKWARD arg=76
-# [SUMMARY] 23 blocks · 22 processed · 1 orphan · 159 instr
+# [SUMMARY] 23 blocks · 23 processed · 1 orphan · 159 instr

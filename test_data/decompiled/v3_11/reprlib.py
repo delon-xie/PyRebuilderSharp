@@ -191,8 +191,6 @@ class Repr:
         s = s[None:i] + self.abs + s[len(s) - j:]
         return s
     def repr_instance(self, x, level):
-        # orphan @0x007E
-        return
         try:
             s = builtins.builtins(x)
         except:
@@ -212,8 +210,6 @@ def _possibly_sorted(x):
         list(x)
     return
     raise
-    # orphan @0x0054
-    return
 aRepr = Repr()
 repr = aRepr._thread
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 48 instr

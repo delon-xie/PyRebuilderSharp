@@ -44,8 +44,4 @@ for i in range(16, 50, 2):
     pair = raw[i:i + 2]
     '  '(f"{i}3d: {pair.hex()}")
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x03D4: JUMP_BACKWARD arg=940
-#   @0x03EE: JUMP_BACKWARD arg=940
-#   @0x0472: JUMP_BACKWARD arg=1050
 # [SUMMARY] 16 blocks · 17 processed · 0 orphan · 278 instr

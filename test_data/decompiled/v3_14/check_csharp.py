@@ -44,6 +44,4 @@ elif type2 == 115:
     print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
     return None
 raise
-# [WARN] 1 instructions not decompiled
-#   @0x017C: JUMP_BACKWARD arg=248
 # [SUMMARY] 20 blocks · 21 processed · 0 orphan · 276 instr

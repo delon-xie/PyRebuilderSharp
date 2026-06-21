@@ -80,8 +80,6 @@ class Repr:
         repr1 = self.repr1
         elem
         pieces.append(self.fillvalue)
-        # [WARN] 1 instructions not decompiled
-        #   @0x00A2: JUMP_BACKWARD arg=142
     def repr_tuple(self, x, level):
         return
     def repr_list(self, x, level):
@@ -109,8 +107,6 @@ class Repr:
             return '{}'
         elif level <= 0:
             return '{' + self.fillvalue + '}'
-        # [WARN] 1 instructions not decompiled
-        #   @0x0116: JUMP_BACKWARD arg=186
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -150,7 +146,6 @@ class Repr:
         exc = None
         return
         # orphan @0x023C
-        # orphan @0x023E
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -163,7 +158,6 @@ class Repr:
         return s
         return
         # orphan @0x017E
-        # orphan @0x0180
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
 def _possibly_sorted(x):
     try:
@@ -173,7 +167,6 @@ def _possibly_sorted(x):
     return
     return
     # orphan @0x0048
-    # orphan @0x004A
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

@@ -19,8 +19,4 @@ range(10)
 for n in range(10):
     m = n + 1
 break
-# orphan @0x0084
-# [WARN] 2 instructions not decompiled
-#   @0x0044: JUMP_BACKWARD arg=36
-#   @0x0068: JUMP_BACKWARD arg=88
-# [SUMMARY] 12 blocks · 9 processed · 3 orphan · 55 instr
+# [SUMMARY] 12 blocks · 11 processed · 3 orphan · 55 instr

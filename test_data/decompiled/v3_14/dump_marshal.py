@@ -68,11 +68,4 @@ elif t in (90, 122):
     pos += length
     print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
 raise
-# [WARN] 6 instructions not decompiled
-#   @0x01E4: JUMP_BACKWARD arg=360
-#   @0x06D4: JUMP_BACKWARD arg=1726
-#   @0x06F4: JUMP_BACKWARD arg=1144
-#   @0x0724: JUMP_BACKWARD arg=1144
-#   @0x07D4: JUMP_BACKWARD arg=1144
-#   @0x08BE: JUMP_BACKWARD arg=1144
 # [SUMMARY] 45 blocks · 46 processed · 0 orphan · 590 instr

@@ -74,10 +74,6 @@ class Repr:
         # orphan @0x004C
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
-        # orphan @0x0068
-        TypeError
-        # orphan @0x008A
-        error = None
         # orphan @0x0096
         error = None
         # orphan @0x00A0

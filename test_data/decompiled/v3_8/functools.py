@@ -543,33 +543,6 @@ def lru_cache(maxsize, typed):
         return update_wrapper(wrapper, user_function)
     return decorating_function
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
-    # orphan @0x0010
-    None: == 0
-    [[], root, None, None]
-    lock
-    RLock()
-    cache_len
-    cache_get.__len__
-    full.get
-    False
-    misses
-    hits
-    0
-    0
-    cache
-    {}
-    RESULT
-    KEY
-    NEXT
-    PREV
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    *(0, 1, 2, 3)
-    make_key
-    _make_key
-    sentinel
-    object()
     if not True:
         raise TypeError('the first argument must be callable')
     # orphan @0x0068
@@ -592,28 +565,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             last = link_prev[link_next]
             yield from hits
             return last
-        # orphan @0x007E
-        yield from 1
         # orphan @0x00A8
         # orphan @0x00AA
-        # orphan @0x00AE
-        oldkey = oldroot[oldroot][root]
-        oldresult = oldroot[result]
-        key
-        oldroot
-        oldkey
-        None
-        None
-        key
-        # orphan @0x00FA
-        link = [last, key, result]
-        full
-        last >= key()
-        last
-        link
-        link
-        # orphan @0x0130
-        return result
     ()
     # orphan @0x00C6
     def cache_info():
@@ -800,10 +753,6 @@ class singledispatchmethod:
         except AttributeError:
             pass
         return f"<single dispatch method descriptor {name}>"
-        # orphan @0x002A
-        # orphan @0x0032
-        name = '?'
-        # orphan @0x0040
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         self._unbound = unbound
@@ -817,14 +766,8 @@ class _singledispatchmethod_get:
         0
         # orphan @0x003A
         self.__module__ = func.__module__
-        # orphan @0x004C
-        # orphan @0x0054
-        # orphan @0x005E
         # orphan @0x0060
         self.__doc__ = func.__doc__
-        # orphan @0x006E
-        # orphan @0x0076
-        # orphan @0x0080
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -832,10 +775,6 @@ class _singledispatchmethod_get:
             pass
         if self._obj is not None:
             return f"<bound single dispatch method {name} of {self._obj!r}>"
-        # orphan @0x0026
-        # orphan @0x002E
-        name = '?'
-        # orphan @0x003C
         # orphan @0x0062
         return f"<single dispatch method {name}>"
     def __call__(self):
@@ -888,7 +827,6 @@ class cached_property:
     def __get__(self, instance, owner):
         # orphan @0x0032
         msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
-        # orphan @0x002A
         # orphan @0x001E
         cache = instance.__dict__
         # orphan @0x0016
@@ -896,8 +834,6 @@ class cached_property:
         self.attrname is None
         if instance is None:
             return self
-        # orphan @0x005C
-        # orphan @0x0060
         # orphan @0x0062
         val = cache.get(self.attrname, _NOT_FOUND)
         val is _NOT_FOUND
@@ -905,11 +841,8 @@ class cached_property:
         val = self.func(instance)
         yield from cache
         val
-        # orphan @0x0092
         # orphan @0x009A
         msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
-        # orphan @0x00C4
-        # orphan @0x00C8
         # orphan @0x00CA
         return val
     __class_getitem__ = classmethod(GenericAlias)

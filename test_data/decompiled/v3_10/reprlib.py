@@ -141,9 +141,6 @@ def _possibly_sorted(x):
         pass
     return
     # orphan @0x0024
-    # orphan @0x0036
-    Exception
-    return list(x)
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

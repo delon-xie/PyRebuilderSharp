@@ -70,13 +70,6 @@ print('           actual=  %s' % a)
 # orphan @0x0212
 yield from results
 match
-# orphan @0x021E
-Exception
-print('❌ %s: AST parse failed - %s' % (ver, e))
-print('  Decompiled: %s' % actual_src[None:200])
-yield from results
-e = None
-False
 # orphan @0x0266
 e = None
 # orphan @0x0272
@@ -84,4 +77,4 @@ passed = sum(<genexpr>(results.items()))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-# [SUMMARY] 33 blocks · 7 processed · 27 orphan · 332 instr
+# [SUMMARY] 33 blocks · 8 processed · 27 orphan · 332 instr

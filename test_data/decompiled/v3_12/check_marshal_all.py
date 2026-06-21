@@ -22,7 +22,4 @@ for (ver, py_path) in versions.items():
     for line in out.split("""
 """):
         print(f"  {line}")
-# [WARN] 2 instructions not decompiled
-#   @0x014A: JUMP_BACKWARD arg=30
-#   @0x014E: JUMP_BACKWARD arg=260
 # [SUMMARY] 7 blocks · 8 processed · 0 orphan · 83 instr

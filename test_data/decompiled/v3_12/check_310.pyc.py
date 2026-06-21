@@ -31,10 +31,5 @@ def dump_bytecode(c, depth = 0):
                 print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
         dis.dis(const)
         dump_bytecode(const, depth + 1)
-    # [WARN] 4 instructions not decompiled
-    #   @0x0044: JUMP_BACKWARD arg=34
-    #   @0x007A: JUMP_BACKWARD arg=88
-    #   @0x0270: JUMP_BACKWARD arg=306
-    #   @0x02BE: JUMP_BACKWARD arg=668
 dump_bytecode(code)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 56 instr

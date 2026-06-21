@@ -19,7 +19,4 @@ print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.dump(ast.parse(r.stdout), 2)
 print(actual_ast)
-# [WARN] 2 instructions not decompiled
-#   @0x0150: JUMP_BACKWARD arg=22
-#   @0x016E: JUMP_BACKWARD arg=52
 # [SUMMARY] 6 blocks · 7 processed · 0 orphan · 105 instr

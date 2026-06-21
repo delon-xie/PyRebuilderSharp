@@ -36,6 +36,4 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
         print(f"  argcount={argcount}")
     hdr = 12
 break
-# [WARN] 1 instructions not decompiled
-#   @0x0344: JUMP_BACKWARD arg=14
 # [SUMMARY] 15 blocks · 16 processed · 0 orphan · 268 instr

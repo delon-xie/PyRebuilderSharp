@@ -21,7 +21,4 @@ try:
 finally:
     pass
 # orphan @0x0084
-# orphan @0x00F8
-IOError
-f = None
-# [SUMMARY] 19 blocks · 18 processed · 2 orphan · 67 instr
+# [SUMMARY] 19 blocks · 19 processed · 2 orphan · 67 instr

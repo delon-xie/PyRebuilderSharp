@@ -50,11 +50,4 @@ elif t in (90, 122):
 break
 break
 raise
-# [WARN] 6 instructions not decompiled
-#   @0x0182: JUMP_BACKWARD arg=286
-#   @0x0584: JUMP_BACKWARD arg=1390
-#   @0x05A4: JUMP_BACKWARD arg=892
-#   @0x05D2: JUMP_BACKWARD arg=892
-#   @0x065A: JUMP_BACKWARD arg=892
-#   @0x073C: JUMP_BACKWARD arg=892
 # [SUMMARY] 45 blocks · 45 processed · 0 orphan · 584 instr

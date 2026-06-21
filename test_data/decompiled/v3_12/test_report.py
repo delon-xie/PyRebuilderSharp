@@ -50,15 +50,4 @@ for group in failed_groups:
         print(f"    - {f}")
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-# [WARN] 12 instructions not decompiled
-#   @0x00FC: JUMP_BACKWARD arg=98
-#   @0x017A: JUMP_BACKWARD arg=224
-#   @0x0180: JUMP_BACKWARD arg=230
-#   @0x01C0: JUMP_BACKWARD arg=294
-#   @0x020C: JUMP_BACKWARD arg=370
-#   @0x027E: JUMP_BACKWARD arg=24
-#   @0x02B0: JUMP_BACKWARD arg=74
-#   @0x02C0: JUMP_BACKWARD arg=90
-#   @0x02E4: JUMP_BACKWARD arg=126
-#   @0x033C: JUMP_BACKWARD arg=30
 # [SUMMARY] 30 blocks · 31 processed · 0 orphan · 260 instr

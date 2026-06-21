@@ -12,8 +12,6 @@ def recursive_repr(fillvalue):
             key = (id(self), get_ident())
             return
             # orphan @0x001A
-            # orphan @0x0032
-            return result
         wrapper.__module__ = (set(), repr_running)(getattr, '__module__')
         return wrapper
     return decorating_function
@@ -73,12 +71,8 @@ class Repr:
         # orphan @0x004C
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
-        # orphan @0x0068
         # orphan @0x0070
         # orphan @0x008C
-        # orphan @0x0090
-        error = None
-        # orphan @0x009C
         # orphan @0x009E
         -len(indent)
         1

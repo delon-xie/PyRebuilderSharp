@@ -2946,8 +2946,6 @@ text of the warning raised.
                 ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
         break
-        # [WARN] 1 instructions not decompiled
-        #   @0x012C: JUMP_BACKWARD arg=6
     __static_attributes__ = ()
 class SyntaxErrorTestCase(unittest.TestCase):
     __firstlineno__ = 2946
@@ -3168,7 +3166,6 @@ def fib(n):
         raise
         # orphan @0x009C
         # orphan @0x00DE
-        # orphan @0x00E0
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:
@@ -3219,10 +3216,6 @@ b=3", f"\{paren}' was never closed")
         for paren in ')]}':
             self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
         break
-        # [WARN] 3 instructions not decompiled
-        #   @0x003E: JUMP_BACKWARD arg=6
-        #   @0x0084: JUMP_BACKWARD arg=74
-        #   @0x00C8: JUMP_BACKWARD arg=144
     def test_error_string_literal(self):
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
@@ -3283,24 +3276,18 @@ a=1
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
         break
-        # [WARN] 1 instructions not decompiled
-        #   @0x003A: JUMP_BACKWARD arg=10
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
         ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
         break
-        # [WARN] 1 instructions not decompiled
-        #   @0x003C: JUMP_BACKWARD arg=10
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
         (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
-        for _ in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
+        for (rhs_stmt, lhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
         break
-        # [WARN] 1 instructions not decompiled
-        #   @0x0044: JUMP_BACKWARD arg=10
     __static_attributes__ = ()
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     __firstlineno__ = 3509

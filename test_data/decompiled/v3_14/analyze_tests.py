@@ -74,8 +74,4 @@ else:
 '<10'(f" {total_failed}<10 {total}<10 {overall_rate}>8.1f%")
 print('======================================================================')
 raise
-# [WARN] 3 instructions not decompiled
-#   @0x0380: JUMP_BACKWARD arg=382
-#   @0x0398: JUMP_BACKWARD arg=162
-#   @0x053A: JUMP_BACKWARD arg=1098
 # [SUMMARY] 36 blocks · 37 processed · 0 orphan · 385 instr

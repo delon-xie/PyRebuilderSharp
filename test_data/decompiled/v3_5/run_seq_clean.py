@@ -1,17 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x00E3
-def <genexpr>(.0):
-    .0
-    for (v, r) in .0:
-        pass
-    # orphan @0x0015
-    yield 1
-# orphan @0x00BD
-print('Failed to parse expected source:', e)
-sys.exit(1)
-None
-# orphan @0x00B2
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
@@ -48,14 +36,4 @@ passed = sum(<genexpr>(results.items()))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-# orphan @0x02CA
-# orphan @0x02D5
-print('❌ %s: AST parse failed - %s' % (ver, e))
-print('  Decompiled: %s' % actual_src[None:200])
-yield from results
-None
-False
-# orphan @0x0317
-e = None
-# orphan @0x0325
-# [SUMMARY] 32 blocks · 26 processed · 7 orphan · 330 instr
+# [SUMMARY] 32 blocks · 33 processed · 7 orphan · 330 instr

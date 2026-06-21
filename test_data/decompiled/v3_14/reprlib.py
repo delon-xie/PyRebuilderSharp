@@ -21,21 +21,21 @@ class Repr:
     __firstlineno__ = 38
     _lookup = {'tuple': 'builtins', 'list': 'builtins', 'array': 'array', 'set': 'builtins', 'frozenset': 'builtins', 'deque': 'collections', 'dict': 'builtins', 'str': 'builtins', 'int': 'builtins'}
     def __init__(self):
-        self.maxlevel = maxlevel
-        self.maxtuple = maxtuple
-        self.maxlist = maxlist
-        self.maxarray = maxarray
-        self.maxdict = maxdict
-        self.maxset = maxset
-        self.maxfrozenset = maxfrozenset
-        self.maxdeque = maxdeque
-        self.maxstring = maxstring
-        self.maxlong = maxlong
-        self.maxother = maxother
-        self.fillvalue = fillvalue
-        self.indent = indent
+        maxlevel.maxlevel = self
+        maxtuple.maxtuple = self
+        maxlist.maxlist = self
+        maxarray.maxarray = self
+        maxdict.maxdict = self
+        maxset.maxset = self
+        maxfrozenset.maxfrozenset = self
+        maxdeque.maxdeque = self
+        maxstring.maxstring = self
+        maxlong.maxlong = self
+        maxother.maxother = self
+        fillvalue.fillvalue = self
+        indent.indent = self
     def repr(self, x):
-        return self.repr1(self, x.maxlevel)
+        return self.repr1(x, self.maxlevel)
     def repr1(self, x, level):
         """ """
         cls = type(x)
@@ -44,12 +44,12 @@ class Repr:
             parts = typename.split()
             typename = '_'.join(parts)
         method = getattr(self, 'repr_' + typename, None)
-        if method and (self not in typename._lookup):
-            return method(level, x)
+        if method and (typename not in self._lookup):
+            return method(x, level)
         module = getattr(cls, '__module__', None)
-        if self == module._lookup[typename]:
-            return method(level, x)
-        return self.repr_instance(level, x)
+        if module == self._lookup[typename]:
+            return method(x, level)
+        return self.repr_instance(x, level)
     def _join(self, pieces, level):
         try:
             sep = """,
@@ -77,11 +77,11 @@ class Repr:
                 try:
                     try:
                         []
-                        if maxiter > n:
+                        if n > maxiter:
                             pieces.append(self.fillvalue)
-                        s = self._join(level, pieces)
+                        s = self._join(pieces, level)
                         if (n == 1) and trail:
-                            right += trail
+                            right = trail + right
                         return f"{left}{s}{right}"
                         break
                     except:
@@ -96,44 +96,40 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         elem
-        islice(maxiter, x)
-        # [WARN] 1 instructions not decompiled
-        #   @0x00AC: JUMP_BACKWARD arg=152
+        islice(x, maxiter)
     def repr_tuple(self, x, level):
         """("""
-        return self._repr_iterable(level, x, '(', ')', self.maxtuple, ',')
+        return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
         """["""
-        return self._repr_iterable(level, x, '[', ']', self.maxlist)
+        return self._repr_iterable(x, level, '[', ']', self.maxlist)
     def repr_array(self, x, level):
         """array('%s')"""
         if not x:
             return 'array(\'%s\')' % x.typecode
         header = 'array(\'%s\', [' % x.typecode
-        return self._repr_iterable(level, x, header, '])', self.maxarray)
+        return self._repr_iterable(x, level, header, '])', self.maxarray)
     def repr_set(self, x, level):
         """set()"""
         if not x:
             return 'set()'
         x = _possibly_sorted(x)
-        return self._repr_iterable(level, x, '{', '}', self.maxset)
+        return self._repr_iterable(x, level, '{', '}', self.maxset)
     def repr_frozenset(self, x, level):
         """frozenset()"""
         if not x:
             return 'frozenset()'
         x = _possibly_sorted(x)
-        return self._repr_iterable(level, x, 'frozenset({', '})', self.maxfrozenset)
+        return self._repr_iterable(x, level, 'frozenset({', '})', self.maxfrozenset)
     def repr_deque(self, x, level):
         """deque(["""
-        return self._repr_iterable(level, x, 'deque([', '])', self.maxdeque)
+        return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
         n = len(x)
         if n == 0:
             return '{}'
         elif level <= 0:
             return '{' + self.fillvalue + '}'
-        # [WARN] 1 instructions not decompiled
-        #   @0x013C: JUMP_BACKWARD arg=216
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -174,7 +170,6 @@ class Repr:
         exc = None
         return
         # orphan @0x0282
-        # orphan @0x0284
     def repr_instance(self, x, level):
         """<%s instance at %#x>"""
         try:
@@ -188,7 +183,6 @@ class Repr:
         return s
         return
         # orphan @0x01C2
-        # orphan @0x01C4
     __static_attributes__ = ('fillvalue', 'indent', 'maxarray', 'maxdeque', 'maxdict', 'maxfrozenset', 'maxlevel', 'maxlist', 'maxlong', 'maxother', 'maxset', 'maxstring', 'maxtuple')
     __classdictcell__ = __classdict__
 def _possibly_sorted(x):
@@ -199,7 +193,6 @@ def _possibly_sorted(x):
     return
     return
     # orphan @0x004A
-    # orphan @0x004C
 aRepr = Repr()
 repr = aRepr.repr
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 47 instr

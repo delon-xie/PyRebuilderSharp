@@ -38,14 +38,6 @@ def fix_pyc_names(directory):
             old_ver = match.group(1)
             new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
     break
-    # [WARN] 7 instructions not decompiled
-    #   @0x0062: JUMP_BACKWARD arg=46
-    #   @0x00C6: JUMP_BACKWARD arg=46
-    #   @0x00DE: JUMP_BACKWARD arg=46
-    #   @0x0128: JUMP_BACKWARD arg=270
-    #   @0x0202: JUMP_BACKWARD arg=46
-    #   @0x02B2: JUMP_BACKWARD arg=46
-    #   @0x0306: JUMP_BACKWARD arg=46
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

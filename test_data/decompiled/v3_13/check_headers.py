@@ -17,6 +17,4 @@ for ver in ('3.5', '3.6', '3.7', '3.8'):
     '  16-byte header: flags='(f"{fl16}, ts={ts16}, size={sz16}, marshal_start_byte={marshal16}#x")
     print()
 break
-# [WARN] 1 instructions not decompiled
-#   @0x0232: JUMP_BACKWARD arg=14
 # [SUMMARY] 4 blocks · 5 processed · 0 orphan · 161 instr

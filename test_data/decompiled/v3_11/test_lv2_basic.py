@@ -20,5 +20,4 @@ i < 5
 for n in range(10):
     m = n + 1
 a = 1
-# orphan @0x00A0
-# [SUMMARY] 9 blocks · 8 processed · 2 orphan · 67 instr
+# [SUMMARY] 9 blocks · 10 processed · 2 orphan · 67 instr

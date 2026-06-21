@@ -42,12 +42,4 @@ if not True:
 raise
 ex = None
 # orphan @0x0470
-# orphan @0x0472
-# [WARN] 6 instructions not decompiled
-#   @0x0214: JUMP_BACKWARD arg=358
-#   @0x037E: JUMP_BACKWARD arg=862
-#   @0x03A8: JUMP_BACKWARD arg=358
-#   @0x03B2: JUMP_BACKWARD arg=358
-#   @0x03B8: JUMP_BACKWARD arg=358
-#   @0x0464: JUMP_BACKWARD arg=358
-# [SUMMARY] 40 blocks · 39 processed · 5 orphan · 256 instr
+# [SUMMARY] 40 blocks · 40 processed · 5 orphan · 256 instr

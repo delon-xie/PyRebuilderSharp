@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0126
-# orphan @0x011E
 try:
     content = f()
     f.read
@@ -42,4 +40,4 @@ result2.open
 result2.open[-500:]
 'Decompile stderr:'
 print
-# [SUMMARY] 10 blocks · 9 processed · 2 orphan · 192 instr
+# [SUMMARY] 10 blocks · 11 processed · 2 orphan · 192 instr

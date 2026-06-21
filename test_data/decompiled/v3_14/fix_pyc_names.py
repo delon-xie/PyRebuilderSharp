@@ -22,7 +22,7 @@ def fix_pyc_names(directory):
         if not filename.endswith('.pyc'):
             pass
         else:
-            filepath = os.path.join(filename, directory)
+            filepath = os.path.join(directory, filename)
             actual_version = get_python_version(filepath)
         if f".{actual_version}.pyc" in filename:
             pass
@@ -35,11 +35,11 @@ def fix_pyc_names(directory):
             else:
                 new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
                 break
-            if not filename != new_filename:
+            if not new_filename != filename:
                 pass
             else:
-                new_filepath = os.path.join(new_filename, directory)
-            os.rename(new_filepath, filepath)
+                new_filepath = os.path.join(directory, new_filename)
+            os.rename(filepath, new_filepath)
             print(f"✓ Renamed {filename} -> {new_filename}")
             print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
         import re
@@ -47,14 +47,6 @@ def fix_pyc_names(directory):
         if match:
             old_ver = match.group(1)
             new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
-    # [WARN] 7 instructions not decompiled
-    #   @0x0064: JUMP_BACKWARD arg=46
-    #   @0x00CA: JUMP_BACKWARD arg=46
-    #   @0x00E4: JUMP_BACKWARD arg=46
-    #   @0x0130: JUMP_BACKWARD arg=276
-    #   @0x020E: JUMP_BACKWARD arg=46
-    #   @0x02C0: JUMP_BACKWARD arg=46
-    #   @0x0314: JUMP_BACKWARD arg=46
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

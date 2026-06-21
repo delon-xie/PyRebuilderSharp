@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0096
-# orphan @0x008E
 try:
     data = f.read(f())
     bytearray
@@ -31,4 +29,4 @@ for instr in dis.len(code):
     '  '
     print
 return
-# [SUMMARY] 14 blocks · 13 processed · 2 orphan · 180 instr
+# [SUMMARY] 14 blocks · 15 processed · 2 orphan · 180 instr

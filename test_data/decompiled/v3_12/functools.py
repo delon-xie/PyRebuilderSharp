@@ -55,11 +55,6 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
     return wrapper
     setattr(wrapper, attr, value)
     # orphan @0x00C6
-    # orphan @0x00C8
-    # [WARN] 3 instructions not decompiled
-    #   @0x0040: JUMP_BACKWARD arg=60
-    #   @0x009A: JUMP_BACKWARD arg=84
-    #   @0x00C4: JUMP_BACKWARD arg=192
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -178,11 +173,6 @@ def total_ordering(cls):
         break
     op
     _convert
-    # [WARN] 4 instructions not decompiled
-    #   @0x0058: JUMP_BACKWARD arg=68
-    #   @0x005E: JUMP_BACKWARD arg=74
-    #   @0x00BC: JUMP_BACKWARD arg=22
-    #   @0x00E6: JUMP_BACKWARD arg=64
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     return K
@@ -214,9 +204,6 @@ def reduce(function, sequence, initial = _initial_missing):
     for element in it:
         value = function(value, element)
     return value
-    # orphan @0x0096
-    # [WARN] 1 instructions not decompiled
-    #   @0x0062: JUMP_BACKWARD arg=26
 class _PlaceholderType:
     __doc__ = """The type of the Placeholder singleton.
 
@@ -253,9 +240,6 @@ def _partial_prepare_merger(args):
     else:
         None
     return (phcount, merger)
-    # [WARN] 2 instructions not decompiled
-    #   @0x0084: JUMP_BACKWARD arg=74
-    #   @0x00A8: JUMP_BACKWARD arg=110
 def _partial_new(cls, func):
     if issubclass(cls, callable):
         base_cls = callable
@@ -267,8 +251,6 @@ def _partial_new(cls, func):
     if callable(func):
         pass
     raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
-    # [WARN] 1 instructions not decompiled
-    #   @0x0118: JUMP_BACKWARD arg=24
 def _partial_repr(self):
     cls = type(self)
     module = cls.__module__
@@ -298,7 +280,6 @@ class partial:
             pto_args = self.args
         keywords = keywords
         return pto_args(**keywords)
-        # orphan @0x0116
     def __get__(self, obj, objtype = None):
         return self
         # orphan @0x000A
@@ -338,7 +319,6 @@ class partialmethod:
                 pto_args = cell_5.args
             keywords = keywords
             return pto_args(**keywords)
-            # orphan @0x011A
         _method.__isabstractmethod__ = cell_0.__isabstractmethod__
         _method.__partialmethod__ = cell_0
         return _method
@@ -356,9 +336,6 @@ class partialmethod:
         result = self._make_unbound_method().__get__(obj, cls)
         return result
         # orphan @0x012E
-        # orphan @0x0130
-        # [WARN] 1 instructions not decompiled
-        #   @0x012C: JUMP_BACKWARD arg=94
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
 def _unwrap_partial(func):
@@ -368,8 +345,6 @@ def _unwrap_partial(func):
     # orphan @0x0022
     func = func.func
     isinstance(func, func)
-    # [WARN] 1 instructions not decompiled
-    #   @0x005A: JUMP_BACKWARD arg=58
 def _unwrap_partialmethod(func):
     # orphan @0x0048
     func = func.__partialmethod__
@@ -397,10 +372,6 @@ def _unwrap_partialmethod(func):
     # orphan @0x00B8
     func = getattr(func, 'func')
     isinstance(func, _unwrap_partial)
-    # [WARN] 3 instructions not decompiled
-    #   @0x0096: JUMP_BACKWARD arg=80
-    #   @0x00F0: JUMP_BACKWARD arg=58
-    #   @0x0110: JUMP_BACKWARD arg=260
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -448,10 +419,6 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     []
     for v in []:
         pass
-    # [WARN] 3 instructions not decompiled
-    #   @0x005A: JUMP_BACKWARD arg=18
-    #   @0x009A: JUMP_BACKWARD arg=24
-    #   @0x00F8: JUMP_BACKWARD arg=24
 def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
 
@@ -535,9 +502,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
             raise
             return result
-            # orphan @0x01C8
-            # [WARN] 1 instructions not decompiled
-            #   @0x01AC: JUMP_BACKWARD arg=238
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
     return lru_cache(None)(user_function)
@@ -577,14 +541,6 @@ def _c3_merge(sequences):
     result = []
     for _ in s:
         pass
-    # [WARN] 7 instructions not decompiled
-    #   @0x001E: JUMP_BACKWARD arg=12
-    #   @0x0024: JUMP_BACKWARD arg=18
-    #   @0x0060: JUMP_BACKWARD arg=22
-    #   @0x0068: JUMP_BACKWARD arg=50
-    #   @0x00C8: JUMP_BACKWARD arg=24
-    #   @0x00D0: JUMP_BACKWARD arg=32
-    #   @0x00D4: JUMP_BACKWARD arg=206
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -665,15 +621,6 @@ def _c3_mro(cls, abcs = None):
         base
         explicit_bases
     boundary = 0
-    # [WARN] 8 instructions not decompiled
-    #   @0x0064: JUMP_BACKWARD arg=38
-    #   @0x0144: JUMP_BACKWARD arg=32
-    #   @0x0182: JUMP_BACKWARD arg=94
-    #   @0x01A6: JUMP_BACKWARD arg=130
-    #   @0x01D6: JUMP_BACKWARD arg=42
-    #   @0x0206: JUMP_BACKWARD arg=34
-    #   @0x023A: JUMP_BACKWARD arg=34
-    #   @0x026E: JUMP_BACKWARD arg=34
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
@@ -698,9 +645,6 @@ def _compose_mro(cls, types):
                     pass
                 break
                 return False
-            # [WARN] 2 instructions not decompiled
-            #   @0x0018: JUMP_BACKWARD arg=18
-            #   @0x0036: JUMP_BACKWARD arg=48
         n
         cell_1
         []
@@ -744,17 +688,6 @@ def _compose_mro(cls, types):
     n
     cell_1
     # orphan @0x0244
-    # [WARN] 14 instructions not decompiled
-    #   @0x0060: JUMP_BACKWARD arg=24
-    #   @0x0066: JUMP_BACKWARD arg=30
-    #   @0x009C: JUMP_BACKWARD arg=24
-    #   @0x00A2: JUMP_BACKWARD arg=30
-    #   @0x0102: JUMP_BACKWARD arg=16
-    #   @0x011C: JUMP_BACKWARD arg=42
-    #   @0x0162: JUMP_BACKWARD arg=16
-    #   @0x0168: JUMP_BACKWARD arg=22
-    #   @0x017A: JUMP_BACKWARD arg=136
-    #   @0x01A4: JUMP_BACKWARD arg=220
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
@@ -777,9 +710,6 @@ def _find_impl(cls, registry):
         else:
             match = t
     return registry.get(match)
-    # [WARN] 2 instructions not decompiled
-    #   @0x00E2: JUMP_BACKWARD arg=166
-    #   @0x00E8: JUMP_BACKWARD arg=172
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -831,8 +761,6 @@ class singledispatchmethod:
         raise
         # orphan @0x0098
         # orphan @0x00A4
-        # [WARN] 1 instructions not decompiled
-        #   @0x00A2: JUMP_BACKWARD arg=116
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
@@ -855,9 +783,6 @@ class _singledispatchmethod_get:
         raise
         # orphan @0x0110
         # orphan @0x012E
-        # orphan @0x0130
-        # [WARN] 1 instructions not decompiled
-        #   @0x010E: JUMP_BACKWARD arg=60
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -872,8 +797,6 @@ class _singledispatchmethod_get:
         raise
         # orphan @0x00AE
         # orphan @0x00BA
-        # [WARN] 1 instructions not decompiled
-        #   @0x00B8: JUMP_BACKWARD arg=158
     def __call__(self):
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
@@ -941,10 +864,4 @@ raise
 # orphan @0x02D6
 # orphan @0x02EC
 # orphan @0x0302
-# orphan @0x0304
-# [WARN] 4 instructions not decompiled
-#   @0x02BE: JUMP_BACKWARD arg=374
-#   @0x02D4: JUMP_BACKWARD arg=356
-#   @0x02EA: JUMP_BACKWARD arg=284
-#   @0x0300: JUMP_BACKWARD arg=194
-# [SUMMARY] 29 blocks · 24 processed · 5 orphan · 353 instr
+# [SUMMARY] 29 blocks · 25 processed · 5 orphan · 353 instr

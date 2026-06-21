@@ -24,12 +24,6 @@ def depth_5_for():
             break
         break
     break
-    # [WARN] 5 instructions not decompiled
-    #   @0x009C: JUMP_BACKWARD arg=140
-    #   @0x00A4: JUMP_BACKWARD arg=112
-    #   @0x00AC: JUMP_BACKWARD arg=84
-    #   @0x00B4: JUMP_BACKWARD arg=56
-    #   @0x00BC: JUMP_BACKWARD arg=28
 def depth_5_while():
     # orphan @0x004A
     c -= 1
@@ -78,14 +72,7 @@ def depth_5_while():
     e -= 1
     total += 1
     e > 0
-    # [WARN] 5 instructions not decompiled
-    #   @0x009E: JUMP_BACKWARD arg=126
-    #   @0x00AE: JUMP_BACKWARD arg=100
-    #   @0x00BE: JUMP_BACKWARD arg=74
-    #   @0x00CE: JUMP_BACKWARD arg=48
-    #   @0x00DE: JUMP_BACKWARD arg=22
 def depth_5_try():
-    # orphan @0x001E
     try:
         result = 42
     except:

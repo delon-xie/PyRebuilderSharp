@@ -183,5 +183,4 @@ class ABC(ABCMeta):
     __slots__ = ()
 raise
 raise
-# orphan @0x00D0
-# [SUMMARY] 8 blocks · 8 processed · 1 orphan · 101 instr
+# [SUMMARY] 8 blocks · 9 processed · 1 orphan · 101 instr

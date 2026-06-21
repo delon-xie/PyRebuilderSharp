@@ -117,13 +117,13 @@ even via super()).
 
 Returns the subclass, to allow usage as a class decorator.
 """
-        return _abc_register(subclass, cls)
+        return _abc_register(cls, subclass)
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
-        return _abc_instancecheck(instance, cls)
+        return _abc_instancecheck(cls, instance)
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
-        return _abc_subclasscheck(subclass, cls)
+        return _abc_subclasscheck(cls, subclass)
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         f"Class: {cls.__module__}.{cls.__qualname__}"(file, ('file',))
@@ -162,26 +162,19 @@ If cls is not an instance of ABCMeta, does nothing.
     cls.__bases__
     for scls in cls.__bases__:
         for name in getattr(scls, '__abstractmethods__', ()):
-            value = getattr(name, cls, None)
+            value = getattr(cls, name, None)
             if not getattr(value, '__isabstractmethod__', False):
                 pass
             else:
                 abstracts.add(name)
     cls.__dict__.items()
-    for _ in cls.__dict__.items():
+    for (value, name) in cls.__dict__.items():
         if not getattr(value, '__isabstractmethod__', False):
             pass
         else:
             abstracts.add(name)
     frozenset(abstracts).__abstractmethods__ = cls
     return cls
-    # [WARN] 5 instructions not decompiled
-    #   @0x00BA: JUMP_BACKWARD arg=118
-    #   @0x00E0: JUMP_BACKWARD arg=118
-    #   @0x00E8: JUMP_BACKWARD arg=86
-    #   @0x0154: JUMP_BACKWARD arg=292
-    #   @0x017A: JUMP_BACKWARD arg=292
 ABC = ABC('ABC', ABCMeta, ('metaclass',))
 # orphan @0x00E0
-# orphan @0x00E2
-# [SUMMARY] 8 blocks · 7 processed · 2 orphan · 95 instr
+# [SUMMARY] 8 blocks · 8 processed · 2 orphan · 95 instr

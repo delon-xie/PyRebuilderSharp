@@ -51,8 +51,5 @@ def mixed_4(n):
                     continue
     except:
         total = -1
-    # orphan @0x0040
     # orphan @0x0052
-    # orphan @0x0058
-    total = -1
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

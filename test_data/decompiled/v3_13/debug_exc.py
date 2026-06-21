@@ -38,10 +38,4 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
                 print(f"  bytes: {const.co_exceptiontable.hex()}")
         break
 # orphan @0x0444
-# [WARN] 5 instructions not decompiled
-#   @0x0440: JUMP_BACKWARD arg=768
-#   @0x0496: JUMP_BACKWARD arg=1120
-#   @0x0506: JUMP_BACKWARD arg=1120
-#   @0x052C: JUMP_BACKWARD arg=1120
-#   @0x0576: JUMP_BACKWARD arg=1120
 # [SUMMARY] 18 blocks · 18 processed · 1 orphan · 312 instr

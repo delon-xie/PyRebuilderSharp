@@ -18,7 +18,4 @@ def test5():
                 break
     except:
         break
-    # orphan @0x0036
-    # [WARN] 1 instructions not decompiled
-    #   @0x0024: JUMP_BACKWARD arg=12
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 5 instr
