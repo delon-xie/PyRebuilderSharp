@@ -1436,6 +1436,7 @@ public class AstBuilder
                     if (isHandlerPart || !pastHandlerPreamble)
                     {
                         handlerBlocks.Add(succ);
+                        _processedBlockIds.Add(succ.Id);
                         queue.Enqueue(succ);
                         if (isHandlerPart && !pastHandlerPreamble)
                         {
@@ -1767,6 +1768,7 @@ public class AstBuilder
                     if (isHandlerPart || !pastHandlerPreamble)
                     {
                         handlerBlocks.Add(succ);
+                        _processedBlockIds.Add(succ.Id);
                         queue.Enqueue(succ);
                         if (isHandlerPart && !pastHandlerPreamble)
                         {
