@@ -242,6 +242,21 @@ public class AstBuilder
                     var blockResult = blockDecomp.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
                     if (blockResult.IsSuccess)
                     {
+                        // 跳过残留的 handler 块：DUP_TOP/POP_TOP/END_FINALLY/RERAISE 等是
+                        // try/except 处理器前导指令，其内容已包含在 try/except AST 中。
+                        bool hasHandlerPreamble = orphan.Instructions.Any(i =>
+                            i.Opcode == Opcode.DUP_TOP
+                            || i.Opcode == Opcode.POP_EXCEPT
+                            || i.Opcode == Opcode.END_FINALLY
+                            || i.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH
+                            || i.Opcode == Opcode.CHECK_EXC_MATCH
+                            || i.Opcode == Opcode.CHECK_EG_MATCH);
+                        if (hasHandlerPreamble)
+                        {
+                            _processedBlockIds.Add(orphan.Id);
+                            continue;
+                        }
+
                         // 过滤孤儿块的无效内容：仅含 return None 时跳过
                         bool isEmptyReturn = blockResult.Statements.Count == 1
                             && blockResult.Statements[0] is Return r
