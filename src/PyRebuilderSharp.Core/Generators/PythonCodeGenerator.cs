@@ -167,6 +167,12 @@ public class PythonCodeGenerator : ICodeGenerator
             case FunctionRef fr:
                 _output.Append(fr.Name);
                 break;
+            case Slice s:
+                VisitSliceLiteral(s);
+                break;
+            case SetLiteral sl:
+                VisitSetLiteral(sl);
+                break;
             case NamedExpr ne:
                 Visit(ne.Target);
                 _output.Append(" := ");
@@ -1029,6 +1035,17 @@ public class PythonCodeGenerator : ICodeGenerator
         if (val is long l) return l.ToString();
         if (val is string s) return EscapeString(s);
         return val.ToString() ?? "";
+    }
+
+    private void VisitSetLiteral(SetLiteral set)
+    {
+        _output.Append("{");
+        for (int i = 0; i < set.Elts.Count; i++)
+        {
+            if (i > 0) _output.Append(", ");
+            Visit(set.Elts[i]);
+        }
+        _output.Append("}");
     }
 
     private void VisitListLiteral(ListLiteral list)
