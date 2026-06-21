@@ -140,7 +140,7 @@ class ABCMeta(type):
     def _abc_caches_clear(cls):
         """Clear the caches (for debugging or testing)."""
         _reset_caches(cls)
-class ABC:
+class ABC(metaclass=ABCMeta):
     __doc__ = """Helper class that provides a standard way to create an ABC using
     inheritance.
     """

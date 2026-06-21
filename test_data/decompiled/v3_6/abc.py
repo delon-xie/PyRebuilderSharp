@@ -173,7 +173,7 @@ class ABCMeta(type):
         # orphan @0x00A6
         issubclass(subclass, rcls)
         # orphan @0x00C4
-class ABC:
+class ABC(metaclass=ABCMeta):
     __doc__ = """Helper class that provides a standard way to create an ABC using
     inheritance.
     """

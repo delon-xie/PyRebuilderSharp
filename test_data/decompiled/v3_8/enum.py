@@ -607,7 +607,7 @@ class EnumType(type):
         if cls._member_names_:
             return Signature([Parameter('values', Parameter.VAR_POSITIONAL)])
 EnumMeta = EnumType
-class Enum:
+class Enum(metaclass=EnumType):
     __doc__ = """
     Create a collection of name/value pairs.
 
@@ -788,7 +788,7 @@ STRICT = *FlagBoundary
 CONFORM = *FlagBoundary
 EJECT = *FlagBoundary
 KEEP = *FlagBoundary
-class Flag(Enum):
+class Flag(Enum, boundary=STRICT):
     __doc__ = """
     Support for flags
     """
@@ -926,7 +926,7 @@ class Flag(Enum):
     __rand__ = __and__
     __ror__ = __or__
     __rxor__ = __xor__
-class IntFlag(int, ReprEnum, Flag):
+class IntFlag(int, ReprEnum, Flag, boundary=KEEP):
     __doc__ = """
     Support for integer-based Flags
     """

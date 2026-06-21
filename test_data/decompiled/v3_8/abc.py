@@ -155,7 +155,7 @@ def update_abstractmethods(cls):
     # orphan @0x007E
     cls.__abstractmethods__ = frozenset(abstracts)
     return cls
-class ABC:
+class ABC(metaclass=ABCMeta):
     __doc__ = """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
