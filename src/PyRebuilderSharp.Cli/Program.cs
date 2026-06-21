@@ -23,6 +23,9 @@ class Program
         string? outputDir = null;
         bool batchMode = false;
         bool statsOnly = false;
+        bool noHeader = false;
+        bool noSummary = false;
+        bool noOrphans = false;
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -46,6 +49,10 @@ class Program
                     Console.Error.WriteLine($"Warning: Directory not found: {dir}");
                 continue;
             }
+            // Options
+            if (args[i] is "--no-header") { noHeader = true; continue; }
+            if (args[i] is "--no-summary") { noSummary = true; continue; }
+            if (args[i] is "--no-orphans") { noOrphans = true; continue; }
             // Treat as input file
             if (File.Exists(args[i]))
                 inputFiles.Add(args[i]);
@@ -71,10 +78,16 @@ class Program
             return;
         }
 
+        var opts = new DecompileOptions
+        {
+            ShowHeader = !noHeader,
+            ShowSummary = !noSummary,
+            ShowOrphanBlocks = !noOrphans
+        };
         if (inputFiles.Count > 1 || batchMode)
-            RunBatch(inputFiles, outputDir, statsOnly);
+            RunBatch(inputFiles, outputDir, statsOnly, opts);
         else
-            RunSingle(inputFiles[0], outputDir);
+            RunSingle(inputFiles[0], outputDir, opts);
     }
 
     static void ShowUsage()
@@ -86,14 +99,17 @@ class Program
         Console.Error.WriteLine("  -o, --output <path>   Output file (single) or directory (batch)");
         Console.Error.WriteLine("  -d, --dir <dir>       Input directory (batch)");
         Console.Error.WriteLine("  --stats              Show batch statistics only");
+        Console.Error.WriteLine("  --no-header          Suppress '# Decompiled from:' header");
+        Console.Error.WriteLine("  --no-summary         Suppress '# [SUMMARY]' footer");
+        Console.Error.WriteLine("  --no-orphans         Suppress orphan block output");
     }
 
-    static void RunSingle(string inputFile, string? outputFile)
+    static void RunSingle(string inputFile, string? outputFile, DecompileOptions opts)
     {
         try
         {
             var pycData = File.ReadAllBytes(inputFile);
-            var decompiler = new Decompiler();
+            var decompiler = new Decompiler(opts);
             var result = decompiler.DecompileWithStats(pycData);
 
             if (outputFile != null)
@@ -114,11 +130,11 @@ class Program
         }
     }
 
-    static void RunBatch(List<string> files, string? outputDir, bool statsOnly)
+    static void RunBatch(List<string> files, string? outputDir, bool statsOnly, DecompileOptions opts)
     {
         int success = 0, failed = 0;
         double totalMs = 0;
-        var decompiler = new Decompiler();
+        var decompiler = new Decompiler(opts);
 
         foreach (var file in files)
         {

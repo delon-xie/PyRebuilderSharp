@@ -9,4 +9,5 @@ public class CodeGenOptions
     public bool FormatImports { get; set; } = true;
     public bool SortImports { get; set; } = true;
     public bool RemoveUnusedVariables { get; set; } = false;
+    public bool ShowHeader { get; set; } = true;
 }

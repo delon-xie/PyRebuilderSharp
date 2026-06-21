@@ -209,9 +209,11 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitModule(Module module)
     {
-        // Module head comment
-        _output.AppendLine($"# Decompiled from: {module.Name}");
-        _output.AppendLine();
+        // Module head comment (optional)
+        if (_options.ShowHeader)
+            _output.AppendLine($"# Decompiled from: {module.Name}");
+        if (_options.ShowHeader)
+            _output.AppendLine();
 
         foreach (var stmt in module.Body)
         {

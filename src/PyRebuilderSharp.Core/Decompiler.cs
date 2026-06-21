@@ -56,7 +56,11 @@ public class Decompiler
             failedBlocks = astBuilder.FailedBlockCount;
 
             // Phase 4: 代码生成
-            var generator = new PythonCodeGenerator();
+            var genOptions = new CodeGenOptions
+            {
+                ShowHeader = _options.ShowHeader
+            };
+            var generator = new PythonCodeGenerator(genOptions);
             sourceCode = generator.Generate(ast);
         }
         catch (Exception ex)

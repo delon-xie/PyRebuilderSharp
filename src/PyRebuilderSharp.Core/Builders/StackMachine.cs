@@ -196,6 +196,20 @@ public class StackMachine
                 _exprStack.Push(new Name(globalName, ExpressionContext.Load));
                 return null;
 
+            case Opcode.LOAD_DEREF:
+            {
+                var idx = instr.Argument ?? 0;
+                string cellName;
+                if (idx < _code.Cellvars.Count)
+                    cellName = _code.Cellvars[idx];
+                else if (idx - _code.Cellvars.Count < _code.Freevars.Count)
+                    cellName = _code.Freevars[idx - _code.Cellvars.Count];
+                else
+                    cellName = $"cell_{idx}";
+                _exprStack.Push(new Name(cellName, ExpressionContext.Load));
+                return null;
+            }
+
             case Opcode.STORE_NAME:
             {
                 var storeName = GetName(instr);

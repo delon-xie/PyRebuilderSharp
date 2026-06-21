@@ -256,7 +256,13 @@ public class AstBuilder
                             {
                                 new CommentBlock($"# orphan @0x{orphan.StartOffset:X4}")
                             };
-                            orphanStmts.AddRange(blockResult.Statements);
+                            // 过滤孤儿块中的 raise 语句：这些是失去处理器上下文的不可达异常重抛，
+                            // 不应出现在反编译输出中。
+                            foreach (var s in blockResult.Statements)
+                            {
+                                if (s is Raise) continue;
+                                orphanStmts.Add(s);
+                            }
 
                             // 检查 orphan 的偏移是否较小（早期初始化块）
                             // 启发式：orphan 偏移在字节码前 1/3 范围内 → 插入开头
@@ -367,11 +373,8 @@ public class AstBuilder
             }
         }
         
-        // Remove trailing module-level return None
-        if (stmts.Count > 0 && stmts[^1] is Return ret && ret.Value is Constant { Value: null })
-        {
-            stmts.RemoveAt(stmts.Count - 1);
-        }
+        // Remove trailing module-level return None (always implicit at module level)
+        stmts = stmts.Where(s => !(s is Return ret && ret.Value is Constant { Value: null })).ToList();
         
         // Convert __doc__ = '...' to bare docstring (ExprStmt with string constant)
         stmts = ConvertDocstring(stmts);
@@ -541,7 +544,7 @@ public class AstBuilder
             return stmts;
         }
 
-        // 检测 with 语句 (SETUP_WITH 模式)
+        // 检测 with 语句 (SETUP_WITH / BEFORE_WITH 模式)
         var withStmts = BuildWithFromBlock(block, visited);
         if (withStmts != null)
         {
@@ -1045,6 +1048,13 @@ public class AstBuilder
             if (succStart >= matchingEntry.TargetOffset && succStart < handlerEnd
                 && !visited.Contains(succ))
             {
+                // 跳过类/函数定义块 — 这些是结构边界，不是 handler 后继体
+                bool isDefBlock = succ.Instructions.Any(i =>
+                    i.Opcode == Opcode.MAKE_FUNCTION
+                    || i.Opcode == Opcode.MAKE_CLOSURE
+                    || i.Opcode == Opcode.LOAD_BUILD_CLASS);
+                if (isDefBlock) continue;
+
                 var succResult = _blockResults.GetValueOrDefault(succ.Id);
                 if (succResult?.Statements != null)
                 {
@@ -1088,7 +1098,15 @@ public class AstBuilder
         foreach (var succ in handlerBlock.Successors)
         {
             if (!visited.Contains(succ) && succ.StartOffset <= matchingEntry.EndOffset)
-                visited.Add(succ);
+            {
+                // 同样跳过类/函数定义块
+                bool isDefBlock = succ.Instructions.Any(i =>
+                    i.Opcode == Opcode.MAKE_FUNCTION
+                    || i.Opcode == Opcode.MAKE_CLOSURE
+                    || i.Opcode == Opcode.LOAD_BUILD_CLASS);
+                if (!isDefBlock)
+                    visited.Add(succ);
+            }
         }
 
         return new List<Stmt> { new Try(tryBody, handlers) };
@@ -1800,80 +1818,106 @@ public class AstBuilder
     {
         var instrs = block.Instructions;
         var setupIdx = instrs.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
-        if (setupIdx < 0) return null;
+        var beforeWithIdx = instrs.FindIndex(i =>
+            i.Opcode == Opcode.BEFORE_WITH_313 || i.Opcode == Opcode.BEFORE_WITH
+            || i.Opcode == Opcode.BEFORE_WITH_312);
+        var withIdx = setupIdx >= 0 ? setupIdx : beforeWithIdx;
+        if (withIdx < 0) return null;
+        bool isSetupWith = setupIdx >= 0;
 
-        // 1. 提取 SETUP_WITH 之前的上下文表达式
+        // 1. 提取 with 之前的上下文表达式
         var preMachine = new StackMachine(_codeObject);
-        var preStmts = new List<Stmt>();
-        for (int i = 0; i < setupIdx; i++)
+        for (int i = 0; i < withIdx; i++)
         {
             var stmt = preMachine.Execute(instrs[i]);
-            if (stmt != null) preStmts.Add(stmt);
         }
 
-        // 在 SETUP_WITH 之前的最终表达式就是上下文管理器
-        Expr? contextExpr = null;
-        while (preMachine.HasResults)
-            contextExpr = preMachine.PopResult();
-        if (contextExpr == null && preMachine.ExprStackCount > 0)
-            contextExpr = preMachine.PopExpr();
+        Expr? contextExpr = preMachine.ExprStackCount > 0 ? preMachine.PopExpr() : null;
+        if (contextExpr == null) return null;
 
         // 2. 提取可选的 as 变量
-        // SETUP_WITH 后是 BEFORE_WITH，然后 STORE_FAST/NAME 或 POP_TOP
         Expr? optionalVar = null;
-        for (int i = setupIdx + 1; i < instrs.Count; i++)
+        for (int i = withIdx + 1; i < instrs.Count; i++)
         {
             var op = instrs[i].Opcode;
-            if (op == Opcode.BEFORE_WITH || op == Opcode.SETUP_WITH || op == Opcode.WITH_EXCEPT_START)
+            if (op == Opcode.BEFORE_WITH || op == Opcode.BEFORE_WITH_313
+                || op == Opcode.BEFORE_WITH_312
+                || op == Opcode.SETUP_WITH || op == Opcode.WITH_EXCEPT_START)
                 continue;
             if (op == Opcode.POP_TOP)
-                break; // 没有 as 变量
-            if ((op == Opcode.STORE_FAST || op == Opcode.STORE_NAME) && instrs[i].Argument.HasValue)
+                break;
+            if ((op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
+                && instrs[i].Argument.HasValue)
             {
                 var idx = instrs[i].Argument.Value;
-                string varName;
-                if (op == Opcode.STORE_FAST)
-                    varName = idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}";
-                else
-                    varName = idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}";
+                string varName = op == Opcode.STORE_FAST
+                    ? (idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}")
+                    : (idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}");
                 optionalVar = new Name(varName, ExpressionContext.Store);
                 break;
             }
             break;
         }
 
-        // 3. 提取 body — 当前块内剩余指令 + 后继块
-        var handlerRel = instrs[setupIdx].Argument ?? 0;
-        var handlerAbs = instrs[setupIdx].Offset + 2 + handlerRel * 2;
+        // 3. 确定 handler 起始偏移和 body 范围
+        int handlerAbs;
+        if (isSetupWith)
+        {
+            // pre-3.11: SETUP_WITH arg = handler offset (in wordcode units)
+            var handlerRel = instrs[setupIdx].Argument ?? 0;
+            handlerAbs = instrs[setupIdx].Offset + 2 + handlerRel * 2;
+        }
+        else
+        {
+            // 3.11+: 用 ExceptionTable 找 WITH_EXCEPT_START handler 的起始偏移
+            handlerAbs = -1;
+            if (_codeObject.ExceptionTable != null)
+            {
+                var blockStart = instrs[0].Offset;
+                var blockEnd = instrs[^1].Offset;
+                var withET = _codeObject.ExceptionTable
+                    .FirstOrDefault(e => e.TargetOffset > blockStart
+                        && e.TargetOffset < blockEnd + 4);
+                if (withET != null)
+                    handlerAbs = withET.TargetOffset;
+            }
+            if (handlerAbs < 0) return null; // no ET entry found
+        }
 
-        // 跳过变量赋值指令找到 body 起始位置
-        int bodyStart = setupIdx + 1;
+        // 4. 跳过变量赋值找到 body 起始
+        int bodyStart = withIdx + 1;
         for (; bodyStart < instrs.Count; bodyStart++)
         {
             var op = instrs[bodyStart].Opcode;
-            if (op == Opcode.BEFORE_WITH || op == Opcode.WITH_EXCEPT_START)
+            if (op == Opcode.BEFORE_WITH || op == Opcode.BEFORE_WITH_313
+                || op == Opcode.BEFORE_WITH_312
+                || op == Opcode.WITH_EXCEPT_START)
                 continue;
             if (op == Opcode.POP_TOP || op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
                 continue;
             break;
         }
 
-        // 处理当前块内的 body 指令（到 POP_BLOCK 之前）
+        // 5. 处理当前块内的 body 指令
         var bodyStmts = new List<Stmt>();
         var bodyMachine = new StackMachine(_codeObject);
         for (int i = bodyStart; i < instrs.Count; i++)
         {
-            if (instrs[i].Opcode == Opcode.POP_BLOCK)
+            if (isSetupWith && instrs[i].Opcode == Opcode.POP_BLOCK)
                 break;
-            if (instrs[i].Opcode == Opcode.RETURN_VALUE && i < instrs.Count - 1)
-                continue; // 跳过 handler 部分的 RETURN_VALUE
+            if (!isSetupWith)
+            {
+                // 3.11+: 遇到 handler 起始或 cleanup 前停止
+                if (instrs[i].Opcode == Opcode.WITH_EXCEPT_START) break;
+                if (instrs[i].Offset >= handlerAbs && handlerAbs > 0) break;
+            }
             var stmt = bodyMachine.Execute(instrs[i]);
             if (stmt != null) bodyStmts.Add(stmt);
         }
         while (bodyMachine.HasResults)
             bodyStmts.Add(new ExprStmt(bodyMachine.PopResult()));
 
-        // 收集后继块作为 body（如 with 体内含循环/分支时）
+        // 6. 收集后继块作为 body
         var bodyBlocks = new List<BasicBlock>();
         var bodyCollector = new HashSet<BasicBlock> { block };
         var blockQueue = new Queue<BasicBlock>();
@@ -1881,7 +1925,7 @@ public class AstBuilder
         {
             if (succ == null || succ.StartOffset >= handlerAbs || bodyCollector.Contains(succ))
                 continue;
-            if (succ.StartOffset < instrs[setupIdx].Offset + 2) continue;
+            if (succ.StartOffset < instrs[withIdx].Offset + 2) continue;
             blockQueue.Enqueue(succ);
         }
         while (blockQueue.Count > 0)
@@ -1898,31 +1942,23 @@ public class AstBuilder
             }
         }
 
-        // 从 visited 移除以支持递归
         foreach (var bb in bodyBlocks)
             visited.Remove(bb);
-
-        // 合并后继块的 body 语句
         foreach (var bodyBlock in bodyBlocks)
             bodyStmts.AddRange(GetStructuredBlockStmts(bodyBlock, visited));
 
-        // 构建 With AST
-        var items = new List<WithItem>
+        // 标记 handler 块为 visited
+        var hbList = new List<BasicBlock>();
+        FindBlocksFromOffset(handlerAbs, hbList);
+        foreach (var hb in hbList)
+            visited.Add(hb);
+
+        return new List<Stmt>
         {
-            new(contextExpr ?? new Name("_", ExpressionContext.Load), optionalVar)
+            new With(new List<WithItem> { new WithItem(contextExpr, optionalVar) }, bodyStmts)
         };
-        var result = new List<Stmt>();
-        // 前缀语句
-        foreach (var ps in preStmts)
-        {
-            // 过滤掉来自 LOAD_GLOBAL/CALL_FUNCTION 等已经作为上下文表达式的语句
-            if (ps is ExprStmt e && e.Value == contextExpr)
-                continue;
-            result.Add(ps);
-        }
-        result.Add(new With(items, bodyStmts));
-        return result;
     }
+
     private List<Stmt> BuildWhileLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
         bool hasTryBeforeJump = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode));
@@ -2752,9 +2788,20 @@ public class AstBuilder
         //   Block B: GET_ITER                         ← fallthrough to C
         //   Block C: FOR_ITER                         ← loop header
         // 循环体末端的 JUMP_ABSOLUTE 跳回 C，但该跳转边不指向 A。
+        //
+        // 关键修复：跳转边（以无条件跳转结尾的块）是循环体回跳，其中含有循环体内的
+        // 比较表达式（如 j < i），评估这些块会返回错误的迭代表达式。
         var visitedPreds = new HashSet<int>();
         var predStack = new Stack<(BasicBlock block, BasicBlock? source)>();
-        foreach (var p in header.Predecessors) predStack.Push((p, header));
+        // 3.13+ 块拆分异常时（POP_JUMP_IF_FALSE 的 cache 导致 range(x) 落到前一个块），
+        // 块前驱链找不出正确的迭代表达式。新增全局指令级后备方案。
+        foreach (var p in header.Predecessors)
+        {
+            // 跳过跳转型前驱（循环体回跳或有条件跳转），只跟踪纯落回前驱
+            if (p.Instructions.Count > 0 && JumpHelper.IsJump(p.Instructions.Last().Opcode))
+                continue;
+            predStack.Push((p, header));
+        }
         
         while (predStack.Count > 0 && visitedPreds.Count < 20)
         {
@@ -2773,17 +2820,74 @@ public class AstBuilder
                 var expr = sm.PopExpr();
                 if (expr != null) return expr;
             }
-            // 只跟踪落回前驱（block 末指令不是无条件跳转，如 JUMP_ABSOLUTE/JUMP_BACKWARD）
+            // 只跟踪纯落回前驱（跳过任何跳转型块：无条件跳转或条件跳转如 POP_JUMP_IF_FALSE）
+            // 条件跳转块（如 if-条件）的前驱包含比较表达式，误作为迭代表达式。
             var lastInstr = pred.Instructions.LastOrDefault();
-            bool isFallthrough = lastInstr == default || !JumpHelper.IsUnconditionalJump(lastInstr.Opcode);
+            bool isFallthrough = lastInstr == default || !JumpHelper.IsJump(lastInstr.Opcode);
             if (isFallthrough)
             {
                 foreach (var pp in pred.Predecessors)
+                {
+                    // 同样跳过跳转边（回跳块不是迭代表达式的来源）
+                    if (pp.Instructions.Count > 0 && JumpHelper.IsJump(pp.Instructions.Last().Opcode))
+                        continue;
                     predStack.Push((pp, pred));
+                }
             }
         }
 
-        // Fallback: header's own instructions before FOR_ITER
+        // Fallback 2: 从全局指令列表中找 FOR_ITER 之前的 GET_ITER 及其迭代表达式构建指令
+        // 不依赖块边界（某些版本如 3.13+ 块拆分异常时仍有正确的指令序列）
+        int forIterIdx = _codeObject.Instructions.FindIndex(i =>
+            i.Opcode == Opcode.FOR_ITER
+            && i.Offset >= header.StartOffset
+            && i.Offset <= header.EndOffset);
+        if (forIterIdx > 0)
+        {
+            int getIterIdx = -1;
+            for (int i = forIterIdx - 1; i >= 0; i--)
+            {
+                var op = _codeObject.Instructions[i].Opcode;
+                if (op == Opcode.GET_ITER) { getIterIdx = i; break; }
+                if (JumpHelper.IsJump(op) || op == Opcode.RETURN_VALUE
+                    || op == Opcode.RAISE_VARARGS)
+                    break;
+            }
+
+            if (getIterIdx >= 0)
+            {
+                int startIdx = getIterIdx;
+                for (int i = getIterIdx - 1; i >= 0; i--)
+                {
+                    var op = _codeObject.Instructions[i].Opcode;
+                    if (JumpHelper.IsUnconditionalJump(op)
+                        || op == Opcode.FOR_ITER || op == Opcode.POP_JUMP_IF_FALSE
+                        || op == Opcode.POP_JUMP_IF_TRUE || op == Opcode.RETURN_VALUE
+                        || op == Opcode.RAISE_VARARGS)
+                        break;
+                    startIdx = i;
+                }
+
+                if (startIdx < getIterIdx)
+                {
+                    var iterBuilder = _codeObject.Instructions.GetRange(startIdx, getIterIdx - startIdx);
+                    var sm2 = new StackMachine(_codeObject);
+                    Exception? buildError = null;
+                    foreach (var instr in iterBuilder)
+                    {
+                        try { sm2.Execute(instr); }
+                        catch (Exception ex) { buildError = ex; break; }
+                    }
+                    if (buildError == null && sm2.ExprStackCount > 0)
+                    {
+                        var expr = sm2.PopExpr();
+                        if (expr != null) return expr;
+                    }
+                }
+            }
+        }
+
+        // Fallback 3: header's own instructions before FOR_ITER
         var iterInstrs = header.Instructions
             .TakeWhile(i => i.Opcode != Opcode.FOR_ITER)
             .ToList();
