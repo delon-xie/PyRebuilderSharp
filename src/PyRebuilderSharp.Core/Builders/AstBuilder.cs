@@ -3640,7 +3640,8 @@ public class AstBuilder
         body = body.Where(s => s is not Assign a
             || a.Targets.Count != 1
             || a.Targets[0] is not Name n
-            || (n.Id != "__module__" && n.Id != "__qualname__" && n.Id != "__classcell__")).ToList();
+            || (n.Id != "__module__" && n.Id != "__qualname__" && n.Id != "__classcell__"
+                && n.Id != "__static_attributes__" && n.Id != "__firstlineno__")).ToList();
 
         // 将第一个 __doc__ = '...' 转换为裸字符串表达式（类体 docstring）
         if (body.Count > 0 && body[0] is Assign docAssign

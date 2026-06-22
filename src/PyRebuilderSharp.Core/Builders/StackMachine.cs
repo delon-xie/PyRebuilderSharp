@@ -315,8 +315,12 @@ public class StackMachine
                 Expr? attrValue, obj;
                 if (_code.Version >= PythonVersion.Py313)
                 {
-                    attrValue = SafePop();  // TOS = value (3.13+ convention)
-                    obj = SafePop();        // TOS1 = object
+                    // CPython 3.13 STORE_ATTR: TOS=owner, TOS1=value
+                    // Bytecode: LOAD_CONST value, LOAD_FAST owner, STORE_ATTR
+                    // Stack = [value, owner], TOS=owner
+                    // CPython generated_cases.c.h: owner=TOP(), value=SECOND()
+                    obj = SafePop();        // TOS = owner
+                    attrValue = SafePop();  // TOS1 = value
                 }
                 else
                 {
