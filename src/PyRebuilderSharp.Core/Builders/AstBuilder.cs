@@ -20,6 +20,7 @@ public class AstBuilder
     private List<BasicBlock> _allBlocks = new();
     private readonly Dictionary<int, BasicBlock> _blockByOffset = new();
     private readonly HashSet<int> _processedBlockIds = new(); // 已实际处理的块 ID（用于孤儿块检测）
+    private int _buildDepth; // BuildStatements 递归深度，防止 StackOverflow
     private bool _diagETPrinted; // temporary diagnostic flag
     private List<ExceptionTableEntry> _sortedExceptionTable = new();
     private List<BasicBlock> _sortedBlocks = new(); // sorted by StartOffset
@@ -532,6 +533,14 @@ public class AstBuilder
         if (block == null || visited.Contains(block))
             return new List<Stmt>();
 
+        // 递归深度保护：防止 BuildIfElse→BuildTryFromBlock→BuildStatements 无限递归
+        const int MAX_DEPTH = 500;
+        if (++_buildDepth > MAX_DEPTH)
+        {
+            _buildDepth--;
+            return new List<Stmt> { new CommentBlock("# [Recursion limit]") };
+        }
+
         visited.Add(block);
 
         try
@@ -556,6 +565,10 @@ public class AstBuilder
             catch { }
             var fallback = $"# [Block @0x{block.StartOffset:X4}] Error: {ex.GetType().Name}: {ex.Message}";
             return new List<Stmt> { new CommentBlock(fallback) };
+        }
+        finally
+        {
+            _buildDepth--;
         }
     }
 
