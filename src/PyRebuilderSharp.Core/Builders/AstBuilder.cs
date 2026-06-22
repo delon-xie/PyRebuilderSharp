@@ -1497,6 +1497,11 @@ public class AstBuilder
                         var name = _codeObject.Names.ElementAtOrDefault(typeLoad.Argument ?? 0);
                         if (name != null) exceptType = new Name(name);
                     }
+                    else if (typeLoad.Opcode == Opcode.LOAD_GLOBAL)
+                    {
+                        var name = _codeObject.Names.ElementAtOrDefault(typeLoad.Argument ?? 0);
+                        if (name != null) exceptType = new Name(name);
+                    }
                 }
                 break;
             }
