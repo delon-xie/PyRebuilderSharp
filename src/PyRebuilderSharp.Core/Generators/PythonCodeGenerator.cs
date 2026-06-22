@@ -243,6 +243,19 @@ public class PythonCodeGenerator : ICodeGenerator
         if (body.Count > 0 && body[0] is ExprStmt { Value: Constant { Value: string docStr } })
         {
             WriteIndent();
+            // Python 3.13 编译器会去除 docstring 续行的前导空格，导致输出中续行紧贴行首。
+            // 检测这种无缩进续行，添加 4 空格（与函数/类体内容缩进一致）。
+            if (docStr.Contains('\n'))
+            {
+                var bodyIndent = "    ";
+                var lines = docStr.Split('\n');
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i > 0 && lines[i].Length > 0 && !char.IsWhiteSpace(lines[i][0]))
+                        lines[i] = bodyIndent + lines[i];
+                }
+                docStr = string.Join("\n", lines);
+            }
             _output.AppendLine($"\"\"\"{docStr}\"\"\"");
             body.RemoveAt(0);  // 移除已被发出的 docstring，避免后续 Visit 重复输出
         }
