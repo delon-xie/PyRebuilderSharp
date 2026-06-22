@@ -528,9 +528,11 @@ public class PythonCodeGenerator : ICodeGenerator
         _output.AppendLine("try:");
 
         _indentLevel++;
-        foreach (var stmt in tryStmt.Body)
+        // 合并连续的相同模块 import 语句
+        var mergedBody = MergeConsecutiveImports(tryStmt.Body);
+        foreach (var stmt in mergedBody)
             Visit(stmt);
-        if (tryStmt.Body.Count == 0)
+        if (mergedBody.Count == 0)
             EmitEmptyBodyPass();
         _indentLevel--;
 
@@ -754,6 +756,36 @@ public class PythonCodeGenerator : ICodeGenerator
         _output.Append($" {GetAugOpSymbol(aug.Op)} ");
         Visit(aug.Value);
         _output.AppendLine();
+    }
+
+    /// <summary>
+    /// 合并连续的相同模块 import 语句。
+    /// 例如: from _abc import X, from _abc import Y → from _abc import (X, Y)
+    /// </summary>
+    private static List<Stmt> MergeConsecutiveImports(List<Stmt> stmts)
+    {
+        var result = new List<Stmt>(stmts.Count);
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            if (stmts[i] is not ImportFrom current)
+            {
+                result.Add(stmts[i]);
+                continue;
+            }
+            var names = new List<Alias>(current.Names);
+            var module = current.Module;
+            var level = current.Level;
+            int j = i + 1;
+            while (j < stmts.Count && stmts[j] is ImportFrom next
+                   && next.Module == module && next.Level == level)
+            {
+                names.AddRange(next.Names);
+                j++;
+            }
+            result.Add(new ImportFrom(module, names, level));
+            i = j - 1;
+        }
+        return result;
     }
 
     private void VisitImport(Import imp)
