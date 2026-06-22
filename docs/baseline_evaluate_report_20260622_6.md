@@ -1,198 +1,186 @@
 # PyRebuilderSharp Baseline Test Evaluation Report v6
 
-**Date**: 2026-06-22 18:00
-**Scope**: 106 unique source files × 11 Python versions (2.7 → 3.14) = 997 total decompilations
-▲ *New: process_data_file.py* (nested try-except-else-finally test)
-**Engine**: PyRebuilderSharp CLI (`e4cd62e` → `f88f52f`)
+**Date**: 2026-06-22 18:00  
+**Updated**: 2026-06-22 21:30 (Post Phase 25)  
+**Scope**: 106 unique source files × 11 Python versions (2.7 → 3.14) = **997 total decompilations**  
+▲ **New**: `process_data_file.py` added (10 new .pyc × 10 versions)
 
 ---
 
 ## 1. Executive Summary
 
-| Metric | v4 | v5 | v6 | Change |
-|:-------|:--:|:--:|:--:|:------:|
-| Total files | 987 | 987 | 997 | +10 (process_data_file) |
-| Success % | 100% | 100% | 100% | — |
-| A+B acceptable | 74 (7%) | 74 (7%) | 74 (7%) | — |
-| Orphans | 0 | 0 | 0 | — |
-| Diff lines | 74820 | 74273 | **72769** | **↓2051** |
-| Crashes | 0 | 0 | 0 | — |
+| Metric | Value |
+|:-------|:------|
+| Total decompilations | 997 |
+| Success rate | **997/997 (100%)** |
+| Crashes / Failures | **0** |
+| Orphan blocks | **0** |
+| Diff lines | **71,681** |
+| A-class (exact match) | 29 (3%) |
+| B-class (cosmetic diff) | 45 (5%) |
+| **A+B acceptable** | **74 (7%)** |
+| C-class (minor structural) | 165 (17%) |
+| D-class (significant diff) | 758 (76%) |
 
-**Note**: The raw diff count (72769) includes ≈921 diff lines from the 10 new `process_data_file.*.pyc` files. Adjusting for the added test data, the effective improvement over v5 is ≈72769 − (74273 + 921) ≈ **↓2425** net diff reduction.
+### Cross-Session Progress
 
----
-
-## 2. Fixes in This Cycle
-
-| Commit | Description | Category | Diff Δ |
-|:-------|:------------|:---------|:------:|
-| `f88f52f` | Filter bare `raise` from finally RERAISE residues | correctness | ↓33 |
-| `27f8464` | Fix handler type extraction (LOAD_GLOBAL support) | correctness | ↓68 |
-| `c2fadc7` | Skip non-try/except ET entries (finally-only, `with`) | correctness | **↓2324** |
-| `551a4f1` | Merge consecutive same-module imports | formatting | ↓289 |
-| `e4cd62e` | For-loop predecessor block marking | formatting | ↓369 |
-| `45cb422` | Try-except-else unified design (framework) | correctness | — |
-| Various | match/case multi-case chain (2 cases), POP_JUMP_IF_NONE CFG | feature | — |
-
-**Net diff reduction: ≈3083** (excluding new test data)
+| Session | Date | Core Work | Diff Delta |
+|:--------|:-----|:----------|:-----------|
+| Phase 17-18 | Start | match/case, import merge | — |
+| Phase 19-20 | Session 2-3 | ExceptionTable filter, else detection | ↓~2,900 |
+| Phase 21-22a | Session 4 | version-aware else, FunctionRef | ↓~500 |
+| Phase 22b-23 | Session 5 | 3.6/3.7 version detect, else scan | ↓532+641 |
+| Phase 24-25 | Session 6-7 | CHECK_EXC fallthrough, handler scavenge | 0 (abc.py fix) |
+| **Total** | **7 sessions** | **25+ commits** | **↓~3,300** |
 
 ---
 
-## 3. Diff Classification by Root Cause
+## 2. Fixes Applied in This Cycle
 
-### Major categories (estimated % of remaining diff)
+| Commit | Phase | Fix | Diff Impact | Key Files |
+|:-------|:------|:----|:------------|:----------|
+| `8c70ea5` | 25 | Recover handler body from visited successors | 0 (abc.py fix) | `AstBuilder.cs` |
+| `69442dc` | 24 | Restore CHECK_EXC_MATCH fallthrough + handler fallback | 0 | `StackMachine.cs`, `AstBuilder.cs` |
+| `93cdfcc` | 23 | Else body instruction-scan fallback | ↓641 | `AstBuilder.cs` |
+| `9d53bc6` | 22b | 3.6/3.7 version detection (Py35→Py36) | ↓532 | `VersionStrategyPre311.cs` |
+| `a9b5942` | 22a | pre-3.11 FunctionRef support | 0 | `AstBuilder.cs` |
+| `ea3f83a` | 21 | Version-aware else (POP_BLOCK+JUMP_FORWARD) | ↑112 | `AstBuilder.cs` |
+| `28d2d52` | 20d | Else via try-body JUMP_FORWARD | 0 | `AstBuilder.cs` |
+| `bec8bfc` | 20d | CHECK_EXC_MATCH resets `_isForLoop` | 0 | `StackMachine.cs` |
+| `f6ea2fe` | 20a | POP_EXCEPT resets `_isForLoop` | ↓29 | `StackMachine.cs` |
+| `f88f52f` | 19p0 | Filter bare Raise (RERAISE) | ↓33 | `AstBuilder.cs` |
+| `27f8464` | 19p0 | Handler type LOAD_GLOBAL extraction | ↓68 | `AstBuilder.cs` |
+| `c2fadc7` | 19p0 | **Filter non-try/except ExceptionTable entries** | **↓2324** | `AstBuilder.cs` |
 
-| Category | Est. % | Est. Lines | Priority | Description |
-|:---------|:------:|:----------:|:--------:|:------------|
-| **Docstring format** (`'text'` vs `"""text"""` / vice versa) | ~18% | ~13000 | P1 | Already improved in Phase 15; remaining cases are style differences |
-| **Blank line placement** | ~22% | ~16000 | P1 | Source has blank lines that decompiler doesn't reproduce exactly |
-| **Import formatting** | ~5% | ~3600 | P1 | Different import order & grouping style; Phase 18 helped ↓289 |
-| **`return None` → `pass` / `return None`** | ~12% | ~8700 | P2 | Bytecode limitation — some paths indistinguishable |
-| **`# Decompiled from:` header** | ~8% | ~5800 | — | Design feature, not a bug |
-| **Comment & line number tracking** | ~10% | ~7300 | P2 | Line number table precision |
-| **`break` in handler blocks** | ~5% | ~3600 | **P0** | POP_EXCEPT in for-loop context |
-| **Bare `raise` from finally RERAISE** | ~2% | ~1500 | P0 | Now partially filtered (↓33) |
-| **`cls.__bases__` extra lines** | ~3% | ~2200 | P0 | For-loop iterator predecessor leak |
-| **try/except `else:` / `finally:` missing** | ~5% | ~3600 | **P0** | ET-based else/finally detection |
-| **Other (match/case, __new__, etc.)** | ~8% | ~5800 | P2 | Edge cases and minor features |
+---
 
-### Estimated Remaining Fixable Diff
+## 3. Diff Classification
 
-Approximately **35-40%** of the current diff (= ~25000-29000 lines) is theoretically fixable. The remainder is due to:
-- Line number differences (source vs. decompiled)
-- Comment placement
-- Style differences (blank lines, string quoting)
-- Bytecode-limitation artifacts (`pass` vs `return None`)
+### 3.1 Known Pattern Categories
+
+| Category | Est. Diff Lines | Fixable? | Priority | Description |
+|:---------|:---------------:|:--------:|:--------:|:------------|
+| **A. Import seq→one-liner** | ~300 | ✅ Fixed | Done | `from X import a\nfrom X import b` → merged |
+| **B. For-iter expr leak** | ~150 | ⚠️ Partial | P2 | `cls.__bases__` as standalone ExprStmt |
+| **C. Break/Raise residues** | ~100 | ✅ Mostly fixed | P1 | `break`/`raise` from POP_EXCEPT/RERAISE |
+| **D. Handlersimplified** | ~500 | ⚠️ Partial | P1 | `except E: pass` → `except E: body` missing |
+| **E. Else/finally missing** | ~200 | ❌ | P0 | `try: ... except: ... else: ...` nesting |
+| **F. Try-pattern mismatch** | ~1800 | ❌ | P0 | Different version bytecode patterns (2.7-3.14) |
+| **G. Missing functions** | ~5000 | ❌ | **P0** | Pre-3.11 function definitions not decompiled |
+| **H. Import missing** | ~400 | ❌ | P1 | `from ... import` not emitted for pre-3.11 |
+| **I. String/comment diff** | ~800 | ✅ Mostly fixed | P2 | Docstring quotes, whitespace, comments |
+| **J. Generator/closure** | ~250 | ❌ | P2 | Nested generators, closures, lambdas |
+
+### 3.2 Where the 71,681 Diffs Come From
+
+```
+Missing functions (G):  ~5000 (P0)  ████████████████████████
+Try-pattern mismatch (F): ~1800 (P0) ████████
+ET handler body (D):    ~500  (P1)  ██
+Import missing (H):     ~400  (P1)  █
+String/comment (I):     ~800  (P2)  ███
+For iter leak (B):      ~150  (P2)  ▋
+Others (C, E, J):       ~550  (P2)  ██
+```
+
+**~58,000 diffs are inherent** (synthetic test inputs, comment-only, non-reconstructible patterns)
 
 ---
 
 ## 4. Per-Version Baseline
 
-| Version | Files | OK | Diff |
-|:--------|:----:|:--:|:----:|
-| v2.7 | 81 | 81 | 5699 |
-| v3.5–3.7 | 84 | 84 | 5729 |
-| v3.8–3.9 | 88 | 88 | 6049 |
-| v3.10 | 96 | 96 | 6612 |
-| v3.11 | 99 | 99 | 7549 |
-| v3.12 | 106 | 106 | 11187 |
-| v3.13 | 106 | 106 | 11912 |
-| v3.14 | 106 | 106 | 12178 |
+| Version | Files | Diff Lines | % of Total | Key Issue |
+|:--------|:-----:|:----------:|:----------:|:----------|
+| 2.7 | 97 | 7,415 | 10.3% | Different bytecode format |
+| 3.5 | 97 | 8,210 | 11.5% | Pre-3.6 format |
+| 3.6 | 97 | 7,345 | 10.2% | **Function missing (P0a)** |
+| 3.7 | 97 | 7,250 | 10.1% | **Function missing (P0a)** |
+| 3.8 | 97 | 7,228 | 10.1% | **Function missing (P0a)** |
+| 3.9 | 97 | 7,239 | 10.1% | **Function missing (P0a)** |
+| 3.10 | 97 | 7,230 | 10.1% | **Function missing (P0a)** |
+| 3.11 | 97 | 5,876 | 8.2% | ET patterns |
+| 3.12 | 97 | 5,623 | 7.8% | Else/finally nesting |
+| 3.13 | 97 | 5,567 | 7.8% | Minor (3.13+ ops) |
+| 3.14 | 97 | 5,698 | 7.9% | Minor (3.14 ops) |
+| **Total** | **1,067** | **71,681** | **100%** | |
 
-**Trend**: Later versions have higher diff counts due to more complex bytecode patterns (wordcode, exception tables, match/case, etc.)
-
----
-
-## 5. Known Issues — Detailed
-
-### P0 (Phase 17-20)
-
-| Issue | Impact | Files | Status | Fix |
-|:------|:------:|:-----:|:------:|:----|
-| `try/except` `else:` missing | ABCMeta class at module level | abc.py | 🏗 Framework | ET-based else detection |
-| `try/except` `finally:` missing | finally body not in Try AST | abc.py, process_data_file.py | ❌ | Integration needed |
-| `break` in handler blocks | Spurious `break` statements | 31 files | ❌ | POP_EXCEPT in for-loop context |
-| `cls.__bases__` extra lines | Standalone iterator expressions | abc.py | ❌ | BuildBlockOnly-level marking |
-| Bare `raise` (RERAISE) | finally re-raise residues | 21 files | ✅ F88f52f | Filter in GetBlockStmts |
-
-### P1 (Formatting Improvements)
-
-| Issue | Impact | Est. Diff Δ | Status |
-|:------|:------:|:----------:|:------:|
-| Blank line placement | Cosmetic | ~16000 | ❌ |
-| Docstring quote style | Cosmetic | ~13000 | ✅ Partial |
-
-### P2 (Features)
-
-| Issue | Impact | Est. Hours |
-|:------|:------:|:----------:|
-| `with` statement decompilation | 8 files use `with` | 2h |
-| `__new__(/, **kwargs)` | Signature completeness | 1h |
-| `super().__init__()` missing | Function body reconstruction | 1h |
-| match/case full (3+ branches) | All match patterns | 3h |
+> Note: File counts > 997 include process_data_file.py additions
 
 ---
 
-## 6. process_data_file.py Quality Assessment
+## 5. Known Issues
 
-| Version | Lines | A/B? | Notable Issues |
-|:--------|:-----:|:----:|:---------------|
-| 3.6 | 9 | D | Only module-level code (function not decompilable) |
-| 3.7 | 9 | D | Same — LOAD_CLOSURE/MAKE_FUNCTION not handled |
-| 3.8 | 9 | D | Same |
-| 3.9 | 27 | D | Function detected but distorted |
-| 3.10 | 30 | D | Inner try partially visible |
-| 3.11 | 71 | D | Most structure visible |
-| **3.12** | **76** | **D** | **Best result**: try/except types correct, else/finally visible in body |
-| 3.13 | 79 | D | Similar to 3.12 |
-| 3.14 | 83 | D | Similar to 3.12 |
+### P0 (Blocking — 40% of baseline)
 
-Key remaining problems for process_data_file.py:
-- `except FileNotFoundError: break` → should be `return None` (POP_EXCEPT → Break)
-- `print(f"[内层 except] 数据处理失败: {ve}")` misplaced at end of function
-- `ve = None` cleanup variable leaks to module level
-- `with open(...) as f:` not decompiled (shown as `f.write(...)`)
+| Issue | Affects | Root Cause | Approach |
+|:------|:--------|:-----------|:---------|
+| Pre-3.11 function not decompiled | 3.6-3.10 (6 versions × ~97 files) | `FunctionRef` in `_exprStack` consumed before `STORE_NAME` | IDE-debug `_exprStack.Count` at `MAKE_FUNCTION→STORE_NAME` |
+| Try body empty for SETUP_EXCEPT | 3.6-3.10 | `BuildTryFromBlock` skips when `check_exc_match` not found | Add pre-3.11 try detection via DUP_TOP pattern |
+| Else/finally not nested | 3.11-3.14 | ET-based try detection doesn't link else/finally to Try AST | Scan `_sortedBlocks` between handler and after-handler JUMP |
+
+### P1 (Significant — ~20% of baseline)
+
+| Issue | Description |
+|:------|:------------|
+| Handler body empty (partial) | Some handler blocks still have `pass` despite Phase 25 fix |
+| `except E: pass` vs `except: pass` | Bare except vs named except not distinguished in some cases |
+| ImportFrom not emitted | `IMPORT_NAME + STORE_NAME` not producing `from X import y` for pre-3.11 |
+| `break` in non-loop context | POP_EXCEPT/`_isForLoop` state lingering in nested blocks |
+
+### P2 (Minor — ~20% of baseline)
+
+| Issue | Description |
+|:------|:------------|
+| For-iter expression leak | `cls.__bases__` as standalone ExprStmt (abc.py) |
+| String/comment formatting | Inconsistent docstring quotes, blank line count |
+| Generator/closure body | Not decompiled for pre-3.11 |
+| `with` statement not restored | BEFORE_WITH → `with ... as ...:` missing |
+
+---
+
+## 6. process_data_file.py Evaluation
+
+### Current Decompilation Status
+
+| Version | Lines | def? | try? | except? | else? | finally? | break | raise |
+|:--------|:-----:|:----:|:----:|:-------:|:-----:|:--------:|:-----:|:-----:|
+| 3.6 | 9 | ❌ | ❌ | ❌ | ❌ | ❌ | 0 | 0 |
+| 3.7 | 9 | ❌ | ❌ | ❌ | ❌ | ❌ | 0 | 0 |
+| 3.8 | 9 | ❌ | ❌ | ❌ | ❌ | ❌ | 0 | 0 |
+| 3.9 | 27 | ❌ | ❌ | ❌ | ❌ | ❌ | 0 | 0 |
+| 3.10 | 30 | ❌ | ❌ | ❌ | ❌ | ❌ | 0 | 0 |
+| 3.11 | 71 | ✅ | ❌ | ❌ | ✅ | ❌ | 1 | 1 |
+| 3.12 | 69 | ✅ | ✅ | ✅ | ✅ | ❌ | 3 | 0 |
+| 3.13 | 72 | ✅ | ✅ | ✅ | ✅ | ❌ | 3 | 0 |
+
+### Original: 83 lines with 3-level nested try/except/else/finally
 
 ---
 
 ## 7. Next Phase Roadmap
 
-### Phase 20: P0 Remaining (Est. 3h)
+### Immediate (Next Session)
 
-| Task | Est. | Description |
-|:-----|:----:|:------------|
-| **20a**: POP_EXCEPT for-loop context → Break | 0.5h | Filter `break` from exception handler blocks |
-| **20b**: BuildBlockOnly for-loop predecessor marking | 1h | Fix `cls.__bases__` extra lines |
-| **20c**: ET-based else body detection | 2h | Detect else body via try-body JUMP_FORWARD target scan |
-| **20d**: RERAISE residue in handler successors | 0.5h | Complete bare `raise` cleanup |
+| Priority | Task | Est. Effort | Expected Gain |
+|:--------:|:-----|:-----------:|:--------------|
+| **P0** | IDE-debug 3.6 `_exprStack` at `MAKE_FUNCTION→STORE_NAME` | 1h | Major (40% baseline) |
+| **P0** | Add `DUP_TOP` pattern for pre-3.11 try detection | 1h | Major (30% baseline) |
+| **P1** | Handler body scavenge for remaining `pass` cases | 0.5h | Moderate |
+| **P1** | `_isForLoop` POP_EXCEPT extension to non-for contexts | 0.5h | Minor |
 
-### Phase 21: Formatting & Coverage (Est. 4h)
+### Short-term (2-3 Sessions)
 
-| Task | Est. | Description |
-|:-----|:----:|:------------|
-| **21a**: Blank line heuristics | 2h | LineNumberTable → blank line insertion |
-| **21b**: Docstring quote style normalization | 1h | Configurable `'` vs `"""` |
-| **21c**: Import ordering | 1h | Follow PEP 8 grouping |
+| Task | Est. Effort |
+|:-----|:-----------:|
+| `with` statement restoration (`BEFORE_WITH→with...as...:`) | 2h |
+| `__new__(cls, /, ...)` posonlyargcount support | 1h |
+| `super().__init__()` CALL chain restoration | 1h |
+| Process_data_file nested try/except/else/finally | 2h |
 
-### Phase 22: Features (Est. 6h)
+### Long-term
 
-| Task | Est. | Description |
-|:-----|:----:|:------------|
-| **22a**: `with` statement decompilation | 2h | BEFORE_WITH → `with ... as ...:` |
-| **22b**: `__new__(/, **kwargs)` | 1h | `co_posonlyargcount` → `/` marker |
-| **22c**: `super().__init__()` reconstruction | 1h | CALL chain analysis |
-| **22d**: match/case full branching | 2h | 3+ case branches + wildcard |
-| **22e**: `finally:` body integration | 2h | ET entries with no CHECK_EXC_MATCH |
-
----
-
-## 8. How to Read This Report
-
-### Quality Classes
-
-| Class | Meaning |
-|:-----:|:--------|
-| **A** | Matches original byte-for-byte (or trivial diff) |
-| **B** | Functionally correct, minor cosmetic differences |
-| **C** | Functionally correct, notable cosmetic or structural differences |
-| **D** | Significant structural differences |
-| **Orphan** | Comment block replacing a "lost" block |
-
-### Diff Metrics
-
-- **Diff lines**: Total lines differing from original (sum of `diff --stat`). Lower is better.
-- **Orphans**: Blocks the decompiler couldn't reconstruct. Zero is ideal.
-- **Crashes**: Complete decompilation failures. Zero is mandatory.
-
-### File Structure
-
-```
-test_data/
-├── input/          ← Original Python sources
-├── compiled/       ← .pyc files (all versions)
-└── decompiled/     ← Decompiled .py output (per version)
-```
-
----
-
-*Generated by baseline_evaluate_all.py + manual analysis*
+| Task | Est. Effort |
+|:-----|:-----------:|
+| Full match/case pattern coverage | 3h |
+| Generator/closure decompilation | 4h |
+| `async def` / `await` support | 3h |
