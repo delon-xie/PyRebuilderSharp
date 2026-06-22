@@ -15,21 +15,24 @@ def dump_bytecode(c, depth = 0):
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
-        print(f"{p}--- {const.co_name} ---")
-        et = getattr(const, 'co_exceptiontable', None)
-        if et:
+        elif not isinstance(const, co_name.CodeType):
             pass
         else:
-            '(none)'
-        break
-        if et:
-            for i in range(0, len(et), 8):
-                s = et(i // (i + 2), 'little')
-                e = et((i + 2) // (i + 4), 'little')
-                t = et((i + 4) // (i + 6), 'little')
-                dl = et((i + 6) // (i + 8), 'little')
-                print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
-        dis.dis(const)
-        dump_bytecode(const, depth + 1)
+            print(f"{p}--- {const.co_name} ---")
+            et = getattr(const, 'co_exceptiontable', None)
+            if et:
+                pass
+            else:
+                '(none)'
+                break
+                if et:
+                    for i in range(0, len(et), 8):
+                        s = et(i // (i + 2), 'little')
+                        e = et((i + 2) // (i + 4), 'little')
+                        t = et((i + 4) // (i + 6), 'little')
+                        dl = et((i + 6) // (i + 8), 'little')
+                        print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
+                dis.dis(const)
+                dump_bytecode(const, depth + 1)
 dump_bytecode(code)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 56 instr

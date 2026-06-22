@@ -60,14 +60,14 @@ try:
                                             print('  Line %d: expected=%s' % (i, e))
                                             print('           actual=  %s' % a)
                                             break
-                                        for ver in versions:
-                                            pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
-                                            if not os.path.exists(pyc):
-                                                print('⏭ %s: .pyc not found' % ver)
-                                            else:
-                                                r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
-                                                actual_src = r.stdout
-                                        break
+                                            for ver in versions:
+                                                pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
+                                                if not os.path.exists(pyc):
+                                                    print('⏭ %s: .pyc not found' % ver)
+                                                else:
+                                                    r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
+                                                    actual_src = r.stdout
+                                            break
                                     break
                                 except Exception:
                                     pass

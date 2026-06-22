@@ -32,10 +32,14 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
                 print(f"
 --- Nested: {const.co_name} ---")
                 print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
-            if not const.co_exceptiontable:
-                pass
-            else:
-                print(f"  bytes: {const.co_exceptiontable.hex()}")
+                if not hasattr(const, 'co_exceptiontable'):
+                    pass
+                elif not const.co_exceptiontable:
+                    pass
+                else:
+                    print(f"  bytes: {const.co_exceptiontable.hex()}")
         return None
+code.co_consts
+code.co_consts
 # orphan @0x04A4
 # [SUMMARY] 18 blocks · 18 processed · 1 orphan · 313 instr

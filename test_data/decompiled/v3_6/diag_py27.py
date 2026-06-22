@@ -56,6 +56,10 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
         pass
     else:
         break
-    with open(out_path) as f:
-        content = f.read().strip()
-# [SUMMARY] 8 blocks · 9 processed · 1 orphan · 230 instr
+        if os.path.exists(out_path):
+            f = open(out_path)
+            content = f.read().strip()
+            print(f"Output ({len(content)} bytes):
+{content[None:300]}")
+            continue
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 230 instr

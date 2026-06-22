@@ -9,13 +9,13 @@ Flag = None
 EJECT = None
 ReprEnum = None
 class nonmember(object):
-    __doc__ = """
+    """
     Protects item from becoming an Enum member during class creation.
     """
     def __init__(self, value):
         self.value = value
 class member(object):
-    __doc__ = """
+    """
     Forces item to become an Enum member during class creation.
     """
     def __init__(self, value):
@@ -125,7 +125,7 @@ class _auto_null:
         return '_auto_null'
 _auto_null = _auto_null()
 class auto:
-    __doc__ = """
+    """
     Instances are replaced with an appropriate value in Enum class suites.
     """
     def __init__(self, value):
@@ -133,7 +133,7 @@ class auto:
     def __repr__(self):
         return 'auto(%r)' % self.value
 class property(DynamicClassAttribute):
-    __doc__ = """
+    """
     This is a descriptor, used to define attributes that act differently
     when accessed through an enum member and through an enum class.
     Instance access is the same as property(), but access to an attribute
@@ -165,7 +165,7 @@ class property(DynamicClassAttribute):
         self.name = name
         self.clsname = ownerclass.__name__
 class _proto_member:
-    __doc__ = """
+    """
     intermediate step for enum members between class execution and final creation
     """
     def __init__(self, value):
@@ -176,6 +176,9 @@ class _proto_member:
         """
         # orphan @0x00A8
         None
+        # orphan @0x008E
+        new_exc = TypeError('_value_ not set in __new__, unable to create it')
+        new_exc.__cause__ = exc
         # orphan @0x0048
         enum_member = enum_class._new_member_(enum_class, **args)
         # orphan @0x0030
@@ -187,21 +190,6 @@ class _proto_member:
         if not isinstance(value, tuple):
             args = (value)
         enum_member = enum_class._new_member_(enum_class)
-        if hasattr(enum_member, '_value_'):
-            enum_class._singles_mask_ | value._singles_mask_ = enum_class
-        try:
-            pass
-        except Exception:
-            pass
-        value = enum_member._value_
-        enum_member._name_ = member_name
-        enum_member.__objclass__ = enum_class
-        enum_member._sort_order_ = len(enum_class._member_names_)
-        if (Flag is not None) and issubclass(enum_class, Flag) and isinstance(value, int):
-            enum_class._flag_mask_ | value._flag_mask_ = enum_class
-            if _is_single_bit(value):
-                pass
-        enum_member._value_ = value
         # orphan @0x012A
         enum_class._all_bits_ = 2 ** enum_class._flag_mask_.bit_length() - 1
         # orphan @0x018A
@@ -210,7 +198,7 @@ class _proto_member:
         # orphan @0x0234
         enum_class._hashable_values_.append(value)
 class EnumDict(dict):
-    __doc__ = """
+    """
     Track enum member order and ensure member names are not reused.
 
     EnumType will use the names found in self._member_names as the
@@ -271,7 +259,7 @@ class EnumDict(dict):
             pass
 _EnumDict = EnumDict
 class EnumType(type):
-    __doc__ = """
+    """
     Metaclass for Enum
     """
     @classmethod
@@ -382,11 +370,9 @@ class EnumType(type):
         """
         if isinstance(value, cls):
             return True
-        try:
+        else:
             result = cls._missing_(value)
             return isinstance(result, cls)
-        except ValueError:
-            pass
         # orphan @0x004C
         value in cls._hashable_values_
         # orphan @0x0054
@@ -606,7 +592,7 @@ class EnumType(type):
             return Signature([Parameter('values', Parameter.VAR_POSITIONAL)])
 EnumMeta = EnumType
 class Enum(metaclass=EnumType):
-    __doc__ = """
+    """
     Create a collection of name/value pairs.
 
     Example enumeration:
@@ -649,7 +635,10 @@ class Enum(metaclass=EnumType):
         return cls[name]
         if type(value) is cls:
             return value
-        elif cls._member_map_:
+        for (name, unhashable_values) in cls._unhashable_values_map_.items():
+            if value in unhashable_values:
+                return cls[name]
+        if cls._member_map_:
             if getattr(cls, '_%s__in_progress' % cls.__name__, False):
                 raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
             elif exc is None:
@@ -736,15 +725,17 @@ class Enum(metaclass=EnumType):
         """The value of the Enum member."""
         return self._value_
 class ReprEnum(Enum):
-    __doc__ = """
+    """
     Only changes the repr(), leaving str() and format() to the mixed-in type.
     """
+    pass
 class IntEnum(int, ReprEnum):
-    __doc__ = """
+    """
     Enum where members are also (and must be) ints
     """
+    pass
 class StrEnum(str, ReprEnum):
-    __doc__ = """
+    """
     Enum where members are also (and must be) strings
     """
     def __new__(cls):
@@ -771,7 +762,7 @@ _reduce_ex_by_global_name = pickle_by_global_name
 def pickle_by_enum_name(self, proto):
     return (getattr, (self.__class__, self._name_))
 class FlagBoundary(StrEnum):
-    __doc__ = """
+    """
     control how out of range values are handled
     "strict" -> error is raised             [default for Flag]
     "conform" -> extra bits are discarded
@@ -787,7 +778,7 @@ CONFORM = *FlagBoundary
 EJECT = *FlagBoundary
 KEEP = *FlagBoundary
 class Flag(Enum, boundary=STRICT):
-    __doc__ = """
+    """
     Support for flags
     """
     _numeric_repr_ = repr
@@ -929,9 +920,10 @@ class Flag(Enum, boundary=STRICT):
     __ror__ = __or__
     __rxor__ = __xor__
 class IntFlag(int, ReprEnum, Flag, boundary=KEEP):
-    __doc__ = """
+    """
     Support for integer-based Flags
     """
+    pass
 def _high_bit(value):
     """
     returns index of highest bit, or -1 if value is zero or negative
@@ -972,7 +964,8 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_ is None:
         return ('%s.%s(%r)', cls_name, self._value_)
-    return '|'.join(global_flag_repr.<locals>.<listcomp>(self.name.split('|')))
+    else:
+        return '|'.join(global_flag_repr.<locals>.<listcomp>(self.name.split('|')))
     # orphan @0x00BA
     return '|'.join(name)
 def global_str(self):
@@ -1067,7 +1060,7 @@ def _simple_enum(etype):
         new_member
         # orphan @0x0030
         cls_name = cls.__name__
-        use_args
+        __new__
         # orphan @0x027E
         value = gnv(name, 1, len(member_names), gnv_last_values)
         # orphan @0x02A2
@@ -1110,7 +1103,7 @@ CONTINUOUS = *EnumCheck
 NAMED_FLAGS = *EnumCheck
 UNIQUE = *EnumCheck
 class verify:
-    __doc__ = """
+    """
     Check an enumeration for various constraints. (see EnumCheck)
     """
     def __init__(self):

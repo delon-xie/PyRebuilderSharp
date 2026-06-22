@@ -36,9 +36,9 @@ for (version, files) in sorted(version_files.items()):
     else:
         print('    文件列表:')
         sorted(files)
-    for f in sorted(files):
-        print(f"      {f}")
-    break
+        for f in sorted(files):
+            print(f"      {f}")
+        break
 break
 break
 break

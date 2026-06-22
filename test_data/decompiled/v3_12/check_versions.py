@@ -37,8 +37,8 @@ for (version, files) in sorted(version_files.items()):
     else:
         print('    文件列表:')
         sorted(files)
-    for f in sorted(files):
-        print(f"      {f}")
+        for f in sorted(files):
+            print(f"      {f}")
 break
 break
 # [SUMMARY] 23 blocks · 23 processed · 1 orphan · 154 instr

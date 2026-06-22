@@ -1,8 +1,0 @@
-# Decompiled from: <module>
-
-with open(sys.argv[1], 'rb') as f:
-    raw = f.read()
-    for off in range(17, 40):
-        if raw[off:off + 4] == b'AAAAAA==':
-            print(f"  4 zero bytes at offset {off}")
-# [SUMMARY] 11 blocks · 10 processed · 4 orphan · 244 instr

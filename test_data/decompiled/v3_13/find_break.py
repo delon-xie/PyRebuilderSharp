@@ -27,6 +27,8 @@ def test_until_broken(exprs):
         return 'CRASH'
     elif 'if ' in out:
         return f"CONDITIONAL: {out[None:80]}"
+    else:
+        return 'OK'
     raise
 def find_breaking_point(exprs, lo, hi):
     while True:

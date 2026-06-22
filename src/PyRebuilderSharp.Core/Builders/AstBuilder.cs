@@ -280,6 +280,36 @@ public class AstBuilder
 
                         if (!isEmptyReturn && _options.ShowOrphanBlocks)
                         {
+                            // flat_expr_store/flat_expr_loads: reprocess through StackMachine to recover statements
+                            if (classification is "flat_expr_store" or "flat_expr_loads" or "other")
+                            {
+                                var orphanMachine = new StackMachine(_codeObject);
+                                var orphanStmts = new List<Stmt>();
+                                bool allNull = true;
+                                foreach (var ins in orphan.Instructions)
+                                {
+                                    var s = orphanMachine.Execute(ins);
+                                    if (s != null) { orphanStmts.Add(s); allNull = false; }
+                                }
+                                // Also get any remaining expression stack results
+                                while (orphanMachine.HasResults)
+                                    orphanStmts.Add(new ExprStmt(orphanMachine.PopResult()));
+
+                                if (!allNull)
+                                {
+                                    _processedBlockIds.Add(orphan.Id);
+                                    var lastOffset = _allBlocks.Count > 0
+                                        ? _allBlocks[^1].EndOffset : 0;
+                                    bool isEarlyOrphan = lastOffset > 0
+                                        && orphan.StartOffset < lastOffset / 3;
+                                    if (isEarlyOrphan)
+                                        stmts.InsertRange(0, orphanStmts);
+                                    else
+                                        stmts.AddRange(orphanStmts);
+                                    continue;
+                                }
+                            }
+
                             // 根据偏移位置插入孤儿块内容，而非始终追加在末尾。
                             // 早期偏移的孤儿块（如函数体开头的初始化语句 `abstracts = set()`）
                             // 应出现在函数开头而非末尾。

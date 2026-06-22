@@ -18,25 +18,35 @@ def fix_pyc_names(directory):
             pass
         else:
             actual_version = get_python_version(filepath)
-        if f".{actual_version}.pyc" in filename:
-            pass
-        else:
-            new_filename = filename
-            exists.values()
-        for version in exists.values():
-            if not f".{version}.pyc" in new_filename:
+            if actual_version == 'unknown':
+                pass
+            elif f".{actual_version}.pyc" in filename:
                 pass
             else:
-                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                new_filename = filename
+                exists.values()
+                for version in exists.values():
+                    if not f".{version}.pyc" in new_filename:
+                        pass
+                    else:
+                        new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
+                        break
+                        if not True:
+                            pass
+                        elif os.path.exists(new_filepath):
+                            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+                        else:
+                            break
                 break
-            if not True:
-                pass
-            break
-            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-        break
-        if match:
-            old_ver = match.group(1)
-            new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+                if match:
+                    old_ver = match.group(1)
+                    new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+                elif not True:
+                    pass
+                elif os.path.exists(new_filepath):
+                    pass
+                else:
+                    break
     break
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')

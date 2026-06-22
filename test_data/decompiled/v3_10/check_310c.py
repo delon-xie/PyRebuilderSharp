@@ -20,15 +20,15 @@ def dump_bytecode(c, depth):
                 pass
             else:
                 '(none)'
-            break
-            if et:
-                for i in range(0, len(et), 8):
-                    s = int.from_bytes(et[i:i + 2], 'little')
-                    e = int.from_bytes(et[i + 2:i + 4], 'little')
-                    t = int.from_bytes(et[i + 4:i + 6], 'little')
-                    dl = int.from_bytes(et[i + 6:i + 8], 'little')
-                    print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
-            dis.dis(const)
-            dump_bytecode(const, depth + 1)
+                break
+                if et:
+                    for i in range(0, len(et), 8):
+                        s = int.from_bytes(et[i:i + 2], 'little')
+                        e = int.from_bytes(et[i + 2:i + 4], 'little')
+                        t = int.from_bytes(et[i + 4:i + 6], 'little')
+                        dl = int.from_bytes(et[i + 6:i + 8], 'little')
+                        print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
+                dis.dis(const)
+                dump_bytecode(const, depth + 1)
 dump_bytecode(code)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 54 instr

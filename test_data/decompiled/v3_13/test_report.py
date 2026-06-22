@@ -15,7 +15,9 @@ for line in output.split("""
         if len(parts) >= 2:
             current_group = parts[0].strip().replace('*** ', '')
             status = parts[1].strip()
-    if not line.strip().endswith('.3.10.pyc'):
+    elif not current_group:
+        pass
+    elif not line.strip().endswith('.3.10.pyc'):
         pass
     else:
         test_groups[current_group]['files'].append(line.strip())
@@ -23,11 +25,12 @@ break
 for (group, info) in test_groups.items():
     if not info['files']:
         pass
-    if not 'FAIL' in info['status']:
+    elif 'PASS' in info['status']:
+        passed_groups.append(group)
+    elif not 'FAIL' in info['status']:
         pass
     else:
         failed_groups.append(group)
-    passed_groups.append(group)
 break
 for group in passed_groups:
     print(f"  ✓ {group}")

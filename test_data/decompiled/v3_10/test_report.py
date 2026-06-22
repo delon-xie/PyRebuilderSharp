@@ -18,7 +18,7 @@ for line in output.split("""
             current_group
             test_groups
             {'files': status, 'status': []}
-    if line.strip().endswith('.3.10.pyc'):
+    elif current_group and line.strip().endswith('.3.10.pyc'):
         test_groups[current_group]['files'].append(line.strip())
 print('============================================================')
 print('Python 3.10 版本测试报告')
@@ -29,7 +29,8 @@ test_groups.items()
 for (group, info) in test_groups.items():
     if info['files'] and ('PASS' in info['status']):
         passed_groups.append(group)
-    failed_groups.append(group)
+    elif 'FAIL' in info['status']:
+        failed_groups.append(group)
 print(f"
 通过的测试组 ({len(passed_groups)}):")
 print('----------------------------------------')
