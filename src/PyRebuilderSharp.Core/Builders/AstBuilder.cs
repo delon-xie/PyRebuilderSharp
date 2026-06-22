@@ -3002,7 +3002,8 @@ public class AstBuilder
                         return new ListLiteral(names, ContainerKind.Tuple);
                 }
 
-                if ((instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME)
+                if ((instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME
+                        || instr.Opcode == Opcode.STORE_DEREF)
                     && instr.Argument.HasValue)
                 {
                     var idx = instr.Argument.Value;
@@ -3013,11 +3014,22 @@ public class AstBuilder
                             continue;
                         varName = _codeObject.Varnames[idx];
                     }
-                    else
+                    else if (instr.Opcode == Opcode.STORE_NAME)
                     {
                         if (idx < 0 || idx >= _codeObject.Names.Count)
                             continue;
                         varName = _codeObject.Names[idx];
+                    }
+                    else // STORE_DEREF
+                    {
+                        // CPython 3.12+ STORE_DEREF uses varname index for cell variables,
+                        // and len(varnames) + freevar_index for free variables
+                        if (idx < _codeObject.Varnames.Count)
+                            varName = _codeObject.Varnames[idx];
+                        else if (idx - _codeObject.Varnames.Count < _codeObject.Freevars.Count)
+                            varName = _codeObject.Freevars[idx - _codeObject.Varnames.Count];
+                        else
+                            varName = $"cell_{idx}";
                     }
                     return new Name(varName, ExpressionContext.Store);
                 }
@@ -3051,6 +3063,20 @@ public class AstBuilder
             else if (instr.Opcode == Opcode.STORE_NAME && instr.Argument.HasValue
                 && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Names.Count)
                 names.Add(new Name(_codeObject.Names[instr.Argument.Value], ExpressionContext.Store));
+            else if (instr.Opcode == Opcode.STORE_DEREF && instr.Argument.HasValue)
+            {
+                int idx = instr.Argument.Value;
+                string cellName;
+                // CPython 3.12+ STORE_DEREF uses varname index for cell variables,
+                // and len(varnames) + freevar_index for free variables
+                if (idx < _codeObject.Varnames.Count)
+                    cellName = _codeObject.Varnames[idx];
+                else if (idx - _codeObject.Varnames.Count < _codeObject.Freevars.Count)
+                    cellName = _codeObject.Freevars[idx - _codeObject.Varnames.Count];
+                else
+                    cellName = $"cell_{idx}";
+                names.Add(new Name(cellName, ExpressionContext.Store));
+            }
             else break;
         }
         return names;

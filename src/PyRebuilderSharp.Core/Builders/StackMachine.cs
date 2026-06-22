@@ -204,10 +204,12 @@ public class StackMachine
             {
                 var idx = instr.Argument ?? 0;
                 string cellName;
-                if (idx < _code.Cellvars.Count)
-                    cellName = _code.Cellvars[idx];
-                else if (idx - _code.Cellvars.Count < _code.Freevars.Count)
-                    cellName = _code.Freevars[idx - _code.Cellvars.Count];
+                // CPython 3.12+ uses varname index for cell variables,
+                // and len(varnames) + freevar_index for free variables
+                if (idx < _code.Varnames.Count)
+                    cellName = _code.Varnames[idx];
+                else if (idx - _code.Varnames.Count < _code.Freevars.Count)
+                    cellName = _code.Freevars[idx - _code.Varnames.Count];
                 else
                     cellName = $"cell_{idx}";
                 _exprStack.Push(new Name(cellName, ExpressionContext.Load));
