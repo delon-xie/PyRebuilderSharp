@@ -1159,15 +1159,30 @@ public class StackMachine
             case Opcode.PUSH_EXC_INFO_312:
             case Opcode.CHECK_EXC_MATCH:
             case Opcode.CHECK_EG_MATCH:
-            // 3.10+ match/case: runtime pattern matching, no AST generation
+            // 3.10+ match/case: runtime pattern matching ops — adjust stack for consistent state
             case Opcode.MATCH_MAPPING_312:
             case Opcode.MATCH_MAPPING_313:
+                // MATCH_MAPPING: pop subject, push subject (match) or None (fail)
+                SafePop(); // subject
+                _exprStack.Push(new Name("_match_subj"));
+                return null;
             case Opcode.MATCH_SEQUENCE_312:
             case Opcode.MATCH_SEQUENCE_313:
+                // MATCH_SEQUENCE: pop subject, push subject (match) or None (fail)
+                SafePop();
+                _exprStack.Push(new Name("_match_subj"));
+                return null;
             case Opcode.MATCH_KEYS_312:
             case Opcode.MATCH_KEYS_313:
+                // MATCH_KEYS: pop (subject, keys_tuple), push matched dict or None
+                SafePop(); SafePop();
+                _exprStack.Push(new Name("_match_subj"));
+                return null;
             case Opcode.MATCH_CLASS_312:
             case Opcode.MATCH_CLASS_313:
+                // MATCH_CLASS: pop (subject, class, empty_tuple), push subject (match) or None
+                SafePop(); SafePop(); SafePop();
+                _exprStack.Push(new Name("_match_subj"));
                 return null;
 
             // ---- 3.5-3.10 opcodes that carry through ----
