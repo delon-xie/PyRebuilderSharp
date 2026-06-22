@@ -3612,6 +3612,14 @@ public class AstBuilder
             || a.Targets[0] is not Name n
             || (n.Id != "__module__" && n.Id != "__qualname__" && n.Id != "__classcell__")).ToList();
 
+        // 将第一个 __doc__ = '...' 转换为裸字符串表达式（类体 docstring）
+        if (body.Count > 0 && body[0] is Assign docAssign
+            && docAssign.Targets.Count == 1 && docAssign.Targets[0] is Name docName
+            && docName.Id == "__doc__" && docAssign.Value is Constant docConst)
+        {
+            body[0] = new ExprStmt(docConst);
+        }
+
         // 过滤 class body 中的 return 语句（class body 无 return）
         body = body.Where(s => s is not Return).ToList();
 
