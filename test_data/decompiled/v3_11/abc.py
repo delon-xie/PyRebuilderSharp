@@ -51,7 +51,7 @@ class abstractclassmethod(classmethod):
     __isabstractmethod__ = True
     def __init__(self, callable):
         import warnings
-        warnings('abc.abstractclassmethod', (3, 21))
+        warnings('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super()(callable)
 class abstractstaticmethod(staticmethod):
@@ -71,7 +71,7 @@ class abstractstaticmethod(staticmethod):
     __isabstractmethod__ = True
     def __init__(self, callable):
         import warnings
-        warnings('abc.abstractstaticmethod', (3, 21))
+        warnings('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super()(callable)
 class abstractproperty(property):
@@ -89,9 +89,9 @@ class abstractproperty(property):
 
     """
     __isabstractmethod__ = True
-    def __init__(self, fget, fset, fdel, doc):
+    def __init__(self, fget = None, fset = None, fdel = None, doc = None):
         import warnings
-        warnings('abc.abstractproperty', (3, 21))
+        warnings('abc.abstractproperty', remove=(3, 21))
         super()(fget, fset, fdel, doc)
 class ABCMeta(type):
     __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
@@ -124,13 +124,13 @@ class ABCMeta(type):
         return _abc_subclasscheck(cls, subclass)
     def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
-        print(f"Class: {cls.print}.{cls.__module__}", file)
-        print(f"Inv. counter: {get_cache_token()}", file)
+        print(f"Class: {cls.print}.{cls.__module__}", file=file)
+        print(f"Inv. counter: {get_cache_token()}", file=file)
         (_abc_registry, _abc_cache, _abc_negative_cache, _abc_negative_cache_version) = _get_dump(cls)
-        print(f"_abc_registry: {_abc_registry!r}", file)
-        print(f"_abc_cache: {_abc_cache!r}", file)
-        print(f"_abc_negative_cache: {_abc_negative_cache!r}", file)
-        print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file)
+        print(f"_abc_registry: {_abc_registry!r}", file=file)
+        print(f"_abc_cache: {_abc_cache!r}", file=file)
+        print(f"_abc_negative_cache: {_abc_negative_cache!r}", file=file)
+        print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file=file)
     def _abc_registry_clear(cls):
         """Clear the registry (for debugging or testing)."""
         _reset_registry(cls)
@@ -168,7 +168,7 @@ def update_abstractmethods(cls):
     abstracts.add
     # orphan @0x0178
     return cls
-class ABC(ABCMeta):
+class ABC(metaclass=ABCMeta):
     __doc__ = """Helper class that provides a standard way to create an ABC using
     inheritance.
     """

@@ -1,9 +1,9 @@
 # PyRebuilderSharp Baseline Test Evaluation Report
 
-**Date**: 2026-06-22 08:03
-**Scope**: 942 decompiled outputs across 11 Python versions (2.7 → 3.14)
+**Date**: 2026-06-22 08:59
+**Scope**: 978 decompiled outputs across 11 Python versions (2.7 → 3.14)
 **Engine**: PyRebuilderSharp (.NET 10 + Avalonia, block-level CFG reconstruction)
-**Commit**: `a56f9df`
+**Commit**: `feebd97`
 
 ---
 
@@ -11,22 +11,22 @@
 
 | Metric | Value | Status |
 |:-------|:------|:------:|
-| Unique source files | 95 | |
-| Total decompilation attempts | 942 | |
-| **Decompilation success (no crashes)** | **942 (100.0%)** | ✅ |
+| Unique source files | 100 | |
+| Total decompilation attempts | 978 | |
+| **Decompilation success (no crashes)** | **978 (100.0%)** | ✅ |
 | **Decompilation failures** | **0** | ❌ |
 | **A class (near-perfect, ≤3% diff)** | **29 (3%)** | ✅ |
-| **B class (minor cosmetic, ≤15%)** | **43 (5%)** | ✅ |
-| C class (notable formatting diff, ≤40%) | 164 (17%) | ⚠️ |
-| D class (high diff ratio, >40%) | 706 (75%) | ⚠️ |
-| **A+B (acceptable output)** | **72 (8%)** | ✅ |
-| Total orphan blocks | 1363 | ⚠️ |
-| Total diff lines (added+removed) | 69472 | |
-| Total diff lines per file (avg) | 73.7 | |
+| **B class (minor cosmetic, ≤15%)** | **43 (4%)** | ✅ |
+| C class (notable formatting diff, ≤40%) | 169 (17%) | ⚠️ |
+| D class (high diff ratio, >40%) | 737 (75%) | ⚠️ |
+| **A+B (acceptable output)** | **72 (7%)** | ✅ |
+| Total orphan blocks | 1376 | ⚠️ |
+| Total diff lines (added+removed) | 69845 | |
+| Total diff lines per file (avg) | 71.4 | |
 
 ### Interpretation Note
 
-> **D-class does NOT mean "corrupted" or "useless" output.** All 706 D-class files are structurally correct Python code.
+> **D-class does NOT mean "corrupted" or "useless" output.** All 737 D-class files are structurally correct Python code.
 > D-class indicates >40% of lines differ from the original — the dominant causes are:
 > - **Many small test files** (10-30 lines): a few missing blank lines or import formatting = high ratio
 > - **Docstring format**: decompiler outputs `'text'` instead of `"""text"""`
@@ -43,15 +43,15 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 |:-------:|:-----:|:-------:|:--------:|:--------:|:--------:|:----:|:-------:|
 | 2.7 | 51 | 3 | 5 | 15 | 28 | 16% | 2 |
 | 3.5 | 57 | 3 | 5 | 17 | 32 | 14% | 4 |
-| 3.6 | 91 | 3 | 4 | 14 | 70 | 8% | 153 |
-| 3.7 | 91 | 3 | 4 | 17 | 67 | 8% | 273 |
-| 3.8 | 93 | 3 | 4 | 19 | 67 | 8% | 327 |
-| 3.9 | 93 | 3 | 4 | 19 | 67 | 8% | 353 |
-| 3.10 | 93 | 3 | 5 | 19 | 66 | 9% | 39 |
-| 3.11 | 93 | 1 | 2 | 10 | 80 | 3% | 137 |
-| 3.12 | 93 | 1 | 3 | 13 | 76 | 4% | 26 |
-| 3.13 | 93 | 3 | 3 | 10 | 77 | 6% | 25 |
-| 3.14 | 94 | 3 | 4 | 11 | 76 | 7% | 24 |
+| 3.6 | 95 | 3 | 4 | 15 | 73 | 7% | 153 |
+| 3.7 | 95 | 3 | 4 | 18 | 70 | 7% | 273 |
+| 3.8 | 97 | 3 | 4 | 20 | 70 | 7% | 327 |
+| 3.9 | 97 | 3 | 4 | 20 | 70 | 7% | 355 |
+| 3.10 | 97 | 3 | 5 | 20 | 69 | 8% | 39 |
+| 3.11 | 97 | 1 | 2 | 10 | 84 | 3% | 137 |
+| 3.12 | 97 | 1 | 3 | 13 | 80 | 4% | 26 |
+| 3.13 | 97 | 3 | 3 | 10 | 81 | 6% | 30 |
+| 3.14 | 98 | 3 | 4 | 11 | 80 | 7% | 30 |
 
 ---
 
@@ -66,27 +66,27 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 | abc.py | 3.8 | +46/−93 | 🔴 D | 1 | 66.2% |
 | abc.py | 3.9 | +47/−92 | 🔴 D | 1 | 66.2% |
 | abc.py | 3.10 | +53/−87 | 🔴 D | 0 | 66.7% |
-| abc.py | 3.11 | +68/−103 | 🔴 D | 4 | 81.4% |
-| abc.py | 3.12 | +60/−94 | 🔴 D | 0 | 73.3% |
-| abc.py | 3.13 | +129/−164 | 🔴 D | 0 | 139.5% |
-| abc.py | 3.14 | +132/−162 | 🔴 D | 0 | 140.0% |
+| abc.py | 3.11 | +67/−102 | 🔴 D | 4 | 80.5% |
+| abc.py | 3.12 | +56/−90 | 🔴 D | 0 | 69.5% |
+| abc.py | 3.13 | +130/−159 | 🔴 D | 0 | 137.6% |
+| abc.py | 3.14 | +133/−157 | 🔴 D | 0 | 138.1% |
 | enum.py | 3.6 | +829/−1498 | 🔴 D | 111 | 105.4% |
 | enum.py | 3.7 | +376/−1582 | 🔴 D | 203 | 88.7% |
 | enum.py | 3.8 | +377/−1580 | 🔴 D | 191 | 88.6% |
 | enum.py | 3.9 | +388/−1585 | 🔴 D | 193 | 89.4% |
 | enum.py | 3.10 | +576/−1438 | 🔴 D | 13 | 91.2% |
-| enum.py | 3.11 | +984/−1791 | 🔴 D | 54 | 125.7% |
-| enum.py | 3.12 | +1031/−1675 | 🔴 D | 23 | 122.6% |
-| enum.py | 3.13 | +1161/−2102 | 🔴 D | 20 | 147.8% |
-| enum.py | 3.14 | +1206/−2097 | 🔴 D | 18 | 149.6% |
+| enum.py | 3.11 | +981/−1788 | 🔴 D | 54 | 125.4% |
+| enum.py | 3.12 | +1028/−1672 | 🔴 D | 23 | 122.3% |
+| enum.py | 3.13 | +1429/−2102 | 🔴 D | 25 | 159.9% |
+| enum.py | 3.14 | +1300/−1898 | 🔴 D | 24 | 144.8% |
 | functools.py | 3.8 | +190/−792 | 🔴 D | 72 | 82.8% |
 | functools.py | 3.9 | +192/−817 | 🔴 D | 68 | 85.1% |
 | functools.py | 3.10 | +213/−819 | 🔴 D | 2 | 87.0% |
-| functools.py | 3.11 | +508/−930 | 🔴 D | 37 | 121.2% |
-| functools.py | 3.12 | +527/−873 | 🔴 D | 1 | 118.0% |
-| functools.py | 3.13 | +655/−987 | 🔴 D | 1 | 138.4% |
-| functools.py | 3.14 | +656/−960 | 🔴 D | 2 | 136.3% |
-| pprint.py | 3.14 | +174/−804 | 🔴 D | 1 | 103.2% |
+| functools.py | 3.11 | +507/−929 | 🔴 D | 37 | 121.1% |
+| functools.py | 3.12 | +526/−872 | 🔴 D | 1 | 117.9% |
+| functools.py | 3.13 | +652/−978 | 🔴 D | 1 | 137.4% |
+| functools.py | 3.14 | +650/−949 | 🔴 D | 2 | 134.8% |
+| pprint.py | 3.14 | +172/−804 | 🔴 D | 1 | 103.0% |
 | reprlib.py | 3.6 | +71/−146 | 🔴 D | 9 | 93.9% |
 | reprlib.py | 3.7 | +50/−152 | 🔴 D | 25 | 87.4% |
 | reprlib.py | 3.8 | +46/−154 | 🔴 D | 23 | 86.6% |
@@ -110,18 +110,18 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 | 3.6 | 153 | abc.py, analyze_tests.py, check_csharp.py, compare_ast.py, debug_analyze.py... |
 | 3.7 | 273 | analyze_tests.py, check_csharp.py, compare_ast.py, debug_exc.py, dump_27_bytecode.py... |
 | 3.8 | 327 | abc.py, analyze_tests.py, check_csharp.py, compare_ast.py, dump_27_bytecode.py... |
-| 3.9 | 353 | abc.py, analyze_tests.py, check_csharp.py, compare_ast.py, debug_analyze.py... |
+| 3.9 | 355 | abc.py, analyze_tests.py, check_csharp.py, compare_ast.py, debug_analyze.py... |
 | 3.10 | 39 | analyze_tests.py, check_csharp.py, debug_analyze.py, dump_27_bytecode.py, enum.py... |
 | 3.11 | 137 | abc.py, check_csharp.py, compare_ast.py, debug_exc.py, definitive_marshal.py... |
 | 3.12 | 26 | enum.py, find_break.py, functools.py, mixed5_out.py |
-| 3.13 | 25 | debug_exc.py, enum.py, find_break.py, functools.py, mixed5_out.py |
-| 3.14 | 24 | debug_exc.py, enum.py, functools.py, mixed5_out.py, pprint.py |
+| 3.13 | 30 | debug_exc.py, enum.py, find_break.py, functools.py, mixed5_out.py |
+| 3.14 | 30 | debug_exc.py, enum.py, functools.py, mixed5_out.py, pprint.py |
 
 ### Top Files by Total Orphans (all versions)
 
 | File | Total Orphans |
 |:-----|:-------------:|
-| enum | 826 |
+| enum | 837 |
 | functools | 183 |
 | reprlib | 97 |
 | dump_27_bytecode | 29 |
@@ -144,19 +144,19 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 
 | File | Version | Diff Lines |
 |:-----|:-------:|:----------:|
-| enum | 3.14 | 3303 |
-| enum | 3.13 | 3263 |
-| enum | 3.11 | 2775 |
-| enum | 3.12 | 2706 |
+| enum | 3.13 | 3531 |
+| enum | 3.14 | 3198 |
+| enum | 3.11 | 2769 |
+| enum | 3.12 | 2700 |
 | enum | 3.6 | 2327 |
 | enum | 3.10 | 2014 |
 | enum | 3.9 | 1973 |
 | enum | 3.7 | 1958 |
 | enum | 3.8 | 1957 |
-| functools | 3.13 | 1642 |
-| functools | 3.14 | 1616 |
-| functools | 3.11 | 1438 |
-| functools | 3.12 | 1400 |
+| functools | 3.13 | 1630 |
+| functools | 3.14 | 1599 |
+| functools | 3.11 | 1436 |
+| functools | 3.12 | 1398 |
 | functools | 3.10 | 1032 |
 | functools | 3.9 | 1009 |
 
@@ -203,7 +203,7 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 1. **CFG handler→class edge** (~50 files): BlockScanner misclassifies class/function defs after handler blocks as handler successors
 2. **3.13 abc.py**: Module-level only outputs `if not True: pass` — ET+block interaction not resolved
 3. **3.14 abc.py `iterable`**: `for scls in iterable:` not resolved to `cls.__bases__`
-4. **Orphan blocks** (1363): Blocks that couldn't be placed in the AST, output with `# orphan` comment
+4. **Orphan blocks** (1376): Blocks that couldn't be placed in the AST, output with `# orphan` comment
 5. **Marshal truncation**: Some padded .pyc files hit EndOfStreamException (non-fatal, partial output)
 
 ### 6.5 Recommendations
@@ -214,7 +214,7 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 | P0 | 3.14 abc.py `iterable` | Adjust `ExtractIterExpression` for 3.14 | 2h |
 | P1 | CFG handler→class edge | Rework BlockScanner successor handling | 4h |
 | P2 | Default param values in decompiled output | Track in AST, emit in generator | 3h |
-| P3 | Orphan reduction (1363) | Strengthen `_processedBlockIds` | 4h |
+| P3 | Orphan reduction (1376) | Strengthen `_processedBlockIds` | 4h |
 | P3 | `# orphan @` / `# [SUMMARY]` noise | Make optional (CLI flag) | 3h |
 | P4 | Docstring `'text'` → `"""text"""` | Detect docstring pattern in generator | 2h |
 | P4 | Blank line preservation | Track line gaps in lnotab | 3h |
@@ -243,15 +243,15 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 |:-------:|:----------:|:----------:|:------------:|
 | 2.7 | 51 | 51 | 100% |
 | 3.5 | 57 | 57 | 100% |
-| 3.6 | 91 | 91 | 100% |
-| 3.7 | 91 | 91 | 100% |
-| 3.8 | 93 | 93 | 100% |
-| 3.9 | 93 | 93 | 100% |
-| 3.10 | 94 | 94 | 100% |
-| 3.11 | 93 | 93 | 100% |
-| 3.12 | 93 | 93 | 100% |
-| 3.13 | 93 | 93 | 100% |
-| 3.14 | 94 | 94 | 100% |
+| 3.6 | 96 | 96 | 100% |
+| 3.7 | 96 | 96 | 100% |
+| 3.8 | 98 | 98 | 100% |
+| 3.9 | 98 | 98 | 100% |
+| 3.10 | 99 | 99 | 100% |
+| 3.11 | 98 | 98 | 100% |
+| 3.12 | 98 | 98 | 100% |
+| 3.13 | 98 | 98 | 100% |
+| 3.14 | 99 | 99 | 100% |
 
 ---
 
@@ -263,11 +263,11 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 | P0 | Fix 3.14 abc.py `for scls in iterable:` | 2h |
 | P1 | Fix CFG handler→class edge misclassification | 4h |
 | P2 | Add default parameter value recovery | 3h |
-| P3 | Reduce orphan blocks (1363) | 4h |
+| P3 | Reduce orphan blocks (1376) | 4h |
 | P3 | Make `# orphan @` / `# [SUMMARY]` CLI-optional | 3h |
 | P4 | Docstring format preservation | 2h |
 | P4 | Blank line preservation | 3h |
 
 ---
 
-*Report generated by `tools/baseline_evaluate_all.py` on 2026-06-22 08:03*
+*Report generated by `tools/baseline_evaluate_all.py` on 2026-06-22 08:59*

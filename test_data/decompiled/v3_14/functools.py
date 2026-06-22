@@ -29,7 +29,7 @@ from types import FunctionType, GenericAlias, MethodType, MappingProxyType, Unio
 from _thread import RLock
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
 WRAPPER_UPDATES = ('__dict__',)
-def update_wrapper(wrapper, wrapped, assigned, updated):
+def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Update a wrapper function to look like the wrapped function
 
 wrapper is the function to be updated
@@ -54,7 +54,7 @@ function (defaults to functools.WRAPPER_UPDATES)
     wrapped.__wrapped__ = wrapper
     return wrapper
     setattr(wrapper, attr, value)
-def wraps(wrapped, assigned, updated):
+def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
 Returns a decorator that invokes update_wrapper() with the decorated
@@ -63,7 +63,7 @@ remaining arguments. Default arguments are as for update_wrapper().
 This is a convenience function to simplify applying partial() to
 update_wrapper().
 """
-    return name_2(wrapped, assigned, updated, ('wrapped', 'assigned', 'updated'))
+    return partial(name_2, updated=updated, assigned=assigned, wrapped=wrapped)
 def _gt_from_lt(self, other):
     """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
     op_result = type(self).__lt__(self, other)
@@ -177,13 +177,28 @@ def total_ordering(cls):
     _convert
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    K = (mycmp)(K, 'K', object)
+    class K(object):
+        __firstlineno__ = 208
+        __slots__ = ['obj']
+        def __init__(self, obj):
+            obj.obj = self
+        def __lt__(self, other):
+            return cell_2(self.obj, other.obj) < 0
+        def __gt__(self, other):
+            return cell_2(self.obj, other.obj) > 0
+        def __eq__(self, other):
+            return cell_2(self.obj, other.obj) == 0
+        def __le__(self, other):
+            return cell_2(self.obj, other.obj) <= 0
+        def __ge__(self, other):
+            return cell_2(self.obj, other.obj) >= 0
+        __hash__ = None
+        __static_attributes__ = ['obj']
+        __classdictcell__ = __classdict__
     return K
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
 []
 _initial_missing = sentinel('_initial_missing')
-def reduce(function, sequence, initial):
+def reduce(function, sequence, initial = _initial_missing):
     """
 reduce(function, iterable, /[, initial]) -> value
 
@@ -209,7 +224,6 @@ calculates ((((1 + 2) + 3) + 4) + 5).
     for element in it:
         value = function(value, element)
     return value
-(_initial_missing)
 class _PlaceholderType:
     __firstlineno__ = 278
     __doc__ = """The type of the Placeholder singleton.
@@ -293,7 +307,7 @@ and keywords.
             pto_args = self.args
         keywords = keywords
         return pto_args(**keywords)
-    def __get__(self, obj, objtype):
+    def __get__(self, obj, objtype = None):
         return self
         # orphan @0x000E
         return MethodType(self, obj)
@@ -341,7 +355,7 @@ callables as instance methods.
         cell_0.__isabstractmethod__.__isabstractmethod__ = _method
         cell_0.__partialmethod__ = _method
         return _method
-    def __get__(self, obj, cls):
+    def __get__(self, obj, cls = None):
         """__get__"""
         try:
             new_func.__self__.__self__ = result
@@ -374,7 +388,7 @@ def _unwrap_partialmethod(func):
         func = _unwrap_partial(func)
     return func
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
-def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
+def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
     """Make a cache key from optionally typed positional and keyword arguments
 
 The key is constructed in a way that is flat as possible rather than
@@ -415,7 +429,7 @@ saves space and improves lookup speed.
     []
     for _ in []:
         pass
-def lru_cache(maxsize, typed):
+def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
 
 If *maxsize* is set to None, the LRU features are disabled and the cache
@@ -498,13 +512,9 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             __module__
             return
             raise
-        (KEY, NEXT, PREV, RESULT, cache, cache_get, cache_len, full, hits, lock, make_key, maxsize, misses, root, typed, user_function)
-        (cache, cache_get, hits, make_key, misses, sentinel, typed, user_function)
-(128, False)
-((object()), {int, str}, tuple, type, len)
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
-    return lru_cache(('maxsize',))(user_function)
+    return lru_cache(maxsize=None)(user_function)
 def _c3_merge(sequences):
     """Merges MROs in *sequences* to a single MRO using the C3 algorithm.
 
@@ -543,7 +553,7 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     except:
         break
     result = []
-def _c3_mro(cls, abcs):
+def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
 
 If no *abcs* are given, the algorithm works exactly like the built-in C3
@@ -615,8 +625,6 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
             if not issubclass(cls, cell_7):
                 pass
             <genexpr>(cls.__bases__())
-            (base)
-            None
             break
             for _ in cls.__bases__():
                 if not True:
@@ -653,7 +661,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
                     pass
                 break
             return False
-        (types)
         n
         cell_1
         []
@@ -681,16 +688,15 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
             if not found:
                 mro.append(typ)
             else:
-                name_12(True, ('key', 'reverse'))
+                found.sort(reverse=True, key=name_12)
                 found
-                found.sort
             for sub in found:
                 for subcls in sub:
                     if not subcls not in mro:
                         pass
                     else:
                         mro.append(subcls)
-        return cell_0(mro, ('abcs',))
+        return _c3_mro(cell_0, abcs=mro)
     except:
         break
     def is_related(typ):
@@ -699,7 +705,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
             issubclass(cell_2, typ)
         return
     set(cell_0.__mro__)
-    (bases, cls)
     n
     cell_1
 def _find_impl(cls, registry):
@@ -755,13 +760,13 @@ callables as instance methods.
     def __init__(self, func):
         """__get__"""
         pass
-    def register(self, cls, method):
+    def register(self, cls, method = None):
         """generic_method.register(cls, func) -> func
 
 Registers a new implementation for the given *cls* on a *generic_method*.
 """
-        return cls(method, ['func'])
-    def __get__(self, obj, cls):
+        return self.dispatcher.register(cls, func=method)
+    def __get__(self, obj, cls = None):
         return _singledispatchmethod_get(self, obj, cls)
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
@@ -848,7 +853,7 @@ class cached_property:
     def __set_name__(self, owner, name):
         name.attrname = self
         # orphan @0x004E
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner = None):
         try:
             cache = instance.__dict__
         except:

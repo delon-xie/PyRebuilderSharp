@@ -2,7 +2,7 @@
 
 import subprocess
 import re
-result = subprocess.run(['python3', 'tests/run_tests.py'], True, True, '/Users/admin/codes/Tools/PyRebuild/ref/pycdc')
+result = subprocess.run(['python3', 'tests/run_tests.py'], cwd='/Users/admin/codes/Tools/PyRebuild/ref/pycdc', text=True, capture_output=True)
 lines = result.stdout.split("""
 """)
 print('============================================================')

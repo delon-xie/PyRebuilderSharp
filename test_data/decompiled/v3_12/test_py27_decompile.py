@@ -20,10 +20,10 @@ try:
     py_compile.compile(src, cfile=dst, doraise=True)
     print('OK')
 except Exception as e:
-    print('FAIL:' + str(e))""", INPUT_PY, outc], True, True, 30)
+    print('FAIL:' + str(e))""", INPUT_PY, outc], timeout=30, text=True, capture_output=True)
 print('2.7 compile:', result.stdout + result.stderr.strip())
 OUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData')
-result2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], True, True, 60)
+result2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], timeout=60, text=True, capture_output=True)
 if len(result2.stdout) > 500:
     pass
 else:

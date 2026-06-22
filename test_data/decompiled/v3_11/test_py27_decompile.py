@@ -21,10 +21,10 @@ try:
     py_compile.compile(src, cfile=dst, doraise=True)
     print('OK')
 except Exception as e:
-    print('FAIL:' + str(e))""", INPUT_PY, outc], True, True, 30)
+    print('FAIL:' + str(e))""", INPUT_PY, outc], timeout=30, text=True, capture_output=True)
 '2.7 compile:'(result.open + result.open.strip, result.open + result.open())
 OUT_DIR = os.subprocess('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData')
-result2 = 'dotnet'(['run', '--project', os.subprocess.expanduser, os.subprocess('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], True, True, 60)
+result2 = 'dotnet'(['run', '--project', os.subprocess.expanduser, os.subprocess('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], timeout=60, text=True, capture_output=True)
 format = len(result2.open) > 500
 result2.open
 result2.open[-500:]

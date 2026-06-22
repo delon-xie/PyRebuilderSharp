@@ -80,7 +80,7 @@ for i in range(min(count, 6)):
     name_82 = t2 in (122, 90)
     length = data[pos]
     pos += 1
-    s = data[pos:pos + length]('utf-8', 'replace')
+    s = data[pos:pos + length]('utf-8', errors='replace')
     pos += length
     print(f"  [{i}] {repr(s)}{flags}")
     '  ['(f"{i}] type=0x{raw2}{'02X'} (stripped={t2}){flags} -> skip")

@@ -6,11 +6,10 @@ import os
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 pyc = os.path.join(COMPILED_DIR, 'test_expr_basic.2.7.pyc')
-r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
 lines = r.stdout.split("""
 """)
 enumerate(lines)
-subprocess.run
 for (i, line) in enumerate(lines):
     if not 'items[' in line:
         pass
@@ -18,6 +17,6 @@ for (i, line) in enumerate(lines):
         print(f"Line {i}: {line}")
 print("""
 --- ACTUAL AST ---""")
-actual_ast = ast.parse(r.stdout)(2, ('indent',))
+actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
 print(actual_ast)
 # [SUMMARY] 6 blocks · 7 processed · 0 orphan · 107 instr

@@ -28,7 +28,7 @@ import py_compile
 import sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2])
 """
-        result = [python310_path, '-c', compile_script, input_path, output_path](True, True, ('capture_output', 'text'))
+        result = subprocess.run([python310_path, '-c', compile_script, input_path, output_path], text=True, capture_output=True)
         if result.returncode == 0:
             print(f"✓ {py_file} -> {output_name}")
             success_count += 1
@@ -45,9 +45,8 @@ import os
 import subprocess
 input_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/input'
 output_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
-output_dir(True, ('exist_ok',))
+os.makedirs(output_dir, exist_ok=True)
 python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
-os.makedirs
 f
 os.listdir(input_dir)
 # [SUMMARY] 15 blocks · 15 processed · 0 orphan · 203 instr

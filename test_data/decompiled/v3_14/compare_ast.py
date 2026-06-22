@@ -1,13 +1,11 @@
 # Decompiled from: <module>
 
 try:
-    expected_ast = ast.parse(expected)(2, ('indent',))
-    ast.dump
+    expected_ast = ast.dump(ast.parse(expected), indent=2)
 except Exception:
     pass
 try:
-    actual_ast = ast.parse(decompiled)(2, ('indent',))
-    ast.dump
+    actual_ast = ast.dump(ast.parse(decompiled), indent=2)
 except Exception:
     pass
 try:

@@ -108,7 +108,7 @@ def _iter_bits_lsb(num):
         pass
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
-def bin(num, max_bits):
+def bin(num, max_bits = None):
     """
 Like built-in bin(), except negative values are represented in
 twos-complement, and the leading bit always indicates sign
@@ -147,7 +147,7 @@ class auto:
     __doc__ = """
 Instances are replaced with an appropriate value in Enum class suites.
 """
-    def __init__(self, value):
+    def __init__(self, value = _auto_null):
         pass
     def __repr__(self):
         return 'auto(%r)' % self.value
@@ -164,7 +164,7 @@ a corresponding enum member.
     member = None
     _attr_type = None
     _cls_type = None
-    def __get__(self, instance, ownerclass):
+    def __get__(self, instance, ownerclass = None):
         try:
             ownerclass._member_map_[self.name]
         except:
@@ -273,7 +273,7 @@ Track enum member order and ensure member names are not reused.
 EnumType will use the names found in self._member_names as the
 enumeration member names.
 """
-    def __init__(self, cls_name):
+    def __init__(self, cls_name = None):
         {}._member_names = self
         []._last_values = self
         []._ignore = self
@@ -500,7 +500,7 @@ Metaclass for Enum
 classes/types should always be True.
 """
         return True
-    def __call__(cls, value, names):
+    def __call__(cls, value, names = _not_given):
         """
 Either returns an existing member, or creates a new enum class.
 
@@ -636,7 +636,7 @@ Convenience method to create a new Enum class.
         except:
             pass
         raise
-    def _convert_(cls, name, module, filter, source):
+    def _convert_(cls, name, module, filter, source = None):
         """
 Create a new Enum subclass that replaces a collection of global constants
 """
@@ -654,8 +654,7 @@ Create a new Enum subclass that replaces a collection of global constants
                 if not True:
                     pass
             break
-            <lambda>(('key',))
-            members.sort
+            members.sort(key=<lambda>)
             t
             members
             try:
@@ -737,7 +736,197 @@ Create a new Enum subclass that replaces a collection of global constants
     __signature__ = __signature__()
     __static_attributes__ = []
 EnumMeta = EnumType
-Enum = Enum('Enum', EnumType, ('metaclass',))
+class Enum(metaclass=EnumType):
+    __firstlineno__ = 1137
+    __doc__ = """
+Create a collection of name/value pairs.
+
+Example enumeration:
+
+>>> class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+
+Access them by:
+
+- attribute access:
+
+  >>> Color.RED
+  <Color.RED: 1>
+
+- value lookup:
+
+  >>> Color(1)
+  <Color.RED: 1>
+
+- name lookup:
+
+  >>> Color['RED']
+  <Color.RED: 1>
+
+Enumerations can be iterated over, and know how many members they have:
+
+>>> len(Color)
+3
+
+>>> list(Color)
+[<Color.RED: 1>, <Color.BLUE: 2>, <Color.GREEN: 3>]
+
+Methods can be added to enumerations, and members can have their own
+attributes -- see the documentation for details.
+"""
+    def __new__(cls, value):
+        try:
+            cls._value2member_map_[value]
+        except:
+            pass
+        try:
+            break
+        except:
+            pass
+        try:
+            exc = None
+            result = cls._missing_(value)
+        except:
+            pass
+        try:
+            exc = e
+            result = None
+        except:
+            e = None
+        try:
+            try:
+                try:
+                    ve_exc = ValueError(f"{value} is not a valid {cls.__qualname__}")
+                    try:
+                        exc = TypeError(f"error in {cls.__name__}._missing_: returned {result} instead of None or a valid member")
+                        try:
+                            try:
+                                pass
+                            except:
+                                exc = None
+                                ve_exc = None
+                        except:
+                            exc = None
+                            ve_exc = None
+                    except:
+                        exc = None
+                        ve_exc = None
+                except:
+                    exc = None
+                    ve_exc = None
+                if (cls._boundary_ is name_32) and isinstance(result, name_34):
+                    result
+                result
+            except:
+                exc = None
+                ve_exc = None
+        except:
+            exc = None
+            ve_exc = None
+        if type(value) is cls:
+            return value
+        return
+        if not True:
+            pass
+        return
+        if not True:
+            pass
+        return
+        e = None
+        exc = None
+        ve_exc = None
+        return
+        exc = None
+        ve_exc = None
+        return
+        # orphan @0x01AC
+        # orphan @0x01C4
+        # orphan @0x01E0
+    def _add_alias_(self, name):
+        pass
+    def _add_value_alias_(self, value):
+        try:
+            try:
+                try:
+                    raise ValueError(f"{value} is already bound: {cls._value2member_map_[value]}")
+                    return None
+                    try:
+                        cls._hashable_values_.append(value)
+                    except:
+                        break
+                    try:
+                        try:
+                            cls._member_map_.values()
+                            for m in cls._member_map_.values():
+                                try:
+                                    m._value_ == value
+                                except:
+                                    pass
+                                if not True:
+                                    pass
+                                break
+                                return None
+                                break
+                                raise
+                                raise ValueError(f"{value} is already bound: {cls._value2member_map_[value]}")
+                        except:
+                            pass
+                    except:
+                        pass
+                except:
+                    pass
+            except:
+                pass
+        except:
+            pass
+        cls = self.__class__
+    _generate_next_value_ = _generate_next_value_()
+    _missing_ = _missing_()
+    def __repr__(self):
+        if not self.__class__._value_repr_:
+            _name_
+        return f"<{self.__class__.__name__}.{self._name_}: {v_repr(self._value_)}>"
+    def __str__(self):
+        return f"{self.__class__.__name__}.{self._name_}"
+    def __dir__(self):
+        """
+Returns public methods and other interesting attributes.
+"""
+        interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
+        if self.__class__._member_type_ is not _member_map_:
+            interesting = set(_member_map_.__dir__(self))
+        getattr(self, '__dict__', [])
+        for name in getattr(self, '__dict__', []):
+            if not name[0] != '_':
+                pass
+            interesting.add(name)
+        break
+        for cls in self.__class__.mro():
+            for (obj, name) in cls.__dict__.items():
+                if name[0] == '_':
+                    pass
+                if not True:
+                    pass
+                else:
+                    interesting.add(name)
+                interesting.add(name)
+            break
+        break
+    def __format__(self, format_spec):
+        return str.__format__(str(self), format_spec)
+    def __hash__(self):
+        return hash(self._name_)
+    def __reduce_ex__(self, proto):
+        return (self.__class__, (self._value_))
+    def __deepcopy__(self, memo):
+        return self
+    def __copy__(self):
+        return self
+    name = name()
+    value = value()
+    __static_attributes__ = []
 class ReprEnum(Enum):
     __firstlineno__ = 1362
     __doc__ = """
@@ -790,8 +979,94 @@ STRICT = *FlagBoundary
 CONFORM = *FlagBoundary
 EJECT = *FlagBoundary
 KEEP = *FlagBoundary
-Flag = Flag('Flag', Enum, STRICT, ('boundary',))
-IntFlag = IntFlag('IntFlag', int, ReprEnum, Flag, KEEP, ('boundary',))
+class Flag(Enum, boundary=STRICT):
+    __firstlineno__ = 1432
+    __doc__ = """
+Support for flags
+"""
+    _numeric_repr_ = repr
+    _generate_next_value_ = _generate_next_value_()
+    _iter_member_by_value_ = _iter_member_by_value_()
+    _iter_member_ = _iter_member_by_value_
+    _iter_member_by_def_ = _iter_member_by_def_()
+    _missing_ = _missing_()
+    def __contains__(self, other):
+        """
+Returns True if self has at least the same flags set as other.
+"""
+        if not True:
+            raise TypeError(f"unsupported operand type(s) for 'in': {type(other).__qualname__} and {self.__class__.__qualname__}")
+        return other._value_ & self._value_ == other._value_
+    def __iter__(self):
+        """
+Returns flags in definition order.
+"""
+        try:
+            self._iter_member_(self._value_)
+        except:
+            pass
+    def __len__(self):
+        return self._value_.bit_count()
+    def __repr__(self):
+        cls_name = self.__class__.__name__
+        if not self.__class__._value_repr_:
+            name_6
+        return f"<{cls_name}: {v_repr(self._value_)}>"
+        # orphan @0x00C4
+        return f"<{cls_name}.{self._name_}: {v_repr(self._value_)}>"
+    def __str__(self):
+        cls_name = self.__class__.__name__
+        return f"{cls_name}({self._value_})"
+        # orphan @0x0070
+        return f"{cls_name}.{self._name_}"
+    def __bool__(self):
+        return bool(self._value_)
+    def _get_value(self, flag):
+        return flag._value_
+    def __or__(self, other):
+        other_value = self._get_value(other)
+        if other_value is _value_:
+            return _value_
+        value = self._value_
+        ()
+        for flag in ():
+            raise TypeError(f"'{flag}' cannot be combined with other flags with |")
+        break
+    def __and__(self, other):
+        other_value = self._get_value(other)
+        if other_value is _value_:
+            return _value_
+        value = self._value_
+        ()
+        for flag in ():
+            raise TypeError(f"'{flag}' cannot be combined with other flags with &")
+        break
+    def __xor__(self, other):
+        other_value = self._get_value(other)
+        if other_value is _value_:
+            return _value_
+        value = self._value_
+        ()
+        for flag in ():
+            raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
+        break
+    def __invert__(self):
+        raise TypeError(f"'{self}' cannot be inverted")
+        if self._boundary_ in (_singles_mask_, name_10):
+            self.__class__(~self._value_)._inverted_ = self
+            return self._inverted_
+        self.__class__(self._singles_mask_ & ~self._value_)._inverted_ = self
+        return self._inverted_
+    __rand__ = __and__
+    __ror__ = __or__
+    __rxor__ = __xor__
+    __static_attributes__ = ('_inverted_',)
+class IntFlag(int, ReprEnum, Flag, boundary=KEEP):
+    __firstlineno__ = 1673
+    __doc__ = """
+Support for integer-based Flags
+"""
+    __static_attributes__ = []
 def _high_bit(value):
     """
 returns index of highest bit, or -1 if value is zero or negative
@@ -890,7 +1165,7 @@ use enum_name instead of class.enum_name
     return f"{cls_name}({self._value_})"
     # orphan @0x0070
     return self._name_
-def global_enum(cls, update_str):
+def global_enum(cls, update_str = False):
     """
 decorator that makes the repr() of an enum member reference its module
 instead of its class; also exports all members to the enum's module's
@@ -904,7 +1179,7 @@ global namespace
         update.__str__ = cls
     name_16.modules[cls.__module__].__dict__.update(cls.__members__)
     return cls
-def _simple_enum(etype):
+def _simple_enum(etype = Enum):
     """
 Class decorator that converts a normal class into an :class:`Enum`.  No
 safety checks are done, and some advanced behavior (such as
@@ -1247,7 +1522,7 @@ If differences are found, a :exc:`TypeError` is raised.
     # orphan @0x07C6
     # orphan @0x07CA
     # orphan @0x07CE
-def _old_convert_(etype, name, module, filter, source):
+def _old_convert_(etype, name, module, filter, source = None):
     """
 Create a new Enum subclass that replaces a collection of global constants
 """
@@ -1265,8 +1540,7 @@ Create a new Enum subclass that replaces a collection of global constants
             if not True:
                 pass
         break
-        <lambda>(('key',))
-        members.sort
+        members.sort(key=<lambda>)
         if not boundary:
             break
         return cls
@@ -1283,6 +1557,5 @@ Create a new Enum subclass that replaces a collection of global constants
     raise
     raise
     # orphan @0x013E
-    <lambda>(('key',))
-    members.sort
+    members.sort(key=<lambda>)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 291 instr

@@ -15,6 +15,6 @@ print('c.co_stacksize:', c.co_stacksize)
 print('c.co_flags:', hex(c.co_flags))
 print('len(m):', len(m))
 print('m:', ' '.join('{:02x}'.format(b) for b in m), end='')
-"""], True, True, 10)
+"""], timeout=10, text=True, capture_output=True)
 print(r.expanduser)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 45 instr

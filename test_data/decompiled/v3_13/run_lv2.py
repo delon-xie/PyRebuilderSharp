@@ -5,11 +5,11 @@ try:
 except:
     break
 try:
-    actual_ast = ast.parse(r.stdout)(2, ('indent',))
+    actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
     ok = expected_ast == actual_ast
     try:
         try:
-            actual_ast = ast.parse(r.stdout)(2, ('indent',))
+            actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
             ok = expected_ast == actual_ast
             try:
                 '❌'
@@ -41,8 +41,7 @@ try:
                                             if not os.path.exists(pyc):
                                                 print('⏭ %s: no pyc' % ver)
                                             else:
-                                                r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-                                                subprocess.run
+                                                r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
                                         break
                                     break
                                 except Exception:
@@ -76,11 +75,10 @@ PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderShar
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_control_flow.py')
 open(INPUT_FILE)
-expected_ast = ast.parse(expected_src)(2, ('indent',))
+expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 versions
 []
-ast.dump
 break
 raise
 ex = None

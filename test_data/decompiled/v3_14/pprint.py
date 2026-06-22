@@ -30,13 +30,13 @@ import sys as _sys
 import types as _types
 from io import StringIO as _StringIO
 __all__ = ('pprint', 'pformat', 'isreadable', 'isrecursive', 'saferepr', 'PrettyPrinter', 'pp')
-def pprint(object, stream, indent, width, depth):
+def pprint(object, stream = None, indent = 1, width = 80, depth = None):
     """Pretty-print a Python object to a stream [default is sys.stdout]."""
-    printer = stream(indent, width, depth, compact, expand, sort_dicts, underscore_numbers, ('stream', 'indent', 'width', 'depth', 'compact', 'expand', 'sort_dicts', 'underscore_numbers'))
+    printer = PrettyPrinter(underscore_numbers=underscore_numbers, sort_dicts=sort_dicts, expand=expand, compact=compact, depth=depth, width=width, indent=indent, stream=stream)
     printer.pprint(object)
-def pformat(object, indent, width, depth):
+def pformat(object, indent = 1, width = 80, depth = None):
     """Format a Python object into a pretty-printed representation."""
-    return indent(width, depth, compact, expand, sort_dicts, underscore_numbers, ('indent', 'width', 'depth', 'compact', 'expand', 'sort_dicts', 'underscore_numbers')).pformat(object)
+    return PrettyPrinter(underscore_numbers=underscore_numbers, sort_dicts=sort_dicts, expand=expand, compact=compact, depth=depth, width=width, indent=indent).pformat(object)
 def pp(object):
     """Pretty-print a Python object"""
     [object](**kwargs)
@@ -93,7 +93,7 @@ class PrettyPrinter:
     except:
         break
     __firstlineno__ = 114
-    def __init__(self, indent, width, depth, stream):
+    def __init__(self, indent = 1, width = 80, depth = None, stream = None):
         """Handle pretty printing operations onto a stream using a set of
 configured parameters.
 
@@ -225,7 +225,7 @@ underscore_numbers
         self._write_indent_padding(write)
         length = len(object)
         if length and self._sort_dicts:
-            items = object.items()(name_14, ('key',))
+            items = sorted(object.items(), key=name_14)
         else:
             items = object.items()
         self._format_dict_items(items, stream, indent, allowance + 1, context, level)
@@ -239,7 +239,7 @@ underscore_numbers
         write(self._format_block_start(cls.__name__ + '({', indent))
         self._write_indent_padding(write)
         if self._sort_dicts:
-            items = object.items()(name_20, ('key',))
+            items = sorted(object.items(), key=name_20)
         else:
             items = object.items()
         self._format_dict_items(items, stream, self._child_indent(indent, len(cls.__name__) + 1), allowance + 2, context, level)
@@ -261,7 +261,7 @@ underscore_numbers
         write = stream.write
         write(self._format_block_start(object.__class__.__name__ + '([', indent))
         if len(object) and self._sort_dicts:
-            entries = object(key, ('key',))
+            entries = sorted(object, key=key)
         else:
             entries = object
         self._format_items(entries, stream, indent, allowance + 2, context, level)
@@ -275,8 +275,6 @@ underscore_numbers
     _dict_keys_view = type({}.keys())
     _dict_values_view = type({}.values())
     _dict_items_view = type({}.items())
-    (1, 80, None, None)
-    {'compact': False, 'expand': False, 'sort_dicts': True, 'underscore_numbers': False}
     cls
     (_dict_keys_view, _dict_values_view, _dict_items_view, _collections.abc.MappingView)
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})

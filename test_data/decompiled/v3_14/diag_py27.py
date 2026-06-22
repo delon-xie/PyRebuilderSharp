@@ -15,7 +15,7 @@ import tempfile
 import sys
 PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
 OUTPUT_DIR = '/tmp/py27_diag'
-OUTPUT_DIR(True, ('exist_ok',))
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 tests = {'expr_simple': """a = 1
 b = 2
 c = a + b
@@ -48,7 +48,6 @@ r = obj.attr
 s = x if cond else y
 """}
 tests.items()
-os.makedirs
 for (name, code) in tests.items():
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")

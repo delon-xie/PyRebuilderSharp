@@ -2,13 +2,12 @@
 
 import subprocess
 import os
-result = ['python3', 'tests/run_tests.py'](True, True, ('capture_output', 'text'))
+result = subprocess.run(['python3', 'tests/run_tests.py'], text=True, capture_output=True)
 output = result.stdout + result.stderr
 test_groups = {}
 current_group = None
 output.split("""
 """)
-subprocess.run
 for line in output.split("""
 """):
     if line.startswith('***'):

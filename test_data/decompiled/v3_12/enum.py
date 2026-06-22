@@ -281,7 +281,7 @@ class EnumDict(dict):
     EnumType will use the names found in self._member_names as the
     enumeration member names.
     """
-    def __init__(self, cls_name):
+    def __init__(self, cls_name = None):
         self._member_names = {}
         self._last_values = []
         self._ignore = []
@@ -645,7 +645,7 @@ class EnumType(type):
                 last_values.append(value)
                 names.append((name, value))
         _make_class_unpicklable(classdict)
-        return metacls.__new__(metacls, class_name, bases, classdict, boundary)
+        return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
         try:
             pass
         except:
@@ -665,7 +665,7 @@ class EnumType(type):
                             (name, value)
                             try:
                                 try:
-                                    members.sort(<lambda>)
+                                    members.sort(key=<lambda>)
                                 except:
                                     pass
                                 break
@@ -710,7 +710,7 @@ class EnumType(type):
         t
         members
         # orphan @0x0234
-        members.sort(<lambda>)
+        members.sort(key=<lambda>)
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -758,7 +758,7 @@ class EnumType(type):
                 setattr(cls, name, member)
     __signature__ = __signature__()
 EnumMeta = EnumType
-class Enum(EnumType):
+class Enum(metaclass=EnumType):
     __doc__ = """
     Create a collection of name/value pairs.
 
@@ -990,7 +990,7 @@ STRICT = *FlagBoundary
 CONFORM = *FlagBoundary
 EJECT = *FlagBoundary
 KEEP = *FlagBoundary
-class Flag(Enum, STRICT):
+class Flag(Enum, boundary=STRICT):
     __doc__ = """
     Support for flags
     """
@@ -1073,7 +1073,7 @@ class Flag(Enum, STRICT):
     __rand__ = __and__
     __ror__ = __or__
     __rxor__ = __xor__
-class IntFlag(int, ReprEnum, Flag, KEEP):
+class IntFlag(int, ReprEnum, Flag, boundary=KEEP):
     __doc__ = """
     Support for integer-based Flags
     """
@@ -1271,7 +1271,7 @@ def _simple_enum(etype = Enum):
                 pass
             if _is_descriptor(obj):
                 pass
-        enum_class = type(cls_name, (cell_29), body, cell_28, True)
+        enum_class = type(cls_name, (cell_29), body, _simple=True, boundary=cell_28)
         ('__repr__', '__str__', '__format__', '__reduce_ex__')
         for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
             if not name not in body:
@@ -1558,7 +1558,7 @@ def _old_convert_(etype, name, module, filter, source = None):
                         (name, value)
                         try:
                             try:
-                                members.sort(<lambda>)
+                                members.sort(key=<lambda>)
                             except:
                                 pass
                             break
@@ -1584,5 +1584,5 @@ def _old_convert_(etype, name, module, filter, source = None):
         break
     return cls
     # orphan @0x0126
-    members.sort(<lambda>)
+    members.sort(key=<lambda>)
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 285 instr

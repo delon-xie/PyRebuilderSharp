@@ -22,11 +22,11 @@ def test_until_broken(exprs):
     open(pyf, 'w')
     __module__
     open(pyf, 'w')
-    r = ['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'](True, True, 30, ('capture_output', 'text', 'timeout'))
+    r = path.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     if not stderr.path.exists(pyc):
         return 'NO_COMPILE'
-    r2 = ['dotnet', 'run', '--project', name_16, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+    r2 = path.run(['dotnet', 'run', '--project', name_16, '--', pyc], timeout=30, text=True, capture_output=True)
     out = r2.stdout + r2.stderr.strip()
     if 'Decompilation failed' in out:
         return 'CRASH'

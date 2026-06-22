@@ -5,7 +5,7 @@ try:
 except:
     pass
 try:
-    actual_ast = ast.parse(r.stdout)(2, ('indent',))
+    actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
     ok = expected_ast == actual_ast
 except Exception:
     pass
@@ -25,18 +25,16 @@ __name__()
 open(INPUT_FILE)
 __module__
 open(INPUT_FILE)
-expected_ast = ast.parse(expected_src)(2, ('indent',))
+expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 versions
 []
-ast.dump
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)
     else:
-        r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
-        subprocess.run
+        r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
 if not True:
     pass
 raise

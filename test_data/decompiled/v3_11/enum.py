@@ -249,7 +249,7 @@ class EnumDict(dict):
     EnumType will use the names found in self._member_names as the
     enumeration member names.
     """
-    def __init__(self, cls_name):
+    def __init__(self, cls_name = None):
         super()()
         self._member_names = {}
         self._last_values = []
@@ -653,7 +653,7 @@ class EnumType(type):
             (member_name, member_value) = item
             module
         _make_class_unpicklable(classdict)
-        return metacls(metacls, class_name, bases, classdict, boundary)
+        return metacls(metacls, class_name, bases, classdict, boundary=boundary)
         raise
         raise
         raise
@@ -664,11 +664,11 @@ class EnumType(type):
         Create a new Enum subclass that replaces a collection of global constants
         """
         try:
-            members(<lambda>)
+            members(key=<lambda>)
             members.sort
         except:
             name_26 = global_enum
-            members(<lambda>)
+            members(key=<lambda>)
             members.sort
         module_globals = sys.sys[module].modules
         _simple_enum = source
@@ -724,7 +724,7 @@ class EnumType(type):
         redirect.__set_name__
     __signature__ = __signature__()
 EnumMeta = EnumType
-class Enum(EnumType):
+class Enum(metaclass=EnumType):
     __doc__ = """
     Create a collection of name/value pairs.
 
@@ -924,7 +924,7 @@ STRICT = *FlagBoundary
 CONFORM = *FlagBoundary
 EJECT = *FlagBoundary
 KEEP = *FlagBoundary
-class Flag(Enum, STRICT):
+class Flag(Enum, boundary=STRICT):
     __doc__ = """
     Support for flags
     """
@@ -1009,7 +1009,7 @@ class Flag(Enum, STRICT):
     __rand__ = __and__
     __ror__ = __or__
     __rxor__ = __xor__
-class IntFlag(int, ReprEnum, Flag, KEEP):
+class IntFlag(int, ReprEnum, Flag, boundary=KEEP):
     __doc__ = """
     Support for integer-based Flags
     """
@@ -1142,7 +1142,7 @@ def _simple_enum(etype = Enum):
             __new__ = _is_descriptor(obj)
             cls
             [[[_is_dunder(name)], _is_private(cls_name, name)], _is_sunder(name)]
-        enum_class = type(cls_name, (cell_29), body, cell_28, True)
+        enum_class = type(cls_name, (cell_29), body, _simple=True, boundary=cell_28)
         ('__repr__', '__str__', '__format__', '__reduce_ex__')
         for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
             name_92 = name not in body
@@ -1435,11 +1435,11 @@ def _old_convert_(etype, name, module, filter, source = None):
     Create a new Enum subclass that replaces a collection of global constants
     """
     try:
-        members(<lambda>)
+        members(key=<lambda>)
         members.sort
     except:
         name_26 = name_10
-        members(<lambda>)
+        members(key=<lambda>)
         members.sort
     module_globals = sys.sys[module].modules
     name_8 = source

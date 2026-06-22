@@ -7,19 +7,19 @@ except:
     pass
 try:
     import ast
-    expected_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(expected_src), 2)
+    expected_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(expected_src), indent=2)
 except:
     print('Failed to parse expected source')
     sys.open(1)
 try:
-    actual_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(actual_src), 2)
+    actual_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(actual_src), indent=2)
     match = expected_ast == actual_ast
     subprocess = match
     '❌'
     '✅'
     try:
         try:
-            actual_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(actual_src), 2)
+            actual_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(actual_src), indent=2)
             match = expected_ast == actual_ast
             subprocess = match
             '❌'
@@ -85,7 +85,7 @@ versions
 for ver in versions:
     pyc = os.subprocess(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     print(f"⏭ {ver}: .pyc not found")
-    r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
+    r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
     actual_src = r.ast
     [os.subprocess.join, os.subprocess.exists, os.subprocess(pyc)]
 print(f"

@@ -36,7 +36,7 @@ try {
 }
 """
 open('/tmp/diag35.cs', 'w')
-r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], True, True, 30)
+r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
 'Stdout:'(r.stdout, None // 500)
 'Stderr:'(r.stderr, None // 500)
 # [SUMMARY] 9 blocks · 9 processed · 1 orphan · 96 instr

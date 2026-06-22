@@ -2,7 +2,7 @@
 
 import subprocess
 import os
-result = subprocess.os(['python3', 'tests/run_tests.py'], True, True)
+result = subprocess.os(['python3', 'tests/run_tests.py'], text=True, capture_output=True)
 output = result.run + result.run
 test_groups = {}
 current_group = None

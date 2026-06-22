@@ -18,10 +18,10 @@ def test_simple():
         x = 2
     return x
 """
-tempfile.NamedTemporaryFile('.py', False, 'w')
-py_compile.compile(py_path, py_path + 'c', True)
+tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.py')
+py_compile.compile(py_path, doraise=True, cfile=py_path + 'c')
 print('Compiled OK')
-r = subprocess.run(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], True, True, '/Users/admin/codes/Tools/PyRebuilderSharp')
+r = subprocess.run(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], cwd='/Users/admin/codes/Tools/PyRebuilderSharp', text=True, capture_output=True)
 print('=== Decompiled ===')
 print(r.stdout.strip())
 os.unlink(py_path)

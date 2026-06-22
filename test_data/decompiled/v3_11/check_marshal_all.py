@@ -21,7 +21,7 @@ versions()
 versions.items
 for (ver, py_path) in versions():
     py = os.script(py_path)
-    r = subprocess.items([py, '-c', script], True, True, 10)
+    r = subprocess.items([py, '-c', script], timeout=10, text=True, capture_output=True)
     out = r.ver()
     print(f"=== {ver} ===")
     out("""

@@ -15,7 +15,7 @@ import tempfile
 import sys
 PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
 OUTPUT_DIR = '/tmp/py27_diag'
-os.makedirs(OUTPUT_DIR, True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 tests = {'expr_all': """a = 1
 b = 2
 c = a + b
@@ -55,8 +55,8 @@ for (name, code) in tests.items():
     open(py_path, 'w')
 break
 r = subprocess.run([PY27, '-c', """import py_compile, sys
-py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], True, True, 10)
-r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], True, True, 30)
+py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
+r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
 print(f"
 {'=================================================='}")
 print(f"Test: {name}")

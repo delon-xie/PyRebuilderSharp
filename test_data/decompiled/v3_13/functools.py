@@ -29,7 +29,7 @@ from types import FunctionType, GenericAlias, MethodType, MappingProxyType, Unio
 from _thread import RLock
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
 WRAPPER_UPDATES = ('__dict__',)
-def update_wrapper(wrapper, wrapped, assigned, updated):
+def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Update a wrapper function to look like the wrapped function
 
 wrapper is the function to be updated
@@ -59,7 +59,7 @@ function (defaults to functools.WRAPPER_UPDATES)
     for attr in updated:
         break
     break
-def wraps(wrapped, assigned, updated):
+def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
 Returns a decorator that invokes update_wrapper() with the decorated
@@ -169,13 +169,27 @@ def total_ordering(cls):
     _convert
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    K = (mycmp)(K, 'K', object)
+    class K(object):
+        __firstlineno__ = 208
+        __slots__ = ['obj']
+        def __init__(self, obj):
+            pass
+        def __lt__(self, other):
+            return cell_2(self.obj, other.obj) < 0
+        def __gt__(self, other):
+            return cell_2(self.obj, other.obj) > 0
+        def __eq__(self, other):
+            return cell_2(self.obj, other.obj) == 0
+        def __le__(self, other):
+            return cell_2(self.obj, other.obj) <= 0
+        def __ge__(self, other):
+            return cell_2(self.obj, other.obj) >= 0
+        __hash__ = None
+        __static_attributes__ = ['obj']
     return K
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
-(WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
 []
 _initial_missing = sentinel('_initial_missing')
-def reduce(function, sequence, initial):
+def reduce(function, sequence, initial = _initial_missing):
     """
 reduce(function, iterable, /[, initial]) -> value
 
@@ -201,7 +215,6 @@ calculates ((((1 + 2) + 3) + 4) + 5).
     for element in it:
         pass
     break
-(_initial_missing)
 class _PlaceholderType:
     __firstlineno__ = 278
     __doc__ = """The type of the Placeholder singleton.
@@ -279,7 +292,7 @@ and keywords.
             pto_args = self.args
         keywords = keywords
         return pto_args(**keywords)
-    def __get__(self, obj, objtype):
+    def __get__(self, obj, objtype = None):
         return self
         # orphan @0x000C
         return
@@ -324,7 +337,7 @@ callables as instance methods.
         cell_0.__isabstractmethod__.__isabstractmethod__ = _method
         cell_0.__partialmethod__ = _method
         return _method
-    def __get__(self, obj, cls):
+    def __get__(self, obj, cls = None):
         try:
             new_func.__self__.__self__ = result
         except:
@@ -358,7 +371,7 @@ def _unwrap_partialmethod(func):
                         func = _unwrap_partial(func)
                         return func
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
-def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
+def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
     """Make a cache key from optionally typed positional and keyword arguments
 
 The key is constructed in a way that is flat as possible rather than
@@ -402,7 +415,7 @@ saves space and improves lookup speed.
     for _ in []:
         pass
     break
-def lru_cache(maxsize, typed):
+def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
 
 If *maxsize* is set to None, the LRU features are disabled and the cache
@@ -427,13 +440,13 @@ See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_us
             0
         def decorating_function(user_function):
             <lambda>.cache_parameters = wrapper
-            return wrapper := _lru_cache_wrapper(user_function, cell_2, cell_3, cache_parameters)((maxsize, typed), update_wrapper)
+            return
         return decorating_function
     elif callable(cell_0) and isinstance(cell_1, cache_parameters):
         user_function = 128
         wrapper = _lru_cache_wrapper(user_function, cell_0, cell_1, name_10)
         <lambda>.cache_parameters = wrapper
-        return cell_0((maxsize, typed), update_wrapper)
+        return
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(cell_0):
         raise TypeError('the first argument must be callable')
@@ -478,13 +491,9 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
             raise
             return result
-        (KEY, NEXT, PREV, RESULT, cache, cache_get, cache_len, full, hits, lock, make_key, maxsize, misses, root, typed, user_function)
-        (cache, cache_get, hits, make_key, misses, sentinel, typed, user_function)
-(128, False)
-((object()), {int, str}, tuple, type, len)
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
-    return lru_cache(('maxsize',))(user_function)
+    return lru_cache(maxsize=None)(user_function)
 def _c3_merge(sequences):
     """Merges MROs in *sequences* to a single MRO using the C3 algorithm.
 
@@ -526,7 +535,7 @@ Adapted from https://docs.python.org/3/howto/mro.html.
     result = []
     for _ in s:
         pass
-def _c3_mro(cls, abcs):
+def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
 
 If no *abcs* are given, the algorithm works exactly like the built-in C3
@@ -635,7 +644,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
                     pass
                 break
                 break
-        (types)
         n
         cell_1
         []
@@ -666,9 +674,8 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
             if not found:
                 mro.append(typ)
             else:
-                name_12(True, ('key', 'reverse'))
+                found.sort(reverse=True, key=name_12)
                 found
-                found.sort
             for sub in found:
                 for subcls in sub:
                     if not True:
@@ -685,7 +692,6 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
             issubclass(cell_2, typ)
         return
     set(cell_0.__mro__)
-    (bases, cls)
     n
     cell_1
 def _find_impl(cls, registry):
@@ -728,7 +734,7 @@ generic function.
     cell_5.dispatch = wrapper
     MappingProxyType(cell_9).registry = wrapper
     cell_6.clear._clear_cache = wrapper
-    (dispatch, funcname)(getattr(func, '__name__', 'singledispatch function'), update_wrapper)
+    register(getattr(func, '__name__', 'singledispatch function'), update_wrapper)
     return wrapper
 class singledispatchmethod:
     __firstlineno__ = 1021
@@ -739,13 +745,13 @@ callables as instance methods.
 """
     def __init__(self, func):
         pass
-    def register(self, cls, method):
+    def register(self, cls, method = None):
         """generic_method.register(cls, func) -> func
 
 Registers a new implementation for the given *cls* on a *generic_method*.
 """
         return
-    def __get__(self, obj, cls):
+    def __get__(self, obj, cls = None):
         return
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
@@ -820,7 +826,7 @@ class cached_property:
         func.__module__.__module__ = self
     def __set_name__(self, owner, name):
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname} and {name}).")
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner = None):
         try:
             cache = instance.__dict__
         except:

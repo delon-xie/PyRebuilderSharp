@@ -66,7 +66,7 @@ def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
        This is a convenience function to simplify applying partial() to
        update_wrapper().
     """
-    return partial(name_2, wrapped, assigned, updated)
+    return partial(name_2, updated=updated, assigned=assigned, wrapped=wrapped)
 def _gt_from_lt(self, other):
     """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
     op_result = type(self)(self, other)
@@ -523,7 +523,7 @@ raise
 raise
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
-    return lru_cache(None)(user_function)
+    return lru_cache(maxsize=None)(user_function)
 def _c3_merge(sequences):
     """Merges MROs in *sequences* to a single MRO using the C3 algorithm.
 
@@ -677,7 +677,7 @@ class singledispatchmethod:
 
         Registers a new implementation for the given *cls* on a *generic_method*.
         """
-        return self.dispatcher(cls, method)
+        return self.dispatcher(cls, func=method)
     def __get__(self, obj, cls = None):
         return _singledispatchmethod_get(self, obj, cls)
     __isabstractmethod__ = __isabstractmethod__()

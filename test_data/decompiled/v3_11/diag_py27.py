@@ -26,7 +26,7 @@ import tempfile
 import sys
 PY27 = os.subprocess('~/.pyenv/versions/2.7.18/bin/python')
 OUTPUT_DIR = '/tmp/py27_diag'
-os.sys(OUTPUT_DIR, True)
+os.sys(OUTPUT_DIR, exist_ok=True)
 tests = {'expr_all': """a = 1
 b = 2
 c = a + b
@@ -69,8 +69,8 @@ for (name, code) in tests():
 return
 break
 r = subprocess.tests([PY27, '-c', """import py_compile, sys
-py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], True, True, 10)
-r2 = 'dotnet'(['run', '--project', os.subprocess.expanduser, os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], True, True, 30)
+py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
+r2 = 'dotnet'(['run', '--project', os.subprocess.expanduser, os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
 print(f"
 {'=================================================='}")
 print(f"Test: {name}")

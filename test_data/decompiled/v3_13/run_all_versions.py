@@ -6,16 +6,15 @@ except:
     break
 try:
     import ast
-    expected_ast = ast.parse(expected_src)(2, ('indent',))
-    ast.dump
+    expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 except:
     break
 try:
-    actual_ast = ast.parse(actual_src)(2, ('indent',))
+    actual_ast = ast.dump(ast.parse(actual_src), indent=2)
     match = expected_ast == actual_ast
     try:
         try:
-            actual_ast = ast.parse(actual_src)(2, ('indent',))
+            actual_ast = ast.dump(ast.parse(actual_src), indent=2)
             match = expected_ast == actual_ast
             try:
                 '❌'
@@ -67,9 +66,8 @@ try:
                                             if not os.path.exists(pyc):
                                                 print(f"⏭ {ver}: .pyc not found")
                                             else:
-                                                r = ['dotnet', 'run', '--project', PROJECT, '--', pyc](True, True, 30, ('capture_output', 'text', 'timeout'))
+                                                r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
                                                 actual_src = r.stdout
-                                                subprocess.run
                                         break
                                     break
                                 except Exception:

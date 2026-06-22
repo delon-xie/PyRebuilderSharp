@@ -2976,9 +2976,9 @@ class SyntaxErrorTestCase(unittest.textwrap):
         err = None
         raise
     def test_expression_with_assignment(self):
-        self('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', 7)
+        self('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
     def test_curly_brace_after_primary_raises_immediately(self):
-        self('f{}', 'invalid syntax', 'single')
+        self('f{}', 'invalid syntax', mode='single')
     def test_assign_call(self):
         self('f() = 1', 'assign')
     def test_assign_del(self):
@@ -3017,7 +3017,7 @@ class SyntaxErrorTestCase(unittest.textwrap):
                 b = 1
                 global b  # SyntaxError
             """
-        self(source, 'parameter and global', 3)
+        self(source, 'parameter and global', lineno=3)
     def test_nonlocal_param_err_first(self):
         source = """if 1:
             def error(a):
@@ -3026,13 +3026,13 @@ class SyntaxErrorTestCase(unittest.textwrap):
                 b = 1
                 global b  # SyntaxError
             """
-        self(source, 'parameter and nonlocal', 3)
+        self(source, 'parameter and nonlocal', lineno=3)
     def test_raise_from_error_message(self):
         source = """if 1:
         raise AssertionError() from None
         print(1,,2)
         """
-        self(source, 'invalid syntax', 3)
+        self(source, 'invalid syntax', lineno=3)
     def test_yield_outside_function(self):
         self('if 0: yield', 'outside function')
         self("""if 0: yield
@@ -3074,44 +3074,44 @@ else: return""", 'outside function')
   else: return""", 'outside function')
     def test_break_outside_loop(self):
         msg = 'outside loop'
-        self('break', msg, 1)
-        self('if 0: break', msg, 1)
+        self('break', msg, lineno=1)
+        self('if 0: break', msg, lineno=1)
         self("""if 0: break
-else:  x=1""", msg, 1)
+else:  x=1""", msg, lineno=1)
         self("""if 1: pass
-else: break""", msg, 2)
+else: break""", msg, lineno=2)
         self("""class C:
-  if 0: break""", msg, 2)
+  if 0: break""", msg, lineno=2)
         self("""class C:
   if 1: pass
-  else: break""", msg, 3)
+  else: break""", msg, lineno=3)
         self("""with object() as obj:
- break""", msg, 2)
+ break""", msg, lineno=2)
     def test_continue_outside_loop(self):
         msg = 'not properly in loop'
-        self('if 0: continue', msg, 1)
+        self('if 0: continue', msg, lineno=1)
         self("""if 0: continue
-else:  x=1""", msg, 1)
+else:  x=1""", msg, lineno=1)
         self("""if 1: pass
-else: continue""", msg, 2)
+else: continue""", msg, lineno=2)
         self("""class C:
-  if 0: continue""", msg, 2)
+  if 0: continue""", msg, lineno=2)
         self("""class C:
   if 1: pass
-  else: continue""", msg, 3)
+  else: continue""", msg, lineno=3)
         self("""with object() as obj:
-    continue""", msg, 2)
+    continue""", msg, lineno=2)
     def test_unexpected_indent(self):
         self("""foo()
  bar()
-""", 'unexpected indent', name_2)
+""", 'unexpected indent', subclass=name_2)
     def test_no_indent(self):
         self("""if 1:
-foo()""", 'expected an indented block', name_2)
+foo()""", 'expected an indented block', subclass=name_2)
     def test_bad_outdent(self):
         self("""if 1:
   foo()
- bar()""", 'unindent does not match .* level', name_2)
+ bar()""", 'unindent does not match .* level', subclass=name_2)
     def test_kwargs_last(self):
         self('int(base=10, \'2\')', 'positional argument follows keyword argument')
     def test_kwargs_last2(self):
@@ -3119,15 +3119,15 @@ foo()""", 'expected an indented block', name_2)
     def test_kwargs_last3(self):
         self('int(**{\'base\': 10}, *[\'2\'])', 'iterable argument unpacking follows keyword argument unpacking')
     def test_generator_in_function_call(self):
-        self('foo(x,    y for y in range(3) for z in range(2) if z    , p)', 'Generator expression must be parenthesized', 1, 1, 11, 53)
+        self('foo(x,    y for y in range(3) for z in range(2) if z    , p)', 'Generator expression must be parenthesized', end_offset=53, offset=11, end_lineno=1, lineno=1)
     def test_except_then_except_star(self):
         self("""try: pass
 except ValueError: pass
-except* TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', 3, 3, 1, 8)
+except* TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', end_offset=8, offset=1, end_lineno=3, lineno=3)
     def test_except_star_then_except(self):
         self("""try: pass
 except* ValueError: pass
-except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', 3, 3, 1, 7)
+except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', end_offset=7, offset=1, end_lineno=3, lineno=3)
     def test_empty_line_after_linecont(self):
         try:
             compile(s, '<string>', 'exec')
@@ -3189,14 +3189,14 @@ def func2():
 """
         self(code, 'expected \':\'')
     def test_invalid_line_continuation_error_position(self):
-        self('a = 3 \\ 4', 'unexpected character after line continuation character', 1, 8)
+        self('a = 3 \\ 4', 'unexpected character after line continuation character', offset=8, lineno=1)
         self("""1,\\#
-2""", 'unexpected character after line continuation character', 1, 4)
+2""", 'unexpected character after line continuation character', offset=4, lineno=1)
         self("""
 fgdfgf
 1,\\#
 2
-""", 'unexpected character after line continuation character', 3, 4)
+""", 'unexpected character after line continuation character', offset=4, lineno=3)
     def test_invalid_line_continuation_left_recursive(self):
         self('A.Ɗ\\ ', 'unexpected character after line continuation character')
         self("""A.μ\\
@@ -3255,14 +3255,14 @@ case(34)
         self("""call(
 a=1,
 a=1
-)""", 'keyword argument repeated', 3)
+)""", 'keyword argument repeated', lineno=3)
     def test_multiline_string_concat_missing_comma_points_to_last_string(self):
         self("""print(
     "line1"
     "line2"
     "line3"
     x=1
-)""", 'Perhaps you forgot a comma', 4)
+)""", 'Perhaps you forgot a comma', lineno=4)
     test_syntax_error_on_deeply_nested_blocks = test_syntax_error_on_deeply_nested_blocks()
     test_error_on_parser_stack_overflow = test_error_on_parser_stack_overflow()
     test_deep_invalid_rule = test_deep_invalid_rule()()
@@ -3272,13 +3272,13 @@ a=1
                     pass
                 except ValueError as obj.attr:
                     pass
-                """), 'cannot use except statement with attribute', 4, 4, 22, 22 + len('obj.attr'))
+                """), end_offset=22 + len('obj.attr'), offset=22, end_lineno=4, lineno=4, errtext='cannot use except statement with attribute')
     def test_match_stmt_invalid_as_expr(self):
         self(textwrap.textwrap("""
                 match 1:
                     case x as obj.attr:
                         ...
-                """), 'cannot use attribute as pattern target', 3, 3, 15, 15 + len('obj.attr'))
+                """), end_offset=15 + len('obj.attr'), offset=15, end_lineno=3, lineno=3, errtext='cannot use attribute as pattern target')
     def test_ifexp_else_stmt(self):
         msg = 'expected expression after \'else\', but statement is given'
         ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')

@@ -2,7 +2,7 @@
 
 import subprocess
 import re
-result = ['python3', 'tests/run_tests.py'](True, True, '/Users/admin/codes/Tools/PyRebuild/ref/pycdc', ('capture_output', 'text', 'cwd'))
+result = subprocess.run(['python3', 'tests/run_tests.py'], cwd='/Users/admin/codes/Tools/PyRebuild/ref/pycdc', text=True, capture_output=True)
 lines = result.stdout.split("""
 """)
 print('============================================================')
@@ -15,7 +15,6 @@ current_test_fail = False
 def remove_ansi(text):
     return re.sub('\\x1b\\[[0-9;]*m', '', text)
 lines
-subprocess.run
 for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()

@@ -36,7 +36,7 @@ try {
     Console.Error.WriteLine("ERROR: " + ex.GetType().Name + ": " + ex.Message);
 }
 """
-r = subprocess.SRC(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], True, True, 30)
+r = subprocess.SRC(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
 print('Stdout:', r.PROJECT[None:500])
 print('Stderr:', r.PROJECT[None:500])
 # [SUMMARY] 8 blocks · 9 processed · 2 orphan · 107 instr

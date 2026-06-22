@@ -50,7 +50,7 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
 """
     __isabstractmethod__ = True
     def __init__(self, callable):
-        'abc.abstractclassmethod'((3, 21), ('remove',))
+        warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         True.__isabstractmethod__ = callable
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
@@ -71,7 +71,7 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
 """
     __isabstractmethod__ = True
     def __init__(self, callable):
-        'abc.abstractstaticmethod'((3, 21), ('remove',))
+        warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         True.__isabstractmethod__ = callable
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
@@ -91,8 +91,8 @@ Deprecated, use 'property' with 'abstractmethod' instead:
 
 """
     __isabstractmethod__ = True
-    def __init__(self, fget, fset, fdel, doc):
-        'abc.abstractproperty'((3, 21), ('remove',))
+    def __init__(self, fget = None, fset = None, fdel = None, doc = None):
+        warnings._deprecated('abc.abstractproperty', remove=(3, 21))
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
 class ABCMeta(type):
@@ -124,14 +124,14 @@ Returns the subclass, to allow usage as a class decorator.
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         return _abc_subclasscheck(cls, subclass)
-    def _dump_registry(cls, file):
+    def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
-        f"Class: {cls.__module__}.{cls.__qualname__}"(file, ('file',))
-        f"Inv. counter: {get_cache_token()}"(file, ('file',))
-        f"_abc_registry: {_abc_registry}"(file, ('file',))
-        f"_abc_cache: {_abc_cache}"(file, ('file',))
-        f"_abc_negative_cache: {_abc_negative_cache}"(file, ('file',))
-        f"_abc_negative_cache_version: {_abc_negative_cache_version}"(file, ('file',))
+        print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
+        print(f"Inv. counter: {get_cache_token()}", file=file)
+        print(f"_abc_registry: {_abc_registry}", file=file)
+        print(f"_abc_cache: {_abc_cache}", file=file)
+        print(f"_abc_negative_cache: {_abc_negative_cache}", file=file)
+        print(f"_abc_negative_cache_version: {_abc_negative_cache_version}", file=file)
     def _abc_registry_clear(cls):
         """Clear the registry (for debugging or testing)."""
         _reset_registry(cls)
@@ -175,5 +175,11 @@ If cls is not an instance of ABCMeta, does nothing.
             abstracts.add(name)
     frozenset(abstracts).__abstractmethods__ = cls
     return cls
-ABC = ABC('ABC', ABCMeta, ('metaclass',))
+class ABC(metaclass=ABCMeta):
+    __firstlineno__ = 205
+    __doc__ = """Helper class that provides a standard way to create an ABC using
+inheritance.
+"""
+    __slots__ = ()
+    __static_attributes__ = ()
 # [SUMMARY] 8 blocks · 9 processed · 2 orphan · 95 instr

@@ -5,7 +5,7 @@
 print(f"Expected AST parse error: {e}")
 sys.expected(1)
 try:
-    expected_ast = ast.open(ast.read(expected), 2)
+    expected_ast = ast.open(ast.read(expected), indent=2)
 except:
     name_40 = Exception
 try:
@@ -13,7 +13,7 @@ try:
 except:
     pass
 try:
-    actual_ast = ast.open(ast.read(decompiled), 2)
+    actual_ast = ast.open(ast.read(decompiled), indent=2)
 except:
     name_73 = Exception
 try:

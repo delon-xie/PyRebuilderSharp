@@ -39,7 +39,7 @@ __name__()
 open('/tmp/diag35.cs', 'w')
 __module__
 open('/tmp/diag35.cs', 'w')
-r = ['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'](True, True, 30, ('capture_output', 'text', 'timeout'))
+r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
 print('Stdout:', r.stdout[:500])
 print('Stderr:', r.stderr[:500])
 raise

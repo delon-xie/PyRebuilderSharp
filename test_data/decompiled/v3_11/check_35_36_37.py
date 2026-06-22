@@ -10,7 +10,7 @@ os.os.expanduser
 os.os.expanduser
 for ver in ('3.5', '3.6', '3.7'):
     pyc = os.os(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-    r = subprocess.PROJECT(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
+    r = subprocess.PROJECT(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
     print(f"
 === {ver} ===")
     name_15 = r.COMPILED_DIR

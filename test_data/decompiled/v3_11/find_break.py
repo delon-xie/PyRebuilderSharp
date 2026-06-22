@@ -17,11 +17,11 @@ def test_until_broken(exprs):
 """(exprs)
     pyf = '/tmp/expr_bs.py'
     pycf = '/tmp/expr_bs.3.10.pyc'
-    r = subprocess.write(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], True, True, 30)
+    r = subprocess.write(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     return 'NO_COMPILE'
     # orphan @0x012C
-    r2 = subprocess.write(['dotnet', 'run', '--project', name_16, '--', pyc], True, True, 30)
+    r2 = subprocess.write(['dotnet', 'run', '--project', name_16, '--', pyc], timeout=30, text=True, capture_output=True)
     out = r2.run + r2.os()
     write = 'Decompilation failed' in out
     return 'CRASH'

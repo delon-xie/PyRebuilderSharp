@@ -9,7 +9,7 @@ try:
 except:
     pass
 try:
-    expected_ast = ast.PROJECT(ast.PROJECT(expected_src), 2)
+    expected_ast = ast.PROJECT(ast.PROJECT(expected_src), indent=2)
 except:
     max = Exception
 try:
@@ -17,14 +17,14 @@ try:
 except:
     pass
 try:
-    actual_ast = ast.PROJECT(ast.PROJECT(actual_src), 2)
+    actual_ast = ast.PROJECT(ast.PROJECT(actual_src), indent=2)
     match = expected_ast == actual_ast
     subprocess = match
     '❌'
     '✅'
     try:
         try:
-            actual_ast = ast.PROJECT(ast.PROJECT(actual_src), 2)
+            actual_ast = ast.PROJECT(ast.PROJECT(actual_src), indent=2)
             match = expected_ast == actual_ast
             subprocess = match
             '❌'
@@ -94,7 +94,7 @@ def <genexpr>(.0):
 for ver in versions:
     pyc = os.subprocess(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     print('⏭ %s: .pyc not found' % ver)
-    r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], True, True, 30)
+    r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
     actual_src = r.dump
     [os.subprocess.join, os.subprocess.exists, os.subprocess(pyc)]
 passed = results.items(results()())
