@@ -37,9 +37,30 @@ try:
             for last in block_instrs():
                 if not True:
                     pass
-                else:
+                elif block_instrs:
                     last = block_instrs[-1]
                     print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
+                elif any is None:
+                    for ins in block_instrs():
+                        if not True:
+                            pass
+                        elif not block_instrs:
+                            for (i, start) in enumerate(sorted_leaders):
+                                if i + 1 < len(sorted_leaders):
+                                    pass
+                                else:
+                                    instrs[-1].offset + 2
+                                    ins
+                                    instrs
+                        else:
+                            block_instrs
+                            for ins in block_instrs:
+                                if not ins.opname == 'JUMP_ABSOLUTE':
+                                    pass
+                                else:
+                                    print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+                else:
+                    <genexpr>(block_instrs())
         else:
             <genexpr>(block_instrs())
 except:

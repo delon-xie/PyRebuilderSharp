@@ -21,7 +21,8 @@ pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
 if next_type <= next_type:
-    pass
+    if open < 127:
+        pass
 elif arg is not None:
     pass
 pos += 1

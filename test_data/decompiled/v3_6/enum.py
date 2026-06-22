@@ -247,28 +247,29 @@ class EnumDict(dict):
         Single underscore (sunder) names are reserved.
         """
         already = set(value) & set(self._member_names)
-        if (self._cls_name is not None) and _is_private(self._cls_name, key) and _is_sunder(key):
-            key
-        raise TypeError('%r already defined as %r' % (key, self[key]))
-        break
-        for v in value:
-            if isinstance(v, auto):
-                non_auto_store = False
-                if v.value == _auto_null:
-                    len
-                    1
-                    key
-                    self._generate_next_value
-        if single:
-            value = auto_valued[0]
-            try:
-                value = t(auto_valued)
-            except TypeError:
-                pass
-        raise ValueError('_sunder_ names, such as %r, are reserved for future Enum use' % (key))
-        '_repr_'
-        key.startswith
-        setattr(self, '_generate_next_value', _gnv)
+        if self._cls_name is not None:
+            if _is_private(self._cls_name, key) and _is_sunder(key):
+                key
+            raise TypeError('%r already defined as %r' % (key, self[key]))
+            break
+            for v in value:
+                if isinstance(v, auto):
+                    non_auto_store = False
+                    if v.value == _auto_null:
+                        len
+                        1
+                        key
+                        self._generate_next_value
+            if single:
+                value = auto_valued[0]
+                try:
+                    value = t(auto_valued)
+                except TypeError:
+                    pass
+            raise ValueError('_sunder_ names, such as %r, are reserved for future Enum use' % (key))
+        elif self not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_'):
+            '_repr_'
+            key.startswith
         non_auto_store = True
         single = False
         single = True
@@ -393,7 +394,7 @@ class EnumType(type):
                     name not in classdict
                 if (Enum is not None) and save_new:
                     pass
-                if _order_:
+                if (p != sorted(member_list)) and _order_:
                     _order_ = EnumType.__new__.<locals>.<listcomp>(_order_)
                     ()
                 _order_ is not None
@@ -791,7 +792,8 @@ class Enum(metaclass=EnumType):
             return cls._value2member_map_[value]
         except KeyError:
             return
-        return cls[name]
+        if cls in unhashable_values:
+            return cls[name]
         raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
         for (name, unhashable_values) in cls._unhashable_values_map_.items():
             value
@@ -884,7 +886,7 @@ class Enum(metaclass=EnumType):
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
             getattr(self, '__dict__', [])
-        elif name not in self._member_map_:
+        elif (self[0] != '_') and (name not in self._member_map_):
             interesting.add(name)
         elif (name[0] == '_') and isinstance(obj, property):
             pass
@@ -1025,7 +1027,8 @@ class Flag(Enum, boundary=STRICT):
             value & flag_mask
         cls._boundary_
         neg_value
-        return pseudo_member
+        if value is not None:
+            return pseudo_member
         neg_value = value
         members.append(m)
         combined_value |= m._value_
@@ -1070,7 +1073,8 @@ class Flag(Enum, boundary=STRICT):
     def _get_value(self, flag):
         if isinstance(flag, self.__class__):
             return flag._value_
-        return flag
+        elif flag(flag, self._member_type_):
+            return flag
 
     def __or__(self, other):
         other_value = self._get_value(other)
@@ -1108,8 +1112,9 @@ class Flag(Enum, boundary=STRICT):
     def __invert__(self):
         if self._get_value(self) is None:
             raise TypeError(f"'{self}' cannot be inverted")
-        self._inverted_ = self.__class__(~self._value_)
-        self._inverted_ = self.__class__(self._singles_mask_ & ~self._value_)
+        elif self in (EJECT, KEEP):
+            self._inverted_ = self.__class__(~self._value_)
+            self._inverted_ = self.__class__(self._singles_mask_ & ~self._value_)
     __rand__ = __and__
     __ror__ = __or__
     __rxor__ = __xor__
@@ -1204,46 +1209,6 @@ def _simple_enum(etype):
         __new__ = cls.__dict__.get('__new__')
         __new__
         __new__
-        new_member = __new__.__func__
-        gnv = '_generate_next_value_'
-        member_names = '_member_names_'
-        member_map = '_member_map_'
-        value2member_map = '_value2member_map_'
-        body
-        []
-        []
-        body
-        {}
-        {}
-        body
-        {}
-        {}
-        body
-        []
-        []
-        body
-        '_use_args_'._generate_next_value_
-        '_use_args_'._generate_next_value_
-        body
-        hashable_values = '_hashable_values_'
-        unhashable_values = '_unhashable_values_'
-        member_type = '_member_type_'
-        if '_value_repr_'(issubclass, Flag):
-            enum_class = body('__doc__', type, (cls_name), boundary=body, _simple=True)
-            ('__repr__', '__str__', '__format__', '__reduce_ex__')
-            'An enumeration.'
-            'An enumeration.'
-            break
-            hashable_values.append(value)
-            if _is_single_bit(value):
-                member_names.append(name)
-                single_bits |= value
-        setattr(enum_class, name, enum_method)
-        enum_class._all_bits_ = 1
-        member_list = _simple_enum.<locals>.convert_class.<locals>.<listcomp>(enum_class)
-        if member_list != sorted(member_list):
-            enum_class._iter_member_ = enum_class._iter_member_by_def_
-            attrs.items()
         gnv_last_values = []
         value = gnv(name, 1, len(member_names), gnv_last_values)
         def <listcomp>(.0):
@@ -1324,13 +1289,14 @@ class verify:
                     if missing:
                         raise ValueError('invalid %s %r: missing values %s' % (enum_type, cls_name, ', '.join(verify.__call__.<locals>.<genexpr>(missing)))[None:256])
                     check
-                    member_names = enumeration._member_names_
-                    missing_names = []
-                    missing_value = 0
-                    enumeration._member_map_.items()
-                    self
-                    self
-                    verify.__call__.<locals>.<listcomp>(enumeration)
+                    if check is NAMED_FLAGS:
+                        member_names = enumeration._member_names_
+                        missing_names = []
+                        missing_value = 0
+                        enumeration._member_map_.items()
+                        self
+                        self
+                        verify.__call__.<locals>.<listcomp>(enumeration)
                 return enumeration
                 alias = 'aliases %s and %s are missing' % (', '.join(missing_names[None:-1]), missing_names[-1])
                 if _is_single_bit(missing_value):

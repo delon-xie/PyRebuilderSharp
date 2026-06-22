@@ -12,17 +12,8 @@ for filename in os.listdir(pyc_dir):
         magic = f.read(4)
         version = magic_numbers.get(magic, 'unknown')
         version
-    version_files[version].append(filename)
-    yield from version_files
-    break
-    for f in sorted(files):
-        f
-        '      '
-        print
-    for (version, files) in sorted(version_files.items()):
-        print(f"  Python {version}: {len(files)} 个文件")
-        if version == '3.10':
-            print('    文件列表:')
-            sorted(files)
+    elif filename not in version_files:
+        version_files[version].append(filename)
+        yield from version_files
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())

@@ -2958,6 +2958,8 @@ class SyntaxErrorTestCase(unittest.TestCase):
 """
         try:
             try:
+                if self:
+                    pass
                 try:
                     try:
                         err = None

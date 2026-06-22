@@ -1098,8 +1098,44 @@ class Flag(Enum, boundary=STRICT):
             for m in .0:
                 pass
             return
-        if value <= value:
+        if (value <= value) and (cls <= all_bits):
             pass
+        elif cls._boundary_ is STRICT:
+            max_bits = max(value.bit_length(), flag_mask.bit_length())
+            raise ValueError("""%r invalid value %r
+    given %s
+  allowed %s""" % (cls, value, bin(value, max_bits), bin(flag_mask, max_bits)))
+        elif cls._boundary_ is CONFORM:
+            value &= flag_mask
+        elif cls._boundary_ is EJECT:
+            return value
+        elif cls._boundary_ is KEEP:
+            if value < 0:
+                value = max(all_bits + 1, 2 ** value.bit_length()) + value
+            elif value < 0:
+                neg_value = value
+                if cls._boundary_ in (EJECT, KEEP):
+                    value = all_bits + 1 + value
+                else:
+                    value = singles_mask & value
+                    unknown = value & ~flag_mask
+                    aliases = value & ~singles_mask
+                    member_value = value & singles_mask
+                    if unknown:
+                        if cls._boundary_ is not KEEP:
+                            raise ValueError('%s(%r) -->  unknown values %r [%s]' % (cls.__name__, value, unknown, bin(unknown)))
+                        elif cls._member_type_ is object:
+                            pseudo_member = object.__new__(cls)
+                        else:
+                            pseudo_member = cls._member_type_.__new__(cls, value)
+                            if not hasattr(pseudo_member, '_value_'):
+                                pseudo_member._value_ = value
+                    elif cls._member_type_ is object:
+                        pass
+                    else:
+                        pseudo_member = cls._member_type_.__new__(cls, value)
+        else:
+            raise ValueError('%r unknown flag boundary %r' % (cls, cls._boundary_))
         pseudo_member._name_ = None
 
     def __contains__(self, other):
@@ -1302,7 +1338,7 @@ def _simple_enum(etype):
             hashable_values = '_hashable_values_'
             unhashable_values = '_unhashable_values_'
             member_type = '_member_type_'
-            if '_value_repr_'(issubclass, Flag):
+            if '_value_repr_'(issubclass, Flag) and new_member:
                 '__invert__'
                 body
                 Flag.__invert__
@@ -1357,71 +1393,121 @@ def _simple_enum(etype):
             gnv_last_values = []
             if issubclass(enum_class, Flag):
                 for (name, value) in attrs.items():
-                    if isinstance(value, auto) and (auto.value is _auto_null):
-                        value = gnv(name, 1, len(member_names), gnv_last_values)
-                    elif not isinstance(value, tuple):
-                        value = (value)
+                    if isinstance(value, auto):
+                        if auto.value is _auto_null:
+                            value = gnv(name, 1, len(member_names), gnv_last_values)
+                        elif value:
+                            if not isinstance(value, tuple):
+                                value = (value)
+                            member = new_member(enum_class, **value)
+                            value = value[0]
+                            if __new__ is None:
+                                member._value_ = value
+                            try:
+                                contained = value2member_map.get(member._value_)
+                            except TypeError:
+                                contained = None
+                            if contained is not None:
+                                contained._add_alias_(name)
+                            else:
+                                member._name_ = name
+                                member.__objclass__ = enum_class
+                                member.__init__(value)
+                                member._sort_order_ = len(member_names)
+                                if name not in ('name', 'value'):
+                                    setattr(enum_class, name, member)
+                                else:
+                                    enum_class._add_member_(name, member)
+                                    hashable_values.append(value)
+                                    if _is_single_bit(value):
+                                        member_names.append(name)
+                                        single_bits |= value
+                                    else:
+                                        multi_bits |= value
+                                        gnv_last_values.append(value)
+                        else:
+                            member = new_member(enum_class)
+                    elif value:
+                        pass
+                    else:
+                        member = new_member(enum_class)
             else:
                 attrs.items()
                 for (name, value) in attrs.items():
-                    if isinstance(value, auto) and (value.value is _auto_null):
-                        value.value = gnv(name, 1, len(member_names), gnv_last_values)
-                    value = value.value
-                    if not isinstance(value, tuple):
-                        value = (value)
-                    member = new_member(enum_class, **value)
-                    value = value[0]
-                    if __new__ is None:
-                        member._value_ = value
-                    try:
-                        contained = value2member_map.get(member._value_)
-                    except TypeError:
-                        contained = None
-                    if contained is not None:
-                        contained._add_alias_(name)
-                    else:
-                        member._name_ = name
-                        member.__objclass__ = enum_class
-                        member.__init__(value)
-                        member._sort_order_ = len(member_names)
-                        if name not in ('name', 'value'):
-                            setattr(enum_class, name, member)
-                        else:
-                            enum_class._add_member_(name, member)
-                            member_names.append(name)
-                            gnv_last_values.append(value)
+                    if isinstance(value, auto):
+                        if value.value is _auto_null:
+                            value.value = gnv(name, 1, len(member_names), gnv_last_values)
+                        value = value.value
+                        if value:
+                            if not isinstance(value, tuple):
+                                value = (value)
+                            member = new_member(enum_class, **value)
+                            value = value[0]
+                            if __new__ is None:
+                                member._value_ = value
                             try:
-                                enum_class._value2member_map_.setdefault(value, member)
-                                if value not in hashable_values:
-                                    hashable_values.append(value)
-                                else:
-                                    for (name, value) in attrs.items():
-                                        if isinstance(value, auto) and (value.value is _auto_null):
-                                            value.value = gnv(name, 1, len(member_names), gnv_last_values)
-                                        value = value.value
-                                        if not isinstance(value, tuple):
-                                            value = (value)
-                                        member = new_member(enum_class, **value)
-                                        value = value[0]
-                                        if __new__ is None:
-                                            member._value_ = value
-                                        try:
-                                            contained = value2member_map.get(member._value_)
-                                        except TypeError:
-                                            contained = None
-                                        if contained is not None:
-                                            contained._add_alias_(name)
-                                        else:
-                                            member._name_ = name
-                                            member.__objclass__ = enum_class
-                                            member.__init__(value)
-                                            member._sort_order_ = len(member_names)
-                                            if name not in ('name', 'value'):
-                                                setattr(enum_class, name, member)
-                                            else:
-                                                enum_class._add_member_(name, member)
+                                contained = value2member_map.get(member._value_)
                             except TypeError:
-                                enum_class._unhashable_values_map_.setdefault(name, []).append(value)
+                                contained = None
+                            if contained is not None:
+                                contained._add_alias_(name)
+                            else:
+                                member._name_ = name
+                                member.__objclass__ = enum_class
+                                member.__init__(value)
+                                member._sort_order_ = len(member_names)
+                                if name not in ('name', 'value'):
+                                    setattr(enum_class, name, member)
+                                else:
+                                    enum_class._add_member_(name, member)
+                                    member_names.append(name)
+                                    gnv_last_values.append(value)
+                                    try:
+                                        enum_class._value2member_map_.setdefault(value, member)
+                                        if value not in hashable_values:
+                                            hashable_values.append(value)
+                                        else:
+                                            for (name, value) in attrs.items():
+                                                if isinstance(value, auto):
+                                                    if value.value is _auto_null:
+                                                        value.value = gnv(name, 1, len(member_names), gnv_last_values)
+                                                    value = value.value
+                                                    if value:
+                                                        if not isinstance(value, tuple):
+                                                            value = (value)
+                                                        member = new_member(enum_class, **value)
+                                                        value = value[0]
+                                                        if __new__ is None:
+                                                            member._value_ = value
+                                                        try:
+                                                            contained = value2member_map.get(member._value_)
+                                                        except TypeError:
+                                                            contained = None
+                                                        if contained is not None:
+                                                            contained._add_alias_(name)
+                                                        else:
+                                                            member._name_ = name
+                                                            member.__objclass__ = enum_class
+                                                            member.__init__(value)
+                                                            member._sort_order_ = len(member_names)
+                                                            if name not in ('name', 'value'):
+                                                                setattr(enum_class, name, member)
+                                                            else:
+                                                                enum_class._add_member_(name, member)
+                                                    else:
+                                                        member = new_member(enum_class)
+                                                elif value:
+                                                    pass
+                                                else:
+                                                    member = new_member(enum_class)
+                                    except TypeError:
+                                        enum_class._unhashable_values_map_.setdefault(name, []).append(value)
+                        else:
+                            member = new_member(enum_class)
+                    elif value:
+                        pass
+                    else:
+                        member = new_member(enum_class)
                 if '__new__' in body:
                     enum_class.__new_member__ = enum_class.__new__
                 enum_class.__new__ = Enum.__new__

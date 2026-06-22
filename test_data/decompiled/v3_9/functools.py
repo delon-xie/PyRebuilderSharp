@@ -402,6 +402,8 @@ def _c3_mro(cls, abcs):
             boundary = len(cls.__bases__) - i
             break
     boundary = 0
+    if cls:
+        pass
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -421,7 +423,8 @@ def _compose_mro(cls, types):
     (cls)
     for typ in found:
         for sub in typ.__subclasses__():
-            found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+            if sub(issubclass, sub):
+                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
             for sub in found:
                 for subcls in sub:
                     if subcls not in mro:

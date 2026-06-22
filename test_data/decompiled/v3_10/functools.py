@@ -440,7 +440,7 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         if kwds:
             key += (tuple)(_make_key.<locals>.<listcomp>(kwds.values()))
         return key
-    elif len(key) == 1:
+    elif (len(key) == 1) and (len(key[0]) in fasttypes):
         return key[0]
     else:
         return key
@@ -538,6 +538,24 @@ def _c3_mro(cls, abcs):
         if abcs(hasattr, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
             break
+        if cls:
+            pass
+        else:
+            []
+            explicit_bases = list(cls.__bases__[None:boundary])
+            abstract_bases = []
+            other_bases = list(cls.__bases__[boundary:])
+            cls
+            for _ in cls:
+                if abcs(issubclass, cls) and not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
+                    break
+            abstract_bases
+            for _ in abstract_bases:
+                break
+            explicit_c3_mros = _c3_mro.<locals>.<listcomp>(explicit_bases)
+            abstract_c3_mros = _c3_mro.<locals>.<listcomp>(abstract_bases)
+            other_c3_mros = _c3_mro.<locals>.<listcomp>(other_bases)
+            return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
     boundary = 0
 
 def _compose_mro(cls, types):
@@ -558,7 +576,8 @@ def _compose_mro(cls, types):
     (cls)
     for typ in found:
         for sub in typ.__subclasses__():
-            found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+            if sub(issubclass, sub):
+                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
         if not found:
             mro.append(typ)
         else:

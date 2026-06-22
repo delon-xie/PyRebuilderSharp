@@ -4,7 +4,10 @@
 def test_match(x):
     if x == 1:
         return 'one'
-    return 'two'
+    elif x == 2:
+        return 'two'
+    else:
+        return 'other'
 
 def test_match_with_guard(x):
     if len(s) > 5:

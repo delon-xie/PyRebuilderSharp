@@ -134,7 +134,10 @@ class ABCMeta(type):
         return True
         subtype = type(instance)
         if subtype is subclass:
-            return False
+            if instance._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
+                return False
+            else:
+                return
         else:
             return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'({subclass, subtype}))
 

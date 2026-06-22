@@ -11,7 +11,7 @@ try:
         try:
             try:
                 []
-                if not True:
+                if not start < end:
                     pass
                 else:
                     try:

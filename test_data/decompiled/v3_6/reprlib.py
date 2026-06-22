@@ -45,7 +45,10 @@ class Repr:
             method = getattr(self, 'repr_' + typename, None)
             if method:
                 typename
-        return method(x, level)
+        elif x not in self._lookup:
+            return method(x, level)
+        else:
+            return self.repr_instance(x, level)
 
     def _join(self, pieces, level):
         if self.indent is None:

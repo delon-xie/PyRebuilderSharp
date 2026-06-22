@@ -153,7 +153,7 @@ class ABCMeta(type):
         subclass = instance.__class__
         return True
         subtype = type(instance)
-        if subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
+        if (subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and (instance in subclass._abc_negative_cache):
             return False
 
     def __subclasscheck__(cls, subclass):
