@@ -1367,10 +1367,34 @@ public class AstBuilder
             if (tryBlocks.Count == 0) return null;
         }
 
+        // 在 try 体中查找 POP_BLOCK 或 JUMP_FORWARD 分界：
+        // - POP_BLOCK（3.11）：标记 try 体结束，之后是 else 体
+        // - JUMP_FORWARD（3.12+）：标记 try 体结束，之后是 else 体
         var tryBody = new List<Stmt>();
+        var elseBody = new List<Stmt>();  // will be replaced below if non-null
+        bool afterTryBody = false;
         var tryVisited = new HashSet<BasicBlock>();
         foreach (var tb in tryBlocks)
         {
+            // 检测 POP_BLOCK 或 JUMP_FORWARD（3.12+）分界
+            if (!afterTryBody
+                && (tb.Instructions.Any(i => i.Opcode == Opcode.POP_BLOCK)
+                    || tb.Instructions.Any(i => i.Opcode == Opcode.JUMP_FORWARD)))
+            {
+                afterTryBody = true;
+                // 分界指令本身是 try 体的一部分
+                var result = _blockResults.GetValueOrDefault(tb.Id);
+                if (result?.Statements != null)
+                {
+                    var filtered = result.Statements.Where(s => s is not Raise).ToList();
+                    if (filtered.Count > 0)
+                        tryBody.AddRange(filtered);
+                }
+                // 对于 POP_BLOCK：后续块全部属于 else 体
+                // 对于 JUMP_FORWARD：当前块之后的块属于 else 体
+                // （JUMP_FORWARD 块的语句仍属 try 体）
+                continue;
+            }
             if (tb == block)
             {
                 var result = _blockResults.GetValueOrDefault(block.Id);
@@ -1378,14 +1402,19 @@ public class AstBuilder
                 {
                     var filtered = result.Statements.Where(s => s is not Raise).ToList();
                     if (filtered.Count > 0)
-                        tryBody.AddRange(filtered);
+                        (afterTryBody ? elseBody : tryBody).AddRange(filtered);
                 }
             }
             else if (!visited.Contains(tb) && !tryVisited.Contains(tb))
             {
-                tryBody.AddRange(BuildStatements(tb, visited));
+                var stmts = BuildStatements(tb, visited);
+                if (afterTryBody)
+                    elseBody.AddRange(stmts);
+                else
+                    tryBody.AddRange(stmts);
             }
         }
+        if (elseBody.Count == 0) elseBody = null;
 
         // 跳过仅有基础设施指令（Raise/异常处理）的 try 体
         // 这些是 CPython 嵌套清理条目，不应生成独立 try/except
@@ -1399,35 +1428,37 @@ public class AstBuilder
         }
 
         visited.Add(handlerBlock);
-        List<Stmt>? elseBody = null;
 
-        // 收集 else 体：查找 try 体末尾的 JUMP_FORWARD 目标。
+        // 收集 else 体：查找 try 体末尾的 JUMP_FORWARD 目标（POP_BLOCK 未捕获的 fallback）。
         // else 体位于 try 体的 JUMP_FORWARD 目标与 handler 的 JUMP_FORWARD 目标之间。
-        var tryBodyJump = tryBlocks
-            .SelectMany(b => b.Instructions)
-            .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
-        var handlerJump = handlerBlock.Instructions
-            .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
-        if (tryBodyJump.Argument.HasValue && handlerJump.Argument.HasValue)
+        if (elseBody == null)
         {
-            int elseStart = tryBodyJump.Offset + 2 + tryBodyJump.Argument.Value;
-            int elseEnd = handlerJump.Offset + 2 + handlerJump.Argument.Value;
-            var elseCandidates = _sortedBlocks
-                .Where(b => b.StartOffset >= elseStart
-                    && b.EndOffset < elseEnd
-                    && !visited.Contains(b))
-                .OrderBy(b => b.StartOffset)
-                .ToList();
-            if (elseCandidates.Count > 0)
+            var tryBodyJump = tryBlocks
+                .SelectMany(b => b.Instructions)
+                .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
+            var handlerJump = handlerBlock.Instructions
+                .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
+            if (tryBodyJump.Argument.HasValue && handlerJump.Argument.HasValue)
             {
-                elseBody = new List<Stmt>();
-                foreach (var eb in elseCandidates)
+                int elseStart = tryBodyJump.Offset + 2 + tryBodyJump.Argument.Value;
+                int elseEnd = handlerJump.Offset + 2 + handlerJump.Argument.Value;
+                var elseCandidates = _sortedBlocks
+                    .Where(b => b.StartOffset >= elseStart
+                        && b.EndOffset < elseEnd
+                        && !visited.Contains(b))
+                    .OrderBy(b => b.StartOffset)
+                    .ToList();
+                if (elseCandidates.Count > 0)
                 {
-                    visited.Add(eb);
-                    _processedBlockIds.Add(eb.Id);
-                    var elseStmts = BuildStatements(eb, visited);
-                    if (elseStmts.Count > 0)
-                        elseBody.AddRange(elseStmts);
+                    elseBody = new List<Stmt>();
+                    foreach (var eb in elseCandidates)
+                    {
+                        visited.Add(eb);
+                        _processedBlockIds.Add(eb.Id);
+                        var elseStmts = BuildStatements(eb, visited);
+                        if (elseStmts.Count > 0)
+                            elseBody.AddRange(elseStmts);
+                    }
                 }
             }
         }
