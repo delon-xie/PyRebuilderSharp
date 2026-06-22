@@ -221,6 +221,9 @@ public class PythonCodeGenerator : ICodeGenerator
         if (_options.ShowHeader)
             _output.AppendLine();
 
+        // 预处理：移除模块级 return None（CPython 自动添加的隐式模块结束返回）
+        StripModuleReturnNone(module.Body);
+
         foreach (var stmt in module.Body)
         {
             // 检测模块级 __doc__ = '...' → 变成 docstring
@@ -234,6 +237,24 @@ public class PythonCodeGenerator : ICodeGenerator
             }
             Visit(stmt);
             // Visit already appends newline, no need for extra blank line
+        }
+    }
+
+    /// <summary>递归移除模块级 return None。</summary>
+    private void StripModuleReturnNone(List<Stmt> stmts)
+    {
+        // 移除 body 尾部 return None
+        while (stmts.Count > 0 && stmts[^1] is Return { Value: null or Constant { Value: null } })
+            stmts.RemoveAt(stmts.Count - 1);
+        // 递归处理模块级 if 语句的 body 和 orelse
+        foreach (var stmt in stmts)
+        {
+            if (stmt is If ifStmt)
+            {
+                StripModuleReturnNone(ifStmt.Body);
+                if (ifStmt.Orelse != null)
+                    StripModuleReturnNone(ifStmt.Orelse);
+            }
         }
     }
 
