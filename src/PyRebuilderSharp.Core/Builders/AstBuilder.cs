@@ -1376,6 +1376,7 @@ public class AstBuilder
         }
 
         visited.Add(handlerBlock);
+        List<Stmt>? elseBody = null;
         var handlerResult = _blockResults.GetValueOrDefault(handlerBlock.Id);
         var handlerBody = handlerResult?.Statements
             ?.Where(s => s is not Raise and not CommentBlock)
@@ -1396,11 +1397,24 @@ public class AstBuilder
                 && !visited.Contains(succ))
             {
                 // 跳过类/函数定义块 — 这些是结构边界，不是 handler 后继体
+                // 在 try/except/else 中, handler 后出现的类/函数定义属于 else 体
                 bool isDefBlock = succ.Instructions.Any(i =>
                     i.Opcode == Opcode.MAKE_FUNCTION
                     || i.Opcode == Opcode.MAKE_CLOSURE
                     || i.Opcode == Opcode.LOAD_BUILD_CLASS);
-                if (isDefBlock) continue;
+                if (isDefBlock)
+                {
+                    // 这是 else 体：handler 后续的类/函数定义
+                    var elseStmts = BuildStatements(succ, visited);
+                    if (elseStmts.Count > 0)
+                    {
+                        elseBody ??= new List<Stmt>();
+                        elseBody.AddRange(elseStmts);
+                    }
+                    visited.Add(succ);
+                    _processedBlockIds.Add(succ.Id);
+                    continue;
+                }
 
                 var succResult = _blockResults.GetValueOrDefault(succ.Id);
                 if (succResult?.Statements != null)
@@ -1442,21 +1456,9 @@ public class AstBuilder
             new ExceptHandler(exceptType, exceptName, handlerBody, isGroup)
         };
 
-        // 收集 else 体：handler 后继中余下的块（在 ET 范围内）
-        List<Stmt>? elseBody = null;
-        foreach (var succ in handlerBlock.Successors)
-        {
-            if (!visited.Contains(succ) && succ.StartOffset <= matchingEntry.EndOffset)
-            {
-                // 这些块是 else 体
-                var elseStmts = BuildStatements(succ, visited);
-                if (elseStmts.Count > 0)
-                {
-                    elseBody ??= new List<Stmt>();
-                    elseBody.AddRange(elseStmts);
-                }
-            }
-        }
+        // 收集 else 体：handler 后继中部分块因超出 ET 范围或属于类/函数定义被单独收集
+        if (elseBody?.Count > 0)
+            handlers[0] = new ExceptHandler(exceptType, exceptName, handlerBody, isGroup);
 
         return new List<Stmt> { new Try(tryBody, handlers, elseBody) };
     }
