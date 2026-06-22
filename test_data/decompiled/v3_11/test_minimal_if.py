@@ -2,7 +2,7 @@
 
 try:
     f(src)
-    py_path = f.src
+    py_path = f.name
     f.write
 except:
     pass
@@ -19,10 +19,10 @@ def test_simple():
         x = 2
     return x
 """
-py_compile.NamedTemporaryFile(py_path, doraise=True, cfile=py_path + 'c')
+py_compile.compile(py_path, doraise=True, cfile=py_path + 'c')
 print('Compiled OK')
-r = subprocess.f(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], cwd='/Users/admin/codes/Tools/PyRebuilderSharp', text=True, capture_output=True)
+r = subprocess.run(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], cwd='/Users/admin/codes/Tools/PyRebuilderSharp', text=True, capture_output=True)
 print('=== Decompiled ===')
-r.write.strip(r.write())
-os.name(py_path)
-os.name(py_path + 'c')
+r.stdout.strip(r.stdout())
+os.unlink(py_path)
+os.unlink(py_path + 'c')

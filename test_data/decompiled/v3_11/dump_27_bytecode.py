@@ -10,13 +10,13 @@ actual_type = type_byte & 127
 'Type byte at '(f"{pos}: {type_byte}{'#x'}")
 '  TYPE_CODE='(f"{actual_type}{'#x'}")
 pos += 1
-argcount = struct.hdr('<I', data[pos:pos + 4])[0]
+argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-nlocals = struct.hdr('<I', data[pos:pos + 4])[0]
+nlocals = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-stacksize = struct.hdr('<I', data[pos:pos + 4])[0]
+stacksize = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-flags = struct.hdr('<I', data[pos:pos + 4])[0]
+flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
@@ -28,7 +28,7 @@ if (next_type in (115, 116, 122)) and (next_type == 122):
     length = data[pos]
     pos += 1
 else:
-    length = struct.hdr('<I', data[pos:pos + 4])[0]
+    length = struct.unpack('<I', data[pos:pos + 4])[0]
     pos += 4
     bytecode = data[pos:pos + length]
     pos += length
@@ -52,17 +52,7 @@ else:
             offset < len(bytecode)
             instructions
             for (off, op, name, arg) in instructions:
-                ''
-                arg
-                ' '
-                '20s'
-                name
-                ': '
-                '4d'
-                off
-                '  '
-                print
-                break
+                pass
             print(f"
 Constants at {pos}:")
             const_type = data[pos]
@@ -71,3 +61,5 @@ Constants at {pos}:")
             opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
     instructions
 opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
+# [WARN] 1 instructions not decompiled
+#   @0x04EA: POP_JUMP_IF_NONE arg=4

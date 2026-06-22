@@ -802,6 +802,22 @@ public class AstBuilder
             }
         }
 
+        // 检测 match/case 内联模式：COPY+MATCH_CLASS
+        if (block.Instructions.Any(i => i.Opcode == Opcode.COPY)
+            && block.Instructions.Any(i =>
+                i.Opcode is Opcode.MATCH_CLASS_312 or Opcode.MATCH_CLASS_313
+                    or Opcode.MATCH_MAPPING_312 or Opcode.MATCH_MAPPING_313
+                    or Opcode.MATCH_SEQUENCE_312 or Opcode.MATCH_SEQUENCE_313
+                    or Opcode.MATCH_KEYS_312 or Opcode.MATCH_KEYS_313))
+        {
+            var matchStmts = BuildMatchFromInline(block, visited);
+            if (matchStmts != null)
+            {
+                stmts.AddRange(matchStmts);
+                return stmts;
+            }
+        }
+
         // 检查是否为条件分支
         if (IsConditionBranch(block))
         {
@@ -1113,10 +1129,13 @@ public class AstBuilder
             if (lastInstr == default) break;
 
             // 确定 case body 和 next case
-            int? jumpTarget = lastInstr.Argument;
-            BasicBlock? bodyBlock = currentBlock.Successors.FirstOrDefault(s =>
-                s != (jumpTarget.HasValue ? FindBlockByOffset(jumpTarget.Value) : null));
-            BasicBlock? nextCaseBlock = jumpTarget.HasValue ? FindBlockByOffset(jumpTarget.Value) : null;
+            // 使用 BlockScanner 创建的 Successors (POP_JUMP_IF_NONE 现已被识别为条件跳转)
+            // bodyBlock = fallthrough (UNPACK_SEQUENCE + case body)
+            // nextCaseBlock = jump target (下一个 case 或清理块)
+            var sortedSuccs = currentBlock.Successors
+                .Where(s => s != null).OrderBy(s => s.StartOffset).ToList();
+            BasicBlock? bodyBlock = sortedSuccs.FirstOrDefault();
+            BasicBlock? nextCaseBlock = sortedSuccs.Count > 1 ? sortedSuccs.Last() : null;
 
             // 标记 next case 和 body 为已处理
             if (bodyBlock != null) { visited.Add(bodyBlock); _processedBlockIds.Add(bodyBlock.Id); }

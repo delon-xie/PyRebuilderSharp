@@ -2,7 +2,7 @@
 
 try:
     f(16)
-    code = marshal.struct(f)
+    code = marshal.load(f)
     f.read
 except:
     pass
@@ -10,40 +10,15 @@ import dis
 import marshal
 import types
 import struct
-code.open
-for const in code.open:
-    if isinstance(const, types.read) and (const.read == 'depth_5_while'):
+code.co_consts
+for const in code.co_consts:
+    if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
         for (i, instr) in enumerate(instrs):
-            if instr.isinstance in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-                leaders(instr.isinstance)
-            elif instr.isinstance in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
-                leaders(instr.isinstance)
-                if i + 1 < len(instrs):
-                    leaders(instrs[i + 1].co_name)
-                    leaders.add
-                sorted_leaders = sorted(leaders)
-                enumerate(sorted_leaders)
-                for (i, start) in enumerate(sorted_leaders):
-                    if i + 1 < len(sorted_leaders):
-                        pass
-                    else:
-                        instrs[-1].co_name + 2
-                        block_instrs = instrs()
-                        if len(block_instrs) > 3:
-                            pass
-                        else:
-                            f"{end - 1}{'3d'}]: {', '.join}, {<genexpr>(block_instrs())}"
-                            '-'
-                            '3d'
-                            start
-                            'Block ['
-                            break
-                            if <genexpr>(block_instrs()):
-                                last = block_instrs[-1]
-                                print(f"  → COND: jump_target={last.isinstance}, fallthrough_offset={block_instrs[-1].co_name + 2}")
-                            elif <genexpr>(block_instrs()):
-                                for ins in block_instrs:
-                                    if ins.isinstance == 'JUMP_ABSOLUTE':
-                                        print(f"  → JUMP: offset={ins.co_name}, target={ins.isinstance}")
-                None
-                return
+            if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
+                pass
+            elif instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
+                pass
+return
+# [WARN] 2 instructions not decompiled
+#   @0x0190: POP_JUMP_IF_NONE arg=52
+#   @0x01E6: POP_JUMP_IF_NONE arg=52

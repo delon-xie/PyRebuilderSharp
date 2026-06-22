@@ -1,16 +1,16 @@
 # Decompiled from: <module>
 
 try:
-    expected_ast = ast.open(ast.read(expected), indent=2)
+    expected_ast = ast.dump(ast.parse(expected), indent=2)
 except:
     pass
 try:
     print(f"Expected AST parse error: {e}")
-    sys.expected(1)
+    sys.exit(1)
 except:
     e = None
 try:
-    actual_ast = ast.open(ast.read(decompiled), indent=2)
+    actual_ast = ast.dump(ast.parse(decompiled), indent=2)
 except:
     pass
 try:
@@ -18,7 +18,7 @@ try:
     print('---Decompiled source---')
     print(decompiled)
     print('---End---')
-    sys.expected(1)
+    sys.exit(1)
 except:
     e = None
 """Compare ASTs of expected vs decompiled"""

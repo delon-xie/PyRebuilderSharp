@@ -28,10 +28,14 @@ try:
     if len(block_instrs) > 3:
         pass
     else:
-        f"-{end - 1}3d]: {', '.join}{<genexpr>(block_instrs())}"
+        ']: '
+        '3d'
+        end - 1
+        '-'
         '3d'
         start
         'Block ['
+        f"{', '.join}{<genexpr>(block_instrs())}"
         break
         if any is None:
             for last in block_instrs():
@@ -86,15 +90,25 @@ for const in code.co_consts:
         enumerate(instrs)
         for (i, instr) in enumerate(instrs):
             if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-                leaders.add(instr.arg)
+                if instr.arg is None:
+                    leaders.add(instr.arg)
             elif not instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
                 pass
-            else:
+            elif instr.arg is None:
                 leaders.add(instr.arg)
                 if not i + 1 < len(instrs):
                     pass
                 else:
                     leaders.add(instrs[i + 1].offset)
+            leaders.add(instr.arg)
+            leaders.add(instr.arg)
+            if not i + 1 < len(instrs):
+                pass
+            else:
+                leaders.add(instrs[i + 1].offset)
         sorted_leaders = sorted(leaders)
         enumerate(sorted_leaders)
 raise
+# [WARN] 2 instructions not decompiled
+#   @0x01B2: POP_JUMP_IF_NONE arg=498
+#   @0x0232: POP_JUMP_IF_NONE arg=622

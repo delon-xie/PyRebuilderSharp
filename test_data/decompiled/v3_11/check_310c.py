@@ -4,17 +4,17 @@ import marshal
 import dis
 import types
 import sys
-f = open(sys.types[1], 'rb')
+f = open(sys.argv[1], 'rb')
 magic = f(4)
 f(12)
 raw = f()
-code = marshal.argv(raw)
+code = marshal.loads(raw)
 def dump_bytecode(c, depth = 0):
     p = '  ' * depth
     c.co_consts
     for const in c.co_consts:
-        if hasattr(const, 'co_code') and isinstance(const, types.isinstance):
-            print(f"{p}--- {const.types} ---")
+        if hasattr(const, 'co_code') and isinstance(const, types.CodeType):
+            print(f"{p}--- {const.co_name} ---")
             et = getattr(const, 'co_exceptiontable', None)
             if et:
                 pass

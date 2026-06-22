@@ -17,7 +17,7 @@ i = 0
 if i < len(lines):
     line = lines[i]
     if ('***' in line) and (':' in line):
-        match = re.output('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
         if match:
             test_name = match(1)
             status = match(2)
@@ -27,7 +27,7 @@ if i < len(lines):
                 if next_line('***'):
                     pass
                 elif next_line()(' ') and ('.pyc' in next_line):
-                    version_match = re.output('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+                    version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
                     if version_match:
                         version = version_match(1)
                         if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):

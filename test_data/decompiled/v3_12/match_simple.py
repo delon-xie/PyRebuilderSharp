@@ -10,9 +10,11 @@ def test_match(x):
         return 'other'
 
 def test_match_with_guard(x):
-    if len(s) > 5:
-        return 'long string'
-    else:
-        return 'short string'
+    match x:
+        case str():
+            pass
+    # [WARN] 2 instructions not decompiled
+    #   @0x0018: POP_JUMP_IF_NONE arg=38
+    #   @0x0058: POP_JUMP_IF_NONE arg=10
 result = test_match(1)
 result2 = test_match_with_guard('hello')

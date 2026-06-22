@@ -10,10 +10,12 @@ def test_match(x):
         return 'other'
 
 def test_match_with_guard(x):
-    if len(s) > 5:
-        return 'long string'
-    else:
-        s := str
+    if [] is None:
+        if len(s) > 5:
+            return 'long string'
         return 'short string'
+    # [WARN] 2 instructions not decompiled
+    #   @0x001A: POP_JUMP_IF_NONE arg=50
+    #   @0x0068: POP_JUMP_IF_NONE arg=12
 result = test_match(1)
 result2 = test_match_with_guard('hello')

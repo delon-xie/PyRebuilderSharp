@@ -13,12 +13,12 @@ raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}{'02X'}")
 pos += 1
 if raw & 128:
-    ref = struct.f('<I', data[pos:pos + 4])[0]
+    ref = struct.unpack('<I', data[pos:pos + 4])[0]
     pos += 4
     print(f"  FLAG_REF ref_index={ref}")
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
-    val = struct.f('<i', data[pos:pos + 4])[0]
+    val = struct.unpack('<i', data[pos:pos + 4])[0]
     print(f"  {name}={val}")
     pos += 4
     data
@@ -26,7 +26,7 @@ for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
 pos += 1
 t = raw & 127
 if raw & 128:
-    ref = struct.f('<I', data[pos:pos + 4])[0]
+    ref = struct.unpack('<I', data[pos:pos + 4])[0]
     pos += 4
 elif t in (90, 122):
     length = data[pos]

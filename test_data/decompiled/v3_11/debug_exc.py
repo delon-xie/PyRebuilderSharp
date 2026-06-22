@@ -4,7 +4,7 @@ import sys
 import dis
 import marshal
 import types
-f = open(sys.marshal[1], 'rb')
+f = open(sys.argv[1], 'rb')
 magic = f(4)
 'Magic: '(f"{magic.hex}{magic()}")
 flags = f.read(f(4), 'little')
@@ -12,11 +12,11 @@ ts = f.read(f(4), 'little')
 size = f.read(f(4), 'little')
 print(f"Header: flags={flags} ts={ts} size={size}")
 raw = f()
-code = marshal.magic(raw)
-print(f"Code name: {code.print}")
+code = marshal.loads(raw)
+print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable'):
-    if code.hex:
+    if code.co_exceptiontable:
         for i in range(0, len(et), 8):
             if i + 7 >= len(et):
                 break
@@ -29,13 +29,13 @@ if hasattr(code, 'co_exceptiontable'):
             code
     code
     for const in code:
-        if isinstance(const, types.loads):
+        if isinstance(const, types.CodeType):
             print(f"
---- Nested: {const.print} ---")
+--- Nested: {const.co_name} ---")
             print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
             if hasattr(const, 'co_exceptiontable'):
-                if const.hex:
-                    '  bytes: '(f"{const.hex.hex}{const.hex()}")
+                if const.co_exceptiontable:
+                    '  bytes: '(f"{const.co_exceptiontable.hex}{const.co_exceptiontable()}")
                     print
                 None
                 return

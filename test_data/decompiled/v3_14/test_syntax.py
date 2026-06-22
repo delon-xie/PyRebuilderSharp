@@ -2951,7 +2951,6 @@ class SyntaxWarningTest(unittest.TestCase):
                             {kw}
                 ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
-    __classdictcell__ = __classdict__
 
 class SyntaxErrorTestCase(unittest.TestCase):
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
@@ -2972,12 +2971,37 @@ class SyntaxErrorTestCase(unittest.TestCase):
                         self.fail('SyntaxError is not a %s' % subclass.__name__)
                         try:
                             mo = re.search(errtext, str(err))
-                            self.fail(f"SyntaxError did not contain {errtext}")
-                            self.assertEqual(err.filename, filename)
-                            self.assertEqual(err.lineno, lineno)
-                            self.assertEqual(err.offset, offset)
-                            self.assertEqual(err.end_lineno, end_lineno)
-                            self.assertEqual(err.end_offset, end_offset)
+                            try:
+                                self.fail(f"SyntaxError did not contain {errtext}")
+                                self.assertEqual(err.filename, filename)
+                                try:
+                                    self.assertEqual(err.lineno, lineno)
+                                    try:
+                                        self.assertEqual(err.offset, offset)
+                                        try:
+                                            self.assertEqual(err.end_lineno, end_lineno)
+                                            try:
+                                                self.assertEqual
+                                                try:
+                                                    pass
+                                                except:
+                                                    err = None
+                                                    return None
+                                            except:
+                                                err = None
+                                                return None
+                                        except:
+                                            err = None
+                                            return None
+                                    except:
+                                        err = None
+                                        return None
+                                except:
+                                    err = None
+                                    return None
+                            except:
+                                err = None
+                                return None
                         except:
                             err = None
                             return None
@@ -2995,6 +3019,12 @@ class SyntaxErrorTestCase(unittest.TestCase):
             return None
         self.fail('compile() did not raise SyntaxError')
         err = None
+        # [WARN] 5 instructions not decompiled
+        #   @0x0112: POP_JUMP_IF_NOT_NONE arg=322
+        #   @0x017C: POP_JUMP_IF_NONE arg=442
+        #   @0x01BC: POP_JUMP_IF_NONE arg=506
+        #   @0x01FC: POP_JUMP_IF_NONE arg=570
+        #   @0x023C: POP_JUMP_IF_NONE arg=646
 
     def test_expression_with_assignment(self):
         """print(end1 + end2 = ' ')"""
@@ -3447,7 +3477,6 @@ a=1
         (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (rhs_stmt, lhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
-    __classdictcell__ = __classdict__
 
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     """Test syntax restrictions for lazy imports."""
@@ -3540,7 +3569,6 @@ except* Exception:
         compile('lazy from sys import path', '<test>', 'exec')
         compile('lazy import json as j', '<test>', 'exec')
         compile('lazy from datetime import datetime as dt', '<test>', 'exec')
-    __classdictcell__ = __classdict__
 
 def load_tests(loader, tests, pattern):
     tests.addTest(doctest.DocTestSuite())

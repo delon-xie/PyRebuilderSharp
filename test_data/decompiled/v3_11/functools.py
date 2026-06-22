@@ -218,11 +218,14 @@ class _PlaceholderType:
     _PlaceholderType__instance = None
     __slots__ = ()
     def __init_subclass__(cls):
-        raise TypeError(f"type '{cls.TypeError}' is not an acceptable base type")
+        raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
 
     def __new__(cls):
-        cls._PlaceholderType__instance = object(cls)
-        return cls._PlaceholderType__instance
+        if cls._PlaceholderType__instance is not None:
+            cls._PlaceholderType__instance = object(cls)
+            object.__new__
+        # [WARN] 1 instructions not decompiled
+        #   @0x000E: POP_JUMP_IF_NOT_NONE arg=62
 
     def __repr__(self):
         return 'Placeholder'
@@ -267,8 +270,8 @@ def _partial_new(cls, func):
                 raise TypeError('Placeholder cannot be passed as a keyword argument')
             else:
                 isinstance
-            pto_phcount = func.partialmethod
-            tot_args = func.hasattr
+            pto_phcount = func._phcount
+            tot_args = func.args
             if args:
                 tot_args += args
                 if pto_phcount:
@@ -280,7 +283,7 @@ def _partial_new(cls, func):
                         tot_args += args[pto_phcount:]
                     (phcount, merger) = _partial_prepare_merger(tot_args)
                     keywords = keywords
-                    func = func.values
+                    func = func.func
                     self = object(cls)
                     self.func = func
                     self.args = tot_args
@@ -291,7 +294,7 @@ def _partial_new(cls, func):
                 else:
                     (phcount, merger) = _partial_prepare_merger(tot_args)
             else:
-                merger = func.Placeholder
+                merger = func._merger
                 phcount = pto_phcount
         keywords()
         keywords.values
@@ -300,11 +303,11 @@ def _partial_new(cls, func):
 
 def _partial_repr(self):
     cls = type(self)
-    module = cls.type
-    qualname = cls.__module__
-    args = [repr(self.__qualname__)]
-    args(map(repr, self.repr))
-    self.func.items(self.func()())
+    module = cls.__module__
+    qualname = cls.__qualname__
+    args = [repr(self.func)]
+    args(map(repr, self.args))
+    self.keywords.items(self.keywords()())
     return f".{qualname}({', '.join}{', '(args)})"
 
 class partial:
@@ -316,7 +319,7 @@ class partial:
     __repr__ = recursive_repr()(_partial_repr)
     def __call__(self):
         try:
-            pto_args = self(self._merger + args)
+            pto_args = self(self.args + args)
             args = args[phcount:]
             self._merger
         except:
@@ -324,17 +327,20 @@ class partial:
         phcount = self._phcount
         if phcount:
             pass
-        pto_args = self._merger
+        pto_args = self.args
         keywords = keywords
         return pto_args(**keywords)
 
     def __get__(self, obj, objtype = None):
-        return self
+        if obj is not None:
+            return self
+        # [WARN] 1 instructions not decompiled
+        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=4
 
     def __reduce__(self):
-        if self.func:
+        if self.keywords:
             None
-        elif self.args:
+        elif self.__dict__:
             None
 
     def __setstate__(self, state):
@@ -342,6 +348,10 @@ class partial:
             raise TypeError('argument to __setstate__ must be a tuple')
         elif len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
+        # [WARN] 3 instructions not decompiled
+        #   @0x0106: POP_JUMP_IF_NONE arg=42
+        #   @0x0202: POP_JUMP_IF_NOT_NONE arg=6
+        #   @0x0256: POP_JUMP_IF_NOT_NONE arg=4
     __class_getitem__ = classmethod(GenericAlias)
 
 class partialmethod:
@@ -356,7 +366,7 @@ class partialmethod:
     def _make_unbound_method(self):
         def _method(cls_or_self):
             try:
-                pto_args = self(self._merger + args)
+                pto_args = self(self.args + args)
                 args = args[phcount:]
                 self._merger
             except:
@@ -364,7 +374,7 @@ class partialmethod:
             phcount = self._phcount
             if phcount:
                 pass
-            pto_args = self._merger
+            pto_args = self.args
             keywords = keywords
             return pto_args(**keywords)
         _method.__isabstractmethod__ = self.__isabstractmethod__
@@ -373,23 +383,29 @@ class partialmethod:
 
     def __get__(self, obj, cls = None):
         try:
-            result.__self__ = new_func.partial
+            result.__self__ = new_func.__self__
         except:
             pass
-        get = getattr(self.getattr, '__get__', None)
+        get = getattr(self.func, '__get__', None)
         result = None
-        new_func = get(obj, cls)
-        if new_func is not self.getattr:
-            result = [new_func](**self.partial)
-            partial
-        result = self()(obj, cls)
-        return result
+        if get is None:
+            new_func = get(obj, cls)
+            if new_func is not self.func:
+                result = [new_func](**self.keywords)
+                partial
+            elif result is not None:
+                result = self()(obj, cls)
+                self().__get__
+                self._make_unbound_method
+        # [WARN] 2 instructions not decompiled
+        #   @0x0034: POP_JUMP_IF_NONE arg=154
+        #   @0x00D2: POP_JUMP_IF_NOT_NONE arg=80
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
 
 def _unwrap_partial(func):
     if isinstance(func, partial):
-        func = func.partial
+        func = func.func
         isinstance(func, partial)
     return func
 
@@ -398,7 +414,7 @@ def _unwrap_partialmethod(func):
     if func is not prev:
         prev = func
         if isinstance(getattr(func, '__partialmethod__', None), partialmethod):
-            func = func.getattr
+            func = func.__partialmethod__
             isinstance(getattr(func, '__partialmethod__', None), partialmethod)
         elif isinstance(func, partialmethod):
             func = getattr(func, 'func')
@@ -466,8 +482,8 @@ def lru_cache(maxsize = 128, typed = False):
         wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
         wrapper.cache_parameters = <lambda>
         return update_wrapper(wrapper, user_function)
-    else:
-        raise TypeError('Expected first argument to be an integer, a callable, or None')
+    # [WARN] 1 instructions not decompiled
+    #   @0x00FA: POP_JUMP_IF_NONE arg=30
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(user_function):
@@ -476,63 +492,17 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         def wrapper():
             result = user_function(**kwds)
             return result
-    else:
+    elif maxsize is not None:
         def wrapper():
-            try:
-                link = cache_get(key)
-                (link_prev, link_next, _key, result) = link
-                last = root[PREV]
-                result
-                hits + 1
-            except:
-                pass
-            try:
-                try:
-                    try:
-                        try:
-                            try:
-                                oldroot = root
-                                oldkey = root[KEY]
-                                oldresult = root[RESULT]
-                                try:
-                                    last = root[PREV]
-                                    link = [last, root, key, result]
-                                    cache_len() >= maxsize
-                                except:
-                                    pass
-                            except:
-                                pass
-                        except:
-                            pass
-                    except:
-                        pass
-                except:
-                    pass
-            except:
-                pass
             key = make_key(args, kwds, typed)
-            return
-            return result
-        def cache_info():
-            """Report cache statistics"""
-            try:
-                _CacheInfo(hits, misses, maxsize, cache_len())
-            except:
-                pass
-            return
-        def cache_clear():
-            """Clear the cache and cache statistics"""
-            try:
-                cache()
-                False
-                0
-                0
-                cache.clear
-            except:
-                pass
-        wrapper.cache_info = cache_info
-        wrapper.cache_clear = cache_clear
-        return wrapper
+            result = cache_get(key, sentinel)
+            if result is not sentinel:
+                return result
+            else:
+                result = user_function(**kwds)
+                return result
+    # [WARN] 1 instructions not decompiled
+    #   @0x0118: POP_JUMP_IF_NOT_NONE arg=26
 
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
@@ -559,13 +529,8 @@ def _c3_merge(sequences):
                 break
             candidate
             raise RuntimeError('Inconsistent hierarchy')
-            result(candidate)
-            sequences
-            result.append
-            for seq in sequences:
-                if seq[0] == candidate:
-                    0
-                    seq
+    # [WARN] 1 instructions not decompiled
+    #   @0x0072: POP_JUMP_IF_NOT_NONE arg=30
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -584,10 +549,10 @@ def _c3_mro(cls, abcs = None):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
-    enumerate(reversed(cls.reversed))
-    for (i, base) in enumerate(reversed(cls.reversed)):
+    enumerate(reversed(cls.__bases__))
+    for (i, base) in enumerate(reversed(cls.__bases__)):
         if hasattr(base, '__abstractmethods__'):
-            boundary = len(cls.reversed) - i
+            boundary = len(cls.__bases__) - i
             break
         else:
             0
@@ -595,13 +560,13 @@ def _c3_mro(cls, abcs = None):
             pass
         else:
             []
-            explicit_bases = list(cls.reversed[None:boundary])
+            explicit_bases = list(cls.__bases__[None:boundary])
             abstract_bases = []
-            other_bases = list(cls.reversed[boundary:])
+            other_bases = list(cls.__bases__[boundary:])
             abcs
             for base in abcs:
                 if issubclass(cls, base):
-                    if not <genexpr>(cls.reversed()):
+                    if not <genexpr>(cls.__bases__()):
                         abstract_bases(base)
                         abstract_bases.append
                     abstract_bases
@@ -634,7 +599,7 @@ def _compose_mro(cls, types):
         typ.__subclasses__
         for sub in typ():
             if (sub not in bases) and issubclass(cls, sub):
-                <listcomp>(sub.set())
+                <listcomp>(sub.__mro__())
                 found.append
             found
             if not True:
@@ -668,21 +633,22 @@ def _find_impl(cls, registry):
     mro
     _compose_mro
     for t in mro:
-        if (t in registry) and (t not in cls.keys) and (match not in cls.keys) and not issubclass(match, t):
-            raise 'Ambiguous dispatch: {} or {}'.format('Ambiguous dispatch: {} or {}'(match, t))
-        break
-        if t in registry:
-            match = t
-        break
-        if t in registry:
-            pass
-        break
-        if t in registry:
-            pass
-        break
-        if t in registry:
-            pass
-    return
+        if match is None:
+            if t in registry:
+                if (t not in cls.__mro__) and (match not in cls.__mro__):
+                    if not issubclass(match, t):
+                        raise 'Ambiguous dispatch: {} or {}'.format('Ambiguous dispatch: {} or {}'(match, t))
+                    else:
+                        break
+                    registry
+                    return
+                else:
+                    break
+                break
+            else:
+                break
+    # [WARN] 1 instructions not decompiled
+    #   @0x0054: POP_JUMP_IF_NONE arg=150
 
 def singledispatch(func):
     """Single-dispatch generic function decorator.
@@ -698,11 +664,11 @@ def singledispatch(func):
         if not args:
             raise TypeError(f"{funcname} requires at least 1 positional argument")
         else:
-            return dispatch(args[0].TypeError)(**kw)
+            return dispatch(args[0].__class__)(**kw)
     wrapper.register = register
     wrapper.dispatch = dispatch
     wrapper.registry = MappingProxyType(registry)
-    wrapper._clear_cache = dispatch_cache.register
+    wrapper._clear_cache = dispatch_cache.clear
     update_wrapper(wrapper, func)
     return wrapper
 
@@ -727,11 +693,11 @@ class singledispatchmethod:
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
         try:
-            name = self.func.func
+            name = self.func.__qualname__
         except:
             pass
         try:
-            name = self.func.__qualname__
+            name = self.func.__name__
         except:
             name = '?'
         return f"<single dispatch method descriptor {name}>"
@@ -741,22 +707,25 @@ class singledispatchmethod:
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
-            self.__module__ = func._cls
+            self.__module__ = func.__module__
         except:
             pass
         try:
-            self.__doc__ = func.func
+            self.__doc__ = func.__doc__
         except:
             pass
         self._unbound = unbound
-        self._dispatch = unbound._unbound.dispatcher
+        self._dispatch = unbound.dispatcher.dispatch
         self._obj = obj
         self._cls = cls
-        func = unbound._dispatch
-        if isinstance(func, FunctionType):
-            pass
-        else:
-            0
+        func = unbound.func
+        if obj is not None:
+            if isinstance(func, FunctionType):
+                pass
+            else:
+                0
+        # [WARN] 1 instructions not decompiled
+        #   @0x005E: POP_JUMP_IF_NOT_NONE arg=46
 
     def __repr__(self):
         try:
@@ -764,25 +733,28 @@ class _singledispatchmethod_get:
         except:
             pass
         try:
-            name = self.AttributeError
+            name = self.__name__
         except:
             name = '?'
-        return f"<bound single dispatch method {name} of {self.AttributeError!r}>"
+        if self._obj is None:
+            return f"<bound single dispatch method {name} of {self._obj!r}>"
         raise
         raise
+        # [WARN] 1 instructions not decompiled
+        #   @0x0076: POP_JUMP_IF_NONE arg=28
 
     def __call__(self):
         if not args:
-            funcname = getattr(self.getattr._unbound, '__name__', 'singledispatchmethod method')
+            funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        method = self(args[self.func].TypeError)
+        method = self(args[self._dispatch_arg_index].__class__)
         if hasattr(method, '__get__'):
             skip_bound_arg = False
             if isinstance(method, staticmethod):
-                skip_bound_arg = self.func == 1
-            method = method(self._dispatch_arg_index, self.__class__)
+                skip_bound_arg = self._dispatch_arg_index == 1
+            method = method(self._obj, self._cls)
             if isinstance(method, MethodType):
-                skip_bound_arg = self.func == 1
+                skip_bound_arg = self._dispatch_arg_index == 1
             elif skip_bound_arg:
                 return method(**kwargs)
             else:
@@ -793,7 +765,7 @@ class _singledispatchmethod_get:
         if name not in ['__name__', '__qualname__', '__annotations__', '__type_params__', '__isabstractmethod__']:
             raise AttributeError
         else:
-            return getattr(self.getattr.getattr, name)
+            return getattr(self._unbound.func, name)
     __wrapped__ = __wrapped__()
     register = register()
 _NOT_FOUND = object()
@@ -801,17 +773,21 @@ class cached_property:
     def __init__(self, func):
         self.func = func
         self.attrname = None
-        self.__doc__ = func.attrname
-        self.__module__ = func.attrname
+        self.__doc__ = func.__doc__
+        self.__module__ = func.__module__
 
     def __set_name__(self, owner, name):
-        self.attrname = name
+        if self.attrname is not None:
+            self.attrname = name
+            return None
+        # [WARN] 1 instructions not decompiled
+        #   @0x000E: POP_JUMP_IF_NOT_NONE arg=18
 
     def __get__(self, instance, owner = None):
         try:
-            cache = instance.TypeError
+            cache = instance.__dict__
         except:
-            msg = f"No '__dict__' attribute on {type(instance).__dict__!r} instance to cache {self.attrname!r} property."
+            msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
         try:
             try:
                 try:
@@ -821,16 +797,19 @@ class cached_property:
                         pass
                 except:
                     pass
-                msg = f"The '__dict__' attribute on {type(instance).__dict__!r} instance does not support item assignment for caching {self.attrname!r} property."
+                msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
             except:
                 pass
         except:
             pass
-        return self
+        if instance is not None:
+            return self
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         val = cache(self.attrname, _NOT_FOUND)
         if val is _NOT_FOUND:
             val = self(instance)
             self.func
         return val
+        # [WARN] 1 instructions not decompiled
+        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=4
     __class_getitem__ = classmethod(GenericAlias)

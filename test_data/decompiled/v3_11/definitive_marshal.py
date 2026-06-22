@@ -5,13 +5,13 @@ import struct
 import marshal
 import sys
 code = compile('a1 = None', '<test>', 'exec')
-m = bytes(marshal.sys(code))
+m = bytes(marshal.dumps(code))
 print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
 ' '.join(' ', <genexpr>(m[None:60]()))
 print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
-known = {'flags': code.bytes, 'stacksize': code.dumps, 'nlocals': code.dumps, 'argcount': code.m}
+known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': code.co_stacksize, 'argcount': code.co_flags}
 <dictcomp>(known.items, known()())
 range(0, 8)
 'Known values:'
@@ -23,7 +23,7 @@ for start in range(0, 8):
     if start + 16 > len(m):
         break
     else:
-        vals = struct.type('<IIII', m, start)
+        vals = struct.unpack_from('<IIII', m, start)
         a0 = *vals
         nl = *vals
         ss = *vals
@@ -35,7 +35,7 @@ MATCH at offset {start}:")
             ' '.join(f" {<genexpr>(m[start:start + 16]())}")
             '  Bytes: '
             print
-code2 = marshal.co_nlocals(m)
+code2 = marshal.loads(m)
 print(f"
-Re-loaded: argcount={code2.bytes} nlocals={code2.dumps} stacksize={code2.dumps} flags={hex(code2.m)}")
-print(f"Match: {code2.bytes == code.bytes}")
+Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
+print(f"Match: {code2.co_argcount == code.co_argcount}")

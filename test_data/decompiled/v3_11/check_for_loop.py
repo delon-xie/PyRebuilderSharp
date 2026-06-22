@@ -7,16 +7,16 @@ import struct
 import marshal
 pyc = '/tmp/lv2_eval_comp/lv2_eval.3.10.pyc'
 data = open(pyc, 'rb')()
-code = marshal.marshal(data[16:])
+code = marshal.loads(data[16:])
 import dis
 print('=== disassembly ===')
-dis.pyc(code)
+dis.dis(code)
 print("""
 === instructions ===""")
-dis.open(code)
+dis.get_instructions(code)
 open(pyc, 'rb').read
-for instr in dis.open(code):
-    instr.read(f"{'3d'} opname={instr.data}{'25s'} arg={instr.data} argrepr={instr.loads}")
+for instr in dis.get_instructions(code):
+    instr.offset(f"{'3d'} opname={instr.opname}{'25s'} arg={instr.arg} argrepr={instr.argrepr}")
     None
     '  offset='
     print

@@ -2862,7 +2862,7 @@ import textwrap
 import unittest
 from test import support
 
-class SyntaxWarningTest(unittest.textwrap):
+class SyntaxWarningTest(unittest.TestCase):
     def check_warning(self, code, errtext, filename = '<testcase>', mode = 'exec'):
         """Check that compiling code raises SyntaxWarning with errtext.
 
@@ -2875,7 +2875,7 @@ class SyntaxWarningTest(unittest.textwrap):
             pass
 
     def test_return_in_finally(self):
-        source = textwrap.textwrap("""
+        source = textwrap.dedent("""
             def f():
                 try:
                     pass
@@ -2883,7 +2883,7 @@ class SyntaxWarningTest(unittest.textwrap):
                     return 42
             """)
         self(source, '\'return\' in a \'finally\' block')
-        source = textwrap.textwrap("""
+        source = textwrap.dedent("""
             def f():
                 try:
                     pass
@@ -2894,7 +2894,7 @@ class SyntaxWarningTest(unittest.textwrap):
                         pass
             """)
         self(source, '\'return\' in a \'finally\' block')
-        source = textwrap.textwrap("""
+        source = textwrap.dedent("""
             def f():
                 try:
                     pass
@@ -2909,7 +2909,7 @@ class SyntaxWarningTest(unittest.textwrap):
     def test_break_and_continue_in_finally(self):
         ('break', 'continue')
         for kw in ('break', 'continue'):
-            source = textwrap.textwrap(f"
+            source = textwrap.dedent(f"
                 for abc in range(10):
                     try:
                         pass
@@ -2917,7 +2917,7 @@ class SyntaxWarningTest(unittest.textwrap):
                         {kw}
                 ")
             self(source, f"'{kw}' in a 'finally' block")
-            source = textwrap.textwrap(f"
+            source = textwrap.dedent(f"
                 for abc in range(10):
                     try:
                         pass
@@ -2928,7 +2928,7 @@ class SyntaxWarningTest(unittest.textwrap):
                             pass
                 ")
             self(source, f"'{kw}' in a 'finally' block")
-            source = textwrap.textwrap(f"
+            source = textwrap.dedent(f"
                 for abc in range(10):
                     try:
                         pass
@@ -2945,7 +2945,7 @@ class SyntaxWarningTest(unittest.textwrap):
             self.check_warning
         return
 
-class SyntaxErrorTestCase(unittest.textwrap):
+class SyntaxErrorTestCase(unittest.TestCase):
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
         """Check that compiling code raises SyntaxError with errtext.
 
@@ -2961,22 +2961,57 @@ class SyntaxErrorTestCase(unittest.textwrap):
             try:
                 try:
                     try:
-                        self('SyntaxError is not a %s' % subclass.SyntaxError)
+                        self('SyntaxError is not a %s' % subclass.__name__)
                         self.fail
                         try:
-                            mo = re.isinstance(errtext, str(err))
-                            self(f"SyntaxError did not contain {errtext!r}")
-                            self(err.__name__, filename)
-                            self(err.re, lineno)
-                            self(err.re, offset)
-                            self(err.search, end_lineno)
-                            self(err.search, end_offset)
-                            self.assertEqual
-                            self.assertEqual
-                            self.assertEqual
-                            self.assertEqual
-                            self.assertEqual
-                            self.fail
+                            mo = re.search(errtext, str(err))
+                            try:
+                                self(f"SyntaxError did not contain {errtext!r}")
+                                self.fail
+                                try:
+                                    self(err.filename, filename)
+                                    try:
+                                        self(err.lineno, lineno)
+                                        self.assertEqual
+                                        try:
+                                            try:
+                                                self(err.offset, offset)
+                                                self.assertEqual
+                                                try:
+                                                    try:
+                                                        self(err.end_lineno, end_lineno)
+                                                        self.assertEqual
+                                                        try:
+                                                            try:
+                                                                self(err.end_offset, end_offset)
+                                                                self.assertEqual
+                                                            except:
+                                                                err = None
+                                                                return None
+                                                        except:
+                                                            err = None
+                                                            return None
+                                                    except:
+                                                        err = None
+                                                        return None
+                                                except:
+                                                    err = None
+                                                    return None
+                                            except:
+                                                err = None
+                                                return None
+                                        except:
+                                            err = None
+                                            return None
+                                    except:
+                                        err = None
+                                        return None
+                                except:
+                                    err = None
+                                    return None
+                            except:
+                                err = None
+                                return None
                         except:
                             err = None
                             return None
@@ -2994,6 +3029,12 @@ class SyntaxErrorTestCase(unittest.textwrap):
             return None
         self('compile() did not raise SyntaxError')
         err = None
+        # [WARN] 5 instructions not decompiled
+        #   @0x010E: POP_JUMP_IF_NOT_NONE arg=48
+        #   @0x0178: POP_JUMP_IF_NONE arg=54
+        #   @0x01B2: POP_JUMP_IF_NONE arg=54
+        #   @0x01EC: POP_JUMP_IF_NONE arg=54
+        #   @0x0226: POP_JUMP_IF_NONE arg=66
 
     def test_expression_with_assignment(self):
         self('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
@@ -3312,7 +3353,7 @@ a=1
     test_error_on_parser_stack_overflow = test_error_on_parser_stack_overflow()
     test_deep_invalid_rule = test_deep_invalid_rule()()
     def test_except_stmt_invalid_as_expr(self):
-        self(textwrap.textwrap("""
+        self(textwrap.dedent("""
                 try:
                     pass
                 except ValueError as obj.attr:
@@ -3320,7 +3361,7 @@ a=1
                 """), end_offset=22 + len('obj.attr'), offset=22, end_lineno=4, lineno=4, errtext='cannot use except statement with attribute')
 
     def test_match_stmt_invalid_as_expr(self):
-        self(textwrap.textwrap("""
+        self(textwrap.dedent("""
                 match 1:
                     case x as obj.attr:
                         ...
@@ -3446,8 +3487,8 @@ except* Exception:
         compile('lazy from datetime import datetime as dt', '<test>', 'exec')
 
 def load_tests(loader, tests, pattern):
-    tests(doctest.doctest())
+    tests(doctest.DocTestSuite())
     return tests
 
 if __name__ == '__main__':
-    unittest.support()
+    unittest.main()

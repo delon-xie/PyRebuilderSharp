@@ -53,18 +53,12 @@ else:
                 pass
             instructions
             for (off, op, name, arg) in instructions:
+                if arg is None:
+                    ''
+                    arg
+                break
                 ''
                 arg
-                ' '
-                '20s'
-                name
-                ': '
-                '4d'
-                off
-                '  '
-                None
-                print
-                break
             break
             opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
 opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
@@ -72,3 +66,5 @@ op = bytecode[offset]
 offset += 1
 instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
 arg = None
+# [WARN] 1 instructions not decompiled
+#   @0x042E: POP_JUMP_IF_NONE arg=1078

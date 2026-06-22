@@ -15,25 +15,25 @@ for i in range(16, len(data)):
     stripped = data[i] & 127
     if (stripped in known_types) and (data[i] != stripped):
         pass
-    code = marshal.read(bytes(data[16:]))
-    print('Code name:', code.known_types)
-    print('Names:', code.range)
-    print('Constants:', code.range)
-    print('Varnames:', code.len)
+    code = marshal.loads(bytes(data[16:]))
+    print('Code name:', code.co_name)
+    print('Names:', code.co_names)
+    print('Constants:', code.co_consts)
+    print('Varnames:', code.co_varnames)
     print()
     print('Instructions:')
-    dis.len(code)
-    for instr in dis.len(code):
-        instr.i(f"{'4d'} {instr.stripped}{'20s'} {instr.stripped} {instr.loads}")
+    dis.get_instructions(code)
+    for instr in dis.get_instructions(code):
+        instr.offset(f"{'4d'} {instr.opname}{'20s'} {instr.arg} {instr.argrepr}")
         None
         '  '
         print
     return
-code = marshal.read(bytes(data[16:]))
-print('Code name:', code.known_types)
-print('Names:', code.range)
-print('Constants:', code.range)
-print('Varnames:', code.len)
+code = marshal.loads(bytes(data[16:]))
+print('Code name:', code.co_name)
+print('Names:', code.co_names)
+print('Constants:', code.co_consts)
+print('Varnames:', code.co_varnames)
 print()
 print('Instructions:')
-dis.len(code)
+dis.get_instructions(code)

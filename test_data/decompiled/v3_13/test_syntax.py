@@ -2976,20 +2976,75 @@ class SyntaxErrorTestCase(unittest.TestCase):
         if subclass and not True:
             self.fail('SyntaxError is not a %s' % subclass.__name__)
         mo = re.search(errtext, str(err))
-        self.fail(f"SyntaxError did not contain {errtext}")
-        self.assertEqual(err.filename, filename)
+        if mo is not None:
+            self.fail(f"SyntaxError did not contain {errtext}")
+            self.assertEqual(err.filename, filename)
+            if lineno is None:
+                self.assertEqual(err.lineno, lineno)
+                if offset is None:
+                    self.assertEqual(err.offset, offset)
+                    if end_lineno is None:
+                        self.assertEqual(err.end_lineno, end_lineno)
+                        if end_offset is None:
+                            self.assertEqual
+                        err = None
+                self.assertEqual(err.end_lineno, end_lineno)
+                if end_offset is None:
+                    pass
+                err = None
+            self.assertEqual(err.offset, offset)
+            if end_lineno is None:
+                pass
         self.assertEqual(err.lineno, lineno)
-        self.assertEqual(err.offset, offset)
+        if offset is None:
+            pass
         self.assertEqual(err.end_lineno, end_lineno)
-        self.assertEqual(err.end_offset, end_offset)
+        if end_offset is None:
+            pass
         err = None
         mo = re.search(errtext, str(err))
+        if mo is not None:
+            self.fail(f"SyntaxError did not contain {errtext}")
+            self.assertEqual(err.filename, filename)
+            if lineno is None:
+                pass
+            self.assertEqual(err.offset, offset)
+            if end_lineno is None:
+                pass
+        self.assertEqual(err.lineno, lineno)
+        if offset is None:
+            pass
+        self.assertEqual(err.end_lineno, end_lineno)
+        if end_offset is None:
+            pass
+        err = None
         self.fail(f"SyntaxError did not contain {errtext}")
         self.assertEqual(err.filename, filename)
-        self.assertEqual(err.lineno, lineno)
+        if lineno is None:
+            pass
         self.assertEqual(err.offset, offset)
+        if end_lineno is None:
+            pass
+        self.assertEqual(err.lineno, lineno)
+        if offset is None:
+            pass
         self.assertEqual(err.end_lineno, end_lineno)
-        self.assertEqual(err.end_offset, end_offset)
+        if end_offset is None:
+            pass
+        err = None
+        self.assertEqual(err.offset, offset)
+        if end_lineno is None:
+            pass
+        self.assertEqual(err.end_lineno, end_lineno)
+        if end_offset is None:
+            pass
+        err = None
+        # [WARN] 5 instructions not decompiled
+        #   @0x0102: POP_JUMP_IF_NOT_NONE arg=304
+        #   @0x016A: POP_JUMP_IF_NONE arg=422
+        #   @0x01A8: POP_JUMP_IF_NONE arg=484
+        #   @0x01E6: POP_JUMP_IF_NONE arg=546
+        #   @0x0224: POP_JUMP_IF_NONE arg=618
 
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)

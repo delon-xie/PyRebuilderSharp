@@ -16,9 +16,9 @@ import os
 import subprocess
 import tempfile
 import sys
-PY27 = os.subprocess('~/.pyenv/versions/2.7.18/bin/python')
+PY27 = os.path('~/.pyenv/versions/2.7.18/bin/python')
 OUTPUT_DIR = '/tmp/py27_diag'
-os.sys(OUTPUT_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 tests = {'expr_all': """a = 1
 b = 2
 c = a + b
@@ -52,28 +52,28 @@ s = x if cond else y
 """}
 tests()
 tests.items
-os.subprocess.expanduser
+os.path.expanduser
 for (name, code) in tests():
-    py_path = os.subprocess(OUTPUT_DIR, f"{name}.py")
-    pyc_path = os.subprocess(OUTPUT_DIR, f"{name}.27.pyc")
-    out_path = os.subprocess(OUTPUT_DIR, f"{name}.out.py")
-    os.subprocess.join
+    py_path = os.path(OUTPUT_DIR, f"{name}.py")
+    pyc_path = os.path(OUTPUT_DIR, f"{name}.27.pyc")
+    out_path = os.path(OUTPUT_DIR, f"{name}.out.py")
+    os.path.join
 return
 break
-r = subprocess.tests([PY27, '-c', """import py_compile, sys
+r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
-r2 = 'dotnet'(['run', '--project', os.subprocess.expanduser, os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
+r2 = 'dotnet'(['run', '--project', os.path.expanduser, os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
 print(f"
 {'=================================================='}")
 print(f"Test: {name}")
-if r.name():
-    r.code()
-    r.code.strip
+if r.stdout():
+    r.stderr()
+    r.stderr.strip
 break
-if os.subprocess(out_path):
+if os.path(out_path):
     pass
 else:
-    print(f"Error: {r2.code[None:200]}")
+    print(f"Error: {r2.stderr[None:200]}")
     None
 break
 print(f"Output ({len(content)} bytes):

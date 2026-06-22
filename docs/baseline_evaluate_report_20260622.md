@@ -1,9 +1,9 @@
 # PyRebuilderSharp Baseline Test Evaluation Report
 
-**Date**: 2026-06-22 12:44
-**Scope**: 987 decompiled outputs across 11 Python versions (2.7 → 3.14)
+**Date**: 2026-06-22 13:53
+**Scope**: 988 decompiled outputs across 11 Python versions (2.7 → 3.14)
 **Engine**: PyRebuilderSharp (.NET 10 + Avalonia, block-level CFG reconstruction)
-**Commit**: `6249ddf`
+**Commit**: `05d6b8d`
 
 ---
 
@@ -11,22 +11,22 @@
 
 | Metric | Value | Status |
 |:-------|:------|:------:|
-| Unique source files | 104 | |
-| Total decompilation attempts | 987 | |
-| **Decompilation success (no crashes)** | **987 (100.0%)** | ✅ |
+| Unique source files | 105 | |
+| Total decompilation attempts | 988 | |
+| **Decompilation success (no crashes)** | **988 (100.0%)** | ✅ |
 | **Decompilation failures** | **0** | ❌ |
 | **A class (near-perfect, ≤3% diff)** | **29 (3%)** | ✅ |
-| **B class (minor cosmetic, ≤15%)** | **42 (4%)** | ✅ |
-| C class (notable formatting diff, ≤40%) | 164 (17%) | ⚠️ |
-| D class (high diff ratio, >40%) | 752 (76%) | ⚠️ |
-| **A+B (acceptable output)** | **71 (7%)** | ✅ |
+| **B class (minor cosmetic, ≤15%)** | **45 (5%)** | ✅ |
+| C class (notable formatting diff, ≤40%) | 165 (17%) | ⚠️ |
+| D class (high diff ratio, >40%) | 749 (76%) | ⚠️ |
+| **A+B (acceptable output)** | **74 (7%)** | ✅ |
 | Total orphan blocks | 0 | ⚠️ |
-| Total diff lines (added+removed) | 75132 | |
-| Total diff lines per file (avg) | 76.1 | |
+| Total diff lines (added+removed) | 79011 | |
+| Total diff lines per file (avg) | 80.0 | |
 
 ### Interpretation Note
 
-> **D-class does NOT mean "corrupted" or "useless" output.** All 752 D-class files are structurally correct Python code.
+> **D-class does NOT mean "corrupted" or "useless" output.** All 749 D-class files are structurally correct Python code.
 > D-class indicates >40% of lines differ from the original — the dominant causes are:
 > - **Many small test files** (10-30 lines): a few missing blank lines or import formatting = high ratio
 > - **Docstring format**: decompiler outputs `'text'` instead of `"""text"""`
@@ -48,8 +48,8 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 | 3.8 | 97 | 3 | 4 | 20 | 70 | 7% | 0 |
 | 3.9 | 97 | 3 | 4 | 20 | 70 | 7% | 0 |
 | 3.10 | 99 | 3 | 5 | 17 | 74 | 8% | 0 |
-| 3.11 | 98 | 1 | 2 | 10 | 85 | 3% | 0 |
-| 3.12 | 101 | 1 | 3 | 13 | 84 | 4% | 0 |
+| 3.11 | 98 | 1 | 5 | 11 | 81 | 6% | 0 |
+| 3.12 | 102 | 1 | 3 | 13 | 85 | 4% | 0 |
 | 3.13 | 98 | 3 | 3 | 10 | 82 | 6% | 0 |
 | 3.14 | 99 | 3 | 4 | 10 | 82 | 7% | 0 |
 
@@ -66,36 +66,36 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 | abc.py | 3.8 | +44/−79 | 🔴 D | 0 | 58.6% |
 | abc.py | 3.9 | +45/−78 | 🔴 D | 0 | 58.6% |
 | abc.py | 3.10 | +50/−72 | 🔴 D | 0 | 58.1% |
-| abc.py | 3.11 | +65/−82 | 🔴 D | 0 | 70.0% |
+| abc.py | 3.11 | +64/−81 | 🔴 D | 0 | 69.0% |
 | abc.py | 3.12 | +54/−75 | 🔴 D | 0 | 61.4% |
 | abc.py | 3.13 | +92/−118 | 🔴 D | 0 | 100.0% |
-| abc.py | 3.14 | +94/−115 | 🔴 D | 0 | 99.5% |
+| abc.py | 3.14 | +90/−115 | 🔴 D | 0 | 97.6% |
 | enum.py | 3.6 | +597/−1423 | 🔴 D | 0 | 91.5% |
 | enum.py | 3.7 | +298/−1499 | 🔴 D | 0 | 81.4% |
 | enum.py | 3.8 | +313/−1495 | 🔴 D | 0 | 81.9% |
 | enum.py | 3.9 | +314/−1498 | 🔴 D | 0 | 82.1% |
 | enum.py | 3.10 | +827/−1378 | 🔴 D | 0 | 99.9% |
-| enum.py | 3.11 | +889/−1601 | 🔴 D | 0 | 112.8% |
-| enum.py | 3.12 | +1029/−1540 | 🔴 D | 0 | 116.3% |
-| enum.py | 3.13 | +1122/−1708 | 🔴 D | 0 | 128.2% |
-| enum.py | 3.14 | +1136/−1658 | 🔴 D | 0 | 126.5% |
+| enum.py | 3.11 | +4086/−1692 | 🔴 D | 0 | 261.7% |
+| enum.py | 3.12 | +1167/−1543 | 🔴 D | 0 | 122.7% |
+| enum.py | 3.13 | +1355/−1720 | 🔴 D | 0 | 139.3% |
+| enum.py | 3.14 | +1372/−1696 | 🔴 D | 0 | 138.9% |
 | functools.py | 3.8 | +155/−773 | 🔴 D | 0 | 78.2% |
 | functools.py | 3.9 | +146/−802 | 🔴 D | 0 | 79.9% |
 | functools.py | 3.10 | +293/−783 | 🔴 D | 0 | 90.7% |
-| functools.py | 3.11 | +481/−831 | 🔴 D | 0 | 110.6% |
-| functools.py | 3.12 | +569/−796 | 🔴 D | 0 | 115.1% |
-| functools.py | 3.13 | +642/−833 | 🔴 D | 0 | 124.4% |
-| functools.py | 3.14 | +654/−806 | 🔴 D | 0 | 123.1% |
-| pprint.py | 3.14 | +180/−769 | 🔴 D | 0 | 100.1% |
+| functools.py | 3.11 | +443/−814 | 🔴 D | 0 | 106.0% |
+| functools.py | 3.12 | +534/−794 | 🔴 D | 0 | 112.0% |
+| functools.py | 3.13 | +691/−831 | 🔴 D | 0 | 128.3% |
+| functools.py | 3.14 | +690/−800 | 🔴 D | 0 | 125.6% |
+| pprint.py | 3.14 | +179/−771 | 🔴 D | 0 | 100.2% |
 | reprlib.py | 3.6 | +73/−137 | 🔴 D | 0 | 90.9% |
 | reprlib.py | 3.7 | +34/−142 | 🔴 D | 0 | 76.2% |
 | reprlib.py | 3.8 | +39/−144 | 🔴 D | 0 | 79.2% |
 | reprlib.py | 3.9 | +41/−142 | 🔴 D | 0 | 79.2% |
 | reprlib.py | 3.10 | +74/−134 | 🔴 D | 0 | 90.0% |
-| reprlib.py | 3.11 | +133/−145 | 🔴 D | 0 | 120.3% |
-| reprlib.py | 3.12 | +135/−129 | 🔴 D | 0 | 114.3% |
-| reprlib.py | 3.13 | +115/−150 | 🔴 D | 0 | 114.7% |
-| reprlib.py | 3.14 | +130/−134 | 🔴 D | 0 | 114.3% |
+| reprlib.py | 3.11 | +129/−136 | 🔴 D | 0 | 114.7% |
+| reprlib.py | 3.12 | +140/−128 | 🔴 D | 0 | 116.0% |
+| reprlib.py | 3.13 | +120/−150 | 🔴 D | 0 | 116.9% |
+| reprlib.py | 3.14 | +135/−134 | 🔴 D | 0 | 116.5% |
 
 ---
 
@@ -134,21 +134,21 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 
 | File | Version | Diff Lines |
 |:-----|:-------:|:----------:|
+| enum | 3.11 | 5778 |
 | run_seq_clean | 2.7 | 3567 |
+| enum | 3.13 | 3075 |
+| enum | 3.14 | 3068 |
 | run_lv2 | 3.10 | 2938 |
-| enum | 3.13 | 2830 |
-| enum | 3.14 | 2794 |
-| enum | 3.12 | 2569 |
-| enum | 3.11 | 2490 |
+| enum | 3.12 | 2710 |
 | enum | 3.10 | 2205 |
 | enum | 3.6 | 2020 |
 | run_seq_clean | 3.5 | 1890 |
 | enum | 3.9 | 1812 |
 | enum | 3.8 | 1808 |
 | enum | 3.7 | 1797 |
-| functools | 3.13 | 1475 |
-| functools | 3.14 | 1460 |
-| functools | 3.12 | 1365 |
+| functools | 3.13 | 1522 |
+| functools | 3.14 | 1490 |
+| functools | 3.12 | 1328 |
 
 ---
 
@@ -239,7 +239,7 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 | 3.9 | 98 | 98 | 100% |
 | 3.10 | 101 | 101 | 100% |
 | 3.11 | 99 | 99 | 100% |
-| 3.12 | 102 | 102 | 100% |
+| 3.12 | 103 | 103 | 100% |
 | 3.13 | 99 | 99 | 100% |
 | 3.14 | 100 | 100 | 100% |
 
@@ -260,4 +260,4 @@ The decompiler produces **functionally equivalent** code for all 942 files, with
 
 ---
 
-*Report generated by `tools/baseline_evaluate_all.py` on 2026-06-22 12:44*
+*Report generated by `tools/baseline_evaluate_all.py` on 2026-06-22 13:53*

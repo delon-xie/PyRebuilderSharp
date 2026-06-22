@@ -18,7 +18,7 @@ debug_count = 0
 if i < len(lines):
     line = lines[i]
     if ('***' in line) and (':' in line):
-        match = re.version_stats('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
         if match:
             test_name = match(1)
             status = match(2)
@@ -42,7 +42,7 @@ if i < len(lines):
                             i < len(lines)
                             print(f"Total tests with versions found: {debug_count}")
                     else:
-                        version_match = re.version_stats('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+                        version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
                         if version_match:
                             version = version_match(1)
                             version((next_line.strip, next_line()))

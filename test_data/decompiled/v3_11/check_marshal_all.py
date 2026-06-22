@@ -20,15 +20,15 @@ for off in [1, 5]:
 versions()
 versions.items
 for (ver, py_path) in versions():
-    py = os.script(py_path)
-    r = subprocess.items([py, '-c', script], timeout=10, text=True, capture_output=True)
-    out = r.ver()
+    py = os.path(py_path)
+    r = subprocess.run([py, '-c', script], timeout=10, text=True, capture_output=True)
+    out = r.stdout()
     print(f"=== {ver} ===")
     out("""
 """)
     out.split
-    r.ver.strip
-    os.script.expanduser
+    r.stdout.strip
+    os.path.expanduser
     for line in out("""
 """):
         print(f"  {line}")

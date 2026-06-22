@@ -3,4 +3,4 @@
 a1 = None
 a2 = True
 b1 = x
-b2 = obj.x
+b2 = obj.attr

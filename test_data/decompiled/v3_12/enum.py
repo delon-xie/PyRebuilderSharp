@@ -142,10 +142,13 @@ def bin(num, max_bits = None):
         s = bltns.bin(~num ^ ceiling - 1 + ceiling)
         sign = None // 3
         digits = 3 // None
-        if len(digits) < max_bits:
-            digits = -max_bits // None
-            sign[-1] * max_bits + digits
-        return f"{sign!s} {digits!s}"
+        if max_bits is None:
+            if len(digits) < max_bits:
+                digits = -max_bits // None
+                sign[-1] * max_bits + digits
+            return f"{sign!s} {digits!s}"
+    # [WARN] 1 instructions not decompiled
+    #   @0x00FA: POP_JUMP_IF_NONE arg=58
 
 class _not_given:
     def __repr__(self):
@@ -181,18 +184,32 @@ class property(DynamicClassAttribute):
             ownerclass._member_map_[self.name]
         except:
             pass
-        return self.member
+        if instance is not None:
+            if self.member is None:
+                return self.member
         raise AttributeError(f"{ownerclass!r} has no attribute {self.name!r}")
+        if self.fget is None:
+            return self.fget(instance)
         return getattr(self._cls_type, self.name)
         if self._attr_type == 'desc':
             return getattr(instance._value_, self.name)
         return
+        # [WARN] 3 instructions not decompiled
+        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=100
+        #   @0x001C: POP_JUMP_IF_NONE arg=24
+        #   @0x0080: POP_JUMP_IF_NONE arg=34
 
     def __set__(self, instance, value):
-        return self.fset(instance, value)
+        if self.fset is None:
+            return self.fset(instance, value)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0018: POP_JUMP_IF_NONE arg=36
 
     def __delete__(self, instance):
-        return self.fdel(instance)
+        if self.fdel is None:
+            return self.fdel(instance)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0018: POP_JUMP_IF_NONE arg=34
 
     def __set_name__(self, ownerclass, name):
         self.name = name
@@ -260,17 +277,29 @@ class _proto_member:
             else:
                 enum_member = enum_class._new_member_(enum_class, **args)
                 None
+        if issubclass(enum_class, Flag) and isinstance(value, int):
+            enum_class._flag_mask_ | value._flag_mask_ = enum_class
+            if _is_single_bit(value):
+                enum_class._singles_mask_ | value._singles_mask_ = enum_class
+            enum_class._all_bits_ = 2 ** enum_class._flag_mask_.bit_length() - 1
+        enum_class._all_bits_ = 2 ** enum_class._flag_mask_.bit_length() - 1
         enum_class._add_member_(member_name, enum_member)
         raise
         try:
             break
             try:
-                enum_class._member_names_.append(member_name)
                 try:
+                    enum_class._member_names_.append(member_name)
                     try:
                         try:
                             try:
-                                enum_class._member_names_.append(member_name)
+                                try:
+                                    try:
+                                        enum_class._member_names_.append(member_name)
+                                    except:
+                                        pass
+                                except:
+                                    pass
                             except:
                                 pass
                         except:
@@ -284,6 +313,10 @@ class _proto_member:
         except:
             pass
         raise
+        # [WARN] 3 instructions not decompiled
+        #   @0x01F0: POP_JUMP_IF_NONE arg=244
+        #   @0x04B6: POP_JUMP_IF_NONE arg=32
+        #   @0x051A: POP_JUMP_IF_NONE arg=140
 
 class EnumDict(dict):
     """
@@ -312,55 +345,60 @@ class EnumDict(dict):
             value = t(auto_valued)
         except:
             break
-        if _is_private(self._cls_name, key):
-            pass
-        elif _is_sunder(key):
-            if key not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_'):
-                if not key.startswith('_repr_'):
-                    raise ValueError(f"_sunder_ names, such as {key!r}, are reserved for future Enum use")
+        if self._cls_name is None:
+            if _is_private(self._cls_name, key):
+                pass
+            elif _is_sunder(key):
+                if key not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_'):
+                    if not key.startswith('_repr_'):
+                        raise ValueError(f"_sunder_ names, such as {key!r}, are reserved for future Enum use")
+                    elif key == '_generate_next_value_':
+                        if self._auto_called:
+                            raise TypeError('_generate_next_value_ must be defined before members')
+                        elif isinstance(value, staticmethod):
+                            pass
+                        else:
+                            value
+                            setattr(self, '_generate_next_value', _gnv)
+                            break
+                    elif (key == '_ignore_') and isinstance(value, str):
+                        value = value.replace(',', ' ').split()
+                    else:
+                        value = list(value)
+                        self._ignore = value
+                        already = set(value) & set(self._member_names)
+                        if already:
+                            raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
+                        else:
+                            break
                 elif key == '_generate_next_value_':
-                    if self._auto_called:
-                        raise TypeError('_generate_next_value_ must be defined before members')
-                    elif isinstance(value, staticmethod):
-                        pass
-                    else:
-                        value
-                        setattr(self, '_generate_next_value', _gnv)
-                        break
-                elif (key == '_ignore_') and isinstance(value, str):
-                    value = value.replace(',', ' ').split()
-                else:
-                    value = list(value)
-                    self._ignore = value
-                    already = set(value) & set(self._member_names)
-                    if already:
-                        raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
-                    else:
-                        break
-            elif key == '_generate_next_value_':
+                    pass
+                elif key == '_ignore_':
+                    pass
+            elif _is_dunder(key):
+                if key == '__order__':
+                    key = '_order_'
+                break
+            elif key in self._member_names:
+                raise TypeError(f"{key!r} already defined as {self[key]!r}")
+            elif key in self._ignore:
                 pass
-            elif key == '_ignore_':
+            elif isinstance(value, nonmember):
+                value = value.value
+            elif _is_descriptor(value):
                 pass
-        elif _is_dunder(key):
-            if key == '__order__':
-                key = '_order_'
-            break
-        elif key in self._member_names:
-            raise TypeError(f"{key!r} already defined as {self[key]!r}")
-        elif key in self._ignore:
-            pass
-        elif isinstance(value, nonmember):
-            value = value.value
-        elif _is_descriptor(value):
-            pass
-        elif _is_internal_class(self._cls_name, value):
-            pass
-        elif key in self:
-            raise TypeError(f"{key!r} already defined as {self[key]!r}")
-        elif isinstance(value, member):
-            value = value.value
+            elif self._cls_name is None:
+                if _is_internal_class(self._cls_name, value):
+                    pass
+                elif key in self:
+                    raise TypeError(f"{key!r} already defined as {self[key]!r}")
+                elif isinstance(value, member):
+                    value = value.value
         if single:
             value = auto_valued[0]
+        # [WARN] 2 instructions not decompiled
+        #   @0x001A: POP_JUMP_IF_NONE arg=48
+        #   @0x032A: POP_JUMP_IF_NONE arg=48
     member_names = member_names()
     def update(self, members):
         try:
@@ -454,11 +492,14 @@ class EnumType(type):
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise 'invalid enum member name(s) %s'(','.join % <genexpr>(invalid_names()))
-        _order_ = classdict.pop('_order_', None)
-        _gnv = classdict.get('_generate_next_value_')
+        else:
+            _order_ = classdict.pop('_order_', None)
+            _gnv = classdict.get('_generate_next_value_')
         if type(_gnv) is not staticmethod:
             _gnv = staticmethod(_gnv)
         classdict = dict(classdict.items())
+        if _gnv is None:
+            pass
         (member_type, first_enum) = metacls._get_mixins_(cls, bases)
         (__new__, save_new, use_args) = metacls._find_new_(classdict, member_type, first_enum)
         member_names
@@ -466,7 +507,7 @@ class EnumType(type):
             value = classdict[name]
         if not boundary:
             break
-        elif bases and issubclass(bases[-1], Flag):
+        if bases and issubclass(bases[-1], Flag):
             for n in member_names:
                 p = classdict[n]
                 if isinstance(p.value, int):
@@ -474,16 +515,18 @@ class EnumType(type):
                         inverted.append(p)
                     else:
                         bits |= p.value
-                elif not isinstance(p.value, tuple):
+                elif p.value is not None:
                     pass
-                elif not p.value:
-                    pass
-                elif not isinstance(p.value[0], int):
-                    pass
-                elif p.value[0] < 0:
-                    inverted.append(p)
-                else:
-                    bits |= p.value[0]
+        if not isinstance(p.value, tuple):
+            pass
+        elif not p.value:
+            pass
+        elif not isinstance(p.value[0], int):
+            pass
+        elif p.value[0] < 0:
+            inverted.append(p)
+        else:
+            bits |= p.value[0]
         inverted
         for p in inverted:
             if isinstance(p.value, int):
@@ -491,38 +534,47 @@ class EnumType(type):
             else:
                 p.value = p.value + 1 // None
         classdict.update(enum_class.__dict__)
-        if (ReprEnum in bases) and (member_type is object):
-            raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
-        elif '__format__' not in classdict:
-            enum_class.__format__ = member_type.__format__
-        elif '__str__' not in classdict:
-            method = member_type.__str__
-            if method is object.__str__:
-                method = member_type.__repr__
-            enum_class.__str__ = method
-            ('__repr__', '__str__', '__format__', '__reduce_ex__')
-            for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
-                if not name not in classdict:
-                    pass
-                else:
-                    enum_method = getattr(first_enum, name)
-                    found_method = getattr(enum_class, name)
-                    object_method = getattr(object, name)
-                    data_type_method = getattr(member_type, name)
-                    if not found_method in (data_type_method, object_method):
-                        pass
-                    else:
-                        setattr(enum_class, name, enum_method)
-            if issubclass(enum_class, Flag):
-                for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
+        if ReprEnum is None:
+            if (ReprEnum in bases) and (member_type is object):
+                raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
+            elif '__format__' not in classdict:
+                enum_class.__format__ = member_type.__format__
+            elif '__str__' not in classdict:
+                method = member_type.__str__
+                if method is object.__str__:
+                    method = member_type.__repr__
+                enum_class.__str__ = method
+                ('__repr__', '__str__', '__format__', '__reduce_ex__')
+                for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
                     if not name not in classdict:
                         pass
                     else:
-                        enum_method = getattr(Flag, name)
-                        setattr(enum_class, name, enum_method)
-            elif save_new:
-                enum_class.__new_member__ = __new__
-        ('__repr__', '__str__', '__format__', '__reduce_ex__')
+                        enum_method = getattr(first_enum, name)
+                        found_method = getattr(enum_class, name)
+                        object_method = getattr(object, name)
+                        data_type_method = getattr(member_type, name)
+                        if not found_method in (data_type_method, object_method):
+                            pass
+                        else:
+                            setattr(enum_class, name, enum_method)
+                if Flag is None:
+                    if issubclass(enum_class, Flag):
+                        for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
+                            if not name not in classdict:
+                                pass
+                            else:
+                                enum_method = getattr(Flag, name)
+                                setattr(enum_class, name, enum_method)
+                    elif Enum is None:
+                        if save_new:
+                            enum_class.__new_member__ = __new__
+                        enum_class.__new__ = Enum.__new__
+                        if _order_ is None:
+                            if isinstance(_order_, str):
+                                _order_ = _order_.replace(',', ' ').split()
+                            elif Flag is not None:
+                                pass
+            ('__repr__', '__str__', '__format__', '__reduce_ex__')
         []
         for o in []:
             pass
@@ -535,6 +587,17 @@ class EnumType(type):
   {_order_!r}")
         else:
             return enum_class
+        # [WARN] 11 instructions not decompiled
+        #   @0x0178: POP_JUMP_IF_NONE arg=56
+        #   @0x01E6: POP_JUMP_IF_NONE arg=10
+        #   @0x035E: POP_JUMP_IF_NONE arg=690
+        #   @0x0456: POP_JUMP_IF_NOT_NONE arg=2
+        #   @0x06B8: POP_JUMP_IF_NONE arg=262
+        #   @0x0872: POP_JUMP_IF_NONE arg=124
+        #   @0x08FA: POP_JUMP_IF_NONE arg=60
+        #   @0x093A: POP_JUMP_IF_NONE arg=96
+        #   @0x09A6: POP_JUMP_IF_NOT_NONE arg=10
+        #   @0x09BC: POP_JUMP_IF_NONE arg=154
 
     def __bool__(cls):
         """
@@ -575,12 +638,14 @@ class EnumType(type):
                 value = (value, names) + values
             return cls.__new__(cls, value)
         elif names is _not_given:
-            raise TypeError(f"{cls} has no members; specify `names=()` if you meant to create a new, empty, enum")
+            pass
         elif names is _not_given:
             pass
         else:
             names
             return
+        # [WARN] 1 instructions not decompiled
+        #   @0x006E: POP_JUMP_IF_NOT_NONE arg=28
 
     def __contains__(cls, value):
         """Return True if `value` is in `cls`.
@@ -641,10 +706,13 @@ class EnumType(type):
         return len(cls._member_names_)
     __members__ = __members__()
     def __repr__(cls):
-        if issubclass(cls, Flag):
-            return '<flag %r>' % cls.__name__
-        else:
-            return '<enum %r>' % cls.__name__
+        if Flag is None:
+            if issubclass(cls, Flag):
+                return '<flag %r>' % cls.__name__
+            else:
+                return '<enum %r>' % cls.__name__
+        # [WARN] 1 instructions not decompiled
+        #   @0x000C: POP_JUMP_IF_NONE arg=62
 
     def __reversed__(cls):
         """
@@ -685,24 +753,51 @@ class EnumType(type):
         except:
             break
         metacls = cls.__class__
+        if type is not None:
+            pass
         (type, cls)
-        (cls)
         (_, first_enum) = cls._get_mixins_(class_name, bases)
         classdict = metacls.__prepare__(class_name, bases)
         if isinstance(names, str):
             names = names.replace(',', ' ').split()
-        elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            for (count, name) in enumerate(original_names):
-                value = name(start, count, last_values, None // None)
-                last_values.append(value)
-                names.append((name, value))
-        _make_class_unpicklable(classdict)
+        elif isinstance(names, (tuple, list)):
+            if names:
+                if isinstance(names[0], str):
+                    for (count, name) in enumerate(original_names):
+                        value = name(start, count, last_values, None // None)
+                        last_values.append(value)
+                        names.append((name, value))
+                elif names is not None:
+                    names = []
+            elif names is not None:
+                pass
+        elif names is not None:
+            pass
+        names
+        for item in names:
+            if isinstance(item, str):
+                member_value = names[item]
+                member_name = item
+            else:
+                (member_name, member_value) = item
+        if module is not None:
+            pass
+        if module is not None:
+            _make_class_unpicklable(classdict)
+        if qualname is None:
+            pass
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
         try:
             pass
         except:
             pass
         raise
+        # [WARN] 5 instructions not decompiled
+        #   @0x001C: POP_JUMP_IF_NOT_NONE arg=6
+        #   @0x01DA: POP_JUMP_IF_NOT_NONE arg=4
+        #   @0x0234: POP_JUMP_IF_NOT_NONE arg=44
+        #   @0x0264: POP_JUMP_IF_NOT_NONE arg=24
+        #   @0x028A: POP_JUMP_IF_NONE arg=10
 
     def _convert_(cls, name, module, filter, source = None):
         """
@@ -778,41 +873,33 @@ class EnumType(type):
         cls.__mro__
         for base in 1 // None:
             attr = base.__dict__.get(name)
-            if isinstance(attr, (property, DynamicClassAttribute)):
-                found_descriptor = attr
-                class_type = base
-                descriptor_type = 'enum'
-                break
-            elif _is_descriptor(attr):
-                found_descriptor = attr
-                if not descriptor_type:
-                    break
-                elif not class_type:
-                    break
-            else:
-                descriptor_type = 'attr'
-                class_type = base
-            if found_descriptor:
-                redirect = property()
-                redirect.member = member
-                redirect.__set_name__(cls, name)
-                if descriptor_type in ('enum', 'desc'):
-                    redirect.fget = getattr(found_descriptor, 'fget', None)
-                    redirect._get = getattr(found_descriptor, '__get__', None)
-                    redirect.fset = getattr(found_descriptor, 'fset', None)
-                    redirect._set = getattr(found_descriptor, '__set__', None)
-                    redirect.fdel = getattr(found_descriptor, 'fdel', None)
-                    redirect._del = getattr(found_descriptor, '__delete__', None)
-                redirect._attr_type = descriptor_type
-                redirect._cls_type = class_type
-                setattr(cls, name, redirect)
-            else:
-                setattr(cls, name, member)
+        if found_descriptor:
+            redirect = property()
+            redirect.member = member
+            redirect.__set_name__(cls, name)
+            if descriptor_type in ('enum', 'desc'):
+                redirect.fget = getattr(found_descriptor, 'fget', None)
+                redirect._get = getattr(found_descriptor, '__get__', None)
+                redirect.fset = getattr(found_descriptor, 'fset', None)
+                redirect._set = getattr(found_descriptor, '__set__', None)
+                redirect.fdel = getattr(found_descriptor, 'fdel', None)
+                redirect._del = getattr(found_descriptor, '__delete__', None)
+            redirect._attr_type = descriptor_type
+            redirect._cls_type = class_type
+            setattr(cls, name, redirect)
+        else:
+            setattr(cls, name, member)
         found_descriptor = None
         descriptor_type = None
         class_type = None
         1 // None
         cls.__mro__
+        found_descriptor = attr
+        class_type = base
+        descriptor_type = 'enum'
+        found_descriptor = attr
+        # [WARN] 1 instructions not decompiled
+        #   @0x00E4: POP_JUMP_IF_NOT_NONE arg=2
     __signature__ = __signature__()
 EnumMeta = EnumType
 class Enum(metaclass=EnumType):
@@ -882,7 +969,11 @@ class Enum(metaclass=EnumType):
                         try:
                             try:
                                 try:
-                                    result
+                                    try:
+                                        result
+                                    except:
+                                        exc = None
+                                        ve_exc = None
                                 except:
                                     exc = None
                                     ve_exc = None
@@ -914,6 +1005,11 @@ class Enum(metaclass=EnumType):
         exc = None
         ve_exc = None
         return
+        # [WARN] 4 instructions not decompiled
+        #   @0x0252: POP_JUMP_IF_NONE arg=112
+        #   @0x02FA: POP_JUMP_IF_NOT_NONE arg=8
+        #   @0x02FE: POP_JUMP_IF_NOT_NONE arg=4
+        #   @0x0306: POP_JUMP_IF_NOT_NONE arg=56
 
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
@@ -984,16 +1080,15 @@ class Enum(metaclass=EnumType):
                 if name[0] == '_':
                     pass
                 elif isinstance(obj, property):
-                    if name not in self._member_map_:
-                        interesting.add(name)
-                    else:
-                        interesting.discard(name)
+                    pass
                 elif not name not in self._member_map_:
                     pass
                 else:
                     interesting.add(name)
         names = set([](('__class__', '__doc__', '__eq__', '__hash__', '__module__')) | interesting)
         return names
+        # [WARN] 1 instructions not decompiled
+        #   @0x01C4: POP_JUMP_IF_NOT_NONE arg=28
 
     def __format__(self, format_spec):
         return str.__format__(str(self), format_spec)
@@ -1109,11 +1204,17 @@ class Flag(Enum, boundary=STRICT):
         cls_name = self.__class__.__name__
         if not self.__class__._value_repr_:
             repr
-        return f"<{cls_name!s}: {v_repr(self._value_)!s}>"
+        elif self._name_ is not None:
+            return f"<{cls_name!s}: {v_repr(self._value_)!s}>"
+        # [WARN] 1 instructions not decompiled
+        #   @0x0080: POP_JUMP_IF_NOT_NONE arg=50
 
     def __str__(self):
         cls_name = self.__class__.__name__
-        return f"{cls_name!s}({self._value_!r})"
+        if self._name_ is not None:
+            return f"{cls_name!s}({self._value_!r})"
+        # [WARN] 1 instructions not decompiled
+        #   @0x0044: POP_JUMP_IF_NOT_NONE arg=36
 
     def __bool__(self):
         return bool(self._value_)
@@ -1132,10 +1233,13 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         else:
             value = self._value_
-            (self, other)
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with |")
-        return self.__class__(value | other_value)
+        if other_value is not None:
+            for flag in (self, other):
+                pass
+        # [WARN] 3 instructions not decompiled
+        #   @0x005A: POP_JUMP_IF_NONE arg=4
+        #   @0x005E: POP_JUMP_IF_NOT_NONE arg=82
+        #   @0x008E: POP_JUMP_IF_NONE arg=2
 
     def __and__(self, other):
         other_value = self._get_value(other)
@@ -1143,10 +1247,13 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         else:
             value = self._value_
-            (self, other)
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with &")
-        return self.__class__(value & other_value)
+        if other_value is not None:
+            for flag in (self, other):
+                pass
+        # [WARN] 3 instructions not decompiled
+        #   @0x005A: POP_JUMP_IF_NONE arg=4
+        #   @0x005E: POP_JUMP_IF_NOT_NONE arg=82
+        #   @0x008E: POP_JUMP_IF_NONE arg=2
 
     def __xor__(self, other):
         other_value = self._get_value(other)
@@ -1154,19 +1261,19 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         else:
             value = self._value_
-            (self, other)
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
-        return self.__class__(value ^ other_value)
+        if other_value is not None:
+            for flag in (self, other):
+                pass
+        # [WARN] 3 instructions not decompiled
+        #   @0x005A: POP_JUMP_IF_NONE arg=4
+        #   @0x005E: POP_JUMP_IF_NOT_NONE arg=82
+        #   @0x008E: POP_JUMP_IF_NONE arg=2
 
     def __invert__(self):
-        raise TypeError(f"'{self}' cannot be inverted")
-        if self._boundary_ in (EJECT, KEEP):
-            self._inverted_ = self.__class__(~self._value_)
-            return self._inverted_
-        else:
-            self._inverted_ = self.__class__(self._singles_mask_ & ~self._value_)
-            return self._inverted_
+        if self._get_value(self) is not None:
+            raise TypeError(f"'{self}' cannot be inverted")
+        # [WARN] 1 instructions not decompiled
+        #   @0x0022: POP_JUMP_IF_NOT_NONE arg=30
     __rand__ = __and__
     __ror__ = __or__
     __rxor__ = __xor__
@@ -1250,7 +1357,8 @@ def global_flag_repr(self):
         break
     module = self.__class__.__module__.split('.')[-1]
     cls_name = self.__class__.__name__
-    return f"{module!s}.{cls_name!s}({self._value_!r})"
+    if self._name_ is not None:
+        return f"{module!s}.{cls_name!s}({self._value_!r})"
     return f"{module!s}.{self._name_!s}"
     if self._boundary_ is not FlagBoundary.KEEP:
         '|'.join
@@ -1265,13 +1373,18 @@ def global_flag_repr(self):
             else:
                 name.append(f"{module!s}.{n!s}")
         return '|'.join(name)
+    # [WARN] 1 instructions not decompiled
+    #   @0x0094: POP_JUMP_IF_NOT_NONE arg=42
 
 def global_str(self):
     """
     use enum_name instead of class.enum_name
     """
-    cls_name = self.__class__.__name__
-    return f"{cls_name!s}({self._value_!r})"
+    if self._name_ is not None:
+        cls_name = self.__class__.__name__
+        return f"{cls_name!s}({self._value_!r})"
+    # [WARN] 1 instructions not decompiled
+    #   @0x0018: POP_JUMP_IF_NOT_NONE arg=80
 
 def global_enum(cls, update_str = False):
     """
@@ -1364,18 +1477,25 @@ def _simple_enum(etype = Enum):
         except:
             pass
         cls_name = cls.__name__
+        if use_args is not None:
+            etype._use_args_
         __new__ = cls.__dict__.get('__new__')
-        new_member = __new__.__func__
+        if __new__ is None:
+            new_member = __new__.__func__
         new_member = etype._member_type_.__new__
-        etype._use_args_
         attrs = {}
         body = {}
+        if __new__ is None:
+            pass
         if issubclass(etype, Flag) and not boundary:
             etype._boundary_
         cls.__dict__.items()
         for (name, obj) in cls.__dict__.items():
             if name in ('__dict__', '__weakref__'):
                 pass
+        if cls.__dict__.get('__doc__') is not None:
+            pass
+        cls.__dict__.items()
         enum_class = type(cls_name, (etype), body, _simple=True, boundary=boundary)
         ('__repr__', '__str__', '__format__', '__reduce_ex__')
         for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
@@ -1401,7 +1521,8 @@ def _simple_enum(etype = Enum):
                             value = (value)
                         member = new_member(enum_class, **value)
                         value = value[0]
-                        member._value_ = value
+                        if __new__ is not None:
+                            member._value_ = value
                     else:
                         member = new_member(enum_class)
                 elif use_args:
@@ -1420,30 +1541,16 @@ def _simple_enum(etype = Enum):
                             value = (value)
                         member = new_member(enum_class, **value)
                         value = value[0]
-                        member._value_ = value
-                        contained = value2member_map.get(member._value_)
-                        contained._add_alias_(name)
-                        member._name_ = name
-                        member.__objclass__ = enum_class
-                        member.__init__(value)
-                        member._sort_order_ = len(member_names)
-                        if name not in ('name', 'value'):
-                            setattr(enum_class, name, member)
-                        else:
-                            enum_class._add_member_(name, member)
-                            member_names.append(name)
-                            gnv_last_values.append(value)
-                            enum_class._value2member_map_.setdefault(value, member)
-                            if value not in hashable_values:
-                                hashable_values.append(value)
+                        if __new__ is not None:
+                            member._value_ = value
                     else:
                         member = new_member(enum_class)
                 elif use_args:
                     pass
                 else:
                     member = new_member(enum_class)
-        cls.__dict__.items()
-        contained._add_alias_(name)
+        if contained is None:
+            contained._add_alias_(name)
         member._name_ = name
         member.__objclass__ = enum_class
         member.__init__(value)
@@ -1464,9 +1571,34 @@ def _simple_enum(etype = Enum):
         enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1
         m
         enum_class
+        contained = value2member_map.get(member._value_)
+        if contained is None:
+            contained._add_alias_(name)
+        member._name_ = name
+        member.__objclass__ = enum_class
+        member.__init__(value)
+        member._sort_order_ = len(member_names)
+        if name not in ('name', 'value'):
+            setattr(enum_class, name, member)
+        else:
+            enum_class._add_member_(name, member)
+            member_names.append(name)
+            gnv_last_values.append(value)
+            enum_class._value2member_map_.setdefault(value, member)
+            if value not in hashable_values:
+                hashable_values.append(value)
         raise
         raise
         raise
+        # [WARN] 8 instructions not decompiled
+        #   @0x001E: POP_JUMP_IF_NOT_NONE arg=24
+        #   @0x0070: POP_JUMP_IF_NONE arg=26
+        #   @0x00C2: POP_JUMP_IF_NONE arg=10
+        #   @0x03FE: POP_JUMP_IF_NOT_NONE arg=10
+        #   @0x05FE: POP_JUMP_IF_NOT_NONE arg=14
+        #   @0x0648: POP_JUMP_IF_NONE arg=36
+        #   @0x09AA: POP_JUMP_IF_NOT_NONE arg=14
+        #   @0x09F4: POP_JUMP_IF_NONE arg=36
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1602,13 +1734,16 @@ class verify:
             break
         checks = self.checks
         cls_name = enumeration.__name__
-        if issubclass(enumeration, Flag):
-            enum_type = 'flag'
-        elif issubclass(enumeration, Enum):
-            enum_type = 'enum'
-        else:
-            raise TypeError('the \'verify\' decorator only works with Enum and Flag')
-            checks
+        if Flag is None:
+            if issubclass(enumeration, Flag):
+                enum_type = 'flag'
+            elif issubclass(enumeration, Enum):
+                enum_type = 'enum'
+            else:
+                raise TypeError('the \'verify\' decorator only works with Enum and Flag')
+                checks
+        # [WARN] 1 instructions not decompiled
+        #   @0x003C: POP_JUMP_IF_NONE arg=38
 
 def _test_simple_enum(checked_enum, simple_enum):
     """

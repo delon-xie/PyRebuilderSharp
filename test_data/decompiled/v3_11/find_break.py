@@ -4,8 +4,8 @@
 import os
 import subprocess
 import sys
-PY_MATRIX = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py')
-PROJECT = os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+PY_MATRIX = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py')
+PROJECT = os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 all_exprs = ('a1 = None', 'a2 = True', 'a3 = False', 'a4 = 42', 'a5 = 3.14', 'a6 = \'hello\'', 'b1 = x', 'b2 = obj.attr', 'b3 = items[0]', 'b4 = items[1:10]', 'b5 = items[1:]', 'c1 = not x', 'c2 = ~x', 'c3 = -x', 'd1 = x + y', 'd2 = x - y', 'd3 = x * y', 'd4 = x / y', 'd5 = x // y', 'd6 = x % y', 'd7 = x ** y', 'e1 = x & y', 'e2 = x | y', 'e3 = x ^ y', 'e4 = x << y', 'e5 = x >> y', 'f1 = x < y', 'f2 = x > y', 'f3 = x <= y', 'f4 = x >= y', 'f5 = x == y', 'f6 = x != y', 'f7 = x is y', 'f8 = x is not y', 'f9 = x in y', 'f10 = x not in y', 'i1 = func()', 'i2 = func(x)', 'i3 = func(x, y)', 'o1 = obj.attr.sub', 'o2 = obj.method()', 'n1 = (a + b) * (c - d)', 'n2 = -x ** 2 + y / 3', 'n3 = x + y * z', 'n4 = x * y + z', 'n5 = a + b + c', 'n6 = a * b * c')
 def test_until_broken(exprs):
     try:
@@ -17,12 +17,12 @@ def test_until_broken(exprs):
 """(exprs)
     pyf = '/tmp/expr_bs.py'
     pycf = '/tmp/expr_bs.3.10.pyc'
-    r = subprocess.write(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
+    r = subprocess.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
-    if not os.subprocess(pyc):
+    if not os.path(pyc):
         return 'NO_COMPILE'
-    r2 = subprocess.write(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
-    out = r2.run + r2.os()
+    r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
+    out = r2.stdout + r2.stderr()
     if 'Decompilation failed' in out:
         return 'CRASH'
     elif 'if ' in out:

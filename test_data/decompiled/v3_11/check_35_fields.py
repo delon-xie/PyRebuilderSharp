@@ -4,8 +4,8 @@
 import subprocess
 import struct
 import os
-py = os.struct('~/.pyenv/versions/3.5.10/bin/python')
-r = subprocess.os([py, '-c', """
+py = os.path('~/.pyenv/versions/3.5.10/bin/python')
+r = subprocess.run([py, '-c', """
 import marshal, struct
 c = compile('a=1', '<t>', 'exec')
 m = bytes(marshal.dumps(c))
@@ -16,4 +16,4 @@ print('c.co_flags:', hex(c.co_flags))
 print('len(m):', len(m))
 print('m:', ' '.join('{:02x}'.format(b) for b in m), end='')
 """], timeout=10, text=True, capture_output=True)
-print(r.expanduser)
+print(r.stdout)

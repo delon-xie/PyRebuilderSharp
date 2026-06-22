@@ -6,20 +6,20 @@ try:
 except:
     pass
 try:
-    expected_ast = ast.PROJECT(ast.PROJECT(expected_src), indent=2)
+    expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 except:
     pass
 try:
     print('Failed to parse expected source:', e)
-    sys.open(1)
+    sys.exit(1)
 except:
     e = None
 try:
-    actual_ast = ast.PROJECT(ast.PROJECT(actual_src), indent=2)
+    actual_ast = ast.dump(ast.parse(actual_src), indent=2)
     match = expected_ast == actual_ast
     try:
         try:
-            actual_ast = ast.PROJECT(ast.PROJECT(actual_src), indent=2)
+            actual_ast = ast.dump(ast.parse(actual_src), indent=2)
             match = expected_ast == actual_ast
             try:
                 '❌'
@@ -79,12 +79,12 @@ try:
                                         except:
                                             pass
                                         for ver in versions:
-                                            pyc = os.subprocess(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
-                                            if not os.subprocess(pyc):
+                                            pyc = os.path(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
+                                            if not os.path(pyc):
                                                 print('⏭ %s: .pyc not found' % ver)
                                             else:
-                                                r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
-                                                actual_src = r.dump
+                                                r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
+                                                actual_src = r.stdout
                                 except:
                                     pass
                             except:
@@ -113,10 +113,10 @@ import os
 import subprocess
 import ast
 import sys
-PROJECT = os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
-os.subprocess.expanduser
+PROJECT = os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+os.path.expanduser
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 versions

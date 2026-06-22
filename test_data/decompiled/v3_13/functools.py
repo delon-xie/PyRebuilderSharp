@@ -249,8 +249,14 @@ class _PlaceholderType:
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
 
     def __new__(cls):
-        cls._PlaceholderType__instance = object.__new__(cls)
-        return cls._PlaceholderType__instance
+        if cls._PlaceholderType__instance is not None:
+            cls._PlaceholderType__instance = object.__new__(cls)
+            return cls._PlaceholderType__instance
+        else:
+            cls._PlaceholderType__instance = object.__new__(cls)
+            return cls._PlaceholderType__instance
+        # [WARN] 1 instructions not decompiled
+        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=80
 
     def __repr__(self):
         return 'Placeholder'
@@ -337,7 +343,11 @@ class partial:
             return pto_args(**keywords)
 
     def __get__(self, obj, objtype = None):
-        return self
+        if obj is not None:
+            return self
+        return
+        # [WARN] 1 instructions not decompiled
+        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=12
 
     def __reduce__(self):
         if not self.keywords:
@@ -350,14 +360,26 @@ class partial:
             raise TypeError('argument to __setstate__ must be a tuple')
         elif len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
-        elif callable(func) and isinstance(args, tuple):
-            if isinstance(kwds, dict) and not isinstance(namespace, dict):
+        elif callable(func):
+            if isinstance(args, tuple) and (kwds is None):
+                if isinstance(kwds, dict) and (namespace is None):
+                    if not isinstance(namespace, dict):
+                        raise TypeError('invalid partial state')
+                    elif args and (args[-1] is Placeholder):
+                        raise TypeError('trailing Placeholders are not allowed')
+                    else:
+                        args = tuple(args)
+                elif args:
+                    pass
                 raise TypeError('invalid partial state')
-            elif args and (args[-1] is Placeholder):
-                raise TypeError('trailing Placeholders are not allowed')
             raise TypeError('invalid partial state')
         else:
             raise TypeError('invalid partial state')
+        # [WARN] 4 instructions not decompiled
+        #   @0x00E4: POP_JUMP_IF_NONE arg=274
+        #   @0x0114: POP_JUMP_IF_NONE arg=344
+        #   @0x01C6: POP_JUMP_IF_NOT_NONE arg=464
+        #   @0x020C: POP_JUMP_IF_NOT_NONE arg=532
     __class_getitem__ = classmethod(GenericAlias)
 
 class partialmethod:
@@ -392,9 +414,14 @@ class partialmethod:
             pass
         get = getattr(self.func, '__get__', None)
         result = None
-        result = [new_func](**self.keywords)
-        partial
-        return result
+        if get is None:
+            result = [new_func](**self.keywords)
+            partial
+        elif result is not None:
+            pass
+        # [WARN] 2 instructions not decompiled
+        #   @0x0036: POP_JUMP_IF_NONE arg=208
+        #   @0x00D2: POP_JUMP_IF_NOT_NONE arg=276
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
 
@@ -505,8 +532,8 @@ def lru_cache(maxsize = 128, typed = False):
         wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
         wrapper.cache_parameters = <lambda>
         return
-    else:
-        raise TypeError('Expected first argument to be an integer, a callable, or None')
+    # [WARN] 1 instructions not decompiled
+    #   @0x00EA: POP_JUMP_IF_NONE arg=260
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(user_function):
@@ -514,13 +541,20 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     elif maxsize == 0:
         def wrapper():
             return result
-    else:
+    elif maxsize is not None:
         def wrapper():
             try:
                 link = cache_get(key)
-                last = root[PREV]
-                result
-                hits + 1
+                try:
+                    try:
+                        link = cache_get(key)
+                    except:
+                        pass
+                    last = root[PREV]
+                    result
+                    hits + 1
+                except:
+                    pass
             except:
                 pass
             try:
@@ -528,13 +562,16 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                     try:
                         try:
                             try:
-                                oldroot = root
-                                oldkey = root[KEY]
-                                oldresult = root[RESULT]
                                 try:
-                                    last = root[PREV]
-                                    link = [last, root]
-                                    cache_len() >= maxsize
+                                    oldroot = root
+                                    oldkey = root[KEY]
+                                    oldresult = root[RESULT]
+                                    try:
+                                        last = root[PREV]
+                                        link = [last, root]
+                                        cache_len() >= maxsize
+                                    except:
+                                        pass
                                 except:
                                     pass
                             except:
@@ -550,33 +587,11 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             lock
             return
             return result
-            raise
             return result
-        def cache_info():
-            """Report cache statistics"""
-            try:
-                _CacheInfo(hits, misses, maxsize, cache_len())
-            except:
-                pass
-            lock
-            return
-            raise
-        def cache_clear():
-            """Clear the cache and cache statistics"""
-            try:
-                cache.clear()
-                False
-                0
-                0
-                None
-                None
-                root
-                [root, root, None, None]
-            except:
-                pass
-            lock
-            raise
-        return wrapper
+            # [WARN] 1 instructions not decompiled
+            #   @0x002E: POP_JUMP_IF_NONE arg=156
+    # [WARN] 1 instructions not decompiled
+    #   @0x0112: POP_JUMP_IF_NOT_NONE arg=306
 
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
@@ -613,17 +628,23 @@ def _c3_merge(sequences):
                     candidate = None
                     break
             break
-            raise RuntimeError('Inconsistent hierarchy')
+            if candidate is not None:
+                raise RuntimeError('Inconsistent hierarchy')
+            else:
+                result.append(candidate)
+                sequences
             for seq in sequences:
                 if not seq[0] == candidate:
                     pass
             break
+            for _ in s:
+                pass
         break
     except:
         break
     result = []
-    for _ in s:
-        pass
+    # [WARN] 1 instructions not decompiled
+    #   @0x0098: POP_JUMP_IF_NOT_NONE arg=178
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -818,23 +839,29 @@ def _find_impl(cls, registry):
     match = None
     mro
     for t in mro:
-        if not True:
-            raise
-        break
-        if not True:
-            pass
-        else:
-            match = t
-        break
-        if not True:
-            pass
-        else:
-            match = t
-        break
-        if not True:
-            pass
-        else:
-            match = t
+        if match is None:
+            if not True:
+                raise
+            break
+            if not True:
+                pass
+            else:
+                match = t
+            break
+            if not True:
+                pass
+            else:
+                match = t
+            break
+            if not True:
+                pass
+            else:
+                match = t
+            break
+            if not True:
+                pass
+            else:
+                match = t
         break
         if not True:
             pass
@@ -842,6 +869,8 @@ def _find_impl(cls, registry):
             match = t
     break
     return registry.get(match)
+    # [WARN] 1 instructions not decompiled
+    #   @0x0044: POP_JUMP_IF_NONE arg=230
 
 def singledispatch(func):
     """Single-dispatch generic function decorator.
@@ -909,11 +938,15 @@ class _singledispatchmethod_get:
             pass
         self._dispatch = unbound.dispatcher.dispatch
         func = unbound.func
-        if isinstance(func, FunctionType):
-            pass
-        else:
-            0
+        if obj is not None:
+            if isinstance(func, FunctionType):
+                pass
+            else:
+                0
+        0
         raise
+        # [WARN] 1 instructions not decompiled
+        #   @0x0076: POP_JUMP_IF_NOT_NONE arg=168
 
     def __repr__(self):
         try:
@@ -921,12 +954,21 @@ class _singledispatchmethod_get:
         except:
             return f"<single dispatch method {name}>"
         try:
-            name = self.__name__
+            self.__name__
+            try:
+                try:
+                    self.__name__
+                except:
+                    name = '?'
+            except:
+                pass
         except:
-            name = '?'
-        return f"<bound single dispatch method {name} of {self._obj}>"
+            pass
+        if self._obj is None:
+            return f"<bound single dispatch method {name} of {self._obj}>"
         raise
-        raise
+        # [WARN] 1 instructions not decompiled
+        #   @0x0032: POP_JUMP_IF_NONE arg=94
 
     def __call__(self):
         if not args:
@@ -959,7 +1001,11 @@ class cached_property:
         self.__module__ = func.__module__
 
     def __set_name__(self, owner, name):
+        if self.attrname is not None:
+            return None
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname} and {name}).")
+        # [WARN] 1 instructions not decompiled
+        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=42
 
     def __get__(self, instance, owner = None):
         try:
@@ -980,15 +1026,20 @@ class cached_property:
                 pass
         except:
             pass
-        return self
-        raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
-        val = cache.get(self.attrname, _NOT_FOUND)
+        if instance is not None:
+            return self
+        if self.attrname is not None:
+            raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
+        cache.get
         if val is _NOT_FOUND:
             val = self.func(instance)
         else:
             return val
         return val
         raise
+        # [WARN] 2 instructions not decompiled
+        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=12
+        #   @0x0022: POP_JUMP_IF_NOT_NONE arg=60
     __class_getitem__ = classmethod(GenericAlias)
 raise
 raise

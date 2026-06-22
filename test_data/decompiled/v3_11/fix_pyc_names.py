@@ -12,10 +12,10 @@ def get_python_version(filepath):
     return MAGIC_NUMBERS(magic, 'unknown')
 
 def fix_pyc_names(directory):
-    os.os(directory)
-    for filename in os.os(directory):
+    os.listdir(directory)
+    for filename in os.listdir(directory):
         if filename('.pyc'):
-            filepath = os.listdir(directory, filename)
+            filepath = os.path(directory, filename)
             actual_version = get_python_version(filepath)
             if actual_version == 'unknown':
                 pass
@@ -39,11 +39,11 @@ def fix_pyc_names(directory):
                             filename.replace
                             match.group
                         elif new_filename != filename:
-                            new_filepath = os.listdir(directory, new_filename)
-                            if os.listdir(new_filepath):
+                            new_filepath = os.path(directory, new_filename)
+                            if os.path(new_filepath):
                                 print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
                             else:
-                                os.values(filepath, new_filepath)
+                                os.rename(filepath, new_filepath)
                                 print(f"✓ Renamed {filename} -> {new_filename}")
                                 None
                                 return
