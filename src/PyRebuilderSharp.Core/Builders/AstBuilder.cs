@@ -182,9 +182,16 @@ public class AstBuilder
                         visited.Add(handler);
                         foreach (var succ in handler.Successors)
                         {
+                            // 跳过通过 RERAISE/RAISE_VARARGS 的人工 fallthrough 边连接到类/函数定义的后继块。
+                            // 这些边是 BlockScanner 为保持 CFG 连通性添加的人工边，但类/函数定义应作为
+                            // try/except 后的正常代码流处理，而非 handler 的后继。
+                            bool isHandlerFallthroughToDefinition = succ.Instructions.Count > 0
+                                && (succ.Instructions[0].Opcode == Opcode.LOAD_BUILD_CLASS
+                                    || succ.Instructions[0].Opcode == Opcode.MAKE_FUNCTION);
                             if (!visited.Contains(succ)
                                 && succ.StartOffset >= entry.TargetOffset
-                                && !_codeObject.ExceptionTable.Any(e => e.TargetOffset == succ.StartOffset))
+                                && !_codeObject.ExceptionTable.Any(e => e.TargetOffset == succ.StartOffset)
+                                && !isHandlerFallthroughToDefinition)
                             {
                                 visited.Add(succ);
                                 stmts.AddRange(BuildStatements(succ, visited));
