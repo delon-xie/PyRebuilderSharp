@@ -1074,6 +1074,124 @@ public class AstBuilder
     }
 
     /// <summary>
+    /// 从内联 bytecode 模式构建 Match AST：COPY+COPY+LOAD_GLOBAL+MATCH_CLASS+POP_JUMP_IF_NONE 链。
+    /// 遍历整个 match/case 块链，构建 MatchCase 节点。
+    /// </summary>
+    private List<Stmt>? BuildMatchFromInline(BasicBlock startBlock, HashSet<BasicBlock> visited)
+    {
+        // 查找 match subject：倒序追溯前驱块
+        Name? matchSubject = null;
+        var pred = startBlock.Predecessors.FirstOrDefault();
+        while (pred != null && matchSubject == null)
+        {
+            var loadInstr = pred.Instructions.LastOrDefault(i =>
+                i.Opcode == Opcode.LOAD_FAST || i.Opcode == Opcode.LOAD_NAME);
+            if (loadInstr != default)
+            {
+                var name = loadInstr.Opcode == Opcode.LOAD_FAST
+                    ? _codeObject.Varnames.ElementAtOrDefault(loadInstr.Argument ?? 0)
+                    : _codeObject.Names.ElementAtOrDefault(loadInstr.Argument ?? 0);
+                if (name != null) matchSubject = new Name(name);
+            }
+            pred = pred.Predecessors.FirstOrDefault();
+        }
+        matchSubject ??= new Name("x");
+
+        var cases = new List<MatchCase>();
+        BasicBlock? currentBlock = startBlock;
+        var localVisited = new HashSet<BasicBlock>();
+
+        while (currentBlock != null && !localVisited.Contains(currentBlock)
+            && currentBlock.Instructions.Count >= 3
+            && currentBlock.Instructions.Any(i => i.Opcode == Opcode.COPY))
+        {
+            localVisited.Add(currentBlock);
+            _processedBlockIds.Add(currentBlock.Id);
+
+            var instrs = currentBlock.Instructions;
+            var lastInstr = instrs.LastOrDefault();
+            if (lastInstr == default) break;
+
+            // 确定 case body 和 next case
+            int? jumpTarget = lastInstr.Argument;
+            BasicBlock? bodyBlock = currentBlock.Successors.FirstOrDefault(s =>
+                s != (jumpTarget.HasValue ? FindBlockByOffset(jumpTarget.Value) : null));
+            BasicBlock? nextCaseBlock = jumpTarget.HasValue ? FindBlockByOffset(jumpTarget.Value) : null;
+
+            // 标记 next case 和 body 为已处理
+            if (bodyBlock != null) { visited.Add(bodyBlock); _processedBlockIds.Add(bodyBlock.Id); }
+            if (nextCaseBlock == null || !localVisited.Add(nextCaseBlock))
+                nextCaseBlock = null;
+
+            // 提取模式
+            MatchPattern? pattern = null;
+            bool hasClassPattern = false;
+            for (int i = 0; i < instrs.Count; i++)
+            {
+                if (instrs[i].Opcode is Opcode.MATCH_CLASS_312 or Opcode.MATCH_CLASS_313)
+                {
+                    // MATCH_CLASS 前的 LOAD_GLOBAL 是类名
+                    for (int j = i - 1; j >= 0; j--)
+                    {
+                        if (instrs[j].Opcode == Opcode.LOAD_GLOBAL)
+                        {
+                            var nameIdx = instrs[j].Argument ?? 0;
+                            var className = nameIdx < _codeObject.Names.Count
+                                ? _codeObject.Names[nameIdx] : null;
+                            if (!string.IsNullOrEmpty(className))
+                                pattern = new MatchClass(new Name(className!), new List<MatchPattern>());
+                            break;
+                        }
+                    }
+                    pattern ??= new MatchWildcard();
+                    hasClassPattern = true;
+                    break;
+                }
+                if (instrs[i].Opcode == Opcode.MATCH_MAPPING_312 || instrs[i].Opcode == Opcode.MATCH_MAPPING_313)
+                { pattern = new MatchMapping(new List<Expr>(), new List<MatchPattern>()); hasClassPattern = true; break; }
+                if (instrs[i].Opcode == Opcode.MATCH_SEQUENCE_312 || instrs[i].Opcode == Opcode.MATCH_SEQUENCE_313)
+                { pattern = new MatchSequence(new List<MatchPattern>()); hasClassPattern = true; break; }
+            }
+
+            if (!hasClassPattern)
+                pattern ??= new MatchWildcard();
+
+            // 构建 case body
+            var caseBody = new List<Stmt>();
+            if (bodyBlock != null)
+            {
+                // body 块可能包含 guard 检查（POP_JUMP_IF_FALSE）
+                var guardStmts = GetBlockStmts(bodyBlock);
+                if (bodyBlock.Instructions.Any(i => i.Opcode == Opcode.POP_JUMP_IF_FALSE))
+                {
+                    // Guard 块的 fallthrough 是实际 body
+                    var realBody = bodyBlock.Successors
+                        .FirstOrDefault(s => s != nextCaseBlock
+                            && s.StartOffset > bodyBlock.EndOffset);
+                    if (realBody != null)
+                    {
+                        caseBody.AddRange(GetBlockStmts(realBody));
+                        _processedBlockIds.Add(realBody.Id);
+                    }
+                }
+                else
+                {
+                    caseBody.AddRange(guardStmts);
+                }
+            }
+
+            cases.Add(new MatchCase(pattern, null, caseBody));
+
+            // 移动到下一个 case
+            currentBlock = nextCaseBlock;
+        }
+
+        if (cases.Count == 0) return null;
+        _processedBlockIds.Add(startBlock.Id);
+        return new List<Stmt> { new Match(matchSubject, cases) };
+    }
+
+    /// <summary>
     /// 3.11+: 通过 ExceptionTable 检测 try/except。
     /// 如果 block 的字节码范围在某个 ExceptionTable 条目的 try 体内，构建 Try AST 并设置 IsGroup。
     /// </summary>
@@ -2714,17 +2832,6 @@ public class AstBuilder
             var etTry = BuildTryFromExceptionTable(block, visited);
             if (etTry != null)
                 return etTry;
-        }
-
-        // 检测 match/case 内联模式：COPY+COPY 为特征
-        if (block.Instructions.Count >= 3
-            && block.Instructions[0].Opcode == Opcode.COPY
-            && block.Instructions[1].Opcode == Opcode.COPY
-            && IsConditionBranch(block))
-        {
-            _processedBlockIds.Add(block.Id);
-            visited.Add(block);
-            // fall through to if/else — 让 BuildIfElse 处理 match/case 链
         }
 
         // 检测 if/else 条件分支
