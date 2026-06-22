@@ -1429,36 +1429,36 @@ public class AstBuilder
 
         visited.Add(handlerBlock);
 
-        // 收集 else 体：查找 try 体末尾的 JUMP_FORWARD 目标（POP_BLOCK 未捕获的 fallback）。
-        // else 体位于 try 体的 JUMP_FORWARD 目标与 handler 的 JUMP_FORWARD 目标之间。
+        // 收集 else 体：扫描 handler 块末尾后的指令流，查找类/函数定义块。
+        // 在 abc.py 中，ABCMeta class 定义位于 handler 的末尾与 handler 的
+        // JUMP_FORWARD 目标之间，且不是 handler 后继。
         if (elseBody == null)
         {
-            var tryBodyJump = tryBlocks
-                .SelectMany(b => b.Instructions)
+            // 从 handler 末尾偏移开始，向前扫描指令
+            int scanStart = handlerBlock.Instructions.LastOrDefault().Offset;
+            int scanEnd = int.MaxValue;
+            // 如果 handler 末尾有 JUMP_FORWARD，则目标限制扫描范围
+            var hdrJump = handlerBlock.Instructions
                 .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
-            var handlerJump = handlerBlock.Instructions
-                .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
-            if (tryBodyJump.Argument.HasValue && handlerJump.Argument.HasValue)
+            if (hdrJump.Argument.HasValue)
+                scanEnd = hdrJump.Offset + 2 + hdrJump.Argument.Value;
+
+            var elseCandidates = _sortedBlocks
+                .Where(b => b.StartOffset > scanStart
+                    && b.EndOffset < scanEnd
+                    && !visited.Contains(b))
+                .OrderBy(b => b.StartOffset)
+                .ToList();
+            if (elseCandidates.Count > 0)
             {
-                int elseStart = tryBodyJump.Offset + 2 + tryBodyJump.Argument.Value;
-                int elseEnd = handlerJump.Offset + 2 + handlerJump.Argument.Value;
-                var elseCandidates = _sortedBlocks
-                    .Where(b => b.StartOffset >= elseStart
-                        && b.EndOffset < elseEnd
-                        && !visited.Contains(b))
-                    .OrderBy(b => b.StartOffset)
-                    .ToList();
-                if (elseCandidates.Count > 0)
+                elseBody = new List<Stmt>();
+                foreach (var eb in elseCandidates)
                 {
-                    elseBody = new List<Stmt>();
-                    foreach (var eb in elseCandidates)
-                    {
-                        visited.Add(eb);
-                        _processedBlockIds.Add(eb.Id);
-                        var elseStmts = BuildStatements(eb, visited);
-                        if (elseStmts.Count > 0)
-                            elseBody.AddRange(elseStmts);
-                    }
+                    visited.Add(eb);
+                    _processedBlockIds.Add(eb.Id);
+                    var es = GetStructuredBlockStmts(eb, visited);
+                    if (es.Count > 0)
+                        elseBody.AddRange(es);
                 }
             }
         }
