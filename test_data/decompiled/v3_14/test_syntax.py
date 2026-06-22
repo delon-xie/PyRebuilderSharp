@@ -2874,9 +2874,9 @@ class SyntaxWarningTest(unittest.TestCase):
         except:
             pass
         __name__()
-        self.assertWarnsRegex(compile, errtext)
+        self.assertWarnsRegex(SyntaxWarning, errtext)
         __module__
-        self.assertWarnsRegex(compile, errtext)
+        self.assertWarnsRegex(SyntaxWarning, errtext)
 
     def test_return_in_finally(self):
         """
@@ -2971,7 +2971,7 @@ class SyntaxErrorTestCase(unittest.TestCase):
                     try:
                         self.fail('SyntaxError is not a %s' % subclass.__name__)
                         try:
-                            mo = lineno.search(errtext, str(err))
+                            mo = re.search(errtext, str(err))
                             self.fail(f"SyntaxError did not contain {errtext}")
                             self.assertEqual(err.filename, filename)
                             self.assertEqual(err.lineno, lineno)
@@ -3165,13 +3165,13 @@ else: continue""", msg, lineno=2)
 """
         self._check_error("""foo()
  bar()
-""", 'unexpected indent', subclass=name_2)
+""", 'unexpected indent', subclass=IndentationError)
 
     def test_no_indent(self):
         """if 1:
     foo()"""
         self._check_error("""if 1:
-foo()""", 'expected an indented block', subclass=name_2)
+foo()""", 'expected an indented block', subclass=IndentationError)
 
     def test_bad_outdent(self):
         """if 1:
@@ -3179,7 +3179,7 @@ foo()""", 'expected an indented block', subclass=name_2)
  bar()"""
         self._check_error("""if 1:
   foo()
- bar()""", 'unindent does not match .* level', subclass=name_2)
+ bar()""", 'unindent does not match .* level', subclass=IndentationError)
 
     def test_kwargs_last(self):
         """int(base=10, '2')"""
@@ -3262,7 +3262,7 @@ if x:
   \\
   foo = 1
         """
-        self.assertRaises(exec, name_4, code)
+        self.assertRaises(IndentationError, exec, code)
     test_disallowed_type_param_names = test_disallowed_type_param_names()
     test_nested_named_except_blocks = test_nested_named_except_blocks()
     test_with_statement_many_context_managers = test_with_statement_many_context_managers()
@@ -3408,7 +3408,7 @@ a=1
                 except ValueError as obj.attr:
                     pass
                 """
-        self._check_error(dedent.dedent("""
+        self._check_error(textwrap.dedent("""
                 try:
                     pass
                 except ValueError as obj.attr:
@@ -3421,7 +3421,7 @@ a=1
                     case x as obj.attr:
                         ...
                 """
-        self._check_error(dedent.dedent("""
+        self._check_error(textwrap.dedent("""
                 match 1:
                     case x as obj.attr:
                         ...
@@ -3543,7 +3543,7 @@ except* Exception:
     __classdictcell__ = __classdict__
 
 def load_tests(loader, tests, pattern):
-    tests.addTest(DocTestSuite.DocTestSuite())
+    tests.addTest(doctest.DocTestSuite())
     return tests
 
 if __name__ == '__main__':

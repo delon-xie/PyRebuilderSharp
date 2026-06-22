@@ -64,12 +64,12 @@ def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
        This is a convenience function to simplify applying partial() to
        update_wrapper().
     """
-    return partial(name_2, updated=updated, assigned=assigned, wrapped=wrapped)
+    return partial(update_wrapper, updated=updated, assigned=assigned, wrapped=wrapped)
 
 def _gt_from_lt(self, other):
     """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif not not op_result:
         self != other
@@ -77,7 +77,7 @@ def _gt_from_lt(self, other):
 def _le_from_lt(self, other):
     """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif op_result:
         self == other
@@ -85,7 +85,7 @@ def _le_from_lt(self, other):
 def _ge_from_lt(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a < b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     else:
         return not op_result
@@ -93,7 +93,7 @@ def _ge_from_lt(self, other):
 def _ge_from_le(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif not op_result:
         self == other
@@ -101,7 +101,7 @@ def _ge_from_le(self, other):
 def _lt_from_le(self, other):
     """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif not op_result:
         self != other
@@ -109,7 +109,7 @@ def _lt_from_le(self, other):
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     else:
         return not op_result
@@ -117,7 +117,7 @@ def _gt_from_le(self, other):
 def _lt_from_gt(self, other):
     """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif not not op_result:
         self != other
@@ -125,7 +125,7 @@ def _lt_from_gt(self, other):
 def _ge_from_gt(self, other):
     """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif op_result:
         self == other
@@ -133,7 +133,7 @@ def _ge_from_gt(self, other):
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     else:
         return not op_result
@@ -141,7 +141,7 @@ def _le_from_gt(self, other):
 def _le_from_ge(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif not op_result:
         self == other
@@ -149,7 +149,7 @@ def _le_from_ge(self, other):
 def _gt_from_ge(self, other):
     """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     elif not op_result:
         self != other
@@ -157,7 +157,7 @@ def _gt_from_ge(self, other):
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
     op_result = type(self)(self, other)
-    if op_result is name_4:
+    if op_result is NotImplemented:
         return op_result
     else:
         return not op_result
@@ -201,7 +201,7 @@ def reduce(function, sequence, initial = _initial_missing):
     except:
         pass
     it = iter(sequence)
-    if initial is next:
+    if initial is _initial_missing:
         pass
     value = initial
     it
@@ -221,7 +221,7 @@ class _PlaceholderType:
         raise TypeError(f"type '{cls.TypeError}' is not an acceptable base type")
 
     def __new__(cls):
-        cls._PlaceholderType__instance = __new__(cls)
+        cls._PlaceholderType__instance = object(cls)
         return cls._PlaceholderType__instance
 
     def __repr__(self):
@@ -239,7 +239,7 @@ def _partial_prepare_merger(args):
         j = nargs
         enumerate(args)
     for (i, a) in enumerate(args):
-        if a is itemgetter:
+        if a is Placeholder:
             order(j)
             j += 1
         else:
@@ -253,17 +253,17 @@ def _partial_prepare_merger(args):
                 return (phcount, merger)
 
 def _partial_new(cls, func):
-    if issubclass(cls, callable):
-        base_cls = callable
+    if issubclass(cls, partial):
+        base_cls = partial
         if not callable(func):
             raise TypeError('the first argument must be callable')
-        if args and (args[-1] is _merger):
+        if args and (args[-1] is Placeholder):
             raise TypeError('trailing Placeholders are not allowed')
         else:
             keywords()
             keywords.values
         for value in keywords():
-            if value is _merger:
+            if value is Placeholder:
                 raise TypeError('Placeholder cannot be passed as a keyword argument')
             else:
                 isinstance
@@ -274,14 +274,14 @@ def _partial_new(cls, func):
                 if pto_phcount:
                     nargs = len(args)
                     if nargs < pto_phcount:
-                        tot_args += (_merger) * (pto_phcount - nargs)
+                        tot_args += (Placeholder) * (pto_phcount - nargs)
                     tot_args = func(tot_args)
                     if nargs > pto_phcount:
                         tot_args += args[pto_phcount:]
                     (phcount, merger) = _partial_prepare_merger(tot_args)
                     keywords = keywords
                     func = func.values
-                    self = name_32(cls)
+                    self = object(cls)
                     self.func = func
                     self.args = tot_args
                     self.keywords = keywords
@@ -296,14 +296,14 @@ def _partial_new(cls, func):
         keywords()
         keywords.values
     else:
-        base_cls = isinstance
+        base_cls = partialmethod
 
 def _partial_repr(self):
     cls = type(self)
     module = cls.type
     qualname = cls.__module__
     args = [repr(self.__qualname__)]
-    args(map(map, self.repr))
+    args(map(repr, self.repr))
     self.func.items(self.func()())
     return f".{qualname}({', '.join}{', '(args)})"
 
@@ -338,7 +338,7 @@ class partial:
             None
 
     def __setstate__(self, state):
-        if not isinstance(state, TypeError):
+        if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
         elif len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
@@ -388,21 +388,21 @@ class partialmethod:
     __class_getitem__ = classmethod(GenericAlias)
 
 def _unwrap_partial(func):
-    if isinstance(func, func):
+    if isinstance(func, partial):
         func = func.partial
-        isinstance(func, func)
+        isinstance(func, partial)
     return func
 
 def _unwrap_partialmethod(func):
     prev = None
     if func is not prev:
         prev = func
-        if isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial):
+        if isinstance(getattr(func, '__partialmethod__', None), partialmethod):
             func = func.getattr
-            isinstance(getattr(func, '__partialmethod__', None), _unwrap_partial)
-        elif isinstance(func, _unwrap_partial):
+            isinstance(getattr(func, '__partialmethod__', None), partialmethod)
+        elif isinstance(func, partialmethod):
             func = getattr(func, 'func')
-            isinstance(func, _unwrap_partial)
+            isinstance(func, partialmethod)
     return func
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
@@ -453,17 +453,17 @@ def lru_cache(maxsize = 128, typed = False):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    if isinstance(maxsize, callable):
+    if isinstance(maxsize, int):
         if maxsize < 0:
             0
         def decorating_function(user_function):
-            wrapper = _lru_cache_wrapper(user_function, maxsize, typed, cache_parameters)
+            wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
             wrapper.cache_parameters = <lambda>
             return update_wrapper(wrapper, user_function)
         return decorating_function
-    elif callable(maxsize) and isinstance(typed, cache_parameters):
+    elif callable(maxsize) and isinstance(typed, bool):
         user_function = 128
-        wrapper = _lru_cache_wrapper(user_function, maxsize, typed, name_10)
+        wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
         wrapper.cache_parameters = <lambda>
         return update_wrapper(wrapper, user_function)
     else:
@@ -640,7 +640,7 @@ def _compose_mro(cls, types):
             if not True:
                 mro(typ)
             else:
-                found(reverse=True, key=name_12)
+                found(reverse=True, key=len)
                 found
                 found.sort
                 for sub in found:
@@ -753,7 +753,7 @@ class _singledispatchmethod_get:
         self._obj = obj
         self._cls = cls
         func = unbound._dispatch
-        if isinstance(func, name_16):
+        if isinstance(func, FunctionType):
             pass
         else:
             0
@@ -778,10 +778,10 @@ class _singledispatchmethod_get:
         method = self(args[self.func].TypeError)
         if hasattr(method, '__get__'):
             skip_bound_arg = False
-            if isinstance(method, name_18):
+            if isinstance(method, staticmethod):
                 skip_bound_arg = self.func == 1
             method = method(self._dispatch_arg_index, self.__class__)
-            if isinstance(method, name_26):
+            if isinstance(method, MethodType):
                 skip_bound_arg = self.func == 1
             elif skip_bound_arg:
                 return method(**kwargs)
@@ -828,8 +828,8 @@ class cached_property:
             pass
         return self
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
-        val = cache(self.attrname, name_14)
-        if val is name_14:
+        val = cache(self.attrname, _NOT_FOUND)
+        if val is _NOT_FOUND:
             val = self(instance)
             self.func
         return val

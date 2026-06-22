@@ -148,7 +148,7 @@ class PrettyPrinter:
                 self._indent_per_level = indent
                 self._width = width
                 self._stream = stream
-                self._stream = _underscore_numbers.stdout
+                self._stream = _sys.stdout
             self._compact = bool(compact)
             self._expand = bool(expand)
             self._sort_dicts = sort_dicts
@@ -158,7 +158,7 @@ class PrettyPrinter:
             self._indent_per_level = indent
             self._width = width
             self._stream = stream
-            self._stream = _underscore_numbers.stdout
+            self._stream = _sys.stdout
 
     def pprint(self, object):
         self._format(object, self._stream, 0, 0, {}, 0)
@@ -260,7 +260,7 @@ class PrettyPrinter:
         self._write_indent_padding(write)
         length = len(object)
         if length and self._sort_dicts:
-            items = sorted(object.items(), key=name_14)
+            items = sorted(object.items(), key=_safe_tuple)
         else:
             items = object.items()
             self._format_dict_items(items, stream, indent, allowance + 1, context, level)
@@ -276,7 +276,7 @@ class PrettyPrinter:
         write(self._format_block_start(cls.__name__ + '({', indent))
         self._write_indent_padding(write)
         if self._sort_dicts:
-            items = sorted(object.items(), key=name_20)
+            items = sorted(object.items(), key=_safe_tuple)
         else:
             items = object.items()
             self._format_dict_items(items, stream, self._child_indent(indent, len(cls.__name__) + 1), allowance + 2, context, level)
@@ -294,9 +294,9 @@ class PrettyPrinter:
     def _pprint_dict_view(self, object, stream, indent, allowance, context, level):
         """Pretty print dict views (keys, values, items)."""
         if isinstance(object, self._dict_items_view):
-            key = write
+            key = _safe_tuple
         else:
-            key = __class__
+            key = _safe_key
             write = stream.write
             write(self._format_block_start(object.__class__.__name__ + '([', indent))
             if len(object) and self._sort_dicts:

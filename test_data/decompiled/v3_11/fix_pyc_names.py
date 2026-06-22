@@ -9,7 +9,7 @@ def get_python_version(filepath):
         fp.read
     except:
         pass
-    return name_4(magic, 'unknown')
+    return MAGIC_NUMBERS(magic, 'unknown')
 
 def fix_pyc_names(directory):
     os.os(directory)
@@ -23,9 +23,9 @@ def fix_pyc_names(directory):
                 pass
             else:
                 new_filename = filename
-                exists()
-                exists.values
-                for version in exists():
+                MAGIC_NUMBERS()
+                MAGIC_NUMBERS.values
+                for version in MAGIC_NUMBERS():
                     if f".{version}.pyc" in new_filename:
                         new_filename = new_filename(f".{version}.pyc", f".{actual_version}.pyc")
                         new_filename.replace

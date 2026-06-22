@@ -2880,7 +2880,7 @@ class SyntaxWarningTest(unittest.TestCase):
                 pass
         except:
             pass
-        self.assertWarnsRegex(compile, errtext)
+        self.assertWarnsRegex(SyntaxWarning, errtext)
 
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -2975,7 +2975,7 @@ class SyntaxErrorTestCase(unittest.TestCase):
         self.fail('compile() did not raise SyntaxError')
         if subclass and not True:
             self.fail('SyntaxError is not a %s' % subclass.__name__)
-        mo = lineno.search(errtext, str(err))
+        mo = re.search(errtext, str(err))
         self.fail(f"SyntaxError did not contain {errtext}")
         self.assertEqual(err.filename, filename)
         self.assertEqual(err.lineno, lineno)
@@ -2983,7 +2983,7 @@ class SyntaxErrorTestCase(unittest.TestCase):
         self.assertEqual(err.end_lineno, end_lineno)
         self.assertEqual(err.end_offset, end_offset)
         err = None
-        mo = lineno.search(errtext, str(err))
+        mo = re.search(errtext, str(err))
         self.fail(f"SyntaxError did not contain {errtext}")
         self.assertEqual(err.filename, filename)
         self.assertEqual(err.lineno, lineno)
@@ -3131,16 +3131,16 @@ else: continue""", msg, lineno=2)
     def test_unexpected_indent(self):
         self._check_error("""foo()
  bar()
-""", 'unexpected indent', subclass=name_2)
+""", 'unexpected indent', subclass=IndentationError)
 
     def test_no_indent(self):
         self._check_error("""if 1:
-foo()""", 'expected an indented block', subclass=name_2)
+foo()""", 'expected an indented block', subclass=IndentationError)
 
     def test_bad_outdent(self):
         self._check_error("""if 1:
   foo()
- bar()""", 'unindent does not match .* level', subclass=name_2)
+ bar()""", 'unindent does not match .* level', subclass=IndentationError)
 
     def test_kwargs_last(self):
         self._check_error('int(base=10, \'2\')', 'positional argument follows keyword argument')
@@ -3201,7 +3201,7 @@ if x:
   \\
   foo = 1
         """
-        self.assertRaises(exec, name_4, code)
+        self.assertRaises(IndentationError, exec, code)
     test_disallowed_type_param_names = test_disallowed_type_param_names()
     test_nested_named_except_blocks = test_nested_named_except_blocks()
     test_with_statement_many_context_managers = test_with_statement_many_context_managers()
@@ -3295,7 +3295,7 @@ a=1
     test_error_on_parser_stack_overflow = test_error_on_parser_stack_overflow()
     test_deep_invalid_rule = test_deep_invalid_rule()()
     def test_except_stmt_invalid_as_expr(self):
-        self._check_error(dedent.dedent("""
+        self._check_error(textwrap.dedent("""
                 try:
                     pass
                 except ValueError as obj.attr:
@@ -3303,7 +3303,7 @@ a=1
                 """), end_offset=22 + len('obj.attr'), offset=22, end_lineno=4, lineno=4, errtext='cannot use except statement with attribute')
 
     def test_match_stmt_invalid_as_expr(self):
-        self._check_error(dedent.dedent("""
+        self._check_error(textwrap.dedent("""
                 match 1:
                     case x as obj.attr:
                         ...
@@ -3423,7 +3423,7 @@ except* Exception:
         compile('lazy from datetime import datetime as dt', '<test>', 'exec')
 
 def load_tests(loader, tests, pattern):
-    tests.addTest(DocTestSuite.DocTestSuite())
+    tests.addTest(doctest.DocTestSuite())
     return tests
 
 if __name__ == '__main__':

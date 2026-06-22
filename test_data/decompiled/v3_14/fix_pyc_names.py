@@ -13,7 +13,7 @@ def get_python_version(filepath):
     open(filepath, 'rb')
     __module__
     open(filepath, 'rb')
-    return name_4.get(magic, 'unknown')
+    return MAGIC_NUMBERS.get(magic, 'unknown')
     raise
 
 def fix_pyc_names(directory):
@@ -31,8 +31,8 @@ def fix_pyc_names(directory):
                 pass
             else:
                 new_filename = filename
-                exists.values()
-                for version in exists.values():
+                MAGIC_NUMBERS.values()
+                for version in MAGIC_NUMBERS.values():
                     if not f".{version}.pyc" in new_filename:
                         pass
                     else:

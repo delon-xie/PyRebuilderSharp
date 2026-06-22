@@ -3135,16 +3135,16 @@ else: continue""", msg, lineno=2)
     def test_unexpected_indent(self):
         self("""foo()
  bar()
-""", 'unexpected indent', subclass=name_2)
+""", 'unexpected indent', subclass=IndentationError)
 
     def test_no_indent(self):
         self("""if 1:
-foo()""", 'expected an indented block', subclass=name_2)
+foo()""", 'expected an indented block', subclass=IndentationError)
 
     def test_bad_outdent(self):
         self("""if 1:
   foo()
- bar()""", 'unindent does not match .* level', subclass=name_2)
+ bar()""", 'unindent does not match .* level', subclass=IndentationError)
 
     def test_kwargs_last(self):
         self('int(base=10, \'2\')', 'positional argument follows keyword argument')
@@ -3206,7 +3206,7 @@ if x:
   \\
   foo = 1
         """
-        self(exec, name_4, code)
+        self(IndentationError, exec, code)
     test_disallowed_type_param_names = test_disallowed_type_param_names()
     test_nested_named_except_blocks = test_nested_named_except_blocks()
     test_with_statement_many_context_managers = test_with_statement_many_context_managers()

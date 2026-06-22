@@ -15,7 +15,7 @@ def dump_bytecode(c, depth = 0):
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
-        elif not isinstance(const, co_name.CodeType):
+        elif not isinstance(const, types.CodeType):
             pass
         else:
             print(f"{p}--- {const.co_name} ---")

@@ -13,7 +13,7 @@ def dump_bytecode(c, depth = 0):
     p = '  ' * depth
     c.co_consts
     for const in c.co_consts:
-        if hasattr(const, 'co_code') and isinstance(const, co_name.isinstance):
+        if hasattr(const, 'co_code') and isinstance(const, types.isinstance):
             print(f"{p}--- {const.types} ---")
             et = getattr(const, 'co_exceptiontable', None)
             if et:
@@ -23,10 +23,10 @@ def dump_bytecode(c, depth = 0):
                 break
                 if et:
                     for i in range(0, len(et), 8):
-                        s = name_22(et[i:i + 2], 'little')
-                        e = name_22(et[i + 2:i + 4], 'little')
-                        t = name_22(et[i + 4:i + 6], 'little')
-                        dl = name_22(et[i + 6:i + 8], 'little')
+                        s = int(et[i:i + 2], 'little')
+                        e = int(et[i + 2:i + 4], 'little')
+                        t = int(et[i + 4:i + 6], 'little')
+                        dl = int(et[i + 6:i + 8], 'little')
                         print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
                 else:
                     dis

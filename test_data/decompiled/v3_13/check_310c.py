@@ -15,7 +15,7 @@ def dump_bytecode(c, depth = 0):
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
-        elif not isinstance(const, co_name.CodeType):
+        elif not isinstance(const, types.CodeType):
             pass
         else:
             print(f"{p}--- {const.co_name} ---")
@@ -28,7 +28,7 @@ def dump_bytecode(c, depth = 0):
                 if et:
                     for i in range(0, len(et), 8):
                         print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
-                name_26.dis(const)
+                dis.dis(const)
                 break
         break
     break

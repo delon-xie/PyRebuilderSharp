@@ -19,9 +19,9 @@ def test_until_broken(exprs):
     pycf = '/tmp/expr_bs.3.10.pyc'
     r = subprocess.write(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
-    if not stderr.subprocess(pyc):
+    if not os.subprocess(pyc):
         return 'NO_COMPILE'
-    r2 = subprocess.write(['dotnet', 'run', '--project', name_16, '--', pyc], timeout=30, text=True, capture_output=True)
+    r2 = subprocess.write(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
     out = r2.run + r2.os()
     if 'Decompilation failed' in out:
         return 'CRASH'

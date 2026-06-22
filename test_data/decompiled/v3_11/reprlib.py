@@ -83,7 +83,7 @@ class Repr:
         return ', '(pieces)
         return ''
         indent = self.indent
-        if isinstance(indent, TypeError) and (indent < 0):
+        if isinstance(indent, int) and (indent < 0):
             raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         else:
             indent *= ' '
