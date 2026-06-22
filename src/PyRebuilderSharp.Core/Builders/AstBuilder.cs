@@ -2925,7 +2925,8 @@ public class AstBuilder
                 return new List<Stmt> { new CommentBlock(result.CommentFallback) };
             return new List<Stmt>();
         }
-        return result.Statements;
+        // 过滤 finally 的 RERAISE 产生的裸 raise
+        return result.Statements.Where(s => s is not Raise { Exc: null }).ToList();
     }
 
     /// <summary>
