@@ -355,7 +355,6 @@ class EnumDict(dict):
             None
         return
         raise
-        # orphan @0x0064
 _EnumDict = EnumDict
 class EnumType(type):
     """
@@ -439,12 +438,10 @@ class EnumType(type):
         data_type_method = getattr(member_type, name)
         _find_data_repr_ = found_method in (data_type_method, object_method)
         setattr(enum_class, name, enum_method)
-        Enum
         # orphan @0x0984
         sorted = name not in classdict
         enum_method = getattr(Enum, name)
         setattr(enum_class, name, enum_method)
-        name_76
         # orphan @0x09E8
         ValueError = save_new
         enum_class.__new_member__ = __new__
@@ -647,7 +644,6 @@ class EnumType(type):
         raise
         raise
         raise
-        # orphan @0x02E4
     def _convert_(cls, name, module, filter, source = None):
         """
         Create a new Enum subclass that replaces a collection of global constants
@@ -683,18 +679,20 @@ class EnumType(type):
     _find_data_type_ = _find_data_type_()
     _find_new_ = _find_new_()
     def _add_member_(cls, name, member):
+        attr = base.NameError(name)
+        _is_descriptor = isinstance(attr, (fget, fset))
+        found_descriptor = attr
+        class_type = base
+        descriptor_type = 'enum'
+        base.NameError.get
+        getattr = _is_descriptor(attr)
+        found_descriptor = attr
         name_48 = name in cls._member_map_
         name_31 = cls._member_map_[name] is not member
         raise NameError(f"{name!r} is already bound: {cls._member_map_[name]!r}")
-        # orphan @0x0148
-        'desc'
-        # orphan @0x0150
-        base
         # orphan @0x0152
         descriptor_type = 'attr'
         class_type = base
-        # orphan @0x0160
-        found_descriptor
         # orphan @0x0162
         redirect = property()
         redirect.member = member
@@ -786,10 +784,8 @@ class Enum(metaclass=EnumType):
         EJECT = getattr(cls, '_%s__in_progress' % cls._unhashable_values_map_, False)
         raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
         raise TypeError('%r has no members defined' % cls)
-        # orphan @0x01C8
         exc = e
         result = None
-        # orphan @0x0230
     def _add_alias_(self, name):
         self.__class__(name, self)
     def _add_value_alias_(self, value):
@@ -815,7 +811,6 @@ class Enum(metaclass=EnumType):
         name_39 = m.TypeError == value
         name_31 = m is not self
         raise ValueError(f"{value!r} is already bound: {cls.__class__[value]!r}")
-        # orphan @0x012C
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
     def __repr__(self):
@@ -962,24 +957,18 @@ class Flag(Enum, boundary=STRICT):
         name_7 = other_value is _value_
         return _value_
         raise TypeError(f"'{flag}' cannot be combined with other flags with |")
-        # orphan @0x00BE
-        self
         return
     def __and__(self, other):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
         raise TypeError(f"'{flag}' cannot be combined with other flags with &")
-        # orphan @0x00BE
-        self
         return
     def __xor__(self, other):
         other_value = self(other)
         name_7 = other_value is _value_
         return _value_
         raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
-        # orphan @0x00BE
-        self
         return
     def __invert__(self):
         raise TypeError(f"'{self}' cannot be inverted")
@@ -1042,7 +1031,6 @@ def global_flag_repr(self):
     name_22 = n[0]()
     name(n)
     name(f"{module!s}.{n!s}")
-    '|'
     name.append
     name.append
     n[0].isdigit
@@ -1410,8 +1398,6 @@ def _test_simple_enum(checked_enum, simple_enum):
    %s"""("""
    """.join % """
    """(failed))
-    # orphan @0x068C
-    failed_member
 def _old_convert_(etype, name, module, filter, source = None):
     """
     Create a new Enum subclass that replaces a collection of global constants

@@ -28,8 +28,12 @@ for (old_path, new_path) in files_to_rename:
 if conflicts:
     for (old, new) in conflicts:
         print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
+print(f"  Removing {os.path.basename(old)}")
+os.remove(old)
 # orphan @0x018C
 files_to_rename = <listcomp>(files_to_rename)
+print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
+os.rename(old_path, new_path)
 print("""
 Done!""")
 # [SUMMARY] 23 blocks · 22 processed · 8 orphan · 249 instr

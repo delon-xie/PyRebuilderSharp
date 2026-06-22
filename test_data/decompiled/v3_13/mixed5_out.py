@@ -11,7 +11,6 @@ def mixed_1(n):
                 pass
             result += 1
     return result
-    # orphan @0x007C
 def mixed_2(n):
     total = 0
     range(n)
@@ -25,6 +24,7 @@ def mixed_2(n):
             break
     break
 def mixed_3(n):
+    i += 1
     total = 0
     i = 0
     while True:
@@ -38,7 +38,6 @@ def mixed_3(n):
                     pass
         else:
             return total
-    # orphan @0x0088
 def mixed_4(n):
     try:
         try:

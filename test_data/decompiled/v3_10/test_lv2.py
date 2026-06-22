@@ -1,5 +1,7 @@
 # Decompiled from: <module>
 
+j = i * 2
+i += 1
 x = 1
 y = 2
 z = x + y

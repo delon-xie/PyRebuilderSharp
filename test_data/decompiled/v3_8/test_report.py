@@ -26,6 +26,9 @@ print('============================================================')
 passed_groups = []
 failed_groups = []
 test_groups.items()
+failed_groups.append(group)
+print(f"  ✓ {group}")
+print(f"    - {f}")
 print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
 # [SUMMARY] 26 blocks · 26 processed · 12 orphan · 233 instr

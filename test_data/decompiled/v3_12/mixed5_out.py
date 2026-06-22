@@ -28,6 +28,7 @@ def mixed_2(n):
             total += k
     return total
 def mixed_3(n):
+    i += 1
     total = 0
     i = 0
     while i < n:
@@ -72,5 +73,4 @@ def mixed_4(n):
     except:
         break
     total = 0
-    # orphan @0x0068
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

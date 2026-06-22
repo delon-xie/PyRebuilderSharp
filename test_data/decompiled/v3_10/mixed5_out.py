@@ -48,6 +48,8 @@ def mixed_3(n):
                 return total
             while i % 2 == 0:
                 pass
+    k -= 1
+    total += 1
 def mixed_4(n):
     total = 0
     try:

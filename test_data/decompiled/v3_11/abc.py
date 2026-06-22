@@ -159,12 +159,9 @@ def update_abstractmethods(cls):
     abstracts(name)
     abstracts.add
     return cls
-    # orphan @0x00EC
-    cls
     # orphan @0x0120
     name_21 = getattr(value, '__isabstractmethod__', False)
     abstracts(name)
-    frozenset
     abstracts.add
     return cls
 class ABC(metaclass=ABCMeta):

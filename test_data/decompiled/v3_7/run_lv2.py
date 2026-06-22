@@ -27,5 +27,4 @@ for ver in versions:
            actual=  {a}")
     except Exception:
         pass
-# orphan @0x0172
-# [SUMMARY] 22 blocks · 22 processed · 4 orphan · 221 instr
+# [SUMMARY] 22 blocks · 23 processed · 4 orphan · 221 instr

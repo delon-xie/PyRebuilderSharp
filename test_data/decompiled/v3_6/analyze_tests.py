@@ -2,6 +2,7 @@
 
 # orphan @0x00D4
 next_line.strip().startswith(' ')
+next_line = lines[j]
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 while i < len(lines):
@@ -44,6 +45,8 @@ while i < len(lines):
     print('=' * 70)
     return None
 line = lines[i]
+j += 1
+i += 1
 print('=' * 70)
 print('Python 3.7-3.10 版本测试通过率统计')
 print('=' * 70)

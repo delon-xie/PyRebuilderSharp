@@ -8,22 +8,18 @@ with open(INPUT_FILE) as f:
     except Exception:
         print('Failed to parse expected source:', e)
         sys.exit(1)
-# orphan @0x0154
-'❌'
-# orphan @0x0156
-ver
-status
-'%s %s: AST %s'
-print
-# orphan @0x0168
-'MISMATCH'
-# orphan @0x01B8
-'(missing)'
-# orphan @0x01D0
-'(missing)'
+pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
+print('⏭ %s: .pyc not found' % ver)
+r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
+actual_src = r.stdout
+actual_ast = ast.dump(ast.parse(actual_src), indent=2)
+match = expected_ast == actual_ast
+print('  Line %d: expected=%s' % (i, e))
+print('           actual=  %s' % a)
+yield from results
 # orphan @0x025C
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-# [SUMMARY] 34 blocks · 28 processed · 28 orphan · 331 instr
+# [SUMMARY] 34 blocks · 33 processed · 28 orphan · 331 instr

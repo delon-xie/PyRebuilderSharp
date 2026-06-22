@@ -63,7 +63,6 @@ class Repr:
         else:
             return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
-        # orphan @0x0070
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
         if (level <= 0) and n:
@@ -113,6 +112,9 @@ class Repr:
             return '{}'
         else:
             return '}'
+        keyrepr = repr1(key, newlevel)
+        valrepr = repr1(x[key], newlevel)
+        pieces.append('%s: %s' % (keyrepr, valrepr))
         pieces.append(self.fillvalue)
         s = self._join(pieces, level)
         return '{%s}' % (s)

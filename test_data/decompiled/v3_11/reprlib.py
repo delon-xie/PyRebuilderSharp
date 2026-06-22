@@ -79,8 +79,6 @@ class Repr:
         name_19 = indent < 0
         raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
-        # orphan @0x019A
-        None
         return
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
@@ -124,7 +122,6 @@ class Repr:
         keyrepr = repr1(key, newlevel)
         valrepr = repr1(x[key], newlevel)
         pieces(f"{keyrepr!s}: {valrepr!s}")
-        n
         pieces.append
         pieces(self.len)
         s = self(pieces, level)

@@ -5,11 +5,11 @@ with open('/tmp/test_full.txt', 'r') as f:
 while i < len(lines):
     pass
 line = lines[i]
+next_line = lines[j]
 # orphan @0x00E6
 next_line.startswith
-# orphan @0x0180
 # orphan @0x0182
 print()
 i += 1
 print(f"Total tests with versions found: {debug_count}")
-# [SUMMARY] 29 blocks · 27 processed · 10 orphan · 201 instr
+# [SUMMARY] 29 blocks · 28 processed · 10 orphan · 201 instr

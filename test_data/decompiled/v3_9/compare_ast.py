@@ -22,10 +22,6 @@ except Exception:
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
 e = None
-# orphan @0x0148
-'(missing)'
-# orphan @0x0162
-'(missing)'
 print(f"Line {i}:")
 print(f"  expected: {e}")
-# [SUMMARY] 22 blocks · 20 processed · 13 orphan · 211 instr
+# [SUMMARY] 22 blocks · 22 processed · 13 orphan · 211 instr

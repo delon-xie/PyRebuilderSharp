@@ -1,5 +1,7 @@
 # Decompiled from: <module>
 
+j = i * 2
+i += 1
 try:
     a = 1
 except:

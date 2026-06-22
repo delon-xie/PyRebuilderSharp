@@ -887,7 +887,6 @@ class Enum(metaclass=EnumType):
         return
         raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
         raise TypeError('%r has no members defined' % cls)
-        # orphan @0x01C4
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -1591,29 +1590,30 @@ def _test_simple_enum(checked_enum, simple_enum):
         raise TypeError("""enum mismatch:
    %s""" % """
    """.join(failed))
-    # orphan @0x04F6
+    failed_member = []
+    failed.append('missing member from simple enum: %r' % name)
+    failed.append('extra member in simple enum: %r' % name)
     # orphan @0x0500
     failed_member.append(f"missing key {key!r} not in the simple enum member {name!r}")
     # orphan @0x0538
     failed_member.append(f"extra key {key!r} in simple enum member {name!r}")
-    # orphan @0x0586
+    checked_value = checked_member_dict[key]
+    simple_value = simple_member_dict[key]
     # orphan @0x0588
     failed_member.append(f"{key!r}:
          {f"checked member -> {checked_value!r}"!s}
          {f"simple member  -> {simple_value!r}"!s}")
-    # orphan @0x05D0
     # orphan @0x05D2
     failed.append(f"{name!r} member mismatch:
       {"""
       """.join(failed_member)!s}")
-    # orphan @0x063C
+    checked_method = getattr(checked_enum, method, None)
+    simple_method = getattr(simple_enum, method, None)
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
-    # orphan @0x06D4
     # orphan @0x06D6
     method!r(f":  {f"checked -> {checked_method!r}"}{'30'!s} {f"simple -> {simple_method!r}"!s}")
     failed.append
-    # orphan @0x0718
 def _old_convert_(etype, name, module, filter, source = None):
     """
     Create a new Enum subclass that replaces a collection of global constants

@@ -1,5 +1,7 @@
 # Decompiled from: <module>
 
+next_line = lines[j]
+line = lines[i]
 try:
     output = f.read()
 except:

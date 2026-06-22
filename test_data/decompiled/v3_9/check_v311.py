@@ -5,4 +5,6 @@ with open(sys.argv[1], 'rb') as f:
     for off in range(17, 40):
         if raw[off:off + 4] == b'AAAAAA==':
             print(f"  4 zero bytes at offset {off}")
+pair = raw[i:i + 2]
+'  '(f"{i}{'3d'}: {pair.hex()}")
 # [SUMMARY] 11 blocks · 10 processed · 4 orphan · 244 instr

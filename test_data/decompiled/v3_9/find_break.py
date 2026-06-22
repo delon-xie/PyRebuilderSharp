@@ -14,6 +14,8 @@ def test_until_broken(exprs):
         pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
         if not os.path.exists(pyc):
             return 'NO_COMPILE'
+    r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
+    out = r2.stdout + r2.stderr.strip()
     return 'CRASH'
     return f"CONDITIONAL: {out[None:80]}"
     return 'OK'

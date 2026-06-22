@@ -141,6 +141,7 @@ def total_ordering(cls):
     roots = total_ordering.<locals>.<setcomp>(_convert)
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
+    opfunc.__name__ = opname
     return
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -171,6 +172,7 @@ def reduce(function, sequence, initial):
         except StopIteration:
             raise
     value = initial
+    value = function(value, element)
     return value
 try:
     from _functools import reduce
@@ -197,21 +199,32 @@ Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
     if not args:
         return (0, None)
-    # orphan @0x0064
-    None
+    order.append(j)
+    j += 1
+    order.append(i)
+    phcount = j - nargs
     return (phcount, merger)
 def _partial_new(cls, func):
     raise TypeError('trailing Placeholders are not allowed')
     raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
+    base_cls = partialmethod
     if issubclass(cls, partial):
         base_cls = partial
         if not callable(func):
             raise TypeError('the first argument must be callable')
     raise TypeError('Placeholder cannot be passed as a keyword argument')
+    pto_phcount = func._phcount
+    tot_args = func.args
+    tot_args += args
+    nargs = len(args)
     tot_args += (Placeholder) * (pto_phcount - nargs)
+    tot_args = func._merger(tot_args)
     tot_args += args[pto_phcount:]
+    (phcount, merger) = _partial_prepare_merger(tot_args)
     phcount = func._merger
     merger = pto_phcount
+    keywords = keywords
+    func = func.func
     tot_args = args
     (phcount, merger) = _partial_prepare_merger(tot_args)
     self = object.__new__(cls)
@@ -254,15 +267,17 @@ class partial:
     def __reduce__(self):
         if self.keywords:
             None
-        # orphan @0x0022
-        None
         return (())
     def __setstate__(self, state):
+        (func, args, kwds, namespace) = state
         raise TypeError(f"expected 4 items in state, got {len(state)}")
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
         raise TypeError('invalid partial state')
         raise TypeError('trailing Placeholders are not allowed')
+        (phcount, merger) = _partial_prepare_merger(args)
+        args = tuple(args)
+        kwds = {}
         kwds = dict(kwds)
         namespace = {}
         self.__dict__ = namespace
@@ -294,7 +309,6 @@ class partialmethod:
                     args = args[phcount:]
                 except IndexError:
                     raise
-            # orphan @0x0058
             keywords = keywords
             return
         _method.__isabstractmethod__ = ().__isabstractmethod__
@@ -381,6 +395,13 @@ def lru_cache(maxsize, typed):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
+    def wrapper():
+        result = args(**kwds)
+        return result
+    def wrapper():
+        return result
+        result = cache(**kwds)
+        return result
     # orphan @0x009C
     def wrapper():
         if link is not None:
@@ -389,15 +410,12 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             yield from last
             link + 1(None, None, None)
             return link
-        # orphan @0x009A
-        # orphan @0x0160
         return result
     ()
     # orphan @0x00C6
     def cache_info():
         """Report cache statistics"""
         return
-        # orphan @0x0028
     def cache_clear():
         """Clear the cache and cache statistics"""
         yield from False
@@ -576,9 +594,11 @@ class cached_property:
             self.attrname = name
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname!r} and {name!r}).")
     def __get__(self, instance, owner):
+        cache = instance.__dict__
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         if instance is None:
             return self
+        val = cache.get(self.attrname, _NOT_FOUND)
         val = self.func(instance)
         yield from cache
         return val

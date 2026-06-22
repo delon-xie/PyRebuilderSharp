@@ -41,5 +41,4 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
         return None
 code.co_consts
 code.co_consts
-# orphan @0x04A4
-# [SUMMARY] 18 blocks · 18 processed · 1 orphan · 313 instr
+# [SUMMARY] 18 blocks · 19 processed · 1 orphan · 313 instr

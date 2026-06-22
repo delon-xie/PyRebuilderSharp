@@ -24,5 +24,8 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
         target = int.from_bytes(et[i + 4:i + 6], 'little')
         dl = int.from_bytes(et[i + 6:i + 8], 'little')
         print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
-# orphan @0x01D8
-# [SUMMARY] 15 blocks · 13 processed · 8 orphan · 286 instr
+print(f"
+--- Nested: {const.co_name} ---")
+print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
+print(f"  bytes: {const.co_exceptiontable.hex()}")
+# [SUMMARY] 15 blocks · 14 processed · 8 orphan · 286 instr

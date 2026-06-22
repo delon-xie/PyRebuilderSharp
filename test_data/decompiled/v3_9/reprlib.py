@@ -11,7 +11,6 @@ def recursive_repr(fillvalue):
         def wrapper(self):
             key = (id(self), get_ident())
             return
-            # orphan @0x003C
             return result
         wrapper.__module__ = (set(), user_function)(getattr, '__module__')
         return wrapper
@@ -35,29 +34,33 @@ class Repr:
     def repr(self, x):
         return self.repr1(x, self.maxlevel)
     def repr1(self, x, level):
+        method = getattr(self, 'repr_' + typename, None)
         cls = type(x)
         typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
         return method(x, level)
+        module = getattr(cls, '__module__', None)
         return method(x, level)
         return self.repr_instance(x, level)
     def _join(self, pieces, level):
         raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
+        indent = self.indent
         return ''
         if self.indent is None:
             return ', '.join(pieces)
         indent *= ' '
+        sep = """,
+""" + (self.maxlevel - level + 1) * indent
         error = None
-        # orphan @0x00C0
-        None
         return
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
         pieces.append(self.fillvalue)
+        s = self._join(pieces, level)
         right = trail + right
         return '%s%s%s' % (left, s, right)
     def repr_tuple(self, x, level):
@@ -86,6 +89,9 @@ class Repr:
         n = len(x)
         if n == 0:
             return '{}'
+        keyrepr = repr1(key, newlevel)
+        valrepr = repr1(x[key], newlevel)
+        pieces.append('%s: %s' % (keyrepr, valrepr))
         pieces.append(self.fillvalue)
         s = self._join(pieces, level)
         return '{%s}' % (s)

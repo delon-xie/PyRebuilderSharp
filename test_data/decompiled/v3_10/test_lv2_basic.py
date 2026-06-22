@@ -19,4 +19,6 @@ else:
         a = 1
     except:
         a = 0
+j = i * 2
+i += 1
 # [SUMMARY] 12 blocks · 13 processed · 1 orphan · 63 instr

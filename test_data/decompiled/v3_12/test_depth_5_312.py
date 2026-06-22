@@ -31,6 +31,10 @@ def depth_5_for():
                     for e in range(2):
                         total += 1
 def depth_5_while():
+    b -= 1
+    c = 2
+    a -= 1
+    b = 2
     total = 0
     a = 2
     while a > 0:
@@ -58,6 +62,12 @@ def depth_5_while():
                             pass
                         elif a > 0:
                             pass
+    c -= 1
+    d = 2
+    d -= 1
+    e = 2
+    e -= 1
+    total += 1
 def depth_5_try():
     try:
         result = 42

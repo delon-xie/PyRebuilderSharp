@@ -15,8 +15,7 @@ except Exception:
     pass
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
-# orphan @0x0142
-'(missing)'
-# orphan @0x015C
-'(missing)'
-# [SUMMARY] 24 blocks · 21 processed · 12 orphan · 209 instr
+print(f"Line {i}:")
+print(f"  expected: {e}")
+print(f"  actual:   {a}")
+# [SUMMARY] 24 blocks · 23 processed · 12 orphan · 209 instr

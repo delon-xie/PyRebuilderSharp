@@ -330,8 +330,6 @@ Single underscore (sunder) names are reserved.
         for (value, name) in more_members.items():
             pass
         break
-        # orphan @0x0096
-        # orphan @0x00A8
 _EnumDict = EnumDict
 class EnumType(type):
     """
@@ -846,7 +844,6 @@ attributes -- see the documentation for details.
         return
         raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
         raise TypeError('%r has no members defined' % cls)
-        # orphan @0x01E0
     def _add_alias_(self, name):
         pass
     def _add_value_alias_(self, value):
@@ -1520,31 +1517,29 @@ If differences are found, a :exc:`TypeError` is raised.
         raise TypeError("""enum mismatch:
    %s""" % """
    """.join(failed))
-    # orphan @0x0544
+    failed_member = []
+    failed.append('missing member from simple enum: %r' % name)
+    failed.append('extra member in simple enum: %r' % name)
     # orphan @0x0554
     failed_member.append(f"missing key {key} not in the simple enum member {name}")
     # orphan @0x0596
     failed_member.append(f"extra key {key} in simple enum member {name}")
-    # orphan @0x05E8
+    simple_value = simple_member_dict[key]
     # orphan @0x05EC
     failed_member.append(f"{key}:
          {f"checked member -> {checked_value}"}
          {f"simple member  -> {simple_value}"}")
-    # orphan @0x0638
-    # orphan @0x064C
     # orphan @0x0650
     failed.append(f"{name} member mismatch:
       {"""
       """.join(failed_member)}")
-    # orphan @0x06CA
+    checked_method = getattr(checked_enum, method, None)
+    simple_method = getattr(simple_enum, method, None)
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
     # orphan @0x0778
     method(f":  {f"checked -> {checked_method}"}30 {f"simple -> {simple_method}"}")
     failed.append
-    # orphan @0x07C6
-    # orphan @0x07CA
-    # orphan @0x07CE
 def _old_convert_(etype, name, module, filter, source = None):
     """
 Create a new Enum subclass that replaces a collection of global constants

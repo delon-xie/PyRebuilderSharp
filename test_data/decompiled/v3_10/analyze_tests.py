@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+next_line = lines[j]
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
     raise
@@ -105,6 +106,7 @@ with open('/tmp/test_full.txt', 'r') as f:
                 pass
             while '***' in line:
                 pass
+print('----------------------------------------------------------------------')
 # orphan @0x029C
 0
 '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")

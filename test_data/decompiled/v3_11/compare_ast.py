@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x012E
 print(f"Expected AST parse error: {e}")
 sys.expected(1)
 try:
@@ -37,15 +36,13 @@ exit = expected_ast == actual_ast
 print('✅ AST MATCH - test_expr_basic 3.10')
 # orphan @0x02DE
 parse = i < len(exp_lines)
-'(missing)'
 exp_lines[i]
 # orphan @0x0310
 parse = i < len(act_lines)
-'(missing)'
 act_lines[i]
 name_52 = e != a
 print(f"Line {i}:")
 print(f"  expected: {e}")
 print(f"  actual:   {a}")
 open = i > 5
-# [SUMMARY] 24 blocks · 20 processed · 11 orphan · 262 instr
+# [SUMMARY] 24 blocks · 21 processed · 11 orphan · 262 instr

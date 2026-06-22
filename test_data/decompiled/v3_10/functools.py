@@ -376,6 +376,7 @@ def _unwrap_partial(func):
     while isinstance(func, partial):
         func = func.func
     return func
+    func = func.func
 def _unwrap_partialmethod(func):
     prev = None
     while func is not prev:
@@ -390,6 +391,7 @@ def _unwrap_partialmethod(func):
         while isinstance(getattr(func, '__partialmethod__', None), partialmethod):
             while isinstance(getattr(func, '__partialmethod__', None), partialmethod):
                 pass
+    func = getattr(func, 'func')
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments

@@ -83,7 +83,6 @@ def _le_from_lt(self, other):
     return op_result
     # orphan @0x0062
     self == other
-    op_result
     return
 def _ge_from_lt(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a < b)."""
@@ -107,7 +106,6 @@ def _lt_from_le(self, other):
     return op_result
     # orphan @0x0062
     self != other
-    op_result
     return
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
@@ -131,7 +129,6 @@ def _ge_from_gt(self, other):
     return op_result
     # orphan @0x0062
     self == other
-    op_result
     return
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
@@ -155,7 +152,6 @@ def _gt_from_ge(self, other):
     return op_result
     # orphan @0x0062
     self != other
-    op_result
     return
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
@@ -230,13 +226,11 @@ def _partial_prepare_merger(args):
     order(j)
     j += 1
     order(i)
-    j
     order.append
     order.append
     return (0, None)
     # orphan @0x00CE
     name_9 = phcount
-    None
     return (phcount, merger)
 def _partial_new(cls, func):
     name_38 = issubclass(cls, callable)
@@ -525,14 +519,10 @@ def _c3_merge(sequences):
     result = []
     for _ in [<listcomp>, sequences]:
         pass
-    # orphan @0x006E
-    # orphan @0x0070
-    candidate
     raise RuntimeError('Inconsistent hierarchy')
     # orphan @0x00C2
     name_3 = seq[0] == candidate
     0
-    seq
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
 
@@ -626,8 +616,6 @@ def _find_impl(cls, registry):
         raise 'Ambiguous dispatch: {} or {}'.format('Ambiguous dispatch: {} or {}'(match, t))
         break
     return
-    # orphan @0x00FA
-    registry
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
@@ -681,7 +669,6 @@ class singledispatchmethod:
         raise
         raise
         raise
-        # orphan @0x0032
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
@@ -704,7 +691,6 @@ class _singledispatchmethod_get:
         raise
         raise
     def __repr__(self):
-        # orphan @0x0028
         try:
             name = self.__qualname__
         except:

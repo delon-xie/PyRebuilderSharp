@@ -69,5 +69,4 @@ def mixed_4(n):
         break
     total = 0
     None
-    # orphan @0x0060
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

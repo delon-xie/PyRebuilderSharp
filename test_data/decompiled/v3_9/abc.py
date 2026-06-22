@@ -152,8 +152,11 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
     """
+    value = getattr(cls, name, None)
     if not hasattr(cls, '__abstractmethods__'):
         return cls
+    abstracts.add(name)
+    abstracts.add(name)
     cls.__abstractmethods__ = frozenset(abstracts)
     return cls
 class ABC(metaclass=ABCMeta):

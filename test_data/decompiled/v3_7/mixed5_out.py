@@ -10,7 +10,6 @@ def mixed_1(n):
                 if j > 5:
                     result += j
                 result += 1
-    # orphan @0x0050
     return result
 def mixed_2(n):
     total = 0

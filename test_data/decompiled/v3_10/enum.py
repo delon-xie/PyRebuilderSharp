@@ -84,6 +84,9 @@ def _iter_bits_lsb(num):
         num = num.value
     elif num < 0:
         raise ValueError('%r is not a positive integer' % original)
+    b = num & ~num + 1
+    yield b
+    num ^= b
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
 def bin(num, max_bits):
@@ -193,6 +196,7 @@ class _proto_member:
                 enum_member = enum_class._new_member_(enum_class)
             else:
                 enum_member = enum_class._new_member_(enum_class, **args)
+        enum_member = canonical_member
         raise KeyError
 class EnumDict(dict):
     """
@@ -285,6 +289,8 @@ class EnumDict(dict):
             pass
         elif isinstance(value, member):
             pass
+        value = auto_valued[0]
+        value = t(auto_valued)
     @property
     def member_names(self):
         return list(self._member_names)
@@ -452,6 +458,8 @@ class EnumType(type):
         '_new_member_'
         classdict
         __new__
+        p.value = bits & p.value
+        p.value = (bits & p.value[0]) + p.value[1:]
     def __bool__(cls):
         """
         classes/types should always be True.
@@ -828,14 +836,14 @@ class Enum(metaclass=EnumType):
             return
         raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
         raise TypeError('%r has no members defined' % cls)
-        # orphan @0x00C8
-        None
+        result = cls._missing_(value)
         exc = None
         ve_exc = None
         return
         exc = None
         ve_exc = None
         return
+        ve_exc = ValueError('%r is not a valid %s' % (value, cls.__qualname__))
         raise ve_exc
         exc = TypeError('error in %s._missing_: returned %r instead of None or a valid member' % (cls.__name__, result))
         exc.__context__ = ve_exc
@@ -1043,6 +1051,7 @@ class Flag(Enum, boundary=STRICT):
             pass
         members.append(pm)
         combined_value |= pm._value_
+        pseudo_member._name_ = None
         raise ValueError('%r: no members with value %r' % (cls, unknown))
     def __contains__(self, other):
         """
@@ -1463,12 +1472,21 @@ def _test_simple_enum(checked_enum, simple_enum):
         raise TypeError("""enum mismatch:
    %s""" % """
    """.join(failed))
+    failed_member = []
+    failed.append('missing member from simple enum: %r' % name)
+    failed.append('extra member in simple enum: %r' % name)
+    failed_member.append('missing key %r not in the simple enum member %r' % (key, name))
+    failed_member.append('extra key %r in simple enum member %r' % (key, name))
+    checked_value = checked_member_dict[key]
+    simple_value = simple_member_dict[key]
     failed_member.append("""%r:
          %s
          %s""" % (key, 'checked member -> %r' % (checked_value), 'simple member  -> %r' % (simple_value)))
     failed.append("""%r member mismatch:
       %s""" % (name, """
       """.join(failed_member)))
+    checked_method = getattr(checked_enum, method, None)
+    simple_method = getattr(simple_enum, method, None)
     checked_method = checked_method.__func__
     simple_method = simple_method.__func__
     failed.append('%r:  %-30s %s' % (method, 'checked -> %r' % (checked_method), 'simple -> %r' % (simple_method)))

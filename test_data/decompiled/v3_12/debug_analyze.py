@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+line = lines[i]
 try:
     output = f.read()
 except:
@@ -73,4 +74,5 @@ while i < len(lines):
         print(f"Total tests with versions found: {debug_count}")
 print()
 break
+next_line = lines[j]
 # [SUMMARY] 32 blocks · 32 processed · 3 orphan · 236 instr

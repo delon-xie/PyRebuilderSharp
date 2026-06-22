@@ -13,7 +13,6 @@ def mixed_1(n):
             else:
                 result += 1
     return result
-    # orphan @0x008E
 def mixed_2(n):
     total = 0
     range(n)
@@ -79,5 +78,4 @@ def mixed_4(n):
     except:
         break
     total = 0
-    # orphan @0x0078
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 15 instr

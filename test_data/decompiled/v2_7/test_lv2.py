@@ -14,4 +14,5 @@ try:
     a = 1
 except:
     a = 0
+a = 0
 # [SUMMARY] 9 blocks · 10 processed · 1 orphan · 52 instr

@@ -21,6 +21,7 @@ def mixed_2(n):
         while j < n:
             j += 1
     return total
+    total += k
 def mixed_3(n):
     total = 0
     i = 0
@@ -28,6 +29,8 @@ def mixed_3(n):
         i += 1
     return total
     k = j
+    k -= 1
+    total += 1
 def mixed_4(n):
     total = 0
     try:
@@ -45,4 +48,5 @@ def mixed_4(n):
                     continue
     except:
         total = -1
+    total = -1
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

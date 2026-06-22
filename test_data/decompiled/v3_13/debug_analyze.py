@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+line = lines[i]
 try:
     output = f.read()
 except:
@@ -74,4 +75,5 @@ while i < len(lines):
 break
 break
 raise
+next_line = lines[j]
 # [SUMMARY] 31 blocks · 32 processed · 2 orphan · 243 instr

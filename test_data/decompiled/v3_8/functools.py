@@ -34,6 +34,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
         getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     wrapper.__wrapped__ = wrapped
     return wrapper
+    setattr(wrapper, attr, value)
 def wraps(wrapped, assigned, updated):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
@@ -138,6 +139,7 @@ def total_ordering(cls):
     roots = total_ordering.<locals>.<setcomp>(_convert)
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
+    opfunc.__name__ = opname
     return
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -168,6 +170,7 @@ def reduce(function, sequence, initial):
         except StopIteration:
             pass
     value = initial
+    value = function(value, element)
     return value
 try:
     from _functools import reduce
@@ -194,21 +197,32 @@ Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
     if not args:
         return (0, None)
-    # orphan @0x0064
-    None
+    order.append(j)
+    j += 1
+    order.append(i)
+    phcount = j - nargs
     return (phcount, merger)
 def _partial_new(cls, func):
     raise TypeError('trailing Placeholders are not allowed')
     raise TypeError(f"the first argument {func!r} must be a callable or a descriptor")
+    base_cls = partialmethod
     if issubclass(cls, partial):
         base_cls = partial
         if not callable(func):
             raise TypeError('the first argument must be callable')
     raise TypeError('Placeholder cannot be passed as a keyword argument')
+    pto_phcount = func._phcount
+    tot_args = func.args
+    tot_args += args
+    nargs = len(args)
     tot_args += (Placeholder) * (pto_phcount - nargs)
+    tot_args = func._merger(tot_args)
     tot_args += args[pto_phcount:]
+    (phcount, merger) = _partial_prepare_merger(tot_args)
     phcount = func._merger
     merger = pto_phcount
+    keywords = keywords
+    func = func.func
     tot_args = args
     (phcount, merger) = _partial_prepare_merger(tot_args)
     self = object.__new__(cls)
@@ -251,15 +265,17 @@ class partial:
     def __reduce__(self):
         if self.keywords:
             None
-        # orphan @0x0022
-        None
         return (())
     def __setstate__(self, state):
+        (func, args, kwds, namespace) = state
         raise TypeError(f"expected 4 items in state, got {len(state)}")
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
         raise TypeError('invalid partial state')
         raise TypeError('trailing Placeholders are not allowed')
+        (phcount, merger) = _partial_prepare_merger(args)
+        args = tuple(args)
+        kwds = {}
         kwds = dict(kwds)
         namespace = {}
         self.__dict__ = namespace
@@ -291,7 +307,6 @@ class partialmethod:
                     args = args[phcount:]
                 except IndexError:
                     pass
-            # orphan @0x005A
             keywords = keywords
             return pto_args(**keywords)
         _method.__isabstractmethod__ = ().__isabstractmethod__
@@ -379,6 +394,13 @@ def lru_cache(maxsize, typed):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
+    def wrapper():
+        result = args(**kwds)
+        return result
+    def wrapper():
+        return result
+        result = cache(**kwds)
+        return result
     # orphan @0x009C
     def wrapper():
         if link is not None:
@@ -563,6 +585,8 @@ class _singledispatchmethod_get:
             pass
         # orphan @0x0038
         0
+        self.__module__ = func.__module__
+        self.__doc__ = func.__doc__
     def __repr__(self):
         try:
             name = self.__qualname__
@@ -572,10 +596,13 @@ class _singledispatchmethod_get:
             return f"<bound single dispatch method {name} of {self._obj!r}>"
         return f"<single dispatch method {name}>"
     def __call__(self):
+        method = self._dispatch(args[self._dispatch_arg_index].__class__)
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
             raise TypeError(f"{funcname} requires at least 1 positional argument")
+        skip_bound_arg = False
         skip_bound_arg = self._dispatch_arg_index == 1
+        method = method.__get__(self._obj, self._cls)
         skip_bound_arg = self._dispatch_arg_index == 1
         return method(**kwargs)
         return method(**kwargs)
@@ -603,9 +630,13 @@ class cached_property:
     def __get__(self, instance, owner):
         msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
         raise TypeError(msg) from None
+        cache = instance.__dict__
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         if instance is None:
             return self
+        val = cache.get(self.attrname, _NOT_FOUND)
+        val = self.func(instance)
+        yield from cache
         msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
         raise TypeError(msg) from None
         return val

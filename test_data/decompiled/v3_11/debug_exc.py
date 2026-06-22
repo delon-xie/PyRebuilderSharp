@@ -44,6 +44,4 @@ for const in code:
     None
     print
 return
-# orphan @0x04E0
-code
-# [SUMMARY] 8 blocks · 8 processed · 1 orphan · 341 instr
+# [SUMMARY] 8 blocks · 9 processed · 1 orphan · 341 instr

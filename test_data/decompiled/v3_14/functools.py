@@ -950,7 +950,6 @@ class cached_property:
         self.__module__ = func.__module__
     def __set_name__(self, owner, name):
         self.attrname = name
-        # orphan @0x004E
     def __get__(self, instance, owner = None):
         try:
             cache = instance.__dict__

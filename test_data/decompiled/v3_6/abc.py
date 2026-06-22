@@ -128,7 +128,6 @@ class ABCMeta(type):
             raise TypeError('Can only register classes')
         else:
             return subclass
-        # orphan @0x002A
         # orphan @0x0032
         cls._abc_registry.add(subclass)
     def _dump_registry(cls, file):
@@ -172,7 +171,6 @@ class ABCMeta(type):
         return True
         # orphan @0x00A6
         issubclass(subclass, rcls)
-        # orphan @0x00C4
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using
     inheritance.

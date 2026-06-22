@@ -46,6 +46,7 @@ def depth_5_while():
                         e -= 1
                         total += 1
 def depth_5_try():
+    result = -1
     result = 0
     try:
         try:
@@ -63,4 +64,8 @@ def depth_5_try():
             pass
     except:
         result = -5
+    result = -2
+    result = -3
+    result = -4
+    result = -5
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr
