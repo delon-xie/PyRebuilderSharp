@@ -1486,6 +1486,20 @@ public class AstBuilder
         var handlerEnd = handlerET != null
             ? handlerET.EndOffset
             : matchingEntry.EndOffset;
+
+        // 检查已被其他路径 visited 的 handler 后继是否含有未消费的语句
+        foreach (var vsucc in handlerBlock.Successors)
+        {
+            if (vsucc.Instructions.Count == 0) continue;
+            if (!visited.Contains(vsucc)) continue;
+            var vsr = _blockResults.GetValueOrDefault(vsucc.Id);
+            if (vsr?.Statements != null && vsr.Statements.Count > 0
+                && vsr.Statements.Any(s => s is not Raise and not CommentBlock))
+            {
+                handlerBody.AddRange(vsr.Statements.Where(s => s is not Raise and not CommentBlock));
+            }
+        }
+
         foreach (var succ in handlerBlock.Successors.OrderBy(s => s.StartOffset))
         {
             if (succ.Instructions.Count == 0) continue;
