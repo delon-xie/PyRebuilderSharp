@@ -26,6 +26,7 @@ class Program
         bool noHeader = false;
         bool noSummary = false;
         bool noOrphans = false;
+        bool useDebug = false;
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -53,6 +54,7 @@ class Program
             if (args[i] is "--no-header") { noHeader = true; continue; }
             if (args[i] is "--no-summary") { noSummary = true; continue; }
             if (args[i] is "--no-orphans") { noOrphans = true; continue; }
+            if (args[i] is "--debug") { useDebug = true; continue; }
             // Treat as input file
             if (File.Exists(args[i]))
                 inputFiles.Add(args[i]);
@@ -81,8 +83,8 @@ class Program
         var opts = new DecompileOptions
         {
             ShowHeader = !noHeader,
-            ShowSummary = !noSummary,
-            ShowOrphanBlocks = !noOrphans,
+            ShowSummary = useDebug,
+            ShowOrphanBlocks = useDebug,
             VerboseErrors = inputFiles.Count == 1  // 单文件模式启动诊断输出
         };
         if (inputFiles.Count > 1 || batchMode)
@@ -103,6 +105,7 @@ class Program
         Console.Error.WriteLine("  --no-header          Suppress '# Decompiled from:' header");
         Console.Error.WriteLine("  --no-summary         Suppress '# [SUMMARY]' footer");
         Console.Error.WriteLine("  --no-orphans         Suppress orphan block output");
+        Console.Error.WriteLine("  --debug              Enable debug output ([SUMMARY], orphan blocks)");
     }
 
     static void RunSingle(string inputFile, string? outputFile, DecompileOptions opts)
