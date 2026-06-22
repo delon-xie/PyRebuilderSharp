@@ -223,6 +223,15 @@ public class PythonCodeGenerator : ICodeGenerator
 
         // 预处理：移除模块级 return None（CPython 自动添加的隐式模块结束返回）
         StripModuleReturnNone(module.Body);
+        
+        // 模块级首句 docstring：纯字符串常量 → """...""" 格式
+        if (module.Body.Count > 0 && module.Body[0] is ExprStmt { Value: Constant { Value: string } })
+        {
+            var docStr = (string)((Constant)((ExprStmt)module.Body[0]).Value).Value!;
+            WriteIndent();
+            _output.AppendLine($"\"\"\"{docStr}\"\"\"");
+            module.Body.RemoveAt(0);
+        }
 
         Stmt? prevStmt = null;
         foreach (var stmt in module.Body)
