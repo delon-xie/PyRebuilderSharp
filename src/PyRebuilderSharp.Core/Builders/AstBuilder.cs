@@ -275,7 +275,32 @@ public class AstBuilder
 
                         if (isTerminalJump)
                         {
-                            _processedBlockIds.Add(orphan.Id);
+                            // jump_cond blocks often have useful prefix instructions (LOAD/STORE)
+                            // before the terminal jump. Extract and recover them.
+                            bool recoveredPrefix = false;
+                            if (classification == "jump_cond" && orphan.Instructions.Count > 1)
+                            {
+                                var om = new StackMachine(_codeObject);
+                                var prefixStmts = new List<Stmt>();
+                                // Process all instructions except the last (terminal jump)
+                                for (int ji = 0; ji < orphan.Instructions.Count - 1; ji++)
+                                {
+                                    var s = om.Execute(orphan.Instructions[ji]);
+                                    if (s != null) { prefixStmts.Add(s); recoveredPrefix = true; }
+                                }
+                                while (om.HasResults)
+                                    prefixStmts.Add(new ExprStmt(om.PopResult()));
+                                if (recoveredPrefix)
+                                {
+                                    _processedBlockIds.Add(orphan.Id);
+                                    var lo = _allBlocks.Count > 0 ? _allBlocks[^1].EndOffset : 0;
+                                    bool early = lo > 0 && orphan.StartOffset < lo / 3;
+                                    if (early) stmts.InsertRange(0, prefixStmts);
+                                    else stmts.AddRange(prefixStmts);
+                                }
+                            }
+                            if (!recoveredPrefix)
+                                _processedBlockIds.Add(orphan.Id);
                             continue;
                         }
 
@@ -318,7 +343,19 @@ public class AstBuilder
                             foreach (var s in blockResult.Statements)
                             {
                                 if (s is Raise) continue;
+                                // 过滤孤立 None 表达式（异常处理残留）
+                                if (s is ExprStmt { Value: Constant { Value: null } }) continue;
+                                // 过滤孤立变量引用（如 solo name / 'string' / classdict = 异常处理残留）
+                                if (s is ExprStmt { Value: Name }) continue;
+                                if (s is ExprStmt { Value: Constant { Value: string } }) continue;
                                 orphanStmts.Add(s);
+                            }
+
+                            // 跳过纯注释的孤儿块（无有效语句，例如已被控制流消费的 jump_cond 块）
+                            if (orphanStmts.Count <= 1)
+                            {
+                                _processedBlockIds.Add(orphan.Id);
+                                continue;
                             }
 
                             // 检查 orphan 的偏移是否较小（早期初始化块）
