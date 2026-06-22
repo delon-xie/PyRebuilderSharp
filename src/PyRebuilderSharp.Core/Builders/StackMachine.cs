@@ -23,6 +23,7 @@ public class StackMachine
     private int _pendingCopyDepth = -1; // 用于 walrus := 检测
     private Expr? _pendingUnpackContainer; // 待处理的元组解包容器
     private List<Expr>? _pendingUnpackTargets; // 待处理的元组解包目标列表
+    private object? _kwNames; // 3.11+ KW_NAMES 存储的关键词名元组，由 CALL 消费
 
     public StackMachine(CodeObject code)
     {
@@ -910,10 +911,68 @@ public class StackMachine
                 // For 3.12: CALL arg = number of positional args
                 // For 3.11: CALL_311 arg = same, PRECALL_311 handled separately
                 var args = new List<Expr>();
-                for (int i = 0; i < argCount && _exprStack.Count > 0; i++)
+                var keywords = new List<Keyword>();
+
+                // 3.13+ CALL_KW: 关键词名元组在栈顶
+                if (instr.Opcode == Opcode.CALL_KW_313)
                 {
-                    var a = SafePop();
-                    if (a != null) args.Insert(0, a);
+                    var kwNamesExpr = SafePop();
+                    if (kwNamesExpr is Constant { Value: System.Collections.IList kwList })
+                    {
+                        int kwCount = kwList.Count;
+                        int posCount = argCount - kwCount;
+                        // Pop keyword values (TOS, after kw_names)
+                        for (int i = kwCount - 1; i >= 0; i--)
+                        {
+                            var kwVal = SafePop();
+                            if (kwVal != null)
+                                keywords.Add(new Keyword(kwList[i]?.ToString() ?? "", kwVal));
+                        }
+                        // Pop positional args
+                        for (int i = 0; i < posCount && _exprStack.Count > 0; i++)
+                        {
+                            var a = SafePop();
+                            if (a != null) args.Insert(0, a);
+                        }
+                    }
+                    else
+                    {
+                        // Fallback: all positional
+                        for (int i = 0; i < argCount && _exprStack.Count > 0; i++)
+                        {
+                            var a = SafePop();
+                            if (a != null) args.Insert(0, a);
+                        }
+                    }
+                }
+                // 3.11-3.12 CALL with KW_NAMES
+                else if (_kwNames is System.Collections.IList kwList && kwList.Count > 0)
+                {
+                    int kwCount = kwList.Count;
+                    int posCount = argCount - kwCount;
+                    // Pop keyword values (TOS)
+                    for (int i = kwCount - 1; i >= 0; i--)
+                    {
+                        var kwVal = SafePop();
+                        if (kwVal != null)
+                            keywords.Add(new Keyword(kwList[i]?.ToString() ?? "", kwVal));
+                    }
+                    // Pop positional args
+                    for (int i = 0; i < posCount && _exprStack.Count > 0; i++)
+                    {
+                        var a = SafePop();
+                        if (a != null) args.Insert(0, a);
+                    }
+                    _kwNames = null; // consumed
+                }
+                else
+                {
+                    // Regular: all args are positional
+                    for (int i = 0; i < argCount && _exprStack.Count > 0; i++)
+                    {
+                        var a = SafePop();
+                        if (a != null) args.Insert(0, a);
+                    }
                 }
                 
                 var func = SafePop();
@@ -942,7 +1001,7 @@ public class StackMachine
                 
                 // Create a dummy Call to capture the null sentinel issue
                 // If the null sentinel exists, wrap as call; otherwise just treat as func(args)
-                var call = new Call(func, args, new List<Keyword>());
+                var call = new Call(func, args, keywords);
                 _exprStack.Push(call);
                 return null;
             }
@@ -1017,8 +1076,9 @@ public class StackMachine
             case Opcode.KW_NAMES:
             {
                 // KW_NAMES stores keyword argument name tuple index.
-                // The actual keyword values are on the stack after positional args.
-                // For now: skip — keywords are handled via simplifications
+                // CALL uses this to separate positional args from keyword args.
+                if (instr.Argument.HasValue && _code.Constants.TryGetValue(instr.Argument.Value, out var kwNames))
+                    _kwNames = kwNames;
                 return null;
             }
 
