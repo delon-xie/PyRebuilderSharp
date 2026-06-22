@@ -224,6 +224,7 @@ public class PythonCodeGenerator : ICodeGenerator
         // 预处理：移除模块级 return None（CPython 自动添加的隐式模块结束返回）
         StripModuleReturnNone(module.Body);
 
+        Stmt? prevStmt = null;
         foreach (var stmt in module.Body)
         {
             // 检测模块级 __doc__ = '...' → 变成 docstring
@@ -235,9 +236,22 @@ public class PythonCodeGenerator : ICodeGenerator
                 _output.AppendLine($"\"\"\"{docStr}\"\"\"");
                 continue;
             }
+            EmitBlankLineIfNeeded(stmt, prevStmt);
             Visit(stmt);
-            // Visit already appends newline, no need for extra blank line
+            prevStmt = stmt;
         }
+    }
+
+    /// <summary>
+    /// 在模块/类定义之间插入空行（模仿 Python 源文件的排版习惯）。
+    /// </summary>
+    private void EmitBlankLineIfNeeded(Stmt current, Stmt? previous)
+    {
+        if (previous == null) return;
+        bool curIsDef = current is FunctionDef or AsyncFunctionDef or ClassDef;
+        bool prevIsDef = previous is FunctionDef or AsyncFunctionDef or ClassDef;
+        if (curIsDef && prevIsDef)
+            _output.AppendLine();
     }
 
     /// <summary>递归移除模块级 return None。</summary>
@@ -371,8 +385,13 @@ public class PythonCodeGenerator : ICodeGenerator
         _indentLevel++;
         // 类体 docstring: 首个语句若为字符串常量，用 """...""" 格式
         EmitDocstringPrefix(cls.Body);
+        Stmt? prevClsStmt = null;
         foreach (var stmt in cls.Body)
+        {
+            EmitBlankLineIfNeeded(stmt, prevClsStmt);
             Visit(stmt);
+            prevClsStmt = stmt;
+        }
         if (cls.Body.Count == 0)
             EmitEmptyBodyPass();
         _indentLevel--;
