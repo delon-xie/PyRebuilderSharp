@@ -283,29 +283,24 @@ public class AstBuilder
                             // flat_expr_store/flat_expr_loads: reprocess through StackMachine to recover statements
                             if (classification is "flat_expr_store" or "flat_expr_loads" or "other")
                             {
-                                var orphanMachine = new StackMachine(_codeObject);
-                                var orphanStmts = new List<Stmt>();
-                                bool allNull = true;
+                                var om = new StackMachine(_codeObject);
+                                var recovered = new List<Stmt>();
+                                bool hasRecovered = false;
                                 foreach (var ins in orphan.Instructions)
                                 {
-                                    var s = orphanMachine.Execute(ins);
-                                    if (s != null) { orphanStmts.Add(s); allNull = false; }
+                                    var s = om.Execute(ins);
+                                    if (s != null) { recovered.Add(s); hasRecovered = true; }
                                 }
-                                // Also get any remaining expression stack results
-                                while (orphanMachine.HasResults)
-                                    orphanStmts.Add(new ExprStmt(orphanMachine.PopResult()));
+                                while (om.HasResults)
+                                    recovered.Add(new ExprStmt(om.PopResult()));
 
-                                if (!allNull)
+                                if (hasRecovered)
                                 {
                                     _processedBlockIds.Add(orphan.Id);
-                                    var lastOffset = _allBlocks.Count > 0
-                                        ? _allBlocks[^1].EndOffset : 0;
-                                    bool isEarlyOrphan = lastOffset > 0
-                                        && orphan.StartOffset < lastOffset / 3;
-                                    if (isEarlyOrphan)
-                                        stmts.InsertRange(0, orphanStmts);
-                                    else
-                                        stmts.AddRange(orphanStmts);
+                                    var lo = _allBlocks.Count > 0 ? _allBlocks[^1].EndOffset : 0;
+                                    bool early = lo > 0 && orphan.StartOffset < lo / 3;
+                                    if (early) stmts.InsertRange(0, recovered);
+                                    else stmts.AddRange(recovered);
                                     continue;
                                 }
                             }
