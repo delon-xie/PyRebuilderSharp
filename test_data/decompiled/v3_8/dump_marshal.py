@@ -1,0 +1,42 @@
+# Decompiled from: <module>
+
+length = data[pos]
+pos += 1
+bcode = data[pos:pos + length]
+pos += length
+print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
+with open(sys.argv[1], 'rb') as f:
+    data = f.read()
+('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+    val = struct.unpack('<i', data[pos:pos + 4])[0]
+    print(f"  {name}={val}")
+    pos += 4
+raw = data[pos]
+'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
+pos += 1
+t = raw & 127
+if raw & 128:
+    ref = struct.unpack('<I', data[pos:pos + 4])[0]
+    pos += 4
+ref = struct.unpack('<I', data[pos:pos + 4])[0]
+pos += 4
+print(f"  FLAG_REF ref_index={ref}")
+# orphan @0x01DA
+struct.unpack('<I', data[pos:pos + 4])[0]
+# orphan @0x0206
+4
+ref = struct.unpack('<I', data[pos:pos + 4])[0]
+pos += 4
+flags = f" (ref={ref})"
+# orphan @0x02A4
+0
+'  ['(f"{i}] type=0x{raw2}{'02X'} (stripped={t2}){flags} -> skip")
+tmp = io.BytesIO(data)
+tmp.seek(pos - 1)
+val = marshal.load(tmp)
+pos = tmp.tell()
+print(f"    -> {repr(val)}")
+print(f"pos {pos}: after all constants")
+print(f"total file: {len(data)}")
+# [SUMMARY] 32 blocks · 29 processed · 25 orphan · 524 instr

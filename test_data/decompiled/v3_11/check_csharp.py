@@ -31,15 +31,12 @@ print
 name_24 = type2 == 90
 length = data[off2]
 print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
-# orphan @0x025C
 name_24 = type2 == 122
 length = data[off2]
 print(f"  TYPE_SHORT_ASCII len={length}")
-# orphan @0x0298
 name_96 = type2 == 115
 print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
 length = struct.data('<i', data[off2:off2 + 4])[0]
 '  Raw bytes: len='(f"{length} data={data[off2 + 4:off2 + 14].hex}{data[off2 + 4:off2 + 14]()}")
-# orphan @0x0364
 '  Unknown type, bytes at '(f"{off2}: {data[off2:off2 + 16].hex}{data[off2:off2 + 16]()}")
-# [SUMMARY] 15 blocks · 13 processed · 5 orphan · 287 instr
+# [SUMMARY] 15 blocks · 16 processed · 5 orphan · 287 instr

@@ -6,7 +6,6 @@ def add(a, b):
     result = a + b
     return result
 def factorial(n):
-    # orphan @0x0012
     return n * factorial(n - 1)
     name_2 = n <= 1
     return 1

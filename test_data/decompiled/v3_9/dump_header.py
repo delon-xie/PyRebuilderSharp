@@ -21,7 +21,6 @@ if type_byte & 128:
     ref_idx = struct.unpack('<I', data[pos:pos + 4])[0]
     print(f"  ref_index={ref_idx}")
     pos += 4
-# orphan @0x0142
 argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 nlocals = struct.unpack('<I', data[pos:pos + 4])[0]
@@ -43,4 +42,4 @@ print(f"Flags={flags2}, Timestamp={ts2}, Size={sz2}")
 pos2 = 16
 'Marshal at offset '(f"{pos2}: byte={data[pos2]}{'#x'}")
 print(f"Bytes from 16: {data[16:40].hex()}")
-# [SUMMARY] 3 blocks · 2 processed · 1 orphan · 360 instr
+# [SUMMARY] 3 blocks · 3 processed · 1 orphan · 360 instr

@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x017E
 print('Failed to parse expected source:', e)
 sys.open(1)
 try:
@@ -104,7 +103,6 @@ Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 e = None
 e = None
 raise
-# orphan @0x04B2
 print(f"❌ {ver!s}: AST parse failed - {e!s}")
 print('  Decompiled: %s' % actual_src[None:200])
-# [SUMMARY] 34 blocks · 33 processed · 6 orphan · 393 instr
+# [SUMMARY] 34 blocks · 35 processed · 6 orphan · 393 instr
