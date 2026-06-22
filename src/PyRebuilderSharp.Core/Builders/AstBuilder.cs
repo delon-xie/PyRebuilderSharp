@@ -4292,6 +4292,34 @@ public class AstBuilder
 
         foreach (var stmt in stmts)
         {
+            // 处理 pre-3.11: Assign + FunctionRef（来自 MAKE_FUNCTION → STORE_NAME）
+            if (stmt is Assign assignFn && assignFn.Targets.Count == 1
+                && assignFn.Targets[0] is Name targetNameFn
+                && assignFn.Value is FunctionRef fnRef
+                && fnRef.Code != null)
+            {
+                childIdx++;
+                var funcDef = BuildFunctionDef(fnRef.Name ?? targetNameFn.Id, fnRef);
+                if (funcDef != null)
+                {
+                    if (funcDef.Args.Count == 0 && HasNestedFunctions(funcDef.Body))
+                    {
+                        var className = targetNameFn.Id;
+                        if (!string.IsNullOrEmpty(fnRef.Name) && fnRef.Name != "<module>" && !fnRef.Name.StartsWith("name_"))
+                            className = fnRef.Name;
+                        if (!localSeen.Add(className))
+                        { result.Add(stmt); continue; }
+                        result.Add(new ClassDef(className, new List<Expr>(), funcDef.Body));
+                    }
+                    else
+                    {
+                        result.Add(funcDef);
+                    }
+                }
+                else { result.Add(stmt); }
+                continue;
+            }
+
             if (stmt is Assign assign && assign.Targets.Count == 1
                 && assign.Targets[0] is Name targetName
                 && assign.Value is Constant constVal
