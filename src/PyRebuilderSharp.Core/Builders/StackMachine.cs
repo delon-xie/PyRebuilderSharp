@@ -1227,6 +1227,10 @@ public class StackMachine
             }
 
             case Opcode.POP_EXCEPT:
+                // 异常处理结束后，for 循环上下文已结束
+                // 防止 handler 中的 POP_TOP 被误判为 loop break
+                _isForLoop = false;
+                return null;
             case Opcode.SETUP_FINALLY:
             case Opcode.BEFORE_WITH:
             case Opcode.WITH_EXCEPT_START:
