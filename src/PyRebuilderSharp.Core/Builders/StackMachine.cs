@@ -1160,9 +1160,9 @@ public class StackMachine
             case Opcode.CHECK_EXC_MATCH:
             case Opcode.CHECK_EG_MATCH:
                 // handler 块：for 循环上下文结束，防止 POP_TOP 误判为 break
+                // Fallthrough to MATCH_MAPPING_312: pop consumed item, no visible output
                 _isForLoop = false;
-                SafePop();
-                return null;
+                goto case Opcode.MATCH_MAPPING_312;
             case Opcode.MATCH_MAPPING_312:
             case Opcode.MATCH_MAPPING_313:
                 // MATCH_MAPPING: pop subject

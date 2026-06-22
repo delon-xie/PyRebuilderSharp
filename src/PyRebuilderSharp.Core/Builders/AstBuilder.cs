@@ -816,6 +816,17 @@ public class AstBuilder
                                 stmts[^1] = new Try(firstTry.Body, firstTry.Handlers, elseBody, firstTry.Finalbody);
                                 return stmts;
                             }
+
+                            // 兜底：将 handler 后继（如 abc.py 中 handler 体块的
+                            // 导入语句和模块级类定义）作为普通语句处理。
+                            foreach (var succ in handlerBlock.Successors)
+                            {
+                                if (!visited.Contains(succ))
+                                {
+                                    visited.Add(succ);
+                                    stmts.AddRange(BuildStatements(succ, visited));
+                                }
+                            }
                         }
                     }
                 }
