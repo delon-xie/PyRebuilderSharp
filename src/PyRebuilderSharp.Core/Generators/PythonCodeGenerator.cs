@@ -259,8 +259,21 @@ public class PythonCodeGenerator : ICodeGenerator
         if (previous == null) return;
         bool curIsDef = current is FunctionDef or AsyncFunctionDef or ClassDef;
         bool prevIsDef = previous is FunctionDef or AsyncFunctionDef or ClassDef;
-        if (curIsDef && prevIsDef)
-            _output.AppendLine();
+        bool curIsImport = current is Import or ImportFrom;
+        bool prevIsImport = previous is Import or ImportFrom;
+        bool curIsIf = current is If;
+        bool prevIsIf = previous is If;
+        // 定义之间
+        if (curIsDef && prevIsDef) { _output.AppendLine(); return; }
+        // 定义与 import 之间
+        if (curIsDef && prevIsImport) { _output.AppendLine(); return; }
+        if (curIsImport && prevIsDef) { _output.AppendLine(); return; }
+        // if 与前一个定义之间
+        if (curIsIf && prevIsDef) { _output.AppendLine(); return; }
+        if (curIsDef && prevIsIf) { _output.AppendLine(); return; }
+        // if 与前一个 import 之间
+        if (curIsIf && prevIsImport) { _output.AppendLine(); return; }
+        if (curIsImport && prevIsIf) { _output.AppendLine(); return; }
     }
 
     /// <summary>递归移除模块级 return None。</summary>
