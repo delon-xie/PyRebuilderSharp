@@ -662,6 +662,49 @@ public class AstBuilder
         }
 
         // 检测 with 语句 (SETUP_WITH / BEFORE_WITH 模式)
+        // 但需先处理 before-with 的独立语句（函数定义、print 等）
+        var setupWithIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH
+            || i.Opcode == Opcode.BEFORE_WITH || i.Opcode == Opcode.BEFORE_WITH_312
+            || i.Opcode == Opcode.BEFORE_WITH_313);
+        if (setupWithIdx > 0)
+        {
+            // 先产出独立语句：从 _blockResults 获取完整语句列表，
+            // 只取 SETUP_WITH 之前的语句（函数定义、print 等）
+            var br = _blockResults.GetValueOrDefault(block.Id);
+            if (br?.Statements != null && br.Statements.Count > 0)
+            {
+                var withStmts2 = BuildWithFromBlock(block, visited);
+                if (withStmts2 != null)
+                {
+                    // _blockResults 中的语句是完整的（含 with 体），
+                    // 但 BuildWithFromBlock 消耗了前置独立语句。
+                    // 重建：用 GetBlockStmts 获取所有语句，只取 with 体
+                    var allStmts = GetBlockStmts(block);
+                    var preStatements = allStmts
+                        .Where(s => !(s is With) && !(s is CommentBlock))
+                        .ToList();
+                    stmts.AddRange(preStatements);
+                    stmts.AddRange(withStmts2);
+                    // 标记 handler 块为 visited
+                    var setupIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
+                    if (setupIdx >= 0 && block.Instructions[setupIdx].Argument.HasValue)
+                    {
+                        var handlerAbs = block.Instructions[setupIdx].Offset + 2
+                            + block.Instructions[setupIdx].Argument.Value;
+                        var handlerBlocks = new List<BasicBlock>();
+                        FindBlocksFromOffset(handlerAbs, handlerBlocks);
+                        foreach (var hb in handlerBlocks)
+                            visited.Add(hb);
+                    }
+                    foreach (var succ in block.Successors)
+                    {
+                        if (!visited.Contains(succ))
+                            stmts.AddRange(BuildStatements(succ, visited));
+                    }
+                    return stmts;
+                }
+            }
+        }
         var withStmts = BuildWithFromBlock(block, visited);
         if (withStmts != null)
         {

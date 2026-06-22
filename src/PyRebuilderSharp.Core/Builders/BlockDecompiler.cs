@@ -66,7 +66,9 @@ public class BlockDecompiler
             }
 
             // 死代码消除：移除 Continue/Break/Return 之后的语句
+            Console.Error.WriteLine($"[DB_PRE] block#{blockId} stmts={stmts.Count} types=[{string.Join(",", stmts.Select(s => s.GetType().Name).Take(10))}]");
             stmts = EliminateDeadCode(stmts);
+            Console.Error.WriteLine($"[DB_POST] block#{blockId} stmts={stmts.Count}");
 
             return BlockResult.Success(stmts);
         }
