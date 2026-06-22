@@ -767,7 +767,7 @@ public class AstBuilder
                 {
                     // Orelse 已在 BuildTryFromExceptionTable 中填充，无需额外处理
                 }
-                else
+                else if (firstTry != null)
                 {
                     // 处理 handler 块的后缀块（类定义等在 try/except 之后的代码）
                     var matchingEntry = _codeObject.ExceptionTable
@@ -779,12 +779,93 @@ public class AstBuilder
                         var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
                         if (handlerBlock != null)
                         {
+                            // 检查 handler 的出口后继是否形成 else 体
+                            List<Stmt>? elseBody = null;
                             foreach (var succ in handlerBlock.Successors)
                             {
                                 if (!visited.Contains(succ))
                                 {
                                     visited.Add(succ);
-                                    stmts.AddRange(BuildStatements(succ, visited));
+                                    var succStmts = BuildStatements(succ, visited);
+                                    if (succStmts.Count > 0)
+                                    {
+                                        if (elseBody == null)
+                                        {
+                                            // 第一个成功语句检查是否是类/函数定义(else 体标志)
+                                            if (succStmts[0] is FunctionDef or ClassDef)
+                                            {
+                                                elseBody = new List<Stmt>();
+                                                elseBody.AddRange(succStmts);
+                                            }
+                                            else
+                                            {
+                                                // 无 else 体，按原样输出
+                                                stmts.AddRange(succStmts);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            elseBody.AddRange(succStmts);
+                                        }
+                                    }
+                                }
+                            }
+                            if (elseBody != null)
+                            {
+                                stmts[^1] = new Try(firstTry.Body, firstTry.Handlers, elseBody, firstTry.Finalbody);
+                                return stmts;
+                            }
+
+                            // 方案 B: 查找 try 体末端的跳转目标与 handler 结尾之间的孤立块（else 体）。
+                            // try 体末尾的 JUMP_FORWARD 跳转目标就是 else 体的开始。
+                            var firstTry2 = try311Stmts.FirstOrDefault() as Try;
+                            if (firstTry2 != null && firstTry2.Orelse == null)
+                            {
+                                // 从 try body 的最后一个块查找 JUMP_FORWARD 目标
+                                var tryEntryBlock = FindBlockByOffset(matchingEntry.StartOffset);
+                                if (tryEntryBlock != null)
+                                {
+                                    // 收集 try 体范围内的块
+                                    var allTryBlocks = GetBlocksInRange(matchingEntry.StartOffset, matchingEntry.EndOffset)
+                                        .Where(b => b.StartOffset < matchingEntry.TargetOffset).ToList();
+                                    // 查找最后一个 try 块中的 JUMP_FORWARD
+                                    foreach (var tb in allTryBlocks.OrderByDescending(b => b.StartOffset))
+                                    {
+                                        var lastTi = tb.Instructions.LastOrDefault();
+                                        if (lastTi.Argument.HasValue && lastTi.Opcode == Opcode.JUMP_FORWARD)
+                                        {
+                                            int jmpTarget = lastTi.Offset + 2 + lastTi.Argument.Value;
+                                            // 收集 jmpTarget 到 handler.EndOffset 之间的未访问块（else 体）
+                                            // 注意：jmpTarget < handler.EndOffset 说明 else 体在 handler 之前
+                                            // jmpTarget > handler.EndOffset 说明 else 体在 handler 之后（跳跃式）
+                                            int rangeStart = Math.Min(jmpTarget, matchingEntry.TargetOffset);
+                                            int rangeEnd = Math.Max(jmpTarget, matchingEntry.EndOffset);
+                                            var elseRangeBlocks = GetBlocksInRange(rangeStart, rangeEnd)
+                                                .Where(b => !visited.Contains(b))
+                                                .OrderBy(b => b.StartOffset)
+                                                .ToList();
+                                            if (elseRangeBlocks.Count > 0)
+                                            {
+                                                List<Stmt>? elseBody2 = null;
+                                                foreach (var eb in elseRangeBlocks)
+                                                {
+                                                    visited.Add(eb);
+                                                    var es = BuildStatements(eb, visited);
+                                                    if (es.Count > 0)
+                                                    {
+                                                        elseBody2 ??= new List<Stmt>();
+                                                        elseBody2.AddRange(es);
+                                                    }
+                                                }
+                                                if (elseBody2 != null)
+                                                {
+                                                    stmts[^1] = new Try(firstTry2.Body, firstTry2.Handlers, elseBody2, firstTry2.Finalbody);
+                                                    return stmts;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
