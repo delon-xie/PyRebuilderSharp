@@ -1161,9 +1161,13 @@ public class StackMachine
             case Opcode.CHECK_EG_MATCH:
             // 3.10+ match/case: runtime pattern matching, no AST generation
             case Opcode.MATCH_MAPPING_312:
+            case Opcode.MATCH_MAPPING_313:
             case Opcode.MATCH_SEQUENCE_312:
+            case Opcode.MATCH_SEQUENCE_313:
             case Opcode.MATCH_KEYS_312:
+            case Opcode.MATCH_KEYS_313:
             case Opcode.MATCH_CLASS_312:
+            case Opcode.MATCH_CLASS_313:
                 return null;
 
             // ---- 3.5-3.10 opcodes that carry through ----

@@ -932,9 +932,13 @@ public class AstBuilder
         if (handlerBlock == null) return null;
         bool hasMatchOp = handlerBlock.Instructions.Any(i =>
             i.Opcode == Opcode.MATCH_CLASS_312 ||
+            i.Opcode == Opcode.MATCH_CLASS_313 ||
             i.Opcode == Opcode.MATCH_SEQUENCE_312 ||
+            i.Opcode == Opcode.MATCH_SEQUENCE_313 ||
             i.Opcode == Opcode.MATCH_MAPPING_312 ||
-            i.Opcode == Opcode.MATCH_KEYS_312);
+            i.Opcode == Opcode.MATCH_MAPPING_313 ||
+            i.Opcode == Opcode.MATCH_KEYS_312 ||
+            i.Opcode == Opcode.MATCH_KEYS_313);
         if (!hasMatchOp) return null;
 
         // 收集 match subject（block 中 MATCH 指令之前的表达式）
@@ -1005,8 +1009,11 @@ public class AstBuilder
         {
             var ins = hb.Instructions[i];
             if (ins.Opcode == Opcode.MATCH_CLASS_312 ||
+                ins.Opcode == Opcode.MATCH_CLASS_313 ||
                 ins.Opcode == Opcode.MATCH_SEQUENCE_312 ||
-                ins.Opcode == Opcode.MATCH_MAPPING_312)
+                ins.Opcode == Opcode.MATCH_SEQUENCE_313 ||
+                ins.Opcode == Opcode.MATCH_MAPPING_312 ||
+                ins.Opcode == Opcode.MATCH_MAPPING_313)
             {
                 if (i > 0 && hb.Instructions[i - 1].Opcode == Opcode.LOAD_NAME)
                 {
