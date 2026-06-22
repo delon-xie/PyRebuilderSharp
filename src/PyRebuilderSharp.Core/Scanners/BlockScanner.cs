@@ -145,6 +145,7 @@ public class BlockScanner : IBlockScanner
             // 3.6-3.9 wordcode: 参数已为绝对字节偏移
             Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                 or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                or Opcode.POP_JUMP_IF_NONE or Opcode.POP_JUMP_IF_NOT_NONE
                 when isWordcode => (is36To39Wordcode || codeObj?.Version == PythonVersion.Py310)
                     ? instr.Argument.Value  // 3.6-3.9: 绝对字节偏移; 3.10: 已在 ParseInstructions *2 转为绝对字节偏移
                     : instr.Offset + 2 + instr.Argument.Value,  // 3.11+: 相对字节偏移
@@ -248,6 +249,8 @@ public class BlockScanner : IBlockScanner
                 case Opcode.JUMP_IF_TRUE_OR_POP:
                 case Opcode.JUMP_IF_FALSE_OR_POP:
                 case Opcode.FOR_ITER:
+                case Opcode.POP_JUMP_IF_NONE:
+                case Opcode.POP_JUMP_IF_NOT_NONE:
                     AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr, codeObj)!.Value));
                     if (i + 1 < blocks.Count)
                         AddSuccessor(block, blocks[i + 1]);

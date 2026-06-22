@@ -1142,6 +1142,23 @@ public class AstBuilder
             if (nextCaseBlock == null || !localVisited.Add(nextCaseBlock))
                 nextCaseBlock = null;
 
+            // 跳过 POP_TOP 等清理块，直达下一个 COPY 块（下个 case 的起点）
+            // 也跳过空块（CACHE 条目残留的 leader 边界）
+            if (nextCaseBlock != null)
+            {
+                while (nextCaseBlock.Successors.Count == 1
+                    && !nextCaseBlock.Instructions.Any(i => i.Opcode == Opcode.COPY))
+                {
+                    var next = nextCaseBlock.Successors.First();
+                    if (visited.Contains(next) || localVisited.Contains(next)) break;
+                    visited.Add(next); _processedBlockIds.Add(next.Id);
+                    // 不添加 COPY 块自身到 localVisited — 让外层 while 循环处理它
+                    if (!next.Instructions.Any(i => i.Opcode == Opcode.COPY))
+                        localVisited.Add(next);
+                    nextCaseBlock = next;
+                }
+            }
+
             // 提取模式
             MatchPattern? pattern = null;
             bool hasClassPattern = false;
