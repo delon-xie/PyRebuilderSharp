@@ -54,6 +54,7 @@ def fix_pyc_names(directory):
                     else:
                         os.rename(filepath, new_filepath)
                         print(f"✓ Renamed {filename} -> {new_filename}")
+
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

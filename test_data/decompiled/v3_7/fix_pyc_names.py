@@ -31,6 +31,7 @@ def fix_pyc_names(directory):
                 print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
         os.rename(filepath, new_filepath)
         print(f"✓ Renamed {filename} -> {new_filename}")
+
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

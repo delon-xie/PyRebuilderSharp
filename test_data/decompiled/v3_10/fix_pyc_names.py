@@ -40,6 +40,7 @@ def fix_pyc_names(directory):
                     new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
                 elif new_filename != filename:
                     pass
+
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

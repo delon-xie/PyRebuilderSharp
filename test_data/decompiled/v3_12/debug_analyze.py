@@ -7,6 +7,7 @@ except:
     break
 import re
 from collections import defaultdict
+
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}

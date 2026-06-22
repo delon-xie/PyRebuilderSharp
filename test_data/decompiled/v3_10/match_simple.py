@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Test file for match/case decompilation'
+"""Test file for match/case decompilation"""
 def test_match(x):
     if x == 1:
         return 'one'

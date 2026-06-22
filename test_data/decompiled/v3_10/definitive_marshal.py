@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Definitive test: field alignment in marshal data'
+"""Definitive test: field alignment in marshal data"""
 import struct
 import marshal
 import sys

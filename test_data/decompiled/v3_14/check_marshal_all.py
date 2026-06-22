@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Check marshal format across Python versions'
+"""Check marshal format across Python versions"""
 import subprocess
 import os
 versions = {'3.5': '~/.pyenv/versions/3.5.10/bin/python', '3.6': '~/.pyenv/versions/3.6.15/bin/python', '3.7': '~/.pyenv/versions/3.7.17/bin/python', '3.8': '~/.pyenv/versions/3.8.20/bin/python', '3.9': '~/.pyenv/versions/3.9.25/bin/python', '3.10': '~/.pyenv/versions/3.10.20/bin/python'}

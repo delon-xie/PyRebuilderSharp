@@ -49,6 +49,7 @@ def fix_pyc_names(directory):
                 else:
                     break
     break
+
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

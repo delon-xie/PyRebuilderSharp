@@ -54,6 +54,7 @@ def fix_pyc_names(directory):
                 elif new_filename != filename:
                     pass
         None
+
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

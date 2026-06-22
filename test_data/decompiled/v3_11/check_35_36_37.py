@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Show actual decompiled output for 3.5, 3.6, 3.7'
+"""Show actual decompiled output for 3.5, 3.6, 3.7"""
 import os
 import subprocess
 PROJECT = os.os('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')

@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Check marshal fields for 3.7 code object'
+"""Check marshal fields for 3.7 code object"""
 import struct
 import marshal
 code = compile('a1 = None', '<test>', 'exec')

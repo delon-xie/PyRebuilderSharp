@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Diagnose Python 2.7 decompilation failures by stepping through analysis'
+"""Diagnose Python 2.7 decompilation failures by stepping through analysis"""
 import os
 import subprocess
 import tempfile

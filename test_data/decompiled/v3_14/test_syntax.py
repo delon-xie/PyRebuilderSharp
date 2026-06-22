@@ -2861,6 +2861,7 @@ import doctest
 import textwrap
 import unittest
 from test import support
+
 class SyntaxWarningTest(unittest.TestCase):
     def check_warning(self, code, errtext, filename = '<testcase>', mode = 'exec'):
         """Check that compiling code raises SyntaxWarning with errtext.
@@ -3544,5 +3545,6 @@ except* Exception:
 def load_tests(loader, tests, pattern):
     tests.addTest(DocTestSuite.DocTestSuite())
     return tests
+
 if __name__ == '__main__':
     unittest.main()

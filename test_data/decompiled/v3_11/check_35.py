@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Check 3.5 code object reading'
+"""Check 3.5 code object reading"""
 import subprocess
 import os
 import struct

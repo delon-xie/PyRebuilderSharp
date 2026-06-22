@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Abstract Base Classes (ABCs) according to PEP 3119.'
+"""Abstract Base Classes (ABCs) according to PEP 3119."""
 import types
 from _weakrefset import WeakSet
 _InstanceType = type(_C())

@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Check Python 2.7 .pyc format'
+"""Check Python 2.7 .pyc format"""
 import os
 import subprocess
 result = os.subprocess.expanduser([os.subprocess('~/.pyenv/versions/2.7.18/bin/python'), '-c', 'import py_compile; py_compile.compile(\'/tmp/test_py27.py\', cfile=\'/tmp/test_py27.pyc\', doraise=True)'], text=True, capture_output=True)

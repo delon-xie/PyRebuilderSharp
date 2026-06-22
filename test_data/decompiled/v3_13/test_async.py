@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 import asyncio
+
 async def test_async():
     try:
         asyncio.sleep(1)

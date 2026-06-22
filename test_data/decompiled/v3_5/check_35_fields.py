@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Check 3.5 marshal field alignment comprehensively'
+"""Check 3.5 marshal field alignment comprehensively"""
 import subprocess
 import struct
 import os

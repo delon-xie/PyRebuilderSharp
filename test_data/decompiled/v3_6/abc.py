@@ -1,7 +1,8 @@
 # Decompiled from: <module>
 
-'Abstract Base Classes (ABCs) according to PEP 3119.'
+"""Abstract Base Classes (ABCs) according to PEP 3119."""
 from _weakrefset import WeakSet
+
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 

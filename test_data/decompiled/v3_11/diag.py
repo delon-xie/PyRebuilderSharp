@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Diagnose 3.7 decompilation - test module-level code'
+"""Diagnose 3.7 decompilation - test module-level code"""
 import os
 import subprocess
 PROJECT = os.os('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')

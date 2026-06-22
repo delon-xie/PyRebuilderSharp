@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Binary search to find which expression breaks decompilation'
+"""Binary search to find which expression breaks decompilation"""
 import os
 import subprocess
 import sys

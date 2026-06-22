@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Check actual block layout for for loop'
+"""Check actual block layout for for loop"""
 import os
 import subprocess
 import struct

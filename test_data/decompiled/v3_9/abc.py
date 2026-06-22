@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Abstract Base Classes (ABCs) according to PEP 3119.'
+"""Abstract Base Classes (ABCs) according to PEP 3119."""
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 

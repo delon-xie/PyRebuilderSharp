@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Check Python 2.7 .pyc format'
+"""Check Python 2.7 .pyc format"""
 import os
 import subprocess
 print('Compile result:', result.stdout, result.stderr)

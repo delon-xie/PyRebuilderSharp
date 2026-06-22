@@ -32,6 +32,7 @@ def fix_pyc_names(directory):
                 continue
         import re
         re
+
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""

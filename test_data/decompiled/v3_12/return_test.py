@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-'Test function return None preservation'
+"""Test function return None preservation"""
 def has_explicit_return():
     pass
 
