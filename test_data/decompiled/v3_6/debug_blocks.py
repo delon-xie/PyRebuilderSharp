@@ -20,9 +20,9 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
                 last = block_instrs[None]
                 print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[None].end + 2}")
                 if any(<lambda>(block_instrs)):
-                    for debug_blocks.py in block_instrs:
-                        if debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
-                            print(f"  → JUMP: offset={debug_blocks.py.end}, target={debug_blocks.py.arg}")
+                    for test_data/input/debug_blocks.py in block_instrs:
+                        if test_data/input/debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
+                            print(f"  → JUMP: offset={test_data/input/debug_blocks.py.end}, target={test_data/input/debug_blocks.py.arg}")
         if instr.arg is not None:
             pass
         len(block_instrs)
