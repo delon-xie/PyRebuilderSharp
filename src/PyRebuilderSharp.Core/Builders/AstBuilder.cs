@@ -2895,14 +2895,42 @@ public class AstBuilder
         foreach (var instr in conditionInstrs)
             stackMachine.Execute(instr);
 
-        // Pop from expression stack (not _results), since LOAD_CONST pushes there
         if (stackMachine.ExprStackCount > 0)
             return stackMachine.PopExpr();
+            
+        // elif 模式：COMPARE_OP 因缺少 subject（已在之前块中 COPY）而返回 null。
+        // 从前驱块中复制 subject，用扩展指令列表重新构造比较表达式。
+        if (stackMachine.ExprStackCount == 0 && stackMachine.HasResults == false && conditionInstrs.Count > 0
+            && JumpHelper.IsConditionalJump(block.Instructions.Last().Opcode))
+        {
+            // 从前驱块中找到 LOAD_FAST（subject 变量）
+            var loadInstr = block.Predecessors
+                .SelectMany(p => p.Instructions)
+                .FirstOrDefault(i => i.Opcode is Opcode.LOAD_FAST or Opcode.LOAD_NAME);
+            if (loadInstr != default)
+            {
+                var name = loadInstr.Opcode == Opcode.LOAD_FAST
+                    ? _codeObject.Varnames.ElementAtOrDefault(loadInstr.Argument ?? 0)
+                    : _codeObject.Names.ElementAtOrDefault(loadInstr.Argument ?? 0);
+                if (name != null)
+                {
+                    // 用扩展指令列表重新处理：追加 subject LOAD 到指令前
+                    var extendedInstrs = new List<Instruction>(conditionInstrs);
+                    extendedInstrs.Insert(0, loadInstr);
+                    var sm2 = new StackMachine(_codeObject);
+                    foreach (var ins in extendedInstrs)
+                        sm2.Execute(ins);
+                    if (sm2.ExprStackCount > 0)
+                        return sm2.PopExpr();
+                }
+            }
+        }
+        
         return stackMachine.HasResults ? stackMachine.PopResult() : new Constant(true);
     }
 
     /// <summary>
-    /// Simplify BoolOp by stripping True/False constants from AND/OR expressions.
+    /// 简化 BoolOp
     /// True and X → X,  False and X → False,  True or X → True,  False or X → X
     /// </summary>
     private Expr MergeBoolOpValues(BoolOperator op, List<Expr> values)
