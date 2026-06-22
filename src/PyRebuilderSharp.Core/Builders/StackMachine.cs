@@ -1227,6 +1227,7 @@ public class StackMachine
 
             case Opcode.MAKE_FUNCTION:
             {
+                Console.Error.WriteLine($"[MF] version={_code.Version} func={_code.Name} arg={instr.Argument}");
                 // MAKE_FUNCTION 的栈布局因 Python 版本而异。
                 // 参考 CPython:
                 //   - 2.7: 栈顶只有 code object（无 qualname）— Python/ceval.c 2.7 make_function
@@ -1283,6 +1284,26 @@ public class StackMachine
                                 && dc.Value is System.Collections.IList list)
                                 funcRef.DefaultExprs = list.Cast<object>()
                                     .Select(v => new Constant(v) as Expr).ToList();
+                        }
+
+                        // 后备：当块分拆导致 StackMachine 栈为空时，从指令列表回溯查找 defaults 常量
+                        // 用于 class body 中 LOAD_CONST defaults 与 MAKE_FUNCTION 被分到不同块的情况
+                        if (funcRef.DefaultExprs == null && (flags & 0x01) != 0 && childCode != null)
+                        {
+                            // 在代码对象的完整指令列表中查找本指令之前最近的 LOAD_CONST 加载的 tuple
+                            int mfIdx = _code.Instructions.IndexOf(instr);
+                            for (int j = mfIdx - 1; j >= 0 && j >= mfIdx - 6; j--)
+                            {
+                                var prev = _code.Instructions[j];
+                                if (prev.Opcode == Opcode.LOAD_CONST && prev.Argument.HasValue
+                                    && _code.Constants.TryGetValue(prev.Argument.Value, out var cv)
+                                    && cv is System.Collections.IList tuple)
+                                {
+                                    funcRef.DefaultExprs = tuple.Cast<object>()
+                                        .Select(v => new Constant(v) as Expr).ToList();
+                                    break;
+                                }
+                            }
                         }
                         _exprStack.Push(funcRef);
                         return null;
