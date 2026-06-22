@@ -2716,6 +2716,17 @@ public class AstBuilder
                 return etTry;
         }
 
+        // 检测 match/case 内联模式：COPY+COPY 为特征
+        if (block.Instructions.Count >= 3
+            && block.Instructions[0].Opcode == Opcode.COPY
+            && block.Instructions[1].Opcode == Opcode.COPY
+            && IsConditionBranch(block))
+        {
+            _processedBlockIds.Add(block.Id);
+            visited.Add(block);
+            // fall through to if/else — 让 BuildIfElse 处理 match/case 链
+        }
+
         // 检测 if/else 条件分支
         if (IsConditionBranch(block))
         {
