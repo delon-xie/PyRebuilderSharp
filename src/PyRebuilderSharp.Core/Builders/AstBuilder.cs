@@ -1320,8 +1320,31 @@ public class AstBuilder
             return null;
         }
 
+        // 3.12+ finally-only/cleanup 条目：handler 不包含 CHECK_EXC_MATCH 或 CHECK_EG_MATCH，
+        // 这些是 finally 体、清理代码等，不是 try/except 结构。
         var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
         if (handlerBlock == null || visited.Contains(handlerBlock))
+        {
+            return null;
+        }
+        bool hasExcMatch = handlerBlock.Instructions.Any(i =>
+            i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
+        if (!hasExcMatch)
+        {
+            // 标记 handler 及后继块为已访问，避免误处理
+            visited.Add(handlerBlock);
+            foreach (var hsucc in handlerBlock.Successors)
+                if (!visited.Contains(hsucc))
+                    visited.Add(hsucc);
+            return null;
+        }
+
+        // 跳过 with 语句的隐式 ET 条目：BEFORE_WITH 在 entry 范围内
+        var hasBeforeWith = _codeObject.Instructions
+            .Any(i => i.Opcode == Opcode.BEFORE_WITH
+                && i.Offset >= matchingEntry.StartOffset
+                && i.Offset < matchingEntry.EndOffset);
+        if (hasBeforeWith)
         {
             return null;
         }
