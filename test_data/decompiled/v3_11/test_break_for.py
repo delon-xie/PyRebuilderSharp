@@ -2,7 +2,11 @@
 
 range(3)
 for i in range(3):
-    name_3 = i == 1
-    break
-a = i
-# [SUMMARY] 5 blocks · 6 processed · 1 orphan · 21 instr
+    if i == 1:
+        break
+    else:
+        a = i
+        None
+    return
+return
+# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 21 instr

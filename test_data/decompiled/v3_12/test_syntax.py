@@ -2872,7 +2872,6 @@ class SyntaxWarningTest(unittest.TestCase):
             compile(code, filename, mode)
         except:
             pass
-        self.assertWarnsRegex(compile, errtext)
         raise
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -3373,5 +3372,4 @@ def load_tests(loader, tests, pattern):
     return tests
 if __name__ == '__main__':
     unittest.main()
-    return None
 # [SUMMARY] 3 blocks · 4 processed · 0 orphan · 65 instr

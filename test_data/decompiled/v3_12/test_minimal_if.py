@@ -18,7 +18,6 @@ def test_simple():
         x = 2
     return x
 """
-tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.py')
 py_compile.compile(py_path, doraise=True, cfile=py_path + 'c')
 print('Compiled OK')
 r = subprocess.run(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], cwd='/Users/admin/codes/Tools/PyRebuilderSharp', text=True, capture_output=True)

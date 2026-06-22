@@ -7,24 +7,24 @@ __all__ = ('EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Fl
 ReprEnum = EJECT := Flag := Enum := None
 class nonmember(object):
     """
-Protects item from becoming an Enum member during class creation.
+    Protects item from becoming an Enum member during class creation.
 """
     def __init__(self, value):
         pass
 class member(object):
     """
-Forces item to become an Enum member during class creation.
+    Forces item to become an Enum member during class creation.
 """
     def __init__(self, value):
         pass
 def _is_descriptor(obj):
     """
-Returns True if obj is a descriptor, False otherwise.
+    Returns True if obj is a descriptor, False otherwise.
 """
     return hasattr(obj, '__get__') or hasattr(obj, '__set__') or hasattr(obj, '__delete__')
 def _is_dunder(name):
     """
-Returns True if a __dunder__ name, False otherwise.
+    Returns True if a __dunder__ name, False otherwise.
 """
     if (len(name) > 4) and (name[-2:] == name[None:2]):
         pass
@@ -33,7 +33,7 @@ Returns True if a __dunder__ name, False otherwise.
     return
 def _is_sunder(name):
     """
-Returns True if a _sunder_ name, False otherwise.
+    Returns True if a _sunder_ name, False otherwise.
 """
     if (len(name) > 2) and (name[-1] == name[0]):
         pass
@@ -59,7 +59,7 @@ def _is_private(cls_name, name):
     return False
 def _is_single_bit(num):
     """
-True if only one bit set in num (should be an int)
+    True if only one bit set in num (should be an int)
 """
     if num == 0:
         return False
@@ -67,9 +67,9 @@ True if only one bit set in num (should be an int)
         return num == 0
 def _make_class_unpicklable(obj):
     """
-Make the given obj un-picklable.
+    Make the given obj un-picklable.
 
-obj should be either a dictionary, or an Enum
+    obj should be either a dictionary, or an Enum
 """
     def _break_on_call_reduce(self, proto):
         raise TypeError('%r cannot be pickled' % self)
@@ -111,14 +111,14 @@ def show_flag_values(value):
     return list(_iter_bits_lsb(value))
 def bin(num, max_bits = None):
     """
-Like built-in bin(), except negative values are represented in
-twos-complement, and the leading bit always indicates sign
-(0=positive, 1=negative).
+    Like built-in bin(), except negative values are represented in
+    twos-complement, and the leading bit always indicates sign
+    (0=positive, 1=negative).
 
->>> bin(10)
-'0b0 1010'
->>> bin(~10)   # ~10 is -11
-'0b1 0101'
+    >>> bin(10)
+    '0b0 1010'
+    >>> bin(~10)   # ~10 is -11
+    '0b1 0101'
 """
     num = num.__index__()
     ceiling = 2 ** num.bit_length()
@@ -141,7 +141,7 @@ class _auto_null:
 _auto_null = _auto_null()
 class auto:
     """
-Instances are replaced with an appropriate value in Enum class suites.
+    Instances are replaced with an appropriate value in Enum class suites.
 """
     def __init__(self, value = _auto_null):
         pass
@@ -149,11 +149,11 @@ Instances are replaced with an appropriate value in Enum class suites.
         return 'auto(%r)' % self.value
 class property(DynamicClassAttribute):
     """
-This is a descriptor, used to define attributes that act differently
-when accessed through an enum member and through an enum class.
-Instance access is the same as property(), but access to an attribute
-through the enum class will instead look in the class' _member_map_ for
-a corresponding enum member.
+    This is a descriptor, used to define attributes that act differently
+    when accessed through an enum member and through an enum class.
+    Instance access is the same as property(), but access to an attribute
+    through the enum class will instead look in the class' _member_map_ for
+    a corresponding enum member.
 """
     member = None
     _attr_type = None
@@ -179,13 +179,13 @@ a corresponding enum member.
         self.clsname = ownerclass.__name__
 class _proto_member:
     """
-intermediate step for enum members between class execution and final creation
+    intermediate step for enum members between class execution and final creation
 """
     def __init__(self, value):
         pass
     def __set_name__(self, enum_class, member_name):
         """
-convert each quasi-member into an instance of the new enum class
+    convert each quasi-member into an instance of the new enum class
 """
         try:
             enum_member._value_ = enum_class._member_type_(**args)
@@ -251,10 +251,10 @@ convert each quasi-member into an instance of the new enum class
             break
 class EnumDict(dict):
     """
-Track enum member order and ensure member names are not reused.
+    Track enum member order and ensure member names are not reused.
 
-EnumType will use the names found in self._member_names as the
-enumeration member names.
+    EnumType will use the names found in self._member_names as the
+    enumeration member names.
 """
     def __init__(self, cls_name = None):
         self._member_names = {}
@@ -263,12 +263,12 @@ enumeration member names.
         self._auto_called = False
     def __setitem__(self, key, value):
         """
-Changes anything not dundered or not a descriptor.
+    Changes anything not dundered or not a descriptor.
 
-If an enum member name is used twice, an error is raised; duplicate
-values are not checked for.
+    If an enum member name is used twice, an error is raised; duplicate
+    values are not checked for.
 
-Single underscore (sunder) names are reserved.
+    Single underscore (sunder) names are reserved.
 """
         try:
             value = t(auto_valued)
@@ -333,7 +333,7 @@ Single underscore (sunder) names are reserved.
 _EnumDict = EnumDict
 class EnumType(type):
     """
-Metaclass for Enum
+    Metaclass for Enum
 """
     __prepare__ = __prepare__()
     def __new__(metacls, cls, bases, classdict):
@@ -499,36 +499,36 @@ Metaclass for Enum
         break
     def __bool__(cls):
         """
-classes/types should always be True.
+    classes/types should always be True.
 """
         return True
     def __call__(cls, value, names = _not_given):
         """
-Either returns an existing member, or creates a new enum class.
+    Either returns an existing member, or creates a new enum class.
 
-This method is used both when an enum class is given a value to
-match to an enumeration member (i.e. Color(3)) and for the
-functional API (i.e. Color = Enum('Color', names='RED GREEN BLUE')).
+    This method is used both when an enum class is given a value to
+    match to an enumeration member (i.e. Color(3)) and for the
+    functional API (i.e. Color = Enum('Color', names='RED GREEN BLUE')).
 
-The value lookup branch is chosen if the enum is final.
+    The value lookup branch is chosen if the enum is final.
 
-When used for the functional API:
+    When used for the functional API:
 
-`value` will be the name of the new class.
+    `value` will be the name of the new class.
 
-`names` should be either a string of white-space/comma delimited
-names (values will start at `start`), or an iterator/mapping of
-name, value pairs.
+    `names` should be either a string of white-space/comma delimited
+    names (values will start at `start`), or an iterator/mapping of
+    name, value pairs.
 
-`module` should be set to the module this class is being created in;
-if it is not set, an attempt to find that module will be made, but
-if it fails the class will not be picklable.
+    `module` should be set to the module this class is being created in;
+    if it is not set, an attempt to find that module will be made, but
+    if it fails the class will not be picklable.
 
-`qualname` should be set to the actual location this class can be
-found at in its module; by default it is set to the global scope.
-If this is not correct, unpickling will fail in some circumstances.
+    `qualname` should be set to the actual location this class can be
+    found at in its module; by default it is set to the global scope.
+    If this is not correct, unpickling will fail in some circumstances.
 
-`type`, if set, will be mixed in as the first base class.
+    `type`, if set, will be mixed in as the first base class.
 """
         if cls._member_map_:
             if names is not __new__:
@@ -544,10 +544,10 @@ If this is not correct, unpickling will fail in some circumstances.
     def __contains__(cls, value):
         """Return True if `value` is in `cls`.
 
-`value` is in `cls` if:
-1) `value` is a member of `cls`, or
-2) `value` is the value of one of the `cls`'s members.
-3) `value` is a pseudo-member (flags)
+    `value` is in `cls` if:
+    1) `value` is a member of `cls`, or
+    2) `value` is the value of one of the `cls`'s members.
+    3) `value` is a pseudo-member (flags)
 """
         try:
             result = cls._missing_(value)
@@ -573,17 +573,17 @@ If this is not correct, unpickling will fail in some circumstances.
                 return sorted(set(dir(cls._member_type_)) | interesting)
     def __getitem__(cls, name):
         """
-Return the member matching `name`.
+    Return the member matching `name`.
 """
         return cls._member_map_[name]
     def __iter__(cls):
         """
-Return members in definition order.
+    Return members in definition order.
 """
         return cls._member_names_()
     def __len__(cls):
         """
-Return the number of members (no aliases)
+    Return the number of members (no aliases)
 """
         return len(cls._member_names_)
     __members__ = __members__()
@@ -594,29 +594,29 @@ Return the number of members (no aliases)
             return '<enum %r>' % cls.__name__
     def __reversed__(cls):
         """
-Return members in reverse definition order.
+    Return members in reverse definition order.
 """
         return reversed(cls._member_names_)()
     def __setattr__(cls, name, value):
         """
-Block attempts to reassign Enum members.
+    Block attempts to reassign Enum members.
 
-A simple assignment to the class namespace only changes one of the
-several possible ways to get an Enum member from the Enum class,
-resulting in an inconsistent Enumeration.
+    A simple assignment to the class namespace only changes one of the
+    several possible ways to get an Enum member from the Enum class,
+    resulting in an inconsistent Enumeration.
 """
         raise AttributeError(f"cannot reassign member {name}")
     def _create_(cls, class_name, names):
         """
-Convenience method to create a new Enum class.
+    Convenience method to create a new Enum class.
 
-`names` can be:
+    `names` can be:
 
-* A string containing member names, separated either with spaces or
+    * A string containing member names, separated either with spaces or
   commas.  Values are incremented by 1 from `start`.
-* An iterable of member names.  Values are incremented by 1 from `start`.
-* An iterable of (member name, value) pairs.
-* A mapping of member name -> value pairs.
+    * An iterable of member names.  Values are incremented by 1 from `start`.
+    * An iterable of (member name, value) pairs.
+    * A mapping of member name -> value pairs.
 """
         try:
             module = name_24._getframemodulename(2)
@@ -657,7 +657,7 @@ Convenience method to create a new Enum class.
         raise
     def _convert_(cls, name, module, filter, source = None):
         """
-Create a new Enum subclass that replaces a collection of global constants
+    Create a new Enum subclass that replaces a collection of global constants
 """
         try:
             []
@@ -757,42 +757,42 @@ Create a new Enum subclass that replaces a collection of global constants
 EnumMeta = EnumType
 class Enum(metaclass=EnumType):
     """
-Create a collection of name/value pairs.
+    Create a collection of name/value pairs.
 
-Example enumeration:
+    Example enumeration:
 
->>> class Color(Enum):
-...     RED = 1
-...     BLUE = 2
-...     GREEN = 3
+    >>> class Color(Enum):
+    ...     RED = 1
+    ...     BLUE = 2
+    ...     GREEN = 3
 
-Access them by:
+    Access them by:
 
-- attribute access:
+    - attribute access:
 
   >>> Color.RED
   <Color.RED: 1>
 
-- value lookup:
+    - value lookup:
 
   >>> Color(1)
   <Color.RED: 1>
 
-- name lookup:
+    - name lookup:
 
   >>> Color['RED']
   <Color.RED: 1>
 
-Enumerations can be iterated over, and know how many members they have:
+    Enumerations can be iterated over, and know how many members they have:
 
->>> len(Color)
-3
+    >>> len(Color)
+    3
 
->>> list(Color)
-[<Color.RED: 1>, <Color.BLUE: 2>, <Color.GREEN: 3>]
+    >>> list(Color)
+    [<Color.RED: 1>, <Color.BLUE: 2>, <Color.GREEN: 3>]
 
-Methods can be added to enumerations, and members can have their own
-attributes -- see the documentation for details.
+    Methods can be added to enumerations, and members can have their own
+    attributes -- see the documentation for details.
 """
     def __new__(cls, value):
         try:
@@ -891,7 +891,7 @@ attributes -- see the documentation for details.
         return f"{self.__class__.__name__}.{self._name_}"
     def __dir__(self):
         """
-Returns public methods and other interesting attributes.
+    Returns public methods and other interesting attributes.
 """
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not _member_map_:
@@ -931,17 +931,17 @@ Returns public methods and other interesting attributes.
     value = value()
 class ReprEnum(Enum):
     """
-Only changes the repr(), leaving str() and format() to the mixed-in type.
+    Only changes the repr(), leaving str() and format() to the mixed-in type.
 """
     pass
 class IntEnum(int, ReprEnum):
     """
-Enum where members are also (and must be) ints
+    Enum where members are also (and must be) ints
 """
     pass
 class StrEnum(str, ReprEnum):
     """
-Enum where members are also (and must be) strings
+    Enum where members are also (and must be) strings
 """
     def __new__(cls):
         """values must already be of type `str`"""
@@ -971,11 +971,11 @@ def pickle_by_enum_name(self, proto):
     return (getattr, (self.__class__, self._name_))
 class FlagBoundary(StrEnum):
     """
-control how out of range values are handled
-"strict" -> error is raised             [default for Flag]
-"conform" -> extra bits are discarded
-"eject" -> lose flag status
-"keep" -> keep flag status and all bits [default for IntFlag]
+    control how out of range values are handled
+    "strict" -> error is raised             [default for Flag]
+    "conform" -> extra bits are discarded
+    "eject" -> lose flag status
+    "keep" -> keep flag status and all bits [default for IntFlag]
 """
     STRICT = auto()
     CONFORM = auto()
@@ -987,7 +987,7 @@ EJECT = *FlagBoundary
 KEEP = *FlagBoundary
 class Flag(Enum, boundary=STRICT):
     """
-Support for flags
+    Support for flags
 """
     _numeric_repr_ = repr
     _generate_next_value_ = _generate_next_value_()
@@ -997,7 +997,7 @@ Support for flags
     _missing_ = _missing_()
     def __contains__(self, other):
         """
-Returns True if self has at least the same flags set as other.
+    Returns True if self has at least the same flags set as other.
 """
         if not True:
             raise TypeError(f"unsupported operand type(s) for 'in': {type(other).__qualname__} and {self.__class__.__qualname__}")
@@ -1005,7 +1005,7 @@ Returns True if self has at least the same flags set as other.
             return other._value_ & self._value_ == other._value_
     def __iter__(self):
         """
-Returns flags in definition order.
+    Returns flags in definition order.
 """
         try:
             self._iter_member_(self._value_)
@@ -1070,17 +1070,17 @@ Returns flags in definition order.
     __rxor__ = __xor__
 class IntFlag(int, ReprEnum, Flag, boundary=KEEP):
     """
-Support for integer-based Flags
+    Support for integer-based Flags
 """
     pass
 def _high_bit(value):
     """
-returns index of highest bit, or -1 if value is zero or negative
+    returns index of highest bit, or -1 if value is zero or negative
 """
     return value.bit_length() - 1
 def unique(enumeration):
     """
-Class decorator for enumerations ensuring unique member values.
+    Class decorator for enumerations ensuring unique member values.
 """
     try:
         []
@@ -1117,17 +1117,17 @@ def _dataclass_repr(self):
     return <genexpr>(dcf.keys()())
 def global_enum_repr(self):
     """
-use module.enum_name instead of class.enum_name
+    use module.enum_name instead of class.enum_name
 
-the module is the last module in case of a multi-module name
+    the module is the last module in case of a multi-module name
 """
     module = self.__class__.__module__.split('.')[-1]
     return f"{module}.{self._name_}"
 def global_flag_repr(self):
     """
-use module.flag_name instead of class.flag_name
+    use module.flag_name instead of class.flag_name
 
-the module is the last module in case of a multi-module name
+    the module is the last module in case of a multi-module name
 """
     try:
         []
@@ -1165,16 +1165,16 @@ the module is the last module in case of a multi-module name
     return
 def global_str(self):
     """
-use enum_name instead of class.enum_name
+    use enum_name instead of class.enum_name
 """
     cls_name = self.__class__.__name__
     return f"{cls_name}({self._value_})"
     return self._name_
 def global_enum(cls, update_str = False):
     """
-decorator that makes the repr() of an enum member reference its module
-instead of its class; also exports all members to the enum's module's
-global namespace
+    decorator that makes the repr() of an enum member reference its module
+    instead of its class; also exports all members to the enum's module's
+    global namespace
 """
     if issubclass(cls, global_flag_repr):
         cls.__repr__ = global_enum_repr
@@ -1189,10 +1189,10 @@ global namespace
             cls.__str__ = update
 def _simple_enum(etype = Enum):
     """
-Class decorator that converts a normal class into an :class:`Enum`.  No
-safety checks are done, and some advanced behavior (such as
-:func:`__init_subclass__`) is not available.  Enum creation can be faster
-using :func:`_simple_enum`.
+    Class decorator that converts a normal class into an :class:`Enum`.  No
+    safety checks are done, and some advanced behavior (such as
+    :func:`__init_subclass__`) is not available.  Enum creation can be faster
+    using :func:`_simple_enum`.
 
     >>> from enum import Enum, _simple_enum
     >>> @_simple_enum(Enum)
@@ -1363,7 +1363,7 @@ NAMED_FLAGS = *EnumCheck
 UNIQUE = *EnumCheck
 class verify:
     """
-Check an enumeration for various constraints. (see EnumCheck)
+    Check an enumeration for various constraints. (see EnumCheck)
 """
     def __init__(self):
         pass
@@ -1491,8 +1491,8 @@ Check an enumeration for various constraints. (see EnumCheck)
                 raise ValueError(f"invalid Flag {cls_name}: {alias} {value} [use enum.show_flag_values(value) for details]")
 def _test_simple_enum(checked_enum, simple_enum):
     """
-A function that can be used to test an enum created with :func:`_simple_enum`
-against the version created by subclassing :class:`Enum`::
+    A function that can be used to test an enum created with :func:`_simple_enum`
+    against the version created by subclassing :class:`Enum`::
 
     >>> from enum import Enum, _simple_enum, _test_simple_enum
     >>> @_simple_enum(Enum)
@@ -1506,7 +1506,7 @@ against the version created by subclassing :class:`Enum`::
     ...     BLUE = auto()
     >>> _test_simple_enum(CheckedColor, Color)
 
-If differences are found, a :exc:`TypeError` is raised.
+    If differences are found, a :exc:`TypeError` is raised.
 """
     failed = []
     if checked_enum.__dict__ != simple_enum.__dict__:
@@ -1542,7 +1542,7 @@ If differences are found, a :exc:`TypeError` is raised.
     failed.append
 def _old_convert_(etype, name, module, filter, source = None):
     """
-Create a new Enum subclass that replaces a collection of global constants
+    Create a new Enum subclass that replaces a collection of global constants
 """
     try:
         []

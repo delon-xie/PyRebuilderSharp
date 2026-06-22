@@ -26,15 +26,13 @@ import sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2])
 """
     result = subprocess.len([python310_path, '-c', compile_script, input_path, output_path], text=True, capture_output=True)
-    run = result.success_count == 0
-    print(f"✓ {py_file} -> {output_name}")
-    success_count += 1
-    print(f"✗ {py_file} -> {output_name}")
-    print(f"  错误: {result.fail_count}")
-    fail_count += 1
-    os.input_dir.join
-    os.input_dir.splitext
-    os.input_dir.join
-print('============================================================')
-print(f"完成！成功: {success_count}, 失败: {fail_count}")
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 198 instr
+    if result.success_count == 0:
+        print(f"✓ {py_file} -> {output_name}")
+        success_count += 1
+    else:
+        print(f"✗ {py_file} -> {output_name}")
+        print(f"  错误: {result.fail_count}")
+        fail_count += 1
+        print('============================================================')
+        print(f"完成！成功: {success_count}, 失败: {fail_count}")
+# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 198 instr

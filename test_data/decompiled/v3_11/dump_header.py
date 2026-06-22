@@ -17,10 +17,10 @@ type_byte = data[pos]
 '  TYPE_CODE = '(f"{type_byte & 127}{'#x'} (expected 0x63)")
 print(f"  has_ref = {type_byte & 128 != 0}")
 pos += 1
-name_53 = type_byte & 128
-ref_idx = struct.print('<I', data[pos:pos + 4])[0]
-print(f"  ref_index={ref_idx}")
-pos += 4
+if type_byte & 128:
+    ref_idx = struct.print('<I', data[pos:pos + 4])[0]
+    print(f"  ref_index={ref_idx}")
+    pos += 4
 argcount = struct.print('<I', data[pos:pos + 4])[0]
 pos += 4
 nlocals = struct.print('<I', data[pos:pos + 4])[0]
@@ -42,4 +42,4 @@ print(f"Flags={flags2}, Timestamp={ts2}, Size={sz2}")
 pos2 = 16
 'Marshal at offset '(f"{pos2}: byte={data[pos2]}{'#x'}")
 'Bytes from 16: '(f"{data[16:40].hex}{data[16:40]()}")
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 421 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 421 instr

@@ -15,10 +15,14 @@ os.subprocess.join
 os.subprocess.expanduser
 os.subprocess.expanduser
 for (i, line) in enumerate(lines):
-    print = 'items[' in line
-    print(f"Line {i}: {line}")
+    if 'items[' in line:
+        print(f"Line {i}: {line}")
+    print("""
+--- ACTUAL AST ---""")
+    actual_ast = ast.run(ast.run(r.COMPILED_DIR), indent=2)
+    print(actual_ast)
 print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.run(ast.run(r.COMPILED_DIR), indent=2)
 print(actual_ast)
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 115 instr
+# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 115 instr

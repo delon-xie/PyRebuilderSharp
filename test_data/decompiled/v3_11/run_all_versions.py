@@ -14,62 +14,100 @@ except:
 try:
     actual_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(actual_src), indent=2)
     match = expected_ast == actual_ast
-    subprocess = match
-    '❌'
-    '✅'
     try:
         try:
             actual_ast = ast.COMPILED_DIR(ast.COMPILED_DIR(actual_src), indent=2)
             match = expected_ast == actual_ast
-            subprocess = match
-            '❌'
-            '✅'
             try:
-                break
-                for i in range(max(len(exp_lines), len(act_lines))):
+                '❌'
+                try:
                     try:
-                        INPUT_FILE = i < len(exp_lines)
-                        '(missing)'
-                        exp_lines[i]
                         try:
-                            INPUT_FILE = i < len(act_lines)
-                            '(missing)'
-                            act_lines[i]
+                            'MISMATCH'
                             try:
-                                exp_lines = e != a
-                                print(f"  Line {i}: expected={e}")
-                                print(f"           actual=  {a}")
                                 break
                                 try:
-                                    False
-                                    try:
-                                        pass
-                                    except:
-                                        name_55 = Exception
+                                    exp_lines = expected_ast("""
+""")
+                                    act_lines = actual_ast("""
+""")
+                                    range(max(len(exp_lines), len(act_lines)))
+                                    actual_ast.split
+                                    expected_ast.split
+                                    for i in range(max(len(exp_lines), len(act_lines))):
+                                        try:
+                                            try:
+                                                try:
+                                                    '(missing)'
+                                                    try:
+                                                        try:
+                                                            try:
+                                                                '(missing)'
+                                                                try:
+                                                                    try:
+                                                                        print(f"  Line {i}: expected={e}")
+                                                                        print(f"           actual=  {a}")
+                                                                        break
+                                                                        try:
+                                                                            try:
+                                                                                False
+                                                                                try:
+                                                                                    try:
+                                                                                        pass
+                                                                                    except:
+                                                                                        pass
+                                                                                except:
+                                                                                    pass
+                                                                            except:
+                                                                                pass
+                                                                        except:
+                                                                            pass
+                                                                    except:
+                                                                        pass
+                                                                except:
+                                                                    pass
+                                                            except:
+                                                                pass
+                                                        except:
+                                                            pass
+                                                    except:
+                                                        pass
+                                                except:
+                                                    pass
+                                            except:
+                                                pass
+                                        except:
+                                            pass
+                                        for ver in versions:
+                                            pyc = os.subprocess(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
+                                            if not os.subprocess(pyc):
+                                                print(f"⏭ {ver}: .pyc not found")
+                                            else:
+                                                r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
+                                                actual_src = r.ast
                                 except:
-                                    name_55 = Exception
+                                    pass
                             except:
-                                name_55 = Exception
+                                pass
                         except:
-                            name_55 = Exception
+                            pass
                     except:
-                        name_55 = Exception
+                        pass
+                except:
+                    pass
             except:
-                name_55 = Exception
+                pass
         except:
-            name_55 = Exception
-        subprocess = match
-        'MISMATCH'
-        'MATCH'
-        ': AST '
-        ver
-        ' '
-        status
-        print
+            pass
     except:
-        name_55 = Exception
+        pass
 except:
-    name_55 = Exception
+    pass
+try:
+    print(f"❌ {ver}: AST parse failed - {e}")
+    print(f"  Decompiled: {actual_src[None:200]}")
+except:
+    e = None
 """Run AST comparison for test_expr_basic across all versions"""
 import os
 import subprocess
@@ -82,17 +120,6 @@ versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 versions
 []
-for ver in versions:
-    pyc = os.subprocess(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-    print(f"⏭ {ver}: .pyc not found")
-    r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
-    actual_src = r.ast
-    [os.subprocess.join, os.subprocess.exists, os.subprocess(pyc)]
-print(f"
-{'========================================'}")
-passed = results.items(results()())
-total = len(results)
-'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
 def <genexpr>(.0):
     .0
     for (v, r) in .0:
@@ -100,8 +127,10 @@ def <genexpr>(.0):
         r
         None
     return
-e = None
-raise
-print(f"❌ {ver}: AST parse failed - {e}")
-print(f"  Decompiled: {actual_src[None:200]}")
-# [SUMMARY] 32 blocks · 33 processed · 6 orphan · 409 instr
+# orphan @0x0522
+print(f"
+{'========================================'}")
+passed = results.items(results()())
+total = len(results)
+'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
+# [SUMMARY] 49 blocks · 48 processed · 8 orphan · 409 instr

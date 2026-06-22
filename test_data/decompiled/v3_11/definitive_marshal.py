@@ -19,11 +19,24 @@ print
 print
 'Bytes:'
 print
-for (a0, nl, ss, fl) in range(0, 8):
-    marshal = start + 16 > len(m)
-    break
+for start in range(0, 8):
+    if start + 16 > len(m):
+        break
+    else:
+        vals = struct.type('<IIII', m, start)
+        a0 = *vals
+        nl = *vals
+        ss = *vals
+        fl = *vals
+        if (a0 == known['argcount']) and (nl == known['nlocals']):
+            print(f"
+MATCH at offset {start}:")
+            print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+            ' '.join(f" {<genexpr>(m[start:start + 16]())}")
+            '  Bytes: '
+            print
 code2 = marshal.co_nlocals(m)
 print(f"
 Re-loaded: argcount={code2.bytes} nlocals={code2.dumps} stacksize={code2.dumps} flags={hex(code2.m)}")
 print(f"Match: {code2.bytes == code.bytes}")
-# [SUMMARY] 5 blocks · 6 processed · 1 orphan · 278 instr
+# [SUMMARY] 10 blocks · 11 processed · 0 orphan · 278 instr

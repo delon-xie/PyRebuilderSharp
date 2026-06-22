@@ -19,31 +19,21 @@ result.run.split
 for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line()
-    name_87 = line_stripped('*** ')
-    name_41 = current_test
-    name_20 = current_test_fail
-    print(f"✗ {current_test}")
-    failed += 1
-    print(f"✓ {current_test}")
-    passed += 1
-    line_stripped.startswith
-    clean_line.strip
-    current_test = line_stripped[4:](':')[0]
-    current_test_fail = False
-    run = 'FAIL' in line_stripped
-    current_test_fail = True
-    name_18 = current_test
-    clean_line = '3.10.pyc' in clean_line
-    run = 'Bad MAGIC' in clean_line
-    current_test_fail = True
-    current_test
-    [[line_stripped[4:].split, 'FAIL' in clean_line], 'Unsupported' in clean_line]
-name_20 = current_test_fail
-print(f"✗ {current_test}")
-failed += 1
-print(f"✓ {current_test}")
-passed += 1
-print('============================================================')
-print(f"总计: {passed} PASS, {failed} FAIL")
-print('============================================================')
-# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 210 instr
+    if line_stripped('*** '):
+        if current_test and current_test_fail:
+            print(f"✗ {current_test}")
+            failed += 1
+        else:
+            print(f"✓ {current_test}")
+            passed += 1
+            current_test = line_stripped[4:](':')[0]
+            current_test_fail = False
+            if 'FAIL' in line_stripped:
+                current_test_fail = True
+        current_test = line_stripped[4:](':')[0]
+        current_test_fail = False
+        if 'FAIL' in line_stripped:
+            pass
+    elif current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line):
+        current_test_fail = True
+# [SUMMARY] 22 blocks · 23 processed · 0 orphan · 210 instr

@@ -2865,8 +2865,8 @@ class SyntaxWarningTest(unittest.TestCase):
     def check_warning(self, code, errtext, filename = '<testcase>', mode = 'exec'):
         """Check that compiling code raises SyntaxWarning with errtext.
 
-errtest is a regular expression that must be present in the
-text of the warning raised.
+    errtest is a regular expression that must be present in the
+    text of the warning raised.
 """
         try:
             compile(code, filename, mode)
@@ -2953,9 +2953,9 @@ class SyntaxErrorTestCase(unittest.TestCase):
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
         """Check that compiling code raises SyntaxError with errtext.
 
-errtest is a regular expression that must be present in the
-text of the exception raised.  If subclass is specified it
-is the expected subclass of SyntaxError (e.g. IndentationError).
+    errtest is a regular expression that must be present in the
+    text of the exception raised.  If subclass is specified it
+    is the expected subclass of SyntaxError (e.g. IndentationError).
 """
         try:
             compile(code, filename, mode)
@@ -3152,7 +3152,7 @@ else: continue""", msg, lineno=2)
 """, 'unexpected indent', subclass=name_2)
     def test_no_indent(self):
         """if 1:
-foo()"""
+    foo()"""
         self._check_error("""if 1:
 foo()""", 'expected an indented block', subclass=name_2)
     def test_bad_outdent(self):
@@ -3176,24 +3176,24 @@ foo()""", 'expected an indented block', subclass=name_2)
         self._check_error('foo(x,    y for y in range(3) for z in range(2) if z    , p)', 'Generator expression must be parenthesized', end_offset=53, offset=11, end_lineno=1, lineno=1)
     def test_except_then_except_star(self):
         """try: pass
-except ValueError: pass
-except* TypeError: pass"""
+    except ValueError: pass
+    except* TypeError: pass"""
         self._check_error("""try: pass
 except ValueError: pass
 except* TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', end_offset=8, offset=1, end_lineno=3, lineno=3)
     def test_except_star_then_except(self):
         """try: pass
-except* ValueError: pass
-except TypeError: pass"""
+    except* ValueError: pass
+    except TypeError: pass"""
         self._check_error("""try: pass
 except* ValueError: pass
 except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', end_offset=7, offset=1, end_lineno=3, lineno=3)
     def test_empty_line_after_linecont(self):
         """\
-pass
+    pass
         \
 
-pass
+    pass
 """
         try:
             compile(s, '<string>', 'exec')
@@ -3225,7 +3225,7 @@ def fib(n):
         raise
     def test_continuation_bad_indentation(self):
         """\
-if x:
+    if x:
     y = 1
   \
   foo = 1
@@ -3243,11 +3243,11 @@ if x:
     test_async_with_statement_many_context_managers = test_async_with_statement_many_context_managers()
     def test_barry_as_flufl_with_syntax_errors(self):
         """
-def func1():
+    def func1():
     if a != b:
         raise ValueError
 
-def func2():
+    def func2():
     try
         return 1
     finally:
@@ -3315,10 +3315,10 @@ b=3", f"\{paren}' was never closed")
         self._check_error(b'd2l0aCgwLCwpOgoB', 'invalid non-printable character')
     def test_match_call_does_not_raise_syntax_error(self):
         """
-def match(x):
+    def match(x):
     return 1+1
 
-match(34)
+    match(34)
 """
         code = """
 def match(x):
@@ -3329,10 +3329,10 @@ match(34)
         compile(code, '<string>', 'exec')
     def test_case_call_does_not_raise_syntax_error(self):
         """
-def case(x):
+    def case(x):
     return 1+1
 
-case(34)
+    case(34)
 """
         code = """
 def case(x):
@@ -3343,9 +3343,9 @@ case(34)
         compile(code, '<string>', 'exec')
     def test_multiline_compiler_error_points_to_the_end(self):
         """call(
-a=1,
-a=1
-)"""
+    a=1,
+    a=1
+    )"""
         self._check_error("""call(
 a=1,
 a=1
@@ -3356,7 +3356,7 @@ a=1
     "line2"
     "line3"
     x=1
-)"""
+    )"""
         self._check_error("""print(
     "line1"
     "line2"
@@ -3498,5 +3498,4 @@ def load_tests(loader, tests, pattern):
     return tests
 if __name__ == '__main__':
     unittest.main()
-    return None
 # [SUMMARY] 3 blocks · 4 processed · 0 orphan · 67 instr

@@ -52,10 +52,10 @@ def isrecursive(object):
 class _safe_key:
     """Helper function for key functions when sorting unorderable objects.
 
-The wrapped-object will fallback to a Py2.x style comparison for
-unorderable types (sorting first comparing the type name and then by
-the obj ids).  Does not work recursively, so dict.items() must have
-_safe_key applied to both the key and the value.
+    The wrapped-object will fallback to a Py2.x style comparison for
+    unorderable types (sorting first comparing the type name and then by
+    the obj ids).  Does not work recursively, so dict.items() must have
+    _safe_key applied to both the key and the value.
 
 """
     __slots__ = ['obj']
@@ -92,34 +92,34 @@ class PrettyPrinter:
         break
     def __init__(self, indent = 1, width = 80, depth = None, stream = None):
         """Handle pretty printing operations onto a stream using a set of
-configured parameters.
+    configured parameters.
 
-indent
+    indent
     Number of spaces to indent for each level of nesting.
 
-width
+    width
     Attempted maximum number of columns in the output.
 
-depth
+    depth
     The maximum depth to print out nested structures.
 
-stream
+    stream
     The desired output stream.  If omitted (or false), the standard
     output stream available at construction will be used.
 
-compact
+    compact
     If true, several items will be combined in one line.
     Incompatible with expand mode.
 
-expand
+    expand
     If true, the output will be formatted similar to
     pretty-printed json.dumps() when ``indent`` is supplied.
     Incompatible with compact mode.
 
-sort_dicts
+    sort_dicts
     If true, dict keys are sorted.
 
-underscore_numbers
+    underscore_numbers
     If true, digit groups are separated with underscores.
 
 """

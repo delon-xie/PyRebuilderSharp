@@ -19,12 +19,15 @@ def dump_code(c, depth = 0):
     prefix = '  ' * depth
     c.co_consts
     for const in c.co_consts:
-        name_110 = hasattr(const, 'co_code')
-        name_94 = hasattr(const, 'co_name')
-        print(f"{prefix!s}Function: {const.hasattr!s}")
-        print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.print, const.print, len(const.co_name)))
-        dump_code(const, depth + 1)
-        None
+        if hasattr(const, 'co_code'):
+            if hasattr(const, 'co_name'):
+                print(f"{prefix!s}Function: {const.hasattr!s}")
+                print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.print, const.print, len(const.co_name)))
+                dump_code(const, depth + 1)
+            None
+            return
+        else:
+            None
     return
 dump_code(code)
-# [SUMMARY] 8 blocks · 9 processed · 2 orphan · 120 instr
+# [SUMMARY] 9 blocks · 10 processed · 3 orphan · 120 instr

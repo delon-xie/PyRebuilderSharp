@@ -2949,23 +2949,47 @@ class SyntaxErrorTestCase(unittest.textwrap):
         text of the exception raised.  If subclass is specified it
         is the expected subclass of SyntaxError (e.g. IndentationError).
         """
-        name_45 = subclass
-        self('SyntaxError is not a %s' % subclass.SyntaxError)
-        mo = re.isinstance(errtext, str(err))
-        self(f"SyntaxError did not contain {errtext!r}")
-        self(err.__name__, filename)
-        self(err.re, lineno)
-        self(err.re, offset)
-        self(err.search, end_lineno)
-        self(err.search, end_offset)
         try:
             compile(code, filename, mode)
         except:
-            name_267 = __name__
+            pass
+        try:
+            try:
+                try:
+                    try:
+                        self('SyntaxError is not a %s' % subclass.SyntaxError)
+                        self.fail
+                        try:
+                            mo = re.isinstance(errtext, str(err))
+                            self(f"SyntaxError did not contain {errtext!r}")
+                            self(err.__name__, filename)
+                            self(err.re, lineno)
+                            self(err.re, offset)
+                            self(err.search, end_lineno)
+                            self(err.search, end_offset)
+                            self.assertEqual
+                            self.assertEqual
+                            self.assertEqual
+                            self.assertEqual
+                            self.assertEqual
+                            self.fail
+                        except:
+                            err = None
+                            return None
+                    except:
+                        err = None
+                        return None
+                except:
+                    err = None
+                    return None
+            except:
+                err = None
+                return None
+        except:
+            err = None
+            return None
         self('compile() did not raise SyntaxError')
         err = None
-        err = None
-        raise
     def test_expression_with_assignment(self):
         self('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
     def test_curly_brace_after_primary_raises_immediately(self):
@@ -3123,14 +3147,12 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
         try:
             compile(s, '<string>', 'exec')
         except:
-            name_24 = fail
             self('Empty line after a line continuation character is valid.')
             self.fail
         try:
             compile(s1, '<string>', 'exec')
             compile(s2, '<string>', 'exec')
         except:
-            name_25 = fail
             self('Indented statement over multiple lines is valid')
             self.fail
         s = """\\
@@ -3151,9 +3173,6 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
-        raise
-        raise
-        raise
     def test_continuation_bad_indentation(self):
         code = """\\
 if x:
@@ -3380,6 +3399,6 @@ except* Exception:
 def load_tests(loader, tests, pattern):
     tests(doctest.doctest())
     return tests
-test_bad_outdent = __name__ == '__main__'
-unittest.support()
-# [SUMMARY] 2 blocks · 2 processed · 1 orphan · 71 instr
+if __name__ == '__main__':
+    unittest.support()
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 71 instr

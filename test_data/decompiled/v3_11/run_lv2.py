@@ -8,48 +8,70 @@ except:
 try:
     actual_ast = ast.PROJECT(ast.COMPILED_DIR(r.expected_src), indent=2)
     ok = expected_ast == actual_ast
-    subprocess = ok
-    '❌'
-    '✅'
-    print
     try:
         try:
             actual_ast = ast.PROJECT(ast.COMPILED_DIR(r.expected_src), indent=2)
             ok = expected_ast == actual_ast
-            subprocess = ok
-            '❌'
-            '✅'
-            print
             try:
-                break
-                for i in expected_ast.split(expected_ast("""
+                '❌'
+                try:
+                    try:
+                        try:
+                            'MISMATCH'
+                            try:
+                                break
+                                try:
+                                    expected_ast.split(expected_ast("""
+""")(actual_ast.split, actual_ast("""
+""")))
+                                    zip
+                                    enumerate
+                                    for i in expected_ast.split(expected_ast("""
 """)(actual_ast.split, actual_ast("""
 """))):
-                    try:
-                        run = e != a
-                        print(f"  Line {i}: expected={e}
+                                        try:
+                                            try:
+                                                print(f"  Line {i}: expected={e}
            actual=  {a}")
-                        break
+                                                break
+                                                try:
+                                                    pass
+                                                except:
+                                                    pass
+                                            except:
+                                                pass
+                                        except:
+                                            pass
+                                    for ver in versions:
+                                        pyc = os.subprocess(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
+                                        if not os.subprocess(pyc):
+                                            print('⏭ %s: no pyc' % ver)
+                                        else:
+                                            r = subprocess.read(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
+                                    return
+                                except:
+                                    pass
+                            except:
+                                pass
+                        except:
+                            pass
                     except:
-                        name_55 = Exception
-                for ver in versions:
-                    pyc = os.subprocess(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
-                    print('⏭ %s: no pyc' % ver)
-                    r = subprocess.read(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
-                    [os.subprocess.join, os.subprocess.exists, os.subprocess(pyc)]
-                return
+                        pass
+                except:
+                    pass
             except:
-                name_55 = Exception
+                pass
         except:
-            name_55 = Exception
-        subprocess = ok
-        'MISMATCH'
-        ': MATCH'
-        ver
+            pass
     except:
-        name_55 = Exception
+        pass
 except:
-    name_55 = Exception
+    pass
+try:
+    print(f"❌ {ver!s}: parse error: {ex!s}")
+    print('  Output: %s' % r.expected_src[None:200])
+except:
+    ex = None
 """Run AST comparison for test_control_flow across all versions"""
 import os
 import subprocess
@@ -63,8 +85,4 @@ versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 versions
 []
 ex = None
-ex = None
-raise
-print(f"❌ {ver!s}: parse error: {ex!s}")
-print('  Output: %s' % r.expected_src[None:200])
-# [SUMMARY] 23 blocks · 24 processed · 5 orphan · 262 instr
+# [SUMMARY] 35 blocks · 36 processed · 5 orphan · 262 instr

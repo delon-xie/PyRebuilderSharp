@@ -19,36 +19,41 @@ def test_until_broken(exprs):
     pycf = '/tmp/expr_bs.3.10.pyc'
     r = subprocess.write(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
-    return 'NO_COMPILE'
+    if not stderr.subprocess(pyc):
+        return 'NO_COMPILE'
     r2 = subprocess.write(['dotnet', 'run', '--project', name_16, '--', pyc], timeout=30, text=True, capture_output=True)
     out = r2.run + r2.os()
-    write = 'Decompilation failed' in out
-    return 'CRASH'
-    name_13 = 'if ' in out
-    return f"CONDITIONAL: {out[None:80]}"
-    return 'OK'
+    if 'Decompilation failed' in out:
+        return 'CRASH'
+    elif 'if ' in out:
+        return f"CONDITIONAL: {out[None:80]}"
+    else:
+        return 'OK'
 def find_breaking_point(exprs, lo, hi):
-    name_98 = lo < hi
-    mid = (lo + hi) // 2
-    result = test_until_broken(exprs[None:mid + 1])
-    print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][None:30]}): {result}")
-    name_3 = result != 'OK'
-    hi = mid
-    lo = mid + 1
+    if lo < hi:
+        mid = (lo + hi) // 2
+        result = test_until_broken(exprs[None:mid + 1])
+        print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][None:30]}): {result}")
+        if result != 'OK':
+            hi = mid
+        else:
+            lo = mid + 1
+            lo < hi
+            return lo
     return lo
 base = all_exprs[None:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
-name_149 = r == 'OK'
-bp = find_breaking_point(all_exprs, 6, len(all_exprs) - 1)
-print(f"
+if r == 'OK':
+    bp = find_breaking_point(all_exprs, 6, len(all_exprs) - 1)
+    print(f"
 Breaking expression: #{bp}: {all_exprs[bp]}")
-print(f"
+    print(f"
 Verification - up to #{bp}:")
-r = test_until_broken(all_exprs[None:bp + 1])
-print(f"  {r}")
-print(f"
+    r = test_until_broken(all_exprs[None:bp + 1])
+    print(f"  {r}")
+    print(f"
 Verification - just #{bp}:")
-r = test_until_broken(all_exprs[None:bp])
-print(f"  {r}")
-# [SUMMARY] 2 blocks · 2 processed · 1 orphan · 156 instr
+    r = test_until_broken(all_exprs[None:bp])
+    print(f"  {r}")
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 156 instr

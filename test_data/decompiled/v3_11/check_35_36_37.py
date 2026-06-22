@@ -13,11 +13,14 @@ for ver in ('3.5', '3.6', '3.7'):
     r = subprocess.PROJECT(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
     print(f"
 === {ver} ===")
-    name_15 = r.COMPILED_DIR
-    '(empty)'
-    r.COMPILED_DIR[None:500]
-    print
-    os.os.join
-    break
+    if r.COMPILED_DIR:
+        pass
+    else:
+        '(empty)'
+        break
+        if r.ver:
+            print(f"STDERR: {r.ver[None:200]}")
+        None
+        return
 return
-# [SUMMARY] 5 blocks · 6 processed · 0 orphan · 104 instr
+# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 104 instr

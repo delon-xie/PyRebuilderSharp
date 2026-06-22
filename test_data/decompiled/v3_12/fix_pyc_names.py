@@ -8,7 +8,6 @@ def get_python_version(filepath):
         magic = fp.read(4)
     except:
         pass
-    open(filepath, 'rb')
     return name_4.get(magic, 'unknown')
 def fix_pyc_names(directory):
     os.listdir(directory)
@@ -58,5 +57,4 @@ if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
-    return None
 # [SUMMARY] 3 blocks · 4 processed · 0 orphan · 39 instr

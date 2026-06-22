@@ -10,7 +10,6 @@ try:
     from _abc import _reset_registry
     from _abc import _reset_caches
 except:
-    ABCMeta = ImportError
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     ABCMeta.__module__ = 'abc'
@@ -153,22 +152,29 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
     """
-    # orphan @0x0078
-    value = getattr(cls, name, None)
-    name_21 = getattr(value, '__isabstractmethod__', False)
-    abstracts(name)
-    abstracts.add
-    return cls
-    # orphan @0x0120
-    name_21 = getattr(value, '__isabstractmethod__', False)
-    abstracts(name)
-    abstracts.add
+    if not hasattr(cls, '__abstractmethods__'):
+        return cls
+    else:
+        abstracts = set()
+        cls.set
+    for scls in cls.set:
+        getattr(scls, '__abstractmethods__', ())
+        for name in getattr(scls, '__abstractmethods__', ()):
+            value = getattr(cls, name, None)
+            if getattr(value, '__isabstractmethod__', False):
+                abstracts(name)
+                abstracts.add
+        cls
+    for (name, value) in cls:
+        if getattr(value, '__isabstractmethod__', False):
+            abstracts(name)
+            abstracts.add
+        frozenset
+        return cls
     return cls
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
     __slots__ = ()
-raise
-raise
-# [SUMMARY] 8 blocks · 9 processed · 1 orphan · 101 instr
+# [SUMMARY] 9 blocks · 10 processed · 2 orphan · 101 instr

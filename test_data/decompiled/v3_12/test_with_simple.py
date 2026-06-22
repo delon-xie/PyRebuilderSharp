@@ -8,7 +8,6 @@ def test():
     try:
         try:
             try:
-                lock
                 raise
             except:
                 pass
@@ -17,6 +16,5 @@ def test():
     except:
         pass
     lock = object()
-    lock
     raise
 # [SUMMARY] 1 blocks · 2 processed · 0 orphan · 5 instr

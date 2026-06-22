@@ -12,7 +12,6 @@ INPUT_PY = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/P
 OUTPUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 BASENAME = 'test_expressions_comprehensive'
 PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
-open(INPUT_PY)
 outc = os.path.join(OUTPUT_DIR, '{}.2.7.pyc'.format(BASENAME))
 result = subprocess.run([PY27, '-c', """import py_compile, sys
 src, dst = sys.argv[1], sys.argv[2]
@@ -29,5 +28,5 @@ if len(result2.stdout) > 500:
 else:
     result2.stdout
     if len(result2.stderr) > 500:
-        return None
+        pass
 # [SUMMARY] 14 blocks · 14 processed · 1 orphan · 173 instr

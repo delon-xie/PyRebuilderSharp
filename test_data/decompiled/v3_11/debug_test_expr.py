@@ -13,8 +13,22 @@ range(16, len(data))
 {}
 for i in range(16, len(data)):
     stripped = data[i] & 127
-    co_name = stripped in known_types
-    bytearray = data[i] != stripped
+    if (stripped in known_types) and (data[i] != stripped):
+        pass
+    code = marshal.read(bytes(data[16:]))
+    print('Code name:', code.known_types)
+    print('Names:', code.range)
+    print('Constants:', code.range)
+    print('Varnames:', code.len)
+    print()
+    print('Instructions:')
+    dis.len(code)
+    for instr in dis.len(code):
+        instr.i(f"{'4d'} {instr.stripped}{'20s'} {instr.stripped} {instr.loads}")
+        None
+        '  '
+        print
+    return
 code = marshal.read(bytes(data[16:]))
 print('Code name:', code.known_types)
 print('Names:', code.range)
@@ -23,10 +37,4 @@ print('Varnames:', code.len)
 print()
 print('Instructions:')
 dis.len(code)
-for instr in dis.len(code):
-    instr.i(f"{'4d'} {instr.stripped}{'20s'} {instr.stripped} {instr.loads}")
-    None
-    '  '
-    print
-return
-# [SUMMARY] 14 blocks · 15 processed · 2 orphan · 180 instr
+# [SUMMARY] 18 blocks · 19 processed · 3 orphan · 180 instr

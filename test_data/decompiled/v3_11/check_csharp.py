@@ -22,21 +22,21 @@ for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
 raw2 = data[off]
 type2 = raw2 & 127
 '  type_byte='(f"{raw2}{'#x'}, clean={type2}")
-length = raw2 & 128
-print('  (FLAG_REF set, _refList.Count used)')
-off2 = off + 1
-off2 = off + 1
-print
-print
-name_24 = type2 == 90
-length = data[off2]
-print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
-name_24 = type2 == 122
-length = data[off2]
-print(f"  TYPE_SHORT_ASCII len={length}")
-name_96 = type2 == 115
-print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
-length = struct.data('<i', data[off2:off2 + 4])[0]
-'  Raw bytes: len='(f"{length} data={data[off2 + 4:off2 + 14].hex}{data[off2 + 4:off2 + 14]()}")
-'  Unknown type, bytes at '(f"{off2}: {data[off2:off2 + 16].hex}{data[off2:off2 + 16]()}")
-# [SUMMARY] 15 blocks · 16 processed · 5 orphan · 287 instr
+if raw2 & 128:
+    print('  (FLAG_REF set, _refList.Count used)')
+    off2 = off + 1
+else:
+    off2 = off + 1
+    if type2 == 90:
+        length = data[off2]
+        print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
+    elif type2 == 122:
+        length = data[off2]
+        print(f"  TYPE_SHORT_ASCII len={length}")
+    elif type2 == 115:
+        print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
+        length = struct.data('<i', data[off2:off2 + 4])[0]
+        '  Raw bytes: len='(f"{length} data={data[off2 + 4:off2 + 14].hex}{data[off2 + 4:off2 + 14]()}")
+    else:
+        '  Unknown type, bytes at '(f"{off2}: {data[off2:off2 + 16].hex}{data[off2:off2 + 16]()}")
+# [SUMMARY] 21 blocks · 22 processed · 3 orphan · 287 instr

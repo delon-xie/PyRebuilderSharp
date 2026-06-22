@@ -6,18 +6,19 @@ except:
     break
 x = 1
 y = 2
-i = x < y
-z = x
-i = x > y
-z = y
-z = 0
-i = 0
-name_16 = i < 5
-j = i * 2
-i += 1
-range(10)
-i < 5
-for n in range(10):
-    m = n + 1
-a = 1
-# [SUMMARY] 9 blocks · 10 processed · 2 orphan · 67 instr
+if x < y:
+    z = x
+elif x > y:
+    z = y
+else:
+    z = 0
+    i = 0
+    if i < 5:
+        j = i * 2
+        i += 1
+        i < 5
+    range(10)
+    for n in range(10):
+        m = n + 1
+    a = 1
+# [SUMMARY] 15 blocks · 16 processed · 2 orphan · 67 instr

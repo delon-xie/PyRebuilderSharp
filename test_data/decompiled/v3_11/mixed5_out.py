@@ -2,69 +2,79 @@
 
 def mixed_1(n):
     result = 0
-    name_54 = n > 0
-    range(n)
-    for i in range(n):
-        j = 0
-        name_28 = j < i
-        j += 1
-        name_6 = j > 5
-        result += j
-        result += 1
+    if n > 0:
+        for i in range(n):
+            j = 0
+            if j < i:
+                j += 1
+                if j > 5:
+                    result += j
+                else:
+                    result += 1
+                    j < i
+    else:
         result
-        j < i
-    return
+        return
 def mixed_2(n):
     total = 0
     range(n)
     for i in range(n):
         j = 0
-        name_40 = j < n
-        j += 1
-        name_23 = i == j
-        range(i)
-        for k in range(i):
-            total += k
-            j
+        if j < n:
+            j += 1
+            if i == j:
+                for k in range(i):
+                    total += k
+            else:
+                j
+                total
+                return
         total
     return
 def mixed_3(n):
     total = 0
     i = 0
-    name_62 = i < n
-    i += 1
-    name_42 = i % 2 == 0
-    range(i)
-    for j in range(i):
-        k = j
-        name_16 = k > 0
-        k -= 1
-        total += 1
-        i
-        k > 0
+    if i < n:
+        i += 1
+        if i % 2 == 0:
+            for j in range(i):
+                k = j
+                if k > 0:
+                    k -= 1
+                    total += 1
+                    k > 0
+        else:
+            i
+            return total
     return total
 def mixed_4(n):
     try:
-        name_1 = n > 0
-        range(n)
-        for i in range(n):
+        try:
             try:
                 try:
-                    name_1 = n > 0
                     range(n)
+                    for i in range(n):
+                        try:
+                            j = 0
+                            try:
+                                j += 1
+                            except:
+                                break
+                        except:
+                            break
+                        try:
+                            total += j
+                        except:
+                            break
+                        j < i
+                        raise
+                    return
                 except:
                     break
-                j = 0
-                name_25 = j < i
-                j += 1
             except:
                 break
-            try:
-                total += j
-            except:
-                break
-            raise
-        return
+        except:
+            break
     except:
         break
     total = 0

@@ -7,7 +7,6 @@ except:
 try:
     f = open('test.txt')
 except:
-    n = IOError
     break
 range(10)
 for i in range(10):
@@ -17,7 +16,8 @@ for x in items:
     y = x
 range(5)
 for n in range(5):
-    a = n == 3
-    break
-raise
-# [SUMMARY] 22 blocks · 23 processed · 3 orphan · 77 instr
+    if n == 3:
+        break
+    elif n == 1:
+        pass
+# [SUMMARY] 27 blocks · 28 processed · 4 orphan · 77 instr

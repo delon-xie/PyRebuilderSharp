@@ -67,7 +67,6 @@ except:
 import marshal
 import struct
 import sys
-open(sys.argv[1], 'rb')
 pos = 16
 raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}{'02X'}")

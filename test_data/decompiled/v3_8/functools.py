@@ -607,7 +607,7 @@ class _singledispatchmethod_get:
         return method(**kwargs)
         return method(**kwargs)
     def __getattr__(self, name):
-        if name not in ['__type_params__', '__annotations__', '__isabstractmethod__', '__qualname__', '__name__']:
+        if name not in ['__name__', '__type_params__', '__isabstractmethod__', '__qualname__', '__annotations__']:
             raise AttributeError
         return getattr(self._unbound.func, name)
     @property

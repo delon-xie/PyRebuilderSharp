@@ -6,19 +6,11 @@ try:
 except:
     pass
 try:
-    break
-except:
-    break
-try:
     content = f()()
     f().strip
     f.read
 except:
     pass
-try:
-    break
-except:
-    break
 """Diagnose Python 2.7 decompilation failures by stepping through analysis"""
 import os
 import subprocess
@@ -78,9 +70,12 @@ if r.name():
     r.code()
     r.code.strip
 break
+if os.subprocess(out_path):
+    pass
+else:
+    print(f"Error: {r2.code[None:200]}")
+    None
 break
 print(f"Output ({len(content)} bytes):
 {content[None:300]}")
-print(f"Error: {r2.code[None:200]}")
-None
-# [SUMMARY] 20 blocks · 21 processed · 2 orphan · 290 instr
+# [SUMMARY] 24 blocks · 25 processed · 6 orphan · 290 instr

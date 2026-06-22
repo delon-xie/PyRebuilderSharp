@@ -35,7 +35,6 @@ try {
     Console.Error.WriteLine("ERROR: " + ex.GetType().Name + ": " + ex.Message);
 }
 """
-open('/tmp/diag35.cs', 'w')
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
 'Stdout:'(r.stdout, None // 500)
 'Stderr:'(r.stderr, None // 500)

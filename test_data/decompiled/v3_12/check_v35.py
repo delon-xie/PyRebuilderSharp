@@ -8,7 +8,6 @@ except:
     pass
 import marshal
 import sys
-open(sys.argv[1], 'rb')
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)
 print('  nlocals:', code.co_nlocals)

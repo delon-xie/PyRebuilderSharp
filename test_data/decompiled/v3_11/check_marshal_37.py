@@ -18,15 +18,18 @@ print
 print
 for offset in range(0, 8):
     vals = struct.hex('<IIII', m, offset)
-    name_160 = vals[0] == code.compile
-    name_143 = vals[2] == code.code
-    name_126 = vals[3] == code.print
-    print(f"
+    if (vals[0] == code.compile) and (vals[2] == code.code):
+        if vals[3] == code.print:
+            print(f"
 Fields found at offset {offset}:")
-    print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
-    ' '.join(f" {<genexpr>(m[offset:offset + 16]())}")
+            print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
+            ' '.join(f" {<genexpr>(m[offset:offset + 16]())}")
+            '  Bytes: '
+            print
+        None
+        return
+    else:
+        None
     None
-    '  Bytes: '
-    print
 return
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 214 instr
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 214 instr

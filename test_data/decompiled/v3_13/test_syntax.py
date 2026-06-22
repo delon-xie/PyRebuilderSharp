@@ -2865,8 +2865,8 @@ class SyntaxWarningTest(unittest.TestCase):
     def check_warning(self, code, errtext, filename = '<testcase>', mode = 'exec'):
         """Check that compiling code raises SyntaxWarning with errtext.
 
-errtest is a regular expression that must be present in the
-text of the warning raised.
+    errtest is a regular expression that must be present in the
+    text of the warning raised.
 """
         try:
             try:
@@ -2949,14 +2949,12 @@ class SyntaxErrorTestCase(unittest.TestCase):
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
         """Check that compiling code raises SyntaxError with errtext.
 
-errtest is a regular expression that must be present in the
-text of the exception raised.  If subclass is specified it
-is the expected subclass of SyntaxError (e.g. IndentationError).
+    errtest is a regular expression that must be present in the
+    text of the exception raised.  If subclass is specified it
+    is the expected subclass of SyntaxError (e.g. IndentationError).
 """
         try:
             try:
-                if __name__:
-                    pass
                 try:
                     try:
                         err = None
@@ -3378,5 +3376,4 @@ def load_tests(loader, tests, pattern):
     return tests
 if __name__ == '__main__':
     unittest.main()
-    return None
 # [SUMMARY] 3 blocks · 4 processed · 0 orphan · 65 instr

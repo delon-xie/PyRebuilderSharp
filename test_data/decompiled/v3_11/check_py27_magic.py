@@ -28,6 +28,6 @@ print('co_firstlineno:', code.co_firstlineno)
 dis.disassemble(code)
      """], text=True, capture_output=True)
 print('Marshal dump:', result3.path)
-name_19 = result3.path
-print('Stderr:', result3.path)
-# [SUMMARY] 2 blocks · 2 processed · 1 orphan · 146 instr
+if result3.path:
+    print('Stderr:', result3.path)
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 146 instr

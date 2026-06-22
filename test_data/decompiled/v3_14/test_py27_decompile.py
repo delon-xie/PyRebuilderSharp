@@ -32,6 +32,6 @@ if len(result2.stdout) > 500:
 else:
     result2.stdout
     if len(result2.stderr) > 500:
-        return None
+        pass
 raise
 # [SUMMARY] 13 blocks · 14 processed · 0 orphan · 182 instr

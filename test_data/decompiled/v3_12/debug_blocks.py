@@ -42,7 +42,6 @@ import dis
 import marshal
 import types
 import struct
-open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb')
 code.co_consts
 for const in code.co_consts:
     if not isinstance(const, types.CodeType):

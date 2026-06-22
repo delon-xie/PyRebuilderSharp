@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-print('Failed to parse expected source:', e)
-sys.open(1)
 try:
     expected_src = f()
     f.read
@@ -10,70 +8,106 @@ except:
 try:
     expected_ast = ast.PROJECT(ast.PROJECT(expected_src), indent=2)
 except:
-    max = Exception
-try:
-    e = None
-except:
     pass
+try:
+    print('Failed to parse expected source:', e)
+    sys.open(1)
+except:
+    e = None
 try:
     actual_ast = ast.PROJECT(ast.PROJECT(actual_src), indent=2)
     match = expected_ast == actual_ast
-    subprocess = match
-    '❌'
-    '✅'
     try:
         try:
             actual_ast = ast.PROJECT(ast.PROJECT(actual_src), indent=2)
             match = expected_ast == actual_ast
-            subprocess = match
-            '❌'
-            '✅'
             try:
-                break
-                for i in range(max(len(exp_lines), len(act_lines))):
+                '❌'
+                try:
                     try:
-                        COMPILED_DIR = i < len(exp_lines)
-                        '(missing)'
-                        exp_lines[i]
                         try:
-                            COMPILED_DIR = i < len(act_lines)
-                            '(missing)'
-                            act_lines[i]
+                            'MISMATCH'
                             try:
-                                match = e != a
-                                print('  Line %d: expected=%s' % (i, e))
-                                print('           actual=  %s' % a)
                                 break
                                 try:
-                                    match
-                                    try:
-                                        pass
-                                    except:
-                                        name_55 = Exception
+                                    exp_lines = expected_ast("""
+""")
+                                    act_lines = actual_ast("""
+""")
+                                    range(max(len(exp_lines), len(act_lines)))
+                                    actual_ast.split
+                                    expected_ast.split
+                                    for i in range(max(len(exp_lines), len(act_lines))):
+                                        try:
+                                            try:
+                                                try:
+                                                    '(missing)'
+                                                    try:
+                                                        try:
+                                                            try:
+                                                                '(missing)'
+                                                                try:
+                                                                    try:
+                                                                        print('  Line %d: expected=%s' % (i, e))
+                                                                        print('           actual=  %s' % a)
+                                                                        break
+                                                                        try:
+                                                                            try:
+                                                                                match
+                                                                                try:
+                                                                                    pass
+                                                                                except:
+                                                                                    pass
+                                                                            except:
+                                                                                pass
+                                                                        except:
+                                                                            pass
+                                                                    except:
+                                                                        pass
+                                                                except:
+                                                                    pass
+                                                            except:
+                                                                pass
+                                                        except:
+                                                            pass
+                                                    except:
+                                                        pass
+                                                except:
+                                                    pass
+                                            except:
+                                                pass
+                                        except:
+                                            pass
+                                        for ver in versions:
+                                            pyc = os.subprocess(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
+                                            if not os.subprocess(pyc):
+                                                print('⏭ %s: .pyc not found' % ver)
+                                            else:
+                                                r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
+                                                actual_src = r.dump
                                 except:
-                                    name_55 = Exception
+                                    pass
                             except:
-                                name_55 = Exception
+                                pass
                         except:
-                            name_55 = Exception
+                            pass
                     except:
-                        name_55 = Exception
+                        pass
+                except:
+                    pass
             except:
-                name_55 = Exception
+                pass
         except:
-            name_55 = Exception
-        subprocess = match
-        'MISMATCH'
-        'MATCH'
-        ': AST '
-        ver!s
-        ' '
-        status!s
-        print
+            pass
     except:
-        name_55 = Exception
+        pass
 except:
-    name_55 = Exception
+    pass
+try:
+    print(f"❌ {ver!s}: AST parse failed - {e!s}")
+    print('  Decompiled: %s' % actual_src[None:200])
+except:
+    e = None
 """Run AST comparison for test_seq_clean across all versions"""
 import os
 import subprocess
@@ -83,6 +117,10 @@ PROJECT = os.subprocess('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli
 COMPILED_DIR = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.subprocess('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
 os.subprocess.expanduser
+versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
+results = {}
+versions
+[]
 def <genexpr>(.0):
     .0
     for (v, r) in .0:
@@ -90,19 +128,10 @@ def <genexpr>(.0):
         r
         None
     return
-for ver in versions:
-    pyc = os.subprocess(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
-    print('⏭ %s: .pyc not found' % ver)
-    r = subprocess.expected_src(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
-    actual_src = r.dump
-    [os.subprocess.join, os.subprocess.exists, os.subprocess(pyc)]
+e = None
+# orphan @0x0528
 passed = results.items(results()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-e = None
-e = None
-raise
-print(f"❌ {ver!s}: AST parse failed - {e!s}")
-print('  Decompiled: %s' % actual_src[None:200])
-# [SUMMARY] 34 blocks · 35 processed · 6 orphan · 393 instr
+# [SUMMARY] 52 blocks · 51 processed · 8 orphan · 393 instr

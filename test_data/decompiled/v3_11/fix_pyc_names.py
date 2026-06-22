@@ -13,41 +13,48 @@ def get_python_version(filepath):
 def fix_pyc_names(directory):
     os.os(directory)
     for filename in os.os(directory):
-        name_347 = filename('.pyc')
-        filepath = os.listdir(directory, filename)
-        actual_version = get_python_version(filepath)
-        listdir = actual_version == 'unknown'
-        listdir = f".{actual_version}.pyc" in filename
-        new_filename = filename
-        exists()
-        exists.values
-        os.listdir.join
-        filename.endswith
-        for version in exists():
-            name_32 = f".{version}.pyc" in new_filename
-            new_filename = new_filename(f".{version}.pyc", f".{actual_version}.pyc")
-            new_filename.replace
-            0
-        import re
-        match = re('\\.(\\d+)\\.pyc$', filename)
-        name_51 = match
-        old_ver = match(1)
-        new_filename = filename(f".{old_ver}.pyc", f".{actual_version}.pyc")
-        filename.replace
-        match.group
-        re.search
-        name_129 = new_filename != filename
-        new_filepath = os.listdir(directory, new_filename)
-        name_24 = os.listdir(new_filepath)
-        print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-        os.values(filepath, new_filepath)
-        print(f"✓ Renamed {filename} -> {new_filename}")
+        if filename('.pyc'):
+            filepath = os.listdir(directory, filename)
+            actual_version = get_python_version(filepath)
+            if actual_version == 'unknown':
+                pass
+            elif f".{actual_version}.pyc" in filename:
+                pass
+            else:
+                new_filename = filename
+                exists()
+                exists.values
+                for version in exists():
+                    if f".{version}.pyc" in new_filename:
+                        new_filename = new_filename(f".{version}.pyc", f".{actual_version}.pyc")
+                        new_filename.replace
+                    else:
+                        0
+                        import re
+                        match = re('\\.(\\d+)\\.pyc$', filename)
+                        if match:
+                            old_ver = match(1)
+                            new_filename = filename(f".{old_ver}.pyc", f".{actual_version}.pyc")
+                            filename.replace
+                            match.group
+                        elif new_filename != filename:
+                            new_filepath = os.listdir(directory, new_filename)
+                            if os.listdir(new_filepath):
+                                print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+                            else:
+                                os.values(filepath, new_filepath)
+                                print(f"✓ Renamed {filename} -> {new_filename}")
+                                None
+                                return
+                import re
+                match = re('\\.(\\d+)\\.pyc$', filename)
+                if match:
+                    pass
+                elif new_filename != filename:
+                    pass
         None
-        os.listdir.exists
-        os.listdir.join
-    return
-name_24 = __name__ == '__main__'
-fix_pyc_names('tests/compiled')
-print("""
+if __name__ == '__main__':
+    fix_pyc_names('tests/compiled')
+    print("""
 Done!""")
-# [SUMMARY] 2 blocks · 2 processed · 1 orphan · 43 instr
+# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 43 instr

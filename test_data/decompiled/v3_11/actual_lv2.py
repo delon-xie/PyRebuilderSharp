@@ -8,12 +8,12 @@ x = 1
 y = 2
 z = x + y
 i = 0
-name_16 = i < 5
-j = i * 2
-i += 1
+if i < 5:
+    j = i * 2
+    i += 1
+    i < 5
 range(10)
-i < 5
 for n in range(10):
     m = n + 1
 a = 1
-# [SUMMARY] 8 blocks · 9 processed · 2 orphan · 53 instr
+# [SUMMARY] 10 blocks · 11 processed · 2 orphan · 53 instr

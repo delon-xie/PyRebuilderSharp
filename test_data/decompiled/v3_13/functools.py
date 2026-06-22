@@ -32,14 +32,14 @@ WRAPPER_UPDATES = ('__dict__',)
 def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Update a wrapper function to look like the wrapped function
 
-wrapper is the function to be updated
-wrapped is the original function
-assigned is a tuple naming the attributes assigned directly
-from the wrapped function to the wrapper function (defaults to
-functools.WRAPPER_ASSIGNMENTS)
-updated is a tuple naming the attributes of the wrapper that
-are updated with the corresponding attribute from the wrapped
-function (defaults to functools.WRAPPER_UPDATES)
+    wrapper is the function to be updated
+    wrapped is the original function
+    assigned is a tuple naming the attributes assigned directly
+    from the wrapped function to the wrapper function (defaults to
+    functools.WRAPPER_ASSIGNMENTS)
+    updated is a tuple naming the attributes of the wrapper that
+    are updated with the corresponding attribute from the wrapped
+    function (defaults to functools.WRAPPER_UPDATES)
 """
     try:
         try:
@@ -62,11 +62,11 @@ function (defaults to functools.WRAPPER_UPDATES)
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
 
-Returns a decorator that invokes update_wrapper() with the decorated
-function as the wrapper argument and the arguments to wraps() as the
-remaining arguments. Default arguments are as for update_wrapper().
-This is a convenience function to simplify applying partial() to
-update_wrapper().
+    Returns a decorator that invokes update_wrapper() with the decorated
+    function as the wrapper argument and the arguments to wraps() as the
+    remaining arguments. Default arguments are as for update_wrapper().
+    This is a convenience function to simplify applying partial() to
+    update_wrapper().
 """
     return
 def _gt_from_lt(self, other):
@@ -194,16 +194,16 @@ def cmp_to_key(mycmp):
 _initial_missing = sentinel('_initial_missing')
 def reduce(function, sequence, initial = _initial_missing):
     """
-reduce(function, iterable, /[, initial]) -> value
+    reduce(function, iterable, /[, initial]) -> value
 
-Apply a function of two arguments cumulatively to the items of an iterable, from left to right.
+    Apply a function of two arguments cumulatively to the items of an iterable, from left to right.
 
-This effectively reduces the iterable to a single value.  If initial is present,
-it is placed before the items of the iterable in the calculation, and serves as
-a default when the iterable is empty.
+    This effectively reduces the iterable to a single value.  If initial is present,
+    it is placed before the items of the iterable in the calculation, and serves as
+    a default when the iterable is empty.
 
-For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
-calculates ((((1 + 2) + 3) + 4) + 5).
+    For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
+    calculates ((((1 + 2) + 3) + 4) + 5).
 """
     try:
         value = next(it)
@@ -221,7 +221,7 @@ calculates ((((1 + 2) + 3) + 4) + 5).
 class _PlaceholderType:
     """The type of the Placeholder singleton.
 
-Used as a placeholder for partial arguments.
+    Used as a placeholder for partial arguments.
 """
     _PlaceholderType__instance = None
     __slots__ = ()
@@ -292,7 +292,7 @@ def _partial_repr(self):
     return f"{module}.{qualname}({', '.join(args)})"
 class partial:
     """New function with partial application of the given arguments
-and keywords.
+    and keywords.
 """
     __slots__ = ('func', 'args', 'keywords', '_phcount', '_merger', '__dict__', '__weakref__')
     __new__ = _partial_new
@@ -333,10 +333,10 @@ and keywords.
     __class_getitem__ = classmethod(GenericAlias)
 class partialmethod:
     """Method descriptor with partial application of the given arguments
-and keywords.
+    and keywords.
 
-Supports wrapping existing descriptors and handles non-descriptor
-callables as instance methods.
+    Supports wrapping existing descriptors and handles non-descriptor
+    callables as instance methods.
 """
     __new__ = _partial_new
     __repr__ = _partial_repr
@@ -395,12 +395,12 @@ _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
 def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, tuple = tuple, type = type, len = len):
     """Make a cache key from optionally typed positional and keyword arguments
 
-The key is constructed in a way that is flat as possible rather than
-as a nested structure that would take more memory.
+    The key is constructed in a way that is flat as possible rather than
+    as a nested structure that would take more memory.
 
-If there is only a single argument and its data type is known to cache
-its hash value, then that argument is returned without a wrapper.  This
-saves space and improves lookup speed.
+    If there is only a single argument and its data type is known to cache
+    its hash value, then that argument is returned without a wrapper.  This
+    saves space and improves lookup speed.
 
 """
     try:
@@ -443,21 +443,21 @@ saves space and improves lookup speed.
 def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
 
-If *maxsize* is set to None, the LRU features are disabled and the cache
-can grow without bound.
+    If *maxsize* is set to None, the LRU features are disabled and the cache
+    can grow without bound.
 
-If *typed* is True, arguments of different types will be cached
-separately.  For example, f(decimal.Decimal("3.0")) and f(3.0) will be
-treated as distinct calls with distinct results.  Some types such as
-str and int may be cached separately even when typed is false.
+    If *typed* is True, arguments of different types will be cached
+    separately.  For example, f(decimal.Decimal("3.0")) and f(3.0) will be
+    treated as distinct calls with distinct results.  Some types such as
+    str and int may be cached separately even when typed is false.
 
-Arguments to the cached function must be hashable.
+    Arguments to the cached function must be hashable.
 
-View the cache statistics named tuple (hits, misses, maxsize, currsize)
-with f.cache_info().  Clear the cache and statistics with
-f.cache_clear().  Access the underlying function with f.__wrapped__.
+    View the cache statistics named tuple (hits, misses, maxsize, currsize)
+    with f.cache_info().  Clear the cache and statistics with
+    f.cache_clear().  Access the underlying function with f.__wrapped__.
 
-See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
+    See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
 """
     if isinstance(maxsize, callable):
@@ -549,7 +549,7 @@ def cache(user_function):
 def _c3_merge(sequences):
     """Merges MROs in *sequences* to a single MRO using the C3 algorithm.
 
-Adapted from https://docs.python.org/3/howto/mro.html.
+    Adapted from https://docs.python.org/3/howto/mro.html.
 
 """
     try:
@@ -591,18 +591,18 @@ Adapted from https://docs.python.org/3/howto/mro.html.
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
 
-If no *abcs* are given, the algorithm works exactly like the built-in C3
-linearization used for method resolution.
+    If no *abcs* are given, the algorithm works exactly like the built-in C3
+    linearization used for method resolution.
 
-If given, *abcs* is a list of abstract base classes that should be inserted
-into the resulting MRO. Unrelated ABCs are ignored and don't end up in the
-result. The algorithm inserts ABCs where their functionality is introduced,
-i.e. issubclass(cls, abc) returns True for the class itself but returns
-False for all its direct base classes. Implicit ABCs for a given class
-(either registered or inferred from the presence of a special method like
-__len__) are inserted directly after the last ABC explicitly listed in the
-MRO of said class. If two implicit ABCs end up next to each other in the
-resulting MRO, their ordering depends on the order of types in *abcs*.
+    If given, *abcs* is a list of abstract base classes that should be inserted
+    into the resulting MRO. Unrelated ABCs are ignored and don't end up in the
+    result. The algorithm inserts ABCs where their functionality is introduced,
+    i.e. issubclass(cls, abc) returns True for the class itself but returns
+    False for all its direct base classes. Implicit ABCs for a given class
+    (either registered or inferred from the presence of a special method like
+    __len__) are inserted directly after the last ABC explicitly listed in the
+    MRO of said class. If two implicit ABCs end up next to each other in the
+    resulting MRO, their ordering depends on the order of types in *abcs*.
 
 """
     try:
@@ -676,8 +676,8 @@ resulting MRO, their ordering depends on the order of types in *abcs*.
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
 
-Includes relevant abstract base classes (with their respective bases) from
-the *types* iterable. Uses a modified C3 linearization algorithm.
+    Includes relevant abstract base classes (with their respective bases) from
+    the *types* iterable. Uses a modified C3 linearization algorithm.
 
 """
     try:
@@ -769,11 +769,11 @@ the *types* iterable. Uses a modified C3 linearization algorithm.
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
 
-Where there is no registered implementation for a specific type, its method
-resolution order is used to find a more generic implementation.
+    Where there is no registered implementation for a specific type, its method
+    resolution order is used to find a more generic implementation.
 
-Note: if *registry* does not contain an implementation for the base
-*object* type, this function may return None.
+    Note: if *registry* does not contain an implementation for the base
+    *object* type, this function may return None.
 
 """
     match = None
@@ -806,11 +806,11 @@ Note: if *registry* does not contain an implementation for the base
 def singledispatch(func):
     """Single-dispatch generic function decorator.
 
-Transforms a function into a generic function, which can have different
-behaviours depending upon the type of its first argument. The decorated
-function acts as the default implementation, and additional
-implementations can be registered using the register() attribute of the
-generic function.
+    Transforms a function into a generic function, which can have different
+    behaviours depending upon the type of its first argument. The decorated
+    function acts as the default implementation, and additional
+    implementations can be registered using the register() attribute of the
+    generic function.
 """
     import weakref
     def wrapper():
@@ -827,15 +827,15 @@ generic function.
 class singledispatchmethod:
     """Single-dispatch generic method descriptor.
 
-Supports wrapping existing descriptors and handles non-descriptor
-callables as instance methods.
+    Supports wrapping existing descriptors and handles non-descriptor
+    callables as instance methods.
 """
     def __init__(self, func):
         pass
     def register(self, cls, method = None):
         """generic_method.register(cls, func) -> func
 
-Registers a new implementation for the given *cls* on a *generic_method*.
+    Registers a new implementation for the given *cls* on a *generic_method*.
 """
         return
     def __get__(self, obj, cls = None):

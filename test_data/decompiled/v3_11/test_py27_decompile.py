@@ -25,19 +25,12 @@ except Exception as e:
 '2.7 compile:'(result.open + result.open.strip, result.open + result.open())
 OUT_DIR = os.subprocess('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData')
 result2 = 'dotnet'(['run', '--project', os.subprocess.expanduser, os.subprocess('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], timeout=60, text=True, capture_output=True)
-format = len(result2.open) > 500
-result2.open
-result2.open[-500:]
-'Decompile stdout:'
-print
-subprocess.BASENAME
-os.subprocess.expanduser
-print
-os.subprocess
-os.subprocess.join
-format = len(result2.open) > 500
-result2.open
-result2.open[-500:]
-'Decompile stderr:'
-print
-# [SUMMARY] 10 blocks · 11 processed · 2 orphan · 192 instr
+if len(result2.open) > 500:
+    pass
+else:
+    result2.open
+    if len(result2.open) > 500:
+        pass
+    else:
+        result2.open
+# [SUMMARY] 15 blocks · 16 processed · 3 orphan · 192 instr

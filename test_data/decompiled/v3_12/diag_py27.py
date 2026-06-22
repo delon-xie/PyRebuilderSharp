@@ -52,7 +52,6 @@ for (name, code) in tests.items():
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
-    open(py_path, 'w')
 break
 r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
@@ -64,7 +63,7 @@ if not r.stdout.strip():
     break
 break
 if os.path.exists(out_path):
-    open(out_path)
+    pass
 else:
     'Error: '(f"{r2.stderr}{None // 200}")
 break

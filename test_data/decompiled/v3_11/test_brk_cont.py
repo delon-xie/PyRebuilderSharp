@@ -2,8 +2,12 @@
 
 range(10)
 for i in range(10):
-    name_3 = i == 5
-    break
-i = i == 1
-a = i
-# [SUMMARY] 5 blocks · 6 processed · 1 orphan · 26 instr
+    if i == 5:
+        break
+    elif i == 1:
+        pass
+    else:
+        a = i
+        None
+        return
+# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 26 instr

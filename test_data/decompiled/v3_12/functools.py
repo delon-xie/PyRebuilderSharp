@@ -494,10 +494,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             except:
                 pass
             key = make_key(args, kwds, typed)
-            lock
             return
             result = user_function(**kwds)
-            lock
             None
             return result
             raise
@@ -508,7 +506,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 _CacheInfo(hits, misses, maxsize, cache_len())
             except:
                 pass
-            lock
             return
             raise
         def cache_clear():
@@ -523,7 +520,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 [root, root, None, None]
             except:
                 pass
-            lock
             raise
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear

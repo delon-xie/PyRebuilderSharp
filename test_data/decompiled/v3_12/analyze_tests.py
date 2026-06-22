@@ -8,7 +8,6 @@ except:
     break
 import re
 from collections import defaultdict
-open('/tmp/test_full.txt', 'r')
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}

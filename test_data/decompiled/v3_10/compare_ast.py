@@ -20,7 +20,6 @@ except Exception:
     sys.exit(1)
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
-    return None
 else:
     exp_lines = expected_ast.split("""
 """)
