@@ -861,10 +861,11 @@ public class PycReader
                 arg = arg.Value * 2;
             }
 
-            // Python 3.12+ wordcode: LOAD_GLOBAL 编码 (name_idx << 1) | push_null
-            // 需要提取实际的 name index: arg >> 1
-            if (_strategy.HasCaches && arg.HasValue && op == Models.Bytecode.Opcode.LOAD_GLOBAL
-                && (arg.Value & 1) != 0)  // push_null bit set
+            // Python 3.11+ wordcode: LOAD_GLOBAL 编码 (name_idx << 1) | push_null
+            // 3.11+：始终需要 >> 1 提取真实 name index（含 push_null 标志位）
+            // pre-3.11：arg 就是原始 name index，无需解码
+            if (arg.HasValue && op == Models.Bytecode.Opcode.LOAD_GLOBAL
+                && _strategy.Version >= PythonVersion.Py311)
             {
                 arg = arg.Value >> 1;
             }
