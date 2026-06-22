@@ -52,7 +52,3 @@ for ver in versions:
 """
 """
 print
-# orphan @0x0204
-True
-False
-# [SUMMARY] 32 blocks · 32 processed · 6 orphan · 349 instr

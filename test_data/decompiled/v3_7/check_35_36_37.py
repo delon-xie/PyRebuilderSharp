@@ -17,4 +17,3 @@ for ver in ('3.5', '3.6', '3.7'):
     break
     if r.stderr:
         print(f"STDERR: {r.stderr[None:200]}")
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 94 instr

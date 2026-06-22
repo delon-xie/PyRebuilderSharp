@@ -21,4 +21,3 @@ x = 1
 y = 2
 z = x + y
 w = z * x - y / 2
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 78 instr

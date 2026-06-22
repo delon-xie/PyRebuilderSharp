@@ -22,4 +22,3 @@ for (ver, py_path) in versions.items():
     for line in out.split("""
 """):
         print(f"  {line}")
-# [SUMMARY] 7 blocks · 8 processed · 0 orphan · 78 instr

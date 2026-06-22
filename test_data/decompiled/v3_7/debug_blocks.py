@@ -30,4 +30,3 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             for test_data/input/debug_blocks.py in block_instrs:
                 if test_data/input/debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
                     print(f"  → JUMP: offset={test_data/input/debug_blocks.py.end}, target={test_data/input/debug_blocks.py.arg}")
-# [SUMMARY] 33 blocks · 32 processed · 1 orphan · 298 instr

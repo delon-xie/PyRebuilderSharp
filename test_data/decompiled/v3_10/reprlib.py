@@ -133,8 +133,6 @@ class Repr:
             0
             max
         return s
-        j = max(0, self.maxlong - 3 - i)
-        s = s[None:i] + self.fillvalue + s[len(s) - j:]
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -146,8 +144,6 @@ class Repr:
             0
             max
         return s
-        j = max(0, self.maxother - 3 - i)
-        s = s[None:i] + self.fillvalue + s[len(s) - j:]
 def _possibly_sorted(x):
     try:
         pass
@@ -156,4 +152,3 @@ def _possibly_sorted(x):
     return
 aRepr = Repr()
 repr = aRepr.repr
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 46 instr

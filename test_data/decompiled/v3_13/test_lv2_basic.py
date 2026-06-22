@@ -22,4 +22,3 @@ else:
     break
 j = i * 2
 i += 1
-# [SUMMARY] 17 blocks · 17 processed · 3 orphan · 67 instr

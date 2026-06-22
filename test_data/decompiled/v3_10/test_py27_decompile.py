@@ -20,4 +20,3 @@ except Exception as e:
         result2.stdout
         if len(result2.stderr) > 500:
             return None
-# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 166 instr

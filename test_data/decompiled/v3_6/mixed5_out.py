@@ -11,7 +11,6 @@ def mixed_1(n):
             if j > 5:
                 result += j
                 continue
-    return result
 def mixed_2(n):
     total = 0
     range(n)
@@ -55,4 +54,3 @@ def mixed_4(n):
                     continue
     except:
         total = -1
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

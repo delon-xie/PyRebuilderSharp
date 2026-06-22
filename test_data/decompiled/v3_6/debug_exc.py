@@ -15,12 +15,7 @@ raw = f.read()
 code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
-start = int.from_bytes(et[i:i + 2], 'little')
-end = int.from_bytes(et[i + 2:i + 4], 'little')
-target = int.from_bytes(et[i + 4:i + 6], 'little')
-dl = int.from_bytes(et[i + 6:i + 8], 'little')
 print(f"
 --- Nested: {const.co_name} ---")
 print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
 print(f"  bytes: {const.co_exceptiontable.hex()}")
-# [SUMMARY] 19 blocks · 19 processed · 14 orphan · 286 instr

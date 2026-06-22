@@ -128,8 +128,6 @@ class ABCMeta(type):
             raise TypeError('Can only register classes')
         else:
             return subclass
-        # orphan @0x0032
-        cls._abc_registry.add(subclass)
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
@@ -150,9 +148,6 @@ class ABCMeta(type):
         subtype = type(instance)
         if subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
             return False
-        # orphan @0x0048
-        return (any)(ABCMeta.__instancecheck__.<locals>.<genexpr>({subclass, subtype}))
-        return
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         if subclass in cls._abc_cache:
@@ -163,14 +158,6 @@ class ABCMeta(type):
             if subclass in cls._abc_negative_cache:
                 return False
             return ok
-        # orphan @0x005E
-        cls._abc_cache.add(subclass)
-        cls._abc_negative_cache
-        # orphan @0x008C
-        cls._abc_cache.add(subclass)
-        return True
-        # orphan @0x00A6
-        issubclass(subclass, rcls)
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using
     inheritance.
@@ -184,4 +171,3 @@ def get_cache_token():
     with every call to ``register()`` on any ABC.
     """
     return ABCMeta._abc_invalidation_counter
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 59 instr

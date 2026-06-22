@@ -31,5 +31,3 @@ Fields found at offset {offset}:")
     else:
         None
     None
-return
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 214 instr

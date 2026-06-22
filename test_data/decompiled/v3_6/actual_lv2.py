@@ -8,4 +8,3 @@ if i < 5:
     for n in range(10):
         m = n + 1
 a = 1
-# [SUMMARY] 9 blocks · 10 processed · 2 orphan · 51 instr

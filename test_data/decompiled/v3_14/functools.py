@@ -341,7 +341,6 @@ class partial:
             return pto_args(**keywords)
     def __get__(self, obj, objtype = None):
         return self
-        return MethodType(self, obj)
     def __reduce__(self):
         if not self.keywords:
             None
@@ -983,4 +982,3 @@ class cached_property:
 raise
 raise
 raise
-# [SUMMARY] 29 blocks · 30 processed · 5 orphan · 363 instr

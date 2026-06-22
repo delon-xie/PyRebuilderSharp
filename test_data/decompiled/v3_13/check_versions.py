@@ -42,4 +42,3 @@ for (version, files) in sorted(version_files.items()):
 break
 break
 break
-# [SUMMARY] 23 blocks · 23 processed · 1 orphan · 159 instr

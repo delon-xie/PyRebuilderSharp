@@ -17,4 +17,3 @@ print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
 print(actual_ast)
-# [SUMMARY] 5 blocks · 6 processed · 0 orphan · 98 instr

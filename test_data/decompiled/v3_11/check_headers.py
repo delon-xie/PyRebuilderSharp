@@ -22,5 +22,3 @@ for ver in ('3.5', '3.6', '3.7', '3.8'):
     ver
     print
     open(path, 'rb').read
-return
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 181 instr

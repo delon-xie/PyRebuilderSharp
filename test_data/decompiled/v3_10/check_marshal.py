@@ -37,4 +37,3 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
             print(f"  fields_at={fields_start}")
             argcount = struct.unpack('<I', data[fields_start:fields_start + 4])[0]
             print(f"  argcount={argcount}")
-# [SUMMARY] 15 blocks · 16 processed · 0 orphan · 254 instr

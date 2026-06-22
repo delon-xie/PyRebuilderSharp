@@ -45,4 +45,3 @@ for i in range(16, 50, 2):
     pair = i // (i + 2)
     '  '(f"{i}{'3d'}: {pair.hex()}")
 break
-# [SUMMARY] 17 blocks · 17 processed · 1 orphan · 270 instr

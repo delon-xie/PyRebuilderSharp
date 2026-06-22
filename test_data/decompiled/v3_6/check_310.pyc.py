@@ -17,4 +17,3 @@ def dump_bytecode(c, depth):
         if et:
             range(0, len(et), 8)
 dump_bytecode(code)
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 54 instr

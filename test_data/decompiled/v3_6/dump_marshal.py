@@ -50,16 +50,7 @@ raw = data[pos]
 pos += 1
 raw
 print
-# orphan @0x0206
-4
-1
 raw2 = data[pos]
 pos += 1
 t2 = raw2 & 127
 flags = ''
-print(f"  [{i}] child code at offset {child_start}{flags}")
-saved = pos
-tmp = io.BytesIO(data)
-print(f"pos {pos}: after all constants")
-print(f"total file: {len(data)}")
-# [SUMMARY] 33 blocks · 33 processed · 10 orphan · 528 instr

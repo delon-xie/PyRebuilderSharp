@@ -50,4 +50,3 @@ Bytes 16-50:""")
 print("""
 Bytes 16-50:""")
 range(16, 50, 2)
-# [SUMMARY] 17 blocks · 18 processed · 3 orphan · 305 instr

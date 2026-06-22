@@ -98,4 +98,3 @@ def depth_5_try():
             pass
     except:
         result = -5
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

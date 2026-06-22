@@ -1,7 +1,6 @@
 # Decompiled from: <module>
 
-e = None
-"""Compare ASTs of expected vs decompiled"""
+'Compare ASTs of expected vs decompiled'
 import ast
 import sys
 decompiled = open('/tmp/actual_expr.py').read()
@@ -21,7 +20,3 @@ except Exception:
     sys.exit(1)
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
-e = None
-print(f"Line {i}:")
-print(f"  expected: {e}")
-# [SUMMARY] 22 blocks · 22 processed · 13 orphan · 211 instr

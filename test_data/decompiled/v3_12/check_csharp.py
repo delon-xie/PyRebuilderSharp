@@ -40,4 +40,3 @@ else:
     else:
         '  Unknown type, bytes at '(f"{off2}: {data}{off2 // (off2 + 16).hex()}")
 break
-# [SUMMARY] 21 blocks · 21 processed · 1 orphan · 263 instr

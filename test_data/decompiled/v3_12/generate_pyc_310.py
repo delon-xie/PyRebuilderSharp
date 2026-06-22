@@ -47,4 +47,3 @@ os.makedirs(output_dir, exist_ok=True)
 python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 f
 os.listdir(input_dir)
-# [SUMMARY] 14 blocks · 14 processed · 0 orphan · 200 instr

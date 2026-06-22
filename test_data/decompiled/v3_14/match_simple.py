@@ -10,8 +10,5 @@ def test_match_with_guard(x):
         return 'long string'
     else:
         return 'short string'
-    return 'integer'
-    return 'unknown'
 result = test_match(1)
 result2 = test_match_with_guard('hello')
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 21 instr

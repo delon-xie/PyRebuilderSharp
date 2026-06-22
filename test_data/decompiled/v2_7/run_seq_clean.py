@@ -3508,5 +3508,3 @@ for ver in versions:
             pass
 passed = sum(<genexpr>(results.items()))
 total = len(results)
-return
-# [SUMMARY] 32 blocks · 33 processed · 3 orphan · 304 instr

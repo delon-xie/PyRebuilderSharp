@@ -9,4 +9,3 @@ range(30)
 for i in range(30):
     print('  [%d] = 0x%02x (%d)' % (i, m[i], m[i]))
 break
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 294 instr

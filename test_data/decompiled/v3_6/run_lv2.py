@@ -33,4 +33,3 @@ for ver in versions:
         except Exception:
             print('❌ %s: parse error: %s' % (ver, ex))
             print('  Output: %s' % r.stdout[None:200])
-# [SUMMARY] 23 blocks · 24 processed · 4 orphan · 221 instr

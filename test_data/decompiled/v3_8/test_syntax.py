@@ -3450,4 +3450,3 @@ def load_tests(loader, tests, pattern):
     return tests
 if __name__ == '__main__':
     unittest.main()
-# [SUMMARY] 3 blocks · 2 processed · 1 orphan · 64 instr

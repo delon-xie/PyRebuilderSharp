@@ -28,4 +28,3 @@ print(f"
 --- Nested: {const.co_name} ---")
 print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
 print(f"  bytes: {const.co_exceptiontable.hex()}")
-# [SUMMARY] 15 blocks · 14 processed · 8 orphan · 286 instr

@@ -63,4 +63,3 @@ for (old, new) in conflicts:
     print(f"  Removing {os.path.basename(old)}")
     os.remove(old)
 break
-# [SUMMARY] 35 blocks · 35 processed · 0 orphan · 302 instr

@@ -34,4 +34,3 @@ for const in code.co_consts:
         if hasattr(const, 'co_exceptiontable') and const.co_exceptiontable:
             print(f"  bytes: {const.co_exceptiontable.hex()}")
 code.co_consts
-# [SUMMARY] 15 blocks · 16 processed · 0 orphan · 283 instr

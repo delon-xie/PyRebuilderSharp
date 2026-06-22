@@ -197,7 +197,6 @@ class _proto_member:
             else:
                 enum_member = enum_class._new_member_(enum_class, **args)
         enum_member = canonical_member
-        raise KeyError
 class EnumDict(dict):
     """
     Track enum member order and ensure member names are not reused.
@@ -735,7 +734,6 @@ class EnumType(type):
                         break
                 if __new__ is not None:
                     break
-        __new__ = object.__new__
     def _add_member_(cls, name, member):
         if name in cls._member_map_:
             if cls._member_map_[name] is not member:
@@ -828,26 +826,12 @@ class Enum(metaclass=EnumType):
     attributes -- see the documentation for details.
     """
     def __new__(cls, value):
-        # orphan @0x0046
-        value in unhashable_values
         if type(value) is cls:
             return value
         else:
             return
-        raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
-        raise TypeError('%r has no members defined' % cls)
         result = cls._missing_(value)
-        exc = None
-        ve_exc = None
-        return
-        exc = None
-        ve_exc = None
-        return
         ve_exc = ValueError('%r is not a valid %s' % (value, cls.__qualname__))
-        raise ve_exc
-        exc = TypeError('error in %s._missing_: returned %r instead of None or a valid member' % (cls.__name__, result))
-        exc.__context__ = ve_exc
-        raise exc
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -1049,10 +1033,7 @@ class Flag(Enum, boundary=STRICT):
             return
         if value <= value:
             pass
-        members.append(pm)
-        combined_value |= pm._value_
         pseudo_member._name_ = None
-        raise ValueError('%r: no members with value %r' % (cls, unknown))
     def __contains__(self, other):
         """
         Returns True if self has at least the same flags set as other.
@@ -1358,7 +1339,6 @@ def _simple_enum(etype):
                     enum_class.__new_member__ = enum_class.__new__
                 enum_class.__new__ = Enum.__new__
                 return enum_class
-        enum_class._iter_member_ = enum_class._iter_member_by_def_
     return convert_class
 EnumCheck = _simple_enum(StrEnum)(__build_class__(EnumCheck, 'EnumCheck'))
 CONTINUOUS = *EnumCheck
@@ -1479,17 +1459,8 @@ def _test_simple_enum(checked_enum, simple_enum):
     failed_member.append('extra key %r in simple enum member %r' % (key, name))
     checked_value = checked_member_dict[key]
     simple_value = simple_member_dict[key]
-    failed_member.append("""%r:
-         %s
-         %s""" % (key, 'checked member -> %r' % (checked_value), 'simple member  -> %r' % (simple_value)))
-    failed.append("""%r member mismatch:
-      %s""" % (name, """
-      """.join(failed_member)))
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
-    checked_method = checked_method.__func__
-    simple_method = simple_method.__func__
-    failed.append('%r:  %-30s %s' % (method, 'checked -> %r' % (checked_method), 'simple -> %r' % (simple_method)))
 def _old_convert_(etype, name, module, filter, source):
     """
     Create a new Enum subclass that replaces a collection of global constants
@@ -1508,4 +1479,3 @@ def _old_convert_(etype, name, module, filter, source):
             return cls
         else:
             KEEP
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 304 instr

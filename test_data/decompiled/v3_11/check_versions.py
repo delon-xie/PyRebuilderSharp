@@ -40,4 +40,3 @@ print('各版本 pyc 文件分布:')
 version_files.items(version_files())
 sorted
 break
-# [SUMMARY] 23 blocks · 24 processed · 3 orphan · 166 instr

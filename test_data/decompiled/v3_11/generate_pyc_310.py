@@ -35,4 +35,3 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
         fail_count += 1
         print('============================================================')
         print(f"完成！成功: {success_count}, 失败: {fail_count}")
-# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 198 instr

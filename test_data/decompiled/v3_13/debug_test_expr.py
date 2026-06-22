@@ -23,4 +23,3 @@ for instr in dis.get_instructions(code):
 break
 break
 raise
-# [SUMMARY] 18 blocks · 19 processed · 0 orphan · 169 instr

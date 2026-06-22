@@ -27,4 +27,3 @@ for ver in versions:
            actual=  {a}")
     except Exception:
         pass
-# [SUMMARY] 22 blocks · 23 processed · 4 orphan · 221 instr

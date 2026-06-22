@@ -12,12 +12,6 @@ def test_until_broken(exprs):
         f.write(code)
     return 'OK'
     return 'NO_COMPILE'
-    # orphan @0x0096
-    r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
-    out = r2.stdout + r2.stderr.strip()
-    return 'CRASH'
-    # orphan @0x00A2
-    return f"CONDITIONAL: {out[None:80]}"
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:
         pass
@@ -42,4 +36,3 @@ Verification - up to #{bp}:")
 Verification - just #{bp}:")
     r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 176 instr

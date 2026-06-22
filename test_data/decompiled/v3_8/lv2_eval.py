@@ -20,4 +20,3 @@ try:
     f = open('test.txt')
 except IOError:
     pass
-# [SUMMARY] 19 blocks · 20 processed · 0 orphan · 70 instr

@@ -56,4 +56,3 @@ Verification - up to #{bp}:")
 Verification - just #{bp}:")
     r = all_exprs(None // bp)
     print(f"  {r}")
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 138 instr

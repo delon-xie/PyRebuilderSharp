@@ -6,4 +6,3 @@ async def test_async():
     return 'done'
 async def worker():
     yield from test_async()
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

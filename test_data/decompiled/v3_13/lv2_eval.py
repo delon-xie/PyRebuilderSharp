@@ -22,4 +22,3 @@ for n in range(5):
         pass
 break
 raise
-# [SUMMARY] 27 blocks · 27 processed · 3 orphan · 77 instr

@@ -26,4 +26,3 @@ def dump_code(c, depth = 0):
             print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.co_argcount, const.co_nlocals, len(const.co_code)))
             dump_code(const, depth + 1)
 dump_code(code)
-# [SUMMARY] 9 blocks · 9 processed · 1 orphan · 105 instr

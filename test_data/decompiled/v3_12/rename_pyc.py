@@ -66,4 +66,3 @@ for (old, new) in conflicts:
     os.remove(old)
 f
 files_to_rename
-# [SUMMARY] 34 blocks · 34 processed · 0 orphan · 291 instr

@@ -25,4 +25,3 @@ print('=== Decompiled ===')
 print(r.stdout.strip())
 os.unlink(py_path)
 os.unlink(py_path + 'c')
-# [SUMMARY] 9 blocks · 9 processed · 1 orphan · 115 instr

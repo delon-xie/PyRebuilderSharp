@@ -30,4 +30,3 @@ dis.disassemble(code)
 print('Marshal dump:', result3.stdout)
 if result3.stderr:
     print('Stderr:', result3.stderr)
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 117 instr

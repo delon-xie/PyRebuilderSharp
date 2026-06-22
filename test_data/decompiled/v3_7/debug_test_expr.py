@@ -16,4 +16,3 @@ print('Instructions:')
 dis.get_instructions(code)
 for instr in dis.get_instructions(code):
     instr.offset(f"{'4d'} {instr.opname}{'20s'} {instr.arg} {instr.argrepr}")
-# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 166 instr

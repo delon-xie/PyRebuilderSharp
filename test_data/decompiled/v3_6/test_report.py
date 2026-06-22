@@ -47,4 +47,3 @@ print('=' * 60)
 print('Python 3.10 版本测试报告')
 '=' * 60
 print
-# [SUMMARY] 30 blocks · 31 processed · 0 orphan · 251 instr

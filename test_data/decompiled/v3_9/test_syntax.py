@@ -2955,7 +2955,6 @@ class SyntaxErrorTestCase(unittest.TestCase):
             self.assertEqual(err.end_lineno, end_lineno)
             yield from end_lineno is not None
         self.fail('compile() did not raise SyntaxError')
-        err = None
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
     def test_curly_brace_after_primary_raises_immediately(self):
@@ -3483,4 +3482,3 @@ def load_tests(loader, tests, pattern):
     return tests
 if __name__ == '__main__':
     unittest.main()
-# [SUMMARY] 3 blocks · 2 processed · 1 orphan · 64 instr

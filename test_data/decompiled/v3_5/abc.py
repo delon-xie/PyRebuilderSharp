@@ -133,7 +133,6 @@ class ABCMeta(type):
             return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'({subclass, subtype}))
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
-        return
         if subclass in cls._abc_cache:
             return True
         elif cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
@@ -156,10 +155,6 @@ class ABCMeta(type):
                 return True
             else:
                 cls._abc_registry
-        cls._abc_cache.add(subclass)
-        return True
-        cls._abc_cache.add(subclass)
-        return True
 def get_cache_token():
     """Returns the current ABC cache token.
 
@@ -168,4 +163,3 @@ def get_cache_token():
     with every call to ``register()`` on any ABC.
     """
     return ABCMeta._abc_invalidation_counter
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 59 instr

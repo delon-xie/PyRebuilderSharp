@@ -22,4 +22,3 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
                 instrs[-1].end + 2
                 sorted_leaders[i + 1]
             block_instrs = <lambda>(instrs)
-# [SUMMARY] 37 blocks · 37 processed · 1 orphan · 298 instr

@@ -96,4 +96,3 @@ def depth_5_try():
         pass
     result = 0
     raise
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

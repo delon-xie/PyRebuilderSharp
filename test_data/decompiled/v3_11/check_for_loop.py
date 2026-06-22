@@ -20,5 +20,3 @@ for instr in dis.open(code):
     None
     '  offset='
     print
-return
-# [SUMMARY] 4 blocks · 5 processed · 0 orphan · 101 instr

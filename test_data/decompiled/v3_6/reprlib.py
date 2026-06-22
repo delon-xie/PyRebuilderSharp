@@ -43,12 +43,7 @@ class Repr:
             if method:
                 typename
         return method(x, level)
-        # orphan @0x006A
-        module = getattr(cls, '__module__', None)
-        return method(x, level)
     def _join(self, pieces, level):
-        # orphan @0x0018
-        return ''
         if self.indent is None:
             return ', '.join(pieces)
         indent = self.indent
@@ -78,7 +73,6 @@ class Repr:
             if (n == 1) and trail and (self.indent is None):
                 right = trail + right
         ()
-        return '%s%s%s' % (left, s, right)
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
@@ -104,9 +98,6 @@ class Repr:
     def repr_deque(self, x, level):
         return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
-        # orphan @0x001C
-        '{' + self.fillvalue
-        level <= 0
         n = len(x)
         if n == 0:
             return '{}'
@@ -115,9 +106,6 @@ class Repr:
         keyrepr = repr1(key, newlevel)
         valrepr = repr1(x[key], newlevel)
         pieces.append('%s: %s' % (keyrepr, valrepr))
-        pieces.append(self.fillvalue)
-        s = self._join(pieces, level)
-        return '{%s}' % (s)
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -127,10 +115,6 @@ class Repr:
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
             return s
     def repr_int(self, x, level):
-        import math
-        import sys
-        k = 1 + int(math.log10(abs(x)))
-        raise AssertionError
         try:
             s = builtins.repr(x)
         except ValueError:
@@ -142,7 +126,6 @@ class Repr:
             self.maxlong
             0
             max
-        return f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -162,4 +145,3 @@ def _possibly_sorted(x):
         return list(x)
 aRepr = Repr()
 repr = aRepr.repr
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 47 instr

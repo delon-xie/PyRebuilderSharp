@@ -29,4 +29,3 @@ None
 for instr in dis.get_instructions(code):
     instr.offset(f"{'4d'} {instr.opname}{'20s'} {instr.arg} {instr.argrepr}")
 break
-# [SUMMARY] 19 blocks · 19 processed · 1 orphan · 166 instr

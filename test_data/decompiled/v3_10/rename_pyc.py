@@ -38,6 +38,3 @@ print("""
 Done!""")
 print(f"  Removing {os.path.basename(old)}")
 os.remove(old)
-# orphan @0x0186
-files_to_rename = <listcomp>(files_to_rename)
-# [SUMMARY] 25 blocks · 25 processed · 4 orphan · 249 instr

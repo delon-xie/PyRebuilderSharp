@@ -177,4 +177,3 @@ class ABC(metaclass=ABCMeta):
     inheritance.
     """
     __slots__ = ()
-# [SUMMARY] 9 blocks · 10 processed · 2 orphan · 101 instr

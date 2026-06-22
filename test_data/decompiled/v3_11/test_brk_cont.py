@@ -10,4 +10,3 @@ for i in range(10):
         a = i
         None
         return
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 26 instr

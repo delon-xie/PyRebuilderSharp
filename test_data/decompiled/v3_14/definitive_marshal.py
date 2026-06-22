@@ -67,4 +67,3 @@ None
 v
 k
 known.items()
-# [SUMMARY] 20 blocks · 21 processed · 0 orphan · 288 instr

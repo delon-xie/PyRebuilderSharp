@@ -117,4 +117,3 @@ sorted
 '<12'
 '版本'
 print
-# [SUMMARY] 36 blocks · 37 processed · 3 orphan · 418 instr

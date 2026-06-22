@@ -30,4 +30,3 @@ def dump_code(c, depth = 0):
             None
     return
 dump_code(code)
-# [SUMMARY] 9 blocks · 10 processed · 3 orphan · 120 instr

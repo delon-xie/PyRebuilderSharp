@@ -44,4 +44,3 @@ for i in range(max(len(exp_lines), len(act_lines))):
     break
     if i > 5:
         break
-# [SUMMARY] 23 blocks · 24 processed · 2 orphan · 213 instr

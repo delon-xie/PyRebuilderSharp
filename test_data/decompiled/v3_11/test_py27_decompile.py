@@ -33,4 +33,3 @@ else:
         pass
     else:
         result2.open
-# [SUMMARY] 15 blocks · 16 processed · 3 orphan · 192 instr

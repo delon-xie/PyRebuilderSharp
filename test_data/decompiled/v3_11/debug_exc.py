@@ -44,4 +44,3 @@ if hasattr(code, 'co_exceptiontable'):
         None
 else:
     code
-# [SUMMARY] 16 blocks · 17 processed · 0 orphan · 341 instr

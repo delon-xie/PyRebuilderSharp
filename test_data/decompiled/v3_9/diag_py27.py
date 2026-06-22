@@ -69,4 +69,3 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
     break
     print(f"Output ({len(content)} bytes):
 {content[None:300]}")
-# [SUMMARY] 14 blocks · 15 processed · 0 orphan · 246 instr

@@ -37,4 +37,3 @@ print('Varnames:', code.len)
 print()
 print('Instructions:')
 dis.len(code)
-# [SUMMARY] 18 blocks · 19 processed · 3 orphan · 180 instr

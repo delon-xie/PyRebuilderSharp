@@ -16,4 +16,3 @@ try:
     a = 1
 except:
     a = 0
-# [SUMMARY] 7 blocks · 8 processed · 1 orphan · 51 instr

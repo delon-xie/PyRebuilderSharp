@@ -26,4 +26,3 @@ for filename in os.listdir(pyc_dir):
             sorted(files)
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())
-# [SUMMARY] 16 blocks · 17 processed · 0 orphan · 134 instr

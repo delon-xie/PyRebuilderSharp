@@ -10,4 +10,3 @@ with open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expr
             data
             stripped
 instr.offset(f"{'4d'} {instr.opname}{'20s'} {instr.arg} {instr.argrepr}")
-# [SUMMARY] 13 blocks · 12 processed · 4 orphan · 147 instr

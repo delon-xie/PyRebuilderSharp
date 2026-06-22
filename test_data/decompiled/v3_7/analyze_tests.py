@@ -54,8 +54,3 @@ for version in sorted(version_stats.keys()):
 print('----------------------------------------------------------------------')
 if total > 0:
     pass
-# orphan @0x028E
-0
-'<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
-print('======================================================================')
-# [SUMMARY] 30 blocks · 29 processed · 2 orphan · 344 instr

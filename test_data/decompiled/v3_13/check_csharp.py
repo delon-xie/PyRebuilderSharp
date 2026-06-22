@@ -38,4 +38,3 @@ else:
         print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")
 break
 raise
-# [SUMMARY] 20 blocks · 21 processed · 0 orphan · 266 instr

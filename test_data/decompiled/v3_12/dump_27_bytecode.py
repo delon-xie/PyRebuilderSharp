@@ -78,4 +78,3 @@ op = bytecode[offset]
 offset += 1
 instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
 arg = None
-# [SUMMARY] 24 blocks · 25 processed · 2 orphan · 713 instr

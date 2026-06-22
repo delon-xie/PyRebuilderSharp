@@ -21,4 +21,3 @@ for n in range(5):
     elif not n == 1:
         pass
 raise
-# [SUMMARY] 27 blocks · 28 processed · 3 orphan · 79 instr

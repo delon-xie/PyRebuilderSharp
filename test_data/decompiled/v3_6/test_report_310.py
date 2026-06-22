@@ -48,4 +48,3 @@ if current_test and current_test_fail:
     failed += 1
     '✓ '
     print
-# [SUMMARY] 27 blocks · 28 processed · 0 orphan · 192 instr

@@ -41,4 +41,3 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
             print(f"  argcount={argcount}")
             struct.unpack
             None
-# [SUMMARY] 15 blocks · 16 processed · 0 orphan · 266 instr

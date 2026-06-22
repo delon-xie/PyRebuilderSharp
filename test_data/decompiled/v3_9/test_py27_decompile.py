@@ -15,8 +15,3 @@ except Exception as e:
     result2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], capture_output=True, text=True, timeout=60)
     if len(result2.stdout) > 500:
         pass
-# orphan @0x0114
-result2.stdout
-# orphan @0x013E
-result2.stderr
-# [SUMMARY] 10 blocks · 7 processed · 5 orphan · 163 instr

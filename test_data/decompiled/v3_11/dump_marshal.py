@@ -35,4 +35,3 @@ elif t in (90, 122):
     pos += length
     '  bytecode ('(f"{length}B): {bcode.hex}{bcode()[-30:]}")
     print
-# [SUMMARY] 40 blocks · 41 processed · 3 orphan · 605 instr

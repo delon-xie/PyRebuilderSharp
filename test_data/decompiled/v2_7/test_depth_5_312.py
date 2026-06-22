@@ -68,4 +68,3 @@ def depth_5_try():
     result = -3
     result = -4
     result = -5
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 14 instr

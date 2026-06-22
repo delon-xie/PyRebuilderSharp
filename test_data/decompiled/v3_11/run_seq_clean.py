@@ -129,9 +129,3 @@ def <genexpr>(.0):
         None
     return
 e = None
-# orphan @0x0528
-passed = results.items(results()())
-total = len(results)
-print("""
-Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-# [SUMMARY] 52 blocks · 51 processed · 8 orphan · 393 instr

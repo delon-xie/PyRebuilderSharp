@@ -42,4 +42,3 @@ print(f"Flags={flags2}, Timestamp={ts2}, Size={sz2}")
 pos2 = 16
 'Marshal at offset '(f"{pos2}: byte={data[pos2]}#x")
 print(f"Bytes from 16: {data[16:40].hex()}")
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 369 instr

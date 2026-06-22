@@ -29,4 +29,3 @@ else:
     result2.stdout
     if len(result2.stderr) > 500:
         pass
-# [SUMMARY] 14 blocks · 14 processed · 1 orphan · 173 instr

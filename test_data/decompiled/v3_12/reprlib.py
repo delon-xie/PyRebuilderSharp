@@ -218,4 +218,3 @@ def _possibly_sorted(x):
     return
 aRepr = Repr()
 repr = aRepr.repr
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 45 instr

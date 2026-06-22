@@ -34,9 +34,3 @@ for line in lines:
 if current_test and current_test_fail:
     print(f"✗ {current_test}")
     failed += 1
-print(f"✓ {current_test}")
-passed += 1
-print('============================================================')
-print(f"总计: {passed} PASS, {failed} FAIL")
-print('============================================================')
-# [SUMMARY] 21 blocks · 21 processed · 2 orphan · 184 instr

@@ -36,4 +36,3 @@ def dump_bytecode(c, depth = 0):
                 name_26.dis(const)
                 dump_bytecode(const, depth + 1)
 dump_bytecode(code)
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 58 instr

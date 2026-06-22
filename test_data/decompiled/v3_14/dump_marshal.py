@@ -96,4 +96,3 @@ elif t in (90, 122):
     pos += length
     print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
 raise
-# [SUMMARY] 45 blocks · 46 processed · 0 orphan · 590 instr

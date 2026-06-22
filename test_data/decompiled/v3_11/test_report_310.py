@@ -36,4 +36,3 @@ for line in lines:
             pass
     elif current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line):
         current_test_fail = True
-# [SUMMARY] 22 blocks · 23 processed · 0 orphan · 210 instr

@@ -43,4 +43,3 @@ print('============================================================')
 passed_groups = []
 failed_groups = []
 test_groups.items()
-# [SUMMARY] 26 blocks · 27 processed · 0 orphan · 243 instr

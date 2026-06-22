@@ -15,18 +15,9 @@ actual_ast = ast.dump(ast.parse(actual_src), indent=2)
 match = expected_ast == actual_ast
 print(f"  Line {i}: expected={e}")
 print(f"           actual=  {a}")
-# orphan @0x0216
-True
 def <genexpr>(.0):
     .0
     for (v, r) in .0:
         if r:
             yield 1
             break
-# orphan @0x027C
-print(f"
-{'========================================'}")
-passed = sum(<genexpr>(results.items()))
-total = len(results)
-'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-# [SUMMARY] 33 blocks · 31 processed · 27 orphan · 350 instr

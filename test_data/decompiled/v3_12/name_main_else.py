@@ -8,4 +8,3 @@ if __name__ == '__main__':
     main()
 else:
     print('Not main')
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 25 instr

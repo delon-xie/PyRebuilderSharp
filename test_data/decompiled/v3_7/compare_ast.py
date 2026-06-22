@@ -18,4 +18,3 @@ if expected_ast == actual_ast:
 print(f"Line {i}:")
 print(f"  expected: {e}")
 print(f"  actual:   {a}")
-# [SUMMARY] 25 blocks · 24 processed · 17 orphan · 210 instr

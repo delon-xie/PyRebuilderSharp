@@ -9,4 +9,3 @@ result = subprocess.run([PY35, '-c', 'import py_compile; py_compile.compile(\'/t
 r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
 'STDOUT:'(r2.stdout, None // 200)
 'STDERR:'(r2.stderr, None // 200)
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 77 instr

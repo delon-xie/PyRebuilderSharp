@@ -23,4 +23,3 @@ for line in output("""
         line.strip(line())
         test_groups[current_group]['files']
         test_groups[current_group]['files'].append
-# [SUMMARY] 28 blocks · 29 processed · 0 orphan · 281 instr

@@ -2904,4 +2904,3 @@ with open(INPUT_FILE) as f:
             except Exception:
                 print('❌ %s: parse error: %s' % (ver, ex))
                 print('  Output: %s' % r.stdout[None:200])
-# [SUMMARY] 24 blocks · 25 processed · 2 orphan · 223 instr

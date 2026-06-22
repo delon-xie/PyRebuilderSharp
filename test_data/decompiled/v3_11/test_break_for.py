@@ -8,5 +8,3 @@ for i in range(3):
         a = i
         None
     return
-return
-# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 21 instr

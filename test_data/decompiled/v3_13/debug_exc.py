@@ -41,4 +41,3 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
         break
 code.co_consts
 code.co_consts
-# [SUMMARY] 18 blocks · 19 processed · 1 orphan · 312 instr

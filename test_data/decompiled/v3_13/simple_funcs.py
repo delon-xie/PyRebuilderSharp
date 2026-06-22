@@ -12,4 +12,3 @@ def factorial(n):
 print(greet('World'))
 print(add(3, 4))
 print(factorial(5))
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 36 instr

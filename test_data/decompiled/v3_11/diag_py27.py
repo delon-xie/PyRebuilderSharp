@@ -78,4 +78,3 @@ else:
 break
 print(f"Output ({len(content)} bytes):
 {content[None:300]}")
-# [SUMMARY] 24 blocks · 25 processed · 6 orphan · 290 instr

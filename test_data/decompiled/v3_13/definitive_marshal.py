@@ -71,4 +71,3 @@ Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={co
     print(f"Match: {code2.co_argcount == code.co_argcount}")
     return None
 break
-# [SUMMARY] 20 blocks · 20 processed · 0 orphan · 286 instr

@@ -23,13 +23,3 @@ for filename in os.compiled_dir(compiled_dir):
             os.filename.join
             match_310.group
             os.filename.join
-# orphan @0x0330
-os.filename.basename(f"{os.filename(old)} -> {os.filename.basename}{os.filename(new)} [CONFLICT]")
-# orphan @0x03DA
-'  Removing '(f"{os.filename.basename}{os.filename(old)}")
-os.old_path(old)
-CodeObject: <listcomp> (13 instrs)
-# orphan @0x0452
-files_to_rename = files_to_rename()
-<lambda>
-# [SUMMARY] 25 blocks · 23 processed · 6 orphan · 298 instr

@@ -45,4 +45,3 @@ print(f"
 passed = sum(<genexpr>(results.items()))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-# [SUMMARY] 31 blocks · 32 processed · 5 orphan · 347 instr

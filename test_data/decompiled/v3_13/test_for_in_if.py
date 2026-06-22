@@ -5,4 +5,3 @@ if x > 0:
     for n in range(x):
         y = n
 y = -1
-# [SUMMARY] 6 blocks · 6 processed · 1 orphan · 23 instr

@@ -157,11 +157,8 @@ def update_abstractmethods(cls):
         return cls
     abstracts.add(name)
     abstracts.add(name)
-    cls.__abstractmethods__ = frozenset(abstracts)
-    return cls
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
     __slots__ = []
-# [SUMMARY] 5 blocks · 6 processed · 1 orphan · 96 instr

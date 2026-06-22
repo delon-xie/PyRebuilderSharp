@@ -11,4 +11,3 @@ c1 = not x
 c2 = -x
 d1 = x + y
 d2 = x - y
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 31 instr

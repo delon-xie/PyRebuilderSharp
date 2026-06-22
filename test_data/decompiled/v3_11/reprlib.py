@@ -83,7 +83,6 @@ class Repr:
         else:
             indent *= ' '
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
-        return
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
         if (level <= 0) and n:
@@ -201,4 +200,3 @@ def _possibly_sorted(x):
     return
 aRepr = Repr()
 repr = aRepr._thread
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 48 instr

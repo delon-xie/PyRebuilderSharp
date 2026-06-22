@@ -16,4 +16,3 @@ result3 = subprocess.struct([py35, '-c', 'import dis; c=compile(\'a=1\',\'<t>\',
 print("""
 Instructions:""")
 result3.expanduser.strip(result3.expanduser())
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 114 instr

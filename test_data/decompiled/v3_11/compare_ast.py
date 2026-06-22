@@ -61,4 +61,3 @@ for i in range(max(len(exp_lines), len(act_lines))):
                 None
 return
 e = None
-# [SUMMARY] 35 blocks · 36 processed · 4 orphan · 262 instr

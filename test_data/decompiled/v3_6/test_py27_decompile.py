@@ -7,4 +7,3 @@ result2.stdout[-500:]
 if len(result2.stderr) > 500:
     result2.stderr
     result2.stderr[-500:]
-# [SUMMARY] 7 blocks · 7 processed · 1 orphan · 153 instr

@@ -21,4 +21,3 @@ else:
     for n in range(10):
         m = n + 1
     a = 1
-# [SUMMARY] 15 blocks · 16 processed · 2 orphan · 67 instr

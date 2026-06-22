@@ -29,4 +29,3 @@ with open(sys.argv[1], 'rb') as f:
         bcode = data[pos:pos + length]
         pos = pos + length
         print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
-# [SUMMARY] 34 blocks · 35 processed · 0 orphan · 534 instr

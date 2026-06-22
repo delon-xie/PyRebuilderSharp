@@ -51,4 +51,3 @@ Verification - up to #{bp}:")
 Verification - just #{bp}:")
     r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
-# [SUMMARY] 3 blocks · 4 processed · 0 orphan · 133 instr

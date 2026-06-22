@@ -30,4 +30,3 @@ while i < len(lines):
         j += 1
         print()
 print(f"Total tests with versions found: {debug_count}")
-# [SUMMARY] 23 blocks · 24 processed · 0 orphan · 194 instr

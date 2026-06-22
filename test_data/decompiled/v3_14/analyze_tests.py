@@ -80,4 +80,3 @@ else:
     '<10'(f" {total_failed}<10 {total}<10 {overall_rate}>8.1f%")
     print('======================================================================')
 raise
-# [SUMMARY] 36 blocks · 37 processed · 0 orphan · 385 instr

@@ -34,4 +34,3 @@ if __name__ == '__main__':
     fix_pyc_names('tests/compiled')
     print("""
 Done!""")
-# [SUMMARY] 3 blocks · 2 processed · 1 orphan · 38 instr

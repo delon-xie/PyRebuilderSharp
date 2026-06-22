@@ -107,8 +107,3 @@ with open('/tmp/test_full.txt', 'r') as f:
             while '***' in line:
                 pass
 print('----------------------------------------------------------------------')
-# orphan @0x029C
-0
-'<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
-print('======================================================================')
-# [SUMMARY] 31 blocks · 30 processed · 5 orphan · 364 instr

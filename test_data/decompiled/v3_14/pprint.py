@@ -177,10 +177,8 @@ class PrettyPrinter:
             p = self._dispatch.get(type(object).__repr__, None)
             from dataclasses import is_dataclass
             p(self, object, stream, indent, allowance, context, level + 1)
-            return None
         else:
             stream.write(rep)
-        self._pprint_dataclass(object, stream, indent, allowance, context, level + 1)
     def _format_block_start(self, start_str, indent):
         """
 """
@@ -335,4 +333,3 @@ def _wrap_bytes_repr(object, width, allowance):
             pass
     except:
         pass
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 111 instr

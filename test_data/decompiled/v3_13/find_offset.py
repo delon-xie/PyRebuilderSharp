@@ -26,4 +26,3 @@ for offset_start in range(1, 21, 1):
     else:
         print('  -> FOUND!')
 break
-# [SUMMARY] 14 blocks · 15 processed · 0 orphan · 171 instr

@@ -12,4 +12,3 @@ pyc35 = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderShar
 r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc35], timeout=30, text=True, capture_output=True)
 '3.5 STDOUT:'(r2.stdout, None // 200)
 '3.5 STDERR:'(r2.stderr, None // 200)
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 96 instr

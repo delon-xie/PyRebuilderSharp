@@ -74,4 +74,3 @@ while i < len(lines):
 print()
 break
 next_line = lines[j]
-# [SUMMARY] 32 blocks · 32 processed · 3 orphan · 236 instr

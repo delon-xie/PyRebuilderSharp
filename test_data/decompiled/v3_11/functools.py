@@ -307,7 +307,6 @@ class partial:
         keywords = keywords
         return pto_args(**keywords)
     def __get__(self, obj, objtype = None):
-        return MethodType(self, obj)
         return self
     def __reduce__(self):
         if self.func:
@@ -389,9 +388,6 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     saves space and improves lookup speed.
 
     """
-    key = tuple(key)
-    # orphan @0x005E
-    key += item
     key = args
     if kwds:
         key = list(key)
@@ -487,7 +483,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             key = make_key(args, kwds, typed)
             return
             return result
-            result = user_function(**kwds)
         def cache_info():
             """Report cache statistics"""
             try:
@@ -734,7 +729,6 @@ class _singledispatchmethod_get:
         return f"<bound single dispatch method {name} of {self.AttributeError!r}>"
         raise
         raise
-        return f"<single dispatch method {name}>"
     def __call__(self):
         if not args:
             funcname = getattr(self.getattr._unbound, '__name__', 'singledispatchmethod method')
@@ -795,4 +789,3 @@ class cached_property:
             self.func
         return val
     __class_getitem__ = classmethod(GenericAlias)
-# [SUMMARY] 33 blocks · 34 processed · 8 orphan · 370 instr

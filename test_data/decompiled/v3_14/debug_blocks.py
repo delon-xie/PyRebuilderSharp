@@ -77,4 +77,3 @@ for const in code.co_consts:
         sorted_leaders = sorted(leaders)
         enumerate(sorted_leaders)
 raise
-# [SUMMARY] 71 blocks · 71 processed · 0 orphan · 405 instr

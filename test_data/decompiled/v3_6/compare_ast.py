@@ -33,4 +33,3 @@ if expected_ast == actual_ast:
         break
         if i > 5:
             pass
-# [SUMMARY] 27 blocks · 27 processed · 6 orphan · 210 instr

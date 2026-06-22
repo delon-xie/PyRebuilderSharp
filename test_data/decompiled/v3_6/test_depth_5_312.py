@@ -6,12 +6,6 @@ def depth_5_if(x0, x1, x2, x3, x4):
         result = 42
         result = 41
         result = 40
-    # orphan @0x003C
-    result = 30
-    # orphan @0x0042
-    result = 20
-    # orphan @0x0048
-    result = 10
 def depth_5_for():
     total = 0
     range(2)
@@ -62,4 +56,3 @@ def depth_5_try():
             pass
     except:
         result = -5
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 18 instr

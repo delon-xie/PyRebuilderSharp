@@ -31,4 +31,3 @@ else:
     if len(result2.stderr) > 500:
         pass
 raise
-# [SUMMARY] 13 blocks · 14 processed · 0 orphan · 174 instr

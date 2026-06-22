@@ -22,4 +22,3 @@ try:
     f = open('test.txt')
 except IOError:
     f = None
-# [SUMMARY] 19 blocks · 20 processed · 1 orphan · 75 instr

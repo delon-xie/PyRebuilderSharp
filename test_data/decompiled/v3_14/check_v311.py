@@ -44,4 +44,3 @@ for i in range(16, 50, 2):
     pair = raw[i:i + 2]
     '  '(f"{i}3d: {pair.hex()}")
 raise
-# [SUMMARY] 16 blocks · 17 processed · 0 orphan · 278 instr

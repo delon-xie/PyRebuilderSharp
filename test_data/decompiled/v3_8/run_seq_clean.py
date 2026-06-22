@@ -1,7 +1,5 @@
 # Decompiled from: <module>
 
-print('Failed to parse expected source:', e)
-sys.exit(1)
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
@@ -43,4 +41,3 @@ total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
 yield from results
-# [SUMMARY] 32 blocks · 33 processed · 5 orphan · 325 instr

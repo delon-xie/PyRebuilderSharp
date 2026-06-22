@@ -34,4 +34,3 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
                         for ins in block_instrs:
                             if ins.opname == 'JUMP_ABSOLUTE':
                                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
-# [SUMMARY] 38 blocks · 37 processed · 1 orphan · 300 instr

@@ -30,10 +30,5 @@ if .0:
         print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
 print(f"  Removing {os.path.basename(old)}")
 os.remove(old)
-# orphan @0x019A
-files_to_rename = <lambda>(files_to_rename)
 print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
 os.rename(old_path, new_path)
-print("""
-Done!""")
-# [SUMMARY] 23 blocks · 22 processed · 8 orphan · 259 instr

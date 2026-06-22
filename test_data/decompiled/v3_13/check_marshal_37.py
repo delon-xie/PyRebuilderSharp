@@ -29,4 +29,3 @@ Fields found at offset {offset}:")
         print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
         '  Bytes: '(f"{' '.join}{<genexpr>(m[offset:offset + 16]())}")
 break
-# [SUMMARY] 10 blocks · 11 processed · 0 orphan · 196 instr

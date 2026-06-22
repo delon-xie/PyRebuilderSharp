@@ -24,5 +24,3 @@ for offset_start in range(1, 21, 1):
         None
     None
     None
-return
-# [SUMMARY] 11 blocks · 12 processed · 0 orphan · 184 instr

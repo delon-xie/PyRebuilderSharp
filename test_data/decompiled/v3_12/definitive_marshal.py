@@ -70,4 +70,3 @@ print
 v
 k
 known.items()
-# [SUMMARY] 20 blocks · 21 processed · 0 orphan · 285 instr

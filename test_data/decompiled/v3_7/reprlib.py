@@ -39,27 +39,16 @@ class Repr:
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
-        return method(x, level)
         module = getattr(cls, '__module__', None)
-        return method(x, level)
-        return self.repr_instance(x, level)
     def _join(self, pieces, level):
-        raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         indent = self.indent
-        return ''
         if self.indent is None:
             return ', '.join(pieces)
-        indent *= ' '
-        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
-        return
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        pieces.append(self.fillvalue)
         s = self._join(pieces, level)
-        right = trail + right
-        return '%s%s%s' % (left, s, right)
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
     def repr_list(self, x, level):
@@ -67,31 +56,21 @@ class Repr:
     def repr_array(self, x, level):
         if not x:
             return 'array(\'%s\')' % x.typecode
-        header = 'array(\'%s\', [' % x.typecode
-        return self._repr_iterable(x, level, header, '])', self.maxarray)
     def repr_set(self, x, level):
-        x = _possibly_sorted(x)
-        return self._repr_iterable(x, level, '{', '}', self.maxset)
         if not x:
             return 'set()'
     def repr_frozenset(self, x, level):
-        x = _possibly_sorted(x)
-        return self._repr_iterable(x, level, 'frozenset({', '})', self.maxfrozenset)
         if not x:
             return 'frozenset()'
     def repr_deque(self, x, level):
         return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
     def repr_dict(self, x, level):
-        return '{' + self.fillvalue + '}'
         n = len(x)
         if n == 0:
             return '{}'
         keyrepr = repr1(key, newlevel)
         valrepr = repr1(x[key], newlevel)
         pieces.append('%s: %s' % (keyrepr, valrepr))
-        pieces.append(self.fillvalue)
-        s = self._join(pieces, level)
-        return '{%s}' % (s)
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -99,14 +78,7 @@ class Repr:
             j = max(0, self.maxstring - 3 - i)
             s = builtins.repr(x[None:i] + x[len(x) - j:])
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-        return s
     def repr_int(self, x, level):
-        import math
-        import sys
-        k = 1 + int(math.log10(abs(x)))
-        max_digits = sys.get_int_max_str_digits()
-        return f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
-        raise AssertionError
         try:
             s = builtins.repr(x)
         except ValueError:
@@ -115,7 +87,6 @@ class Repr:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-        return s
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -125,7 +96,6 @@ class Repr:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
-        return s
 def _possibly_sorted(x):
     try:
         return sorted(x)
@@ -134,4 +104,3 @@ def _possibly_sorted(x):
         return list(x)
 aRepr = Repr()
 repr = aRepr.repr
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 47 instr

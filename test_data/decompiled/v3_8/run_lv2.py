@@ -28,4 +28,3 @@ for ver in versions:
                     break
     except Exception:
         pass
-# [SUMMARY] 21 blocks · 22 processed · 1 orphan · 218 instr

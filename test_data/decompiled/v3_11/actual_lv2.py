@@ -16,4 +16,3 @@ range(10)
 for n in range(10):
     m = n + 1
 a = 1
-# [SUMMARY] 10 blocks · 11 processed · 2 orphan · 53 instr

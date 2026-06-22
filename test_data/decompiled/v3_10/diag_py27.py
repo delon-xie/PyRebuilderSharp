@@ -73,4 +73,3 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
             print(f"Error: {r2.stderr[None:200]}")
     else:
         r.stderr.strip()
-# [SUMMARY] 14 blocks · 15 processed · 0 orphan · 246 instr

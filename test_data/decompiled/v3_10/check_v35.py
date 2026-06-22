@@ -13,4 +13,3 @@ with open(sys.argv[1], 'rb') as f:
     dump_code = dump_code
     dump_code(code)
     return None
-# [SUMMARY] 4 blocks · 4 processed · 0 orphan · 96 instr

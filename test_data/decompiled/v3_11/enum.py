@@ -151,10 +151,8 @@ class property(DynamicClassAttribute):
         return
     def __set__(self, instance, value):
         return self(instance, value)
-        raise AttributeError(f"<enum {self.AttributeError!r}> cannot set attribute {self.AttributeError!r}")
     def __delete__(self, instance):
         return self(instance)
-        raise AttributeError(f"<enum {self.AttributeError!r}> cannot delete attribute {self.AttributeError!r}")
     def __set_name__(self, ownerclass, name):
         self.name = name
         self.clsname = ownerclass.name
@@ -268,9 +266,6 @@ class _proto_member:
         raise
         raise
         enum_class.TypeError | value._flag_mask_ = enum_class
-        enum_class.__cause__ | value._singles_mask_ = enum_class
-        enum_class._all_bits_ = enum_class.TypeError.bit_length ** enum_class.TypeError() - 1
-        enum_class(member_name, enum_member)
 class EnumDict(dict):
     """
     Track enum member order and ensure member names are not reused.
@@ -457,34 +452,17 @@ class EnumType(type):
                         else:
                             p.value = (bits & p.staticmethod[0]) + p.staticmethod[1:]
         classdict(enum_class._find_new_)
-        raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
-        enum_class.__format__ = member_type._find_data_repr_
         method = member_type._find_data_repr_
-        method = member_type.getattr
-        enum_class.__str__ = method
         enum_method = getattr(first_enum, name)
         found_method = getattr(enum_class, name)
         object_method = getattr(name_64, name)
         data_type_method = getattr(member_type, name)
-        setattr(enum_class, name, enum_method)
-        enum_method = getattr(Enum, name)
-        setattr(enum_class, name, enum_method)
-        enum_class.__new_member__ = __new__
         enum_class.__new__ = name_76.super
-        _order_ = _order_(',', ' ')()
         delattr(enum_class, '_boundary_')
         delattr(enum_class, '_flag_mask_')
         delattr(enum_class, '_singles_mask_')
         delattr(enum_class, '_all_bits_')
         delattr(enum_class, '_inverted_')
-        enum_class._iter_member_ = enum_class.value
-        # orphan @0x0C2C
-        _order_ = _order_()
-        <listcomp>
-        raise TypeError(f"member order does not match _order_:
-  {enum_class.int!r}
-  {_order_!r}")
-        return enum_class
     def __bool__(cls):
         """
         classes/types should always be True.
@@ -678,9 +656,6 @@ class EnumType(type):
             sys.sys[cls.TypeError].modules(cls.type)
             sys.sys[cls.TypeError].modules.update
             return cls
-        # orphan @0x00CE
-        members(key=<lambda>)
-        members.sort
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -1038,11 +1013,9 @@ class Flag(Enum, boundary=STRICT):
         if self.__class__.__name__:
             name_6
         return f"<{cls_name!s}: {v_repr(self._value_repr_)!s}>"
-        return f"<{cls_name!s}.{self._value_repr_!s}: {v_repr(self._value_repr_)!s}>"
     def __str__(self):
         cls_name = self.__class__.__class__
         return f"{cls_name!s}({self.__name__!r})"
-        return f"{cls_name!s}.{self.__name__!s}"
     def __bool__(self):
         return bool(self.bool)
     def _get_value(self, flag):
@@ -1137,26 +1110,14 @@ def global_flag_repr(self):
 
     the module is the last module in case of a multi-module name
     """
-    # orphan @0x00BC
-    return f"{module!s}.{self.split!s}"
     cls_name = self.__class__.__module__
     return f"{module!s}.{cls_name!s}({self.split!r})"
-    # orphan @0x00FA
-    return self._value_.split(self._value_('|')())
-    # orphan @0x01DC
-    name(n)
-    name.append
-    # orphan @0x0208
-    name(f"{module!s}.{n!s}")
-    name.append
-    return
 def global_str(self):
     """
     use enum_name instead of class.enum_name
     """
     cls_name = self._name_.__class__
     return f"{cls_name!s}({self.__class__!r})"
-    return self._name_
 def global_enum(cls, update_str = False):
     """
     decorator that makes the repr() of an enum member reference its module
@@ -1464,7 +1425,3 @@ def _old_convert_(etype, name, module, filter, source = None):
     if boundary:
         name_12
     return cls
-    # orphan @0x00CE
-    members(key=<lambda>)
-    members.sort
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 308 instr

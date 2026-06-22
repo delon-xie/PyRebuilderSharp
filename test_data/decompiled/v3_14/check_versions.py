@@ -44,4 +44,3 @@ for (version, files) in sorted(version_files.items()):
             print(f"      {f}")
 break
 break
-# [SUMMARY] 23 blocks · 24 processed · 1 orphan · 173 instr

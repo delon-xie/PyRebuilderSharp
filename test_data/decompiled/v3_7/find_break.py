@@ -15,8 +15,6 @@ def test_until_broken(exprs):
     if 'Decompilation failed' in out:
         return 'CRASH'
     return 'NO_COMPILE'
-    return f"CONDITIONAL: {out[None:80]}"
-    return 'OK'
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:
         mid = (lo + hi) // 2
@@ -41,4 +39,3 @@ Verification - up to #{bp}:")
 Verification - just #{bp}:")
     r = test_until_broken(all_exprs[None:bp])
     print(f"  {r}")
-# [SUMMARY] 3 blocks · 2 processed · 1 orphan · 176 instr

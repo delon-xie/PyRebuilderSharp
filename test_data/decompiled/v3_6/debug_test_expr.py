@@ -27,4 +27,3 @@ print('Varnames:', code.co_varnames)
 print()
 print('Instructions:')
 dis.get_instructions(code)
-# [SUMMARY] 11 blocks · 12 processed · 0 orphan · 166 instr

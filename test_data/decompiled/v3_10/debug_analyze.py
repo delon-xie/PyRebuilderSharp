@@ -77,5 +77,3 @@ with open('/tmp/test_full.txt', 'r') as f:
             while '***' in line:
                 pass
 next_line = lines[j]
-print()
-# [SUMMARY] 25 blocks · 25 processed · 2 orphan · 220 instr

@@ -6,4 +6,3 @@ if x > 0:
         y = n
 else:
     y = -1
-# [SUMMARY] 6 blocks · 6 processed · 1 orphan · 21 instr

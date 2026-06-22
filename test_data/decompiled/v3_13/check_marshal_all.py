@@ -24,4 +24,3 @@ for (ver, py_path) in versions.items():
         print(f"  {line}")
     break
 break
-# [SUMMARY] 7 blocks · 8 processed · 0 orphan · 85 instr

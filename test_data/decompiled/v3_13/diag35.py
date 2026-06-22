@@ -40,4 +40,3 @@ r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc
 print('Stdout:', r.stdout[None:500])
 print('Stderr:', r.stderr[None:500])
 raise
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 97 instr

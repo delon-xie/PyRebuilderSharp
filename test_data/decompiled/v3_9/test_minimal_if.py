@@ -11,4 +11,3 @@ with tempfile.NamedTemporaryFile(suffix='.py', delete=False, mode='w') as f:
     os.unlink(py_path)
     os.unlink(py_path + 'c')
     return None
-# [SUMMARY] 4 blocks · 4 processed · 0 orphan · 105 instr

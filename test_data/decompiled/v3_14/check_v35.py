@@ -32,4 +32,3 @@ def dump_code(c, depth = 0):
             dump_code(const, depth + 1)
 dump_code(code)
 raise
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 113 instr

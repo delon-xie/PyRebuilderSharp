@@ -40,4 +40,3 @@ for group in failed_groups:
         print(f"    - {f}")
     break
 break
-# [SUMMARY] 30 blocks · 31 processed · 0 orphan · 269 instr

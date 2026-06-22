@@ -175,10 +175,8 @@ class property(DynamicClassAttribute):
         return
     def __set__(self, instance, value):
         return self.fset(instance, value)
-        raise AttributeError(f"<enum {self.clsname!r}> cannot set attribute {self.name!r}")
     def __delete__(self, instance):
         return self.fdel(instance)
-        raise AttributeError(f"<enum {self.clsname!r}> cannot delete attribute {self.name!r}")
     def __set_name__(self, ownerclass, name):
         self.name = name
         self.clsname = ownerclass.__name__
@@ -732,8 +730,6 @@ class EnumType(type):
             source.items()
         t
         members
-        # orphan @0x0234
-        members.sort(key=<lambda>)
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -885,8 +881,6 @@ class Enum(metaclass=EnumType):
         exc = None
         ve_exc = None
         return
-        raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
-        raise TypeError('%r has no members defined' % cls)
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
     def _add_value_alias_(self, value):
@@ -1066,11 +1060,9 @@ class Flag(Enum, boundary=STRICT):
         if not self.__class__._value_repr_:
             name_6
         return f"<{cls_name!s}: {v_repr(self._value_)!s}>"
-        return f"<{cls_name!s}.{self._name_!s}: {v_repr(self._value_)!s}>"
     def __str__(self):
         cls_name = self.__class__.__name__
         return f"{cls_name!s}({self._value_!r})"
-        return f"{cls_name!s}.{self._name_!s}"
     def __bool__(self):
         return bool(self._value_)
     def _get_value(self, flag):
@@ -1216,7 +1208,6 @@ def global_str(self):
     """
     cls_name = self.__class__.__name__
     return f"{cls_name!s}({self._value_!r})"
-    return self._name_
 def global_enum(cls, update_str = False):
     """
     decorator that makes the repr() of an enum member reference its module
@@ -1410,8 +1401,6 @@ def _simple_enum(etype = Enum):
         raise
         raise
         raise
-        enum_class._unhashable_values_.append(value)
-        enum_class._unhashable_values_map_.setdefault(name, []).append(value)
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1593,27 +1582,10 @@ def _test_simple_enum(checked_enum, simple_enum):
     failed_member = []
     failed.append('missing member from simple enum: %r' % name)
     failed.append('extra member in simple enum: %r' % name)
-    # orphan @0x0500
-    failed_member.append(f"missing key {key!r} not in the simple enum member {name!r}")
-    # orphan @0x0538
-    failed_member.append(f"extra key {key!r} in simple enum member {name!r}")
     checked_value = checked_member_dict[key]
     simple_value = simple_member_dict[key]
-    # orphan @0x0588
-    failed_member.append(f"{key!r}:
-         {f"checked member -> {checked_value!r}"!s}
-         {f"simple member  -> {simple_value!r}"!s}")
-    # orphan @0x05D2
-    failed.append(f"{name!r} member mismatch:
-      {"""
-      """.join(failed_member)!s}")
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
-    checked_method = checked_method.__func__
-    simple_method = simple_method.__func__
-    # orphan @0x06D6
-    method!r(f":  {f"checked -> {checked_method!r}"}{'30'!s} {f"simple -> {simple_method!r}"!s}")
-    failed.append
 def _old_convert_(etype, name, module, filter, source = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
@@ -1654,6 +1626,3 @@ def _old_convert_(etype, name, module, filter, source = None):
         break
     else:
         return cls
-    # orphan @0x0126
-    members.sort(key=<lambda>)
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 285 instr

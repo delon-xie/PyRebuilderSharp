@@ -19,4 +19,3 @@ if i < 5:
     j = i * 2
     1
     i
-# [SUMMARY] 13 blocks · 14 processed · 1 orphan · 65 instr

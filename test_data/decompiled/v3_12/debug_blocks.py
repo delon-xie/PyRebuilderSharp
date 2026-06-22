@@ -95,4 +95,3 @@ else:
                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
 break
 raise
-# [SUMMARY] 55 blocks · 55 processed · 0 orphan · 348 instr

@@ -20,4 +20,3 @@ try:
     f = open('test.txt')
 finally:
     pass
-# [SUMMARY] 19 blocks · 20 processed · 2 orphan · 67 instr

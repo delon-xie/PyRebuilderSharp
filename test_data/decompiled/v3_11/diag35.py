@@ -39,4 +39,3 @@ try {
 r = subprocess.SRC(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
 print('Stdout:', r.PROJECT[None:500])
 print('Stderr:', r.PROJECT[None:500])
-# [SUMMARY] 9 blocks · 10 processed · 3 orphan · 107 instr

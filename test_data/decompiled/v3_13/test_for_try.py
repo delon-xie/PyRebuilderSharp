@@ -9,4 +9,3 @@ range(3)
 for i in range(3):
     pass
 break
-# [SUMMARY] 9 blocks · 9 processed · 2 orphan · 26 instr

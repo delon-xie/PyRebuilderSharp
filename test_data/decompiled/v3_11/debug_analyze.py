@@ -64,7 +64,3 @@ if i < len(lines):
     i += 1
     i < len(lines)
 print(f"Total tests with versions found: {debug_count}")
-# orphan @0x035A
-print(f"  Found version: {v} in: {line_text}")
-print()
-# [SUMMARY] 30 blocks · 30 processed · 6 orphan · 256 instr

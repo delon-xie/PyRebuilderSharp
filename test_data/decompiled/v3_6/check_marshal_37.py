@@ -19,4 +19,3 @@ for offset in range(0, 8):
     vals = struct.unpack_from('<IIII', m, offset)
     if vals[0] == code.co_argcount:
         pass
-# [SUMMARY] 10 blocks · 11 processed · 0 orphan · 181 instr

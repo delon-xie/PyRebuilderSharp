@@ -43,4 +43,3 @@ else:
     break
 raise
 ex = None
-# [SUMMARY] 40 blocks · 41 processed · 5 orphan · 256 instr

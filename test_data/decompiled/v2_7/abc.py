@@ -23,4 +23,3 @@ def abstractmethod(funcobj):
     """
     funcobj.__isabstractmethod__ = True
     return funcobj
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 45 instr

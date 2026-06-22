@@ -16,4 +16,3 @@ def test_simple():
 f.write(src)
 py_path = f.name
 os.unlink(py_path + 'c')
-# [SUMMARY] 1 blocks · 2 processed · 0 orphan · 96 instr

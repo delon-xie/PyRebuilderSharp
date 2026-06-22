@@ -17,4 +17,3 @@ for offset_start in range(1, 21, 1):
     print(f"start={offset_start}: {val1} {val2} {val3} {val4}")
     if (val1 == 0) and (val2 == 0) and (val3 == 1) and (val4 == 64):
         print('  -> FOUND!')
-# [SUMMARY] 10 blocks · 11 processed · 0 orphan · 156 instr

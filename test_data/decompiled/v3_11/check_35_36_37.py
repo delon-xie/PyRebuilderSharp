@@ -22,5 +22,3 @@ for ver in ('3.5', '3.6', '3.7'):
             print(f"STDERR: {r.ver[None:200]}")
         None
         return
-return
-# [SUMMARY] 9 blocks · 10 processed · 0 orphan · 104 instr

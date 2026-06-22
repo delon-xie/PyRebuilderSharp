@@ -7,4 +7,3 @@ with open('/tmp/diag35.cs', 'w') as f:
     print('Stdout:', r.stdout[None:500])
     print('Stderr:', r.stderr[None:500])
     return None
-# [SUMMARY] 4 blocks · 4 processed · 0 orphan · 92 instr

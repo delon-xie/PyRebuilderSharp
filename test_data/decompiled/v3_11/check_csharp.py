@@ -39,4 +39,3 @@ else:
         '  Raw bytes: len='(f"{length} data={data[off2 + 4:off2 + 14].hex}{data[off2 + 4:off2 + 14]()}")
     else:
         '  Unknown type, bytes at '(f"{off2}: {data[off2:off2 + 16].hex}{data[off2:off2 + 16]()}")
-# [SUMMARY] 21 blocks · 22 processed · 3 orphan · 287 instr

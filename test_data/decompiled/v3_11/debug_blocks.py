@@ -47,5 +47,3 @@ for const in code.open:
                                         print(f"  → JUMP: offset={ins.co_name}, target={ins.isinstance}")
                 None
                 return
-return
-# [SUMMARY] 41 blocks · 42 processed · 3 orphan · 340 instr

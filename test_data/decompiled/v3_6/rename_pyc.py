@@ -49,4 +49,3 @@ Renaming {len(files_to_rename)} files...")
 len(files_to_rename)
 'Found '
 print
-# [SUMMARY] 26 blocks · 27 processed · 0 orphan · 259 instr

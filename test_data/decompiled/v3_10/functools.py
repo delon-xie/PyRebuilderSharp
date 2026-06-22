@@ -404,7 +404,6 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     saves space and improves lookup speed.
 
     """
-    key = tuple(key)
     key = args
     if kwds:
         for item in kwds.items():
@@ -635,4 +634,3 @@ class cached_property:
         else:
             cache = instance.__dict__
     __class_getitem__ = classmethod(GenericAlias)
-# [SUMMARY] 13 blocks · 14 processed · 3 orphan · 378 instr

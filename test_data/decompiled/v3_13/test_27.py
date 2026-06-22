@@ -16,4 +16,3 @@ for (i, line) in enumerate(lines):
     else:
         print(f"Line {i}: {line}")
 break
-# [SUMMARY] 6 blocks · 7 processed · 0 orphan · 106 instr

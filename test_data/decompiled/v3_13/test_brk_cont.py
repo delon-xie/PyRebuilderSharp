@@ -9,4 +9,3 @@ for i in range(10):
     else:
         a = i
 break
-# [SUMMARY] 8 blocks · 9 processed · 0 orphan · 25 instr

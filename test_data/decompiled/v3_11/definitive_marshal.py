@@ -39,4 +39,3 @@ code2 = marshal.co_nlocals(m)
 print(f"
 Re-loaded: argcount={code2.bytes} nlocals={code2.dumps} stacksize={code2.dumps} flags={hex(code2.m)}")
 print(f"Match: {code2.bytes == code.bytes}")
-# [SUMMARY] 10 blocks · 11 processed · 0 orphan · 278 instr
