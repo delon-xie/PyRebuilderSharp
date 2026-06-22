@@ -1254,9 +1254,7 @@ public class StackMachine
 
                     case PythonVersion.Py311:
                     case PythonVersion.Py312:
-                    case PythonVersion.Py313:
-                    case PythonVersion.Py314:
-                        // Python 3.11+: MAKE_FUNCTION pops code object + optional args per flags
+                        // Python 3.11-3.12: MAKE_FUNCTION pops code + optional args per flags
                         // 参考 CPython 3.11: Python/ceval.c TARGET(MAKE_FUNCTION)
                         // 栈布局（从下到上）：defaults?, kwdefaults?, annotations?, closure?, code
                         // CPython POP 顺序（从上到下）：code → closure → annotations → kwdefaults → defaults
@@ -1287,10 +1285,8 @@ public class StackMachine
                         }
 
                         // 后备：当块分拆导致 StackMachine 栈为空时，从指令列表回溯查找 defaults 常量
-                        // 用于 class body 中 LOAD_CONST defaults 与 MAKE_FUNCTION 被分到不同块的情况
                         if (funcRef.DefaultExprs == null && (flags & 0x01) != 0 && childCode != null)
                         {
-                            // 在代码对象的完整指令列表中查找本指令之前最近的 LOAD_CONST 加载的 tuple
                             int mfIdx = _code.Instructions.IndexOf(instr);
                             for (int j = mfIdx - 1; j >= 0 && j >= mfIdx - 6; j--)
                             {
@@ -1306,6 +1302,22 @@ public class StackMachine
                             }
                         }
                         _exprStack.Push(funcRef);
+                        return null;
+                    }
+
+                    case PythonVersion.Py313:
+                    case PythonVersion.Py314:
+                        // Python 3.13+: MAKE_FUNCTION 无 arg（opcode < HAVE_ARGUMENT）。
+                        // 只弹出 code object。defaults/closure 由后续 SET_FUNCTION_ATTRIBUTE 处理。
+                        // 参考 CPython 3.13: Python/ceval.c TARGET(MAKE_FUNCTION)
+                    {
+                        var codeExpr = SafePop();
+                        if (codeExpr is Constant c2 && c2.Value is CodeObject co)
+                        {
+                            childCode = co;
+                            funcName = co.Name ?? "<lambda>";
+                        }
+                        _exprStack.Push(new FunctionRef(childCode, funcName));
                         return null;
                     }
 
@@ -1354,9 +1366,31 @@ public class StackMachine
                 return null;
 
             // 3.13+ SET_FUNCTION_ATTRIBUTE: set function attribute (closure/defaults/annotations)
-            // Pops one value from stack. StackMachine: just skip — output unaffected.
+            // 3.13+ MAKE_FUNCTION 无 arg，defaults/closure 在栈上 FunctionRef 之下。
+            // 此指令弹出 FunctionRef，再弹出其下方的属性值并设置到 FunctionRef 上，然后推回。
             case Opcode.SET_FUNCTION_ATTRIBUTE_313:
+            {
+                int sfaFlags = instr.Argument ?? 0;
+                var funcExpr = SafePop();
+                if (funcExpr is not FunctionRef funcRef) return null;
+
+                if ((sfaFlags & 0x08) != 0) _ = SafePop(); // closure — skip
+                if ((sfaFlags & 0x04) != 0) _ = SafePop(); // annotations — skip
+                if ((sfaFlags & 0x02) != 0) _ = SafePop(); // kwdefaults — skip
+                if ((sfaFlags & 0x01) != 0)
+                {
+                    var defaultsExpr = SafePop();
+                    if (defaultsExpr is ListLiteral dl && dl.Kind == ContainerKind.Tuple)
+                        funcRef = funcRef with { DefaultExprs = dl.Elts };
+                    else if (defaultsExpr is Constant dc && dc.Value is System.Collections.IList list)
+                        funcRef = funcRef with {
+                            DefaultExprs = list.Cast<object>()
+                                .Select(v => new Constant(v) as Expr).ToList()
+                        };
+                }
+                _exprStack.Push(funcRef);
                 return null;
+            }
 
             // 3.13+ FORMAT_SIMPLE: f-string simple format (no-op, expression unchanged)
             case Opcode.FORMAT_SIMPLE_313:
