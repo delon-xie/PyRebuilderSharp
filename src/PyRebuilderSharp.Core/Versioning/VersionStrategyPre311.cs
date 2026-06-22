@@ -12,6 +12,7 @@ public class VersionStrategyPre311 : VersionStrategyBase
     private readonly bool _is310;
     private readonly bool _is38plus;
     private readonly bool _is37;
+    private readonly bool _is36;
 
     /// <summary>
     /// 初始化 3.5-3.10 版本策略。
@@ -19,11 +20,13 @@ public class VersionStrategyPre311 : VersionStrategyBase
     /// <param name="is310">是否为 Python 3.10（word offset + linetable）</param>
     /// <param name="is38plus">是否为 Python 3.8+（posonlyargcount）</param>
     /// <param name="is37">是否为 Python 3.7（PEP 552 header，但无 posonlyargcount）</param>
-    public VersionStrategyPre311(bool is310, bool is38plus, bool is37 = false)
+    /// <param name="is36">是否为 Python 3.6（3.5 与 3.6 魔数不同但构造参数相同）</param>
+    public VersionStrategyPre311(bool is310, bool is38plus, bool is37 = false, bool is36 = false)
     {
         _is310 = is310;
         _is38plus = is38plus;
         _is37 = is37;
+        _is36 = is36;
     }
 
     /// <summary>
@@ -36,8 +39,7 @@ public class VersionStrategyPre311 : VersionStrategyBase
             if (_is310) return PythonVersion.Py310;
             if (_is38plus) return PythonVersion.Py38;
             if (_is37) return PythonVersion.Py37;
-            // For versions before 3.8, we approximate with Py35
-            // (caller can refine with specific version if needed)
+            if (_is36) return PythonVersion.Py36;
             return PythonVersion.Py35;
         }
     }
@@ -49,6 +51,7 @@ public class VersionStrategyPre311 : VersionStrategyBase
             if (_is310) return "Python 3.10";
             if (_is38plus) return "Python 3.8";
             if (_is37) return "Python 3.7";
+            if (_is36) return "Python 3.6";
             return "Python 3.5";
         }
     }
