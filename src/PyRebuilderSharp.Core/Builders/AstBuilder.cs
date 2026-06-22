@@ -1401,18 +1401,20 @@ public class AstBuilder
         visited.Add(handlerBlock);
         List<Stmt>? elseBody = null;
 
-        // 收集 else 体：在字节码中 handler 的 JUMP_FORWARD 目标与 handler 末尾之间的所有块。
-        // 这些块（如 ABCMeta class 定义）不是 handlerBlock.Successors 的一部分，
-        // 因为 handler 的 JUMP_FORWARD 跳过它们。但它们出现在模块级块序列中。
-        var lastHandlerInstr = handlerBlock.Instructions.LastOrDefault();
-        if (lastHandlerInstr.Argument.HasValue
-            && lastHandlerInstr.Opcode == Opcode.JUMP_FORWARD)
+        // 收集 else 体：查找 try 体末尾的 JUMP_FORWARD 目标。
+        // else 体位于 try 体的 JUMP_FORWARD 目标与 handler 的 JUMP_FORWARD 目标之间。
+        var tryBodyJump = tryBlocks
+            .SelectMany(b => b.Instructions)
+            .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
+        var handlerJump = handlerBlock.Instructions
+            .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
+        if (tryBodyJump.Argument.HasValue && handlerJump.Argument.HasValue)
         {
-            int afterTryEnd = lastHandlerInstr.Offset + 2 + lastHandlerInstr.Argument.Value;
-            // 扫描 handlerBlock.EndOffset 到 afterTryEnd 之间的未访问块
+            int elseStart = tryBodyJump.Offset + 2 + tryBodyJump.Argument.Value;
+            int elseEnd = handlerJump.Offset + 2 + handlerJump.Argument.Value;
             var elseCandidates = _sortedBlocks
-                .Where(b => b.StartOffset > handlerBlock.EndOffset
-                    && b.EndOffset < afterTryEnd
+                .Where(b => b.StartOffset >= elseStart
+                    && b.EndOffset < elseEnd
                     && !visited.Contains(b))
                 .OrderBy(b => b.StartOffset)
                 .ToList();
