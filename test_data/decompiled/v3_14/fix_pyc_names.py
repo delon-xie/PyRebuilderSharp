@@ -5,16 +5,12 @@ import struct
 MAGIC_NUMBERS = {b'Wg0NCg==': '3.10', b'Yg0NCg==': '3.11', b'bw0NCg==': '3.12', b'eg0NCg==': '3.13', b'hQ0NCg==': '3.14'}
 def get_python_version(filepath):
     """rb"""
-    try:
-        magic = fp.read(4)
-    except:
-        pass
     __name__()
     open(filepath, 'rb')
     __module__
     open(filepath, 'rb')
+    magic = fp.read(4)
     return MAGIC_NUMBERS.get(magic, 'unknown')
-    raise
 
 def fix_pyc_names(directory):
     """.pyc"""

@@ -1,20 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    []
-    for _ in []:
-        if not True:
-            pass
-        else:
-            try:
-                try:
-                    break
-                except:
-                    break
-            except:
-                break
-except:
-    break
 import os
 import subprocess
 input_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/input'
@@ -23,6 +8,11 @@ os.makedirs(output_dir, exist_ok=True)
 python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 f
 os.listdir(input_dir)
+[]
+for _ in []:
+    if not True:
+        pass
+break
 print(f"找到 {len(py_files)} 个 Python 文件")
 print(f"使用 Python: {python310_path}")
 print('============================================================')

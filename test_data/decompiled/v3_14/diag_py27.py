@@ -1,13 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    f.write(code)
-except:
-    break
-try:
-    content = f.read().strip()
-except:
-    break
 """Diagnose Python 2.7 decompilation failures by stepping through analysis"""
 import os
 import subprocess
@@ -56,19 +48,17 @@ for (name, code) in tests.items():
     open(py_path, 'w')
     __module__
     open(py_path, 'w')
-break
-if not r.stdout.strip():
+    f.write(code)
     break
-break
-if os.path.exists(out_path):
-    __name__()
-    open(out_path)
-    __module__
-    open(out_path)
-else:
-    print(f"Error: {r2.stderr[:200]}")
-break
-break
-raise
-break
-raise
+    if not r.stdout.strip():
+        break
+    break
+    if os.path.exists(out_path):
+        __name__()
+        open(out_path)
+        __module__
+        open(out_path)
+    else:
+        print(f"Error: {r2.stderr[:200]}")
+    content = f.read().strip()
+    break

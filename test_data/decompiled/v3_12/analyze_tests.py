@@ -2,13 +2,9 @@
 
 next_line = lines[j]
 line = lines[i]
-try:
-    output = f.read()
-except:
-    break
 import re
 from collections import defaultdict
-
+output = f.read()
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -234,4 +230,3 @@ while i < len(lines):
         '版本'
         print
         None
-break

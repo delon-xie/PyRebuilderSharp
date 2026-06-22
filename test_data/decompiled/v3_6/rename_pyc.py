@@ -41,7 +41,3 @@ Done!""")
     for (old, new) in .0:
         print(f"  Removing {os.path.basename(old)}")
         os.remove(old)
-' files to rename'
-len(files_to_rename)
-'Found '
-print

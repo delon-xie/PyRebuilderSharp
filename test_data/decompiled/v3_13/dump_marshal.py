@@ -1,25 +1,10 @@
 # Decompiled from: <module>
 
-try:
-    data = f.read()
-except:
-    break
-try:
-    []
-    for c in []:
-        try:
-            try:
-                break
-            except:
-                break
-        except:
-            break
-except:
-    break
 import marshal
 import struct
 import sys
 open(sys.argv[1], 'rb')
+data = f.read()
 pos = 16
 raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}02X")
@@ -43,6 +28,3 @@ elif t in (90, 122):
     bcode = data[pos:pos + length]
     pos += length
     print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
-break
-break
-raise

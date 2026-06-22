@@ -1,15 +1,12 @@
 # Decompiled from: <module>
 
-try:
-    output = f.read()
-except:
-    pass
 import re
 from collections import defaultdict
 __name__()
 open('/tmp/test_full.txt', 'r')
 __module__
 open('/tmp/test_full.txt', 'r')
+output = f.read()
 @defaultdict
 def version_stats():
     """total"""
@@ -51,4 +48,3 @@ while i < len(lines):
             i += 1
         print()
 print(f"Total tests with versions found: {debug_count}")
-raise

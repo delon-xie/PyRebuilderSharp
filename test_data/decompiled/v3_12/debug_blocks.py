@@ -1,47 +1,11 @@
 # Decompiled from: <module>
 
-try:
-    f.read(16)
-    code = marshal.load(f)
-except:
-    break
-try:
-    []
-    for ins in []:
-        try:
-            try:
-                []
-                if not start < end:
-                    pass
-                else:
-                    try:
-                        try:
-                            break
-                            try:
-                                ins
-                                try:
-                                    try:
-                                        pass
-                                    except:
-                                        break
-                                except:
-                                    break
-                            except:
-                                break
-                        except:
-                            break
-                    except:
-                        break
-            except:
-                break
-        except:
-            break
-except:
-    break
 import dis
 import marshal
 import types
 import struct
+f.read(16)
+code = marshal.load(f)
 code.co_consts
 for const in code.co_consts:
     if not isinstance(const, types.CodeType):
@@ -73,25 +37,32 @@ for const in code.co_consts:
                 instrs[-1].offset + 2
                 ins
                 instrs
-if len(block_instrs) > 3:
-    pass
-else:
-    f"-{end - 1}{'3d'}]: {', '.join}{<genexpr>(block_instrs())}"
-    '3d'
-    start
-    'Block ['
-    break
-    if <genexpr>(block_instrs()):
-        last = block_instrs[-1]
-        print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-    elif not <genexpr>(block_instrs()):
-        pass
-    else:
-        block_instrs
-        for ins in block_instrs:
-            if not ins.opname == 'JUMP_ABSOLUTE':
-                pass
-            else:
-                print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
-break
-raise
+                []
+                for ins in []:
+                    if ins.offset <= start:
+                        if not start < end:
+                            pass
+                        else:
+                            ins
+                    else:
+                        break
+                if len(block_instrs) > 3:
+                    pass
+                else:
+                    f"-{end - 1}{'3d'}]: {', '.join}{<genexpr>(block_instrs())}"
+                    '3d'
+                    start
+                    'Block ['
+                    break
+                    if <genexpr>(block_instrs()):
+                        last = block_instrs[-1]
+                        print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
+                    elif not <genexpr>(block_instrs()):
+                        pass
+                    else:
+                        block_instrs
+                        for ins in block_instrs:
+                            if not ins.opname == 'JUMP_ABSOLUTE':
+                                pass
+                            else:
+                                print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

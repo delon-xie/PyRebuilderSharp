@@ -1,13 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    x = 1 / 0
-except:
-    break
-try:
-    f = open('test.txt')
-except:
-    break
 range(10)
 for i in range(10):
     a = i
@@ -20,3 +12,5 @@ for n in range(5):
         break
     elif n == 1:
         pass
+x = 1 / 0
+f = open('test.txt')

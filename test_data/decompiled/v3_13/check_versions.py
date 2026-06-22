@@ -1,22 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    magic = f.read(4)
-    version = magic_numbers.get(magic, 'unknown')
-    try:
-        try:
-            magic = f.read(4)
-            version = magic_numbers.get(magic, 'unknown')
-            try:
-                version_files[version].append(filename)
-            except:
-                break
-        except:
-            pass
-    except:
-        pass
-except:
-    pass
 import os
 magic_numbers = {b'YQ0NCg==': '3.10', b'XQ0NCg==': '3.11', b'VQ0NCg==': '3.12', b'hw0NCg==': '3.13', b'eg0NCg==': '3.14', b'bw0NCg==': '3.7', b'Yg0NCg==': '3.8', b'Wg0NCg==': '3.9'}
 pyc_dir = 'tests/compiled'
@@ -28,6 +11,12 @@ for filename in os.listdir(pyc_dir):
     else:
         filepath = os.path.join(pyc_dir, filename)
         open(filepath, 'rb')
+        magic = f.read(4)
+        version = magic_numbers.get(magic, 'unknown')
+        if version not in version_files:
+            pass
+        version_files[version].append(filename)
+        break
 break
 for (version, files) in sorted(version_files.items()):
     print(f"  Python {version}: {len(files)} 个文件")
@@ -39,6 +28,4 @@ for (version, files) in sorted(version_files.items()):
         for f in sorted(files):
             print(f"      {f}")
         break
-break
-break
 break

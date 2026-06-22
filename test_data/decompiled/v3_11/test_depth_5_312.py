@@ -58,28 +58,6 @@ def depth_5_while():
             b > 0
 
 def depth_5_try():
-    try:
-        result = 42
-    except:
-        result = -1
-    try:
-        raise
-        try:
-            try:
-                raise
-                try:
-                    result = -3
-                except:
-                    pass
-            except:
-                result = -3
-        except:
-            result = -3
-        result = -2
-    except:
-        result = -2
-    try:
-        result = -5
-    except:
-        pass
     result = 0
+    result = 42
+    result = -4

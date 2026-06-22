@@ -3,7 +3,6 @@
 with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb') as f:
     f.read(16)
     code = marshal.load(f)
-    raise
     for const in code.co_consts:
         if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
             for (i, instr) in enumerate(instrs):

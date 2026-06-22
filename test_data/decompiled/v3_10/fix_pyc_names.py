@@ -6,7 +6,6 @@ MAGIC_NUMBERS = {b'hQ0NCg==': '3.10', b'eg0NCg==': '3.11', b'bw0NCg==': '3.12', 
 def get_python_version(filepath):
     with open(filepath, 'rb') as fp:
         magic = fp.read(4)
-        raise
         return MAGIC_NUMBERS.get(magic, 'unknown')
 
 def fix_pyc_names(directory):

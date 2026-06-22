@@ -51,34 +51,15 @@ def mixed_3(n):
     return total
 
 def mixed_4(n):
-    try:
-        try:
-            try:
-                try:
-                    range(n)
-                    for i in range(n):
-                        try:
-                            j = 0
-                            try:
-                                j += 1
-                            except:
-                                break
-                        except:
-                            break
-                        try:
-                            total += j
-                        except:
-                            break
-                        j < i
-                        raise
-                    return
-                except:
-                    break
-            except:
-                break
-        except:
-            break
-    except:
-        break
     total = 0
+    if n > 0:
+        pass
+    range(n)
+    for i in range(n):
+        j = 0
+        if j < i:
+            j += 1
+        total += j
+        j < i
+    return
     None

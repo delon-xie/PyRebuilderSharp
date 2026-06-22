@@ -4,7 +4,6 @@ print(f"⏭ {ver}: .pyc not found")
 pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
 with open(INPUT_FILE) as f:
     expected_src = f.read()
-    raise
     try:
         ast = ast
         expected_ast = ast.dump(ast.parse(expected_src), indent=2)

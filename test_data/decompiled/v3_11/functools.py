@@ -1,21 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    from _functools import cmp_to_key
-except:
-    pass
-try:
-    from _functools import reduce
-except:
-    pass
-try:
-    from _functools import partial, Placeholder, _PlaceholderType
-except:
-    pass
-try:
-    from _functools import _lru_cache_wrapper
-except:
-    pass
 """functools.py - Tools for working with functions and callable objects
 """
 __all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
@@ -39,19 +23,15 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
        are updated with the corresponding attribute from the wrapped
        function (defaults to functools.WRAPPER_UPDATES)
     """
-    try:
-        value = getattr(wrapped, attr)
-    except:
-        break
     assigned
     for attr in assigned:
-        pass
+        value = getattr(wrapped, attr)
+        setattr(wrapper, attr, value)
     for attr in updated:
         getattr(wrapper, attr)(getattr(wrapped, attr, {}))
         wrapped
         getattr(wrapper, attr).update
     return wrapper
-    setattr(wrapper, attr, value)
 
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
@@ -180,6 +160,7 @@ def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     return K
 []
+from _functools import cmp_to_key
 _initial_missing = sentinel('_initial_missing')
 def reduce(function, sequence, initial = _initial_missing):
     """
@@ -194,10 +175,6 @@ def reduce(function, sequence, initial = _initial_missing):
     For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
     calculates ((((1 + 2) + 3) + 4) + 5).
     """
-    try:
-        value = next(it)
-    except:
-        pass
     it = iter(sequence)
     if initial is _initial_missing:
         pass
@@ -207,6 +184,8 @@ def reduce(function, sequence, initial = _initial_missing):
         value = function(value, element)
         value
     return
+
+from _functools import reduce
 
 class _PlaceholderType:
     """The type of the Placeholder singleton.
@@ -313,12 +292,6 @@ class partial:
     __new__ = _partial_new
     __repr__ = recursive_repr()(_partial_repr)
     def __call__(self):
-        try:
-            pto_args = self(self.args + args)
-            args = args[phcount:]
-            self._merger
-        except:
-            pass
         phcount = self._phcount
         if phcount:
             pass
@@ -342,6 +315,8 @@ class partial:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
     __class_getitem__ = classmethod(GenericAlias)
 
+from _functools import partial, Placeholder, _PlaceholderType
+
 class partialmethod:
     """Method descriptor with partial application of the given arguments
     and keywords.
@@ -353,12 +328,6 @@ class partialmethod:
     __repr__ = _partial_repr
     def _make_unbound_method(self):
         def _method(cls_or_self):
-            try:
-                pto_args = self(self.args + args)
-                args = args[phcount:]
-                self._merger
-            except:
-                pass
             phcount = self._phcount
             if phcount:
                 pass
@@ -370,10 +339,6 @@ class partialmethod:
         return _method
 
     def __get__(self, obj, cls = None):
-        try:
-            result.__self__ = new_func.__self__
-        except:
-            pass
         get = getattr(self.func, '__get__', None)
         result = None
         new_func = get(obj, cls)
@@ -476,61 +441,42 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
     else:
         def wrapper():
-            try:
-                link = cache_get(key)
-                (link_prev, link_next, _key, result) = link
-                last = root[PREV]
-                result
-                hits + 1
-            except:
-                pass
-            try:
-                try:
-                    try:
-                        try:
-                            try:
-                                oldroot = root
-                                oldkey = root[KEY]
-                                oldresult = root[RESULT]
-                                try:
-                                    last = root[PREV]
-                                    link = [last, root, key, result]
-                                    cache_len() >= maxsize
-                                except:
-                                    pass
-                            except:
-                                pass
-                        except:
-                            pass
-                    except:
-                        pass
-                except:
-                    pass
-            except:
-                pass
             key = make_key(args, kwds, typed)
+            link = cache_get(key)
+            (link_prev, link_next, _key, result) = link
+            last = root[PREV]
+            result
+            hits + 1
             return
-            return result
+            misses + 1(None, None)
+            result = user_function(**kwds)
+            if key in cache:
+                pass
+            elif full:
+                oldroot = root
+                oldkey = root[KEY]
+                oldresult = root[RESULT]
+            else:
+                last = root[PREV]
+                link = [last, root, key, result]
+                cache_len() >= maxsize
+                return result
         def cache_info():
             """Report cache statistics"""
-            try:
-                _CacheInfo(hits, misses, maxsize, cache_len())
-            except:
-                pass
+            _CacheInfo(hits, misses, maxsize, cache_len())
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
-            try:
-                cache()
-                False
-                0
-                0
-                cache.clear
-            except:
-                pass
+            cache()
+            False
+            0
+            0
+            cache.clear
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear
         return wrapper
+
+from _functools import _lru_cache_wrapper
 
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
@@ -724,28 +670,12 @@ class singledispatchmethod:
         return _singledispatchmethod_get(self, obj, cls)
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
-        try:
-            name = self.func.__qualname__
-        except:
-            pass
-        try:
-            name = self.func.__name__
-        except:
-            name = '?'
+        name = self.func.__qualname__
         return f"<single dispatch method descriptor {name}>"
-        raise
-        raise
+        name = self.func.__name__
 
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
-        try:
-            self.__module__ = func.__module__
-        except:
-            pass
-        try:
-            self.__doc__ = func.__doc__
-        except:
-            pass
         self._unbound = unbound
         self._dispatch = unbound.dispatcher.dispatch
         self._obj = obj
@@ -755,19 +685,13 @@ class _singledispatchmethod_get:
             pass
         else:
             0
+            self.__module__ = func.__module__
+            self.__doc__ = func.__doc__
 
     def __repr__(self):
-        try:
-            name = self.__qualname__
-        except:
-            pass
-        try:
-            name = self.__name__
-        except:
-            name = '?'
+        name = self.__qualname__
         return f"<bound single dispatch method {name} of {self._obj!r}>"
-        raise
-        raise
+        name = self.__name__
 
     def __call__(self):
         if not args:
@@ -806,26 +730,9 @@ class cached_property:
         self.attrname = name
 
     def __get__(self, instance, owner = None):
-        try:
-            cache = instance.__dict__
-        except:
-            msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
-        try:
-            try:
-                try:
-                    try:
-                        pass
-                    except:
-                        pass
-                except:
-                    pass
-                msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
-            except:
-                pass
-        except:
-            pass
         return self
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
+        cache = instance.__dict__
         val = cache(self.attrname, _NOT_FOUND)
         if val is _NOT_FOUND:
             val = self(instance)

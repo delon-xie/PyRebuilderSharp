@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    a = 1
-except:
-    break
 x = 1
 y = 2
 if x < y:
@@ -20,5 +16,6 @@ else:
     for n in range(10):
         m = n + 1
     break
+    a = 1
 j = i * 2
 i += 1

@@ -2869,14 +2869,11 @@ class SyntaxWarningTest(unittest.TestCase):
     errtest is a regular expression that must be present in the
     text of the warning raised.
 """
-        try:
-            compile(code, filename, mode)
-        except:
-            pass
         __name__()
         self.assertWarnsRegex(SyntaxWarning, errtext)
         __module__
         self.assertWarnsRegex(SyntaxWarning, errtext)
+        compile(code, filename, mode)
 
     def test_return_in_finally(self):
         """
@@ -2962,38 +2959,26 @@ class SyntaxErrorTestCase(unittest.TestCase):
 """
         try:
             compile(code, filename, mode)
-        except:
+        except SyntaxError:
             pass
-        try:
-            try:
-                try:
-                    try:
-                        self.fail('SyntaxError is not a %s' % subclass.__name__)
-                        try:
-                            mo = re.search(errtext, str(err))
-                            self.fail(f"SyntaxError did not contain {errtext}")
-                            self.assertEqual(err.filename, filename)
-                            self.assertEqual(err.lineno, lineno)
-                            self.assertEqual(err.offset, offset)
-                            self.assertEqual(err.end_lineno, end_lineno)
-                            self.assertEqual(err.end_offset, end_offset)
-                        except:
-                            err = None
-                            return None
-                    except:
-                        err = None
-                        return None
-                except:
-                    err = None
-                    return None
-            except:
-                err = None
-                return None
-        except:
-            err = None
-            return None
         self.fail('compile() did not raise SyntaxError')
+        if subclass and not True:
+            self.fail('SyntaxError is not a %s' % subclass.__name__)
+        mo = re.search(errtext, str(err))
+        self.fail(f"SyntaxError did not contain {errtext}")
+        self.assertEqual(err.filename, filename)
+        self.assertEqual(err.lineno, lineno)
+        self.assertEqual(err.offset, offset)
+        self.assertEqual(err.end_lineno, end_lineno)
+        self.assertEqual(err.end_offset, end_offset)
         err = None
+        mo = re.search(errtext, str(err))
+        self.fail(f"SyntaxError did not contain {errtext}")
+        self.assertEqual(err.filename, filename)
+        self.assertEqual(err.lineno, lineno)
+        self.assertEqual(err.offset, offset)
+        self.assertEqual(err.end_lineno, end_lineno)
+        self.assertEqual(err.end_offset, end_offset)
 
     def test_expression_with_assignment(self):
         """print(end1 + end2 = ' ')"""
@@ -3221,12 +3206,12 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
 """
         try:
             compile(s, '<string>', 'exec')
-        except:
+        except SyntaxError:
             self.fail('Empty line after a line continuation character is valid.')
         try:
             compile(s1, '<string>', 'exec')
             compile(s2, '<string>', 'exec')
-        except:
+        except SyntaxError:
             self.fail('Indented statement over multiple lines is valid')
         s = """\\
 pass

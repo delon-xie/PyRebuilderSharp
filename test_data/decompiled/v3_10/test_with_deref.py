@@ -3,6 +3,6 @@
 def outer():
     def inner():
         if not True:
-            raise
+            pass
         print(lk)
     return inner

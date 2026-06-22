@@ -2,7 +2,6 @@
 
 with open(INPUT_FILE) as f:
     expected_src = f.read()
-    raise
     try:
         expected_ast = ast.dump(ast.parse(expected_src), indent=2)
     except Exception:

@@ -8,19 +8,6 @@ try:
     actual_ast = ast.dump(ast.parse(decompiled), indent=2)
 except Exception:
     pass
-try:
-    print(f"Expected AST parse error: {e}")
-    sys.exit(1)
-except:
-    e = None
-try:
-    print(f"Actual AST parse error: {e}")
-    print('---Decompiled source---')
-    print(decompiled)
-    print('---End---')
-    sys.exit(1)
-except:
-    e = None
 """Compare ASTs of expected vs decompiled"""
 import ast
 import sys
@@ -53,8 +40,14 @@ for i in range(max(len(exp_lines), len(act_lines))):
                     pass
                 else:
                     break
+print(f"Expected AST parse error: {e}")
+sys.exit(1)
 e = None
 []
-raise
+print(f"Actual AST parse error: {e}")
+print('---Decompiled source---')
+print(decompiled)
+print('---End---')
+sys.exit(1)
 e = None
 []

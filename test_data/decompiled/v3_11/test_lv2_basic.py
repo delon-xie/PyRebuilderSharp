@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    a = 1
-except:
-    break
 x = 1
 y = 2
 if x < y:

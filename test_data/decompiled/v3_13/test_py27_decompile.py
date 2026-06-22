@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    content = f.read()
-except:
-    pass
 """编译 test_expressions_comprehensive.py 为 Python 2.7 .pyc"""
 import os
 import subprocess
@@ -13,6 +9,7 @@ OUTPUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests
 BASENAME = 'test_expressions_comprehensive'
 PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
 open(INPUT_PY)
+content = f.read()
 outc = os.path.join(OUTPUT_DIR, '{}.2.7.pyc'.format(BASENAME))
 result = subprocess.run([PY27, '-c', """import py_compile, sys
 src, dst = sys.argv[1], sys.argv[2]
@@ -30,4 +27,3 @@ else:
     result2.stdout
     if len(result2.stderr) > 500:
         pass
-raise

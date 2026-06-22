@@ -41,7 +41,7 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
 """
     try:
         value = getattr(wrapped, attr)
-    except:
+    except AttributeError:
         break
     assigned
     for attr in assigned:
@@ -162,35 +162,25 @@ def _lt_from_ge(self, other):
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    try:
-        {}
-        for op in {}:
-            try:
-                try:
-                    {}
-                except:
-                    break
-                getattr(cls, op, None) is not getattr(object, op, None)
-            except:
-                break
-            if not True:
-                pass
-        if not roots:
-            raise ValueError('must define at least one ordering operation: < > <= >=')
-        else:
-            root = max(roots)
-            _convert[root]
-        for (opfunc, opname) in _convert[root]:
-            if not opname not in roots:
-                pass
-            else:
-                opfunc.__name__ = opname
-                setattr(cls, opname, opfunc)
-        return cls
-    except:
-        break
     op
     _convert
+    {}
+    for op in {}:
+        getattr(cls, op, None) is not getattr(object, op, None)
+        if not True:
+            pass
+    if not roots:
+        raise ValueError('must define at least one ordering operation: < > <= >=')
+    else:
+        root = max(roots)
+        _convert[root]
+    for (opfunc, opname) in _convert[root]:
+        if not opname not in roots:
+            pass
+        else:
+            opfunc.__name__ = opname
+            setattr(cls, opname, opfunc)
+    return cls
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -232,7 +222,7 @@ def reduce(function, sequence, initial = _initial_missing):
 """
     try:
         value = next(it)
-    except:
+    except StopIteration:
         pass
     it = iter(sequence)
     if initial is _initial_missing:
@@ -352,7 +342,7 @@ class partial:
         try:
             pto_args = self._merger(self.args + args)
             args = args[phcount:]
-        except:
+        except IndexError:
             pass
         phcount = self._phcount
         if phcount:
@@ -401,7 +391,7 @@ class partialmethod:
             try:
                 pto_args = self._merger(self.args + args)
                 args = args[phcount:]
-            except:
+            except IndexError:
                 pass
             if phcount:
                 pass
@@ -417,7 +407,7 @@ class partialmethod:
         """__get__"""
         try:
             result.__self__ = new_func.__self__
-        except:
+        except AttributeError:
             pass
         get = getattr(self.func, '__get__', None)
         result = None
@@ -457,24 +447,6 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     saves space and improves lookup speed.
 
 """
-    try:
-        []
-        for _ in []:
-            try:
-                try:
-                    []
-                    if kwds:
-                        v
-                        kwds.values()
-                    return key
-                    break
-                    break
-                except:
-                    break
-            except:
-                break
-    except:
-        break
     key = args
     if kwds:
         for item in kwds.items():
@@ -488,6 +460,10 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     else:
         return key
     key = tuple(key)
+    if kwds:
+        v
+        kwds.values()
+    return key
     []
     for _ in []:
         pass
@@ -536,74 +512,58 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
     else:
         def wrapper():
-            try:
-                link = cache_get(key)
-                last = root[PREV]
-                result
-                hits + 1
-                *link
-                *link
-                *link
-                *link
-            except:
-                pass
-            try:
-                try:
-                    try:
-                        if full:
-                            pass
-                        else:
-                            try:
-                                try:
-                                    oldroot = root
-                                    oldkey = root[KEY]
-                                    oldresult = root[RESULT]
-                                except:
-                                    pass
-                                last = root[PREV]
-                                link = [last, root, key, result]
-                                cache_len() >= maxsize
-                            except:
-                                pass
-                    except:
-                        pass
-                except:
-                    pass
-            except:
-                pass
             __name__()
             lock
             key := make_key(args, kwds, typed)
             lock
             __module__
+            link = cache_get(key)
+            last = root[PREV]
+            result
+            hits + 1
+            *link
+            *link
+            *link
+            *link
             return
-            return result
-            raise
+            misses + 1(None, None, None)
+            result = None(**kwds)
+            __name__()
+            lock
+            user_function
+            lock
+            __module__
+            if key in cache:
+                pass
+            elif full:
+                pass
+            else:
+                last = root[PREV]
+                link = [last, root, key, result]
+                cache_len() >= maxsize
+                return result
+            oldroot = root
+            oldkey = root[KEY]
+            oldresult = root[RESULT]
             return result
         def cache_info():
             """Report cache statistics"""
-            try:
-                _CacheInfo(hits, misses, maxsize, cache_len())
-            except:
-                pass
             __name__()
             lock
             __module__
             lock
+            _CacheInfo(hits, misses, maxsize, cache_len())
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
-            try:
-                cache.clear()
-                False
-                0
-                0
-            except:
-                pass
             __name__()
             lock
             __module__
             lock
+            cache.clear()
+            False
+            0
+            0
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear
         return wrapper
@@ -618,16 +578,9 @@ def _c3_merge(sequences):
     Adapted from https://docs.python.org/3/howto/mro.html.
 
 """
-    try:
-        []
+    result = []
+    for sequences in s:
         for _ in []:
-            try:
-                try:
-                    []
-                except:
-                    break
-            except:
-                break
             if not True:
                 pass
         if not sequences:
@@ -646,11 +599,6 @@ def _c3_merge(sequences):
             for seq in sequences:
                 if not seq[0] == candidate:
                     pass
-            s
-            sequences
-    except:
-        break
-    result = []
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -669,42 +617,6 @@ def _c3_mro(cls, abcs = None):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
 """
-    try:
-        []
-        for base in []:
-            try:
-                try:
-                    []
-                    base
-                    abstract_bases
-                    try:
-                        []
-                        for base in []:
-                            try:
-                                base
-                                other_bases
-                                try:
-                                    []
-                                    for base in []:
-                                        try:
-                                            return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
-                                            break
-                                        except:
-                                            break
-                                except:
-                                    break
-                                break
-                            except:
-                                break
-                    except:
-                        break
-                    break
-                except:
-                    break
-            except:
-                break
-    except:
-        break
     enumerate(reversed(cls.__bases__))
     for (i, base) in enumerate(reversed(cls.__bases__)):
         if not hasattr(base, '__abstractmethods__'):
@@ -734,6 +646,20 @@ def _c3_mro(cls, abcs = None):
                     abcs.remove(base)
                 base
                 explicit_bases
+                []
+                for base in []:
+                    pass
+                base
+                abstract_bases
+                []
+                for base in []:
+                    pass
+                base
+                other_bases
+                []
+                for base in []:
+                    pass
+                return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
     boundary = 0
 
 def _compose_mro(cls, types):
@@ -743,73 +669,6 @@ def _compose_mro(cls, types):
     the *types* iterable. Uses a modified C3 linearization algorithm.
 
 """
-    try:
-        []
-        for _ in []:
-            try:
-                try:
-                    []
-                except:
-                    break
-            except:
-                break
-            if not True:
-                pass
-        def is_strict_base(typ):
-            types
-            for other in types:
-                if not typ != other:
-                    pass
-                elif not typ in other.__mro__:
-                    pass
-                else:
-                    break
-            return False
-        n
-        types
-        []
-        for _ in []:
-            pass
-        type_set = set(types)
-        mro = []
-        types
-        for typ in types:
-            for sub in typ.__subclasses__():
-                if not sub not in bases:
-                    pass
-                elif not issubclass(cls, sub):
-                    pass
-                else:
-                    found.append
-                    s
-                    sub.__mro__
-                    try:
-                        []
-                        for _ in []:
-                            if not True:
-                                pass
-                            else:
-                                try:
-                                    break
-                                    break
-                                except:
-                                    break
-                    except:
-                        break
-            if not found:
-                mro.append(typ)
-            else:
-                found.sort(reverse=True, key=len)
-                found
-                for sub in found:
-                    for subcls in sub:
-                        if not subcls not in mro:
-                            pass
-                        else:
-                            mro.append(subcls)
-        return _c3_mro(cls, abcs=mro)
-    except:
-        break
     def is_related(typ):
         """__mro__"""
         if (typ not in bases) and hasattr(typ, '__mro__'):
@@ -822,6 +681,55 @@ def _compose_mro(cls, types):
     set(cls.__mro__)
     n
     types
+    []
+    for _ in []:
+        if not True:
+            pass
+    def is_strict_base(typ):
+        types
+        for other in types:
+            if not typ != other:
+                pass
+            elif not typ in other.__mro__:
+                pass
+            else:
+                break
+        return False
+    n
+    types
+    []
+    for _ in []:
+        pass
+    type_set = set(types)
+    mro = []
+    types
+    for typ in types:
+        for sub in typ.__subclasses__():
+            if not sub not in bases:
+                pass
+            elif not issubclass(cls, sub):
+                pass
+            else:
+                found.append
+                s
+                sub.__mro__
+                []
+                for _ in []:
+                    if not True:
+                        pass
+                break
+        if not found:
+            mro.append(typ)
+        else:
+            found.sort(reverse=True, key=len)
+            found
+            for sub in found:
+                for subcls in sub:
+                    if not subcls not in mro:
+                        pass
+                    else:
+                        mro.append(subcls)
+    return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -908,25 +816,24 @@ class singledispatchmethod:
         """?"""
         try:
             name = self.func.__qualname__
-        except:
+        except AttributeError:
             pass
         try:
             name = self.func.__name__
-        except:
+        except AttributeError:
             name = '?'
         return f"<single dispatch method descriptor {name}>"
-        raise
         raise
 
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
             self.__module__ = func.__module__
-        except:
+        except AttributeError:
             pass
         try:
             self.__doc__ = func.__doc__
-        except:
+        except AttributeError:
             pass
         self._unbound = unbound
         self._dispatch = unbound.dispatcher.dispatch
@@ -943,14 +850,13 @@ class _singledispatchmethod_get:
         """?"""
         try:
             name = self.__qualname__
-        except:
+        except AttributeError:
             return f"<single dispatch method {name}>"
         try:
             name = self.__name__
-        except:
+        except AttributeError:
             name = '?'
         return f"<bound single dispatch method {name} of {self._obj}>"
-        raise
         raise
 
     def __call__(self):
@@ -994,22 +900,8 @@ class cached_property:
     def __get__(self, instance, owner = None):
         try:
             cache = instance.__dict__
-        except:
+        except AttributeError:
             msg = f"No '__dict__' attribute on {type(instance).__name__} instance to cache {self.attrname} property."
-        try:
-            try:
-                try:
-                    try:
-                        pass
-                    except:
-                        pass
-                except:
-                    pass
-                msg = f"The '__dict__' attribute on {type(instance).__name__} instance does not support item assignment for caching {self.attrname} property."
-            except:
-                pass
-        except:
-            pass
         return self
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         val = cache.get(self.attrname, _NOT_FOUND)
@@ -1018,6 +910,8 @@ class cached_property:
         else:
             return val
         return val
+        msg = f"The '__dict__' attribute on {type(instance).__name__} instance does not support item assignment for caching {self.attrname} property."
+        raise TypeError(msg) from None
         raise
     __class_getitem__ = classmethod(GenericAlias)
 raise

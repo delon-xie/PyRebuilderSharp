@@ -2,7 +2,6 @@
 
 with open(INPUT_FILE) as f:
     expected_src = f.read()
-    raise
     for ver in versions:
         pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
         if not os.path.exists(pyc):

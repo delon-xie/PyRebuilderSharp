@@ -1,11 +1,8 @@
 # Decompiled from: <module>
 
-try:
-    data = f.read()
-except:
-    break
 import struct
 import sys
+data = f.read()
 off = 16
 raw = data[off]
 type_byte = raw & 127
@@ -39,4 +36,3 @@ else:
         '  Raw bytes: len='(f"{length} data={data}{(off2 + 4) // (off2 + 14).hex()}")
     else:
         '  Unknown type, bytes at '(f"{off2}: {data}{off2 // (off2 + 16).hex()}")
-break

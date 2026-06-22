@@ -1,13 +1,9 @@
 # Decompiled from: <module>
 
 line = lines[i]
-try:
-    output = f.read()
-except:
-    break
 import re
 from collections import defaultdict
-
+output = f.read()
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -73,5 +69,4 @@ while i < len(lines):
             pass
         print(f"Total tests with versions found: {debug_count}")
 print()
-break
 next_line = lines[j]

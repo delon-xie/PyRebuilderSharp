@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    raw = f.read()
-except:
-    pass
 import marshal
 import struct
 import sys
@@ -11,6 +7,7 @@ __name__()
 open(sys.argv[1], 'rb')
 __module__
 open(sys.argv[1], 'rb')
+raw = f.read()
 f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 hdr_rest = f.read(12)
@@ -43,4 +40,3 @@ range(16, 50, 2)
 for i in range(16, 50, 2):
     pair = raw[i:i + 2]
     '  '(f"{i}3d: {pair.hex()}")
-raise

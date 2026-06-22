@@ -405,7 +405,7 @@ class EnumType(type):
                 if _order_:
                     _order_ = EnumType.__new__.<locals>.<listcomp>(_order_)
                     if () != _order_._member_names_:
-                        raise
+                        pass
                 return
         _order_ is not None
         method = member_type.__str__
@@ -1085,7 +1085,6 @@ class Flag(Enum, boundary=STRICT):
                 flag
                 '\''
                 TypeError
-            raise
 
     def __and__(self, other):
         other_value = self._get_value(other)
@@ -1096,7 +1095,6 @@ class Flag(Enum, boundary=STRICT):
                 flag
                 '\''
                 TypeError
-            raise
 
     def __xor__(self, other):
         other_value = self._get_value(other)
@@ -1107,7 +1105,6 @@ class Flag(Enum, boundary=STRICT):
                 flag
                 '\''
                 TypeError
-            raise
 
     def __invert__(self):
         if self._get_value(self) is None:
@@ -1265,7 +1262,7 @@ class verify:
                     values = list(_iter_bits_lsb(alias.value))
                     missed = verify.__call__.<locals>.<listcomp>(values)
                     if missed:
-                        missing_names.append(name)
+                        pass
                 if missing_names and (len(missing_names) == 1):
                     0
                     missing_names

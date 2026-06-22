@@ -1,10 +1,6 @@
 # Decompiled from: <module>
 
 try:
-    expected_src = f.read()
-except:
-    break
-try:
     expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 except Exception:
     pass
@@ -82,45 +78,21 @@ try:
         pass
 except Exception:
     pass
-try:
-    print('Failed to parse expected source:', e)
-    sys.exit(1)
-except:
-    e = None
-try:
-    print(f"❌ {ver!s}: AST parse failed - {e!s}")
-    '  Decompiled: %s'(actual_src % None // 200)
-    print
-    None
-except:
-    e = None
-"""Run AST comparison for test_seq_clean across all versions"""
-import os
-import subprocess
-import ast
-import sys
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
 passed = <genexpr>(results.items()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-break
-raise
+print('Failed to parse expected source:', e)
+sys.exit(1)
 def <genexpr>(.0):
-    try:
-        .0
-        for (v, r) in .0:
-            try:
-                try:
-                    .0
-                except:
-                    pass
-            except:
-                pass
+    .0
+    for (v, r) in .0:
+        if not r:
+            pass
+        else:
             1
-    except:
-        pass
-raise
+print(f"❌ {ver!s}: AST parse failed - {e!s}")
+'  Decompiled: %s'(actual_src % None // 200)
+print
+None
 e = None

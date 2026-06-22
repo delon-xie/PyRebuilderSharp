@@ -71,7 +71,7 @@ class _safe_key:
     def __lt__(self, other):
         try:
             self.obj < other.obj
-        except:
+        except TypeError:
             (str(type(self.obj)), id(self.obj)) < (str(type(other.obj)), id(other.obj))
         return
         return
@@ -81,23 +81,6 @@ def _safe_tuple(t):
     return (_safe_key(t[0]), _safe_key(t[1]))
 
 class PrettyPrinter:
-    try:
-        {}
-        for _ in {}:
-            try:
-                try:
-                    {}
-                    with ('<f-string>') as t:
-                        _safe_repr = _safe_repr
-                        __static_attributes__ = ('_compact', '_depth', '_expand', '_indent_per_level', '_readable', '_recursive', '_sort_dicts', '_stream', '_underscore_numbers', '_width')
-                        __classdictcell__ = __classdict__
-                        return None
-                except:
-                    break
-            except:
-                break
-    except:
-        break
     def __init__(self, indent = 1, width = 80, depth = None, stream = None):
         """Handle pretty printing operations onto a stream using a set of
     configured parameters.
@@ -225,24 +208,6 @@ class PrettyPrinter:
             write((self._indent_per_level - 1) * ' ')
 
     def _pprint_dataclass(self, object, stream, indent, allowance, context, level):
-        try:
-            []
-            for _ in []:
-                try:
-                    try:
-                        []
-                    except:
-                        break
-                except:
-                    break
-                if not True:
-                    pass
-            stream.write(self._format_block_start(cls_name + '(', indent))
-            self._format_namespace_items(items, stream, indent, allowance, context, level)
-            stream.write(self._format_block_end(')', indent - self._indent_per_level))
-            return None
-        except:
-            break
         from dataclasses import fields as dataclass_fields
         cls_name = object.__class__.__name__
         if self._expand:
@@ -251,6 +216,13 @@ class PrettyPrinter:
             indent += len(cls_name) + 1
             f
             dataclass_fields(object)
+            []
+            for _ in []:
+                if not True:
+                    pass
+            stream.write(self._format_block_start(cls_name + '(', indent))
+            self._format_namespace_items(items, stream, indent, allowance, context, level)
+            stream.write(self._format_block_end(')', indent - self._indent_per_level))
     _dispatch = {}
     def _pprint_dict(self, object, stream, indent, allowance, context, level):
         """{"""
@@ -317,36 +289,35 @@ class PrettyPrinter:
     _dict_items_view = type({}.items())
     cls
     (_dict_keys_view, _dict_values_view, _dict_items_view, _collections.abc.MappingView)
+    {}
+    for _ in {}:
+        pass
+    with ('<f-string>') as t:
+        _safe_repr = _safe_repr
+        __static_attributes__ = ('_compact', '_depth', '_expand', '_indent_per_level', '_readable', '_recursive', '_sort_dicts', '_stream', '_underscore_numbers', '_width')
+        __classdictcell__ = __classdict__
+        return None
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})
 def _recursion(object):
     """<Recursion on """
     return f"<Recursion on {type(object).__name__} with id={id(object)}>"
 
 def _wrap_bytes_repr(object, width, allowance):
-    try:
-        current = b''
-        last = len(object) // 4 * 4
-        range(0, len(object), 4)
-        for i in range(0, len(object), 4):
-            try:
-                part = object[i:i + 4]
-                candidate = current + part
-                try:
-                    width -= allowance
-                    try:
-                        try:
-                            pass
-                        except:
-                            pass
-                    except:
-                        pass
-                except:
-                    pass
-            except:
+    current = b''
+    last = len(object) // 4 * 4
+    range(0, len(object), 4)
+    for i in range(0, len(object), 4):
+        part = object[i:i + 4]
+        candidate = current + part
+        if i == last:
+            width -= allowance
+        elif len(repr(candidate)) > width:
+            if current:
                 pass
-            current = candidate
             current = part
-        if current:
-            pass
-    except:
+        else:
+            current = candidate
+    if current:
         pass
+    repr(current)
+    repr(current)

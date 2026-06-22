@@ -1,27 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    {}
-    for (v, k) in {}:
-        try:
-            try:
-                try:
-                    v
-                    try:
-                        try:
-                            break
-                        except:
-                            break
-                    except:
-                        break
-                except:
-                    break
-            except:
-                break
-        except:
-            break
-except:
-    break
 """Definitive test: field alignment in marshal data"""
 import struct
 import marshal
@@ -42,6 +20,10 @@ None
 v
 k
 known.items()
+{}
+for (v, k) in {}:
+    pass
+break
 break
 for start in range(0, 8):
     if start + 16 > len(m):

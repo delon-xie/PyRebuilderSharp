@@ -1,20 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    []
-    for _ in []:
-        if not True:
-            pass
-        else:
-            try:
-                try:
-                    break
-                except:
-                    break
-            except:
-                break
-except:
-    break
 import os
 import re
 compiled_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
@@ -60,3 +45,7 @@ for (old, new) in conflicts:
     print(f"  Removing {os.path.basename(old)}")
     os.remove(old)
 break
+[]
+for _ in []:
+    if not True:
+        pass

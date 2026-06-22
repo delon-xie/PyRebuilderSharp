@@ -1,13 +1,9 @@
 # Decompiled from: <module>
 
-try:
-    output = f()
-    f.read
-except:
-    pass
 import re
 from collections import defaultdict
-
+output = f()
+f.read
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}

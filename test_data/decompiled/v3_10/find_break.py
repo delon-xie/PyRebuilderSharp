@@ -10,7 +10,6 @@ all_exprs = ('a1 = None', 'a2 = True', 'a3 = False', 'a4 = 42', 'a5 = 3.14', 'a6
 def test_until_broken(exprs):
     with open(pyf, 'w') as f:
         f.write(code)
-        raise
         r = subprocess.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], capture_output=True, text=True, timeout=30)
         pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
         if not os.path.exists(pyc):

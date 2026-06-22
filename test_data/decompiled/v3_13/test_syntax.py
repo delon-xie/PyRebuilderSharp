@@ -2869,17 +2869,6 @@ class SyntaxWarningTest(unittest.TestCase):
     errtest is a regular expression that must be present in the
     text of the warning raised.
 """
-        try:
-            try:
-                try:
-                    return None
-                    raise
-                except:
-                    pass
-            except:
-                pass
-        except:
-            pass
         self.assertWarnsRegex(SyntaxWarning, errtext)
 
     def test_return_in_finally(self):
@@ -2957,22 +2946,10 @@ class SyntaxErrorTestCase(unittest.TestCase):
     text of the exception raised.  If subclass is specified it
     is the expected subclass of SyntaxError (e.g. IndentationError).
 """
-        try:
-            try:
-                if self:
-                    pass
-                try:
-                    try:
-                        err = None
-                    except:
-                        pass
-                except:
-                    pass
-            except:
-                pass
-        except:
-            pass
         self.fail('compile() did not raise SyntaxError')
+        if self:
+            pass
+        raise
         if subclass and not True:
             self.fail('SyntaxError is not a %s' % subclass.__name__)
         mo = re.search(errtext, str(err))
@@ -3167,12 +3144,12 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
     def test_empty_line_after_linecont(self):
         try:
             compile(s, '<string>', 'exec')
-        except:
+        except SyntaxError:
             self.fail('Empty line after a line continuation character is valid.')
         try:
             compile(s1, '<string>', 'exec')
             compile(s2, '<string>', 'exec')
-        except:
+        except SyntaxError:
             self.fail('Indented statement over multiple lines is valid')
         s = """\\
 pass

@@ -1,10 +1,6 @@
 # Decompiled from: <module>
 
 try:
-    x = 1 / 0
-except:
-    break
-try:
     f = open('test.txt')
 except IOError:
     break
@@ -20,5 +16,5 @@ for n in range(5):
         break
     elif not n == 1:
         pass
+    x = 1 / 0
 break
-raise

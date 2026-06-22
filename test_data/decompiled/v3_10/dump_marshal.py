@@ -2,7 +2,6 @@
 
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
-    raise
     pos = 16
     raw = data[pos]
     'pos '(f"{pos}: type=0x{raw}{'02X'}")

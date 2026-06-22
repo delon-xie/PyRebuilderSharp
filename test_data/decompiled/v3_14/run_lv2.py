@@ -1,19 +1,10 @@
 # Decompiled from: <module>
 
 try:
-    expected_src = f.read()
-except:
-    pass
-try:
     actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
     ok = expected_ast == actual_ast
 except Exception:
     pass
-try:
-    print(f"❌ {ver}: parse error: {ex}")
-    print('  Output: %s' % r.stdout[:200])
-except:
-    ex = None
 """Run AST comparison for test_control_flow across all versions"""
 import os
 import subprocess
@@ -25,6 +16,7 @@ __name__()
 open(INPUT_FILE)
 __module__
 open(INPUT_FILE)
+expected_src = f.read()
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 versions
@@ -41,5 +33,6 @@ else:
     print(f"  Line {i}: expected={e}
            actual=  {a}")
     break
-raise
+print(f"❌ {ver}: parse error: {ex}")
+print('  Output: %s' % r.stdout[:200])
 ex = None

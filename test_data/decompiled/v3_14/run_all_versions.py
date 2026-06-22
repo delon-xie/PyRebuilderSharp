@@ -1,25 +1,10 @@
 # Decompiled from: <module>
 
 try:
-    expected_src = f.read()
-except:
-    pass
-try:
-    import ast
-    expected_ast = ast.dump(ast.parse(expected_src), indent=2)
-except:
-    print('Failed to parse expected source')
-    sys.exit(1)
-try:
     actual_ast = ast.dump(ast.parse(actual_src), indent=2)
     match = expected_ast == actual_ast
 except Exception:
     pass
-try:
-    print(f"❌ {ver}: AST parse failed - {e}")
-    print(f"  Decompiled: {actual_src[:200]}")
-except:
-    e = None
 """Run AST comparison for test_expr_basic across all versions"""
 import os
 import subprocess
@@ -31,6 +16,9 @@ __name__()
 open(INPUT_FILE)
 __module__
 open(INPUT_FILE)
+expected_src = f.read()
+import ast
+expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 versions
@@ -53,23 +41,13 @@ else:
     print(f"  Line {i}: expected={e}")
     print(f"           actual=  {a}")
     break
-raise
-raise
+print(f"❌ {ver}: AST parse failed - {e}")
+print(f"  Decompiled: {actual_src[:200]}")
 def <genexpr>(.0):
-    try:
-        .0
-        for (r, v) in .0:
-            try:
-                try:
-                    .0
-                except:
-                    pass
-                r
-            except:
-                pass
-            if not True:
-                pass
-            else:
-                1
-    except:
-        pass
+    .0
+    for (r, v) in .0:
+        r
+        if not True:
+            pass
+        else:
+            1

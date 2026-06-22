@@ -1,26 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    expected_ast = ast.dump(ast.parse(expected), indent=2)
-except:
-    pass
-try:
-    print(f"Expected AST parse error: {e}")
-    sys.exit(1)
-except:
-    e = None
-try:
-    actual_ast = ast.dump(ast.parse(decompiled), indent=2)
-except:
-    pass
-try:
-    print(f"Actual AST parse error: {e}")
-    print('---Decompiled source---')
-    print(decompiled)
-    print('---End---')
-    sys.exit(1)
-except:
-    e = None
 """Compare ASTs of expected vs decompiled"""
 import ast
 import sys
@@ -28,7 +7,8 @@ decompiled = open('/tmp/actual_expr.py')()
 expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')()
 open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py').read
 open('/tmp/actual_expr.py').read
-e = None
+expected_ast = ast.dump(ast.parse(expected), indent=2)
+actual_ast = ast.dump(ast.parse(decompiled), indent=2)
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
 else:
@@ -60,4 +40,12 @@ for i in range(max(len(exp_lines), len(act_lines))):
             else:
                 None
 return
+print(f"Expected AST parse error: {e}")
+sys.exit(1)
+e = None
+print(f"Actual AST parse error: {e}")
+print('---Decompiled source---')
+print(decompiled)
+print('---End---')
+sys.exit(1)
 e = None

@@ -1,13 +1,10 @@
 # Decompiled from: <module>
 
-try:
-    magic = f.read(4)
-    f.read(8)
-    code = marshal.load(f)
-except:
-    pass
 import marshal
 import sys
+magic = f.read(4)
+f.read(8)
+code = marshal.load(f)
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)
 print('  nlocals:', code.co_nlocals)

@@ -14,9 +14,6 @@ t = raw & 127
 if raw & 128:
     ref = struct.unpack('<I', data[pos:pos + 4])[0]
     pos += 4
-ref = struct.unpack('<I', data[pos:pos + 4])[0]
-pos += 4
-print(f"  FLAG_REF ref_index={ref}")
 raw = data[pos]
 'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
 pos += 1

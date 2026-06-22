@@ -1,13 +1,10 @@
 # Decompiled from: <module>
 
-try:
-    raw = f()
-    f.read
-except:
-    pass
 import marshal
 import struct
 import sys
+raw = f()
+f.read
 f = open(sys.argv[1], 'rb')
 magic = f(4)
 hdr_rest = f(12)

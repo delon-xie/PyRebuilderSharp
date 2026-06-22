@@ -10,16 +10,13 @@ def recursive_repr(fillvalue = '...'):
     """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
         def wrapper(self):
-            try:
-                result = user_function(self)
-            except:
-                repr_running(key)
             key = (id(self), get_ident())
             if key in repr_running:
                 return fillvalue
             else:
                 repr_running(key)
                 repr_running.add
+            result = user_function(self)
             repr_running(key)
             return result
         wrapper.__module__ = getattr(user_function, '__module__')
@@ -71,15 +68,6 @@ class Repr:
         return self(x, level)
 
     def _join(self, pieces, level):
-        try:
-            sep = """,
-""" + (self.maxlevel - level + 1) * indent
-        except:
-            pass
-        try:
-            error = None
-        except:
-            pass
         return ', '(pieces)
         return ''
         indent = self.indent
@@ -87,6 +75,11 @@ class Repr:
             raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
         else:
             indent *= ' '
+        sep = """,
+""" + (self.maxlevel - level + 1) * indent
+        if -len(indent):
+            None
+        return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
@@ -164,43 +157,27 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except:
-            pass
-        try:
-            try:
-                try:
-                    try:
-                        import math
-                        import sys
-                        k = int + math.log10(math(abs(x)))
-                        max_digits = sys()
-                        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
-                        '<'
-                        sys.get_int_max_str_digits
-                        1
-                    except:
-                        exc = None
-                except:
-                    exc = None
-            except:
-                exc = None
-        except:
-            exc = None
+        s = builtins.repr(x)
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
         return s
+        if not 'sys.set_int_max_str_digits()' in str(exc):
+            pass
+        import math
+        import sys
+        k = int + math.log10(math(abs(x)))
+        max_digits = sys()
+        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
+        '<'
+        sys.get_int_max_str_digits
+        1
         exc = None
         return
 
     def repr_instance(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except:
-            '<%s instance at %#x>' % (x.__class__.__name__, id(x))
+        s = builtins.repr(x)
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
@@ -209,10 +186,7 @@ class Repr:
         return
 
 def _possibly_sorted(x):
-    try:
-        sorted(x)
-    except:
-        list(x)
+    sorted(x)
     return
     return
 aRepr = Repr()

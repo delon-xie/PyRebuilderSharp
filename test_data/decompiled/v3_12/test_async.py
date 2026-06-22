@@ -3,13 +3,8 @@
 import asyncio
 
 async def test_async():
-    try:
-        asyncio.sleep(1)()
-    except:
-        pass
+    asyncio.sleep(1)()
+    return 'done'
 
 async def worker():
-    try:
-        test_async()()
-    except:
-        pass
+    test_async()()

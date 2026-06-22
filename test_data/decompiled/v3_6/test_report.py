@@ -43,7 +43,3 @@ for line in output.split("""
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
             None
             break
-print('=' * 60)
-print('Python 3.10 版本测试报告')
-'=' * 60
-print

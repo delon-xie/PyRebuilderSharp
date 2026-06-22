@@ -3,7 +3,6 @@
 next_line = lines[j]
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
-    raise
     version_stats = defaultdict(<lambda>)
     lines = output.split("""
 """)

@@ -2,4 +2,4 @@
 
 def test():
     with lock:
-        raise
+        pass

@@ -1,16 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    f(code)
-    f.write
-except:
-    pass
-try:
-    content = f()()
-    f().strip
-    f.read
-except:
-    pass
 """Diagnose Python 2.7 decompilation failures by stepping through analysis"""
 import os
 import subprocess
@@ -58,23 +47,28 @@ for (name, code) in tests():
     pyc_path = os.path(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path(OUTPUT_DIR, f"{name}.out.py")
     os.path.join
-return
-break
-r = subprocess.run([PY27, '-c', """import py_compile, sys
+    f(code)
+    f.write
+    break
+    r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
-r2 = 'dotnet'(['run', '--project', os.path.expanduser, os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
-print(f"
+    r2 = 'dotnet'(['run', '--project', os.path.expanduser, os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
+    print(f"
 {'=================================================='}")
-print(f"Test: {name}")
-if r.stdout():
-    r.stderr()
-    r.stderr.strip
-break
-if os.path(out_path):
-    pass
-else:
-    print(f"Error: {r2.stderr[None:200]}")
-    None
-break
-print(f"Output ({len(content)} bytes):
+    print(f"Test: {name}")
+    if r.stdout():
+        r.stderr()
+        r.stderr.strip
+    break
+    if os.path(out_path):
+        pass
+    else:
+        print(f"Error: {r2.stderr[None:200]}")
+        None
+        return
+    content = f()()
+    f().strip
+    f.read
+    break
+    print(f"Output ({len(content)} bytes):
 {content[None:300]}")

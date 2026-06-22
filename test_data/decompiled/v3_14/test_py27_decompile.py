@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    content = f.read()
-except:
-    pass
 """编译 test_expressions_comprehensive.py 为 Python 2.7 .pyc"""
 import os
 import subprocess
@@ -16,6 +12,7 @@ __name__()
 open(INPUT_PY)
 __module__
 open(INPUT_PY)
+content = f.read()
 outc = os.path.join(OUTPUT_DIR, '{}.2.7.pyc'.format(BASENAME))
 result = subprocess.run([PY27, '-c', """import py_compile, sys
 src, dst = sys.argv[1], sys.argv[2]
@@ -33,4 +30,3 @@ else:
     result2.stdout
     if len(result2.stderr) > 500:
         pass
-raise

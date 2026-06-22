@@ -629,9 +629,8 @@ def singledispatch(func):
     import weakref
     def wrapper():
         if not args:
-            raise
-        else:
-            return
+            pass
+        return
     wrapper.register = object
     wrapper.dispatch = func
     wrapper.registry = cell_4(MappingProxyType)

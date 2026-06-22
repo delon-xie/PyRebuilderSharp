@@ -1,13 +1,10 @@
 # Decompiled from: <module>
 
-try:
-    data = f()
-    f.read
-except:
-    pass
 import marshal
 import struct
 import sys
+data = f()
+f.read
 pos = 16
 raw = data[pos]
 'pos '(f"{pos}: type=0x{raw}{'02X'}")

@@ -1,15 +1,12 @@
 # Decompiled from: <module>
 
-try:
-    f(16)
-    code = marshal.load(f)
-    f.read
-except:
-    pass
 import dis
 import marshal
 import types
 import struct
+f(16)
+code = marshal.load(f)
+f.read
 code.co_consts
 for const in code.co_consts:
     if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):

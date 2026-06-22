@@ -1,15 +1,6 @@
 # Decompiled from: <module>
 
 try:
-    expected_src = f.read()
-except:
-    break
-try:
-    import ast
-    expected_ast = ast.dump(ast.parse(expected_src), indent=2)
-except:
-    break
-try:
     actual_ast = ast.dump(ast.parse(actual_src), indent=2)
     match = expected_ast == actual_ast
     try:
@@ -88,34 +79,14 @@ try:
         pass
 except Exception:
     pass
-try:
-    print(f"❌ {ver}: AST parse failed - {e}")
-    print(f"  Decompiled: {actual_src[None:200]}")
-except:
-    e = None
-"""Run AST comparison for test_expr_basic across all versions"""
-import os
-import subprocess
-import sys
-PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
-open(INPUT_FILE)
-break
-raise
-raise
+print(f"❌ {ver}: AST parse failed - {e}")
+print(f"  Decompiled: {actual_src[None:200]}")
 def <genexpr>(.0):
-    try:
-        .0
-        for (r, v) in .0:
-            try:
-                r
-            except:
-                pass
-            if not True:
-                pass
-            else:
-                1
-        break
-    except:
-        pass
+    .0
+    for (r, v) in .0:
+        r
+        if not True:
+            pass
+        else:
+            1
+    break

@@ -16,6 +16,4 @@ if x < y:
         a = 0
 i = 0
 if i < 5:
-    j = i * 2
-    1
-    i
+    pass

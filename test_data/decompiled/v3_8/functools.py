@@ -368,7 +368,6 @@ def _c3_merge(sequences):
             if candidate in s2[1:]:
                 candidate = None
                 break
-            continue
             if seq[0] == candidate:
                 pass
         break
@@ -420,7 +419,7 @@ def _compose_mro(cls, types):
     for typ in found:
         for sub in typ.__subclasses__():
             if sub(issubclass, sub):
-                pass
+                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
             for sub in found:
                 for subcls in sub:
                     if subcls not in mro:
@@ -462,7 +461,7 @@ def singledispatch(func):
     import weakref
     def wrapper():
         if not args:
-            raise
+            pass
     wrapper.register = object
     wrapper.dispatch = func
     wrapper.registry = cell_4(MappingProxyType)

@@ -1,23 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    magic = f(4)
-    version = magic_numbers(magic, 'unknown')
-    try:
-        try:
-            magic = f(4)
-            version = magic_numbers(magic, 'unknown')
-            try:
-                version_files[version](filename)
-                version_files[version].append
-            except:
-                pass
-        except:
-            pass
-    except:
-        pass
-except:
-    pass
 import os
 magic_numbers = {b'YQ0NCg==': '3.10', b'XQ0NCg==': '3.11', b'VQ0NCg==': '3.12', b'hw0NCg==': '3.13', b'eg0NCg==': '3.14', b'bw0NCg==': '3.7', b'Yg0NCg==': '3.8', b'Wg0NCg==': '3.9'}
 pyc_dir = 'tests/compiled'
@@ -36,7 +18,13 @@ for filename in os.listdir(pyc_dir):
                 print(f"      {f}")
         None
     return
+    magic = f(4)
+    version = magic_numbers(magic, 'unknown')
+    if version not in version_files:
+        pass
+    version_files[version](filename)
+    version_files[version].append
+    break
 print('各版本 pyc 文件分布:')
 version_files.items(version_files())
 sorted
-break

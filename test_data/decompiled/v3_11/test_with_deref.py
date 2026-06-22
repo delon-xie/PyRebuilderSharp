@@ -2,17 +2,5 @@
 
 def outer():
     def inner():
-        try:
-            try:
-                if not True:
-                    pass
-                raise
-                try:
-                    print(lk)
-                except:
-                    pass
-            except:
-                pass
-        except:
-            pass
+        print(lk)
     return inner

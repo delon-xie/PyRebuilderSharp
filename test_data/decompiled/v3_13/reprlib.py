@@ -45,11 +45,7 @@ class Repr:
         try:
             sep = """,
 """ + (self.maxlevel - level + 1) * indent
-        except:
-            pass
-        try:
-            error = None
-        except:
+        except TypeError:
             pass
         return ', '.join(pieces)
         return ''
@@ -64,28 +60,20 @@ class Repr:
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
-        try:
-            []
-            for _ in []:
-                try:
-                    try:
-                        break
-                    except:
-                        break
-                except:
-                    break
-        except:
-            break
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
         newlevel = level - 1
         repr1 = self.repr1
         elem
+        []
+        for _ in []:
+            pass
+        break
+        pieces.append(self.fillvalue)
         newlevel = level - 1
         repr1 = self.repr1
         elem
-        pieces.append(self.fillvalue)
 
     def repr_tuple(self, x, level):
         return
@@ -141,38 +129,28 @@ class Repr:
     def repr_int(self, x, level):
         try:
             s = builtins.repr(x)
-        except:
+        except ValueError:
             pass
-        try:
-            try:
-                try:
-                    try:
-                        import math
-                        import sys
-                        k = 1 + int(math.log10(abs(x)))
-                        max_digits = sys.get_int_max_str_digits()
-                        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}x>"
-                        '<'
-                    except:
-                        exc = None
-                except:
-                    exc = None
-            except:
-                exc = None
-        except:
-            exc = None
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
         return s
+        if not 'sys.set_int_max_str_digits()' in str(exc):
+            pass
+        import math
+        import sys
+        k = 1 + int(math.log10(abs(x)))
+        max_digits = sys.get_int_max_str_digits()
+        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}x>"
+        '<'
         exc = None
         return
 
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
-        except:
+        except Exception:
             '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
@@ -184,7 +162,7 @@ class Repr:
 def _possibly_sorted(x):
     try:
         sorted(x)
-    except:
+    except Exception:
         list(x)
     return
     return

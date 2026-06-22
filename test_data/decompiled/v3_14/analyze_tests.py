@@ -1,15 +1,12 @@
 # Decompiled from: <module>
 
-try:
-    output = f.read()
-except:
-    pass
 import re
 from collections import defaultdict
 __name__()
 open('/tmp/test_full.txt', 'r')
 __module__
 open('/tmp/test_full.txt', 'r')
+output = f.read()
 @defaultdict
 def version_stats():
     """total"""
@@ -79,4 +76,3 @@ else:
     0
     '<10'(f" {total_failed}<10 {total}<10 {overall_rate}>8.1f%")
     print('======================================================================')
-raise

@@ -1,14 +1,11 @@
 # Decompiled from: <module>
 
-try:
-    magic = f.read(4)
-    f.read(8)
-    code = marshal.load(f)
-except:
-    pass
 import marshal
 import sys
 open(sys.argv[1], 'rb')
+magic = f.read(4)
+f.read(8)
+code = marshal.load(f)
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)
 print('  nlocals:', code.co_nlocals)
@@ -27,4 +24,3 @@ def dump_code(c, depth = 0):
             break
     break
 dump_code(code)
-raise

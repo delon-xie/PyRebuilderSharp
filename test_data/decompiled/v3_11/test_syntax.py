@@ -2869,10 +2869,7 @@ class SyntaxWarningTest(unittest.TestCase):
         errtest is a regular expression that must be present in the
         text of the warning raised.
         """
-        try:
-            compile(code, filename, mode)
-        except:
-            pass
+        compile(code, filename, mode)
 
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -2953,47 +2950,38 @@ class SyntaxErrorTestCase(unittest.TestCase):
         text of the exception raised.  If subclass is specified it
         is the expected subclass of SyntaxError (e.g. IndentationError).
         """
-        try:
-            compile(code, filename, mode)
-        except:
-            pass
-        try:
-            try:
-                try:
-                    try:
-                        self('SyntaxError is not a %s' % subclass.__name__)
-                        self.fail
-                        try:
-                            mo = re.search(errtext, str(err))
-                            self(f"SyntaxError did not contain {errtext!r}")
-                            self(err.filename, filename)
-                            self(err.lineno, lineno)
-                            self(err.offset, offset)
-                            self(err.end_lineno, end_lineno)
-                            self(err.end_offset, end_offset)
-                            self.assertEqual
-                            self.assertEqual
-                            self.assertEqual
-                            self.assertEqual
-                            self.assertEqual
-                            self.fail
-                        except:
-                            err = None
-                            return None
-                    except:
-                        err = None
-                        return None
-                except:
-                    err = None
-                    return None
-            except:
-                err = None
-                return None
-        except:
-            err = None
-            return None
+        compile(code, filename, mode)
         self('compile() did not raise SyntaxError')
+        if subclass and not isinstance(err, subclass):
+            self('SyntaxError is not a %s' % subclass.__name__)
+            self.fail
+        mo = re.search(errtext, str(err))
+        self(f"SyntaxError did not contain {errtext!r}")
+        self(err.filename, filename)
+        self(err.lineno, lineno)
+        self(err.offset, offset)
+        self(err.end_lineno, end_lineno)
+        self(err.end_offset, end_offset)
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.fail
         err = None
+        mo = re.search(errtext, str(err))
+        self(f"SyntaxError did not contain {errtext!r}")
+        self(err.filename, filename)
+        self(err.lineno, lineno)
+        self(err.offset, offset)
+        self(err.end_lineno, end_lineno)
+        self(err.end_offset, end_offset)
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.assertEqual
+        self.fail
 
     def test_expression_with_assignment(self):
         self('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
@@ -3169,23 +3157,13 @@ except* ValueError: pass
 except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', end_offset=7, offset=1, end_lineno=3, lineno=3)
 
     def test_empty_line_after_linecont(self):
-        try:
-            compile(s, '<string>', 'exec')
-        except:
-            self('Empty line after a line continuation character is valid.')
-            self.fail
-        try:
-            compile(s1, '<string>', 'exec')
-            compile(s2, '<string>', 'exec')
-        except:
-            self('Indented statement over multiple lines is valid')
-            self.fail
         s = """\\
 pass
         \\
 
 pass
 """
+        compile(s, '<string>', 'exec')
         s1 = """\\
 def fib(n):
     \\
@@ -3198,6 +3176,8 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
+        compile(s1, '<string>', 'exec')
+        compile(s2, '<string>', 'exec')
 
     def test_continuation_bad_indentation(self):
         code = """\\

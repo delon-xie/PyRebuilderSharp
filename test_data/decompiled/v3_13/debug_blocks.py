@@ -1,61 +1,12 @@
 # Decompiled from: <module>
 
-try:
-    f.read(16)
-    code = marshal.load(f)
-except:
-    break
-try:
-    []
-    for ins in []:
-        try:
-            if not True:
-                pass
-            else:
-                try:
-                    try:
-                        break
-                    except:
-                        break
-                except:
-                    break
-        except:
-            break
-    break
-    if len(block_instrs) > 3:
-        pass
-    else:
-        f"-{end - 1}3d]: {', '.join}{<genexpr>(block_instrs())}"
-        '3d'
-        start
-        'Block ['
-        break
-        if <genexpr>(block_instrs()):
-            last = block_instrs[-1]
-            print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-        elif not <genexpr>(block_instrs()):
-            for (i, start) in enumerate(sorted_leaders):
-                if i + 1 < len(sorted_leaders):
-                    pass
-                else:
-                    instrs[-1].offset + 2
-                    ins
-                    instrs
-        else:
-            block_instrs
-            for ins in block_instrs:
-                if not ins.opname == 'JUMP_ABSOLUTE':
-                    pass
-                else:
-                    print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
-            break
-except:
-    break
 import dis
 import marshal
 import types
 import struct
 open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb')
+f.read(16)
+code = marshal.load(f)
 code.co_consts
 for const in code.co_consts:
     if not isinstance(const, types.CodeType):
@@ -78,7 +29,43 @@ for const in code.co_consts:
                     pass
                 else:
                     leaders.add(instrs[i + 1].offset)
+        break
+        for (i, start) in enumerate(sorted_leaders):
+            if i + 1 < len(sorted_leaders):
+                pass
+            else:
+                instrs[-1].offset + 2
+                ins
+                instrs
+                []
+                for ins in []:
+                    if ins.offset <= start:
+                        pass
+                    else:
+                        break
+                    if not True:
+                        pass
+                break
+                if len(block_instrs) > 3:
+                    pass
+                else:
+                    f"-{end - 1}3d]: {', '.join}{<genexpr>(block_instrs())}"
+                    '3d'
+                    start
+                    'Block ['
+                    break
+                    if <genexpr>(block_instrs()):
+                        last = block_instrs[-1]
+                        print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
+                    elif not <genexpr>(block_instrs()):
+                        pass
+                    else:
+                        block_instrs
+                        for ins in block_instrs:
+                            if not ins.opname == 'JUMP_ABSOLUTE':
+                                pass
+                            else:
+                                print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+                        break
+        break
 break
-break
-break
-raise

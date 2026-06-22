@@ -2,20 +2,6 @@
 
 def outer():
     def inner():
-        try:
-            print(lk)
-        except:
-            pass
-        try:
-            try:
-                try:
-                    raise
-                except:
-                    pass
-            except:
-                pass
-        except:
-            pass
         __name__()
         lock
         __module__
@@ -24,4 +10,5 @@ def outer():
         lock
         __module__
         lock
+        print(lk)
     return inner

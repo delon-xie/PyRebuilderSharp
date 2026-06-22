@@ -1,12 +1,9 @@
 # Decompiled from: <module>
 
-try:
-    data = f()
-    f.read
-except:
-    pass
 import struct
 import sys
+data = f()
+f.read
 off = 16
 raw = data[off]
 type_byte = raw & 127

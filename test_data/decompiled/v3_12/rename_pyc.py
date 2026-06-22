@@ -1,26 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    []
-    for f in []:
-        try:
-            try:
-                []
-            except:
-                break
-        except:
-            break
-    print(f"
-Renaming {len(files_to_rename)} files...")
-    files_to_rename
-    for (old_path, new_path) in files_to_rename:
-        print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
-        os.rename(old_path, new_path)
-    print("""
-Done!""")
-    return None
-except:
-    break
 import os
 import re
 compiled_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
@@ -58,6 +37,11 @@ if conflicts:
 print(f"
 Renaming {len(files_to_rename)} files...")
 files_to_rename
+for (old_path, new_path) in files_to_rename:
+    print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
+    os.rename(old_path, new_path)
+print("""
+Done!""")
 print("""
 Removing conflicting source files...""")
 conflicts
@@ -66,3 +50,7 @@ for (old, new) in conflicts:
     os.remove(old)
 f
 files_to_rename
+[]
+for f in []:
+    if not f not in conflicts:
+        pass

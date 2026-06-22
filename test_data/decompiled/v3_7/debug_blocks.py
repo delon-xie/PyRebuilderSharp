@@ -26,6 +26,7 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             f"{'3d'}-{.0 - 1}{'3d'}]: {', '.join(<lambda>(block_instrs))}"
             offset
             'Block ['
-        for test_data/input/debug_blocks.py in block_instrs:
-            if test_data/input/debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
-                print(f"  → JUMP: offset={test_data/input/debug_blocks.py.end}, target={test_data/input/debug_blocks.py.arg}")
+        if any(<lambda>(block_instrs)):
+            for test_data/input/debug_blocks.py in block_instrs:
+                if test_data/input/debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
+                    print(f"  → JUMP: offset={test_data/input/debug_blocks.py.end}, target={test_data/input/debug_blocks.py.arg}")
