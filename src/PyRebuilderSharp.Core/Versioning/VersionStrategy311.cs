@@ -104,8 +104,8 @@ public class VersionStrategy311 : VersionStrategyBase
             90 => Models.Bytecode.Opcode.STORE_NAME,
             111 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,
             112 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,
-            114 => Models.Bytecode.Opcode.STORE_NAME,   // 3.11: 114 is different
-            115 => Models.Bytecode.Opcode.DELETE_NAME,  // 3.11: 115 is different
+            114 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,   // 3.11: POP_JUMP_FORWARD_IF_FALSE (was STORE_NAME in 3.10)
+            115 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,   // 3.11: POP_JUMP_FORWARD_IF_TRUE (was DELETE_NAME in 3.10)
 
             // 3.11 特有调用操作码
             166 => Models.Bytecode.Opcode.PRECALL_311,
