@@ -639,6 +639,9 @@ public class AstBuilder
         // 即使 LoopHeader 标志未设置
         if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
         {
+            // 标记所有前驱链为已访问，避免迭代表达式产生独立语句
+            MarkForLoopPredecessors(block, visited);
+
             var loopAst = BuildForLoop(block, visited);
             stmts.AddRange(loopAst);
             // 处理循环出口块的后继（如循环后的顺序代码）
@@ -883,6 +886,34 @@ public class AstBuilder
             return BuildWhileLoop(header, visited);
     }
 
+    /// <summary>
+    /// 标记 for 循环的前驱链为已访问，避免 LOAD_FAST cls; LOAD_ATTR __bases__ 
+    /// 等迭代表达式产生独立 ExprStmt。
+    /// 需在 BuildForLoop 之前调用。
+    /// </summary>
+    private static void MarkForLoopPredecessors(BasicBlock header, HashSet<BasicBlock> visited)
+    {
+        var iterPreds = new HashSet<int>();
+        var predStack = new Stack<BasicBlock>();
+        foreach (var p in header.Predecessors)
+        {
+            if (!iterPreds.Add(p.Id)) continue;
+            predStack.Push(p);
+        }
+        while (predStack.Count > 0)
+        {
+            var cur = predStack.Pop();
+            // 跳过跳转型前驱（循环体回跳或条件分支）
+            if (cur.Instructions.Count > 0
+                && JumpHelper.IsJump(cur.Instructions.Last().Opcode))
+                continue;
+            visited.Add(cur);
+            foreach (var p2 in cur.Predecessors)
+                if (iterPreds.Add(p2.Id))
+                    predStack.Push(p2);
+        }
+    }
+
     private List<Stmt> BuildForLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
         // 确保 header 在 visited 中，防止从 GetStructuredBlockStmts 调入时
@@ -894,11 +925,8 @@ public class AstBuilder
         // 标记迭代表达式的前驱链为已访问，避免其语句作为独立表达式再次输出。
         // 例如 for scls in cls.__bases__: 中，LOAD_FAST cls; LOAD_ATTR __bases__
         // 产生 ExprStmt(cls.__bases__) 作为独立语句 —— 应被 for 循环消费。
-        foreach (var pred in header.Predecessors.ToList())
-        {
-            if (pred.Instructions.Any(i => i.Opcode == Opcode.GET_ITER))
-                visited.Add(pred);
-        }
+        // 需要追溯整个前驱链（包括 GET_ITER 之前的块），不限于 FOR_ITER 的直接前驱。
+        MarkForLoopPredecessors(header, visited);
 
         var bodyBlocks = new List<BasicBlock>();
         // FOR_ITER 的后继：[fallthrough body, jump-to-exit]
