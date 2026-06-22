@@ -1377,6 +1377,36 @@ public class AstBuilder
 
         visited.Add(handlerBlock);
         List<Stmt>? elseBody = null;
+
+        // 收集 else 体：在字节码中 handler 的 JUMP_FORWARD 目标与 handler 末尾之间的所有块。
+        // 这些块（如 ABCMeta class 定义）不是 handlerBlock.Successors 的一部分，
+        // 因为 handler 的 JUMP_FORWARD 跳过它们。但它们出现在模块级块序列中。
+        var lastHandlerInstr = handlerBlock.Instructions.LastOrDefault();
+        if (lastHandlerInstr.Argument.HasValue
+            && lastHandlerInstr.Opcode == Opcode.JUMP_FORWARD)
+        {
+            int afterTryEnd = lastHandlerInstr.Offset + 2 + lastHandlerInstr.Argument.Value;
+            // 扫描 handlerBlock.EndOffset 到 afterTryEnd 之间的未访问块
+            var elseCandidates = _sortedBlocks
+                .Where(b => b.StartOffset > handlerBlock.EndOffset
+                    && b.EndOffset < afterTryEnd
+                    && !visited.Contains(b))
+                .OrderBy(b => b.StartOffset)
+                .ToList();
+            if (elseCandidates.Count > 0)
+            {
+                elseBody = new List<Stmt>();
+                foreach (var eb in elseCandidates)
+                {
+                    visited.Add(eb);
+                    _processedBlockIds.Add(eb.Id);
+                    var elseStmts = BuildStatements(eb, visited);
+                    if (elseStmts.Count > 0)
+                        elseBody.AddRange(elseStmts);
+                }
+            }
+        }
+
         var handlerResult = _blockResults.GetValueOrDefault(handlerBlock.Id);
         var handlerBody = handlerResult?.Statements
             ?.Where(s => s is not Raise and not CommentBlock)
