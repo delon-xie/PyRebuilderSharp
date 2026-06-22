@@ -20,12 +20,6 @@ for line in output.split("""
     elif info['files'] and ('PASS' in info['status']):
         for _ in test_groups.items():
             pass
-print('============================================================')
-print('Python 3.10 版本测试报告')
-print('============================================================')
-passed_groups = []
-failed_groups = []
-test_groups.items()
 failed_groups.append(group)
 print(f"  ✓ {group}")
 print(f"    - {f}")

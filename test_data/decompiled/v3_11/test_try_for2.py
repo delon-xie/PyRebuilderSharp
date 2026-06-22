@@ -5,10 +5,6 @@ def test5():
         range(3)
         for x in range(3):
             try:
-                try:
-                    range(3)
-                except:
-                    break
                 y = x
             except:
                 break

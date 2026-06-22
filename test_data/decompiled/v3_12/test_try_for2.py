@@ -5,15 +5,11 @@ def test5():
         range(3)
         for x in range(3):
             try:
+                y = x
                 try:
-                    range(3)
-                    try:
-                        pass
-                    except:
-                        break
+                    pass
                 except:
                     break
-                y = x
             except:
                 break
     except:

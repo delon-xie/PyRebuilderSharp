@@ -9,11 +9,7 @@ try:
     for c in []:
         try:
             try:
-                []
-                try:
-                    break
-                except:
-                    break
+                break
             except:
                 break
         except:

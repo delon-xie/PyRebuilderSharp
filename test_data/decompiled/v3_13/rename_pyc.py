@@ -3,23 +3,16 @@
 try:
     []
     for _ in []:
-        try:
-            try:
-                []
-            except:
-                break
-        except:
-            break
         if not True:
             pass
-    break
-    print(f"
-Renaming {len(files_to_rename)} files...")
-    files_to_rename
-    for (old_path, new_path) in files_to_rename:
-        print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
-        os.rename(old_path, new_path)
-    break
+        else:
+            try:
+                try:
+                    break
+                except:
+                    break
+            except:
+                break
 except:
     break
 import os
@@ -58,6 +51,10 @@ if conflicts:
 print(f"
 Renaming {len(files_to_rename)} files...")
 files_to_rename
+for (old_path, new_path) in files_to_rename:
+    print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
+    os.rename(old_path, new_path)
+break
 break
 for (old, new) in conflicts:
     print(f"  Removing {os.path.basename(old)}")

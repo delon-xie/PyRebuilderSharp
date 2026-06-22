@@ -37,9 +37,3 @@ for line in output.split("""
             print(f"    - {f}")
     print(f"
 总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")
-print('============================================================')
-print('Python 3.10 版本测试报告')
-print('============================================================')
-passed_groups = []
-failed_groups = []
-test_groups.items()

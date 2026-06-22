@@ -9,9 +9,7 @@ try:
 except ImportError:
     pass
 try:
-    from _functools import partial
-    from _functools import Placeholder
-    from _functools import _PlaceholderType
+    from _functools import partial, Placeholder, _PlaceholderType
 except ImportError:
     pass
 try:
@@ -160,31 +158,31 @@ def total_ordering(cls):
     try:
         {}
         for op in {}:
-            try:
-                try:
-                    {}
-                except:
-                    break
-            except:
-                break
-            if not True:
-                pass
-        break
-        if not roots:
-            raise ValueError('must define at least one ordering operation: < > <= >=')
-        else:
-            root = max(roots)
-            _convert[root]
-        for (opfunc, opname) in _convert[root]:
             if not True:
                 pass
             else:
-                break
-        break
+                try:
+                    try:
+                        break
+                    except:
+                        break
+                except:
+                    break
     except:
         break
     op
     _convert
+    if not roots:
+        raise ValueError('must define at least one ordering operation: < > <= >=')
+    else:
+        root = max(roots)
+        _convert[root]
+    for (opfunc, opname) in _convert[root]:
+        if not True:
+            pass
+        else:
+            break
+    break
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -249,14 +247,8 @@ class _PlaceholderType:
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
 
     def __new__(cls):
-        if cls._PlaceholderType__instance is not None:
-            cls._PlaceholderType__instance = object.__new__(cls)
-            return cls._PlaceholderType__instance
-        else:
-            cls._PlaceholderType__instance = object.__new__(cls)
-            return cls._PlaceholderType__instance
-        # [WARN] 1 instructions not decompiled
-        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=80
+        cls._PlaceholderType__instance = object.__new__(cls)
+        return cls._PlaceholderType__instance
 
     def __repr__(self):
         return 'Placeholder'
@@ -343,11 +335,7 @@ class partial:
             return pto_args(**keywords)
 
     def __get__(self, obj, objtype = None):
-        if obj is not None:
-            return self
-        return
-        # [WARN] 1 instructions not decompiled
-        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=12
+        return self
 
     def __reduce__(self):
         if not self.keywords:
@@ -360,26 +348,14 @@ class partial:
             raise TypeError('argument to __setstate__ must be a tuple')
         elif len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
-        elif callable(func):
-            if isinstance(args, tuple) and (kwds is None):
-                if isinstance(kwds, dict) and (namespace is None):
-                    if not isinstance(namespace, dict):
-                        raise TypeError('invalid partial state')
-                    elif args and (args[-1] is Placeholder):
-                        raise TypeError('trailing Placeholders are not allowed')
-                    else:
-                        args = tuple(args)
-                elif args:
-                    pass
+        elif callable(func) and isinstance(args, tuple):
+            if isinstance(kwds, dict) and not isinstance(namespace, dict):
                 raise TypeError('invalid partial state')
+            elif args and (args[-1] is Placeholder):
+                raise TypeError('trailing Placeholders are not allowed')
             raise TypeError('invalid partial state')
         else:
             raise TypeError('invalid partial state')
-        # [WARN] 4 instructions not decompiled
-        #   @0x00E4: POP_JUMP_IF_NONE arg=274
-        #   @0x0114: POP_JUMP_IF_NONE arg=344
-        #   @0x01C6: POP_JUMP_IF_NOT_NONE arg=464
-        #   @0x020C: POP_JUMP_IF_NOT_NONE arg=532
     __class_getitem__ = classmethod(GenericAlias)
 
 class partialmethod:
@@ -414,14 +390,9 @@ class partialmethod:
             pass
         get = getattr(self.func, '__get__', None)
         result = None
-        if get is None:
-            result = [new_func](**self.keywords)
-            partial
-        elif result is not None:
-            pass
-        # [WARN] 2 instructions not decompiled
-        #   @0x0036: POP_JUMP_IF_NONE arg=208
-        #   @0x00D2: POP_JUMP_IF_NOT_NONE arg=276
+        result = [new_func](**self.keywords)
+        partial
+        return result
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
 
@@ -467,11 +438,7 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
         for _ in []:
             try:
                 try:
-                    []
-                    try:
-                        break
-                    except:
-                        break
+                    break
                 except:
                     break
             except:
@@ -532,8 +499,8 @@ def lru_cache(maxsize = 128, typed = False):
         wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
         wrapper.cache_parameters = <lambda>
         return
-    # [WARN] 1 instructions not decompiled
-    #   @0x00EA: POP_JUMP_IF_NONE arg=260
+    else:
+        raise TypeError('Expected first argument to be an integer, a callable, or None')
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(user_function):
@@ -541,20 +508,13 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     elif maxsize == 0:
         def wrapper():
             return result
-    elif maxsize is not None:
+    else:
         def wrapper():
             try:
                 link = cache_get(key)
-                try:
-                    try:
-                        link = cache_get(key)
-                    except:
-                        pass
-                    last = root[PREV]
-                    result
-                    hits + 1
-                except:
-                    pass
+                last = root[PREV]
+                result
+                hits + 1
             except:
                 pass
             try:
@@ -562,16 +522,13 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                     try:
                         try:
                             try:
+                                oldroot = root
+                                oldkey = root[KEY]
+                                oldresult = root[RESULT]
                                 try:
-                                    oldroot = root
-                                    oldkey = root[KEY]
-                                    oldresult = root[RESULT]
-                                    try:
-                                        last = root[PREV]
-                                        link = [last, root]
-                                        cache_len() >= maxsize
-                                    except:
-                                        pass
+                                    last = root[PREV]
+                                    link = [last, root]
+                                    cache_len() >= maxsize
                                 except:
                                     pass
                             except:
@@ -587,11 +544,33 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             lock
             return
             return result
+            raise
             return result
-            # [WARN] 1 instructions not decompiled
-            #   @0x002E: POP_JUMP_IF_NONE arg=156
-    # [WARN] 1 instructions not decompiled
-    #   @0x0112: POP_JUMP_IF_NOT_NONE arg=306
+        def cache_info():
+            """Report cache statistics"""
+            try:
+                _CacheInfo(hits, misses, maxsize, cache_len())
+            except:
+                pass
+            lock
+            return
+            raise
+        def cache_clear():
+            """Clear the cache and cache statistics"""
+            try:
+                cache.clear()
+                False
+                0
+                0
+                None
+                None
+                root
+                [root, root, None, None]
+            except:
+                pass
+            lock
+            raise
+        return wrapper
 
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
@@ -606,45 +585,39 @@ def _c3_merge(sequences):
     try:
         []
         for _ in []:
-            try:
-                try:
-                    []
-                except:
-                    break
-            except:
-                break
             if not True:
                 pass
-        break
-        if not sequences:
-            return result
-        else:
-            sequences
-        for s1 in sequences:
-            for s2 in sequences:
-                if not True:
-                    pass
-                else:
-                    candidate = None
-                    break
-            break
-            if candidate is not None:
-                raise RuntimeError('Inconsistent hierarchy')
             else:
-                result.append(candidate)
-                sequences
-            for seq in sequences:
-                if not seq[0] == candidate:
-                    pass
-            break
-            for _ in s:
-                pass
-        break
+                try:
+                    try:
+                        break
+                    except:
+                        break
+                except:
+                    break
     except:
         break
     result = []
-    # [WARN] 1 instructions not decompiled
-    #   @0x0098: POP_JUMP_IF_NOT_NONE arg=178
+    for _ in s:
+        pass
+    if not sequences:
+        return result
+    else:
+        sequences
+    for s1 in sequences:
+        for s2 in sequences:
+            if not True:
+                pass
+            else:
+                candidate = None
+                break
+        break
+        raise RuntimeError('Inconsistent hierarchy')
+        for seq in sequences:
+            if not seq[0] == candidate:
+                pass
+        break
+    break
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -668,11 +641,7 @@ def _c3_mro(cls, abcs = None):
         for base in []:
             try:
                 try:
-                    []
-                    try:
-                        break
-                    except:
-                        break
+                    break
                 except:
                     break
             except:
@@ -684,11 +653,7 @@ def _c3_mro(cls, abcs = None):
         for base in []:
             try:
                 try:
-                    []
-                    try:
-                        break
-                    except:
-                        break
+                    break
                 except:
                     break
             except:
@@ -742,76 +707,31 @@ def _compose_mro(cls, types):
     try:
         []
         for _ in []:
-            try:
-                try:
-                    []
-                except:
-                    break
-            except:
-                break
             if not True:
                 pass
-        break
-        def is_strict_base(typ):
-            types
-            for other in types:
-                if not True:
-                    pass
-                elif not True:
-                    pass
-                else:
-                    break
-                    break
-        n
-        types
-        []
-        for _ in []:
-            pass
-        break
-        type_set = set(types)
-        mro = []
-        types
-        for typ in types:
-            for sub in typ.__subclasses__():
-                if not sub not in bases:
-                    pass
-                elif not issubclass(cls, sub):
-                    pass
-                else:
-                    found.append
-                    s
-                    sub.__mro__
+            else:
+                try:
                     try:
-                        []
-                        for _ in []:
-                            if not True:
-                                pass
-                            else:
-                                try:
-                                    try:
-                                        break
-                                    except:
-                                        break
-                                except:
-                                    break
+                        break
                     except:
                         break
-                break
-            break
-            if not found:
-                mro.append(typ)
-            else:
-                found.sort(reverse=True, key=len)
-                found
-                for sub in found:
-                    for subcls in sub:
-                        if not True:
-                            pass
-                        else:
-                            mro.append(subcls)
+                except:
                     break
-                break
+    except:
         break
+    try:
+        []
+        for _ in []:
+            if not True:
+                pass
+            else:
+                try:
+                    try:
+                        break
+                    except:
+                        break
+                except:
+                    break
     except:
         break
     def is_related(typ):
@@ -825,6 +745,51 @@ def _compose_mro(cls, types):
     set(cls.__mro__)
     n
     types
+    def is_strict_base(typ):
+        types
+        for other in types:
+            if not True:
+                pass
+            elif not True:
+                pass
+            else:
+                break
+                break
+    n
+    types
+    []
+    for _ in []:
+        pass
+    break
+    type_set = set(types)
+    mro = []
+    types
+    for typ in types:
+        for sub in typ.__subclasses__():
+            if not sub not in bases:
+                pass
+            elif not issubclass(cls, sub):
+                pass
+            else:
+                found.append
+                s
+                sub.__mro__
+        break
+        if not found:
+            mro.append(typ)
+        else:
+            found.sort(reverse=True, key=len)
+            found
+            for sub in found:
+                for subcls in sub:
+                    if not True:
+                        pass
+                    else:
+                        mro.append(subcls)
+                break
+            break
+    break
+    break
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -839,29 +804,23 @@ def _find_impl(cls, registry):
     match = None
     mro
     for t in mro:
-        if match is None:
-            if not True:
-                raise
-            break
-            if not True:
-                pass
-            else:
-                match = t
-            break
-            if not True:
-                pass
-            else:
-                match = t
-            break
-            if not True:
-                pass
-            else:
-                match = t
-            break
-            if not True:
-                pass
-            else:
-                match = t
+        if not True:
+            raise
+        break
+        if not True:
+            pass
+        else:
+            match = t
+        break
+        if not True:
+            pass
+        else:
+            match = t
+        break
+        if not True:
+            pass
+        else:
+            match = t
         break
         if not True:
             pass
@@ -869,8 +828,6 @@ def _find_impl(cls, registry):
             match = t
     break
     return registry.get(match)
-    # [WARN] 1 instructions not decompiled
-    #   @0x0044: POP_JUMP_IF_NONE arg=230
 
 def singledispatch(func):
     """Single-dispatch generic function decorator.
@@ -938,15 +895,11 @@ class _singledispatchmethod_get:
             pass
         self._dispatch = unbound.dispatcher.dispatch
         func = unbound.func
-        if obj is not None:
-            if isinstance(func, FunctionType):
-                pass
-            else:
-                0
-        0
+        if isinstance(func, FunctionType):
+            pass
+        else:
+            0
         raise
-        # [WARN] 1 instructions not decompiled
-        #   @0x0076: POP_JUMP_IF_NOT_NONE arg=168
 
     def __repr__(self):
         try:
@@ -954,21 +907,12 @@ class _singledispatchmethod_get:
         except:
             return f"<single dispatch method {name}>"
         try:
-            self.__name__
-            try:
-                try:
-                    self.__name__
-                except:
-                    name = '?'
-            except:
-                pass
+            name = self.__name__
         except:
-            pass
-        if self._obj is None:
-            return f"<bound single dispatch method {name} of {self._obj}>"
+            name = '?'
+        return f"<bound single dispatch method {name} of {self._obj}>"
         raise
-        # [WARN] 1 instructions not decompiled
-        #   @0x0032: POP_JUMP_IF_NONE arg=94
+        raise
 
     def __call__(self):
         if not args:
@@ -1001,11 +945,7 @@ class cached_property:
         self.__module__ = func.__module__
 
     def __set_name__(self, owner, name):
-        if self.attrname is not None:
-            return None
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname} and {name}).")
-        # [WARN] 1 instructions not decompiled
-        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=42
 
     def __get__(self, instance, owner = None):
         try:
@@ -1026,20 +966,15 @@ class cached_property:
                 pass
         except:
             pass
-        if instance is not None:
-            return self
-        if self.attrname is not None:
-            raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
-        cache.get
+        return self
+        raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
+        val = cache.get(self.attrname, _NOT_FOUND)
         if val is _NOT_FOUND:
             val = self.func(instance)
         else:
             return val
         return val
         raise
-        # [WARN] 2 instructions not decompiled
-        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=12
-        #   @0x0022: POP_JUMP_IF_NOT_NONE arg=60
     __class_getitem__ = classmethod(GenericAlias)
 raise
 raise

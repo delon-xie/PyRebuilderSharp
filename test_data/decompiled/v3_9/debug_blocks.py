@@ -26,7 +26,6 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             if any(<genexpr>(block_instrs)):
                 last = block_instrs[-1]
                 print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-            if any(<genexpr>(block_instrs)):
-                for ins in block_instrs:
-                    if ins.opname == 'JUMP_ABSOLUTE':
-                        print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+        for ins in block_instrs:
+            if ins.opname == 'JUMP_ABSOLUTE':
+                print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

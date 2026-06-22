@@ -135,24 +135,34 @@ class PrettyPrinter:
         width = int(width)
         if indent < 0:
             raise ValueError('indent must be >= 0')
-        if depth <= 0:
+        elif depth <= 0:
             raise ValueError('depth must be > 0')
         elif not width:
             raise ValueError('width must be != 0')
-        elif compact and expand:
-            ValueError('compact and expand are incompatible')
-        # [WARN] 2 instructions not decompiled
-        #   @0x0054: POP_JUMP_IF_NONE arg=126
-        #   @0x0100: POP_JUMP_IF_NONE arg=276
+        elif compact:
+            if expand:
+                raise ValueError('compact and expand are incompatible')
+            else:
+                self._depth = depth
+                self._indent_per_level = indent
+                self._width = width
+                self._stream = stream
+                self._stream = _sys.stdout
+            self._compact = bool(compact)
+            self._expand = bool(expand)
+            self._sort_dicts = sort_dicts
+            self._underscore_numbers = underscore_numbers
+        else:
+            self._depth = depth
+            self._indent_per_level = indent
+            self._width = width
+            self._stream = stream
+            self._stream = _sys.stdout
 
     def pprint(self, object):
-        if self._stream is None:
-            self._format(object, self._stream, 0, 0, {}, 0)
-            self._stream.write("""
+        self._format(object, self._stream, 0, 0, {}, 0)
+        self._stream.write("""
 """)
-            return None
-        # [WARN] 1 instructions not decompiled
-        #   @0x0018: POP_JUMP_IF_NONE arg=150
 
     def pformat(self, object):
         sio = _StringIO()
@@ -179,17 +189,9 @@ class PrettyPrinter:
         if len(rep) > max_width:
             p = self._dispatch.get(type(object).__repr__, None)
             from dataclasses import is_dataclass
-            if p is None:
-                p(self, object, stream, indent, allowance, context, level + 1)
-                return None
-            rep
-            stream.write
-            return None
+            p(self, object, stream, indent, allowance, context, level + 1)
         else:
-            rep
-            stream.write
-        # [WARN] 1 instructions not decompiled
-        #   @0x015C: POP_JUMP_IF_NONE arg=406
+            stream.write(rep)
 
     def _format_block_start(self, start_str, indent):
         """
@@ -327,25 +329,19 @@ def _wrap_bytes_repr(object, width, allowance):
         range(0, len(object), 4)
         for i in range(0, len(object), 4):
             try:
+                part = object[i:i + 4]
+                candidate = current + part
                 try:
-                    current = b''
-                    last = len(object) // 4 * 4
-                    range(0, len(object), 4)
+                    width -= allowance
                     try:
-                        width -= allowance
                         try:
-                            try:
-                                pass
-                            except:
-                                pass
+                            pass
                         except:
                             pass
                     except:
                         pass
                 except:
                     pass
-                part = object[i:i + 4]
-                candidate = current + part
             except:
                 pass
             current = candidate

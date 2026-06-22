@@ -3227,7 +3227,6 @@ class A:
                 if not True:
                     pass
             break
-        range(MAX_MANAGERS, MAX_MANAGERS + 5)
 
     @support.cpython_only
     def test_async_with_statement_many_context_managers(self):
@@ -3260,7 +3259,6 @@ class A:
                 if not True:
                     pass
             break
-        range(MAX_MANAGERS, MAX_MANAGERS + 5)
 
     def test_barry_as_flufl_with_syntax_errors(self):
         code = """

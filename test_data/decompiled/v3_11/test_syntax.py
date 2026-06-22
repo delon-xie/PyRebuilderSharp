@@ -2965,53 +2965,18 @@ class SyntaxErrorTestCase(unittest.TestCase):
                         self.fail
                         try:
                             mo = re.search(errtext, str(err))
-                            try:
-                                self(f"SyntaxError did not contain {errtext!r}")
-                                self.fail
-                                try:
-                                    self(err.filename, filename)
-                                    try:
-                                        self(err.lineno, lineno)
-                                        self.assertEqual
-                                        try:
-                                            try:
-                                                self(err.offset, offset)
-                                                self.assertEqual
-                                                try:
-                                                    try:
-                                                        self(err.end_lineno, end_lineno)
-                                                        self.assertEqual
-                                                        try:
-                                                            try:
-                                                                self(err.end_offset, end_offset)
-                                                                self.assertEqual
-                                                            except:
-                                                                err = None
-                                                                return None
-                                                        except:
-                                                            err = None
-                                                            return None
-                                                    except:
-                                                        err = None
-                                                        return None
-                                                except:
-                                                    err = None
-                                                    return None
-                                            except:
-                                                err = None
-                                                return None
-                                        except:
-                                            err = None
-                                            return None
-                                    except:
-                                        err = None
-                                        return None
-                                except:
-                                    err = None
-                                    return None
-                            except:
-                                err = None
-                                return None
+                            self(f"SyntaxError did not contain {errtext!r}")
+                            self(err.filename, filename)
+                            self(err.lineno, lineno)
+                            self(err.offset, offset)
+                            self(err.end_lineno, end_lineno)
+                            self(err.end_offset, end_offset)
+                            self.assertEqual
+                            self.assertEqual
+                            self.assertEqual
+                            self.assertEqual
+                            self.assertEqual
+                            self.fail
                         except:
                             err = None
                             return None
@@ -3029,12 +2994,6 @@ class SyntaxErrorTestCase(unittest.TestCase):
             return None
         self('compile() did not raise SyntaxError')
         err = None
-        # [WARN] 5 instructions not decompiled
-        #   @0x010E: POP_JUMP_IF_NOT_NONE arg=48
-        #   @0x0178: POP_JUMP_IF_NONE arg=54
-        #   @0x01B2: POP_JUMP_IF_NONE arg=54
-        #   @0x01EC: POP_JUMP_IF_NONE arg=54
-        #   @0x0226: POP_JUMP_IF_NONE arg=66
 
     def test_expression_with_assignment(self):
         self('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)

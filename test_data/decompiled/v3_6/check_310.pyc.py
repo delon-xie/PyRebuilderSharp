@@ -15,5 +15,5 @@ def dump_bytecode(c, depth):
     for const in c.co_consts:
         break
         if et:
-            range(0, len(et), 8)
+            pass
 dump_bytecode(code)

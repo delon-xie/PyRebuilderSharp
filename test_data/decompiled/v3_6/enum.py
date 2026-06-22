@@ -1280,8 +1280,7 @@ class verify:
                 raise
                 for check in checks:
                     if check is UNIQUE:
-                        duplicates = []
-                        enumeration.__members__.items()
+                        pass
                     for i in low:
                         if 2 ** i not in values:
                             missing.append(2 ** i)
@@ -1290,13 +1289,7 @@ class verify:
                         raise ValueError('invalid %s %r: missing values %s' % (enum_type, cls_name, ', '.join(verify.__call__.<locals>.<genexpr>(missing)))[None:256])
                     check
                     if check is NAMED_FLAGS:
-                        member_names = enumeration._member_names_
-                        missing_names = []
-                        missing_value = 0
-                        enumeration._member_map_.items()
-                        self
-                        self
-                        verify.__call__.<locals>.<listcomp>(enumeration)
+                        pass
                 return enumeration
                 alias = 'aliases %s and %s are missing' % (', '.join(missing_names[None:-1]), missing_names[-1])
                 if _is_single_bit(missing_value):

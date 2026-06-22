@@ -55,7 +55,18 @@ else:
                 pass
             instructions
             for (off, op, name, arg) in instructions:
-                pass
+                ''
+                arg
+                ' '
+                '20s'
+                name
+                ': '
+                '4d'
+                off
+                '  '
+                print
+                None
+                break
             print(f"
 Constants at {pos}:")
             const_type = data[pos]
@@ -68,5 +79,3 @@ op = bytecode[offset]
 offset += 1
 instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
 arg = None
-# [WARN] 1 instructions not decompiled
-#   @0x041A: POP_JUMP_IF_NONE arg=4

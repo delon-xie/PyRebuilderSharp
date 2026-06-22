@@ -119,12 +119,9 @@ def bin(num, max_bits = None):
         s = bltns.bin(~num ^ ceiling - 1 + ceiling)
         sign = s[None:3]
         digits = s[3:]
-        if max_bits is None:
-            if len(digits) < max_bits:
-                digits = sign[-1] * max_bits + digits[-max_bits:]
-            return f"{sign!s} {digits!s}"
-    # [WARN] 1 instructions not decompiled
-    #   @0x0124: POP_JUMP_IF_NONE arg=84
+        if len(digits) < max_bits:
+            digits = sign[-1] * max_bits + digits[-max_bits:]
+        return f"{sign!s} {digits!s}"
 
 class _not_given:
     def __repr__(self):
@@ -160,32 +157,18 @@ class property(DynamicClassAttribute):
             ownerclass._member_map_[self.name]
         except:
             pass
-        if instance is not None:
-            if self.member is None:
-                return self.member
+        return self.member
         raise AttributeError(f"{ownerclass!r} has no attribute {self.name!r}")
-        if self.fget is None:
-            return self(instance)
         return getattr(self._cls_type, self.name)
         if self._attr_type == 'desc':
             return getattr(instance._value_, self.name)
         return
-        # [WARN] 3 instructions not decompiled
-        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=78
-        #   @0x0012: POP_JUMP_IF_NONE arg=14
-        #   @0x0060: POP_JUMP_IF_NONE arg=42
 
     def __set__(self, instance, value):
-        if self.fset is None:
-            return self(instance, value)
-        # [WARN] 1 instructions not decompiled
-        #   @0x000E: POP_JUMP_IF_NONE arg=44
+        return self(instance, value)
 
     def __delete__(self, instance):
-        if self.fdel is None:
-            return self(instance)
-        # [WARN] 1 instructions not decompiled
-        #   @0x000E: POP_JUMP_IF_NONE arg=42
+        return self(instance)
 
     def __set_name__(self, ownerclass, name):
         self.name = name
@@ -202,6 +185,10 @@ class _proto_member:
         """
         convert each quasi-member into an instance of the new enum class
         """
+        value = enum_member._value_
+        enum_member._name_ = member_name
+        enum_member.__objclass__ = enum_class
+        enum_member._sort_order_ = len(enum_class._member_names_)
         try:
             try:
                 if Exception:
@@ -226,19 +213,13 @@ class _proto_member:
             try:
                 try:
                     try:
+                        enum_class._member_names_(member_name)
                         try:
-                            enum_class._member_names_(member_name)
                             try:
                                 try:
                                     try:
-                                        try:
-                                            try:
-                                                enum_class._member_names_(member_name)
-                                                enum_class._member_names_.append
-                                            except:
-                                                pass
-                                        except:
-                                            pass
+                                        enum_class._member_names_(member_name)
+                                        enum_class._member_names_.append
                                     except:
                                         pass
                                 except:
@@ -304,9 +285,6 @@ class _proto_member:
         raise
         raise
         enum_class._flag_mask_ | value._flag_mask_ = enum_class
-        # [WARN] 2 instructions not decompiled
-        #   @0x03E4: POP_JUMP_IF_NONE arg=42
-        #   @0x0452: POP_JUMP_IF_NONE arg=166
 
 class EnumDict(dict):
     """
@@ -336,52 +314,50 @@ class EnumDict(dict):
             value = t(auto_valued)
         except:
             break
-        if self._cls_name is None:
-            if _is_private(self._cls_name, key):
-                pass
-            elif _is_sunder(key):
-                if key not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_'):
-                    if not key('_repr_'):
-                        raise ValueError(f"_sunder_ names, such as {key!r}, are reserved for future Enum use")
-                    elif key == '_generate_next_value_':
-                        if self._auto_called:
-                            raise TypeError('_generate_next_value_ must be defined before members')
-                        elif isinstance(value, staticmethod):
-                            pass
-                        else:
-                            value
-                            setattr(self, '_generate_next_value', _gnv)
-                            super()(key, value)
-                    elif (key == '_ignore_') and isinstance(value, str):
-                        value = value(',', ' ')()
-                    else:
-                        value = list(value)
-                        self._ignore = value
-                        already = set(value) & set(self._member_names)
-                        if already:
-                            raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
+        if _is_private(self._cls_name, key):
+            pass
+        elif _is_sunder(key):
+            if key not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_'):
+                if not key('_repr_'):
+                    raise ValueError(f"_sunder_ names, such as {key!r}, are reserved for future Enum use")
                 elif key == '_generate_next_value_':
-                    pass
-                elif key == '_ignore_':
-                    pass
-            elif _is_dunder(key):
-                if key == '__order__':
-                    key = '_order_'
-            elif key in self._member_names:
-                raise TypeError(f"{key!r} already defined as {self[key]!r}")
-            elif key in self._ignore:
+                    if self._auto_called:
+                        raise TypeError('_generate_next_value_ must be defined before members')
+                    elif isinstance(value, staticmethod):
+                        pass
+                    else:
+                        value
+                        setattr(self, '_generate_next_value', _gnv)
+                        super()(key, value)
+                elif (key == '_ignore_') and isinstance(value, str):
+                    value = value(',', ' ')()
+                else:
+                    value = list(value)
+                    self._ignore = value
+                    already = set(value) & set(self._member_names)
+                    if already:
+                        raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
+            elif key == '_generate_next_value_':
                 pass
-            elif isinstance(value, nonmember):
-                value = value.value
-            elif _is_descriptor(value):
+            elif key == '_ignore_':
                 pass
-            elif self._cls_name is None:
-                if _is_internal_class(self._cls_name, value):
-                    pass
-                elif key in self:
-                    raise TypeError(f"{key!r} already defined as {self[key]!r}")
-                elif isinstance(value, member):
-                    value = value.value
+        elif _is_dunder(key):
+            if key == '__order__':
+                key = '_order_'
+        elif key in self._member_names:
+            raise TypeError(f"{key!r} already defined as {self[key]!r}")
+        elif key in self._ignore:
+            pass
+        elif isinstance(value, nonmember):
+            value = value.value
+        elif _is_descriptor(value):
+            pass
+        elif _is_internal_class(self._cls_name, value):
+            pass
+        elif key in self:
+            raise TypeError(f"{key!r} already defined as {self[key]!r}")
+        elif isinstance(value, member):
+            value = value.value
         for v in value:
             if isinstance(v, auto):
                 non_auto_store = False
@@ -399,30 +375,32 @@ class EnumDict(dict):
             auto_valued(v)
             single
             auto_valued.append
-        # [WARN] 2 instructions not decompiled
-        #   @0x0010: POP_JUMP_IF_NONE arg=46
-        #   @0x0372: POP_JUMP_IF_NONE arg=46
     member_names = member_names()
     def update(self, members):
         try:
             members()
             members.keys
             for name in members():
+                pass
+            try:
                 try:
-                    try:
-                        members()
-                        members.keys
-                    except:
-                        break
+                    break
+                    for (name, value) in members:
+                        try:
+                            pass
+                        except:
+                            pass
+                    more_members()
+                    more_members.items
+                    for (name, value) in more_members():
+                        None
+                    return
                 except:
                     pass
+            except:
+                pass
         except:
             pass
-        more_members()
-        more_members.items
-        for (name, value) in more_members():
-            None
-        return
 _EnumDict = EnumDict
 class EnumType(type):
     """
@@ -465,64 +443,52 @@ class EnumType(type):
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise ','.join(',' % <genexpr>(invalid_names()))
-        else:
-            _order_ = classdict('_order_', None)
-            _gnv = classdict('_generate_next_value_')
+        _order_ = classdict('_order_', None)
+        _gnv = classdict('_generate_next_value_')
         if type(_gnv) is not staticmethod:
             _gnv = staticmethod(_gnv)
         classdict = classdict.items(classdict())
-        if _gnv is None:
-            pass
-        return super().__new__(metacls, cls, bases, classdict, **kwds)
         (member_type, first_enum) = metacls(cls, bases)
         (__new__, save_new, use_args) = metacls(classdict, member_type, first_enum)
         member_names
         metacls._find_new_
         metacls._get_mixins_
+        dict
         for name in member_names:
             value = classdict[name]
             []
         if boundary:
             getattr(first_enum, '_boundary_', None)
-        elif Flag is None:
-            if bases and issubclass(bases[-1], Flag):
-                for n in member_names:
-                    p = classdict[n]
-                    if isinstance(p.value, int):
-                        if p.value < 0:
-                            inverted(p)
-                        else:
-                            bits |= p.value
-                    elif p.value is not None:
-                        pass
-        if isinstance(p.value, tuple) and p.value and isinstance(p.value[0], int) and (p.value[0] < 0):
-            inverted(p)
-        else:
-            bits |= p.value[0]
-            inverted
-            for p in inverted:
+        elif bases and issubclass(bases[-1], Flag):
+            for n in member_names:
+                p = classdict[n]
                 if isinstance(p.value, int):
-                    p.value = bits & p.value
+                    if p.value < 0:
+                        inverted(p)
+                    else:
+                        bits |= p.value
+                elif isinstance(p.value, tuple) and p.value and isinstance(p.value[0], int) and (p.value[0] < 0):
+                    inverted(p)
                 else:
-                    p.value = (bits & p.value[0]) + p.value[1:]
-        inverted
-        inverted
-        inverted
+                    bits |= p.value[0]
+                    inverted
+                    for p in inverted:
+                        if isinstance(p.value, int):
+                            p.value = bits & p.value
+                        else:
+                            p.value = (bits & p.value[0]) + p.value[1:]
+        classdict(enum_class.__dict__)
         method = member_type.__str__
         enum_method = getattr(first_enum, name)
         found_method = getattr(enum_class, name)
         object_method = getattr(object, name)
         data_type_method = getattr(member_type, name)
+        enum_class.__new__ = Enum.__new__
         delattr(enum_class, '_boundary_')
         delattr(enum_class, '_flag_mask_')
         delattr(enum_class, '_singles_mask_')
         delattr(enum_class, '_all_bits_')
         delattr(enum_class, '_inverted_')
-        # [WARN] 4 instructions not decompiled
-        #   @0x01CC: POP_JUMP_IF_NONE arg=74
-        #   @0x025C: POP_JUMP_IF_NONE arg=10
-        #   @0x03FC: POP_JUMP_IF_NONE arg=662
-        #   @0x04F4: POP_JUMP_IF_NOT_NONE arg=2
 
     def __bool__(cls):
         """
@@ -563,14 +529,12 @@ class EnumType(type):
                 value = (value, names) + values
             return cls(cls, value)
         elif names is _not_given:
-            pass
+            raise TypeError(f"{cls} has no members; specify `names=()` if you meant to create a new, empty, enum")
         elif names is _not_given:
             pass
         else:
             names
             return
-        # [WARN] 1 instructions not decompiled
-        #   @0x0070: POP_JUMP_IF_NOT_NONE arg=36
 
     def __contains__(cls, value):
         """Return True if `value` is in `cls`.
@@ -636,13 +600,10 @@ class EnumType(type):
         return len(cls._member_names_)
     __members__ = __members__()
     def __repr__(cls):
-        if Flag is None:
-            if issubclass(cls, Flag):
-                return '<flag %r>' % cls.__name__
-            else:
-                return '<enum %r>' % cls.__name__
-        # [WARN] 1 instructions not decompiled
-        #   @0x000E: POP_JUMP_IF_NONE arg=62
+        if issubclass(cls, Flag):
+            return '<flag %r>' % cls.__name__
+        else:
+            return '<enum %r>' % cls.__name__
 
     def __reversed__(cls):
         """
@@ -685,9 +646,8 @@ class EnumType(type):
         except:
             break
         metacls = cls.__class__
-        if type is not None:
-            pass
         (type, cls)
+        (cls)
         (_, first_enum) = cls(class_name, bases)
         classdict = metacls(class_name, bases)
         if isinstance(names, str):
@@ -699,32 +659,13 @@ class EnumType(type):
                 value = first_enum(name, start, count, last_values[None:])
                 last_values(value)
                 names((name, value))
-        names
-        for item in names:
-            if isinstance(item, str):
-                member_value = names[item]
-                member_name = item
-            else:
-                (member_name, member_value) = item
-                module
-        if module is not None:
-            _make_class_unpicklable(classdict)
-        (_, first_enum) = cls(class_name, bases)
-        classdict = metacls(class_name, bases)
-        if isinstance(names, str):
-            pass
-        elif isinstance(names, (tuple, list)):
-            pass
+        _make_class_unpicklable(classdict)
+        return metacls(metacls, class_name, bases, classdict, boundary=boundary)
         try:
             pass
         except:
             pass
         raise
-        # [WARN] 4 instructions not decompiled
-        #   @0x0012: POP_JUMP_IF_NOT_NONE arg=6
-        #   @0x023C: POP_JUMP_IF_NOT_NONE arg=4
-        #   @0x02A2: POP_JUMP_IF_NOT_NONE arg=200
-        #   @0x036E: POP_JUMP_IF_NOT_NONE arg=32
 
     def _convert_(cls, name, module, filter, source = None):
         """
@@ -759,9 +700,6 @@ class EnumType(type):
     _find_data_type_ = _find_data_type_()
     _find_new_ = _find_new_()
     def _add_member_(cls, name, member):
-        found_descriptor = attr
-        class_type = base
-        descriptor_type = 'enum'
         if name in cls._member_map_:
             if cls._member_map_[name] is not member:
                 raise NameError(f"{name!r} is already bound: {cls._member_map_[name]!r}")
@@ -772,6 +710,21 @@ class EnumType(type):
             cls.__mro__[1:]
             for base in cls.__mro__[1:]:
                 attr = base.__dict__(name)
+                if isinstance(attr, (property, DynamicClassAttribute)):
+                    found_descriptor = attr
+                    class_type = base
+                    descriptor_type = 'enum'
+                    break
+                elif _is_descriptor(attr):
+                    found_descriptor = attr
+                    if descriptor_type:
+                        'desc'
+                    elif class_type:
+                        base
+                else:
+                    descriptor_type = 'attr'
+                    class_type = base
+                found_descriptor
             redirect = property()
             redirect.member = member
             redirect(cls, name)
@@ -785,9 +738,6 @@ class EnumType(type):
             redirect._attr_type = descriptor_type
             redirect._cls_type = class_type
             setattr(cls, name, redirect)
-        found_descriptor = attr
-        # [WARN] 1 instructions not decompiled
-        #   @0x00D8: POP_JUMP_IF_NONE arg=132
     __signature__ = __signature__()
 EnumMeta = EnumType
 class Enum(metaclass=EnumType):
@@ -881,7 +831,24 @@ class Enum(metaclass=EnumType):
                                     ve_exc = None
                                 exc = e
                                 result = None
+                                if issubclass(cls, Flag) and (cls._boundary_ is EJECT):
+                                    if isinstance(result, int):
+                                        result
+                                    ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
+                                    raise ve_exc
+                                    exc = TypeError(f"error in {cls.__name__!s}._missing_: returned {result!r} instead of None or a valid member")
+                                    if not isinstance(exc, ValueError):
+                                        exc.__context__ = ve_exc
+                                    raise exc
+                                else:
+                                    ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
+                                    raise ve_exc
+                                ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
+                                raise ve_exc
                                 e = None
+                                exc = None
+                                ve_exc = None
+                                return
                                 exc = None
                                 ve_exc = None
                                 return
@@ -898,31 +865,6 @@ class Enum(metaclass=EnumType):
             return value
         cls._value2member_map_[value]
         return
-        if issubclass(cls, Flag) and (cls._boundary_ is EJECT) and isinstance(result, int):
-            result
-        ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
-        if result is not None:
-            pass
-        ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
-        if result is not None:
-            pass
-        ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
-        if result is not None:
-            pass
-        exc = None
-        ve_exc = None
-        return
-        raise ve_exc
-        if exc is not None:
-            exc = TypeError(f"error in {cls.__name__!s}._missing_: returned {result!r} instead of None or a valid member")
-        if not isinstance(exc, ValueError):
-            exc.__context__ = ve_exc
-        raise exc
-        # [WARN] 4 instructions not decompiled
-        #   @0x026A: POP_JUMP_IF_NONE arg=124
-        #   @0x031C: POP_JUMP_IF_NOT_NONE arg=8
-        #   @0x0320: POP_JUMP_IF_NOT_NONE arg=4
-        #   @0x0328: POP_JUMP_IF_NOT_NONE arg=54
 
     def _add_alias_(self, name):
         self.__class__(name, self)
@@ -1000,7 +942,10 @@ class Enum(metaclass=EnumType):
                         if name[0] == '_':
                             pass
                         elif isinstance(obj, property):
-                            pass
+                            if name not in self._member_map_:
+                                interesting(name)
+                            else:
+                                interesting(name)
                         elif name not in self._member_map_:
                             interesting(name)
                             interesting.add
@@ -1009,8 +954,6 @@ class Enum(metaclass=EnumType):
                 return names
             else:
                 self
-        # [WARN] 1 instructions not decompiled
-        #   @0x01D2: POP_JUMP_IF_NOT_NONE arg=18
 
     def __format__(self, format_spec):
         return str(str(self), format_spec)
@@ -1124,17 +1067,11 @@ class Flag(Enum, boundary=STRICT):
         cls_name = self.__class__.__name__
         if self.__class__._value_repr_:
             repr
-        elif self._name_ is not None:
-            return f"<{cls_name!s}: {v_repr(self._value_)!s}>"
-        # [WARN] 1 instructions not decompiled
-        #   @0x004C: POP_JUMP_IF_NOT_NONE arg=46
+        return f"<{cls_name!s}: {v_repr(self._value_)!s}>"
 
     def __str__(self):
         cls_name = self.__class__.__name__
-        if self._name_ is not None:
-            return f"{cls_name!s}({self._value_!r})"
-        # [WARN] 1 instructions not decompiled
-        #   @0x0026: POP_JUMP_IF_NOT_NONE arg=26
+        return f"{cls_name!s}({self._value_!r})"
 
     def __bool__(self):
         return bool(self._value_)
@@ -1153,1009 +1090,11 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         else:
             value = self._value_
-        if other_value is not None:
-            for flag in (self, other):
-                pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        # [WARN] 3 instructions not decompiled
-        #   @0x005C: POP_JUMP_IF_NONE arg=4
-        #   @0x0060: POP_JUMP_IF_NOT_NONE arg=94
-        #   @0x0096: POP_JUMP_IF_NOT_NONE arg=38
+            (self, other)
+        for flag in (self, other):
+            raise TypeError(f"'{flag}' cannot be combined with other flags with |")
+            self
+        return
 
     def __and__(self, other):
         other_value = self(other)
@@ -2163,1009 +1102,11 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         else:
             value = self._value_
-        if other_value is not None:
-            for flag in (self, other):
-                pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        # [WARN] 3 instructions not decompiled
-        #   @0x005C: POP_JUMP_IF_NONE arg=4
-        #   @0x0060: POP_JUMP_IF_NOT_NONE arg=94
-        #   @0x0096: POP_JUMP_IF_NOT_NONE arg=38
+            (self, other)
+        for flag in (self, other):
+            raise TypeError(f"'{flag}' cannot be combined with other flags with &")
+            self
+        return
 
     def __xor__(self, other):
         other_value = self(other)
@@ -3173,1016 +1114,20 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         else:
             value = self._value_
-        if other_value is not None:
-            for flag in (self, other):
-                pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        elif other_value is not None:
-            pass
-        # [WARN] 3 instructions not decompiled
-        #   @0x005C: POP_JUMP_IF_NONE arg=4
-        #   @0x0060: POP_JUMP_IF_NOT_NONE arg=94
-        #   @0x0096: POP_JUMP_IF_NOT_NONE arg=38
+            (self, other)
+        for flag in (self, other):
+            raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
+            self
+        return
 
     def __invert__(self):
-        if self(self) is not None:
-            raise TypeError(f"'{self}' cannot be inverted")
-        self._inverted_ = self(~self._value_)
-        # [WARN] 1 instructions not decompiled
-        #   @0x002A: POP_JUMP_IF_NOT_NONE arg=38
+        raise TypeError(f"'{self}' cannot be inverted")
+        if self._boundary_ in (EJECT, KEEP):
+            self._inverted_ = self(~self._value_)
+        else:
+            self._inverted_ = self(self._singles_mask_ & ~self._value_)
+            self.__class__
+            return self._inverted_
     __rand__ = __and__
     __ror__ = __or__
     __rxor__ = __xor__
@@ -4234,20 +1179,14 @@ def global_flag_repr(self):
     the module is the last module in case of a multi-module name
     """
     cls_name = self.__class__.__name__
-    if self._name_ is not None:
-        return f"{module!s}.{cls_name!s}({self._value_!r})"
-    # [WARN] 1 instructions not decompiled
-    #   @0x0072: POP_JUMP_IF_NOT_NONE arg=32
+    return f"{module!s}.{cls_name!s}({self._value_!r})"
 
 def global_str(self):
     """
     use enum_name instead of class.enum_name
     """
-    if self._name_ is not None:
-        cls_name = self.__class__.__name__
-        return f"{cls_name!s}({self._value_!r})"
-    # [WARN] 1 instructions not decompiled
-    #   @0x000E: POP_JUMP_IF_NOT_NONE arg=50
+    cls_name = self.__class__.__name__
+    return f"{cls_name!s}({self._value_!r})"
 
 def global_enum(cls, update_str = False):
     """
@@ -4300,11 +1239,7 @@ def _simple_enum(etype = Enum):
                 try:
                     enum_class._value2member_map_(value, member)
                 except:
-                    enum_class._unhashable_values_(value)
-                    enum_class._unhashable_values_map_(name, [])(value)
-                    enum_class._unhashable_values_map_(name, []).append
-                    enum_class._unhashable_values_map_.setdefault
-                    enum_class._unhashable_values_.append
+                    break
                 hashable_values(value)
                 hashable_values.append
             except:
@@ -4312,16 +1247,13 @@ def _simple_enum(etype = Enum):
         except:
             pass
         cls_name = cls.__name__
-        if use_args is not None:
-            etype._use_args_
         __new__ = cls.__dict__('__new__')
-        if __new__ is None:
-            new_member = __new__.__func__
+        new_member = __new__.__func__
         new_member = etype._member_type_.__new__
+        cls.__dict__.get
+        etype._use_args_
         attrs = {}
         body = {}
-        if __new__ is None:
-            pass
         if issubclass(etype, Flag) and boundary:
             etype._boundary_
         cls.__dict__()
@@ -4331,67 +1263,47 @@ def _simple_enum(etype = Enum):
                 pass
         cls.__dict__()
         cls.__dict__.items
-        enum_class = type(cls_name, (etype), body, _simple=True, boundary=boundary)
-        ('__repr__', '__str__', '__format__', '__reduce_ex__')
-        for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
-            if name not in body:
-                enum_method = getattr(etype, name)
-                found_method = getattr(enum_class, name)
-                object_method = getattr(object, name)
-                data_type_method = getattr(member_type, name)
-                if found_method in (data_type_method, object_method):
-                    setattr(enum_class, name, enum_method)
-                []
-                if issubclass(enum_class, Flag):
-                    for (name, value) in attrs():
-                        if isinstance(value, auto):
-                            if auto.value is _auto_null:
-                                value = gnv(name, 1, len(member_names), gnv_last_values)
-                            elif use_args:
-                                if not isinstance(value, tuple):
-                                    value = (value)
-                                member = new_member(enum_class, **value)
-                                value = value[0]
-                                if __new__ is not None:
-                                    member._value_ = value
-                            else:
-                                member = new_member(enum_class)
-                        elif use_args:
-                            pass
-                        else:
-                            member = new_member(enum_class)
+        for (name, value) in attrs():
+            if isinstance(value, auto):
+                if auto.value is _auto_null:
+                    value = gnv(name, 1, len(member_names), gnv_last_values)
+                elif use_args:
+                    if not isinstance(value, tuple):
+                        value = (value)
+                    member = new_member(enum_class, **value)
+                    value = value[0]
+                    member._value_ = value
                 else:
-                    attrs()
-                    attrs.items
-                    for (name, value) in attrs():
-                        if isinstance(value, auto):
-                            if value.value is _auto_null:
-                                value.value = gnv(name, 1, len(member_names), gnv_last_values)
-                            value = value.value
-                            if use_args:
-                                if not isinstance(value, tuple):
-                                    value = (value)
-                                member = new_member(enum_class, **value)
-                                value = value[0]
-                                if __new__ is not None:
-                                    member._value_ = value
-                            else:
-                                member = new_member(enum_class)
-                        elif use_args:
-                            pass
-                        else:
-                            member = new_member(enum_class)
-                    enum_class.__new_member__ = enum_class.__new__
-                    enum_class.__new__ = Enum.__new__
-                    return enum_class
-            []
-        if issubclass(enum_class, Flag):
-            pass
+                    member = new_member(enum_class)
+            elif use_args:
+                pass
+            else:
+                member = new_member(enum_class)
+        enum_class._singles_mask_ = single_bits
+        enum_class._all_bits_ = single_bits | multi_bits.bit_length ** single_bits | multi_bits() - 1
+        member_list = enum_class()
+        if member_list != sorted(member_list):
+            enum_class._iter_member_ = enum_class._iter_member_by_def_
+        '__new__'
+        contained(name)
+        member._name_ = name
+        member.__objclass__ = enum_class
+        member(value)
+        member._sort_order_ = len(member_names)
+        if name not in ('name', 'value'):
+            setattr(enum_class, name, member)
         else:
-            attrs()
-            attrs.items
-        if contained is None:
-            contained(name)
+            enum_class(name, member)
+            enum_class._add_member_
+            hashable_values(value)
+            if _is_single_bit(value):
+                member_names(name)
+                single_bits |= value
+            else:
+                multi_bits |= value
+                gnv_last_values(value)
+                single_bits
+                gnv_last_values.append
         try:
             try:
                 try:
@@ -4415,8 +1327,20 @@ def _simple_enum(etype = Enum):
                 pass
         except:
             pass
-        if contained is None:
-            contained(name)
+        contained(name)
+        member._name_ = name
+        member.__objclass__ = enum_class
+        member(value)
+        member._sort_order_ = len(member_names)
+        if name not in ('name', 'value'):
+            setattr(enum_class, name, member)
+        else:
+            enum_class(name, member)
+            enum_class._add_member_
+            member_names(name)
+            gnv_last_values(value)
+            gnv_last_values.append
+            member_names.append
         try:
             try:
                 try:
@@ -4440,28 +1364,6 @@ def _simple_enum(etype = Enum):
                 pass
         except:
             pass
-        member._name_ = name
-        member.__objclass__ = enum_class
-        member(value)
-        member._sort_order_ = len(member_names)
-        setattr(enum_class, name, member)
-        hashable_values(value)
-        member_names(name)
-        single_bits |= value
-        member._name_ = name
-        member.__objclass__ = enum_class
-        member(value)
-        member._sort_order_ = len(member_names)
-        setattr(enum_class, name, member)
-        # [WARN] 8 instructions not decompiled
-        #   @0x0014: POP_JUMP_IF_NOT_NONE arg=14
-        #   @0x005A: POP_JUMP_IF_NONE arg=16
-        #   @0x008E: POP_JUMP_IF_NONE arg=10
-        #   @0x0388: POP_JUMP_IF_NOT_NONE arg=10
-        #   @0x05EA: POP_JUMP_IF_NOT_NONE arg=14
-        #   @0x06AE: POP_JUMP_IF_NONE arg=44
-        #   @0x0A64: POP_JUMP_IF_NOT_NONE arg=14
-        #   @0x0B28: POP_JUMP_IF_NONE arg=46
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -4477,72 +1379,69 @@ class verify:
     def __call__(self, enumeration):
         checks = self.checks
         cls_name = enumeration.__name__
-        if Flag is None:
-            if issubclass(enumeration, Flag):
-                enum_type = 'flag'
-            elif issubclass(enumeration, Enum):
-                enum_type = 'enum'
-            else:
-                raise TypeError('the \'verify\' decorator only works with Enum and Flag')
-                checks
-                for check in checks:
-                    if check is UNIQUE:
-                        duplicates = []
-                        enumeration.__members__()
-                        enumeration.__members__.items
-                    elif check is CONTINUOUS:
-                        values = <genexpr>(enumeration())
-                        if len(values) < 2:
+        if issubclass(enumeration, Flag):
+            enum_type = 'flag'
+        elif issubclass(enumeration, Enum):
+            enum_type = 'enum'
+        else:
+            raise TypeError('the \'verify\' decorator only works with Enum and Flag')
+            checks
+            for check in checks:
+                if check is UNIQUE:
+                    duplicates = []
+                    enumeration.__members__()
+                    enumeration.__members__.items
+                elif check is CONTINUOUS:
+                    values = <genexpr>(enumeration())
+                    if len(values) < 2:
+                        pass
+                    else:
+                        high = max(values)
+                        low = min(values)
+                        missing = []
+                        if enum_type == 'flag':
+                            range(_high_bit(low) + 1, _high_bit(high))
+                        elif enum_type == 'enum':
+                            range(low + 1, high)
+                elif check is NAMED_FLAGS:
+                    for (name, alias) in enumeration._member_map_():
+                        if name in member_names:
+                            pass
+                        elif alias.value < 0:
                             pass
                         else:
-                            high = max(values)
-                            low = min(values)
-                            missing = []
-                            if enum_type == 'flag':
-                                range(_high_bit(low) + 1, _high_bit(high))
-                            elif enum_type == 'enum':
-                                range(low + 1, high)
-                    elif check is NAMED_FLAGS:
-                        for (name, alias) in enumeration._member_map_():
-                            if name in member_names:
-                                pass
-                            elif alias.value < 0:
-                                pass
-                            else:
-                                values = list(_iter_bits_lsb(alias.value))
-                                missed = values()
-                                if missed:
-                                    for val in missed:
-                                        missing_value |= val
-                            missing_names
-                    for (name, member) in enumeration.__members__():
-                        if name != member.name:
-                            duplicates((name, member.name))
-                            duplicates.append
-                        duplicates
-                        alias_details = <listcomp>(duplicates())
-                        raise ValueError(f"aliases found in {enumeration!r}: {alias_details!s}")
-                    if len(missing_names) == 1:
-                        alias = 'alias %s is missing' % missing_names[0]
+                            values = list(_iter_bits_lsb(alias.value))
+                            missed = values()
+                            if missed:
+                                for val in missed:
+                                    missing_value |= val
+                        missing_names
+                for (name, member) in enumeration.__members__():
+                    if name != member.name:
+                        duplicates((name, member.name))
+                        duplicates.append
+                    duplicates
+                    alias_details = <listcomp>(duplicates())
+                    raise ValueError(f"aliases found in {enumeration!r}: {alias_details!s}")
+                if len(missing_names) == 1:
+                    alias = 'alias %s is missing' % missing_names[0]
+                else:
+                    alias = f"{', '.join}{', '(missing_names[None:-1])!s} and {missing_names[-1]!s} are missing"
+                    'aliases '
+                    if _is_single_bit(missing_value):
+                        value = 'value 0x%x' % missing_value
                     else:
-                        alias = f"{', '.join}{', '(missing_names[None:-1])!s} and {missing_names[-1]!s} are missing"
-                        'aliases '
-                        if _is_single_bit(missing_value):
-                            value = 'value 0x%x' % missing_value
-                        else:
-                            value = 'combined values of 0x%x' % missing_value
-                            raise ValueError(f"invalid Flag {cls_name!r}: {alias!s} {value!s} [use enum.show_flag_values(value) for details]")
-                    for i in range(_high_bit(low) + 1, _high_bit(high)):
-                        if 2 ** i not in values:
-                            missing(2 ** i)
-                            missing.append
-                    for i in range(low + 1, high):
-                        if i not in values:
-                            missing(i)
-                            missing.append
-                return
-        # [WARN] 1 instructions not decompiled
-        #   @0x002C: POP_JUMP_IF_NONE arg=48
+                        value = 'combined values of 0x%x' % missing_value
+                        raise ValueError(f"invalid Flag {cls_name!r}: {alias!s} {value!s} [use enum.show_flag_values(value) for details]")
+                for i in range(_high_bit(low) + 1, _high_bit(high)):
+                    if 2 ** i not in values:
+                        missing(2 ** i)
+                        missing.append
+                for i in range(low + 1, high):
+                    if i not in values:
+                        missing(i)
+                        missing.append
+            return
 
 def _test_simple_enum(checked_enum, simple_enum):
     """

@@ -102,10 +102,6 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
-versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-results = {}
-versions
-[]
 passed = <genexpr>(results.items()())
 total = len(results)
 print("""

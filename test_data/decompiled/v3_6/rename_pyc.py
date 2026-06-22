@@ -41,10 +41,6 @@ Done!""")
     for (old, new) in .0:
         print(f"  Removing {os.path.basename(old)}")
         os.remove(old)
-    files_to_rename = <lambda>(files_to_rename)
-    print(f"
-Renaming {len(files_to_rename)} files...")
-    files_to_rename
 ' files to rename'
 len(files_to_rename)
 'Found '

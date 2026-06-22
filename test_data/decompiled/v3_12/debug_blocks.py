@@ -55,11 +55,15 @@ for const in code.co_consts:
         enumerate(instrs)
         for (i, instr) in enumerate(instrs):
             if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-                pass
+                leaders.add(instr.arg)
             elif not instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
                 pass
-            elif instr.arg is None:
+            else:
                 leaders.add(instr.arg)
+                if not i + 1 < len(instrs):
+                    pass
+                else:
+                    leaders.add(instrs[i + 1].offset)
         sorted_leaders = sorted(leaders)
         enumerate(sorted_leaders)
         for (i, start) in enumerate(sorted_leaders):
@@ -69,11 +73,6 @@ for const in code.co_consts:
                 instrs[-1].offset + 2
                 ins
                 instrs
-leaders.add(instr.arg)
-if not i + 1 < len(instrs):
-    pass
-else:
-    leaders.add(instrs[i + 1].offset)
 if len(block_instrs) > 3:
     pass
 else:
@@ -96,6 +95,3 @@ else:
                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
 break
 raise
-# [WARN] 2 instructions not decompiled
-#   @0x0188: POP_JUMP_IF_NOT_NONE arg=2
-#   @0x01F8: POP_JUMP_IF_NONE arg=54

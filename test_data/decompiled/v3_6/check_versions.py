@@ -15,5 +15,3 @@ for filename in os.listdir(pyc_dir):
     elif filename not in version_files:
         version_files[version].append(filename)
         yield from version_files
-print('各版本 pyc 文件分布:')
-sorted(version_files.items())

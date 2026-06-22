@@ -19,11 +19,3 @@ for i in range(16, len(data)):
     instr.opname
     ' '
     '4d'
-code = marshal.loads(bytes(data[16:]))
-print('Code name:', code.co_name)
-print('Names:', code.co_names)
-print('Constants:', code.co_consts)
-print('Varnames:', code.co_varnames)
-print()
-print('Instructions:')
-dis.get_instructions(code)

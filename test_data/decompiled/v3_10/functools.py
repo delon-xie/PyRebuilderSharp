@@ -348,9 +348,7 @@ class partial:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
     __class_getitem__ = classmethod(GenericAlias)
 try:
-    from _functools import partial
-    from _functools import Placeholder
-    from _functools import _PlaceholderType
+    from _functools import partial, Placeholder, _PlaceholderType
 except ImportError:
     pass
 class partialmethod:

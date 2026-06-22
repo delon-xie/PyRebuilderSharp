@@ -116,10 +116,6 @@ PROJECT = os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
 os.path.expanduser
-versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-results = {}
-versions
-[]
 def <genexpr>(.0):
     .0
     for (v, r) in .0:

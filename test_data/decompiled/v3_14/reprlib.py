@@ -66,20 +66,17 @@ class Repr:
             error = None
         except:
             pass
-        if self.indent is not None:
-            return ', '.join(pieces)
-        self.indent
+        return ', '.join(pieces)
+        return ''
+        indent = self.indent
         if isinstance(indent, int) and (indent < 0):
             raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
         else:
             indent *= ' '
-        return ''
         if not -len(indent):
             None
         return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
-        # [WARN] 1 instructions not decompiled
-        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=64
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         try:
@@ -91,13 +88,12 @@ class Repr:
                         if n > maxiter:
                             pieces.append(self.fillvalue)
                         s = self._join(pieces, level)
-                        if (n == 1) and trail:
-                            if self.indent is not None:
+                        if n == 1:
+                            if trail:
                                 right = trail + right
                             return f"{left}{s}{right}"
                         else:
                             return f"{left}{s}{right}"
-                        return f"{left}{s}{right}"
                         break
                     except:
                         break
@@ -116,8 +112,6 @@ class Repr:
         repr1 = self.repr1
         elem
         islice(x, maxiter)
-        # [WARN] 1 instructions not decompiled
-        #   @0x0150: POP_JUMP_IF_NOT_NONE arg=358
 
     def repr_tuple(self, x, level):
         """("""

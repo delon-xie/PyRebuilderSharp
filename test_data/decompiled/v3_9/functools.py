@@ -246,9 +246,7 @@ class partial:
         kwds = {}
     __class_getitem__ = classmethod(GenericAlias)
 try:
-    from _functools import partial
-    from _functools import Placeholder
-    from _functools import _PlaceholderType
+    from _functools import partial, Placeholder, _PlaceholderType
 except ImportError:
     pass
 class partialmethod:
@@ -424,15 +422,13 @@ def _compose_mro(cls, types):
     for typ in found:
         for sub in typ.__subclasses__():
             if sub(issubclass, sub):
-                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+                pass
             for sub in found:
                 for subcls in sub:
                     if subcls not in mro:
                         mro.append(subcls)
         if not found:
             mro.append(typ)
-        found.sort(key=len, reverse=True)
-        found
     return
 
 def _find_impl(cls, registry):

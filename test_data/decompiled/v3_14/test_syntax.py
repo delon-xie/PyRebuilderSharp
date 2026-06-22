@@ -2971,37 +2971,12 @@ class SyntaxErrorTestCase(unittest.TestCase):
                         self.fail('SyntaxError is not a %s' % subclass.__name__)
                         try:
                             mo = re.search(errtext, str(err))
-                            try:
-                                self.fail(f"SyntaxError did not contain {errtext}")
-                                self.assertEqual(err.filename, filename)
-                                try:
-                                    self.assertEqual(err.lineno, lineno)
-                                    try:
-                                        self.assertEqual(err.offset, offset)
-                                        try:
-                                            self.assertEqual(err.end_lineno, end_lineno)
-                                            try:
-                                                self.assertEqual
-                                                try:
-                                                    pass
-                                                except:
-                                                    err = None
-                                                    return None
-                                            except:
-                                                err = None
-                                                return None
-                                        except:
-                                            err = None
-                                            return None
-                                    except:
-                                        err = None
-                                        return None
-                                except:
-                                    err = None
-                                    return None
-                            except:
-                                err = None
-                                return None
+                            self.fail(f"SyntaxError did not contain {errtext}")
+                            self.assertEqual(err.filename, filename)
+                            self.assertEqual(err.lineno, lineno)
+                            self.assertEqual(err.offset, offset)
+                            self.assertEqual(err.end_lineno, end_lineno)
+                            self.assertEqual(err.end_offset, end_offset)
                         except:
                             err = None
                             return None
@@ -3019,12 +2994,6 @@ class SyntaxErrorTestCase(unittest.TestCase):
             return None
         self.fail('compile() did not raise SyntaxError')
         err = None
-        # [WARN] 5 instructions not decompiled
-        #   @0x0112: POP_JUMP_IF_NOT_NONE arg=322
-        #   @0x017C: POP_JUMP_IF_NONE arg=442
-        #   @0x01BC: POP_JUMP_IF_NONE arg=506
-        #   @0x01FC: POP_JUMP_IF_NONE arg=570
-        #   @0x023C: POP_JUMP_IF_NONE arg=646
 
     def test_expression_with_assignment(self):
         """print(end1 + end2 = ' ')"""

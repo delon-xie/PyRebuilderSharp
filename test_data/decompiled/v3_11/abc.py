@@ -1,14 +1,7 @@
 # Decompiled from: <module>
 
 try:
-    from _abc import get_cache_token
-    from _abc import _abc_init
-    from _abc import _abc_register
-    from _abc import _abc_instancecheck
-    from _abc import _abc_subclasscheck
-    from _abc import _get_dump
-    from _abc import _reset_registry
-    from _abc import _reset_caches
+    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
 except:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token

@@ -5,15 +5,11 @@ try:
     for (v, k) in {}:
         try:
             try:
-                {}
                 try:
+                    v
                     try:
-                        v
                         try:
-                            try:
-                                break
-                            except:
-                                break
+                            break
                         except:
                             break
                     except:
