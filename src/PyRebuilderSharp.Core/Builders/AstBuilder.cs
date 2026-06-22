@@ -2368,25 +2368,29 @@ public class AstBuilder
         var tailCode = new List<Stmt>();
 
         List<Stmt>? afterStmts = null;
-        if (afterBranch != null && !visited.Contains(afterBranch))
+        if (afterBranch != null)
         {
-            // 检测是否为 else 子句（非 elif 链）
-            // 条件：after 块的唯一前驱是条件块，且 body 不以终端指令结尾
-            bool isElseClause = false;
-            if (bodyBranch != null)
-            {
-                isElseClause = afterBranch.Predecessors.Count == 1
-                    && afterBranch.Predecessors.Contains(header);
-            }
+            // afterBranch 通过条件跳转到达，可能已被 CFG 误加入 visited（如 RAISE 块的伪后继）。
+            // 重新允许 else 子句检测。
+            if (visited.Contains(afterBranch))
+                visited.Remove(afterBranch);
 
-            if (isElseClause)
+            // 检测是否为 else 子句（非 elif 链）
+            // 条件：after 块的任意前驱是条件块（即通过条件跳转到达），
+            // 且 body 不以非条件跳转结尾
+            bool isElseClause = false;
+            if (bodyBranch != null && afterBranch != null)
             {
-                // 同时检测 body 的最后一条语句是否为终止语句（Return/Raise/Break/Continue）
-                // 若是，则 afterBranch 是顺序代码而非 else 子句
+                // afterBranch 是 else 子句的条件：
+                // (1) body 以终端指令结尾（不能 fallthrough 到 afterBranch）
+                // (2) afterBranch 不含条件跳转指令（不是 elif 链的一部分）
                 bool bodyEndsWithTerminal = bodyStmts.Count > 0
                     && bodyStmts[^1] is Return or Raise or Break or Continue;
-                if (bodyEndsWithTerminal)
-                    isElseClause = false;
+                bool isConditionBlock = afterBranch.Instructions.Any(i =>
+                    i.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                        or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                        or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38);
+                isElseClause = bodyEndsWithTerminal && !isConditionBlock;
             }
 
             if (isElseClause)
