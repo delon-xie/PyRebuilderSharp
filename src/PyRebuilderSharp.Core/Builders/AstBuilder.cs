@@ -1089,6 +1089,8 @@ public class AstBuilder
         return new MatchWildcard();
     }
 
+    // ---- 辅助方法 ----
+    
     /// <summary>
     /// 从内联 bytecode 模式构建 Match AST：COPY+COPY+LOAD_GLOBAL+MATCH_CLASS+POP_JUMP_IF_NONE 链。
     /// 遍历整个 match/case 块链，构建 MatchCase 节点。
@@ -1115,13 +1117,11 @@ public class AstBuilder
 
         var cases = new List<MatchCase>();
         BasicBlock? currentBlock = startBlock;
-        var localVisited = new HashSet<BasicBlock>();
 
-        while (currentBlock != null && !localVisited.Contains(currentBlock)
+        while (currentBlock != null && cases.Count < 12
             && currentBlock.Instructions.Count >= 3
             && currentBlock.Instructions.Any(i => i.Opcode == Opcode.COPY))
         {
-            localVisited.Add(currentBlock);
             _processedBlockIds.Add(currentBlock.Id);
 
             var instrs = currentBlock.Instructions;
@@ -1139,7 +1139,7 @@ public class AstBuilder
 
             // 标记 next case 和 body 为已处理
             if (bodyBlock != null) { visited.Add(bodyBlock); _processedBlockIds.Add(bodyBlock.Id); }
-            if (nextCaseBlock == null || !localVisited.Add(nextCaseBlock))
+            if (nextCaseBlock == null || _processedBlockIds.Contains(nextCaseBlock.Id))
                 nextCaseBlock = null;
 
             // 跳过 POP_TOP 等清理块，直达下一个 COPY 块（下个 case 的起点）
@@ -1150,11 +1150,10 @@ public class AstBuilder
                     && !nextCaseBlock.Instructions.Any(i => i.Opcode == Opcode.COPY))
                 {
                     var next = nextCaseBlock.Successors.First();
-                    if (visited.Contains(next) || localVisited.Contains(next)) break;
-                    visited.Add(next); _processedBlockIds.Add(next.Id);
-                    // 不添加 COPY 块自身到 localVisited — 让外层 while 循环处理它
+                    if (visited.Contains(next) || _processedBlockIds.Contains(next.Id)) break;
+                    visited.Add(next);
                     if (!next.Instructions.Any(i => i.Opcode == Opcode.COPY))
-                        localVisited.Add(next);
+                        _processedBlockIds.Add(next.Id);
                     nextCaseBlock = next;
                 }
             }
