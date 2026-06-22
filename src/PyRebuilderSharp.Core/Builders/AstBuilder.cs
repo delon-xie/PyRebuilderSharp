@@ -865,6 +865,15 @@ public class AstBuilder
         _processedBlockIds.Add(header.Id);
         var iterExpr = ExtractIterExpression(header);
 
+        // 标记迭代表达式的前驱链为已访问，避免其语句作为独立表达式再次输出。
+        // 例如 for scls in cls.__bases__: 中，LOAD_FAST cls; LOAD_ATTR __bases__
+        // 产生 ExprStmt(cls.__bases__) 作为独立语句 —— 应被 for 循环消费。
+        foreach (var pred in header.Predecessors.ToList())
+        {
+            if (pred.Instructions.Any(i => i.Opcode == Opcode.GET_ITER))
+                visited.Add(pred);
+        }
+
         var bodyBlocks = new List<BasicBlock>();
         // FOR_ITER 的后继：[fallthrough body, jump-to-exit]
         // 取第一个后继作为 body（fallthrough），跳过 exit 路径
@@ -1379,21 +1388,23 @@ public class AstBuilder
             new ExceptHandler(exceptType, exceptName, handlerBody, isGroup)
         };
 
+        // 收集 else 体：handler 后继中余下的块（在 ET 范围内）
+        List<Stmt>? elseBody = null;
         foreach (var succ in handlerBlock.Successors)
         {
             if (!visited.Contains(succ) && succ.StartOffset <= matchingEntry.EndOffset)
             {
-                // 同样跳过类/函数定义块
-                bool isDefBlock = succ.Instructions.Any(i =>
-                    i.Opcode == Opcode.MAKE_FUNCTION
-                    || i.Opcode == Opcode.MAKE_CLOSURE
-                    || i.Opcode == Opcode.LOAD_BUILD_CLASS);
-                if (!isDefBlock)
-                    visited.Add(succ);
+                // 这些块是 else 体
+                var elseStmts = BuildStatements(succ, visited);
+                if (elseStmts.Count > 0)
+                {
+                    elseBody ??= new List<Stmt>();
+                    elseBody.AddRange(elseStmts);
+                }
             }
         }
 
-        return new List<Stmt> { new Try(tryBody, handlers) };
+        return new List<Stmt> { new Try(tryBody, handlers, elseBody) };
     }
 
     /// <summary>
