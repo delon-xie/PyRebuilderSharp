@@ -19,6 +19,7 @@ def abstractmethod(funcobj):
     """
     funcobj.__isabstractmethod__ = True
     return funcobj
+
 class abstractclassmethod(classmethod):
     """A decorator indicating abstract classmethods.
 
@@ -38,6 +39,7 @@ class abstractclassmethod(classmethod):
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
+
 class abstractstaticmethod(staticmethod):
     """A decorator indicating abstract staticmethods.
 
@@ -57,6 +59,7 @@ class abstractstaticmethod(staticmethod):
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
+
 class abstractproperty(property):
     """A decorator indicating abstract properties.
 
@@ -113,18 +116,22 @@ class ABCMeta(type):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         _abc_init(cls)
         return cls
+
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
 
             Returns the subclass, to allow usage as a class decorator.
             """
         return _abc_register(cls, subclass)
+
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         return _abc_instancecheck(cls, instance)
+
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         return _abc_subclasscheck(cls, subclass)
+
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
@@ -134,12 +141,15 @@ class ABCMeta(type):
         print(f"_abc_cache: {_abc_cache!r}", file=file)
         print(f"_abc_negative_cache: {_abc_negative_cache!r}", file=file)
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file=file)
+
     def _abc_registry_clear(cls):
         """Clear the registry (for debugging or testing)."""
         _reset_registry(cls)
+
     def _abc_caches_clear(cls):
         """Clear the caches (for debugging or testing)."""
         _reset_caches(cls)
+
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using
     inheritance.

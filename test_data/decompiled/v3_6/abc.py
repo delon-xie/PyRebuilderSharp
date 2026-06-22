@@ -20,6 +20,7 @@ def abstractmethod(funcobj):
     """
     funcobj.__isabstractmethod__ = True
     return funcobj
+
 class abstractclassmethod(classmethod):
     """
     A decorator indicating abstract classmethods.
@@ -40,6 +41,7 @@ class abstractclassmethod(classmethod):
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
+
 class abstractstaticmethod(staticmethod):
     """
     A decorator indicating abstract staticmethods.
@@ -60,6 +62,7 @@ class abstractstaticmethod(staticmethod):
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
+
 class abstractproperty(property):
     """
     A decorator indicating abstract properties.
@@ -89,6 +92,7 @@ class abstractproperty(property):
     instead.
     """
     __isabstractmethod__ = True
+
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).
 
@@ -119,6 +123,7 @@ class ABCMeta(type):
         cls._abc_negative_cache = WeakSet()
         cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         return cls
+
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
 
@@ -128,6 +133,7 @@ class ABCMeta(type):
             raise TypeError('Can only register classes')
         else:
             return subclass
+
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
@@ -141,6 +147,7 @@ class ABCMeta(type):
                     print('%s: %r' % (name, value), file=file)
             return
         None
+
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         subclass = instance.__class__
@@ -148,6 +155,7 @@ class ABCMeta(type):
         subtype = type(instance)
         if subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
             return False
+
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         if subclass in cls._abc_cache:
@@ -158,11 +166,13 @@ class ABCMeta(type):
             if subclass in cls._abc_negative_cache:
                 return False
             return ok
+
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
     pass
+
 def get_cache_token():
     """Returns the current ABC cache token.
 

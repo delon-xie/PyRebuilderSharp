@@ -15,6 +15,7 @@ def test_until_broken(exprs):
     if 'Decompilation failed' in out:
         return 'CRASH'
     return 'NO_COMPILE'
+
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:
         mid = (lo + hi) // 2

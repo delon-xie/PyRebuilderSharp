@@ -2,8 +2,10 @@
 
 def greet(name):
     return f"Hello, {name}!"
+
 def add(a, b):
     return result
+
 def factorial(n):
     if n <= 1:
         return 1

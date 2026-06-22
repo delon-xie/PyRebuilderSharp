@@ -16,6 +16,7 @@ def mixed_1(n):
             while j > 5:
                 pass
     return result
+
 def mixed_2(n):
     total = 0
     range(n)
@@ -32,6 +33,7 @@ def mixed_2(n):
                 while i == j:
                     pass
     return total
+
 def mixed_3(n):
     total = 0
     i = 0
@@ -50,6 +52,7 @@ def mixed_3(n):
                 pass
     k -= 1
     total += 1
+
 def mixed_4(n):
     total = 0
     try:

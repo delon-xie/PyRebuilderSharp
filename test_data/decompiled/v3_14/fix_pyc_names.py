@@ -15,6 +15,7 @@ def get_python_version(filepath):
     open(filepath, 'rb')
     return name_4.get(magic, 'unknown')
     raise
+
 def fix_pyc_names(directory):
     """.pyc"""
     os.listdir(directory)

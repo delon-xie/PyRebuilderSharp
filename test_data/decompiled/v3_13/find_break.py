@@ -30,6 +30,7 @@ def test_until_broken(exprs):
     else:
         return 'OK'
     raise
+
 def find_breaking_point(exprs, lo, hi):
     result = test_until_broken(exprs[None:mid + 1])
     while True:

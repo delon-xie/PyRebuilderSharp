@@ -7,6 +7,7 @@ def get_python_version(filepath):
     with open(filepath, 'rb') as fp:
         magic = fp.read(4)
         return MAGIC_NUMBERS.get(magic, 'unknown')
+
 def fix_pyc_names(directory):
     os.listdir(directory)
     for filename in os.listdir(directory):

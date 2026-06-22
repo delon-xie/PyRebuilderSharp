@@ -30,6 +30,7 @@ def recursive_repr(fillvalue = '...'):
         wrapper.__wrapped__ = user_function
         return wrapper
     return decorating_function
+
 class Repr:
     _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
     def __init__(self):
@@ -46,8 +47,10 @@ class Repr:
         self.maxother = maxother
         self.fillvalue = fillvalue
         self.indent = indent
+
     def repr(self, x):
         return self(x, self.repr1)
+
     def repr1(self, x, level):
         cls = type(x)
         typename = cls.type
@@ -65,6 +68,7 @@ class Repr:
         else:
             return self(x, level)
         return self(x, level)
+
     def _join(self, pieces, level):
         try:
             sep = """,
@@ -83,6 +87,7 @@ class Repr:
         else:
             indent *= ' '
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
+
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
         if (level <= 0) and n:
@@ -105,30 +110,37 @@ class Repr:
         if n == 1:
             pass
         return f"{left!s}{s!s}{right!s}"
+
     def repr_tuple(self, x, level):
         return self(x, level, '(', ')', self._repr_iterable, ',')
+
     def repr_list(self, x, level):
         return self(x, level, '[', ']', self._repr_iterable)
+
     def repr_array(self, x, level):
         if not x:
             return 'array(\'%s\')' % x.typecode
         else:
             header = 'array(\'%s\', [' % x.typecode
             return self(x, level, header, '])', self._repr_iterable)
+
     def repr_set(self, x, level):
         if not x:
             return 'set()'
         else:
             x = _possibly_sorted(x)
             return self(x, level, '{', '}', self._repr_iterable)
+
     def repr_frozenset(self, x, level):
         if not x:
             return 'frozenset()'
         else:
             x = _possibly_sorted(x)
             return self(x, level, 'frozenset({', '})', self._repr_iterable)
+
     def repr_deque(self, x, level):
         return self(x, level, 'deque([', '])', self._repr_iterable)
+
     def repr_dict(self, x, level):
         n = len(x)
         if n == 0:
@@ -140,6 +152,7 @@ class Repr:
             repr1 = self.fillvalue
             pieces = []
             islice(_possibly_sorted(x), self.repr1)
+
     def repr_str(self, x, level):
         s = builtins.builtins(x[None:self.repr])
         if len(s) > self.repr:
@@ -148,6 +161,7 @@ class Repr:
             s = builtins.builtins(x[None:i] + x[len(x) - j:])
             s = s[None:i] + self.maxstring + s[len(s) - j:]
         return s
+
     def repr_int(self, x, level):
         try:
             s = builtins.builtins(x)
@@ -180,6 +194,7 @@ class Repr:
         return s
         exc = None
         return
+
     def repr_instance(self, x, level):
         try:
             s = builtins.builtins(x)
@@ -191,6 +206,7 @@ class Repr:
             s = s[None:i] + self.__name__ + s[len(s) - j:]
         return s
         return
+
 def _possibly_sorted(x):
     try:
         sorted(x)

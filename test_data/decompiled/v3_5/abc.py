@@ -20,6 +20,7 @@ def abstractmethod(funcobj):
     """
     funcobj.__isabstractmethod__ = True
     return funcobj
+
 class abstractclassmethod(classmethod):
     """
     A decorator indicating abstract classmethods.
@@ -38,6 +39,7 @@ class abstractclassmethod(classmethod):
     """
     __isabstractmethod__ = True
     __init__ = 'abstractclassmethod.__init__'
+
 class abstractstaticmethod(staticmethod):
     """
     A decorator indicating abstract staticmethods.
@@ -56,6 +58,7 @@ class abstractstaticmethod(staticmethod):
     """
     __isabstractmethod__ = True
     __init__ = 'abstractstaticmethod.__init__'
+
 class abstractproperty(property):
     """
     A decorator indicating abstract properties.
@@ -85,6 +88,7 @@ class abstractproperty(property):
     instead.
     """
     __isabstractmethod__ = True
+
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).
 
@@ -116,12 +120,14 @@ class ABCMeta(type):
             cls._abc_registry.add(subclass)
             ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
             return subclass
+
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
             pass
         value = getattr(cls, name)
+
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         subclass = instance.__class__
@@ -131,6 +137,7 @@ class ABCMeta(type):
             return False
         else:
             return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'({subclass, subtype}))
+
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         if subclass in cls._abc_cache:
@@ -155,6 +162,7 @@ class ABCMeta(type):
                 return True
             else:
                 cls._abc_registry
+
 def get_cache_token():
     """Returns the current ABC cache token.
 

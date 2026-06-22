@@ -21,6 +21,7 @@ def depth_5_if(x0, x1, x2, x3, x4):
     result = 30
     result = 20
     result = 10
+
 def depth_5_for():
     total = 0
     range(2)
@@ -30,6 +31,7 @@ def depth_5_for():
                 for d in range(2):
                     for e in range(2):
                         total += 1
+
 def depth_5_while():
     b -= 1
     c = 2
@@ -68,6 +70,7 @@ def depth_5_while():
     e = 2
     e -= 1
     total += 1
+
 def depth_5_try():
     try:
         result = 42

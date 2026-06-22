@@ -14,6 +14,7 @@ def recursive_repr(fillvalue):
         wrapper.__module__ = (set(), user_function)(getattr, '__module__')
         return wrapper
     return decorating_function
+
 class Repr:
     _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
     def __init__(self):
@@ -30,8 +31,10 @@ class Repr:
         self.maxother = maxother
         self.fillvalue = fillvalue
         self.indent = indent
+
     def repr(self, x):
         return self.repr1(x, self.maxlevel)
+
     def repr1(self, x, level):
         method = getattr(self, 'repr_' + typename, None)
         cls = type(x)
@@ -40,32 +43,41 @@ class Repr:
             parts = typename.split()
             typename = '_'.join(parts)
         module = getattr(cls, '__module__', None)
+
     def _join(self, pieces, level):
         indent = self.indent
         if self.indent is None:
             return ', '.join(pieces)
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
+
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
         s = self._join(pieces, level)
+
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
+
     def repr_list(self, x, level):
         return self._repr_iterable(x, level, '[', ']', self.maxlist)
+
     def repr_array(self, x, level):
         if not x:
             return 'array(\'%s\')' % x.typecode
+
     def repr_set(self, x, level):
         if not x:
             return 'set()'
+
     def repr_frozenset(self, x, level):
         if not x:
             return 'frozenset()'
+
     def repr_deque(self, x, level):
         return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
+
     def repr_dict(self, x, level):
         n = len(x)
         if n == 0:
@@ -73,6 +85,7 @@ class Repr:
         keyrepr = repr1(key, newlevel)
         valrepr = repr1(x[key], newlevel)
         pieces.append('%s: %s' % (keyrepr, valrepr))
+
     def repr_str(self, x, level):
         s = builtins.repr(x[None:self.maxstring])
         if len(s) > self.maxstring:
@@ -80,6 +93,7 @@ class Repr:
             j = max(0, self.maxstring - 3 - i)
             s = builtins.repr(x[None:i] + x[len(x) - j:])
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
+
     def repr_int(self, x, level):
         try:
             s = builtins.repr(x)
@@ -89,6 +103,7 @@ class Repr:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
+
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
@@ -98,6 +113,7 @@ class Repr:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
             s = s[None:i] + self.fillvalue + s[len(s) - j:]
+
 def _possibly_sorted(x):
     try:
         pass

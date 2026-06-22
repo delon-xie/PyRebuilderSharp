@@ -6,6 +6,7 @@ async def test_async():
         asyncio.sleep(1)()
     except:
         pass
+
 async def worker():
     try:
         test_async()()

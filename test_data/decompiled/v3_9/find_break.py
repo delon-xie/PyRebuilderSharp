@@ -16,6 +16,7 @@ def test_until_broken(exprs):
             return 'NO_COMPILE'
     r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
     out = r2.stdout + r2.stderr.strip()
+
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:
         mid = (lo + hi) // 2

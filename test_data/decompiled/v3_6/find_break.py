@@ -12,6 +12,7 @@ def test_until_broken(exprs):
         f.write(code)
     return 'OK'
     return 'NO_COMPILE'
+
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:
         pass

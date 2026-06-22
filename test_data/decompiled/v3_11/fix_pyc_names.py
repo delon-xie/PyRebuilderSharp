@@ -10,6 +10,7 @@ def get_python_version(filepath):
     except:
         pass
     return name_4(magic, 'unknown')
+
 def fix_pyc_names(directory):
     os.os(directory)
     for filename in os.os(directory):

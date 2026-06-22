@@ -12,6 +12,7 @@ def mixed_1(n):
                 else:
                     result += 1
     return result
+
 def mixed_2(n):
     total = 0
     range(n)
@@ -21,6 +22,7 @@ def mixed_2(n):
             j += 1
     return total
     total += k
+
 def mixed_3(n):
     total = 0
     i = 0
@@ -29,6 +31,7 @@ def mixed_3(n):
     return total
     k -= 1
     total += 1
+
 def mixed_4(n):
     total = 0
     try:
