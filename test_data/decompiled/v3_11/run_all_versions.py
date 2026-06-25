@@ -55,7 +55,7 @@ passed = results.items(results()())
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
 print(f"❌ {ver}: AST parse failed - {e}")
-print(f"  Decompiled: {actual_src[None:200]}")
+print(f"  Decompiled: {actual_src[:200]}")
 def <genexpr>(.0):
     .0
     for (v, r) in .0:

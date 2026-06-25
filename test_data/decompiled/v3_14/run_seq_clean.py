@@ -4,11 +4,6 @@ try:
     expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 except Exception:
     pass
-try:
-    actual_ast = ast.dump(ast.parse(actual_src), indent=2)
-    match = expected_ast == actual_ast
-except Exception:
-    pass
 """Run AST comparison for test_seq_clean across all versions"""
 import os
 import subprocess
@@ -33,27 +28,41 @@ for ver in versions:
     else:
         r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
         actual_src = r.stdout
+        actual_ast = ast.dump(ast.parse(actual_src), indent=2)
+        match = expected_ast == actual_ast
+        if match:
+            pass
+        else:
+            '❌'
+            if match:
+                pass
+            else:
+                'MISMATCH'
+                break
+                if not match:
+                    pass
 passed = <genexpr>(results.items()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-if not True:
-    pass
-else:
-    print('  Line %d: expected=%s' % (i, e))
-    print('           actual=  %s' % a)
-    break
-print('Failed to parse expected source:', e)
-sys.exit(1)
-def <genexpr>(.0):
-    .0
-    for (r, v) in .0:
-        r
-        if not True:
+exp_lines = expected_ast.split("""
+""")
+act_lines = actual_ast.split("""
+""")
+range(max(len(exp_lines), len(act_lines)))
+for i in range(max(len(exp_lines), len(act_lines))):
+    if i < len(exp_lines):
+        pass
+    else:
+        '(missing)'
+        if i < len(act_lines):
             pass
         else:
-            1
-[]
-print(f"❌ {ver}: AST parse failed - {e}")
-print('  Decompiled: %s' % actual_src[:200])
-e = None
+            '(missing)'
+            e != a
+            if not True:
+                pass
+            else:
+                print('  Line %d: expected=%s' % (i, e))
+                print('           actual=  %s' % a)
+                break

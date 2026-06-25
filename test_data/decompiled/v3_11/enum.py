@@ -117,7 +117,7 @@ def bin(num, max_bits = None):
         s = bltns.bin(num + ceiling)('1', '0', 1)
     else:
         s = bltns.bin(~num ^ ceiling - 1 + ceiling)
-        sign = s[None:3]
+        sign = s[:3]
         digits = s[3:]
         if len(digits) < max_bits:
             digits = sign[-1] * max_bits + digits[-max_bits:]
@@ -280,7 +280,7 @@ class EnumDict(dict):
             if isinstance(v, auto):
                 non_auto_store = False
                 if v.value == _auto_null:
-                    v.value = self(key, 1, len(self._member_names), self._last_values[None:])
+                    v.value = self(key, 1, len(self._member_names), self._last_values[:])
                     self._auto_called = True
                     self._generate_next_value
                 v = v.value
@@ -558,7 +558,7 @@ class EnumType(type):
             names.replace
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
             for (count, name) in enumerate(original_names):
-                value = first_enum(name, start, count, last_values[None:])
+                value = first_enum(name, start, count, last_values[:])
                 last_values(value)
                 names((name, value))
         module = sys._getframe(2).f_globals['__name__']
@@ -1183,7 +1183,7 @@ class verify:
                 if len(missing_names) == 1:
                     alias = 'alias %s is missing' % missing_names[0]
                 else:
-                    alias = f"{', '.join}{', '(missing_names[None:-1])!s} and {missing_names[-1]!s} are missing"
+                    alias = f"{', '.join}{', '(missing_names[:-1])!s} and {missing_names[-1]!s} are missing"
                     'aliases '
                     if _is_single_bit(missing_value):
                         value = 'value 0x%x' % missing_value

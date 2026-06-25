@@ -1,5 +1,16 @@
 # Decompiled from: <module>
 
+import re
+from collections import defaultdict
+f = open('/tmp/test_full.txt', 'r')
+output = f.read()
+@defaultdict
+def version_stats():
+    return {'failed': 0, 'passed': 0, 'total': 0}
+lines = output.split("""
+""")
+i = 0
+debug_count = 0
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 while i < len(lines):

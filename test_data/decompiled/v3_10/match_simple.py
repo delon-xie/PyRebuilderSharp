@@ -10,11 +10,7 @@ def test_match(x):
         return 'other'
 
 def test_match_with_guard(x):
-    if [] and (len(s) > 5):
-        return 'long string'
-    elif []:
-        return 'short string'
-    elif []:
+    if [] and (len(s) > 5) and [] and []:
         return 'integer'
     else:
         return 'unknown'

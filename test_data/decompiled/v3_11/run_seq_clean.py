@@ -62,5 +62,5 @@ def <genexpr>(.0):
         None
     return
 print(f"❌ {ver!s}: AST parse failed - {e!s}")
-print('  Decompiled: %s' % actual_src[None:200])
+print('  Decompiled: %s' % actual_src[:200])
 e = None

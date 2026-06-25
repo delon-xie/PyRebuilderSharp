@@ -41,5 +41,5 @@ for ver in versions:
                             break
 return
 print(f"❌ {ver!s}: parse error: {ex!s}")
-print('  Output: %s' % r.stdout[None:200])
+print('  Output: %s' % r.stdout[:200])
 ex = None

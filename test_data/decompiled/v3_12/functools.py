@@ -4,18 +4,6 @@ try:
     from _functools import cmp_to_key
 except ImportError:
     pass
-try:
-    from _functools import reduce
-except ImportError:
-    pass
-try:
-    from _functools import partial, Placeholder, _PlaceholderType
-except ImportError:
-    pass
-try:
-    from _functools import _lru_cache_wrapper
-except ImportError:
-    pass
 """functools.py - Tools for working with functions and callable objects
 """
 __all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
@@ -213,6 +201,8 @@ def reduce(function, sequence, initial = _initial_missing):
             value = function(value, element)
         return value
 
+from _functools import reduce
+
 class _PlaceholderType:
     """The type of the Placeholder singleton.
 
@@ -284,8 +274,7 @@ class partial:
     def __call__(self):
         try:
             pto_args = self._merger(self.args + args)
-            args = phcount // None
-            args
+            args = args[phcount:]
         except IndexError:
             pass
         phcount = self._phcount
@@ -312,6 +301,8 @@ class partial:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
     __class_getitem__ = classmethod(GenericAlias)
 
+from _functools import partial, Placeholder, _PlaceholderType
+
 class partialmethod:
     """Method descriptor with partial application of the given arguments
     and keywords.
@@ -325,8 +316,7 @@ class partialmethod:
         def _method(cls_or_self):
             try:
                 pto_args = self._merger(self.args + args)
-                args = phcount // None
-                args
+                args = args[phcount:]
             except IndexError:
                 pass
             phcount = self._phcount
@@ -505,6 +495,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         wrapper.cache_clear = cache_clear
         return wrapper
 
+from _functools import _lru_cache_wrapper
+
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
     return lru_cache(maxsize=None)(user_function)
@@ -526,7 +518,7 @@ def _c3_merge(sequences):
             sequences
         for s1 in sequences:
             for s2 in sequences:
-                if not s2 in 1 // None:
+                if not candidate in s2[1:]:
                     pass
                 else:
                     candidate = None
@@ -565,12 +557,10 @@ def _c3_mro(cls, abcs = None):
                 pass
             else:
                 []
-                explicit_bases = cls.__bases__(None // boundary)
+                explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
-                other_bases = cls.__bases__(boundary // None)
+                other_bases = list(cls.__bases__[boundary:])
                 abcs
-                list
-                list
                 for base in abcs:
                     if not issubclass(cls, base):
                         pass
@@ -751,21 +741,12 @@ class singledispatchmethod:
             name = self.func.__qualname__
         except AttributeError:
             pass
-        try:
-            name = self.func.__name__
-        except AttributeError:
-            name = '?'
         return f"<single dispatch method descriptor {name}>"
-        raise
 
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
             self.__module__ = func.__module__
-        except AttributeError:
-            pass
-        try:
-            self.__doc__ = func.__doc__
         except AttributeError:
             pass
         self._unbound = unbound
@@ -777,19 +758,14 @@ class _singledispatchmethod_get:
             pass
         else:
             0
-        raise
+        self.__doc__ = func.__doc__
 
     def __repr__(self):
         try:
             name = self.__qualname__
         except AttributeError:
             return f"<single dispatch method {name}>"
-        try:
-            name = self.__name__
-        except AttributeError:
-            name = '?'
         return f"<bound single dispatch method {name} of {self._obj!r}>"
-        raise
 
     def __call__(self):
         if not args:
@@ -804,7 +780,7 @@ class _singledispatchmethod_get:
             if isinstance(method, MethodType):
                 skip_bound_arg = self._dispatch_arg_index == 1
             elif skip_bound_arg:
-                return args(**kwargs)
+                return method(**kwargs)
             else:
                 return method(**kwargs)
         return method(**kwargs)
@@ -842,10 +818,4 @@ class cached_property:
         else:
             return val
         return val
-        msg = f"The '__dict__' attribute on {type(instance).__name__!r} instance does not support item assignment for caching {self.attrname!r} property."
-        raise TypeError(msg) from None
-        raise
     __class_getitem__ = classmethod(GenericAlias)
-raise
-raise
-raise

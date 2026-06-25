@@ -23,20 +23,20 @@ def test_until_broken(exprs):
     if 'Decompilation failed' in out:
         return 'CRASH'
     elif 'if ' in out:
-        return f"CONDITIONAL: {out[None:80]}"
+        return f"CONDITIONAL: {out[:80]}"
     else:
         return 'OK'
 
 def find_breaking_point(exprs, lo, hi):
-    result = test_until_broken(exprs[None:mid + 1])
+    result = test_until_broken(exprs[:mid + 1])
     while True:
-        result = test_until_broken(exprs[None:mid + 1])
+        result = test_until_broken(exprs[:mid + 1])
         if result != 'OK':
             hi = mid
         else:
             lo = mid + 1
     return lo
-base = all_exprs[None:6]
+base = all_exprs[:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
 if r == 'OK':
@@ -45,9 +45,9 @@ if r == 'OK':
 Breaking expression: #{bp}: {all_exprs[bp]}")
     print(f"
 Verification - up to #{bp}:")
-    r = test_until_broken(all_exprs[None:bp + 1])
+    r = test_until_broken(all_exprs[:bp + 1])
     print(f"  {r}")
     print(f"
 Verification - just #{bp}:")
-    r = test_until_broken(all_exprs[None:bp])
+    r = test_until_broken(all_exprs[:bp])
     print(f"  {r}")

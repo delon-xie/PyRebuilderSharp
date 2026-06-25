@@ -1,0 +1,17 @@
+json
+    {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Debug abc.3.12.pyc",
+                "type": "coreclr",
+                "request": "launch",
+                "preLaunchTask": "build",
+                "program": "${workspaceFolder}/src/PyRebuilderSharp.Cli/bin/Debug/net10.0/PyRebuilderSharp.Cli.dll",
+                "args": ["test_data/compiled/process_data_file.3.6.pyc"],
+                "cwd": "${workspaceFolder}",
+                "console": "internalConsole",
+                "stopAtEntry": false
+            }
+        ]
+    }

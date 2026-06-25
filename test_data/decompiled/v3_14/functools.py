@@ -4,18 +4,6 @@ try:
     from _functools import cmp_to_key
 except ImportError:
     pass
-try:
-    from _functools import reduce
-except ImportError:
-    pass
-try:
-    from _functools import partial, Placeholder, _PlaceholderType
-except ImportError:
-    pass
-try:
-    from _functools import _lru_cache_wrapper
-except ImportError:
-    pass
 """functools.py - Tools for working with functions and callable objects
 """
 __all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
@@ -234,6 +222,8 @@ def reduce(function, sequence, initial = _initial_missing):
             value = function(value, element)
         return value
 
+from _functools import reduce
+
 class _PlaceholderType:
     """The type of the Placeholder singleton.
 
@@ -376,6 +366,8 @@ class partial:
         else:
             raise TypeError('invalid partial state')
     __class_getitem__ = classmethod(GenericAlias)
+
+from _functools import partial, Placeholder, _PlaceholderType
 
 class partialmethod:
     """Method descriptor with partial application of the given arguments
@@ -568,6 +560,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         wrapper.cache_clear = cache_clear
         return wrapper
 
+from _functools import _lru_cache_wrapper
+
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
     return lru_cache(maxsize=None)(user_function)
@@ -628,7 +622,7 @@ def _c3_mro(cls, abcs = None):
                 pass
             else:
                 []
-                explicit_bases = list(cls.__bases__[None:boundary])
+                explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
                 abcs
@@ -818,21 +812,12 @@ class singledispatchmethod:
             name = self.func.__qualname__
         except AttributeError:
             pass
-        try:
-            name = self.func.__name__
-        except AttributeError:
-            name = '?'
         return f"<single dispatch method descriptor {name}>"
-        raise
 
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
         try:
             self.__module__ = func.__module__
-        except AttributeError:
-            pass
-        try:
-            self.__doc__ = func.__doc__
         except AttributeError:
             pass
         self._unbound = unbound
@@ -844,7 +829,7 @@ class _singledispatchmethod_get:
             pass
         else:
             0
-        raise
+        self.__doc__ = func.__doc__
 
     def __repr__(self):
         """?"""
@@ -852,12 +837,7 @@ class _singledispatchmethod_get:
             name = self.__qualname__
         except AttributeError:
             return f"<single dispatch method {name}>"
-        try:
-            name = self.__name__
-        except AttributeError:
-            name = '?'
         return f"<bound single dispatch method {name} of {self._obj}>"
-        raise
 
     def __call__(self):
         """__name__"""
@@ -910,10 +890,4 @@ class cached_property:
         else:
             return val
         return val
-        msg = f"The '__dict__' attribute on {type(instance).__name__} instance does not support item assignment for caching {self.attrname} property."
-        raise TypeError(msg) from None
-        raise
     __class_getitem__ = classmethod(GenericAlias)
-raise
-raise
-raise

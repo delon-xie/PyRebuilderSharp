@@ -43,6 +43,7 @@ public class VersionStrategy312 : VersionStrategyBase
             12 => Models.Bytecode.Opcode.UNARY_NOT,
             15 => Models.Bytecode.Opcode.UNARY_INVERT,
             25 => Models.Bytecode.Opcode.BINARY_SUBSCR,
+            26 => Models.Bytecode.Opcode.BINARY_SLICE_313,
             60 => Models.Bytecode.Opcode.STORE_SUBSCR,
             68 => Models.Bytecode.Opcode.GET_ITER,
             69 => Models.Bytecode.Opcode.GET_YIELD_FROM_ITER,

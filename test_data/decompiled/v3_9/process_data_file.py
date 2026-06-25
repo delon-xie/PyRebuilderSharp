@@ -1,5 +1,54 @@
 # Decompiled from: <module>
 
+def process_data_file(filename):
+    """
+    读取文件中的数字，计算平均值。
+    演示嵌套的 try-except-else-finally 用法。
+    """
+    data = None
+    try:
+        try:
+            try:
+                try:
+                    print('[内层] 开始读取数据...')
+                    lines = file.readlines()
+                    numbers = []
+                except:
+                    pass
+            except:
+                PermissionError
+                print(f"[外层 except] 没有权限读取文件: {filename}")
+        except:
+            pass
+        for line in lines:
+            line = line.strip()
+            if not line:
+                pass
+            try:
+                try:
+                    num = int(line)
+                    numbers.append(num)
+                except:
+                    print(f"[最内层 finally] 行处理完毕: '{line}'")
+                print(f"[最内层 else] 成功解析数字: {num}")
+            finally:
+                pass
+    finally:
+        return None
+    ve = None
+    print('[内层 else] 数据处理顺利完成，即将返回结果')
+    print('[内层 finally] 关闭文件')
+    file.close()
+print('==================================================')
+print('测试1: 正常文件')
+print('==================================================')
+f = open('test_numbers.txt', 'w')
+f.write("""10
+20
+abc
+30
+40
+""")
 with open('test_numbers.txt', 'w') as f:
     f.write("""10
 20

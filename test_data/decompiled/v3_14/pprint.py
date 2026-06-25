@@ -74,7 +74,6 @@ class _safe_key:
         except TypeError:
             (str(type(self.obj)), id(self.obj)) < (str(type(other.obj)), id(other.obj))
         return
-        return
 
 def _safe_tuple(t):
     """Helper function for comparing 2-tuples"""
@@ -292,6 +291,373 @@ class PrettyPrinter:
     {}
     for _ in {}:
         pass
+    def _pprint_list(self, object, stream, indent, allowance, context, level):
+        """["""
+        stream.write(self._format_block_start('[', indent))
+        self._format_items(object, stream, indent, allowance + 1, context, level)
+        stream.write(self._format_block_end(']', indent))
+
+    def _pprint_tuple(self, object, stream, indent, allowance, context, level):
+        """("""
+        stream.write(self._format_block_start('(', indent))
+        if (len(object) == 1) and not self._expand:
+            endchar = ',)'
+        endchar = ')'
+        self._format_items(object, stream, indent, allowance + len(endchar), context, level)
+        stream.write(self._format_block_end(endchar, indent))
+        endchar = ')'
+
+    def _pprint_set(self, object, stream, indent, allowance, context, level):
+        if not len(object):
+            stream.write(repr(object))
+            return None
+        typ = object.__class__
+        if typ is set:
+            stream.write(self._format_block_start('{', indent))
+            endchar = '}'
+        else:
+            stream.write(self._format_block_start(typ.__name__ + '({', indent))
+            endchar = '})'
+            if not self._expand:
+                indent += len(typ.__name__) + 1
+            object = sorted(object, key=_safe_key)
+            self._format_items(object, stream, indent, allowance + len(endchar), context, level)
+            stream.write(self._format_block_end(endchar, indent))
+
+    def _pprint_str(self, object, stream, indent, allowance, context, level):
+        write = stream.write
+        if not len(object):
+            write(repr(object))
+            return None
+        chunks = []
+        lines = object.splitlines(True)
+        if (level == 1) and self._expand:
+            indent += self._indent_per_level
+        else:
+            indent += 1
+            allowance += 1
+            enumerate(lines)
+            self._width - indent
+            self._width - indent
+            for (line, i) in enumerate(lines):
+                rep = repr(line)
+                if i == len(lines) - 1:
+                    max_width1 -= allowance
+                elif len(rep) <= max_width1:
+                    chunks.append(rep)
+                else:
+                    import re
+                    parts = re.findall('\\S*\\s*', line)
+                    if not parts:
+                        raise None
+                    elif parts[-1]:
+                        raise None
+                    else:
+                        parts.pop()
+                        max_width2 = max_width
+                        current = ''
+                        enumerate(parts)
+            if len(chunks) == 1:
+                write(rep)
+                return None
+            elif level == 1:
+                write(self._format_block_start('(', indent))
+        enumerate(lines)
+        self._width - indent
+        self._width - indent
+
+    def _pprint_bytes(self, object, stream, indent, allowance, context, level):
+        write = stream.write
+        if len(object) <= 4:
+            write(repr(object))
+            return None
+        parens = level == 1
+        if parens and self._expand:
+            indent += self._indent_per_level
+        else:
+            indent += 1
+            allowance += 1
+            write(self._format_block_start('(', indent))
+            delim = ''
+            _wrap_bytes_repr(object, self._width - indent, allowance)
+            for rep in _wrap_bytes_repr(object, self._width - indent, allowance):
+                write(delim)
+                write(rep)
+                if delim:
+                    pass
+                else:
+                    delim = """
+""" + ' ' * indent
+            if parens:
+                write(self._format_block_end(')', indent - self._indent_per_level))
+                return None
+        delim = ''
+        _wrap_bytes_repr(object, self._width - indent, allowance)
+
+    def _pprint_bytearray(self, object, stream, indent, allowance, context, level):
+        """bytearray("""
+        write = stream.write
+        write(self._format_block_start('bytearray(', indent))
+        if self._expand:
+            write(' ' * self._indent_per_level)
+            recursive_indent = indent + self._indent_per_level
+        else:
+            recursive_indent = indent + 10
+            self._pprint_bytes(bytes(object), stream, recursive_indent, allowance + 1, context, level + 1)
+            write(self._format_block_end(')', indent))
+
+    def _pprint_mappingproxy(self, object, stream, indent, allowance, context, level):
+        """mappingproxy("""
+        stream.write('mappingproxy(')
+        self._format(object.copy(), stream, self._child_indent(indent, 13), allowance + 1, context, level)
+        stream.write(')')
+
+    def _pprint_simplenamespace(self, object, stream, indent, allowance, context, level):
+        """namespace"""
+        if type(object) is _types.SimpleNamespace:
+            cls_name = 'namespace'
+        else:
+            cls_name = object.__class__.__name__
+            if self._expand:
+                indent += self._indent_per_level
+            else:
+                indent += len(cls_name) + 1
+                items = object.__dict__.items()
+                stream.write(self._format_block_start(cls_name + '(', indent))
+                self._format_namespace_items(items, stream, indent, allowance, context, level)
+                stream.write(self._format_block_end(')', indent - self._indent_per_level))
+
+    def _format_dict_items(self, items, stream, indent, allowance, context, level):
+        """,
+"""
+        write = stream.write
+        indent += self._indent_per_level
+        delimnl = """,
+""" + ' ' * indent
+        last_index = len(items) - 1
+        enumerate(items)
+        for i in enumerate(items):
+            last = i == last_index
+            rep = self._repr(key, context, level)
+            write(rep)
+            write(': ')
+            if last:
+                pass
+            else:
+                1
+                break
+                if not last:
+                    write(delimnl)
+                elif not self._expand:
+                    pass
+                else:
+                    write(',')
+
+    def _format_namespace_items(self, items, stream, indent, allowance, context, level):
+        """,
+"""
+        write = stream.write
+        delimnl = """,
+""" + ' ' * indent
+        last_index = len(items) - 1
+        enumerate(items)
+        for i in enumerate(items):
+            last = i == last_index
+            write(key)
+            write('=')
+            if id(ent) in context:
+                write('...')
+            elif last:
+                pass
+            else:
+                1
+                break
+                if not last:
+                    write(delimnl)
+                elif not self._expand:
+                    pass
+                else:
+                    write(',')
+
+    def _format_items(self, items, stream, indent, allowance, context, level):
+        """,
+"""
+        try:
+            next_ent = next(it)
+        except StopIteration:
+            pass
+        write = stream.write
+        indent += self._indent_per_level
+        self._write_indent_padding(write)
+        delimnl = """,
+""" + ' ' * indent
+        delim = ''
+        it := iter(items)
+        self._width - indent + 1
+        self._width - indent + 1
+        last = False
+        while last:
+            ent = next_ent
+            next_ent = next(it)
+            if self._compact:
+                w = len(rep) + 2
+                if width < w:
+                    width = max_width
+                    if delim:
+                        delim = delimnl
+                    elif width >= w:
+                        width -= w
+                        write(delim)
+                        delim = ', '
+                        write(rep)
+                elif width >= w:
+                    pass
+            write(delim)
+            delim = delimnl
+            if last:
+                pass
+            else:
+                1
+
+    def _repr(self, object, context, level):
+        if not readable:
+            self._readable = False
+        elif recursive:
+            self._recursive = True
+
+    def format(self, object, context, maxlevels, level):
+        """Format object for a specific context, returning a string
+    and flags indicating whether the representation is 'readable'
+    and whether the object represents a recursive construct.
+"""
+        return self._safe_repr(object, context, maxlevels, level)
+
+    def _pprint_default_dict(self, object, stream, indent, allowance, context, level):
+        if not len(object):
+            stream.write(repr(object))
+            return None
+        rdf = self._repr(object.default_factory, context, level)
+        cls = object.__class__
+        if self._expand:
+            stream.write(f"{cls.__name__}({rdf}, ")
+        else:
+            indent += len(cls.__name__) + 1
+            stream.write(f"{cls.__name__}({rdf},
+{' ' * indent}")
+            self._pprint_dict(object, stream, indent, allowance + 1, context, level)
+            stream.write(')')
+
+    def _pprint_counter(self, object, stream, indent, allowance, context, level):
+        if not len(object):
+            stream.write(repr(object))
+        else:
+            cls = object.__class__
+            stream.write(self._format_block_start(cls.__name__ + '({', indent))
+            self._write_indent_padding(stream.write)
+            items = object.most_common()
+            self._format_dict_items(items, stream, self._child_indent(indent, len(cls.__name__) + 1), allowance + 2, context, level)
+            stream.write(self._format_block_end('})', indent))
+
+    def _pprint_chain_map(self, object, stream, indent, allowance, context, level):
+        if not len(object.maps):
+            stream.write(repr(object))
+            return None
+        cls = object.__class__
+        stream.write(self._format_block_start(cls.__name__ + '(', indent + self._indent_per_level))
+        if self._expand:
+            indent += self._indent_per_level
+        else:
+            indent += len(cls.__name__) + 1
+            enumerate(object.maps)
+            for (m, i) in enumerate(object.maps):
+                if i == len(object.maps) - 1:
+                    self._format(m, stream, indent, allowance + 1, context, level)
+                    if self._expand:
+                        stream.write(',')
+                    stream.write(self._format_block_end(')', indent - self._indent_per_level))
+                else:
+                    self._format(m, stream, indent, 1, context, level)
+                    stream.write(""",
+""" + ' ' * indent)
+
+    def _pprint_deque(self, object, stream, indent, allowance, context, level):
+        if not len(object):
+            stream.write(repr(object))
+            return None
+        cls = object.__class__
+        stream.write(self._format_block_start(cls.__name__ + '([', indent))
+        if not self._expand:
+            indent += len(cls.__name__) + 1
+        self._format_items(object, stream, indent, allowance + 2, context, level)
+        stream.write(self._format_block_end('])', indent))
+
+    def _pprint_user_dict(self, object, stream, indent, allowance, context, level):
+        self._format(object.data, stream, indent, allowance, context, level - 1)
+
+    def _pprint_user_list(self, object, stream, indent, allowance, context, level):
+        self._format(object.data, stream, indent, allowance, context, level - 1)
+
+    def _pprint_user_string(self, object, stream, indent, allowance, context, level):
+        self._format(object.data, stream, indent, allowance, context, level - 1)
+
+    def _pprint_template(self, object, stream, indent, allowance, context, level):
+        cls_name = object.__class__.__name__
+        if self._expand:
+            indent += self._indent_per_level
+        else:
+            indent += len(cls_name) + 1
+            items = (('strings', object.strings), ('interpolations', object.interpolations))
+            stream.write(self._format_block_start(cls_name + '(', indent))
+            self._format_namespace_items(items, stream, indent, allowance, context, level)
+            stream.write(self._format_block_end(')', indent - self._indent_per_level))
+
+    def _pprint_interpolation(self, object, stream, indent, allowance, context, level):
+        """value"""
+        cls_name = object.__class__.__name__
+        if self._expand:
+            indent += self._indent_per_level
+            items = (('value', object.value), ('expression', object.expression), ('conversion', object.conversion), ('format_spec', object.format_spec))
+            stream.write(self._format_block_start(cls_name + '(', indent))
+            self._format_namespace_items(items, stream, indent, allowance, context, level)
+            stream.write(self._format_block_end(')', indent - self._indent_per_level))
+        else:
+            indent += len(cls_name)
+            items = (object.value, object.expression, object.conversion, object.format_spec)
+            stream.write(cls_name + '(')
+            self._format_items(items, stream, indent, allowance, context, level)
+            stream.write(')')
+    t = ('<f-string>')
+    def _safe_repr(self, object, context, maxlevels, level):
+        typ = type(object)
+        if typ in _builtin_scalars:
+            return (repr(object), True, False)
+        r = getattr(typ, '__repr__', None)
+        if issubclass(typ, int):
+            if r is int.__repr__:
+                if self._underscore_numbers:
+                    return ('_d', True, False)
+                else:
+                    return (repr(object), True, False)
+            elif issubclass(typ, dict):
+                pass
+            elif issubclass(typ, frozendict):
+                pass
+            elif issubclass(typ, list):
+                pass
+            elif issubclass(typ, tuple):
+                pass
+            elif issubclass(typ, _collections.abc.MappingView):
+                pass
+        elif issubclass(typ, dict):
+            pass
+        elif issubclass(typ, frozendict):
+            pass
+        elif issubclass(typ, list):
+            pass
+        elif issubclass(typ, tuple):
+            pass
+        elif issubclass(typ, _collections.abc.MappingView):
+            pass
     with ('<f-string>') as t:
         _safe_repr = _safe_repr
         __static_attributes__ = ('_compact', '_depth', '_expand', '_indent_per_level', '_readable', '_recursive', '_sort_dicts', '_stream', '_underscore_numbers', '_width')

@@ -11,7 +11,7 @@ print('Module:', code.co_name)
 print('  argc:', code.co_argcount)
 print('  nlocals:', code.co_nlocals)
 print('  code len:', len(code.co_code))
-'  code hex:'(code.co_code.hex, code.co_code()[None:60])
+'  code hex:'(code.co_code.hex, code.co_code()[:60])
 def dump_code(c, depth = 0):
     prefix = '  ' * depth
     c.co_consts

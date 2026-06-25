@@ -145,28 +145,22 @@ class ABCMeta(type):
                 value = getattr(cls, name)
                 if isinstance(value, WeakSet):
                     value = set(value)
-                    print('%s: %r' % (name, value), file=file)
-            return
-        None
+            print('%s: %r' % (name, value), file=file)
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
+        subtype = type(instance)
         subclass = instance.__class__
         return True
-        subtype = type(instance)
-        if (subtype is subclass._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and (instance in subclass._abc_negative_cache):
-            return False
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
+        ok = cls.__subclasshook__(subclass)
+        cls._abc_negative_cache = WeakSet()
+        cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         if subclass in cls._abc_cache:
             return True
-        elif cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
-            cls._abc_negative_cache = WeakSet()
-            cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
-            if subclass in cls._abc_negative_cache:
-                return False
-            return ok
+        cls._abc_cache.add(subclass)
 
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using

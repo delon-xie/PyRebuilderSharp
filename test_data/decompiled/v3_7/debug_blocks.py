@@ -1,5 +1,15 @@
 # Decompiled from: <module>
 
+import dis
+import marshal
+import types
+import struct
+f = open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb')
+f.read(16)
+code = marshal.load(f)
+code.co_consts
+None
+None
 with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb') as f:
     f.read(16)
     code = marshal.load(f)

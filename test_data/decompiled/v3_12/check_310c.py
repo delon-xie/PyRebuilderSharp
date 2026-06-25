@@ -27,10 +27,10 @@ def dump_bytecode(c, depth = 0):
                 break
                 if et:
                     for i in range(0, len(et), 8):
-                        s = et(i // (i + 2), 'little')
-                        e = et((i + 2) // (i + 4), 'little')
-                        t = et((i + 4) // (i + 6), 'little')
-                        dl = et((i + 6) // (i + 8), 'little')
+                        s = int.from_bytes(et[i:i + 2], 'little')
+                        e = int.from_bytes(et[i + 2:i + 4], 'little')
+                        t = int.from_bytes(et[i + 4:i + 6], 'little')
+                        dl = int.from_bytes(et[i + 6:i + 8], 'little')
                         print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
                 dis.dis(const)
                 dump_bytecode(const, depth + 1)

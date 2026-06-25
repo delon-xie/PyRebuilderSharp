@@ -1,5 +1,16 @@
 # Decompiled from: <module>
 
+import struct
+import sys
+f = open(sys.argv[1], 'rb')
+data = f.read()
+off = 16
+raw = data[off]
+type_byte = raw & 127
+'Type byte at '(f"{off}: {raw}{'#x'}, clean: {type_byte} (TYPE_CODE={type_byte == 99})")
+off += 1
+('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
+print
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):

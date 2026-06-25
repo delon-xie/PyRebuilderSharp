@@ -8,13 +8,12 @@ code = compile('a1 = None', '<test>', 'exec')
 m = bytes(marshal.dumps(code))
 print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
-' '.join(<genexpr>, m(None // 60()))
+'Bytes:'(' '.join, <genexpr>(m[:60]()))
 print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
 known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': code.co_stacksize, 'argcount': code.co_flags}
 None
 print
-'Bytes:'
 None
 print
 None
@@ -47,7 +46,7 @@ for start in range(0, 8):
             print(f"
 MATCH at offset {start}:")
             print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-            ' '.join(f"{<genexpr>}{m(start // (start + 16)())}")
+            '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
     code2 = marshal.loads(m)
     print(f"
 Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")

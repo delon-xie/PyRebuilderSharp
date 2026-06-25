@@ -3146,11 +3146,6 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
             compile(s, '<string>', 'exec')
         except SyntaxError:
             self.fail('Empty line after a line continuation character is valid.')
-        try:
-            compile(s1, '<string>', 'exec')
-            compile(s2, '<string>', 'exec')
-        except SyntaxError:
-            self.fail('Indented statement over multiple lines is valid')
         s = """\\
 pass
         \\
@@ -3169,7 +3164,8 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
-        raise
+        compile(s1, '<string>', 'exec')
+        compile(s2, '<string>', 'exec')
 
     def test_continuation_bad_indentation(self):
         code = """\\

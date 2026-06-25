@@ -53,7 +53,7 @@ for (name, code) in tests.items():
     if os.path.exists(out_path):
         open(out_path)
     else:
-        print(f"Error: {r2.stderr[None:200]}")
+        print(f"Error: {r2.stderr[:200]}")
     content = f.read().strip()
     break
 break

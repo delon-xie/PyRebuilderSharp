@@ -1,5 +1,10 @@
 # Decompiled from: <module>
 
+import marshal
+import struct
+import sys
+f = open(sys.argv[1], 'rb')
+raw = f.read()
 with open(sys.argv[1], 'rb') as f:
     raw = f.read()
     for off in range(17, 40):

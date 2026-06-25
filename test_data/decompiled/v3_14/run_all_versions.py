@@ -41,13 +41,3 @@ else:
     print(f"  Line {i}: expected={e}")
     print(f"           actual=  {a}")
     break
-print(f"❌ {ver}: AST parse failed - {e}")
-print(f"  Decompiled: {actual_src[:200]}")
-def <genexpr>(.0):
-    .0
-    for (r, v) in .0:
-        r
-        if not True:
-            pass
-        else:
-            1

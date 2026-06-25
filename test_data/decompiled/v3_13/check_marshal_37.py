@@ -9,7 +9,7 @@ print(f"  argcount={code.co_argcount} nlocals={code.co_nlocals} stacksize={code.
 m = bytes(marshal.dumps(code))
 print(f"
 Marshaled ({len(m)} bytes):")
-' '.join(<genexpr>(m[None:40]()))
+' '.join(<genexpr>(m[:40]()))
 """
 Byte 0 = """(f"{m[0]}02x")
 range(0, 8)

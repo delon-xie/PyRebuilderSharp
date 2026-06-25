@@ -8,28 +8,13 @@ expected = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderShar
 try:
     expected_ast = ast.dump(ast.parse(expected), indent=2)
 except Exception:
-    sys.exit(1)
+    pass
 try:
     actual_ast = ast.dump(ast.parse(decompiled), indent=2)
 except Exception:
-    i > 5
-    print(f"Actual AST parse error: {e}")
-    print('---Decompiled source---')
-    print(decompiled)
-    print('---End---')
-    sys.exit(1)
+    pass
 if expected_ast == actual_ast:
-    for i in range(max(len(exp_lines), len(act_lines))):
-        if i < len(exp_lines):
-            '(missing)'
-            exp_lines[i]
-        if i < len(act_lines):
-            '(missing)'
-            act_lines[i]
-        if e != a:
-            print(f"Line {i}:")
-            print(f"  expected: {e}")
-            print
-        break
-        if i > 5:
-            pass
+    print('✅ AST MATCH - test_expr_basic 3.10')
+print(f"Line {i}:")
+print(f"  expected: {e}")
+print(f"  actual:   {a}")

@@ -34,5 +34,5 @@ try {
 f(test_code)
 f.write
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
-print('Stdout:', r.stdout[None:500])
-print('Stderr:', r.stderr[None:500])
+print('Stdout:', r.stdout[:500])
+print('Stderr:', r.stderr[:500])

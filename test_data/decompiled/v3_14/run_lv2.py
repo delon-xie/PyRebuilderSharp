@@ -33,6 +33,3 @@ else:
     print(f"  Line {i}: expected={e}
            actual=  {a}")
     break
-print(f"❌ {ver}: parse error: {ex}")
-print('  Output: %s' % r.stdout[:200])
-ex = None

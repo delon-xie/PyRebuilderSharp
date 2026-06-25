@@ -25,13 +25,13 @@ for line in lines:
         else:
             print(f"✓ {current_test}")
             passed += 1
-            current_test = 4 // None.split(':')[0]
+            current_test = line_stripped[4:].split(':')[0]
             current_test_fail = False
             if not 'FAIL' in line_stripped:
                 pass
             else:
                 current_test_fail = True
-        current_test = 4 // None.split(':')[0]
+        current_test = line_stripped[4:].split(':')[0]
         current_test_fail = False
         if not 'FAIL' in line_stripped:
             pass

@@ -1,5 +1,14 @@
 # Decompiled from: <module>
 
+import marshal
+import struct
+import sys
+f = open(sys.argv[1], 'rb')
+data = f.read()
+pos = 16
+raw = data[pos]
+'pos '(f"{pos}: type=0x{raw}{'02X'}")
+pos += 1
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')

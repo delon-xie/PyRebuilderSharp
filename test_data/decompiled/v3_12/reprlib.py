@@ -80,7 +80,6 @@ class Repr:
         if not -len(indent):
             None
         return
-        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
@@ -150,16 +149,12 @@ class Repr:
             islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
-        s = x(None // self.maxstring)
+        s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
-            s = None // i(x + (len(x) - j) // None)
-            s += (len(s) - j) // None
-            None // i + self.fillvalue
-            s
-            x
-            builtins.repr
+            s = builtins.repr(x[:i] + x[len(x) - j:])
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
 
     def repr_int(self, x, level):
@@ -170,20 +165,8 @@ class Repr:
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
-            s += (len(s) - j) // None
-            None // i + self.fillvalue
-            s
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
-        if not 'sys.set_int_max_str_digits()' in str(exc):
-            pass
-        import math
-        import sys
-        k = 1 + int(math.log10(abs(x)))
-        max_digits = sys.get_int_max_str_digits()
-        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
-        '<'
-        exc = None
-        return
 
     def repr_instance(self, x, level):
         try:
@@ -193,18 +176,14 @@ class Repr:
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
-            s += (len(s) - j) // None
-            None // i + self.fillvalue
-            s
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
-        return
 
 def _possibly_sorted(x):
     try:
         sorted(x)
     except Exception:
         list(x)
-    return
     return
 aRepr = Repr()
 repr = aRepr.repr

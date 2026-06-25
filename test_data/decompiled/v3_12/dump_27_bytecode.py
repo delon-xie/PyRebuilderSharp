@@ -10,13 +10,13 @@ actual_type = type_byte & 127
 'Type byte at '(f"{pos}: {type_byte}{'#x'}")
 '  TYPE_CODE='(f"{actual_type}{'#x'}")
 pos += 1
-argcount = '<I'(data, pos // (pos + 4))[0]
+argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-nlocals = '<I'(data, pos // (pos + 4))[0]
+nlocals = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-stacksize = '<I'(data, pos // (pos + 4))[0]
+stacksize = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-flags = '<I'(data, pos // (pos + 4))[0]
+flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
@@ -28,11 +28,9 @@ if (next_type in (115, 116, 122)) and (next_type == 122):
     length = data[pos]
     pos += 1
 else:
-    length = '<I'(data, pos // (pos + 4))[0]
+    length = struct.unpack('<I', data[pos:pos + 4])[0]
     pos += 4
-    struct.unpack
-    None
-    bytecode = pos // (pos + length)
+    bytecode = data[pos:pos + length]
     pos += length
     print(f"Bytecode length={length}")
     print(f"Bytecode hex: {bytecode.hex()}")

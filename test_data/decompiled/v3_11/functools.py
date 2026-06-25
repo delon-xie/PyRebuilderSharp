@@ -539,7 +539,7 @@ def _c3_mro(cls, abcs = None):
             pass
         else:
             []
-            explicit_bases = list(cls.__bases__[None:boundary])
+            explicit_bases = list(cls.__bases__[:boundary])
             abstract_bases = []
             other_bases = list(cls.__bases__[boundary:])
             abcs

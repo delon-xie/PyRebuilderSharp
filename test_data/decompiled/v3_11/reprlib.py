@@ -148,12 +148,12 @@ class Repr:
             islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
-        s = builtins.repr(x[None:self.maxstring])
+        s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
-            s = builtins.repr(x[None:i] + x[len(x) - j:])
-            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            s = builtins.repr(x[:i] + x[len(x) - j:])
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
 
     def repr_int(self, x, level):
@@ -161,7 +161,7 @@ class Repr:
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
-            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
         if not 'sys.set_int_max_str_digits()' in str(exc):
             pass
@@ -181,7 +181,7 @@ class Repr:
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
-            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
         return
 

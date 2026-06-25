@@ -1125,8 +1125,10 @@ public class PythonCodeGenerator : ICodeGenerator
     /// </summary>
     private void VisitSliceLiteral(Slice slice)
     {
-        // Strip trailing None for cleaner output: items[1:] instead of items[1:None]
-        Visit(slice.Lower);
+        // 优化: None 下限表示起始不指定 → 输出空（[:2] 而非 [None:2]）
+        bool lowerIsNone = slice.Lower == null || slice.Lower is Constant { Value: null };
+        if (!lowerIsNone)
+            Visit(slice.Lower);
         _output.Append(":");
         bool hasUpper = !(slice.Upper is Constant { Value: null }); // None
         bool hasStep = slice.Step != null && !(slice.Step is Constant { Value: null });

@@ -3,10 +3,10 @@
 import struct
 data = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.3.5.pyc', 'rb').read()
 print(f"Total bytes: {len(data)}")
-print(f"Full hex: {data[None:48].hex()}")
+print(f"Full hex: {data[:48].hex()}")
 print("""
 --- Assuming 12-byte header (old format) ---""")
-magic = data[None:4]
+magic = data[:4]
 print(f"Magic: {magic.hex()}")
 ts = struct.unpack('<I', data[4:8])[0]
 size = struct.unpack('<I', data[8:12])[0]

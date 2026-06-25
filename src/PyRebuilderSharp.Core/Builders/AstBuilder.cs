@@ -2945,12 +2945,52 @@ public class AstBuilder
         }
 
         // AND 短接合并: POP_JUMP_IF_FALSE/JUMP_IF_FALSE_OR_POP + body 首条为 If → BoolOp(And, ...)
+        // 递归合并所有嵌套 AND 条件，确保 BoolOp 收集完整条件链。
+        // 特殊处理：JUMP_IF_FALSE_OR_POP (链式比较) 可能把后继 AND 条件放在 elif 链中，
+        // 需要同时遍历 body 链和 elif 链以收集全部条件。
         if ((lastInstr.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.JUMP_IF_FALSE_OR_POP
                 or Opcode.POP_JUMP_IF_FALSE_PY38)
             && bodyStmts.Count > 0 && bodyStmts[0] is If innerIf && orelse == null)
         {
-            var mergedTest = MergeBoolOpValues(BoolOperator.And, new List<Expr> { testExpr, innerIf.Test });
-            result.Add(new If(mergedTest, innerIf.Body, innerIf.Orelse));
+            // 外层条件 + 嵌套 If 的条件
+            var conditions = new List<Expr> { testExpr, innerIf.Test };
+            var currentBody = innerIf.Body;
+            var currentOrelse = innerIf.Orelse;
+            var extraStmts = new List<Stmt>();
+            
+            while (true)
+            {
+                // Step 1: 递归合并 body 链（标准 AND 链，内层 If 无 else）
+                while (currentBody.Count > 0 && currentBody[0] is If nestedIf && currentOrelse == null)
+                {
+                    conditions.Add(nestedIf.Test);
+                    currentBody = nestedIf.Body;
+                    currentOrelse = nestedIf.Orelse;
+                    if (nestedIf.Body.Count > 1)
+                        extraStmts.AddRange(nestedIf.Body.Skip(1));
+                }
+                
+                // Step 2: 没有 elif 链 → 完成递归
+                if (currentOrelse == null || currentOrelse.Count == 0 || !(currentOrelse[0] is If elifIf))
+                    break;
+                
+                // Step 3: 检查 elif 是否为 AND 条件延续（链式比较伪影）。
+                // 鉴别条件：当前 body 为空或仅含 Return（非真实 elif 体）
+                if (currentBody.Count > 0 && !(currentBody.Count == 1 && currentBody[0] is Return))
+                    break; // 真实 elif，保留原样
+                
+                // 将 elif 条件合并为 AND 条件
+                conditions.Add(elifIf.Test);
+                currentBody = elifIf.Body;
+                currentOrelse = elifIf.Orelse;
+                if (elifIf.Body.Count > 1)
+                    extraStmts.AddRange(elifIf.Body.Skip(1));
+            }
+            
+            var mergedTest = MergeBoolOpValues(BoolOperator.And, conditions);
+            result.Add(new If(mergedTest, currentBody, currentOrelse));
+            if (extraStmts.Count > 0)
+                result.AddRange(extraStmts);
             if (bodyStmts.Count > 1)
                 result.AddRange(bodyStmts.Skip(1));
         }

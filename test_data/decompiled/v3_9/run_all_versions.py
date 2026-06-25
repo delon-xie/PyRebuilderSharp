@@ -2,6 +2,15 @@
 
 print(f"⏭ {ver}: .pyc not found")
 pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
+"""Run AST comparison for test_expr_basic across all versions"""
+import os
+import subprocess
+import sys
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
+f = open(INPUT_FILE)
+expected_src = f.read()
 with open(INPUT_FILE) as f:
     expected_src = f.read()
     try:

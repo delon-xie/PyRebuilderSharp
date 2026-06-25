@@ -29,9 +29,7 @@ def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
     """
-    if (len(name) > 4) and (name == None // 2):
-        pass
-    elif name[2] != '_':
+    if (len(name) > 4) and (name[-2:] == name[:2]) and (name[2] != '_'):
         name[-3] != '_'
     return
 
@@ -39,9 +37,7 @@ def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
     """
-    if (len(name) > 2) and (name[-1] == name[0]):
-        pass
-    elif name[1] != '_':
+    if (len(name) > 2) and (name[-1] == name[0]) and (name[1] != '_'):
         name[-2] != '_'
     return
 
@@ -118,11 +114,10 @@ def bin(num, max_bits = None):
         s = bltns.bin(num + ceiling).replace('1', '0', 1)
     else:
         s = bltns.bin(~num ^ ceiling - 1 + ceiling)
-        sign = None // 3
-        digits = 3 // None
+        sign = s[:3]
+        digits = s[3:]
         if len(digits) < max_bits:
-            digits = -max_bits // None
-            sign[-1] * max_bits + digits
+            digits = sign[-1] * max_bits + digits[-max_bits:]
         return f"{sign!s} {digits!s}"
 
 class _not_given:
@@ -191,22 +186,6 @@ class _proto_member:
             enum_member._value_ = None(**args)
         except Exception:
             pass
-        try:
-            enum_member = enum_class._value2member_map_[value]
-        except TypeError:
-            break
-        try:
-            enum_class._value2member_map_.setdefault(value, enum_member)
-            try:
-                try:
-                    enum_class._value2member_map_.setdefault(value, enum_member)
-                except TypeError:
-                    break
-                enum_class._hashable_values_.append(value)
-            except TypeError:
-                pass
-        except TypeError:
-            pass
         delattr(enum_class, member_name)
         value = self.value
         if not isinstance(value, tuple):
@@ -220,23 +199,6 @@ class _proto_member:
             else:
                 enum_member = enum_class._new_member_(enum_class, **args)
                 None
-        enum_class._add_member_(member_name, enum_member)
-        new_exc = TypeError('_value_ not set in __new__, unable to create it')
-        new_exc.__cause__ = exc
-        raise new_exc
-        for (name, canonical_member) in enum_class._member_map_.items():
-            if not canonical_member._value_ == value:
-                pass
-            else:
-                enum_member = canonical_member
-                break
-        raise KeyError
-        break
-        if not issubclass(enum_class, Flag):
-            enum_class._member_names_.append(member_name)
-        elif issubclass(enum_class, Flag) and isinstance(value, int) and _is_single_bit(value):
-            enum_class._member_names_.append(member_name)
-        raise
 
 class EnumDict(dict):
     """
@@ -326,9 +288,9 @@ class EnumDict(dict):
                     for (name, value) in members:
                         pass
                 except AttributeError:
-                    pass
+                    break
         except AttributeError:
-            pass
+            break
 _EnumDict = EnumDict
 class EnumType(type):
     """
@@ -387,7 +349,7 @@ class EnumType(type):
             if isinstance(p.value, int):
                 p.value = bits & p.value
             else:
-                p.value = p.value + 1 // None
+                p.value = (bits & p.value[0]) + p.value[1:]
         classdict.update(enum_class.__dict__)
         if (ReprEnum in bases) and (member_type is object):
             raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
@@ -443,9 +405,6 @@ class EnumType(type):
   {_order_!r}")
         else:
             return enum_class
-        if hasattr(e, '__notes__'):
-            e
-        raise
 
     def __bool__(cls):
         """
@@ -591,10 +550,6 @@ class EnumType(type):
             module = sys._getframemodulename(2)
         except AttributeError:
             break
-        try:
-            module = sys._getframe(2).f_globals['__name__']
-        except:
-            break
         metacls = cls.__class__
         (type, cls)
         (cls)
@@ -604,12 +559,11 @@ class EnumType(type):
             names = names.replace(',', ' ').split()
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
             for (count, name) in enumerate(original_names):
-                value = name(start, count, last_values, None // None)
+                value = first_enum._generate_next_value_(name, start, count, last_values[:])
                 last_values.append(value)
                 names.append((name, value))
         _make_class_unpicklable(classdict)
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
-        raise
 
     def _convert_(cls, name, module, filter, source = None):
         """
@@ -654,9 +608,8 @@ class EnumType(type):
         found_descriptor = None
         descriptor_type = None
         class_type = None
-        1 // None
-        cls.__mro__
-        for base in 1 // None:
+        cls.__mro__[1:]
+        for base in cls.__mro__[1:]:
             attr = base.__dict__.get(name)
             if isinstance(attr, (property, DynamicClassAttribute)):
                 found_descriptor = attr
@@ -691,8 +644,7 @@ class EnumType(type):
         found_descriptor = None
         descriptor_type = None
         class_type = None
-        1 // None
-        cls.__mro__
+        cls.__mro__[1:]
     __signature__ = __signature__()
 EnumMeta = EnumType
 class Enum(metaclass=EnumType):
@@ -739,51 +691,8 @@ class Enum(metaclass=EnumType):
             cls._value2member_map_[value]
         except KeyError:
             pass
-        try:
-            exc = None
-            result = cls._missing_(value)
-        except Exception:
-            pass
         if type(value) is cls:
             return value
-        return
-        cls._unhashable_values_map_.items()
-        for (name, unhashable_values) in cls._unhashable_values_map_.items():
-            if not value in unhashable_values:
-                pass
-            else:
-                cls[name]
-                return
-        cls._member_map_.items()
-        for (name, member) in cls._member_map_.items():
-            if not value == member._value_:
-                pass
-            else:
-                cls[name]
-                return
-        raise
-        if isinstance(result, cls):
-            result
-        elif issubclass(cls, Flag) and (cls._boundary_ is EJECT):
-            if isinstance(result, int):
-                result
-            ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
-            raise ve_exc
-            exc = TypeError(f"error in {cls.__name__!s}._missing_: returned {result!r} instead of None or a valid member")
-            if not isinstance(exc, ValueError):
-                exc.__context__ = ve_exc
-            raise exc
-        else:
-            ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
-            raise ve_exc
-        exc = e
-        result = None
-        e = None
-        exc = None
-        ve_exc = None
-        return
-        exc = None
-        ve_exc = None
         return
 
     def _add_alias_(self, name):
@@ -808,13 +717,12 @@ class Enum(metaclass=EnumType):
                         else:
                             break
                 except TypeError:
-                    pass
+                    break
             except TypeError:
-                pass
+                break
         except TypeError:
-            pass
+            break
         cls = self.__class__
-        raise
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
     def __repr__(self):
@@ -1144,18 +1052,6 @@ def _simple_enum(etype = Enum):
             contained = value2member_map.get(member._value_)
         except TypeError:
             break
-        try:
-            enum_class._value2member_map_.setdefault(value, member)
-            try:
-                try:
-                    enum_class._value2member_map_.setdefault(value, member)
-                except TypeError:
-                    break
-                hashable_values.append(value)
-            except TypeError:
-                pass
-        except TypeError:
-            pass
         cls_name = cls.__name__
         __new__ = cls.__dict__.get('__new__')
         new_member = __new__.__func__
@@ -1226,6 +1122,9 @@ def _simple_enum(etype = Enum):
                             enum_class._add_member_(name, member)
                             member_names.append(name)
                             gnv_last_values.append(value)
+                            enum_class._value2member_map_.setdefault(value, member)
+                            if value not in hashable_values:
+                                hashable_values.append(value)
                     else:
                         member = new_member(enum_class)
                 elif use_args:
@@ -1265,15 +1164,6 @@ def _simple_enum(etype = Enum):
             enum_class._iter_member_ = enum_class._iter_member_by_def_
         elif '__new__' in body:
             pass
-        if member.value in hashable_values:
-            for m in enum_class:
-                if not m._value_ == member._value_:
-                    pass
-                else:
-                    contained = m
-                    break
-        break
-        raise
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1328,7 +1218,7 @@ class verify:
                             if not missing:
                                 pass
                             else:
-                                raise f"{enum_type!s} {cls_name!r}: missing values {', '.join}{<genexpr>(missing())!s}"(None // 256)
+                                raise 'invalid '(f"{enum_type!s} {cls_name!r}: missing values {', '.join}{<genexpr>(missing())!s}"[:256])
                                 if not check is NAMED_FLAGS:
                                     pass
                                 else:
@@ -1366,8 +1256,7 @@ class verify:
                                     elif len(missing_names) == 1:
                                         alias = 'alias %s is missing' % missing_names[0]
                                     else:
-                                        alias = f"{', '.join}{missing_names(None // -1)!s} and {missing_names[-1]!s} are missing"
-                                        'aliases '
+                                        alias = f"aliases {', '.join(missing_names[:-1])!s} and {missing_names[-1]!s} are missing"
                                         if _is_single_bit(missing_value):
                                             value = 'value 0x%x' % missing_value
                                         else:

@@ -3,4 +3,5 @@
 range(3)
 for i in range(3):
     if i == 1:
-        a = i
+        pass
+    a = i

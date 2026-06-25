@@ -1,6 +1,10 @@
 # Decompiled from: <module>
 
 next_line = lines[j]
+import re
+from collections import defaultdict
+f = open('/tmp/test_full.txt', 'r')
+output = f.read()
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
     version_stats = defaultdict(<lambda>)

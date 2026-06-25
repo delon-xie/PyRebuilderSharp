@@ -117,7 +117,7 @@ def bin(num, max_bits):
         s = bltns.bin(num + ceiling).replace('1', '0', 1)
     else:
         s = bltns.bin(~num ^ ceiling - 1 + ceiling)
-        sign = s[None:3]
+        sign = s[:3]
         digits = s[3:]
         if max_bits is not None:
             if len(digits) < max_bits:
@@ -653,7 +653,7 @@ class EnumType(type):
                 if names:
                     if isinstance(names[0], str):
                         for (count, name) in enumerate(original_names):
-                            value = first_enum._generate_next_value_(name, start, count, last_values[None:])
+                            value = first_enum._generate_next_value_(name, start, count, last_values[:])
                             last_values.append(value)
                             names.append((name, value))
                     elif names is None:
@@ -1098,9 +1098,7 @@ class Flag(Enum, boundary=STRICT):
             for m in .0:
                 pass
             return
-        if (value <= value) and (cls <= all_bits):
-            pass
-        elif cls._boundary_ is STRICT:
+        if (value <= value) and (cls <= all_bits) and (cls._boundary_ is STRICT):
             max_bits = max(value.bit_length(), flag_mask.bit_length())
             raise ValueError("""%r invalid value %r
     given %s
@@ -1136,6 +1134,9 @@ class Flag(Enum, boundary=STRICT):
                         pseudo_member = cls._member_type_.__new__(cls, value)
         else:
             raise ValueError('%r unknown flag boundary %r' % (cls, cls._boundary_))
+        raise ValueError("""%r invalid value %r
+    given %s
+  allowed %s""" % (cls, value, bin(value, max_bits), bin(flag_mask, max_bits)))
         pseudo_member._name_ = None
 
     def __contains__(self, other):
@@ -1559,7 +1560,7 @@ class verify:
                             else:
                                 raise Exception('verify: unknown type %r' % enum_type)
                                 if missing:
-                                    raise ValueError('invalid %s %r: missing values %s' % (enum_type, cls_name, ', '.join(verify.__call__.<locals>.<genexpr>(missing)))[None:256])
+                                    raise ValueError('invalid %s %r: missing values %s' % (enum_type, cls_name, ', '.join(verify.__call__.<locals>.<genexpr>(missing)))[:256])
                     elif check is NAMED_FLAGS:
                         for (name, alias) in enumeration._member_map_.items():
                             if name in member_names:
@@ -1578,7 +1579,7 @@ class verify:
                     if missing_names and (len(missing_names) == 1):
                         alias = 'alias %s is missing' % missing_names[0]
                     else:
-                        alias = 'aliases %s and %s are missing' % (', '.join(missing_names[None:-1]), missing_names[-1])
+                        alias = 'aliases %s and %s are missing' % (', '.join(missing_names[:-1]), missing_names[-1])
                         if _is_single_bit(missing_value):
                             value = 'value 0x%x' % missing_value
                         else:

@@ -2,6 +2,10 @@
 
 match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
 line = lines[i]
+import re
+from collections import defaultdict
+f = open('/tmp/test_full.txt', 'r')
+output = f.read()
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
     version_stats = defaultdict(<lambda>)

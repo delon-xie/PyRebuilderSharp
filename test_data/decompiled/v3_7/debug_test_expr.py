@@ -1,5 +1,14 @@
 # Decompiled from: <module>
 
+import struct
+import marshal
+import dis
+f = open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expressions.38.pyc', 'rb')
+data = bytearray(f.read())
+known_types = {78, 105, 108, 102, 120, 115, 122, 218, 116, 117, 65, 40, 41, 91, 123, 60, 62, 99, 114, 82, 70, 84, 46, 63, 33, 73, 74}
+range(16, len(data))
+None
+None
 with open('/Users/admin/codes/tools/PyRebuild/ref/pycdc/tests/compiled/test_expressions.38.pyc', 'rb') as f:
     data = bytearray(f.read())
 for i in range(16, len(data)):

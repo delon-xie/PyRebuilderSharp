@@ -41,13 +41,6 @@ def process_data_file(filename):
         pass
     print('[外层 finally] 程序结束')
     return
-    print(f"[内层 except] 数据处理失败: {ve}")
-    ve = None
-    print('[外层 finally] 程序结束')
-    print('[外层 finally] 程序结束')
-    break
-    print('[外层 finally] 程序结束')
-    raise
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')

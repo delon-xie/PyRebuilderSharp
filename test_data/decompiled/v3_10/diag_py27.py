@@ -66,8 +66,8 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
                 pass
             break
             print(f"Output ({len(content)} bytes):
-{content[None:300]}")
+{content[:300]}")
         else:
-            print(f"Error: {r2.stderr[None:200]}")
+            print(f"Error: {r2.stderr[:200]}")
     else:
         r.stderr.strip()

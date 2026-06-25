@@ -20,10 +20,10 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
         if i + 7 >= len(et):
             break
         else:
-            start = et(i // (i + 2), 'little')
-            end = et((i + 2) // (i + 4), 'little')
-            target = et((i + 4) // (i + 6), 'little')
-            dl = et((i + 6) // (i + 8), 'little')
+            start = int.from_bytes(et[i:i + 2], 'little')
+            end = int.from_bytes(et[i + 2:i + 4], 'little')
+            target = int.from_bytes(et[i + 4:i + 6], 'little')
+            dl = int.from_bytes(et[i + 6:i + 8], 'little')
             print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
         for const in code.co_consts:
             if not isinstance(const, types.CodeType):

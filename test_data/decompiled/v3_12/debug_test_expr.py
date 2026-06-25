@@ -13,7 +13,7 @@ for i in range(16, len(data)):
         pass
     elif not data[i] != stripped:
         pass
-code = bytes(data(16 // None))
+code = marshal.loads(bytes(data[16:]))
 print('Code name:', code.co_name)
 print('Names:', code.co_names)
 print('Constants:', code.co_consts)
@@ -21,7 +21,5 @@ print('Varnames:', code.co_varnames)
 print()
 print('Instructions:')
 dis.get_instructions(code)
-marshal.loads
-None
 for instr in dis.get_instructions(code):
     instr.offset(f"{'4d'} {instr.opname}{'20s'} {instr.arg} {instr.argrepr}")

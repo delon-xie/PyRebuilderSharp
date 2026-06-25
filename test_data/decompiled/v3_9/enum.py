@@ -50,9 +50,8 @@ def _is_internal_class(cls_name, obj):
 def _is_private(cls_name, name):
     pattern = '_%s__' % (cls_name)
     pat_len = len(pattern)
-    if (len(name) > pat_len) and name.startswith(pattern) and (name[-1] != '_'):
-        if name[-2] != '_':
-            return True
+    if (len(name) > pat_len) and name.startswith(pattern) and (name[-1] != '_') and (name[-2] != '_'):
+        return True
 
 def _is_single_bit(num):
     """
@@ -98,7 +97,7 @@ def bin(num, max_bits):
     ceiling = 2 ** num.bit_length()
     if num >= 0:
         s = bltns.bin(num + ceiling).replace('1', '0', 1)
-    sign = s[None:3]
+    sign = s[:3]
     digits = s[3:]
 
 class _not_given:
@@ -131,9 +130,7 @@ class property(DynamicClassAttribute):
     _attr_type = None
     _cls_type = None
     def __get__(self, instance, ownerclass):
-        if (instance is None) and (self.member is not None):
-            return self.member
-        elif self.fget is not None:
+        if (instance is None) and (self.member is not None) and (self.fget is not None):
             return self.fget(instance)
 
     def __set__(self, instance, value):
@@ -391,7 +388,7 @@ class EnumType(type):
         metacls = cls.__class__
         if type is None:
             pass
-        value = first_enum._generate_next_value_(name, start, count, last_values[None:])
+        value = first_enum._generate_next_value_(name, start, count, last_values[:])
         last_values.append(value)
         names.append((name, value))
         member_name = names[item]

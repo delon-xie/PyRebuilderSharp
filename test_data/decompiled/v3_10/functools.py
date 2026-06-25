@@ -473,7 +473,7 @@ def lru_cache(maxsize, typed):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
-    elif None: == 0:
+    elif : == 0:
         def wrapper():
             result = args(**kwds)
             return result
@@ -540,7 +540,7 @@ def _c3_mro(cls, abcs):
             pass
         else:
             []
-            explicit_bases = list(cls.__bases__[None:boundary])
+            explicit_bases = list(cls.__bases__[:boundary])
             abstract_bases = []
             other_bases = list(cls.__bases__[boundary:])
             cls

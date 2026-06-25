@@ -18,33 +18,20 @@ lines
 for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()
-    if line_stripped.startswith('*** ') and current_test:
-        if current_test_fail:
-            print(f"✗ {current_test}")
-            failed += 1
-            print(f"✓ {current_test}")
-            passed += 1
-        break
-        print('=' * 60)
-        break
-        break
-        break
-    else:
-        print('=' * 60)
-    break
+    if line_stripped.startswith('*** ') and current_test and current_test_fail:
+        print(f"✗ {current_test}")
+        failed += 1
+    print('=' * 60)
+    print(f"总计: {passed} PASS, {failed} FAIL")
+    print('=' * 60)
+    if current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line) and ('Unsupported' in clean_line) and ('Bad MAGIC' in clean_line):
+        current_test_fail = True
     current_test = line_stripped[4:].split(':')[0]
     current_test_fail = False
     if 'FAIL' in line_stripped:
         current_test_fail = True
-        continue
-        if current_test:
-            if ('3.10.pyc' in clean_line) and ('FAIL' in clean_line):
-                pass
-            break
-        else:
-            break
+    print(f"✓ {current_test}")
+    passed += 1
 if current_test and current_test_fail:
     print(f"✗ {current_test}")
     failed += 1
-    '✓ '
-    print

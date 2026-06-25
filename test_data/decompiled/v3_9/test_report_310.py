@@ -21,10 +21,8 @@ for line in lines:
     if line_stripped.startswith('*** ') and current_test and current_test_fail:
         print(f"✗ {current_test}")
         failed += 1
-    if current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line):
-        if 'Unsupported' in clean_line:
-            if 'Bad MAGIC' in clean_line:
-                current_test_fail = True
+    if current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line) and ('Unsupported' in clean_line) and ('Bad MAGIC' in clean_line):
+        current_test_fail = True
     current_test = line_stripped[4:].split(':')[0]
     current_test_fail = False
     if 'FAIL' in line_stripped:

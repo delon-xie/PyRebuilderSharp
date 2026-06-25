@@ -1,5 +1,18 @@
 # Decompiled from: <module>
 
+import struct
+import sys
+f = open(sys.argv[1], 'rb')
+data = f.read()
+off = 16
+raw = data[off]
+type_byte = raw & 127
+'Type byte at '(f"{off}: {raw}{'#x'}, clean: {type_byte} (TYPE_CODE={type_byte == 99})")
+off += 1
+('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
+print
+print
+None
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
@@ -13,8 +26,10 @@ type2 = raw2 & 127
 if raw2 & 128:
     print('  (FLAG_REF set, _refList.Count used)')
     off2 = off + 1
-    off2 = off + 1
 length = data[off2]
 print(f"  TYPE_SHORT_ASCII_INTERNED len={length}")
 length = data[off2]
 print(f"  TYPE_SHORT_ASCII len={length}")
+print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
+length = struct.unpack('<i', data[off2:off2 + 4])[0]
+print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")

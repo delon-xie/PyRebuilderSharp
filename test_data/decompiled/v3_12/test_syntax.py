@@ -2950,23 +2950,6 @@ class SyntaxErrorTestCase(unittest.TestCase):
         except SyntaxError:
             pass
         self.fail('compile() did not raise SyntaxError')
-        if subclass and not isinstance(err, subclass):
-            self.fail('SyntaxError is not a %s' % subclass.__name__)
-        mo = re.search(errtext, str(err))
-        self.fail(f"SyntaxError did not contain {errtext!r}")
-        self.assertEqual(err.filename, filename)
-        self.assertEqual(err.lineno, lineno)
-        self.assertEqual(err.offset, offset)
-        self.assertEqual(err.end_lineno, end_lineno)
-        self.assertEqual(err.end_offset, end_offset)
-        err = None
-        mo = re.search(errtext, str(err))
-        self.fail(f"SyntaxError did not contain {errtext!r}")
-        self.assertEqual(err.filename, filename)
-        self.assertEqual(err.lineno, lineno)
-        self.assertEqual(err.offset, offset)
-        self.assertEqual(err.end_lineno, end_lineno)
-        self.assertEqual(err.end_offset, end_offset)
 
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
@@ -3146,11 +3129,6 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
             compile(s, '<string>', 'exec')
         except SyntaxError:
             self.fail('Empty line after a line continuation character is valid.')
-        try:
-            compile(s1, '<string>', 'exec')
-            compile(s2, '<string>', 'exec')
-        except SyntaxError:
-            self.fail('Indented statement over multiple lines is valid')
         s = """\\
 pass
         \\
@@ -3169,7 +3147,8 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
-        raise
+        compile(s1, '<string>', 'exec')
+        compile(s2, '<string>', 'exec')
 
     def test_continuation_bad_indentation(self):
         code = """\\

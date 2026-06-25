@@ -53,12 +53,11 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
 {'=' * 50}")
     print(f"Test: {name}")
     if r.stdout.strip():
-        pass
-    else:
-        break
-        if os.path.exists(out_path):
-            f = open(out_path)
-            content = f.read().strip()
-            print(f"Output ({len(content)} bytes):
-{content[None:300]}")
-            continue
+        r.stderr.strip()
+    break
+    if os.path.exists(out_path):
+        f = open(out_path)
+        content = f.read().strip()
+        print(f"Output ({len(content)} bytes):
+{content[:300]}")
+    print(f"Error: {r2.stderr[:200]}")

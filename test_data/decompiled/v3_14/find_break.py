@@ -35,7 +35,7 @@ def test_until_broken(exprs):
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:
         mid = (lo + hi) // 2
-        result = test_until_broken(exprs[None:mid + 1])
+        result = test_until_broken(exprs[:mid + 1])
         print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][:30]}): {result}")
         if result != 'OK':
             hi = mid
@@ -51,9 +51,9 @@ if r == 'OK':
 Breaking expression: #{bp}: {all_exprs[bp]}")
     print(f"
 Verification - up to #{bp}:")
-    r = test_until_broken(all_exprs[None:bp + 1])
+    r = test_until_broken(all_exprs[:bp + 1])
     print(f"  {r}")
     print(f"
 Verification - just #{bp}:")
-    r = test_until_broken(all_exprs[None:bp])
+    r = test_until_broken(all_exprs[:bp])
     print(f"  {r}")

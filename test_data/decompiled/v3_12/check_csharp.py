@@ -12,7 +12,7 @@ off += 1
 print
 None
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
-    val = '<i'(data, off // (off + 4))[0]
+    val = struct.unpack('<i', data[off:off + 4])[0]
     print(f"  {name}: {val} (off {off})")
     off += 4
 'Next marshal at off='(f"{off}, byte={data[off]}{'#x'}")
@@ -32,7 +32,7 @@ else:
         print(f"  TYPE_SHORT_ASCII len={length}")
     elif type2 == 115:
         print('  TYPE_STRING/TYPE_CODE_SIMPLE - reading as string bytes')
-        length = '<i'(data, off2 // (off2 + 4))[0]
-        '  Raw bytes: len='(f"{length} data={data}{(off2 + 4) // (off2 + 14).hex()}")
+        length = struct.unpack('<i', data[off2:off2 + 4])[0]
+        print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
     else:
-        '  Unknown type, bytes at '(f"{off2}: {data}{off2 // (off2 + 16).hex()}")
+        print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")

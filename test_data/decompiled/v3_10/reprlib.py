@@ -124,12 +124,12 @@ class Repr:
             islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
-        s = builtins.repr(x[None:self.maxstring])
+        s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
-            s = builtins.repr(x[None:i] + x[len(x) - j:])
-            s = s[None:i] + self.fillvalue + s[len(s) - j:]
+            s = builtins.repr(x[:i] + x[len(x) - j:])
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
 
     def repr_int(self, x, level):

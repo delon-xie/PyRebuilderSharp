@@ -8,12 +8,11 @@ for x in items:
     y = x
 range(5)
 for n in range(5):
-    if (n == 3) and (n == 1):
+    if n == 3:
+        pass
+    if n == 1:
         continue
-    else:
-        IOError
-    break
-    return None
+    f = None
 try:
     x = 1 / 0
 except open:
@@ -21,4 +20,4 @@ except open:
 try:
     f = open('test.txt')
 except IOError:
-    f = None
+    pass

@@ -2869,6 +2869,8 @@ class SyntaxWarningTest(unittest.TestCase):
         errtest is a regular expression that must be present in the
         text of the warning raised.
         """
+        self.assertWarnsRegex(SyntaxWarning, errtext)
+        compile(code, filename, mode)
         with self.assertWarnsRegex(SyntaxWarning, errtext):
             compile(code, filename, mode)
             return None
@@ -3404,6 +3406,9 @@ while 1:
     @support.skip_wasi_stack_overflow()
     @support.cpython_only
     def test_deep_invalid_rule(self):
+        source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
+        self.assertRaises(SyntaxError)
+        compile(source, '<string>', 'exec')
         with self.assertRaises(SyntaxError):
             compile(source, '<string>', 'exec')
             return None
