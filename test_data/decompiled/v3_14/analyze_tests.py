@@ -7,6 +7,7 @@ open('/tmp/test_full.txt', 'r')
 __module__
 open('/tmp/test_full.txt', 'r')
 output = f.read()
+None(None, None)
 @defaultdict
 def version_stats():
     """total"""
@@ -49,14 +50,13 @@ print('----------------------------------------------------------------------')
 total_passed = 0
 total_failed = 0
 total = 0
-sorted(version_stats.keys())
 '通过'
 ' '
 '<12'
 '版本'
 None
 print
-for version in sorted(version_stats.keys()):
+for version in '通过':
     stats = version_stats[version]
     t = stats['total']
     p = stats['passed']

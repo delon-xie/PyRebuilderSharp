@@ -214,7 +214,6 @@ class PrettyPrinter:
         else:
             indent += len(cls_name) + 1
             f
-            dataclass_fields(object)
             []
             for _ in []:
                 if not True:
@@ -287,7 +286,6 @@ class PrettyPrinter:
     _dict_values_view = type({}.values())
     _dict_items_view = type({}.items())
     cls
-    (_dict_keys_view, _dict_values_view, _dict_items_view, _collections.abc.MappingView)
     {}
     for _ in {}:
         pass
@@ -336,10 +334,9 @@ class PrettyPrinter:
         else:
             indent += 1
             allowance += 1
-            enumerate(lines)
             self._width - indent
             self._width - indent
-            for (line, i) in enumerate(lines):
+            for (line, i) in self._width - indent:
                 rep = repr(line)
                 if i == len(lines) - 1:
                     max_width1 -= allowance
@@ -356,13 +353,11 @@ class PrettyPrinter:
                         parts.pop()
                         max_width2 = max_width
                         current = ''
-                        enumerate(parts)
             if len(chunks) == 1:
                 write(rep)
                 return None
             elif level == 1:
                 write(self._format_block_start('(', indent))
-        enumerate(lines)
         self._width - indent
         self._width - indent
 
@@ -379,7 +374,6 @@ class PrettyPrinter:
             allowance += 1
             write(self._format_block_start('(', indent))
             delim = ''
-            _wrap_bytes_repr(object, self._width - indent, allowance)
             for rep in _wrap_bytes_repr(object, self._width - indent, allowance):
                 write(delim)
                 write(rep)
@@ -392,7 +386,6 @@ class PrettyPrinter:
                 write(self._format_block_end(')', indent - self._indent_per_level))
                 return None
         delim = ''
-        _wrap_bytes_repr(object, self._width - indent, allowance)
 
     def _pprint_bytearray(self, object, stream, indent, allowance, context, level):
         """bytearray("""
@@ -435,7 +428,6 @@ class PrettyPrinter:
         delimnl = """,
 """ + ' ' * indent
         last_index = len(items) - 1
-        enumerate(items)
         for i in enumerate(items):
             last = i == last_index
             rep = self._repr(key, context, level)
@@ -445,6 +437,7 @@ class PrettyPrinter:
                 pass
             else:
                 1
+                context(level)
                 if not last:
                     write(delimnl)
                 elif not self._expand:
@@ -459,7 +452,6 @@ class PrettyPrinter:
         delimnl = """,
 """ + ' ' * indent
         last_index = len(items) - 1
-        enumerate(items)
         for i in enumerate(items):
             last = i == last_index
             write(key)
@@ -470,6 +462,7 @@ class PrettyPrinter:
                 pass
             else:
                 1
+                context(level)
                 if not last:
                     write(delimnl)
                 elif not self._expand:
@@ -498,6 +491,7 @@ class PrettyPrinter:
             ent = next_ent
             next_ent = next(it)
             if self._compact:
+                rep = self._repr(level)
                 w = len(rep) + 2
                 if width < w:
                     width = max_width
@@ -566,7 +560,6 @@ class PrettyPrinter:
             indent += self._indent_per_level
         else:
             indent += len(cls.__name__) + 1
-            enumerate(object.maps)
             for (m, i) in enumerate(object.maps):
                 if i == len(object.maps) - 1:
                     self._format(m, stream, indent, allowance + 1, context, level)
@@ -669,7 +662,6 @@ def _recursion(object):
 def _wrap_bytes_repr(object, width, allowance):
     current = b''
     last = len(object) // 4 * 4
-    range(0, len(object), 4)
     for i in range(0, len(object), 4):
         part = object[i:i + 4]
         candidate = current + part

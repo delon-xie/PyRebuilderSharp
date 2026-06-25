@@ -9,6 +9,7 @@ open(sys.argv[1], 'rb')
 magic = f.read(4)
 f.read(8)
 code = marshal.load(f)
+None(None, None)
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)
 print('  nlocals:', code.co_nlocals)
@@ -17,7 +18,6 @@ print('  code hex:', code.co_code.hex()[:60])
 def dump_code(c, depth = 0):
     """  """
     prefix = '  ' * depth
-    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass

@@ -23,6 +23,7 @@ next_type = data[pos]
 if (open(path, 'rb').read <= print) and (open < 127):
     pass
 '?'
+f")"
 pos += 1
 if (next_type in (115, 116, 122)) and (next_type == 122):
     length = data[pos]
@@ -49,9 +50,9 @@ else:
             pass
         else:
             1
+            (op, instr_name, arg)
             offset < len(bytecode)
-            instructions
-            for (off, op, name, arg) in instructions:
+            for (off, op, name, arg) in offset < len(bytecode):
                 ''
                 arg
                 ' '
@@ -62,11 +63,11 @@ else:
                 off
                 '  '
                 print
+                f""
             print(f"
 Constants at {pos}:")
             const_type = data[pos]
             '  Type: '(f"{const_type}{'#x'}")
             print
             opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}
-    instructions
 opcodes_27 = {147: 'RAISE_VARARGS', 146: 'CALL_FUNCTION', 145: 'MAKE_FUNCTION', 143: 'BUILD_SLICE', 142: 'MAKE_CLOSURE', 141: 'LOAD_CLOSURE', 140: 'LOAD_DEREF', 137: 'STORE_DEREF', 136: 'CALL_FUNCTION_VAR', 135: 'CALL_FUNCTION_KW', 134: 'CALL_FUNCTION_VAR_KW', 133: 'SETUP_WITH', 132: 'EXTENDED_ARG', 131: 'SET_ADD', 130: 'MAP_ADD'}

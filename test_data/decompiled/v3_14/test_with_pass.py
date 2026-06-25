@@ -6,3 +6,4 @@ def test():
     lock
     __module__
     lock
+    None(None, None)

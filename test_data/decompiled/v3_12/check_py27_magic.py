@@ -7,7 +7,7 @@ result = subprocess.run([os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python
 print('Compile result:', result.stdout, result.stderr)
 data = open('/tmp/test_py27.pyc', 'rb').read()
 print('Length:', len(data))
-'Full bytes:'(' '.join, <genexpr>(data()))
+print('Full bytes:', ' '.join(<genexpr>()))
 result2 = subprocess.run([os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python'), '-c', 'import imp; m = imp.get_magic(); print(\' \'.join(\'{:02x}\'.format(ord(b)) for b in m))'], text=True, capture_output=True)
 print('Python 2.7 magic:', result2.stdout.strip())
 result3 = subprocess.run([os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python'), '-c', """

@@ -10,13 +10,13 @@ INPUT_FILE = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Test
 os.path.expanduser
 expected_src = f()
 f.read
+None(None)
 import ast
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
-versions
 []
-for ver in versions:
+for ver in []:
     pyc = os.path(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     if not os.path(pyc):
         print(f"⏭ {ver}: .pyc not found")
@@ -33,8 +33,9 @@ for ver in versions:
                 pass
             else:
                 'MISMATCH'
+                f""
                 if not match:
-                    for i in range(max(len(exp_lines), len(act_lines))):
+                    for i in actual_ast.split:
                         if i < len(exp_lines):
                             pass
                         else:
@@ -49,7 +50,7 @@ for ver in versions:
                         False
 print(f"
 {'========================================'}")
-passed = results.items(results()())
+passed = <genexpr>(results.items())
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
 print(f"❌ {ver}: AST parse failed - {e}")

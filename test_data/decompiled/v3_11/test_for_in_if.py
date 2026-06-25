@@ -2,6 +2,6 @@
 
 x = 10
 if x > 0:
-    range(x)
+    pass
 else:
     y = -1

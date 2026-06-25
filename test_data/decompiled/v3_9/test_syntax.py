@@ -2908,7 +2908,6 @@ class SyntaxWarningTest(unittest.TestCase):
         self.check_warning(source, '\'return\' in a \'finally\' block')
 
     def test_break_and_continue_in_finally(self):
-        ('break', 'continue')
         for kw in ('break', 'continue'):
             source = textwrap.dedent(f"
                 for abc in range(10):
@@ -3177,7 +3176,6 @@ if x:
         self._check_error('class A[__classdict__]: pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
         self._check_error('def f[__classdict__](): pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
         self._check_error('type T[__classdict__] = tuple[__classdict__]', 'reserved name \'__classdict__\' cannot be used for type parameter')
-        ('__class__', '__classcell__', '__classdictcell__')
         for name in ('__class__', '__classcell__', '__classdictcell__'):
             compile(f"
 class A:
@@ -3187,7 +3185,6 @@ class A:
     @support.cpython_only
     def test_nested_named_except_blocks(self):
         code = ''
-        range(12)
         for i in range(12):
             code += f"{'    ' * i}try:
 "
@@ -3206,7 +3203,6 @@ class A:
                     with (
                     a
                 """)
-            range(n)
             for i in range(n):
                 code += f"    as a{i}, a
 "
@@ -3214,7 +3210,6 @@ class A:
             return code
         CO_MAXBLOCKS = 21
         MAX_MANAGERS = CO_MAXBLOCKS - 1
-        range(MAX_MANAGERS)
         for n in range(MAX_MANAGERS):
             self.subTest(f"within range: n={n!r}")
             compile(get_code(n), '<string>', 'exec')
@@ -3236,7 +3231,6 @@ class A:
                     async with (
                     a
                 """)]
-            range(n)
             for i in range(n):
                 code.append(f"    as a{i}, a
 ")
@@ -3244,7 +3238,6 @@ class A:
             return ''.join(code)
         CO_MAXBLOCKS = 21
         MAX_MANAGERS = CO_MAXBLOCKS - 1
-        range(MAX_MANAGERS)
         for n in range(MAX_MANAGERS):
             self.subTest(f"within range: n={n!r}")
             compile(get_code(n), '<string>', 'exec')
@@ -3288,14 +3281,11 @@ fgdfgf
 """, 'unexpected EOF while parsing')
 
     def test_error_parenthesis(self):
-        """([{"""
         for paren in '([{':
             self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
-        '([{'
         for paren in '([{':
             self._check_error(f"a = {paren} 1, 2, 3
 b=3", f"\{paren}' was never closed")
-        ')]}'
         for paren in ')]}':
             self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
         code = """func(
@@ -3385,7 +3375,6 @@ while 1:
     @support.cpython_only
     def test_error_on_parser_stack_overflow(self):
         source = '-' * 100000 + '4'
-        ('exec', 'eval', 'single')
         for mode in ('exec', 'eval', 'single'):
             self.subTest(mode=mode)
             self.assertRaisesRegex(MemoryError, 'too complex')
@@ -3423,19 +3412,16 @@ while 1:
 
     def test_ifexp_else_stmt(self):
         msg = 'expected expression after \'else\', but statement is given'
-        ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
 
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
-        ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
 
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
-        (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (lhs_stmt, rhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
 

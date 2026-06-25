@@ -3,3 +3,4 @@
 def test():
     lock = object()
     lock
+    None(None)

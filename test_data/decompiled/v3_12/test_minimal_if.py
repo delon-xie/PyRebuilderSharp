@@ -15,6 +15,7 @@ def test_simple():
 """
 f.write(src)
 py_path = f.name
+None(None)
 py_compile.compile(py_path, doraise=True, cfile=py_path + 'c')
 print('Compiled OK')
 r = subprocess.run(['dotnet', 'run', '--project', 'src/PyRebuilderSharp.Cli', py_path + 'c'], cwd='/Users/admin/codes/Tools/PyRebuilderSharp', text=True, capture_output=True)

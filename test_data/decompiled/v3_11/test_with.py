@@ -2,3 +2,4 @@
 
 lock = object()
 print('hello')
+None(None)

@@ -6,3 +6,4 @@ lock
 __module__
 lock
 print('hello')
+None(None, None)

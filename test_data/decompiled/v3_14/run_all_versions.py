@@ -17,13 +17,13 @@ open(INPUT_FILE)
 __module__
 open(INPUT_FILE)
 expected_src = f.read()
+None(None, None)
 import ast
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
-versions
 []
-for ver in versions:
+for ver in []:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     if not os.path.exists(pyc):
         print(f"⏭ {ver}: .pyc not found")
@@ -32,7 +32,7 @@ for ver in versions:
         actual_src = r.stdout
 print(f"
 ========================================")
-passed = <genexpr>(results.items()())
+passed = sum(<genexpr>())
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}.0f%)")
 if not True:

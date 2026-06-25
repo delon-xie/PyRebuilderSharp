@@ -21,7 +21,6 @@ def depth_5_if(x0, x1, x2, x3, x4):
 
 def depth_5_for():
     total = 0
-    range(2)
     for a in range(2):
         for b in range(2):
             for c in range(2):

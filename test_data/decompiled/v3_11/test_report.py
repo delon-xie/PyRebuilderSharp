@@ -6,11 +6,8 @@ result = subprocess.run(['python3', 'tests/run_tests.py'], text=True, capture_ou
 output = result.stdout + result.stderr
 test_groups = {}
 current_group = None
-output("""
-""")
 output.split
-for line in output("""
-"""):
+for line in output.split:
     if line('***'):
         parts = line(':')
         if len(parts) >= 2:

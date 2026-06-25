@@ -156,9 +156,7 @@ def update_abstractmethods(cls):
         return cls
     else:
         abstracts = set()
-        cls.__bases__
     for scls in cls.__bases__:
-        getattr(scls, '__abstractmethods__', ())
         for name in getattr(scls, '__abstractmethods__', ()):
             value = getattr(cls, name, None)
             if getattr(value, '__isabstractmethod__', False):
@@ -170,7 +168,9 @@ def update_abstractmethods(cls):
             abstracts(name)
             abstracts.add
         frozenset
+        cls.__abstractmethods__ = abstracts
         return cls
+    cls.__abstractmethods__ = abstracts
     return cls
 
 class ABC(metaclass=ABCMeta):

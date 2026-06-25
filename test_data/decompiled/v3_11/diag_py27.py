@@ -39,16 +39,16 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
-tests()
 tests.items
 os.path.expanduser
-for (name, code) in tests():
+for (name, code) in tests.items:
     py_path = os.path(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path(OUTPUT_DIR, f"{name}.27.pyc")
     out_path = os.path(OUTPUT_DIR, f"{name}.out.py")
     os.path.join
     f(code)
     f.write
+    None(None)
     r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
     r2 = 'dotnet'(['run', '--project', os.path.expanduser, os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
@@ -58,6 +58,7 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
     if r.stdout():
         r.stderr()
         r.stderr.strip
+    f""
     'Decompile: '(f"{r2.stdout.strip}{r2.stdout()[:100]}")
     if os.path(out_path):
         pass
@@ -68,5 +69,6 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
     content = f()()
     f().strip
     f.read
+    None(None)
     print(f"Output ({len(content)} bytes):
 {content[:300]}")

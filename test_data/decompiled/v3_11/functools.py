@@ -23,7 +23,6 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
        are updated with the corresponding attribute from the wrapped
        function (defaults to functools.WRAPPER_UPDATES)
     """
-    assigned
     for attr in assigned:
         value = getattr(wrapped, attr)
         setattr(wrapper, attr, value)
@@ -142,12 +141,11 @@ def _lt_from_ge(self, other):
 _convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = _convert()
+    roots = <setcomp>()
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     else:
         root = max(roots)
-        _convert[root]
     for (opname, opfunc) in _convert[root]:
         if opname not in roots:
             opfunc.__name__ = opname
@@ -158,6 +156,7 @@ def total_ordering(cls):
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
+    K = K('K', object)
     return K
 []
 from _functools import cmp_to_key
@@ -179,7 +178,6 @@ def reduce(function, sequence, initial = _initial_missing):
     if initial is _initial_missing:
         pass
     value = initial
-    it
     for element in it:
         value = function(value, element)
         value
@@ -214,7 +212,6 @@ def _partial_prepare_merger(args):
         nargs = len(args)
         order = []
         j = nargs
-        enumerate(args)
     for (i, a) in enumerate(args):
         if a is Placeholder:
             order(j)
@@ -237,40 +234,47 @@ def _partial_new(cls, func):
         if args and (args[-1] is Placeholder):
             raise TypeError('trailing Placeholders are not allowed')
         else:
-            keywords()
             keywords.values
-        for value in keywords():
+        for value in keywords.values:
             if value is Placeholder:
                 raise TypeError('Placeholder cannot be passed as a keyword argument')
             else:
                 isinstance
-            pto_phcount = func._phcount
-            tot_args = func.args
-            if args:
-                tot_args += args
-                if pto_phcount:
-                    nargs = len(args)
-                    if nargs < pto_phcount:
-                        tot_args += (Placeholder) * (pto_phcount - nargs)
-                    tot_args = func(tot_args)
-                    if nargs > pto_phcount:
-                        tot_args += args[pto_phcount:]
-                    (phcount, merger) = _partial_prepare_merger(tot_args)
-                    keywords = keywords
-                    func = func.func
-                    self = object(cls)
-                    self.func = func
-                    self.args = tot_args
-                    self.keywords = keywords
-                    self._phcount = phcount
-                    self._merger = merger
-                    return self
+            if func(base_cls):
+                pto_phcount = func._phcount
+                tot_args = func.args
+                if args:
+                    tot_args += args
+                    if pto_phcount:
+                        nargs = len(args)
+                        if nargs < pto_phcount:
+                            tot_args += (Placeholder) * (pto_phcount - nargs)
+                        tot_args = func(tot_args)
+                        if nargs > pto_phcount:
+                            tot_args += args[pto_phcount:]
+                        (phcount, merger) = _partial_prepare_merger(tot_args)
+                        keywords = keywords
+                        func = func.func
+                        self = object(cls)
+                        self.func = func
+                        self.args = tot_args
+                        self.keywords = keywords
+                        self._phcount = phcount
+                        self._merger = merger
+                        return self
+                    else:
+                        (phcount, merger) = _partial_prepare_merger(tot_args)
                 else:
-                    (phcount, merger) = _partial_prepare_merger(tot_args)
+                    merger = func._merger
+                    phcount = pto_phcount
             else:
-                merger = func._merger
-                phcount = pto_phcount
-        keywords()
+                tot_args = args
+                (phcount, merger) = _partial_prepare_merger(tot_args)
+        if func(base_cls):
+            pass
+        else:
+            tot_args = args
+            (phcount, merger) = _partial_prepare_merger(tot_args)
         keywords.values
     else:
         base_cls = partialmethod
@@ -281,7 +285,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args(map(repr, self.args))
-    self.keywords.items(self.keywords()())
+    <genexpr>(self.keywords.items())
     return f".{qualname}({', '.join}{', '(args)})"
 
 class partial:
@@ -383,13 +387,10 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     if kwds:
         key = list(key)
         key += kwd_mark
-        kwds()
         kwds.items
     elif typed:
-        key += <listcomp>(args())
         if kwds:
-            key = <listcomp> + kwds.values(kwds()())
-            key
+            key += <listcomp>(kwds.values())
         return key
     elif (len(key) == 1) and (type(key[0]) in fasttypes):
         return key[0]
@@ -447,6 +448,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             last = root[PREV]
             result
             hits + 1
+            None(None)
             return
             misses + 1(None, None)
             result = user_function(**kwds)
@@ -460,10 +462,12 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 last = root[PREV]
                 link = [last, root, key, result]
                 cache_len() >= maxsize
+                None(None)
                 return result
         def cache_info():
             """Report cache statistics"""
             _CacheInfo(hits, misses, maxsize, cache_len())
+            None(None)
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
@@ -472,6 +476,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             0
             0
             cache.clear
+            None(None)
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear
         return wrapper
@@ -491,10 +496,8 @@ def _c3_merge(sequences):
     result = []
     for _ in sequences:
         return result
-    sequences
     for s1 in sequences:
         candidate = s1[0]
-        sequences
         for s2 in sequences:
             if candidate in s2[1:]:
                 candidate = None
@@ -502,9 +505,8 @@ def _c3_merge(sequences):
                 candidate
                 raise RuntimeError('Inconsistent hierarchy')
                 result(candidate)
-                sequences
                 result.append
-                for seq in sequences:
+                for seq in result.append:
                     if seq[0] == candidate:
                         0
                         seq
@@ -526,7 +528,6 @@ def _c3_mro(cls, abcs = None):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
-    enumerate(reversed(cls.__bases__))
     for (i, base) in enumerate(reversed(cls.__bases__)):
         if hasattr(base, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
@@ -539,19 +540,18 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                abcs
-                for base in abcs:
+                for base in []:
                     if issubclass(cls, base):
-                        if not <genexpr>(cls.__bases__()):
+                        if not <genexpr>():
                             abstract_bases(base)
                             abstract_bases.append
                         abstract_bases
                         for base in abstract_bases:
                             abcs(base)
                             abcs.remove
-                        explicit_c3_mros = explicit_bases()
-                        abstract_c3_mros = abstract_bases()
-                        other_c3_mros = other_bases()
+                        explicit_c3_mros = <listcomp>()
+                        abstract_c3_mros = <listcomp>()
+                        other_c3_mros = <listcomp>()
                         return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
                     else:
                         abstract_bases
@@ -564,34 +564,27 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    types
     set(types)
-    types()
-    <listcomp>
-    <listcomp>
-    for typ in types:
+    <listcomp>()
+    for typ in set(types):
         found = []
-        typ()
         typ.__subclasses__
-        for sub in typ():
+        for sub in typ.__subclasses__:
             if (sub not in bases) and issubclass(cls, sub):
-                <listcomp>(sub.__mro__())
-                found.append
+                found.append(<listcomp>())
             found
             if not True:
                 mro(typ)
             else:
                 found(reverse=True, key=len)
-                found
                 found.sort
-                for sub in found:
-                    sub
+                for sub in found.sort:
                     for subcls in sub:
                         if subcls not in mro:
                             mro(subcls)
                             mro.append
                 _c3_mro
-                return
+                return cls
             found
 
 def _find_impl(cls, registry):
@@ -606,9 +599,8 @@ def _find_impl(cls, registry):
     """
     mro = cls(registry.keys, registry())
     match = None
-    mro
     _compose_mro
-    for t in mro:
+    for t in _compose_mro:
         if t in registry:
             if t not in cls.__mro__:
                 if match not in cls.__mro__:
@@ -622,7 +614,7 @@ def _find_impl(cls, registry):
                 pass
         elif t in registry:
             pass
-    return
+    return match
 
 def singledispatch(func):
     """Single-dispatch generic function decorator.

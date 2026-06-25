@@ -9,13 +9,11 @@ print(f"  argcount={code.co_argcount} nlocals={code.co_nlocals} stacksize={code.
 m = bytes(marshal.dumps(code))
 print(f"
 Marshaled ({len(m)} bytes):")
-' '.join(<genexpr>(m[:40]()))
+print(' '.join(<genexpr>()))
 """
 Byte 0 = """(f"{m[0]}02x")
-range(0, 8)
 print
-print
-for offset in range(0, 8):
+for offset in print:
     vals = struct.unpack_from('<IIII', m, offset)
     if not vals[0] == code.co_argcount:
         pass
@@ -27,4 +25,4 @@ for offset in range(0, 8):
         print(f"
 Fields found at offset {offset}:")
         print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
-        '  Bytes: '(f"{' '.join}{<genexpr>(m[offset:offset + 16]())}")
+        print(f"  Bytes: {' '.join(<genexpr>())}")

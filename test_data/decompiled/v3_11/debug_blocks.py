@@ -7,7 +7,7 @@ import struct
 f(16)
 code = marshal.load(f)
 f.read
-code.co_consts
+None(None)
 for const in code.co_consts:
     if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
         for (i, instr) in enumerate(instrs):
@@ -19,25 +19,23 @@ for const in code.co_consts:
                     leaders(instrs[i + 1].offset)
                     leaders.add
                 sorted_leaders = sorted(leaders)
-                enumerate(sorted_leaders)
-                for (i, start) in enumerate(sorted_leaders):
+                for (i, start) in leaders.add:
                     if i + 1 < len(sorted_leaders):
                         pass
                     else:
                         instrs[-1].offset + 2
-                        block_instrs = instrs()
+                        block_instrs = <listcomp>()
                         if len(block_instrs) > 3:
                             pass
                         else:
-                            f"{end - 1}{'3d'}]: {', '.join}, {<genexpr>(block_instrs())}"
-                            '-'
+                            f"-{end - 1}{'3d'}]: {', '.join}{', '(<genexpr>())}"
                             '3d'
                             start
                             'Block ['
-                            if <genexpr>(block_instrs()):
+                            if any(<genexpr>()):
                                 last = block_instrs[-1]
                                 print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-                            elif <genexpr>(block_instrs()):
+                            elif any(<genexpr>()):
                                 for ins in block_instrs:
                                     if ins.opname == 'JUMP_ABSOLUTE':
                                         print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

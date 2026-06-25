@@ -6,10 +6,10 @@ MAGIC_NUMBERS = {b'hQ0NCg==': '3.10', b'eg0NCg==': '3.11', b'bw0NCg==': '3.12', 
 def get_python_version(filepath):
     magic = fp(4)
     fp.read
+    None(None)
     return MAGIC_NUMBERS(magic, 'unknown')
 
 def fix_pyc_names(directory):
-    os.listdir(directory)
     for filename in os.listdir(directory):
         if filename('.pyc'):
             filepath = os.path(directory, filename)
@@ -20,9 +20,8 @@ def fix_pyc_names(directory):
                 pass
             else:
                 new_filename = filename
-                MAGIC_NUMBERS()
                 MAGIC_NUMBERS.values
-                for version in MAGIC_NUMBERS():
+                for version in MAGIC_NUMBERS.values:
                     if f".{version}.pyc" in new_filename:
                         new_filename = new_filename(f".{version}.pyc", f".{actual_version}.pyc")
                         new_filename.replace

@@ -2870,6 +2870,7 @@ class SyntaxWarningTest(unittest.TestCase):
         text of the warning raised.
         """
         compile(code, filename, mode)
+        None(None)
 
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -2904,7 +2905,6 @@ class SyntaxWarningTest(unittest.TestCase):
         self(source, '\'return\' in a \'finally\' block')
 
     def test_break_and_continue_in_finally(self):
-        ('break', 'continue')
         for kw in ('break', 'continue'):
             source = textwrap.dedent(f"
                 for abc in range(10):
@@ -3221,7 +3221,6 @@ fgdfgf
 """, 'unexpected EOF while parsing')
 
     def test_error_parenthesis(self):
-        """([{"""
         for paren in '([{':
             self(paren + '1 + 2', f"\{paren}' was never closed")
             '([{'
@@ -3308,7 +3307,6 @@ a=1
 
     def test_ifexp_else_stmt(self):
         msg = 'expected expression after \'else\', but statement is given'
-        ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self(f"x = 1 if 1 else {stmt}", msg)
             None
@@ -3317,7 +3315,6 @@ a=1
 
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
-        ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self(f"x = {stmt} if 1 else 1", msg)
             None
@@ -3326,7 +3323,6 @@ a=1
 
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
-        (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (lhs_stmt, rhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
             None

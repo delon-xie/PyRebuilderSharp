@@ -25,7 +25,7 @@ class Repr:
         pass
 
     def repr(self, x):
-        return
+        return self.repr1.maxlevel
 
     def repr1(self, x, level):
         cls = type(x)
@@ -35,11 +35,11 @@ class Repr:
             typename = '_'.join(parts)
         method = getattr(self, 'repr_' + typename, None)
         if method:
-            return
+            return method(None)
             module = getattr(cls, '__module__', None)
-            return
+            return method(None)
         else:
-            return
+            return self.repr_instance
 
     def _join(self, pieces, level):
         try:
@@ -65,43 +65,49 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         elem
-        []
-        for _ in []:
+        for _ in elem:
             pass
         pieces.append(self.fillvalue)
+        s = self._join
+        if n == 1:
+            if trail:
+                pass
+            return f"{left}{s}{right}"
+        else:
+            return f"{left}{s}{right}"
         newlevel = level - 1
         repr1 = self.repr1
         elem
 
     def repr_tuple(self, x, level):
-        return
+        return self._repr_iterable('(', ')', self.maxtuple, ',')
 
     def repr_list(self, x, level):
-        return
+        return self._repr_iterable('[', ']', self.maxlist)
 
     def repr_array(self, x, level):
         if not x:
             return 'array(\'%s\')' % x.typecode
         else:
             header = 'array(\'%s\', [' % x.typecode
-            return
+            return self._repr_iterable(header, '])', self.maxarray)
 
     def repr_set(self, x, level):
         if not x:
             return 'set()'
         else:
             x = _possibly_sorted(x)
-            return
+            return self._repr_iterable('{', '}', self.maxset)
 
     def repr_frozenset(self, x, level):
         if not x:
             return 'frozenset()'
         else:
             x = _possibly_sorted(x)
-            return
+            return self._repr_iterable('frozenset({', '})', self.maxfrozenset)
 
     def repr_deque(self, x, level):
-        return
+        return self._repr_iterable('deque([', '])', self.maxdeque)
 
     def repr_dict(self, x, level):
         n = len(x)
@@ -113,7 +119,6 @@ class Repr:
             newlevel = level - 1
             repr1 = self.repr1
             pieces = []
-            islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])

@@ -39,5 +39,3 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
                 else:
                     print(f"  bytes: {const.co_exceptiontable.hex()}")
         return None
-code.co_consts
-code.co_consts

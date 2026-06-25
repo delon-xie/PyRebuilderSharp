@@ -17,11 +17,11 @@ open(INPUT_FILE)
 __module__
 open(INPUT_FILE)
 expected_src = f.read()
+None(None, None)
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-versions
 []
-for ver in versions:
+for ver in []:
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)

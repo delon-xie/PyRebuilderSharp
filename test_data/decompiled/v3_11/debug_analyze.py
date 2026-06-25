@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 output = f()
 f.read
+None(None)
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -33,7 +34,6 @@ if i < len(lines):
                             debug_count += 1
                             if debug_count <= 5:
                                 print(f"Test: {test_name}, Status: {status}")
-                                found_versions
                             i += 1
                             i < len(lines)
                             print(f"Total tests with versions found: {debug_count}")

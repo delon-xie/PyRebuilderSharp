@@ -991,10 +991,34 @@ public class StackMachine
                     if (_exprStack.Count > 0)
                         func = SafePop();
                     else
+                    {
+                        // PUSH_NULL 后无函数 — args 可能包含了函数对象
+                        // 常见于 KW_NAMES 路径多弹了
+                        if (args.Count >= 1)
+                        {
+                            // args[0] = 最后弹出的 = 离 TOS 最近 = 函数
+                            var recoveredFunc = args[0];
+                            args.RemoveAt(0);
+                            _exprStack.Push(new Call(recoveredFunc, args, keywords));
+                        }
                         return null;
+                    }
                 }
                 else if (func == null)
                 {
+                    // func=null — argCount 可能多弹了一个
+                    if (args.Count >= 2)
+                    {
+                        // args[0] = 最后弹出 = 函数, args[1..] = 实际参数
+                        var recoveredFunc = args[0];
+                        args.RemoveAt(0);
+                        _exprStack.Push(new Call(recoveredFunc, args, keywords));
+                    }
+                    else if (args.Count == 1)
+                    {
+                        // 单个参数 — 直接推送为表达式（至少保留值）
+                        _exprStack.Push(args[0]);
+                    }
                     return null;
                 }
 
@@ -1307,7 +1331,13 @@ public class StackMachine
             }
 
             case Opcode.GET_ITER:
+            {
+                // L1: GET_ITER — 消耗栈顶的迭代对象，防止残留导致伪 ExprStmt
+                var iterable = SafePop();
+                if (iterable == null)
+                    Console.Error.WriteLine($"[GET_ITER] v{_code.Version} func={_code.Name} stackEmpty");
                 return null;
+            }
 
             case Opcode.GET_YIELD_FROM_ITER:
                 // GET_YIELD_FROM_ITER: TOS = iter(TOS)，对 AST 透明

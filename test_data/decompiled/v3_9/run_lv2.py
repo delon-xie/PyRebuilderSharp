@@ -11,7 +11,7 @@ f = open(INPUT_FILE)
 expected_src = f.read()
 with open(INPUT_FILE) as f:
     expected_src = f.read()
-    for ver in versions:
+    for ver in []:
         pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
         if not os.path.exists(pyc):
             print('⏭ %s: no pyc' % ver)

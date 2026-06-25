@@ -15,7 +15,6 @@ with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
-versions
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     if not os.path.exists(pyc):
@@ -50,6 +49,5 @@ for ver in versions:
         pass
 print(f"
 {'========================================'}")
-passed = sum(<genexpr>(results.items()))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")

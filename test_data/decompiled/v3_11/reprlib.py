@@ -86,7 +86,7 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        pieces = islice(x, maxiter)()
+        pieces = <listcomp>()
         if n > maxiter:
             pieces(self.fillvalue)
             pieces.append
@@ -97,7 +97,7 @@ class Repr:
             return f"{left!s}{s!s}{right!s}"
         else:
             return f"{left!s}{s!s}{right!s}"
-        pieces = islice(x, maxiter)()
+        pieces = <listcomp>()
         if n > maxiter:
             pass
         s = self(pieces, level)
@@ -145,7 +145,6 @@ class Repr:
             newlevel = level - 1
             repr1 = self.repr1
             pieces = []
-            islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])

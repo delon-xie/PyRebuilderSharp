@@ -124,7 +124,6 @@ class ABCMeta(type):
 
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
-        sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
             pass
         value = getattr(cls, name)
@@ -140,7 +139,7 @@ class ABCMeta(type):
             else:
                 return
         else:
-            return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'({subclass, subtype}))
+            return (any)(CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'))
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
@@ -164,8 +163,6 @@ class ABCMeta(type):
             elif cls in getattr(subclass, '__mro__', ()):
                 cls._abc_cache.add(subclass)
                 return True
-            else:
-                cls._abc_registry
 
 def get_cache_token():
     """Returns the current ABC cache token.

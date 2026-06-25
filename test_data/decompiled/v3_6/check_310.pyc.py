@@ -11,7 +11,6 @@ raw = f.read()
 code = marshal.loads(raw)
 def dump_bytecode(c, depth):
     p = '  ' * depth
-    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             isinstance(const, types.CodeType)

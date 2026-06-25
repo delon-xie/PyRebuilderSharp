@@ -16,10 +16,9 @@ else:
 """)
     act_lines = actual_ast("""
 """)
-    range(max(len(exp_lines), len(act_lines)))
     actual_ast.split
     expected_ast.split
-for i in range(max(len(exp_lines), len(act_lines))):
+for i in actual_ast.split:
     if i < len(exp_lines):
         pass
     else:

@@ -8,7 +8,6 @@ if i < 5:
     j = i * 2
     i += 1
     i < 5
-range(10)
-for n in range(10):
+for n in i < 5:
     m = n + 1
 a = 1

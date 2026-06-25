@@ -6,14 +6,15 @@ MAGIC_NUMBERS = {b'hQ0NCg==': '3.10', b'eg0NCg==': '3.11', b'bw0NCg==': '3.12', 
 def get_python_version(filepath):
     open(filepath, 'rb')
     magic = fp.read(4)
+    None(None)
     return MAGIC_NUMBERS.get(magic, 'unknown')
 
 def fix_pyc_names(directory):
-    os.listdir(directory)
     for filename in os.listdir(directory):
         if not filename.endswith('.pyc'):
             pass
         else:
+            filepath = os.path.join
             actual_version = get_python_version(filepath)
             if actual_version == 'unknown':
                 pass
@@ -21,7 +22,6 @@ def fix_pyc_names(directory):
                 pass
             else:
                 new_filename = filename
-                MAGIC_NUMBERS.values()
                 for version in MAGIC_NUMBERS.values():
                     if not f".{version}.pyc" in new_filename:
                         pass
@@ -29,10 +29,13 @@ def fix_pyc_names(directory):
                         new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
                         if not True:
                             pass
-                        elif os.path.exists(new_filepath):
-                            print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
                         else:
-                            print(f"✓ Renamed {filename} -> {new_filename}")
+                            new_filepath = os.path.join
+                            if os.path.exists(new_filepath):
+                                print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+                            else:
+                                os.rename(None)
+                                print(f"✓ Renamed {filename} -> {new_filename}")
                 import re
                 match = re.search('\\.(\\d+)\\.pyc$', filename)
                 if match:
@@ -40,10 +43,13 @@ def fix_pyc_names(directory):
                     new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
                 elif not True:
                     pass
-                elif os.path.exists(new_filepath):
-                    pass
                 else:
-                    print(f"✓ Renamed {filename} -> {new_filename}")
+                    new_filepath = os.path.join
+                    if os.path.exists(new_filepath):
+                        pass
+                    else:
+                        os.rename(None)
+                        print(f"✓ Renamed {filename} -> {new_filename}")
 
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')

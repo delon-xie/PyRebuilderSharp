@@ -13,7 +13,6 @@ print('  code len:', len(code.co_code))
 print('  code hex:', code.co_code.hex()[:60])
 def dump_code(c, depth):
     prefix = '  ' * depth
-    c.co_consts
     for const in c.co_consts:
         pass
     print('%sFunction: %s' % (prefix, const.co_name))

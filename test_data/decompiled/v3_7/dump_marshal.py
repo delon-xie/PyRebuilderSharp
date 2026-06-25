@@ -11,7 +11,6 @@ raw = data[pos]
 pos += 1
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
-('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     val = struct.unpack('<i', data[pos:pos + 4])[0]
     print(f"  {name}={val}")

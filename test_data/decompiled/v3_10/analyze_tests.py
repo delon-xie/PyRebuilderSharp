@@ -42,7 +42,7 @@ with open('/tmp/test_full.txt', 'r') as f:
                                                         pass
                                                 i = i + 1
                                                 if not i < len(lines):
-                                                    for version in sorted(version_stats.keys()):
+                                                    for version in '通过':
                                                         stats = version_stats[version]
                                                         t = stats['total']
                                                         p = stats['passed']

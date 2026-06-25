@@ -14,6 +14,7 @@ def test_until_broken(exprs):
     pycf = '/tmp/expr_bs.3.10.pyc'
     f(code)
     f.write
+    None(None)
     r = subprocess.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     if not os.path(pyc):

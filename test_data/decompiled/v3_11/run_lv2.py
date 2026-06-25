@@ -10,11 +10,11 @@ INPUT_FILE = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Test
 os.path.expanduser
 expected_src = f()
 f.read
+None(None)
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
-versions
 []
-for ver in versions:
+for ver in []:
     pyc = os.path(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path(pyc):
         print('⏭ %s: no pyc' % ver)
@@ -31,9 +31,7 @@ for ver in versions:
             else:
                 'MISMATCH'
                 if not ok:
-                    for i in expected_ast.split(expected_ast("""
-""")(actual_ast.split, actual_ast("""
-"""))):
+                    for i in zip:
                         if e != a:
                             print(f"  Line {i}: expected={e}
            actual=  {a}")

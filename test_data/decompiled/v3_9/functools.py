@@ -23,13 +23,11 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
        are updated with the corresponding attribute from the wrapped
        function (defaults to functools.WRAPPER_UPDATES)
     """
-    assigned
     for attr in assigned:
         try:
             value = getattr(wrapped, attr)
         except AttributeError:
             pass
-    updated
     for attr in updated:
         attr
         wrapper
@@ -122,7 +120,13 @@ def _lt_from_ge(self, other):
 _convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = total_ordering.<locals>.<setcomp>(_convert)
+    @()
+    def <setcomp>(.0):
+        .0
+        {}
+        for op in .0:
+            pass
+        return
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     opfunc.__name__ = opname
@@ -209,7 +213,6 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    args.extend(_partial_repr.<locals>.<genexpr>(self.keywords.items()))
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -363,7 +366,6 @@ def _c3_merge(sequences):
     result = []
     for _ in sequences:
         return result
-    sequences
     for s1 in sequences:
         for s2 in sequences:
             if candidate in s2[1:]:
@@ -391,7 +393,6 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
-    enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
         if abcs(hasattr, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
@@ -407,18 +408,15 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    found
     sub(set)
-    (typ)(_compose_mro.<locals>.<listcomp>)
-    _compose_mro.<locals>.is_strict_base
+    _compose_mro.<locals>.is_strict_base((typ))
     (sub)
-    (mro)(_compose_mro.<locals>.<listcomp>)
-    _compose_mro.<locals>.is_related
+    _compose_mro.<locals>.is_related((mro))
     (cls)
-    for typ in found:
+    for typ in sub(set):
         for sub in typ.__subclasses__():
             if sub(issubclass, sub):
-                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+                pass
             for sub in found:
                 for subcls in sub:
                     if subcls not in mro:
@@ -439,7 +437,6 @@ def _find_impl(cls, registry):
     """
     mro = _compose_mro(cls, registry.keys())
     match = None
-    mro
     for t in mro:
         if (match is not None) and (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
             raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))

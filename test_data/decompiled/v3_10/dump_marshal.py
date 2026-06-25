@@ -15,7 +15,6 @@ with open(sys.argv[1], 'rb') as f:
         ref = struct.unpack('<I', data[pos:pos + 4])[0]
         pos = pos + 4
         print(f"  FLAG_REF ref_index={ref}")
-    ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
     for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
         val = struct.unpack('<i', data[pos:pos + 4])[0]
         print(f"  {name}={val}")

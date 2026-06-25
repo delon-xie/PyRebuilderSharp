@@ -23,13 +23,11 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
        are updated with the corresponding attribute from the wrapped
        function (defaults to functools.WRAPPER_UPDATES)
     """
-    assigned
     for attr in assigned:
         try:
             value = getattr(wrapped, attr)
         except AttributeError:
             pass
-    updated
     for attr in updated:
         attr
         wrapper
@@ -154,12 +152,18 @@ def _lt_from_ge(self, other):
 _convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = total_ordering.<locals>.<setcomp>(_convert)
+    @()
+    def <setcomp>(.0):
+        .0
+        {}
+        for op in .0:
+            for _ in .0:
+                pass
+            return
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     else:
         root = max(roots)
-        _convert[root]
     for (opname, opfunc) in _convert[root]:
         if opname not in roots:
             opfunc.__name__ = opname
@@ -196,7 +200,6 @@ def reduce(function, sequence, initial):
             raise
             value = initial
     value = initial
-    it
     for element in it:
         value = function(value, element)
     return value
@@ -232,7 +235,6 @@ def _partial_prepare_merger(args):
         nargs = len(args)
         order = []
         j = nargs
-        enumerate(args)
     for (i, a) in enumerate(args):
         if a is Placeholder:
             order.append(j)
@@ -253,8 +255,6 @@ def _partial_new(cls, func):
             raise TypeError('the first argument must be callable')
         if args and (args[-1] is Placeholder):
             raise TypeError('trailing Placeholders are not allowed')
-        else:
-            keywords.values()
         for value in keywords.values():
             if value is Placeholder:
                 raise TypeError('Placeholder cannot be passed as a keyword argument')
@@ -288,7 +288,6 @@ def _partial_new(cls, func):
         else:
             tot_args = args
             (phcount, merger) = _partial_prepare_merger(tot_args)
-        keywords.values()
     else:
         base_cls = partialmethod
 
@@ -298,7 +297,6 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    args.extend(_partial_repr.<locals>.<genexpr>(self.keywords.items()))
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -432,9 +430,23 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         for item in kwds.items():
             key += item
     elif typed:
-        key += (tuple)(_make_key.<locals>.<listcomp>(args))
+        @(tuple)
+        @key
+        def <listcomp>(.0):
+            .0
+            []
+            for v in .0:
+                pass
+            return
         if kwds:
-            key += (tuple)(_make_key.<locals>.<listcomp>(kwds.values()))
+            @(tuple)
+            @key
+            def <listcomp>(.0):
+                .0
+                []
+                for v in .0:
+                    pass
+                return
         return key
     elif (len(key) == 1) and (len(key[0]) in fasttypes):
         return key[0]
@@ -495,7 +507,6 @@ def _c3_merge(sequences):
     result = []
     for _ in sequences:
         return result
-    sequences
     for s1 in sequences:
         for s2 in sequences:
             if candidate in s2[1:]:
@@ -504,7 +515,6 @@ def _c3_merge(sequences):
         raise RuntimeError('Inconsistent hierarchy')
     else:
         result.append(candidate)
-        sequences
     for seq in sequences:
         if seq[0] == candidate:
             0
@@ -527,7 +537,6 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
-    enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
         if abcs(hasattr, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
@@ -538,16 +547,32 @@ def _c3_mro(cls, abcs):
             explicit_bases = list(cls.__bases__[:boundary])
             abstract_bases = []
             other_bases = list(cls.__bases__[boundary:])
-            cls
-            for _ in cls:
-                if abcs(issubclass, cls) and not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
+            for _ in []:
+                if abcs(issubclass, cls) and not cls((any)(_c3_mro.<locals>.<genexpr>)):
                     pass
-            abstract_bases
             for _ in abstract_bases:
                 pass
-            explicit_c3_mros = _c3_mro.<locals>.<listcomp>(explicit_bases)
-            abstract_c3_mros = _c3_mro.<locals>.<listcomp>(abstract_bases)
-            other_c3_mros = _c3_mro.<locals>.<listcomp>(other_bases)
+            @()
+            def <listcomp>(.0):
+                .0
+                []
+                for base in .0:
+                    pass
+                return
+            @()
+            def <listcomp>(.0):
+                .0
+                []
+                for base in .0:
+                    pass
+                return
+            @()
+            def <listcomp>(.0):
+                .0
+                []
+                for base in .0:
+                    pass
+                return
             return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
     boundary = 0
 
@@ -559,23 +584,19 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    found
     sub(set)
-    (typ)(_compose_mro.<locals>.<listcomp>)
-    _compose_mro.<locals>.is_strict_base
+    _compose_mro.<locals>.is_strict_base((typ))
     (sub)
-    (mro)(_compose_mro.<locals>.<listcomp>)
-    _compose_mro.<locals>.is_related
+    _compose_mro.<locals>.is_related((mro))
     (cls)
-    for typ in found:
+    for typ in sub(set):
         for sub in typ.__subclasses__():
             if sub(issubclass, sub):
-                found.append(_compose_mro.<locals>.<listcomp>(sub.__mro__))
+                pass
         if not found:
             mro.append(typ)
         else:
             found.sort(key=len, reverse=True)
-            found
             for sub in found:
                 for subcls in sub:
                     if subcls not in mro:
@@ -594,7 +615,6 @@ def _find_impl(cls, registry):
     """
     mro = _compose_mro(cls, registry.keys())
     match = None
-    mro
     for t in mro:
         if match is not None:
             if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):

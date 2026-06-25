@@ -34,6 +34,7 @@ else:
                         except Exception:
                             pass
                         else:
+                            f""
                             try:
                                 pass
                             except Exception:
@@ -43,7 +44,6 @@ else:
 """)
                                 act_lines = actual_ast.split("""
 """)
-                                range(max(len(exp_lines), len(act_lines)))
                                 for i in range(max(len(exp_lines), len(act_lines))):
                                     try:
                                         pass
@@ -88,7 +88,7 @@ else:
                                     else:
                                         print(f"  Line {i}: expected={e}")
                                         print(f"           actual=  {a}")
-                                        for ver in versions:
+                                        for ver in []:
                                             pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
                                             if not os.path.exists(pyc):
                                                 print(f"⏭ {ver}: .pyc not found")
@@ -97,7 +97,7 @@ else:
                                                 actual_src = r.stdout
                                         print(f"
 ========================================")
-                                        passed = <genexpr>(results.items()())
+                                        passed = sum(<genexpr>())
                                         total = len(results)
                                         'Passed: '(f"{passed}/{total} ({passed / total * 100}.0f%)")
     except Exception:
@@ -107,7 +107,6 @@ else:
 print(f"❌ {ver}: AST parse failed - {e}")
 print(f"  Decompiled: {actual_src[:200]}")
 def <genexpr>(.0):
-    .0
     for (r, v) in .0:
         r
         if not True:

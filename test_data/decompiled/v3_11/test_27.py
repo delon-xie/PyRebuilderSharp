@@ -9,12 +9,11 @@ pyc = os.path(COMPILED_DIR, 'test_expr_basic.2.7.pyc')
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
 lines = r.stdout("""
 """)
-enumerate(lines)
 r.stdout.split
 os.path.join
 os.path.expanduser
 os.path.expanduser
-for (i, line) in enumerate(lines):
+for (i, line) in r.stdout.split:
     if 'items[' in line:
         print(f"Line {i}: {line}")
     print("""

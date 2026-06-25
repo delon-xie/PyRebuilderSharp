@@ -39,9 +39,6 @@ else:
                             except Exception:
                                 pass
                             else:
-                                enumerate(zip(expected_ast.split("""
-"""), actual_ast.split("""
-""")))
                                 for i in enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
 """))):
@@ -56,7 +53,7 @@ else:
                                     else:
                                         print(f"  Line {i}: expected={e}
            actual=  {a}")
-                                        for ver in versions:
+                                        for ver in []:
                                             pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
                                             if not os.path.exists(pyc):
                                                 print('⏭ %s: no pyc' % ver)

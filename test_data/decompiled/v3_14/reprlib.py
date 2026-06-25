@@ -80,7 +80,6 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         elem
-        islice(x, maxiter)
         []
         for _ in []:
             pass
@@ -96,7 +95,6 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         elem
-        islice(x, maxiter)
 
     def repr_tuple(self, x, level):
         """("""
@@ -144,7 +142,6 @@ class Repr:
             newlevel = level - 1
             repr1 = self.repr1
             pieces = []
-            islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])

@@ -13,11 +13,11 @@ PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderShar
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
 expected_src = f.read()
+None(None)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
-versions
 []
-for ver in versions:
+for ver in []:
     pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: .pyc not found' % ver)
@@ -34,6 +34,7 @@ for ver in versions:
                 pass
             else:
                 'MISMATCH'
+                f""
                 if not match:
                     for i in range(max(len(exp_lines), len(act_lines))):
                         if i < len(exp_lines):
@@ -49,7 +50,7 @@ for ver in versions:
                                 else:
                                     print('  Line %d: expected=%s' % (i, e))
                                     print('           actual=  %s' % a)
-passed = <genexpr>(results.items()())
+passed = sum(<genexpr>())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

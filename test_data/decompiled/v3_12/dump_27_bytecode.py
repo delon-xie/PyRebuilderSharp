@@ -23,6 +23,7 @@ next_type = data[pos]
 if (None <= print) and (open < 127):
     pass
 '?'
+f")"
 pos += 1
 if (next_type in (115, 116, 122)) and (next_type == 122):
     length = data[pos]
@@ -49,9 +50,9 @@ else:
             pass
         else:
             1
+            (op, instr_name, arg)
             if offset < len(bytecode):
                 pass
-            instructions
             for (off, op, name, arg) in instructions:
                 ''
                 arg
@@ -64,6 +65,7 @@ else:
                 '  '
                 print
                 None
+                f""
             print(f"
 Constants at {pos}:")
             const_type = data[pos]

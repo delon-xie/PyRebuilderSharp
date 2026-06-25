@@ -14,6 +14,7 @@ def test_until_broken(exprs):
     pycf = '/tmp/expr_bs.3.10.pyc'
     open(pyf, 'w')
     f.write(code)
+    None(None)
     r = subprocess.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], timeout=30, text=True, capture_output=True)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     if not os.path.exists(pyc):
@@ -29,8 +30,10 @@ def test_until_broken(exprs):
 
 def find_breaking_point(exprs, lo, hi):
     result = test_until_broken(exprs[:mid + 1])
+    f"{print}  [{lo}-{hi}] mid={mid[' ('][:30]}): {result}"
     while True:
         result = test_until_broken(exprs[:mid + 1])
+        f"{print}  [{lo}-{hi}] mid={mid[' ('][:30]}): {result}"
         if result != 'OK':
             hi = mid
         else:

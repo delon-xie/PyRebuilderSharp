@@ -6,7 +6,7 @@ import types
 import struct
 f.read(16)
 code = marshal.load(f)
-code.co_consts
+None(None)
 for const in code.co_consts:
     if not isinstance(const, types.CodeType):
         pass
@@ -16,7 +16,6 @@ for const in code.co_consts:
         print('=== Block structure ===')
         instrs = list(dis.Bytecode(const))
         leaders = {0}
-        enumerate(instrs)
         for (i, instr) in enumerate(instrs):
             if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
                 leaders.add(instr.arg)
@@ -29,14 +28,12 @@ for const in code.co_consts:
                 else:
                     leaders.add(instrs[i + 1].offset)
         sorted_leaders = sorted(leaders)
-        enumerate(sorted_leaders)
         for (i, start) in enumerate(sorted_leaders):
             if i + 1 < len(sorted_leaders):
                 pass
             else:
                 instrs[-1].offset + 2
                 ins
-                instrs
                 []
                 for ins in []:
                     if (ins.offset <= start) and not start < end:
@@ -46,17 +43,15 @@ for const in code.co_consts:
                 if len(block_instrs) > 3:
                     pass
                 else:
-                    f"-{end - 1}{'3d'}]: {', '.join}{<genexpr>(block_instrs())}"
-                    '3d'
+                    f"{'3d'}-{end - 1}{'3d'}]: {', '.join(<genexpr>())}"
                     start
                     'Block ['
-                    if <genexpr>(block_instrs()):
+                    if any(<genexpr>()):
                         last = block_instrs[-1]
                         print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-                    elif not <genexpr>(block_instrs()):
+                    elif not any(<genexpr>()):
                         pass
                     else:
-                        block_instrs
                         for ins in block_instrs:
                             if not ins.opname == 'JUMP_ABSOLUTE':
                                 pass

@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 output = f()
 f.read
+None(None)
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -42,14 +43,13 @@ if i < len(lines):
                             total_passed = 0
                             total_failed = 0
                             total = 0
-                            version_stats.keys(version_stats())
                             sorted
                             '通过'
                             ' '
                             '<12'
                             '版本'
                             print
-                            for version in version_stats.keys(version_stats()):
+                            for version in sorted:
                                 stats = version_stats[version]
                                 t = stats['total']
                                 p = stats['passed']
@@ -107,7 +107,6 @@ print('----------------------------------------------------------------------')
 total_passed = 0
 total_failed = 0
 total = 0
-version_stats.keys(version_stats())
 sorted
 '通过'
 ' '

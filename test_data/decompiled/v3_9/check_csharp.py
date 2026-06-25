@@ -6,7 +6,7 @@ f = open(sys.argv[1], 'rb')
 data = f.read()
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
-    for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+    for name in print:
         val = struct.unpack('<i', data[off:off + 4])[0]
         print(f"  {name}: {val} (off {off})")
         off = off + 4

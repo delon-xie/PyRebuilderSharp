@@ -221,7 +221,6 @@ class EnumDict(dict):
                 pass
         except AttributeError:
             pass
-        more_members.items()
         for (name, value) in more_members.items():
             pass
 _EnumDict = EnumDict
@@ -331,7 +330,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return ()(EnumType.__iter__.<locals>.<genexpr>._member_names_)
+        return
 
     def __len__(cls):
         """
@@ -357,7 +356,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return ()(EnumType.__reversed__.<locals>.<genexpr>(reversed._member_names_))
+        return
 
     def __setattr__(cls, name, value):
         """
@@ -407,7 +406,6 @@ class EnumType(type):
 
     @classmethod
     def _check_for_existing_members_(mcls, class_name, bases):
-        bases
         for chain in bases:
             for base in chain.__mro__:
                 if isinstance(base, EnumType) and base._member_names_:
@@ -427,7 +425,6 @@ class EnumType(type):
 
     @classmethod
     def _find_data_repr_(mcls, class_name, bases):
-        bases
         for chain in bases:
             for base in chain.__mro__:
                 if base is object:
@@ -445,7 +442,6 @@ class EnumType(type):
     def _find_data_type_(mcls, class_name, bases):
         data_types = set()
         base_chain = set()
-        bases
         for chain in bases:
             for base in chain.__mro__:
                 base_chain.add(base)
@@ -707,7 +703,6 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition (i.e. increasing value) order.
         """
-        _iter_bits_lsb(value & cls._flag_mask_)
         for val in _iter_bits_lsb(value & cls._flag_mask_):
             yield cls._value2member_map_.get(val)
     _iter_member_ = _iter_member_by_value_
@@ -818,12 +813,10 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
     """
     duplicates = []
-    enumeration.__members__.items()
     for (name, member) in enumeration.__members__.items():
         if name != member.name:
             duplicates.append((name, member.name))
     if duplicates:
-        alias_details = ', '.join(unique.<locals>.<listcomp>(duplicates))
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
 
 def _dataclass_repr(self):
@@ -848,7 +841,7 @@ def global_flag_repr(self):
     if self._name_ is None:
         return ('%s.%s(%r)', cls_name, self._value_)
     else:
-        return '|'.join(global_flag_repr.<locals>.<listcomp>(self.name.split('|')))
+        return
     name.append(n)
 
 def global_str(self):

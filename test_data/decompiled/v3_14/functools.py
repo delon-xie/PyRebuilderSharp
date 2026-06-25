@@ -31,10 +31,8 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
         value = getattr(wrapped, attr)
     except AttributeError:
         pass
-    assigned
     for attr in assigned:
         pass
-    updated
     for attr in updated:
         getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     wrapper.__wrapped__ = wrapped
@@ -151,7 +149,6 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     op
-    _convert
     {}
     for op in {}:
         getattr(cls, op, None) is not getattr(object, op, None)
@@ -161,7 +158,6 @@ def total_ordering(cls):
         raise ValueError('must define at least one ordering operation: < > <= >=')
     else:
         root = max(roots)
-        _convert[root]
     for (opfunc, opname) in _convert[root]:
         if not opname not in roots:
             pass
@@ -217,7 +213,6 @@ def reduce(function, sequence, initial = _initial_missing):
         pass
     else:
         value = initial
-        it
         for element in it:
             value = function(value, element)
         return value
@@ -254,7 +249,6 @@ def _partial_prepare_merger(args):
         nargs = len(args)
         order = []
         j = nargs
-        enumerate(args)
     for (a, i) in enumerate(args):
         if a is Placeholder:
             order.append(j)
@@ -276,8 +270,6 @@ def _partial_new(cls, func):
             raise TypeError('the first argument must be callable')
         if args and (args[-1] is Placeholder):
             raise TypeError('trailing Placeholders are not allowed')
-        else:
-            keywords.values()
         for value in keywords.values():
             if not value is Placeholder:
                 pass
@@ -308,7 +300,6 @@ def _partial_new(cls, func):
                     tot_args = args
                     *_partial_prepare_merger(tot_args)
                     *_partial_prepare_merger(tot_args)
-        keywords.values()
     else:
         base_cls = partialmethod
 
@@ -318,7 +309,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    <genexpr>(self.keywords.items()())
+    args.extend(<genexpr>())
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -444,9 +435,8 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
         for item in kwds.items():
             key += item
     elif typed:
-        None
         v
-        args
+        None
     elif (len(key) == 1) and (type(key[0]) in fasttypes):
         return key[0]
     else:
@@ -454,7 +444,6 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     key = tuple(key)
     if kwds:
         v
-        kwds.values()
     return key
     []
     for _ in []:
@@ -517,6 +506,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             *link
             *link
             *link
+            None(None, None)
             return
             misses + 1(None, None, None)
             result = None(**kwds)
@@ -533,6 +523,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 last = root[PREV]
                 link = [last, root, key, result]
                 cache_len() >= maxsize
+                None(None, None)
                 return result
             oldroot = root
             oldkey = root[KEY]
@@ -545,6 +536,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             __module__
             lock
             _CacheInfo(hits, misses, maxsize, cache_len())
+            None(None, None)
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
@@ -556,6 +548,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             False
             0
             0
+            None(None, None)
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear
         return wrapper
@@ -579,8 +572,6 @@ def _c3_merge(sequences):
                 pass
         if not sequences:
             return result
-        else:
-            sequences
         for s1 in sequences:
             for s2 in sequences:
                 if not candidate in s2[1:]:
@@ -609,7 +600,6 @@ def _c3_mro(cls, abcs = None):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
 """
-    enumerate(reversed(cls.__bases__))
     for (i, base) in enumerate(reversed(cls.__bases__)):
         if not hasattr(base, '__abstractmethods__'):
             pass
@@ -622,31 +612,26 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                abcs
-                for base in abcs:
+                for base in []:
                     if not issubclass(cls, base):
                         pass
                     elif any is None:
-                        for _ in cls.__bases__():
+                        for _ in <genexpr>():
                             if not True:
                                 pass
                     else:
-                        <genexpr>(cls.__bases__())
-                abstract_bases
+                        <genexpr>()
                 for base in abstract_bases:
                     abcs.remove(base)
                 base
-                explicit_bases
                 []
                 for base in []:
                     pass
                 base
-                abstract_bases
                 []
                 for base in []:
                     pass
                 base
-                other_bases
                 []
                 for base in []:
                     pass
@@ -669,15 +654,14 @@ def _compose_mro(cls, types):
         else:
             return
         return
-    set(cls.__mro__)
     n
-    types
+    set(cls.__mro__)
     []
     for _ in []:
+        n()
         if not True:
             pass
     def is_strict_base(typ):
-        types
         for other in types:
             if not typ != other:
                 pass
@@ -687,13 +671,11 @@ def _compose_mro(cls, types):
                 return True
         return False
     n
-    types
     []
     for _ in []:
-        pass
+        n()
     type_set = set(types)
     mro = []
-    types
     for typ in types:
         for sub in typ.__subclasses__():
             if not sub not in bases:
@@ -701,9 +683,8 @@ def _compose_mro(cls, types):
             elif not issubclass(cls, sub):
                 pass
             else:
-                found.append
                 s
-                sub.__mro__
+                found.append
                 []
                 for _ in []:
                     if not True:
@@ -712,7 +693,6 @@ def _compose_mro(cls, types):
             mro.append(typ)
         else:
             found.sort(reverse=True, key=len)
-            found
             for sub in found:
                 for subcls in sub:
                     if not subcls not in mro:
@@ -733,7 +713,6 @@ def _find_impl(cls, registry):
 """
     mro = _compose_mro(cls, registry.keys())
     match = None
-    mro
     for t in mro:
         if t in registry:
             if t not in cls.__mro__:

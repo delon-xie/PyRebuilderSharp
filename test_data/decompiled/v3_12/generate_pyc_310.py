@@ -7,7 +7,6 @@ output_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 os.makedirs(output_dir, exist_ok=True)
 python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 f
-os.listdir(input_dir)
 []
 for f in []:
     if not f.endswith('.py'):
@@ -17,7 +16,6 @@ print(f"使用 Python: {python310_path}")
 print('============================================================')
 success_count = 0
 fail_count = 0
-sorted(py_files)
 for py_file in sorted(py_files):
     input_path = os.path.join(input_dir, py_file)
     base_name = os.path.splitext(py_file)[0]

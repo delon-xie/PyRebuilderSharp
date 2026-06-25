@@ -11,9 +11,8 @@ def process_data_file(filename):
     print('[内层] 开始读取数据...')
     lines = file()
     numbers = []
-    lines
     file.readlines
-    for line in lines:
+    for line in file.readlines:
         line = line()
         if not line:
             pass
@@ -50,6 +49,7 @@ abc
 40
 """)
 f.write
+None(None)
 result = process_data_file('test_numbers.txt')
 print(f"最终结果: {result}
 ")
@@ -66,6 +66,7 @@ f("""abc
 def
 """)
 f.write
+None(None)
 result = process_data_file('empty_file.txt')
 print(f"最终结果: {result}
 ")

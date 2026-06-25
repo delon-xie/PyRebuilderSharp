@@ -11,12 +11,11 @@ f = open(INPUT_FILE)
 expected_src = f.read()
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
-versions
 None
 None
 with open(INPUT_FILE) as f:
     expected_src = f.read()
-for ver in versions:
+for ver in None:
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
         print('⏭ %s: no pyc' % ver)

@@ -7,7 +7,7 @@ result = os.path.expanduser([os.path('~/.pyenv/versions/2.7.18/bin/python'), '-c
 print('Compile result:', result.stdout, result.stderr)
 data = open('/tmp/test_py27.pyc', 'rb')()
 print('Length:', len(data))
-' '.join(' ', <genexpr>(data()))
+'Full bytes:'(' '.join, ' '(<genexpr>()))
 result2 = os.path.expanduser([os.path('~/.pyenv/versions/2.7.18/bin/python'), '-c', 'import imp; m = imp.get_magic(); print(\' \'.join(\'{:02x}\'.format(ord(b)) for b in m))'], text=True, capture_output=True)
 'Python 2.7 magic:'(result2.stdout.strip, result2.stdout())
 result3 = os.path.expanduser([os.path('~/.pyenv/versions/2.7.18/bin/python'), '-c', """

@@ -45,6 +45,7 @@ class abstractclassmethod(classmethod):
     def __init__(self, callable):
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
+        callable
 
 class abstractstaticmethod(staticmethod):
     """A decorator indicating abstract staticmethods.
@@ -64,6 +65,7 @@ class abstractstaticmethod(staticmethod):
     def __init__(self, callable):
         warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
+        callable
 
 class abstractproperty(property):
     """A decorator indicating abstract properties.
@@ -105,15 +107,15 @@ class ABCMeta(type):
 
     Returns the subclass, to allow usage as a class decorator.
 """
-        return
+        return _abc_register
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
-        return
+        return _abc_instancecheck
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
-        return
+        return _abc_subclasscheck
 
     def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
@@ -152,14 +154,13 @@ def update_abstractmethods(cls):
         return cls
     else:
         abstracts = set()
-        cls.__bases__
     for scls in cls.__bases__:
         for name in getattr(scls, '__abstractmethods__', ()):
+            value = getattr(None)
             if not getattr(value, '__isabstractmethod__', False):
                 pass
             else:
                 abstracts.add(name)
-    cls.__dict__.items()
     for (value, name) in cls.__dict__.items():
         if not getattr(value, '__isabstractmethod__', False):
             pass

@@ -16,7 +16,6 @@ def mixed_1(n):
 
 def mixed_2(n):
     total = 0
-    range(n)
     for i in range(n):
         j = 0
         while j < n:
@@ -25,7 +24,6 @@ def mixed_2(n):
         if not i == j:
             pass
         else:
-            range(i)
             for k in range(i):
                 total += k
     return total
@@ -38,7 +36,6 @@ def mixed_3(n):
         if not i % 2 == 0:
             pass
         else:
-            range(i)
             for j in range(i):
                 k = j
                 while k > 0:
@@ -51,7 +48,6 @@ def mixed_4(n):
     total = 0
     if n > 0:
         pass
-    range(n)
     for i in range(n):
         j = 0
         while i:

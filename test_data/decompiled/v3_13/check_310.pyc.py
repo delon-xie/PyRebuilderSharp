@@ -11,7 +11,6 @@ raw = f.read()
 code = marshal.loads(raw)
 def dump_bytecode(c, depth = 0):
     p = '  ' * depth
-    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
@@ -24,8 +23,14 @@ def dump_bytecode(c, depth = 0):
                 pass
             else:
                 '(none)'
+                f""
                 if et:
                     for i in range(0, len(et), 8):
+                        s = 'little'
+                        e = 'little'
+                        t = 'little'
+                        dl = 'little'
                         print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
                 dis.dis(const)
+                dump_bytecode + 1
 dump_bytecode(code)

@@ -6,6 +6,7 @@ import re
 from collections import defaultdict
 open('/tmp/test_full.txt', 'r')
 output = f.read()
+None(None)
 @defaultdict
 def version_stats():
     return {'failed': 0, 'passed': 0, 'total': 0}
@@ -48,14 +49,13 @@ while i < len(lines):
                                         total_passed = 0
                                         total_failed = 0
                                         total = 0
-                                        sorted(version_stats.keys())
                                         '通过'
                                         ' '
                                         '<12'
                                         '版本'
                                         None
                                         print
-                                        for version in sorted(version_stats.keys()):
+                                        for version in '通过':
                                             stats = version_stats[version]
                                             t = stats['total']
                                             p = stats['passed']
@@ -86,7 +86,6 @@ while i < len(lines):
                                         total_passed = 0
                                         total_failed = 0
                                         total = 0
-                                        sorted(version_stats.keys())
                                         '通过'
                                         ' '
                                         '<12'
@@ -107,7 +106,6 @@ while i < len(lines):
                                     total_passed = 0
                                     total_failed = 0
                                     total = 0
-                                    sorted(version_stats.keys())
                                     '通过'
                                     ' '
                                     '<12'
@@ -128,7 +126,6 @@ while i < len(lines):
                                 total_passed = 0
                                 total_failed = 0
                                 total = 0
-                                sorted(version_stats.keys())
                                 '通过'
                                 ' '
                                 '<12'
@@ -149,7 +146,6 @@ while i < len(lines):
                             total_passed = 0
                             total_failed = 0
                             total = 0
-                            sorted(version_stats.keys())
                             '通过'
                             ' '
                             '<12'
@@ -170,7 +166,6 @@ while i < len(lines):
                             total_passed = 0
                             total_failed = 0
                             total = 0
-                            sorted(version_stats.keys())
                             '通过'
                             ' '
                             '<12'
@@ -188,7 +183,6 @@ while i < len(lines):
                 total_passed = 0
                 total_failed = 0
                 total = 0
-                sorted(version_stats.keys())
                 '通过'
                 ' '
                 '<12'
@@ -206,7 +200,6 @@ while i < len(lines):
             total_passed = 0
             total_failed = 0
             total = 0
-            sorted(version_stats.keys())
             '通过'
             ' '
             '<12'
@@ -224,7 +217,6 @@ while i < len(lines):
         total_passed = 0
         total_failed = 0
         total = 0
-        sorted(version_stats.keys())
         '通过'
         ' '
         '<12'

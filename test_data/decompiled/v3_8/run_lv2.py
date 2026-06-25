@@ -11,7 +11,6 @@ f = open(INPUT_FILE)
 expected_src = f.read()
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
-versions
 with open(INPUT_FILE) as f:
     expected_src = f.read()
 for ver in versions:

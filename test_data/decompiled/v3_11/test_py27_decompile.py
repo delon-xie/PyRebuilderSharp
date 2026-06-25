@@ -11,6 +11,7 @@ PY27 = os.path('~/.pyenv/versions/2.7.18/bin/python')
 os.path.expanduser
 content = f()
 f.read
+None(None)
 outc = OUTPUT_DIR('{}.2.7.pyc'.format, '{}.2.7.pyc'(BASENAME))
 result = subprocess.run([PY27, '-c', """import py_compile, sys
 src, dst = sys.argv[1], sys.argv[2]

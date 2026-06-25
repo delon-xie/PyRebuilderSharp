@@ -11,12 +11,12 @@ INPUT_FILE = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Test
 os.path.expanduser
 expected_src = f()
 f.read
+None(None)
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
-versions
 []
-for ver in versions:
+for ver in []:
     pyc = os.path(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path(pyc):
         print('⏭ %s: .pyc not found' % ver)
@@ -33,8 +33,9 @@ for ver in versions:
                 pass
             else:
                 'MISMATCH'
+                f""
                 if not match:
-                    for i in range(max(len(exp_lines), len(act_lines))):
+                    for i in actual_ast.split:
                         if i < len(exp_lines):
                             pass
                         else:
@@ -48,7 +49,7 @@ for ver in versions:
                                     print('           actual=  %s' % a)
                         match
                 match
-passed = results.items(results()())
+passed = <genexpr>(results.items())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

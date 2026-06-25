@@ -15,7 +15,6 @@ current_test_fail = False
 def remove_ansi(text):
     """\x1b\[[0-9;]*m"""
     return re.sub('\\x1b\\[[0-9;]*m', '', text)
-lines
 for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()

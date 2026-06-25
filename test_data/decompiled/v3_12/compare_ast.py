@@ -17,7 +17,6 @@ else:
 """)
     act_lines = actual_ast.split("""
 """)
-    range(max(len(exp_lines), len(act_lines)))
 for i in range(max(len(exp_lines), len(act_lines))):
     if i < len(exp_lines):
         pass

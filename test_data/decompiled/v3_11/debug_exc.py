@@ -17,7 +17,7 @@ print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable'):
     if code.co_exceptiontable:
-        for i in range(0, len(et), 8):
+        for i in print:
             if i + 7 >= len(et):
                 pass
             else:

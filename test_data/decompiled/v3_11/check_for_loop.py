@@ -13,9 +13,8 @@ print('=== disassembly ===')
 dis.dis(code)
 print("""
 === instructions ===""")
-dis.get_instructions(code)
 open(pyc, 'rb').read
-for instr in dis.get_instructions(code):
+for instr in open(pyc, 'rb').read:
     instr.offset(f"{'3d'} opname={instr.opname}{'25s'} arg={instr.arg} argrepr={instr.argrepr}")
     None
     '  offset='
