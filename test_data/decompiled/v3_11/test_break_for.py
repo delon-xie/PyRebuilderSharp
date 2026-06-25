@@ -3,7 +3,7 @@
 range(3)
 for i in range(3):
     if i == 1:
-        break
+        return None
     else:
         a = i
         None

@@ -9,7 +9,7 @@ for x in items:
 range(5)
 for n in range(5):
     if n == 3:
-        break
+        pass
     if n == 1:
         continue
 try:

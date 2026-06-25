@@ -28,10 +28,10 @@ for (k, v) in {}:
         pass
     else:
         v
-break
+range(0, 8)
 for start in range(0, 8):
     if start + 16 > len(m):
-        break
+        pass
     else:
         vals = struct.unpack_from('<IIII', m, start)
         a0 = *vals

@@ -433,12 +433,12 @@ class EnumType(type):
                     continue
                 if isinstance(base, EnumType):
                     base._value_repr_
-                    break
+                    return
                 if ('__repr__' in base.__dict__) and ('__dataclass_fields__' in base.__dict__) and ('__dataclass_params__' in base.__dict__) and base.__dict__['__dataclass_params__'].repr:
                     _dataclass_repr
-                    break
+                    return
                 base.__dict__['__repr__']
-                break
+                return
 
     @classmethod
     def _find_data_type_(mcls, class_name, bases):
@@ -452,11 +452,11 @@ class EnumType(type):
                     continue
                 if isinstance(base, EnumType) and (base._member_type_ is not object):
                     data_types.add(base._member_type_)
-                    break
+                    continue
                 if '__new__' in base.__dict__:
                     if ('__dataclass_fields__' in base.__dict__) and candidate:
                         base
-                break
+                continue
                 if candidate:
                     base
         if len(data_types) > 1:
@@ -705,7 +705,6 @@ class Flag(Enum, boundary=STRICT):
         _iter_bits_lsb(value & cls._flag_mask_)
         for val in _iter_bits_lsb(value & cls._flag_mask_):
             yield cls._value2member_map_.get(val)
-            break
     _iter_member_ = _iter_member_by_value_
     @classmethod
     def _iter_member_by_def_(cls, value):

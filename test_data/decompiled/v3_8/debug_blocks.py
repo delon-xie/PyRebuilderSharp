@@ -16,8 +16,7 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             for (i, instr) in enumerate(instrs):
                 if (instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD')) and (instr.arg is not None):
                     leaders.add(instr.arg)
-                break
-                if any(<genexpr>(block_instrs)):
+                elif any(<genexpr>(block_instrs)):
                     last = block_instrs[-1]
                     print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
                 if (instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER')) and (instr.arg is not None):

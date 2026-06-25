@@ -38,7 +38,6 @@ for ver in versions:
                 pass
             else:
                 'MISMATCH'
-                break
                 if not match:
                     pass
 passed = <genexpr>(results.items()())
@@ -65,4 +64,3 @@ for i in range(max(len(exp_lines), len(act_lines))):
             else:
                 print('  Line %d: expected=%s' % (i, e))
                 print('           actual=  %s' % a)
-                break

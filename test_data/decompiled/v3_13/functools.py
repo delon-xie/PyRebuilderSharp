@@ -29,12 +29,11 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
 """
     assigned
     for attr in assigned:
-        break
-        break
-    break
+        pass
+    updated
     for attr in updated:
-        break
-    break
+        pass
+    return wrapper
 
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
@@ -139,7 +138,6 @@ def total_ordering(cls):
     for op in {}:
         if not True:
             pass
-    break
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     else:
@@ -148,9 +146,7 @@ def total_ordering(cls):
     for (opfunc, opname) in _convert[root]:
         if not True:
             pass
-        else:
-            break
-    break
+    return cls
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -202,7 +198,7 @@ def reduce(function, sequence, initial = _initial_missing):
         it
         for element in it:
             pass
-        break
+        return value
 
 from _functools import reduce
 
@@ -240,7 +236,6 @@ def _partial_prepare_merger(args):
             j += 1
         else:
             order.append(i)
-    break
     if phcount:
         pass
     else:
@@ -261,7 +256,6 @@ def _partial_new(cls, func):
                 pass
             else:
                 raise TypeError('Placeholder cannot be passed as a keyword argument')
-                break
                 pto_phcount = func._phcount
                 tot_args = func.args
                 if args and pto_phcount:
@@ -417,7 +411,7 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
         return key[0]
     else:
         return key
-    break
+    key = tuple(key)
     if kwds:
         v
         kwds.values()
@@ -425,7 +419,6 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     []
     for _ in []:
         pass
-    break
 
 def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
@@ -527,7 +520,6 @@ def _c3_merge(sequences):
         for _ in []:
             if not True:
                 pass
-        break
         if not sequences:
             return result
         else:
@@ -538,13 +530,10 @@ def _c3_merge(sequences):
                     pass
                 else:
                     candidate = None
-                    break
-            break
             raise RuntimeError('Inconsistent hierarchy')
             for seq in sequences:
                 if not seq[0] == candidate:
                     pass
-            break
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -569,7 +558,6 @@ def _c3_mro(cls, abcs = None):
             pass
         else:
             boundary = len(cls.__bases__) - i
-            break
             if abcs:
                 pass
             else:
@@ -585,28 +573,26 @@ def _c3_mro(cls, abcs = None):
                         pass
                     else:
                         abstract_bases.append(base)
-                break
+                abstract_bases
                 for base in abstract_bases:
                     abcs.remove(base)
-                break
+                base
+                explicit_bases
                 []
                 for base in []:
                     pass
-                break
                 base
                 abstract_bases
                 []
                 for base in []:
                     pass
-                break
                 base
                 other_bases
                 []
                 for base in []:
                     pass
-                break
                 return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
-    break
+    boundary = 0
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -630,7 +616,6 @@ def _compose_mro(cls, types):
     for _ in []:
         if not True:
             pass
-    break
     def is_strict_base(typ):
         types
         for other in types:
@@ -639,14 +624,13 @@ def _compose_mro(cls, types):
             elif not True:
                 pass
             else:
-                break
-                break
+                return True
+                return False
     n
     types
     []
     for _ in []:
         pass
-    break
     type_set = set(types)
     mro = []
     types
@@ -664,9 +648,6 @@ def _compose_mro(cls, types):
                 for _ in []:
                     if not True:
                         pass
-                break
-                break
-        break
         if not found:
             mro.append(typ)
         else:
@@ -678,9 +659,7 @@ def _compose_mro(cls, types):
                         pass
                     else:
                         mro.append(subcls)
-                break
-            break
-    break
+    return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -697,27 +676,10 @@ def _find_impl(cls, registry):
     for t in mro:
         if not True:
             pass
-        break
-        if not True:
+        elif not True:
             pass
         else:
             match = t
-        break
-        if not True:
-            pass
-        else:
-            match = t
-        break
-        if not True:
-            pass
-        else:
-            match = t
-        break
-        if not True:
-            pass
-        else:
-            match = t
-    break
     return registry.get(match)
 
 def singledispatch(func):

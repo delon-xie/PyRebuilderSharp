@@ -6,4 +6,3 @@ for i in range(3):
         pass
     else:
         a = i
-break

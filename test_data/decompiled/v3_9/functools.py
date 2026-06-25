@@ -34,7 +34,6 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
         attr
         wrapper
         getattr
-        break
     wrapper.__wrapped__ = wrapped
     return wrapper
 
@@ -369,10 +368,9 @@ def _c3_merge(sequences):
         for s2 in sequences:
             if candidate in s2[1:]:
                 candidate = None
-                break
+                continue
             if seq[0] == candidate:
                 pass
-        break
     if candidate is None:
         raise RuntimeError('Inconsistent hierarchy')
 
@@ -397,7 +395,6 @@ def _c3_mro(cls, abcs):
     for i in enumerate(reversed(cls.__bases__)):
         if abcs(hasattr, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
-            break
     boundary = 0
     if cls:
         pass
@@ -448,7 +445,6 @@ def _find_impl(cls, registry):
             raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
         if t in registry:
             match = t
-        break
     return registry.get(match)
 
 def singledispatch(func):

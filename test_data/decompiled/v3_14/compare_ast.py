@@ -35,5 +35,3 @@ for i in range(max(len(exp_lines), len(act_lines))):
                 print(f"  actual:   {a}")
                 if not i > 5:
                     pass
-                else:
-                    break

@@ -24,12 +24,8 @@ def dump_bytecode(c, depth = 0):
                 pass
             else:
                 '(none)'
-                break
                 if et:
                     for i in range(0, len(et), 8):
                         print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
                 dis.dis(const)
-                break
-        break
-    break
 dump_bytecode(code)

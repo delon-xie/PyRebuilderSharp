@@ -39,7 +39,6 @@ for line in lines:
         pass
     elif 'FAIL' in clean_line:
         current_test_fail = True
-break
 if current_test and current_test_fail:
     print(f"✗ {current_test}")
     failed += 1

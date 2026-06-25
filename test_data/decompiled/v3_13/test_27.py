@@ -15,4 +15,7 @@ for (i, line) in enumerate(lines):
         pass
     else:
         print(f"Line {i}: {line}")
-break
+print("""
+--- ACTUAL AST ---""")
+actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
+print(actual_ast)

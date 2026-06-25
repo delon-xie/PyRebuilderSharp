@@ -233,7 +233,8 @@ class EnumDict(dict):
         try:
             value = t(auto_valued)
         except TypeError:
-            break
+            value = None(**None)
+            t
         if _is_private(self._cls_name, key):
             pass
         elif _is_sunder(key):
@@ -248,7 +249,6 @@ class EnumDict(dict):
                     else:
                         value
                         setattr(self, '_generate_next_value', _gnv)
-                        break
                 elif (key == '_ignore_') and isinstance(value, str):
                     value = value.replace(',', ' ').split()
                 else:
@@ -292,9 +292,9 @@ class EnumDict(dict):
                         pass
                     raise
                 except AttributeError:
-                    break
+                    members
         except AttributeError:
-            break
+            members
 _EnumDict = EnumDict
 class EnumType(type):
     """
@@ -332,7 +332,7 @@ class EnumType(type):
         for name in member_names:
             value = classdict[name]
         if not boundary:
-            break
+            getattr(first_enum, '_boundary_', None)
         elif bases and issubclass(bases[-1], Flag):
             for n in member_names:
                 p = classdict[n]
@@ -567,7 +567,7 @@ class EnumType(type):
         try:
             module = sys._getframemodulename(2)
         except AttributeError:
-            break
+            pass
         metacls = cls.__class__
         (type, cls)
         (cls)
@@ -607,13 +607,13 @@ class EnumType(type):
                 pass
             tmp_cls = type(name, (object), body)
             if not _simple_enum:
-                break
+                KEEP
             elif as_global:
                 global_enum(cls)
             else:
                 sys.modules[cls.__module__].__dict__.update(cls.__members__)
                 return cls
-        break
+        members.sort(key=<lambda>)
         raise
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
@@ -636,13 +636,12 @@ class EnumType(type):
                     found_descriptor = attr
                     class_type = base
                     descriptor_type = 'enum'
-                    break
                 elif _is_descriptor(attr):
                     found_descriptor = attr
                     if not descriptor_type:
-                        break
+                        'desc'
                     elif not class_type:
-                        break
+                        base
                 else:
                     descriptor_type = 'attr'
                     class_type = base
@@ -1070,7 +1069,7 @@ def _simple_enum(etype = Enum):
         try:
             contained = value2member_map.get(member._value_)
         except TypeError:
-            break
+            contained = None
         __new__ = cls.__dict__.get('__new__')
         new_member = __new__.__func__
         new_member = etype._member_type_.__new__
@@ -1136,14 +1135,14 @@ def _simple_enum(etype = Enum):
                         member.__init__(value)
                         member._sort_order_ = len(member_names)
                         if name not in ('name', 'value'):
-                            break
+                            pass
                         else:
                             enum_class._add_member_(name, member)
-                        member_names.append(name)
-                        gnv_last_values.append(value)
-                        enum_class._value2member_map_.setdefault(value, member)
-                        if value not in hashable_values:
-                            hashable_values.append(value)
+                            member_names.append(name)
+                            gnv_last_values.append(value)
+                            enum_class._value2member_map_.setdefault(value, member)
+                            if value not in hashable_values:
+                                hashable_values.append(value)
                     else:
                         member = new_member(enum_class)
                 elif use_args:
@@ -1161,16 +1160,16 @@ def _simple_enum(etype = Enum):
         member.__init__(value)
         member._sort_order_ = len(member_names)
         if name not in ('name', 'value'):
-            break
+            pass
         else:
             enum_class._add_member_(name, member)
-        hashable_values.append(value)
-        if _is_single_bit(value):
-            member_names.append(name)
-            single_bits |= value
-        else:
-            multi_bits |= value
-            gnv_last_values.append(value)
+            hashable_values.append(value)
+            if _is_single_bit(value):
+                member_names.append(name)
+                single_bits |= value
+            else:
+                multi_bits |= value
+                gnv_last_values.append(value)
         enum_class._flag_mask_ = single_bits | multi_bits
         enum_class._singles_mask_ = single_bits
         enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1
@@ -1350,7 +1349,6 @@ def _old_convert_(etype, name, module, filter, source = None):
                 pass
         members.sort(key=<lambda>)
         if not boundary:
-            break
-        else:
-            return cls
+            KEEP
+        return cls
     raise

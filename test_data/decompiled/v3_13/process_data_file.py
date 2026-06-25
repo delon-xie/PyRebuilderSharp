@@ -9,7 +9,7 @@ def process_data_file(filename):
         print(f"[外层] 尝试打开文件: {filename}")
         file = open(filename, 'r')
     except FileNotFoundError:
-        break
+        print(f"[外层 except] 文件不存在: {filename}")
     try:
         print('[内层] 开始读取数据...')
         lines = file.readlines()
@@ -28,10 +28,9 @@ def process_data_file(filename):
                 num = int(line)
                 numbers.append(num)
             except ValueError:
-                break
+                print(f"[最内层 except] 无法转换为整数: '{line}'，已跳过")
             print(f"[最内层 else] 成功解析数字: {num}")
             print(f"[最内层 finally] 行处理完毕: '{line}'")
-        break
         if numbers:
             average = sum(numbers) / len(numbers)
             average

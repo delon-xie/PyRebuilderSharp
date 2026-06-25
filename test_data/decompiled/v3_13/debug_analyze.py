@@ -69,5 +69,5 @@ while i < len(lines):
         if i < len(lines):
             pass
         print(f"Total tests with versions found: {debug_count}")
-break
+print()
 next_line = lines[j]

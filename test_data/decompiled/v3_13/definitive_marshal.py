@@ -23,11 +23,10 @@ known.items()
 {}
 for (v, k) in {}:
     pass
-break
-break
+range(0, 8)
 for start in range(0, 8):
     if start + 16 > len(m):
-        break
+        pass
     else:
         vals = struct.unpack_from('<IIII', m, start)
         a0 = *vals
@@ -48,4 +47,3 @@ MATCH at offset {start}:")
 Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
     print(f"Match: {code2.co_argcount == code.co_argcount}")
     return None
-break

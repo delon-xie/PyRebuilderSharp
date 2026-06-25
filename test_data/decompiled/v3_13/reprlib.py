@@ -68,7 +68,6 @@ class Repr:
         []
         for _ in []:
             pass
-        break
         pieces.append(self.fillvalue)
         newlevel = level - 1
         repr1 = self.repr1

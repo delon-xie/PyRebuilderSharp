@@ -445,7 +445,6 @@ class PrettyPrinter:
                 pass
             else:
                 1
-                break
                 if not last:
                     write(delimnl)
                 elif not self._expand:
@@ -471,7 +470,6 @@ class PrettyPrinter:
                 pass
             else:
                 1
-                break
                 if not last:
                     write(delimnl)
                 elif not self._expand:

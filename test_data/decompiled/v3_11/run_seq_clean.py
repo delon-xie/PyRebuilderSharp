@@ -33,7 +33,6 @@ for ver in versions:
                 pass
             else:
                 'MISMATCH'
-                break
                 if not match:
                     for i in range(max(len(exp_lines), len(act_lines))):
                         if i < len(exp_lines):
@@ -47,7 +46,6 @@ for ver in versions:
                                 if e != a:
                                     print('  Line %d: expected=%s' % (i, e))
                                     print('           actual=  %s' % a)
-                                    break
                         match
                 match
 passed = results.items(results()())

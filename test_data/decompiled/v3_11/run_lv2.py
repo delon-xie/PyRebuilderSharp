@@ -30,7 +30,6 @@ for ver in versions:
                 pass
             else:
                 'MISMATCH'
-                break
                 if not ok:
                     for i in expected_ast.split(expected_ast("""
 """)(actual_ast.split, actual_ast("""
@@ -38,7 +37,6 @@ for ver in versions:
                         if e != a:
                             print(f"  Line {i}: expected={e}
            actual=  {a}")
-                            break
 return
 print(f"❌ {ver!s}: parse error: {ex!s}")
 print('  Output: %s' % r.stdout[:200])

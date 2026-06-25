@@ -23,7 +23,6 @@ def fix_pyc_names(directory):
         for version in MAGIC_NUMBERS.values():
             if f".{version}.pyc" in new_filename:
                 new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                break
         import re
         match = re.search('\\.(\\d+)\\.pyc$', filename)
         if match:

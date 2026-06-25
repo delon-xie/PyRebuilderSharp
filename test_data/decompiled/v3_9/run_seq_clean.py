@@ -31,4 +31,3 @@ def <genexpr>(.0):
     for (v, r) in .0:
         if r:
             yield 1
-            break

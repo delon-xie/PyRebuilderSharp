@@ -35,7 +35,6 @@ for ver in versions:
                 pass
             else:
                 'MISMATCH'
-                break
                 if not match:
                     for i in range(max(len(exp_lines), len(act_lines))):
                         if i < len(exp_lines):
@@ -52,6 +51,7 @@ for ver in versions:
                                 else:
                                     print('  Line %d: expected=%s' % (i, e))
                                     print('           actual=  %s' % a)
-                                    break
-    break
-break
+passed = <genexpr>(results.items()())
+total = len(results)
+print("""
+Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

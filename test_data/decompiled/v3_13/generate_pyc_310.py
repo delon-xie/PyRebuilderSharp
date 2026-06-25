@@ -12,7 +12,6 @@ os.listdir(input_dir)
 for _ in []:
     if not True:
         pass
-break
 print(f"找到 {len(py_files)} 个 Python 文件")
 print(f"使用 Python: {python310_path}")
 print('============================================================')
@@ -37,4 +36,5 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
         print(f"✗ {py_file} -> {output_name}")
         print(f"  错误: {result.stderr}")
         fail_count += 1
-break
+print('============================================================')
+print(f"完成！成功: {success_count}, 失败: {fail_count}")

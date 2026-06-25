@@ -29,7 +29,6 @@ for ver in versions:
         if ok:
             pass
         'MISMATCH'
-        break
         if not ok:
             for i in enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
@@ -37,6 +36,5 @@ for ver in versions:
                 if e != a:
                     print(f"  Line {i}: expected={e}
            actual=  {a}")
-                    break
     except Exception:
         pass

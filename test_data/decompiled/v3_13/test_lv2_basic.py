@@ -15,7 +15,6 @@ else:
     range(10)
     for n in range(10):
         m = n + 1
-    break
     a = 1
 j = i * 2
 i += 1

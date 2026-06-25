@@ -27,7 +27,6 @@ for (off, op, name, arg) in instructions:
     if arg is not None:
         pass
     ''
-    break
 print(f"
 Constants at {pos}:")
 const_type = data[pos]

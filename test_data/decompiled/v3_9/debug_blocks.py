@@ -29,7 +29,6 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             f"{'3d'}-{end - 1}{'3d'}]: {', '.join(<genexpr>(block_instrs))}"
             start
             'Block ['
-            break
             if any(<genexpr>(block_instrs)):
                 last = block_instrs[-1]
                 print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")

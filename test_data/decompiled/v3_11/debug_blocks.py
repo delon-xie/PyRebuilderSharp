@@ -34,7 +34,6 @@ for const in code.co_consts:
                             '3d'
                             start
                             'Block ['
-                            break
                             if <genexpr>(block_instrs()):
                                 last = block_instrs[-1]
                                 print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")

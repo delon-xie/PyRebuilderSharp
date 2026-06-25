@@ -33,7 +33,7 @@ for i in range(max(len(exp_lines), len(act_lines))):
                 print(f"  expected: {e}")
                 print(f"  actual:   {a}")
                 if i > 5:
-                    break
+                    return None
                 else:
                     None
                 return

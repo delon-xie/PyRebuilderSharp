@@ -34,7 +34,6 @@ else:
                         except Exception:
                             pass
                         else:
-                            break
                             try:
                                 pass
                             except Exception:
@@ -84,7 +83,6 @@ else:
                                                                 pass
                                     print(f"  Line {i}: expected={e}")
                                     print(f"           actual=  {a}")
-                                    break
                                     for ver in versions:
                                         pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
                                         if not os.path.exists(pyc):

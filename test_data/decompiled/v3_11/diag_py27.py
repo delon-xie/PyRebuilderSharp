@@ -49,7 +49,6 @@ for (name, code) in tests():
     os.path.join
     f(code)
     f.write
-    break
     r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
     r2 = 'dotnet'(['run', '--project', os.path.expanduser, os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
@@ -59,7 +58,7 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
     if r.stdout():
         r.stderr()
         r.stderr.strip
-    break
+    'Decompile: '(f"{r2.stdout.strip}{r2.stdout()[:100]}")
     if os.path(out_path):
         pass
     else:
@@ -69,6 +68,5 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
     content = f()()
     f().strip
     f.read
-    break
     print(f"Output ({len(content)} bytes):
 {content[:300]}")

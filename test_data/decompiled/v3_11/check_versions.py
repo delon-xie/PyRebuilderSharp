@@ -24,7 +24,6 @@ for filename in os.listdir(pyc_dir):
         pass
     version_files[version](filename)
     version_files[version].append
-    break
 print('各版本 pyc 文件分布:')
 version_files.items(version_files())
 sorted

@@ -40,4 +40,3 @@ if not True:
 else:
     print(f"  Line {i}: expected={e}")
     print(f"           actual=  {a}")
-    break

@@ -27,14 +27,14 @@ def fix_pyc_names(directory):
                         pass
                     else:
                         new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                        break
                         if not True:
                             pass
                         elif os.path.exists(new_filepath):
                             print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
                         else:
-                            break
-                break
+                            print(f"✓ Renamed {filename} -> {new_filename}")
+                import re
+                match = re.search('\\.(\\d+)\\.pyc$', filename)
                 if match:
                     old_ver = match.group(1)
                     new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
@@ -43,8 +43,7 @@ def fix_pyc_names(directory):
                 elif os.path.exists(new_filepath):
                     pass
                 else:
-                    break
-    break
+                    print(f"✓ Renamed {filename} -> {new_filename}")
 
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')

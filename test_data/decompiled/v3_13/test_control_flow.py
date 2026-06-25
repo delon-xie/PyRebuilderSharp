@@ -9,5 +9,4 @@ while i < 5:
 range(10)
 for n in range(10):
     m = n + 1
-break
 a = 1

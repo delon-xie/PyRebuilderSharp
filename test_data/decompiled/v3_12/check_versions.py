@@ -15,7 +15,6 @@ for filename in os.listdir(pyc_dir):
         if version not in version_files:
             pass
         version_files[version].append(filename)
-        break
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())
 for (version, files) in sorted(version_files.items()):

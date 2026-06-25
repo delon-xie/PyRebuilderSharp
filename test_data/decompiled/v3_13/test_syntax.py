@@ -2936,7 +2936,6 @@ class SyntaxWarningTest(unittest.TestCase):
                             {kw}
                 ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
-        break
 
 class SyntaxErrorTestCase(unittest.TestCase):
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
@@ -3212,14 +3211,23 @@ fgdfgf
         """([{"""
         for paren in '([{':
             self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
-        break
+        '([{'
         for paren in '([{':
             self._check_error(f"a = {paren} 1, 2, 3
 b=3", f"\{paren}' was never closed")
-        break
+        ')]}'
         for paren in ')]}':
             self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
-        break
+        code = """func(
+    a=["unclosed], # Need a quote in this comment: "
+    b=2,
+)
+"""
+        self._check_error(code, 'parenthesis \'\\)\' does not match opening parenthesis \'\\[\'')
+        self._check_error("""match y:
+ case e(e=v,v,""", ' was never closed')
+        s = b'IyBjb2Rpbmc9bGF0aW4KKGFhYWFhYWFhYWFhYWFhYWFhCmFhYWFhYWFhYWFhtQ=='
+        self._check_error(s, '\'\\(\' was never closed')
 
     def test_error_string_literal(self):
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
@@ -3287,21 +3295,18 @@ a=1
         ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
-        break
 
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
         ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
-        break
 
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
         (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (rhs_stmt, lhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
-        break
 
 class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     """Test syntax restrictions for lazy imports."""

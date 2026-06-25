@@ -21,7 +21,12 @@ for line in output.split("""
         pass
     else:
         test_groups[current_group]['files'].append(line.strip())
-break
+print('============================================================')
+print('Python 3.10 版本测试报告')
+print('============================================================')
+passed_groups = []
+failed_groups = []
+test_groups.items()
 for (group, info) in test_groups.items():
     if not info['files']:
         pass
@@ -31,12 +36,18 @@ for (group, info) in test_groups.items():
         pass
     else:
         failed_groups.append(group)
-break
+print(f"
+通过的测试组 ({len(passed_groups)}):")
+print('----------------------------------------')
+passed_groups
 for group in passed_groups:
     print(f"  ✓ {group}")
-break
+print(f"
+失败的测试组 ({len(failed_groups)}):")
+print('----------------------------------------')
+failed_groups
 for group in failed_groups:
     for f in test_groups[group]['files']:
         print(f"    - {f}")
-    break
-break
+print(f"
+总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")

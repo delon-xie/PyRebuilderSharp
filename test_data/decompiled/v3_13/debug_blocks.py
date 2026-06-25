@@ -29,7 +29,8 @@ for const in code.co_consts:
                     pass
                 else:
                     leaders.add(instrs[i + 1].offset)
-        break
+        sorted_leaders = sorted(leaders)
+        enumerate(sorted_leaders)
         for (i, start) in enumerate(sorted_leaders):
             if i + 1 < len(sorted_leaders):
                 pass
@@ -41,11 +42,8 @@ for const in code.co_consts:
                 for ins in []:
                     if ins.offset <= start:
                         pass
-                    else:
-                        break
                     if not True:
                         pass
-                break
                 if len(block_instrs) > 3:
                     pass
                 else:
@@ -53,7 +51,6 @@ for const in code.co_consts:
                     '3d'
                     start
                     'Block ['
-                    break
                     if <genexpr>(block_instrs()):
                         last = block_instrs[-1]
                         print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
@@ -66,6 +63,3 @@ for const in code.co_consts:
                                 pass
                             else:
                                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
-                        break
-        break
-break

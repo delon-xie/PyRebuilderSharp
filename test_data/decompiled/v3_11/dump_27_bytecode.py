@@ -62,7 +62,6 @@ else:
                 off
                 '  '
                 print
-                break
             print(f"
 Constants at {pos}:")
             const_type = data[pos]

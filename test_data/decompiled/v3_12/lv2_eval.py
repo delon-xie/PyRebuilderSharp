@@ -3,7 +3,7 @@
 try:
     f = open('test.txt')
 except IOError:
-    break
+    f = None
 range(10)
 for i in range(10):
     a = i
@@ -13,7 +13,7 @@ for x in items:
 range(5)
 for n in range(5):
     if n == 3:
-        break
+        pass
     elif not n == 1:
         pass
     x = 1 / 0

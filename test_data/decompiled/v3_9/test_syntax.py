@@ -3218,17 +3218,15 @@ class A:
         for n in range(MAX_MANAGERS):
             self.subTest(f"within range: n={n!r}")
             compile(get_code(n), '<string>', 'exec')
-            break
+            continue
             if not True:
                 pass
-            break
             for n in range(MAX_MANAGERS, MAX_MANAGERS + 5):
                 self.subTest(f"out of range: n={n!r}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
-                break
+                continue
                 if not True:
                     pass
-            break
 
     @support.cpython_only
     def test_async_with_statement_many_context_managers(self):
@@ -3250,17 +3248,15 @@ class A:
         for n in range(MAX_MANAGERS):
             self.subTest(f"within range: n={n!r}")
             compile(get_code(n), '<string>', 'exec')
-            break
+            continue
             if not True:
                 pass
-            break
             for n in range(MAX_MANAGERS, MAX_MANAGERS + 5):
                 self.subTest(f"out of range: n={n!r}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
-                break
+                continue
                 if not True:
                     pass
-            break
 
     def test_barry_as_flufl_with_syntax_errors(self):
         code = """
@@ -3394,14 +3390,11 @@ while 1:
             self.subTest(mode=mode)
             self.assertRaisesRegex(MemoryError, 'too complex')
             compile(source, '<string>', mode)
-            break
             if not True:
                 pass
-            break
-            break
+            continue
             if not True:
                 pass
-            break
 
     @support.skip_wasi_stack_overflow()
     @support.cpython_only

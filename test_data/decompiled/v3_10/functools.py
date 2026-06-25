@@ -34,7 +34,6 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
         attr
         wrapper
         getattr
-        break
     wrapper.__wrapped__ = wrapped
     return wrapper
 
@@ -164,7 +163,6 @@ def total_ordering(cls):
     for (opname, opfunc) in _convert[root]:
         if opname not in roots:
             opfunc.__name__ = opname
-            break
     return
 
 def cmp_to_key(mycmp):
@@ -502,8 +500,6 @@ def _c3_merge(sequences):
         for s2 in sequences:
             if candidate in s2[1:]:
                 candidate = None
-                break
-        break
     if candidate is None:
         raise RuntimeError('Inconsistent hierarchy')
     else:
@@ -535,7 +531,6 @@ def _c3_mro(cls, abcs):
     for i in enumerate(reversed(cls.__bases__)):
         if abcs(hasattr, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
-            break
         if cls:
             pass
         else:
@@ -546,10 +541,10 @@ def _c3_mro(cls, abcs):
             cls
             for _ in cls:
                 if abcs(issubclass, cls) and not (any)(_c3_mro.<locals>.<genexpr>(cls.__bases__)):
-                    break
+                    pass
             abstract_bases
             for _ in abstract_bases:
-                break
+                pass
             explicit_c3_mros = _c3_mro.<locals>.<listcomp>(explicit_bases)
             abstract_c3_mros = _c3_mro.<locals>.<listcomp>(abstract_bases)
             other_c3_mros = _c3_mro.<locals>.<listcomp>(other_bases)
@@ -602,18 +597,9 @@ def _find_impl(cls, registry):
     mro
     for t in mro:
         if match is not None:
-            if t in registry:
-                if (t not in cls.__mro__) and (match not in cls.__mro__):
-                    if not issubclass(match, t):
-                        raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
-                    else:
-                        break
-                    return registry.get(match)
-                else:
-                    break
-                break
-            else:
-                break
+            if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
+                raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
+            return registry.get(match)
         elif t in registry:
             match = t
 

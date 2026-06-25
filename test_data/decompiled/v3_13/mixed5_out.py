@@ -22,8 +22,7 @@ def mixed_2(n):
         while True:
             for k in range(i):
                 pass
-            break
-    break
+    return total
 
 def mixed_3(n):
     i += 1
@@ -52,4 +51,3 @@ def mixed_4(n):
             pass
         while j + 1:
             pass
-    break

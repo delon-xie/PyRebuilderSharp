@@ -31,8 +31,9 @@ for off in range(17, 40):
         pass
     else:
         print(f"  4 zero bytes at offset {off}")
-break
+print("""
+Bytes 16-50:""")
+range(16, 50, 2)
 for i in range(16, 50, 2):
     pair = raw[i:i + 2]
     '  '(f"{i}3d: {pair.hex()}")
-break

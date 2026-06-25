@@ -45,8 +45,6 @@ for const in code.co_consts:
                 for ins in []:
                     if ins.offset <= start:
                         pass
-                    else:
-                        break
                     if not True:
                         pass
                 if len(block_instrs) > 3:
@@ -56,7 +54,6 @@ for const in code.co_consts:
                     '3d'
                     start
                     'Block ['
-                    break
                     if any is None:
                         for last in block_instrs():
                             if not True:

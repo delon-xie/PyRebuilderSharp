@@ -31,11 +31,6 @@ def depth_5_for():
                 for d in range(2):
                     for e in range(2):
                         total += 1
-                    break
-                break
-            break
-        break
-    break
 
 def depth_5_while():
     c -= 1

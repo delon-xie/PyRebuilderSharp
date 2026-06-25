@@ -68,7 +68,7 @@ while i < len(lines):
                                                 total_failed += f
                                                 total += t
                                                 p(f"<10 {f}<10 {t}<10 {rate}>8.1f%")
-                                        break
+                                        print('----------------------------------------------------------------------')
                                         if total > 0:
                                             pass
                                         else:

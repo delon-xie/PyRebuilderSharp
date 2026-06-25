@@ -15,7 +15,6 @@ for ver in ('3.5', '3.6', '3.7'):
         pass
     else:
         '(empty)'
-        break
         if not r.stderr:
             pass
         else:

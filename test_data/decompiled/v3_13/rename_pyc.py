@@ -23,13 +23,14 @@ for filename in os.listdir(compiled_dir):
             new_name = match_310.group(1) + '3.10.pyc'
             new_path = os.path.join(compiled_dir, new_name)
             files_to_rename.append((old_path, new_path))
-break
+print(f"Found {len(files_to_rename)} files to rename")
+conflicts = []
+files_to_rename
 for (old_path, new_path) in files_to_rename:
     if not os.path.exists(new_path):
         pass
     else:
         conflicts.append((old_path, new_path))
-break
 if conflicts:
     for (old, new) in conflicts:
         print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
@@ -39,12 +40,16 @@ files_to_rename
 for (old_path, new_path) in files_to_rename:
     print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")
     os.rename(old_path, new_path)
-break
-break
+print("""
+Done!""")
+print("""
+Removing conflicting source files...""")
+conflicts
 for (old, new) in conflicts:
     print(f"  Removing {os.path.basename(old)}")
     os.remove(old)
-break
+f
+files_to_rename
 []
 for _ in []:
     if not True:

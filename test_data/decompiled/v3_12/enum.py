@@ -226,7 +226,7 @@ class EnumDict(dict):
         try:
             value = t(auto_valued)
         except TypeError:
-            break
+            value = None(**auto_valued)
         if _is_private(self._cls_name, key):
             pass
         elif _is_sunder(key):
@@ -241,7 +241,6 @@ class EnumDict(dict):
                     else:
                         value
                         setattr(self, '_generate_next_value', _gnv)
-                        break
                 elif (key == '_ignore_') and isinstance(value, str):
                     value = value.replace(',', ' ').split()
                 else:
@@ -250,8 +249,6 @@ class EnumDict(dict):
                     already = set(value) & set(self._member_names)
                     if already:
                         raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
-                    else:
-                        break
             elif key == '_generate_next_value_':
                 pass
             elif key == '_ignore_':
@@ -259,7 +256,6 @@ class EnumDict(dict):
         elif _is_dunder(key):
             if key == '__order__':
                 key = '_order_'
-            break
         elif key in self._member_names:
             raise TypeError(f"{key!r} already defined as {self[key]!r}")
         elif key in self._ignore:
@@ -288,9 +284,9 @@ class EnumDict(dict):
                     for (name, value) in members:
                         pass
                 except AttributeError:
-                    break
+                    members
         except AttributeError:
-            break
+            members
 _EnumDict = EnumDict
 class EnumType(type):
     """
@@ -325,7 +321,7 @@ class EnumType(type):
         for name in member_names:
             value = classdict[name]
         if not boundary:
-            break
+            getattr(first_enum, '_boundary_', None)
         elif bases and issubclass(bases[-1], Flag):
             for n in member_names:
                 p = classdict[n]
@@ -549,7 +545,7 @@ class EnumType(type):
         try:
             module = sys._getframemodulename(2)
         except AttributeError:
-            break
+            pass
         metacls = cls.__class__
         (type, cls)
         (cls)
@@ -589,13 +585,13 @@ class EnumType(type):
                 pass
             tmp_cls = type(name, (object), body)
             if not boundary:
-                break
+                KEEP
             elif as_global:
                 global_enum(cls)
             else:
                 sys.modules[cls.__module__].__dict__.update(cls.__members__)
                 return cls
-        break
+        members.sort(key=<lambda>)
         raise
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
@@ -615,13 +611,12 @@ class EnumType(type):
                 found_descriptor = attr
                 class_type = base
                 descriptor_type = 'enum'
-                break
             elif _is_descriptor(attr):
                 found_descriptor = attr
                 if not descriptor_type:
-                    break
+                    'desc'
                 elif not class_type:
-                    break
+                    base
             else:
                 descriptor_type = 'attr'
                 class_type = base
@@ -708,20 +703,19 @@ class Enum(metaclass=EnumType):
                         cls._value2member_map_.setdefault(value, self)
                         cls._hashable_values_.append(value)
                     except TypeError:
-                        break
+                        cls._unhashable_values_.append(value)
+                        cls._unhashable_values_map_.setdefault(self.name, []).append(value)
                     for m in cls._member_map_.values():
                         if not m._value_ == value:
                             pass
                         elif m is not self:
                             raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
-                        else:
-                            break
                 except TypeError:
-                    break
+                    cls._member_map_.values()
             except TypeError:
-                break
+                cls._member_map_.values()
         except TypeError:
-            break
+            cls._member_map_.values()
         cls = self.__class__
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
@@ -1051,7 +1045,7 @@ def _simple_enum(etype = Enum):
         try:
             contained = value2member_map.get(member._value_)
         except TypeError:
-            break
+            contained = None
         cls_name = cls.__name__
         __new__ = cls.__dict__.get('__new__')
         new_member = __new__.__func__
@@ -1344,7 +1338,6 @@ def _old_convert_(etype, name, module, filter, source = None):
                 (name, value)
         members.sort(key=<lambda>)
         if not boundary:
-            break
-        else:
-            return cls
+            KEEP
+        return cls
     raise

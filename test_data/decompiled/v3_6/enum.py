@@ -443,7 +443,6 @@ class EnumType(type):
                 if '__new__' in base.__dict__:
                     if '__dataclass_fields__' in base.__dict__:
                         pass
-                break
                 if candidate:
                     base
         if len(data_types) > 1:
@@ -690,7 +689,6 @@ class Flag(Enum, boundary=STRICT):
         _iter_bits_lsb(value & cls._flag_mask_)
         for val in _iter_bits_lsb(value & cls._flag_mask_):
             yield cls._value2member_map_.get(val)
-            break
     _iter_member_ = _iter_member_by_value_
     @classmethod
     def _iter_member_by_def_(cls, value):

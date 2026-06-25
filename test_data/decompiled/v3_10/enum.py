@@ -402,7 +402,6 @@ class EnumType(type):
                 method = member_type.__str__
                 method.__str__ = method is object.__str__
                 method = member_type.__repr__
-            break
             if (ReprEnum is not None) and (ReprEnum in bases) and (member_type is object):
                 raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
             elif '__format__' not in classdict:
@@ -421,12 +420,14 @@ class EnumType(type):
                         object_method = getattr(object, name)
                         data_type_method = getattr(member_type, name)
                         if found_method in (data_type_method, object_method):
-                            break
+                            pass
                 if Flag is not None:
                     for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
                         if name not in classdict:
                             enum_method = getattr(Flag, name)
-                            break
+                            name
+                            classdict
+                            enum_method
                 elif Enum is not None:
                     pass
                 elif _order_ is not None:
@@ -724,19 +725,19 @@ class EnumType(type):
                     pass
                 elif isinstance(base, EnumType):
                     base._value_repr_
-                    break
+                    return
                 elif ('__repr__' in base.__dict__) and ('__dataclass_fields__' in base.__dict__):
                     if ('__dataclass_params__' in base.__dict__) and base.__dict__['__dataclass_params__'].repr:
                         _dataclass_repr
-                        break
+                        return
                     else:
                         base.__dict__['__repr__']
-                        break
+                        return
                     base.__dict__['__repr__']
-                    break
+                    return
                 else:
                     base.__dict__['__repr__']
-                    break
+                    return
 
     @classmethod
     def _find_data_type_(mcls, class_name, bases):
@@ -750,7 +751,6 @@ class EnumType(type):
                     pass
                 elif isinstance(base, EnumType) and (base._member_type_ is not object):
                     data_types.add(base._member_type_)
-                    break
         if len(data_types) > 1:
             raise TypeError('too many data types for %r: %r' % (class_name, data_types))
         elif data_types:
@@ -774,9 +774,8 @@ class EnumType(type):
                     target = getattr(possible, method, None)
                     if target not in {None, None.__new__, object.__new__, Enum.__new__}:
                         __new__ = target
-                        break
                 if __new__ is not None:
-                    break
+                    pass
 
     def _add_member_(cls, name, member):
         if name in cls._member_map_:
@@ -793,7 +792,6 @@ class EnumType(type):
                     found_descriptor = attr
                     class_type = base
                     descriptor_type = 'enum'
-                    break
                 elif _is_descriptor(attr):
                     found_descriptor = attr
                     if descriptor_type:
@@ -1071,7 +1069,6 @@ class Flag(Enum, boundary=STRICT):
         _iter_bits_lsb(value & cls._flag_mask_)
         for val in _iter_bits_lsb(value & cls._flag_mask_):
             yield cls._value2member_map_.get(val)
-            break
     _iter_member_ = _iter_member_by_value_
     @classmethod
     def _iter_member_by_def_(cls, value):

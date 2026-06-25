@@ -159,14 +159,14 @@ def update_abstractmethods(cls):
                 pass
             else:
                 abstracts.add(name)
-        break
-    break
+    cls.__dict__.items()
     for (value, name) in cls.__dict__.items():
         if not getattr(value, '__isabstractmethod__', False):
             pass
         else:
             abstracts.add(name)
-    break
+    cls.__abstractmethods__ = frozenset(abstracts)
+    return cls
 
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using

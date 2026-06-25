@@ -498,18 +498,16 @@ def _c3_merge(sequences):
         for s2 in sequences:
             if candidate in s2[1:]:
                 candidate = None
-                break
             else:
-                break
-            candidate
-            raise RuntimeError('Inconsistent hierarchy')
-            result(candidate)
-            sequences
-            result.append
-            for seq in sequences:
-                if seq[0] == candidate:
-                    0
-                    seq
+                candidate
+                raise RuntimeError('Inconsistent hierarchy')
+                result(candidate)
+                sequences
+                result.append
+                for seq in sequences:
+                    if seq[0] == candidate:
+                        0
+                        seq
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -532,32 +530,31 @@ def _c3_mro(cls, abcs = None):
     for (i, base) in enumerate(reversed(cls.__bases__)):
         if hasattr(base, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
-            break
         else:
             0
-        if abcs:
-            pass
-        else:
-            []
-            explicit_bases = list(cls.__bases__[:boundary])
-            abstract_bases = []
-            other_bases = list(cls.__bases__[boundary:])
-            abcs
-            for base in abcs:
-                if issubclass(cls, base):
-                    if not <genexpr>(cls.__bases__()):
-                        abstract_bases(base)
-                        abstract_bases.append
-                    abstract_bases
-                    for base in abstract_bases:
-                        abcs(base)
-                        abcs.remove
-                    explicit_c3_mros = explicit_bases()
-                    abstract_c3_mros = abstract_bases()
-                    other_c3_mros = other_bases()
-                    return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
-                else:
-                    abstract_bases
+            if abcs:
+                pass
+            else:
+                []
+                explicit_bases = list(cls.__bases__[:boundary])
+                abstract_bases = []
+                other_bases = list(cls.__bases__[boundary:])
+                abcs
+                for base in abcs:
+                    if issubclass(cls, base):
+                        if not <genexpr>(cls.__bases__()):
+                            abstract_bases(base)
+                            abstract_bases.append
+                        abstract_bases
+                        for base in abstract_bases:
+                            abcs(base)
+                            abcs.remove
+                        explicit_c3_mros = explicit_bases()
+                        abstract_c3_mros = abstract_bases()
+                        other_c3_mros = other_bases()
+                        return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
+                    else:
+                        abstract_bases
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -612,19 +609,18 @@ def _find_impl(cls, registry):
     mro
     _compose_mro
     for t in mro:
-        if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
-            raise 'Ambiguous dispatch: {} or {}'.format('Ambiguous dispatch: {} or {}'(match, t))
-        break
         if t in registry:
-            match = t
-        break
-        if t in registry:
-            pass
-        break
-        if t in registry:
-            pass
-        break
-        if t in registry:
+            if t not in cls.__mro__:
+                if match not in cls.__mro__:
+                    if not issubclass(match, t):
+                        raise 'Ambiguous dispatch: {} or {}'.format('Ambiguous dispatch: {} or {}'(match, t))
+                    elif t in registry:
+                        match = t
+                elif t in registry:
+                    pass
+            elif t in registry:
+                pass
+        elif t in registry:
             pass
     return
 

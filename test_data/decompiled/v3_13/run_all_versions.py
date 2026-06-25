@@ -34,7 +34,6 @@ else:
                         except Exception:
                             pass
                         else:
-                            break
                             try:
                                 pass
                             except Exception:
@@ -89,7 +88,6 @@ else:
                                     else:
                                         print(f"  Line {i}: expected={e}")
                                         print(f"           actual=  {a}")
-                                        break
                                         for ver in versions:
                                             pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
                                             if not os.path.exists(pyc):
@@ -97,8 +95,11 @@ else:
                                             else:
                                                 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
                                                 actual_src = r.stdout
-                                        break
-                                break
+                                        print(f"
+========================================")
+                                        passed = <genexpr>(results.items()())
+                                        total = len(results)
+                                        'Passed: '(f"{passed}/{total} ({passed / total * 100}.0f%)")
     except Exception:
         pass
     else:
@@ -113,4 +114,3 @@ def <genexpr>(.0):
             pass
         else:
             1
-    break

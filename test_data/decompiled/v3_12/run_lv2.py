@@ -34,7 +34,6 @@ else:
                         except Exception:
                             pass
                         else:
-                            break
                             try:
                                 pass
                             except Exception:
@@ -52,7 +51,6 @@ else:
                                         pass
                                     print(f"  Line {i}: expected={e}
            actual=  {a}")
-                                    break
                                     for ver in versions:
                                         pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
                                         if not os.path.exists(pyc):

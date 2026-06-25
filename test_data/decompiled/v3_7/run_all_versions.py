@@ -32,7 +32,6 @@ for ver in versions:
         if match:
             pass
         'MISMATCH'
-        break
         if not match:
             for i in range(max(len(exp_lines), len(act_lines))):
                 if i < len(exp_lines):

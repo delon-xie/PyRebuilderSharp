@@ -200,10 +200,9 @@ class _proto_member:
         for (name, canonical_member) in enum_class._member_map_():
             if canonical_member._value_ == value:
                 enum_member = canonical_member
-                break
             else:
                 KeyError
-            raise
+                raise
         raise
         raise
         enum_class._member_names_(member_name)
@@ -607,7 +606,6 @@ class EnumType(type):
                     found_descriptor = attr
                     class_type = base
                     descriptor_type = 'enum'
-                    break
                 elif _is_descriptor(attr):
                     found_descriptor = attr
                     if descriptor_type:
@@ -735,8 +733,6 @@ class Enum(metaclass=EnumType):
         for m in cls._member_map_():
             if (m._value_ == value) and (m is not self):
                 raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
-            else:
-                break
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
     def __repr__(self):

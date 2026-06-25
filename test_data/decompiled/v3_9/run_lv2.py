@@ -26,7 +26,6 @@ with open(INPUT_FILE) as f:
             if ok:
                 pass
             'MISMATCH'
-            break
             if not ok:
                 for i in enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
@@ -34,7 +33,6 @@ with open(INPUT_FILE) as f:
                     if e != a:
                         print(f"  Line {i}: expected={e}
            actual=  {a}")
-                        break
         except Exception:
             print('❌ %s: parse error: %s' % (ver, ex))
             print('  Output: %s' % r.stdout[:200])

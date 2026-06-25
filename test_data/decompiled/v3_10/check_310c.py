@@ -20,7 +20,6 @@ def dump_bytecode(c, depth):
                 pass
             else:
                 '(none)'
-                break
                 if et:
                     for i in range(0, len(et), 8):
                         s = int.from_bytes(et[i:i + 2], 'little')

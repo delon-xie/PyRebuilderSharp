@@ -39,13 +39,10 @@ for const in code.co_consts:
                 instrs
                 []
                 for ins in []:
-                    if ins.offset <= start:
-                        if not start < end:
-                            pass
-                        else:
-                            ins
+                    if (ins.offset <= start) and not start < end:
+                        pass
                     else:
-                        break
+                        ins
                 if len(block_instrs) > 3:
                     pass
                 else:
@@ -53,7 +50,6 @@ for const in code.co_consts:
                     '3d'
                     start
                     'Block ['
-                    break
                     if <genexpr>(block_instrs()):
                         last = block_instrs[-1]
                         print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")

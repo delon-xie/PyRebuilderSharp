@@ -30,7 +30,7 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
     try:
         value = getattr(wrapped, attr)
     except AttributeError:
-        break
+        pass
     assigned
     for attr in assigned:
         pass
@@ -522,8 +522,6 @@ def _c3_merge(sequences):
                     pass
                 else:
                     candidate = None
-                    break
-            break
             raise RuntimeError('Inconsistent hierarchy')
             for seq in sequences:
                 if not seq[0] == candidate:
@@ -552,7 +550,6 @@ def _c3_mro(cls, abcs = None):
             pass
         else:
             boundary = len(cls.__bases__) - i
-            break
             if abcs:
                 pass
             else:
@@ -618,7 +615,7 @@ def _compose_mro(cls, types):
             elif not typ in other.__mro__:
                 pass
             else:
-                break
+                return True
                 return False
     n
     types
@@ -643,7 +640,6 @@ def _compose_mro(cls, types):
                 for s in []:
                     if not s in type_set:
                         pass
-                break
         if not found:
             mro.append(typ)
         else:
@@ -671,25 +667,24 @@ def _find_impl(cls, registry):
     match = None
     mro
     for t in mro:
-        if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
-            raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
-        break
-        if not t in registry:
-            pass
-        else:
-            match = t
-        break
-        if not t in registry:
-            pass
-        else:
-            match = t
-        break
-        if not t in registry:
-            pass
-        else:
-            match = t
-        break
-        if not t in registry:
+        if t in registry:
+            if t not in cls.__mro__:
+                if match not in cls.__mro__:
+                    if not issubclass(match, t):
+                        raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
+                    elif not t in registry:
+                        pass
+                    else:
+                        match = t
+                elif not t in registry:
+                    pass
+                else:
+                    match = t
+            elif not t in registry:
+                pass
+            else:
+                match = t
+        elif not t in registry:
             pass
         else:
             match = t

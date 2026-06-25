@@ -37,7 +37,7 @@ def process_data_file(filename):
     file.close
     print('[外层 finally] 程序结束')
     print('[外层 finally] 程序结束')
-    break
+    print(f"[外层 except] 没有权限读取文件: {filename}")
     print('[外层 finally] 程序结束')
     raise
 print('==================================================')

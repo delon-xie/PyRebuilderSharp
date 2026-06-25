@@ -46,14 +46,19 @@ for (name, code) in tests.items():
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
     open(py_path, 'w')
     f.write(code)
-    break
+    r = subprocess.run([PY27, '-c', """import py_compile, sys
+py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
+    r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
+    print(f"
+==================================================")
+    print(f"Test: {name}")
     if not r.stdout.strip():
-        break
-    break
+        r.stderr.strip()
+    print(f"Decompile: {r2.stdout.strip()[:100]}")
     if os.path.exists(out_path):
         open(out_path)
     else:
         print(f"Error: {r2.stderr[:200]}")
     content = f.read().strip()
-    break
-break
+    print(f"Output ({len(content)} bytes):
+{content[:300]}")

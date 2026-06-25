@@ -64,7 +64,6 @@ else:
                 '  '
                 print
                 None
-                break
             print(f"
 Constants at {pos}:")
             const_type = data[pos]

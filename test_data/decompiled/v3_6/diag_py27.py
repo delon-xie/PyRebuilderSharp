@@ -54,7 +54,7 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
     print(f"Test: {name}")
     if r.stdout.strip():
         r.stderr.strip()
-    break
+    print(f"Decompile: {r2.stdout.strip()[:100]}")
     if os.path.exists(out_path):
         f = open(out_path)
         content = f.read().strip()

@@ -21,6 +21,4 @@ def dump_code(c, depth = 0):
             pass
         else:
             print(f"{prefix}Function: {const.co_name}")
-            break
-    break
 dump_code(code)

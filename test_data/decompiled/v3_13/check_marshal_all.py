@@ -22,5 +22,3 @@ for (ver, py_path) in versions.items():
     for line in out.split("""
 """):
         print(f"  {line}")
-    break
-break

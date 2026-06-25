@@ -26,7 +26,6 @@ def fix_pyc_names(directory):
                 for version in MAGIC_NUMBERS.values():
                     if f".{version}.pyc" in new_filename:
                         new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                        break
                     if new_filename != filename:
                         new_filepath = os.path.join(directory, new_filename)
                         if os.path.exists(new_filepath):

@@ -31,7 +31,6 @@ for ver in versions:
         if ok:
             pass
         'MISMATCH'
-        break
         if not ok:
             for i in enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
