@@ -15,11 +15,9 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             for (i, instr) in enumerate(instrs):
                 if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
                     if instr.arg is not None:
-                        leaders.add(instr.arg)
-                elif (instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER')) and (instr.arg is not None):
-                    leaders.add(instr.arg)
-                elif i + 1 < len(instrs):
-                    leaders.add(instrs[i + 1].offset)
+                        return leaders.add(instr.arg)
+                elif (instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER')) and (instr.arg is not None) and (i + 1 < len(instrs)):
+                    return leaders.add(instrs[i + 1].offset)
         for (i, start) in enumerate(sorted_leaders):
             if i + 1 < len(sorted_leaders):
                 pass

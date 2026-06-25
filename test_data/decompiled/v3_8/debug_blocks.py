@@ -14,13 +14,13 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
         if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
             for (i, instr) in enumerate(instrs):
                 if (instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD')) and (instr.arg is not None):
-                    leaders.add(instr.arg)
+                    return leaders.add(instr.arg)
                 last = block_instrs[-1]
                 print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
                 if (instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER')) and (instr.arg is not None):
-                    leaders.add(instr.arg)
+                    return leaders.add(instr.arg)
                 if i + 1 < len(instrs):
-                    leaders.add(instrs[i + 1].offset)
+                    return leaders.add(instrs[i + 1].offset)
         for (i, start) in enumerate(sorted_leaders):
             if i + 1 < len(sorted_leaders):
                 pass
@@ -32,4 +32,4 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
         if any(any(<genexpr>)):
             for ins in block_instrs:
                 if ins.opname == 'JUMP_ABSOLUTE':
-                    print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+                    return print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

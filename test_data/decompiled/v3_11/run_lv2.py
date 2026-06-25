@@ -17,7 +17,7 @@ versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 for ver in []:
     pyc = os.path(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path(pyc):
-        print('⏭ %s: no pyc' % ver)
+        return print('⏭ %s: no pyc' % ver)
     else:
         r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
         actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
@@ -33,7 +33,7 @@ for ver in []:
                 if not ok:
                     for i in zip:
                         if e != a:
-                            print(f"  Line {i}: expected={e}
+                            return print(f"  Line {i}: expected={e}
            actual=  {a}")
 return
 print(f"❌ {ver!s}: parse error: {ex!s}")

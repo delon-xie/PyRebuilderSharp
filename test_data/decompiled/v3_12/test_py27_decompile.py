@@ -28,4 +28,4 @@ else:
     if len(result2.stderr) > 500:
         result2.stderr[-500:]
     else:
-        result2.stderr
+        return result2.stderr

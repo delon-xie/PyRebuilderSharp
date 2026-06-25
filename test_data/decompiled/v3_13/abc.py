@@ -160,12 +160,12 @@ def update_abstractmethods(cls):
             if not getattr(value, '__isabstractmethod__', False):
                 pass
             else:
-                abstracts.add(name)
+                return abstracts.add(name)
     for (value, name) in cls.__dict__.items():
         if not getattr(value, '__isabstractmethod__', False):
             pass
         else:
-            abstracts.add(name)
+            return abstracts.add(name)
     cls.__abstractmethods__ = frozenset(abstracts)
     return cls
 

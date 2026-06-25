@@ -18,7 +18,7 @@ for const in code.co_consts:
         leaders = {0}
         for (i, instr) in enumerate(instrs):
             if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-                leaders.add(instr.arg)
+                return leaders.add(instr.arg)
             elif not instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
                 pass
             else:
@@ -26,7 +26,7 @@ for const in code.co_consts:
                 if not i + 1 < len(instrs):
                     pass
                 else:
-                    leaders.add(instrs[i + 1].offset)
+                    return leaders.add(instrs[i + 1].offset)
         sorted_leaders = sorted(leaders)
         for (i, start) in enumerate(sorted_leaders):
             if i + 1 < len(sorted_leaders):
@@ -39,7 +39,7 @@ for const in code.co_consts:
                     if (ins.offset <= start) and not start < end:
                         pass
                     else:
-                        ins
+                        return ins
                 if len(block_instrs) > 3:
                     pass
                 else:
@@ -56,4 +56,4 @@ for const in code.co_consts:
                             if not ins.opname == 'JUMP_ABSOLUTE':
                                 pass
                             else:
-                                print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+                                return print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

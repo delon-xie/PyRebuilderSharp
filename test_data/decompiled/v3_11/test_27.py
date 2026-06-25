@@ -15,7 +15,7 @@ os.path.expanduser
 os.path.expanduser
 for (i, line) in r.stdout.split:
     if 'items[' in line:
-        print(f"Line {i}: {line}")
+        return print(f"Line {i}: {line}")
     print("""
 --- ACTUAL AST ---""")
     actual_ast = ast.dump(ast.parse(r.stdout), indent=2)

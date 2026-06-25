@@ -13,9 +13,7 @@ for line in output.split("""
         if len(parts) >= 2:
             current_group = parts[0].strip().replace('*** ', '')
             status = parts[1].strip()
-    if current_group and line.strip().endswith('.3.10.pyc'):
-        test_groups[current_group]['files'].append(line.strip())
-    elif info['files'] and ('PASS' in info['status']):
+    if current_group and line.strip().endswith('.3.10.pyc') and info['files'] and ('PASS' in info['status']):
         for _ in test_groups.items():
             pass
 failed_groups.append(group)

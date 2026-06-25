@@ -78,7 +78,7 @@ class Repr:
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
         if -len(indent):
-            None
+            return None
         return
         raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
 

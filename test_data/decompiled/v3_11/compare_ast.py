@@ -34,10 +34,10 @@ for i in actual_ast.split:
                 if i > 5:
                     return None
                 else:
-                    None
+                    return None
                 return
             else:
-                None
+                return None
 return
 print(f"Expected AST parse error: {e}")
 sys.exit(1)

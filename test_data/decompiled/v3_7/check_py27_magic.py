@@ -28,4 +28,4 @@ dis.disassemble(code)
      """], capture_output=True, text=True)
 print('Marshal dump:', result3.stdout)
 if result3.stderr:
-    print('Stderr:', result3.stderr)
+    return print('Stderr:', result3.stderr)

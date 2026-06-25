@@ -26,5 +26,5 @@ Fields found at offset {offset}:")
         None
         return
     else:
-        None
+        return None
     None

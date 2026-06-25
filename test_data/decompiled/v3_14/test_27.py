@@ -13,7 +13,7 @@ for (i, line) in enumerate(lines):
     if not 'items[' in line:
         pass
     else:
-        print(f"Line {i}: {line}")
+        return print(f"Line {i}: {line}")
 print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.dump(ast.parse(r.stdout), indent=2)

@@ -156,7 +156,7 @@ class PrettyPrinter:
 
     def isreadable(self, object):
         if readable:
-            not recursive
+            return not recursive
         return
 
     def _format(self, object, stream, indent, allowance, context, level):
@@ -173,7 +173,7 @@ class PrettyPrinter:
             from dataclasses import is_dataclass
             p(self, object, stream, indent, allowance, context, level + 1)
         else:
-            stream.write(rep)
+            return stream.write(rep)
 
     def _format_block_start(self, start_str, indent):
         """
@@ -341,7 +341,7 @@ class PrettyPrinter:
                 if i == len(lines) - 1:
                     max_width1 -= allowance
                 elif len(rep) <= max_width1:
-                    chunks.append(rep)
+                    return chunks.append(rep)
                 else:
                     import re
                     parts = re.findall('\\S*\\s*', line)
@@ -357,7 +357,7 @@ class PrettyPrinter:
                 write(rep)
                 return None
             elif level == 1:
-                write(self._format_block_start('(', indent))
+                return write(self._format_block_start('(', indent))
         self._width - indent
         self._width - indent
 
@@ -439,11 +439,11 @@ class PrettyPrinter:
                 1
                 context(level)
                 if not last:
-                    write(delimnl)
+                    return write(delimnl)
                 elif not self._expand:
                     pass
                 else:
-                    write(',')
+                    return write(',')
 
     def _format_namespace_items(self, items, stream, indent, allowance, context, level):
         """,
@@ -457,18 +457,18 @@ class PrettyPrinter:
             write(key)
             write('=')
             if id(ent) in context:
-                write('...')
+                return write('...')
             elif last:
                 pass
             else:
                 1
                 context(level)
                 if not last:
-                    write(delimnl)
+                    return write(delimnl)
                 elif not self._expand:
                     pass
                 else:
-                    write(',')
+                    return write(',')
 
     def _format_items(self, items, stream, indent, allowance, context, level):
         """,
@@ -509,7 +509,7 @@ class PrettyPrinter:
             if last:
                 pass
             else:
-                1
+                return 1
 
     def _repr(self, object, context, level):
         if not readable:
@@ -531,7 +531,7 @@ class PrettyPrinter:
         rdf = self._repr(object.default_factory, context, level)
         cls = object.__class__
         if self._expand:
-            stream.write(f"{cls.__name__}({rdf}, ")
+            return stream.write(f"{cls.__name__}({rdf}, ")
         else:
             indent += len(cls.__name__) + 1
             stream.write(f"{cls.__name__}({rdf},
@@ -564,7 +564,7 @@ class PrettyPrinter:
                 if i == len(object.maps) - 1:
                     self._format(m, stream, indent, allowance + 1, context, level)
                     if self._expand:
-                        stream.write(',')
+                        return stream.write(',')
                     stream.write(self._format_block_end(')', indent - self._indent_per_level))
                 else:
                     self._format(m, stream, indent, 1, context, level)

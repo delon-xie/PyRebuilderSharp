@@ -160,7 +160,7 @@ def total_ordering(cls):
         if not True:
             pass
         else:
-            setattr(opfunc)
+            return setattr(opfunc)
     return cls
 
 def cmp_to_key(mycmp):
@@ -248,7 +248,7 @@ def _partial_prepare_merger(args):
             order.append(j)
             j += 1
         else:
-            order.append(i)
+            return order.append(i)
     if phcount:
         pass
     else:
@@ -318,9 +318,9 @@ class partial:
 
     def __reduce__(self):
         if not self.keywords:
-            None
+            pass
         elif not self.__dict__:
-            None
+            pass
 
     def __setstate__(self, state):
         if not isinstance(state, tuple):
@@ -429,7 +429,7 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
         return key
     key = tuple(key)
     if kwds:
-        v
+        return v
     return key
     for _ in v:
         pass
@@ -456,7 +456,7 @@ def lru_cache(maxsize = 128, typed = False):
 """
     if isinstance(maxsize, int):
         if maxsize < 0:
-            0
+            return 0
         def decorating_function(user_function):
             wrapper.cache_parameters = <lambda>
             return wrapper := _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)(update_wrapper)
@@ -587,7 +587,7 @@ def _c3_mro(cls, abcs = None):
                     elif any(<genexpr>()):
                         pass
                     else:
-                        abstract_bases.append(base)
+                        return abstract_bases.append(base)
                 for base in abstract_bases:
                     abcs.remove(base)
                 base
@@ -612,7 +612,7 @@ def _compose_mro(cls, types):
     def is_related(typ):
         if (typ not in bases) and hasattr(typ, '__mro__'):
             if not isinstance(typ, GenericAlias):
-                issubclass(cls, typ)
+                return issubclass(cls, typ)
             return
         else:
             return
@@ -650,7 +650,7 @@ def _compose_mro(cls, types):
                     if not True:
                         pass
         if not found:
-            mro.append(typ)
+            return mro.append(typ)
         else:
             found.sort(reverse=True, key=len)
             for sub in found:
@@ -658,7 +658,7 @@ def _compose_mro(cls, types):
                     if not True:
                         pass
                     else:
-                        mro.append(subcls)
+                        return mro.append(subcls)
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
@@ -741,7 +741,7 @@ class _singledispatchmethod_get:
         if isinstance(func, FunctionType):
             pass
         else:
-            0
+            return 0
         self.__doc__ = func.__doc__
 
     def __repr__(self):

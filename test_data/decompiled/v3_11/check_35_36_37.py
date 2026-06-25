@@ -17,6 +17,6 @@ for ver in os.path.expanduser:
     else:
         '(empty)'
         if r.stderr:
-            print(f"STDERR: {r.stderr[:200]}")
+            return print(f"STDERR: {r.stderr[:200]}")
         None
         return

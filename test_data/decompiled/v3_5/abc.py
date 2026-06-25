@@ -149,14 +149,14 @@ class ABCMeta(type):
             cls._abc_negative_cache = WeakSet()
             cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         elif subclass in cls._abc_negative_cache:
-            False
+            return False
         else:
             ok = cls.__subclasshook__(subclass)
             if ok is not NotImplemented:
                 if not isinstance(ok, bool):
                     raise AssertionError
                 elif ok:
-                    cls._abc_cache.add(subclass)
+                    return cls._abc_cache.add(subclass)
                 else:
                     cls._abc_negative_cache.add(subclass)
                     return ok

@@ -18,7 +18,7 @@ results = {}
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
     if not os.path.exists(pyc):
-        print(f"⏭ {ver}: .pyc not found")
+        return print(f"⏭ {ver}: .pyc not found")
     r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
     actual_src = r.stdout
     try:

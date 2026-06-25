@@ -91,7 +91,7 @@ else:
                                         for ver in []:
                                             pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
                                             if not os.path.exists(pyc):
-                                                print(f"⏭ {ver}: .pyc not found")
+                                                return print(f"⏭ {ver}: .pyc not found")
                                             else:
                                                 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
                                                 actual_src = r.stdout
@@ -112,4 +112,4 @@ def <genexpr>(.0):
         if not True:
             pass
         else:
-            1
+            return 1

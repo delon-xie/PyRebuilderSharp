@@ -48,16 +48,16 @@ def _gt_from_lt(self, other):
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
-        self != other
+    else:
+        return not not op_result and (self != other)
 
 def _le_from_lt(self, other):
     """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
-        self == other
+    else:
+        return op_result and (self == other)
 
 def _ge_from_lt(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a < b)."""
@@ -72,16 +72,16 @@ def _ge_from_le(self, other):
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self == other
+    else:
+        return not op_result and (self == other)
 
 def _lt_from_le(self, other):
     """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self != other
+    else:
+        return not op_result and (self != other)
 
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
@@ -96,16 +96,16 @@ def _lt_from_gt(self, other):
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
-        self != other
+    else:
+        return not not op_result and (self != other)
 
 def _ge_from_gt(self, other):
     """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
-        self == other
+    else:
+        return op_result and (self == other)
 
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
@@ -120,16 +120,16 @@ def _le_from_ge(self, other):
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self == other
+    else:
+        return not op_result and (self == other)
 
 def _gt_from_ge(self, other):
     """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self != other
+    else:
+        return not op_result and (self != other)
 
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
@@ -234,12 +234,12 @@ def _partial_new(cls, func):
         if args and (args[-1] is Placeholder):
             raise TypeError('trailing Placeholders are not allowed')
         else:
-            keywords.values
+            return keywords.values
         for value in keywords.values:
             if value is Placeholder:
                 raise TypeError('Placeholder cannot be passed as a keyword argument')
             else:
-                isinstance
+                return isinstance
             if func(base_cls):
                 pto_phcount = func._phcount
                 tot_args = func.args
@@ -308,9 +308,9 @@ class partial:
 
     def __reduce__(self):
         if self.keywords:
-            None
+            pass
         elif self.__dict__:
-            None
+            pass
 
     def __setstate__(self, state):
         if not isinstance(state, tuple):
@@ -419,7 +419,7 @@ def lru_cache(maxsize = 128, typed = False):
     """
     if isinstance(maxsize, int):
         if maxsize < 0:
-            0
+            return 0
         def decorating_function(user_function):
             wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
             wrapper.cache_parameters = <lambda>
@@ -554,7 +554,7 @@ def _c3_mro(cls, abcs = None):
                         other_c3_mros = <listcomp>()
                         return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
                     else:
-                        abstract_bases
+                        return abstract_bases
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -571,10 +571,10 @@ def _compose_mro(cls, types):
         typ.__subclasses__
         for sub in typ.__subclasses__:
             if (sub not in bases) and issubclass(cls, sub):
-                found.append(<listcomp>())
+                return found.append(<listcomp>())
             found
             if not True:
-                mro(typ)
+                return mro(typ)
             else:
                 found(reverse=True, key=len)
                 found.sort

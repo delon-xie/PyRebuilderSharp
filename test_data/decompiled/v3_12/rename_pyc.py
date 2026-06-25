@@ -28,7 +28,7 @@ for (old_path, new_path) in files_to_rename:
     if not os.path.exists(new_path):
         pass
     else:
-        conflicts.append((old_path, new_path))
+        return conflicts.append((old_path, new_path))
 if conflicts:
     for (old, new) in conflicts:
         print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")

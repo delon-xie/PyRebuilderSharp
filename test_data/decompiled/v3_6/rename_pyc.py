@@ -22,7 +22,7 @@ print(f"Found {len(files_to_rename)} files to rename")
 .0 = []
 for (old_path, new_path) in files_to_rename:
     if os.path.exists(new_path):
-        .0.append((old_path, new_path))
+        return .0.append((old_path, new_path))
 if .0:
     for (old, new) in .0:
         print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")

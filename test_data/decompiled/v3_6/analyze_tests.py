@@ -17,7 +17,7 @@ with open('/tmp/test_full.txt', 'r') as f:
 while i < len(lines):
     line = lines[i]
     if not '***' in line:
-        ':' in line
+        return ':' in line
     match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
     if match:
         test_name = match.group(1)
@@ -30,7 +30,7 @@ while i < len(lines):
         if next_line.startswith('***'):
             pass
         if not next_line.strip().startswith(' '):
-            '.pyc' in next_line
+            return '.pyc' in next_line
         version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
         if version_match:
             version = version_match.group(1)

@@ -14,7 +14,7 @@ def recursive_repr(fillvalue = '...'):
             if key in repr_running:
                 return fillvalue
             else:
-                repr_running.add(key)
+                return repr_running.add(key)
             result = user_function(self)
             repr_running.discard(key)
             return result
@@ -78,7 +78,7 @@ class Repr:
         else:
             indent *= ' '
         if not -len(indent):
-            None
+            return None
         return
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
@@ -92,7 +92,7 @@ class Repr:
         for elem in []:
             pass
         if n > maxiter:
-            pieces.append(self.fillvalue)
+            return pieces.append(self.fillvalue)
         s = self._join(pieces, level)
         if n == 1:
             if trail:

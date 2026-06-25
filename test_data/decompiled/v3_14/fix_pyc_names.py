@@ -37,7 +37,7 @@ def fix_pyc_names(directory):
                         else:
                             new_filepath = os.path.join(directory, new_filename)
                             if os.path.exists(new_filepath):
-                                print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+                                return print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
                             else:
                                 os.rename(filepath, new_filepath)
                                 print(f"✓ Renamed {filename} -> {new_filename}")

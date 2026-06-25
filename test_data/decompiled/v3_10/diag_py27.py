@@ -63,6 +63,6 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
             print(f"Output ({len(content)} bytes):
 {content[:300]}")
         else:
-            print(f"Error: {r2.stderr[:200]}")
+            return print(f"Error: {r2.stderr[:200]}")
     else:
-        r.stderr.strip()
+        return r.stderr.strip()

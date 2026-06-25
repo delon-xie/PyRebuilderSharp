@@ -14,4 +14,4 @@ for ver in ('3.5', '3.6', '3.7'):
         pass
     '(empty)'
     if r.stderr:
-        print(f"STDERR: {r.stderr[:200]}")
+        return print(f"STDERR: {r.stderr[:200]}")

@@ -24,7 +24,7 @@ for (k, v) in {}:
     if k == 'flags':
         pass
     else:
-        v
+        return v
 for start in range(0, 8):
     if start + 16 > len(m):
         pass

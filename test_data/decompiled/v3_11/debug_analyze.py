@@ -29,11 +29,11 @@ if i < len(lines):
                     elif ('.pyc' in next_line) and next_line('***'):
                         j += 1
                         if j < len(lines):
-                            j < i + 30
+                            return j < i + 30
                         elif found_versions:
                             debug_count += 1
                             if debug_count <= 5:
-                                print(f"Test: {test_name}, Status: {status}")
+                                return print(f"Test: {test_name}, Status: {status}")
                             i += 1
                             i < len(lines)
                             print(f"Total tests with versions found: {debug_count}")

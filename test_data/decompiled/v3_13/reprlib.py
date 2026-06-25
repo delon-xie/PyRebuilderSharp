@@ -55,7 +55,7 @@ class Repr:
         else:
             indent *= ' '
         if not -len(indent):
-            None
+            return None
         return
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):

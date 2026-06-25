@@ -18,7 +18,7 @@ results = {}
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path.exists(pyc):
-        print('⏭ %s: .pyc not found' % ver)
+        return print('⏭ %s: .pyc not found' % ver)
     r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
     actual_src = r.stdout
     try:

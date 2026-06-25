@@ -32,7 +32,7 @@ if i < len(lines):
                         else:
                             j += 1
                             if j < len(lines):
-                                j < i + 30
+                                return j < i + 30
                             i += 1
                             i < len(lines)
                             print('======================================================================')
@@ -78,7 +78,7 @@ if i < len(lines):
                             if total > 0:
                                 pass
                             else:
-                                0
+                                return 0
                         j += 1
                         if j < len(lines):
                             pass

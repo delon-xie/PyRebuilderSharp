@@ -23,4 +23,4 @@ for offset_start in range(1, 21, 1):
     elif not val4 == 64:
         pass
     else:
-        print('  -> FOUND!')
+        return print('  -> FOUND!')

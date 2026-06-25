@@ -51,8 +51,8 @@ def _gt_from_lt(self, other):
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
-        self != other
+    else:
+        return not not op_result and (self != other)
 
 def _le_from_lt(self, other):
     """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
@@ -62,7 +62,7 @@ def _le_from_lt(self, other):
     elif op_result:
         return
     else:
-        self == other
+        return self == other
 
 def _ge_from_lt(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a < b)."""
@@ -80,15 +80,15 @@ def _ge_from_le(self, other):
     elif not op_result:
         return
     else:
-        self == other
+        return self == other
 
 def _lt_from_le(self, other):
     """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self != other
+    else:
+        return not op_result and (self != other)
 
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
@@ -103,8 +103,8 @@ def _lt_from_gt(self, other):
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
-        self != other
+    else:
+        return not not op_result and (self != other)
 
 def _ge_from_gt(self, other):
     """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
@@ -114,7 +114,7 @@ def _ge_from_gt(self, other):
     elif op_result:
         return
     else:
-        self == other
+        return self == other
 
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
@@ -132,15 +132,15 @@ def _le_from_ge(self, other):
     elif not op_result:
         return
     else:
-        self == other
+        return self == other
 
 def _gt_from_ge(self, other):
     """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self != other
+    else:
+        return not op_result and (self != other)
 
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
@@ -240,7 +240,7 @@ def _partial_prepare_merger(args):
             order.append(j)
             j += 1
         else:
-            order.append(i)
+            return order.append(i)
     phcount = j - nargs
     if phcount:
         pass
@@ -332,10 +332,6 @@ class partial:
         if self.keywords:
             if self.__dict__:
                 return (())
-            else:
-                None
-        else:
-            None
 
     def __setstate__(self, state):
         if not isinstance(state, tuple):
@@ -514,7 +510,7 @@ def _c3_merge(sequences):
     if candidate is None:
         raise RuntimeError('Inconsistent hierarchy')
     else:
-        result.append(candidate)
+        return result.append(candidate)
     for seq in sequences:
         if seq[0] == candidate:
             0
@@ -594,13 +590,13 @@ def _compose_mro(cls, types):
             if sub(issubclass, sub):
                 pass
         if not found:
-            mro.append(typ)
+            return mro.append(typ)
         else:
             found.sort(key=len, reverse=True)
             for sub in found:
                 for subcls in sub:
                     if subcls not in mro:
-                        mro.append(subcls)
+                        return mro.append(subcls)
     return
 
 def _find_impl(cls, registry):

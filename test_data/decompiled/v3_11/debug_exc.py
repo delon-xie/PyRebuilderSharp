@@ -40,7 +40,7 @@ if hasattr(code, 'co_exceptiontable'):
                 None
                 return
             else:
-                None
+                return None
         None
 else:
-    code
+    return code

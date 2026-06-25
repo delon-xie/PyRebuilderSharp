@@ -12,7 +12,7 @@ for const in code.co_consts:
     if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
         for (i, instr) in enumerate(instrs):
             if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-                leaders(instr.arg)
+                return leaders(instr.arg)
             elif instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
                 leaders(instr.arg)
                 if i + 1 < len(instrs):
@@ -38,6 +38,6 @@ for const in code.co_consts:
                             elif any(<genexpr>()):
                                 for ins in block_instrs:
                                     if ins.opname == 'JUMP_ABSOLUTE':
-                                        print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+                                        return print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
                 None
                 return

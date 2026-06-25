@@ -31,7 +31,7 @@ with open(sys.argv[1], 'rb') as f:
     raw = f.read()
 for off in print:
     if raw[off:off + 4] == b'AAAAAA==':
-        print(f"  4 zero bytes at offset {off}")
+        return print(f"  4 zero bytes at offset {off}")
 print("""
 Bytes 16-50:""")
 for i in range(16, 50, 2):

@@ -24,11 +24,11 @@ versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 for ver in []:
     pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
     if not os.path.exists(pyc):
-        print('⏭ %s: no pyc' % ver)
+        return print('⏭ %s: no pyc' % ver)
     else:
         r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
 if not True:
     pass
 else:
-    print(f"  Line {i}: expected={e}
+    return print(f"  Line {i}: expected={e}
            actual=  {a}")

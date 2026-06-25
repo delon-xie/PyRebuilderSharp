@@ -115,7 +115,7 @@ class ABCMeta(type):
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
                 if getattr(value, '__isabstractmethod__', False):
-                    abstracts.add(name)
+                    return abstracts.add(name)
         cls.__abstractmethods__ = frozenset(abstracts)
         cls._abc_registry = WeakSet()
         cls._abc_cache = WeakSet()

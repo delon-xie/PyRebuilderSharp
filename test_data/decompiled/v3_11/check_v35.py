@@ -24,6 +24,6 @@ def dump_code(c, depth = 0):
             None
             return
         else:
-            None
+            return None
     return
 dump_code(code)

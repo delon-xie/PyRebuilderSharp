@@ -236,7 +236,7 @@ class partial:
 
     def __reduce__(self):
         if self.keywords:
-            None
+            pass
 
     def __setstate__(self, state):
         (func, args, kwds, namespace) = state
@@ -419,9 +419,9 @@ def _compose_mro(cls, types):
             for sub in found:
                 for subcls in sub:
                     if subcls not in mro:
-                        mro.append(subcls)
+                        return mro.append(subcls)
         if not found:
-            mro.append(typ)
+            return mro.append(typ)
     return
 
 def _find_impl(cls, registry):

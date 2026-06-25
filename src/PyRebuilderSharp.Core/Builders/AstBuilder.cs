@@ -3033,6 +3033,15 @@ public class AstBuilder
             result.Add(new If(testExpr, bodyStmts, orelse));
         }
         result.AddRange(tailCode);
+
+        // Phase 29: 修复 elif 体中 Return 丢失
+        // 当 `return X and Y` / `return X or Y` 被放在 if 的 else 分支中时，
+        // bytecode 中的 inner conditional jump (POP_JUMP_IF_FALSE/POP_JUMP_IF_TRUE)
+        // 会使之后被转为 elif 分支，且内层 body 中的 Return 丢失（变为 ExprStmt）。
+        // 此处对 result 中的最后一个 If 语句做后处理，将 elif/else 体末尾的
+        // 裸 ExprStmt 包装为 Return。参考 CPython 3.12: Python/ceval.c
+        // 中 return 操作的字节码结构：LAST(COND_JUMP → body RETURN_VALUE)
+        result = WrapElifReturn(result);
         return result;
     }
 
@@ -3727,6 +3736,69 @@ public class AstBuilder
             .Where(b => b.StartOffset > block.EndOffset)
             .OrderBy(b => b.StartOffset)
             .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Phase 29: 修复 elif/else 体中 Return 丢失。
+    /// 当 `return A and B` / `return A or B` 的 else 分支中含有 inner conditional jump，
+    /// BuildIfElse 将其转为 elif 分支时，内层 body 的 Return 被丢失变为 ExprStmt。
+    /// 此方法递归扫描 If 语句的 orelse 链，将末尾的裸 ExprStmt 包装为 Return。
+    /// 参考 CPython 3.12: Python/ceval.c — RETURN_VALUE pops TOS.
+    /// </summary>
+    private List<Stmt> WrapElifReturn(List<Stmt> stmts)
+    {
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            if (stmts[i] is If ifStmt)
+            {
+                stmts[i] = WrapIfReturn(ifStmt);
+            }
+        }
+        return stmts;
+    }
+
+    private If WrapIfReturn(If ifStmt)
+    {
+        // 处理 elif 链：递归处理 orelse 中的 If（elif 链的第一个元素）
+        var orelse = ifStmt.Orelse;
+        if (orelse?.Count > 0)
+        {
+            if (orelse.Count == 1 && orelse[0] is If elifStmt)
+            {
+                orelse = new List<Stmt> { WrapIfReturn(elifStmt) };
+            }
+            else
+            {
+                // 普通 else 分支：单 ExprStmt → Return
+                orelse = WrapLastExprStmtInReturn(orelse);
+            }
+        }
+
+        var body = ifStmt.Body;
+        // 检查 body 末尾的裸 ExprStmt（AND 链终端 body 会丢 Return）
+        if (body.Count == 1 && body[0] is ExprStmt expr)
+        {
+            body = new List<Stmt> { new Return(expr.Value) };
+        }
+
+        return new If(ifStmt.Test, body, orelse);
+    }
+
+    private List<Stmt>? WrapLastExprStmtInReturn(List<Stmt>? stmts)
+    {
+        if (stmts == null || stmts.Count == 0) return stmts;
+        var last = stmts[^1];
+        if (last is ExprStmt expr && stmts.Count == 1)
+        {
+            stmts[^1] = new Return(expr.Value);
+        }
+        else if (last is If innerIf)
+        {
+            // 递归处理嵌套 If
+            var lastIf = WrapIfReturn(innerIf);
+            stmts[^1] = lastIf;
+        }
+        return stmts;
     }
 
     private bool IsConditionBranch(BasicBlock block)

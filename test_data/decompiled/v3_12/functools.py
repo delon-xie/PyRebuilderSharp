@@ -55,16 +55,16 @@ def _gt_from_lt(self, other):
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self != other
+    else:
+        return not op_result and (self != other)
 
 def _le_from_lt(self, other):
     """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self == other
+    else:
+        return not op_result and (self == other)
 
 def _ge_from_lt(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a < b)."""
@@ -79,16 +79,16 @@ def _ge_from_le(self, other):
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
-        self == other
+    else:
+        return not not op_result and (self == other)
 
 def _lt_from_le(self, other):
     """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
-        self != other
+    else:
+        return op_result and (self != other)
 
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
@@ -103,16 +103,16 @@ def _lt_from_gt(self, other):
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self != other
+    else:
+        return not op_result and (self != other)
 
 def _ge_from_gt(self, other):
     """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
-        self == other
+    else:
+        return not op_result and (self == other)
 
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
@@ -127,16 +127,16 @@ def _le_from_ge(self, other):
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
-        self == other
+    else:
+        return not not op_result and (self == other)
 
 def _gt_from_ge(self, other):
     """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
-        self != other
+    else:
+        return op_result and (self != other)
 
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
@@ -231,7 +231,7 @@ def _partial_prepare_merger(args):
             order.append(j)
             j += 1
         else:
-            order.append(i)
+            return order.append(i)
     phcount = j - nargs
     if phcount:
         pass
@@ -283,9 +283,9 @@ class partial:
 
     def __reduce__(self):
         if not self.keywords:
-            None
+            pass
         elif not self.__dict__:
-            None
+            pass
 
     def __setstate__(self, state):
         if not isinstance(state, tuple):
@@ -555,7 +555,7 @@ def _c3_mro(cls, abcs = None):
                     elif <genexpr>():
                         pass
                     else:
-                        abstract_bases.append(base)
+                        return abstract_bases.append(base)
                 for base in abstract_bases:
                     abcs.remove(base)
                 base
@@ -583,7 +583,7 @@ def _compose_mro(cls, types):
     def is_related(typ):
         if (typ not in bases) and hasattr(typ, '__mro__'):
             if not isinstance(typ, GenericAlias):
-                issubclass(cls, typ)
+                return issubclass(cls, typ)
             return
         else:
             return
@@ -623,7 +623,7 @@ def _compose_mro(cls, types):
                     if not s in type_set:
                         pass
         if not found:
-            mro.append(typ)
+            return mro.append(typ)
         else:
             found.sort(reverse=True, key=len)
             for sub in found:
@@ -631,7 +631,7 @@ def _compose_mro(cls, types):
                     if not subcls not in mro:
                         pass
                     else:
-                        mro.append(subcls)
+                        return mro.append(subcls)
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
@@ -732,7 +732,7 @@ class _singledispatchmethod_get:
         if isinstance(func, FunctionType):
             pass
         else:
-            0
+            return 0
         self.__doc__ = func.__doc__
 
     def __repr__(self):

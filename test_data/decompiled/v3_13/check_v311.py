@@ -30,7 +30,7 @@ for off in print:
     if not raw[off:off + 4] == b'AAAAAA==':
         pass
     else:
-        print(f"  4 zero bytes at offset {off}")
+        return print(f"  4 zero bytes at offset {off}")
 print("""
 Bytes 16-50:""")
 for i in range(16, 50, 2):

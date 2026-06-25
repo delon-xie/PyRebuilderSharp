@@ -56,7 +56,7 @@ else:
                                         for ver in []:
                                             pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
                                             if not os.path.exists(pyc):
-                                                print('⏭ %s: no pyc' % ver)
+                                                return print('⏭ %s: no pyc' % ver)
                                             else:
                                                 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
     except Exception:

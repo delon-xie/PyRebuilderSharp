@@ -56,7 +56,7 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
 ==================================================")
     print(f"Test: {name}")
     if not r.stdout.strip():
-        r.stderr.strip()
+        return r.stderr.strip()
     f""
     print(f"Decompile: {r2.stdout.strip()[:100]}")
     if os.path.exists(out_path):
@@ -65,7 +65,7 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
         __module__
         open(out_path)
     else:
-        print(f"Error: {r2.stderr[:200]}")
+        return print(f"Error: {r2.stderr[:200]}")
     content = f.read().strip()
     None(None, None)
     print(f"Output ({len(content)} bytes):

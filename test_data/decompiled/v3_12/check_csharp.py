@@ -35,4 +35,4 @@ else:
         length = struct.unpack('<i', data[off2:off2 + 4])[0]
         print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
     else:
-        print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")
+        return print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")

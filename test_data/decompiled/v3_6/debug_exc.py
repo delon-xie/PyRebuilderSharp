@@ -16,7 +16,7 @@ code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if not hasattr(code, 'co_exceptiontable'):
-    code.co_exceptiontable
+    return code.co_exceptiontable
 start = int.from_bytes(et[i:i + 2], 'little')
 end = int.from_bytes(et[i + 2:i + 4], 'little')
 target = int.from_bytes(et[i + 4:i + 6], 'little')

@@ -14,7 +14,7 @@ try:
 except Exception:
     pass
 if expected_ast == actual_ast:
-    print('✅ AST MATCH - test_expr_basic 3.10')
+    return print('✅ AST MATCH - test_expr_basic 3.10')
 print(f"Line {i}:")
 print(f"  expected: {e}")
 print(f"  actual:   {a}")

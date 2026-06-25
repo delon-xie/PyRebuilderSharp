@@ -70,7 +70,7 @@ class Repr:
         else:
             indent *= ' '
         if not -len(indent):
-            None
+            return None
         return
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
@@ -84,7 +84,7 @@ class Repr:
         for _ in []:
             pass
         if n > maxiter:
-            pieces.append(self.fillvalue)
+            return pieces.append(self.fillvalue)
         s = self._join(pieces, level)
         if n == 1:
             if trail:

@@ -31,4 +31,4 @@ for const in code.co_consts:
 --- Nested: {const.co_name} ---")
         print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
         if hasattr(const, 'co_exceptiontable') and const.co_exceptiontable:
-            print(f"  bytes: {const.co_exceptiontable.hex()}")
+            return print(f"  bytes: {const.co_exceptiontable.hex()}")

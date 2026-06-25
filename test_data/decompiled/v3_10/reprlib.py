@@ -70,7 +70,7 @@ class Repr:
                 pass
             return
         if n > maxiter:
-            pieces.append(self.fillvalue)
+            return pieces.append(self.fillvalue)
         s = self._join(pieces, level)
         if (n == 1) and trail:
             if self.indent is None:
