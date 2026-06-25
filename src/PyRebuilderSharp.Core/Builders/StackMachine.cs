@@ -992,11 +992,9 @@ public class StackMachine
                         func = SafePop();
                     else
                     {
-                        // PUSH_NULL 后无函数 — args 可能包含了函数对象
-                        // 常见于 KW_NAMES 路径多弹了
+                        // PUSH_NULL 后无函数 — args 可能包含了函数对象（argCount 偏大）
                         if (args.Count >= 1)
                         {
-                            // args[0] = 最后弹出的 = 离 TOS 最近 = 函数
                             var recoveredFunc = args[0];
                             args.RemoveAt(0);
                             _exprStack.Push(new Call(recoveredFunc, args, keywords));
@@ -1006,17 +1004,15 @@ public class StackMachine
                 }
                 else if (func == null)
                 {
-                    // func=null — argCount 可能多弹了一个
+                    // func=null — argCount 可能多弹了一个（函数被当作参数消费）
                     if (args.Count >= 2)
                     {
-                        // args[0] = 最后弹出 = 函数, args[1..] = 实际参数
                         var recoveredFunc = args[0];
                         args.RemoveAt(0);
                         _exprStack.Push(new Call(recoveredFunc, args, keywords));
                     }
                     else if (args.Count == 1)
                     {
-                        // 单个参数 — 直接推送为表达式（至少保留值）
                         _exprStack.Push(args[0]);
                     }
                     return null;
