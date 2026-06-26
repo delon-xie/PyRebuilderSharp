@@ -129,7 +129,7 @@ def _lt_from_ge(self, other):
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = <setcomp>()
+    roots = {op for op in .0}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -575,9 +575,9 @@ def _c3_mro(cls, abcs = None):
                             abcs(base)
                             abcs
                             abcs.remove
-                        explicit_c3_mros = <listcomp>()
-                        abstract_c3_mros = <listcomp>()
-                        other_c3_mros = <listcomp>()
+                        explicit_c3_mros = [base for base in .0]
+                        abstract_c3_mros = [base for base in .0]
+                        other_c3_mros = [base for base in .0]
                         return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
                     return abstract_bases
 

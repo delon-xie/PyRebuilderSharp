@@ -3946,6 +3946,9 @@ public class AstBuilder
             if (s is Assign aa) { elt = aa.Value; break; }
         }
 
+        // Fallback: use for-loop target as element when SET_ADD consumed it
+        elt ??= innermostFor.Target;
+
         if (elt == null) return null;
 
         return kind switch

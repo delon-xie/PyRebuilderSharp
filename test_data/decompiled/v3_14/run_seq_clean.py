@@ -29,14 +29,7 @@ for ver in []:
         if match:
             pass
         else:
-            '❌'
-            if match:
-                pass
-            else:
-                'MISMATCH'
-                f""
-                if not match:
-                    pass
+            return '❌'
 passed = sum(<genexpr>())
 total = len(results)
 print("""
@@ -60,3 +53,17 @@ for i in range(max(len(exp_lines), len(act_lines))):
             else:
                 print('  Line %d: expected=%s' % (i, e))
                 print('           actual=  %s' % a)
+print('Failed to parse expected source:', e)
+sys.exit(1)
+def <genexpr>(.0):
+    .0
+    for (r, v) in .0:
+        r
+        if not True:
+            pass
+        else:
+            return 1
+[]
+print(f"❌ {ver}: AST parse failed - {e}")
+print('  Decompiled: %s' % actual_src[:200])
+e = None

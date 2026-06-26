@@ -562,7 +562,7 @@ class EnumType(type):
             <listcomp>
             members(key=<lambda>)
             members.sort
-            body = <dictcomp>()
+            body = {t: t for t in .0}
             tmp_cls = type(name, (object), body)
             if boundary:
                 return KEEP
@@ -1063,7 +1063,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                         gnv_last_values.append
                         enum_class._singles_mask_ = single_bits
                         enum_class._all_bits_ = single_bits | multi_bits.bit_length ** single_bits | multi_bits() - 1
-                        member_list = <listcomp>()
+                        member_list = [m for m in .0]
                         if member_list != sorted(member_list):
                             enum_class._iter_member_ = enum_class._iter_member_by_def_
                 else:
@@ -1079,7 +1079,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                 pass
         enum_class._singles_mask_ = single_bits
         enum_class._all_bits_ = single_bits | multi_bits.bit_length ** single_bits | multi_bits() - 1
-        member_list = <listcomp>()
+        member_list = [m for m in .0]
         if member_list != sorted(member_list):
             pass
         def <listcomp>(.0):
@@ -1133,7 +1133,7 @@ class verify:
                             pass
                         else:
                             values = list(_iter_bits_lsb(alias.value))
-                            missed = <listcomp>()
+                            missed = [v for v in .0]
                             if missed:
                                 for val in missing_names.append:
                                     missing_value |= val
