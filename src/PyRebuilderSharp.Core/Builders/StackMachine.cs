@@ -1503,15 +1503,34 @@ public class StackMachine
                         // v3.3-3.11: pop qualname + code
                         // 参考 CPython 3.11: Python/ceval.c MAKE_FUNCTION
                         //     "Pops a code object and a qualified name from the stack."
+                        // 注意：部分函数（如 class body）可能没有 qualname 在栈上，
+                        // 此时 TOS(code) 被当作 qualname 弹出，TOS1 是前置指令的余值。
+                        // 检查两个弹出值，自动识别 code，然后将非-code 值推回栈
+                        //（前置值如 __build_class__ 仍需要保留供后续 CALL 使用）。
                     {
-                        var qualNameExpr = SafePop();
-                        var codeExpr = SafePop();
+                        var tos = SafePop();       // 可能是 qualname 或 code
+                        var tos1 = SafePop();      // 可能是 code 或 __build_class__
 
-                        if (qualNameExpr is Constant c3 && c3.Value is string s)
-                            funcName = s;
-
-                        if (codeExpr is Constant c2 && c2.Value is CodeObject co)
+                        // 尝试识别哪个是 CodeObject
+                        if (tos is Constant cCode && cCode.Value is CodeObject co)
+                        {
+                            // TOS 是 code（无 qualname 的变体）
                             childCode = co;
+                            funcName = co.Name ?? "<lambda>";
+                            // tos1 是非-code 前置值（如 __build_class__），推回栈
+                            if (tos1 != null) _exprStack.Push(tos1);
+                        }
+                        else if (tos1 is Constant cCode2 && cCode2.Value is CodeObject co2)
+                        {
+                            // TOS1 是 code（标准 qualname + code 顺序）
+                            childCode = co2;
+                            if (tos is Constant cStr && cStr.Value is string s)
+                                funcName = s;
+                            else
+                                funcName = co2.Name ?? "<lambda>";
+                            // tos1(code) 已作 FunctionRef 源，tos(qualname) 已被消费
+                        }
+                        // 如果都没匹配到 code，childCode 保持 null
                         break;
                     }
                 }
