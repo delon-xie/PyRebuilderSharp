@@ -22,10 +22,9 @@ def test_until_broken(exprs):
     out = r2.stdout + r2.stderr.strip()
     if 'Decompilation failed' in out:
         return 'CRASH'
-    elif 'if ' in out:
+    if 'if ' in out:
         return f"CONDITIONAL: {out[:80]}"
-    else:
-        return 'OK'
+    return 'OK'
 
 def find_breaking_point(exprs, lo, hi):
     mid = (lo + hi) // 2

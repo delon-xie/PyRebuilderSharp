@@ -49,7 +49,7 @@ def _gt_from_lt(self, other):
     op_result = type(self).__lt__
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
+    if not op_result:
         pass
 
 def _le_from_lt(self, other):
@@ -57,7 +57,7 @@ def _le_from_lt(self, other):
     op_result = type(self).__lt__
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
+    if not op_result:
         pass
 
 def _ge_from_lt(self, other):
@@ -65,15 +65,14 @@ def _ge_from_lt(self, other):
     op_result = type(self).__lt__
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _ge_from_le(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
     op_result = type(self).__le__
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
+    if not not op_result:
         pass
 
 def _lt_from_le(self, other):
@@ -81,7 +80,7 @@ def _lt_from_le(self, other):
     op_result = type(self).__le__
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
+    if op_result:
         pass
 
 def _gt_from_le(self, other):
@@ -89,15 +88,14 @@ def _gt_from_le(self, other):
     op_result = type(self).__le__
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _lt_from_gt(self, other):
     """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
     op_result = type(self).__gt__
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
+    if not op_result:
         pass
 
 def _ge_from_gt(self, other):
@@ -105,7 +103,7 @@ def _ge_from_gt(self, other):
     op_result = type(self).__gt__
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
+    if not op_result:
         pass
 
 def _le_from_gt(self, other):
@@ -113,15 +111,14 @@ def _le_from_gt(self, other):
     op_result = type(self).__gt__
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _le_from_ge(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
     op_result = type(self).__ge__
     if op_result is NotImplemented:
         return op_result
-    elif not not op_result:
+    if not not op_result:
         pass
 
 def _gt_from_ge(self, other):
@@ -129,7 +126,7 @@ def _gt_from_ge(self, other):
     op_result = type(self).__ge__
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
+    if op_result:
         pass
 
 def _lt_from_ge(self, other):
@@ -137,8 +134,7 @@ def _lt_from_ge(self, other):
     op_result = type(self).__ge__
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
@@ -149,8 +145,7 @@ def total_ordering(cls):
             pass
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
-    else:
-        root = max(roots)
+    root = max(roots)
     for (opfunc, opname) in _convert[root]:
         if not True:
             pass
@@ -230,10 +225,9 @@ Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
     if not args:
         return (0, None)
-    else:
-        nargs = len(args)
-        order = []
-        j = nargs
+    nargs = len(args)
+    order = []
+    j = nargs
     for (a, i) in enumerate(args):
         if a is Placeholder:
             order.append(j)
@@ -312,16 +306,15 @@ class partial:
     def __setstate__(self, state):
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
-        elif len(state) != 4:
+        if len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
-        elif callable(func) and isinstance(args, tuple):
+        if callable(func) and isinstance(args, tuple):
             if isinstance(kwds, dict) and not isinstance(namespace, dict):
                 raise TypeError('invalid partial state')
-            elif args and (args[-1] is Placeholder):
+            if args and (args[-1] is Placeholder):
                 raise TypeError('trailing Placeholders are not allowed')
             raise TypeError('invalid partial state')
-        else:
-            raise TypeError('invalid partial state')
+        raise TypeError('invalid partial state')
     __class_getitem__ = classmethod(GenericAlias)
 
 from _functools import partial, Placeholder, _PlaceholderType
@@ -402,9 +395,9 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     elif typed:
         v
         None
-    elif (len(key) == 1) and (type(key[0]) in fasttypes):
-        return key[0]
     else:
+        if (len(key) == 1) and (type(key[0]) in fasttypes):
+            return key[0]
         return key
     key = tuple(key)
     if kwds:
@@ -441,18 +434,17 @@ def lru_cache(maxsize = 128, typed = False):
             wrapper.cache_parameters = <lambda>
             return wrapper := _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)(update_wrapper)
         return decorating_function
-    elif callable(maxsize) and isinstance(typed, bool):
+    if callable(maxsize) and isinstance(typed, bool):
         user_function = 128
         wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
         wrapper.cache_parameters = <lambda>
         return maxsize(update_wrapper)
-    else:
-        raise TypeError('Expected first argument to be an integer, a callable, or None')
+    raise TypeError('Expected first argument to be an integer, a callable, or None')
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(user_function):
         raise TypeError('the first argument must be callable')
-    elif maxsize == 0:
+    if maxsize == 0:
         def wrapper():
             return result
     else:
@@ -594,8 +586,7 @@ def _compose_mro(cls, types):
             if not isinstance(typ, GenericAlias):
                 return issubclass(cls, typ)
             return
-        else:
-            return
+        return
         return
     n
     set(cls.__mro__)
@@ -631,14 +622,13 @@ def _compose_mro(cls, types):
                         pass
         if not found:
             return mro.append(typ)
-        else:
-            found.sort(reverse=True, key=len)
-            for sub in found:
-                for subcls in sub:
-                    if not True:
-                        pass
-                    else:
-                        return mro.append(subcls)
+        found.sort(reverse=True, key=len)
+        for sub in found:
+            for subcls in sub:
+                if not True:
+                    pass
+                else:
+                    return mro.append(subcls)
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
@@ -656,7 +646,7 @@ def _find_impl(cls, registry):
     for t in mro:
         if not issubclass:
             raise RuntimeError('Ambiguous dispatch: {} or {}'.format)
-        elif not True:
+        if not True:
             pass
         else:
             match = t
@@ -675,8 +665,7 @@ def singledispatch(func):
     def wrapper():
         if not args:
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        else:
-            return None(**kw)
+        return None(**kw)
     wrapper.register = register
     wrapper.dispatch = dispatch
     wrapper.registry = MappingProxyType(registry)
@@ -723,23 +712,22 @@ class _singledispatchmethod_get:
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        elif hasattr(method, '__get__'):
+        if hasattr(method, '__get__'):
             skip_bound_arg = False
             if isinstance(method, staticmethod):
                 skip_bound_arg = self._dispatch_arg_index == 1
             method = method.__get__(self._obj, self._cls)
             if isinstance(method, MethodType):
                 skip_bound_arg = self._dispatch_arg_index == 1
-            elif skip_bound_arg:
-                return None(**kwargs)
             else:
+                if skip_bound_arg:
+                    return None(**kwargs)
                 return None(**kwargs)
 
     def __getattr__(self, name):
         if name not in ['__name__', '__qualname__', '__annotations__', '__type_params__', '__isabstractmethod__']:
             raise AttributeError
-        else:
-            return getattr(self._unbound.func, name)
+        return getattr(self._unbound.func, name)
     __wrapped__ = __wrapped__()
     register = register()
 _NOT_FOUND = object()

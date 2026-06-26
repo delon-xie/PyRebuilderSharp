@@ -113,14 +113,13 @@ class ABCMeta(type):
         """
         if not isinstance(subclass, type):
             raise TypeError('Can only register classes')
-        elif issubclass(subclass, cls):
+        if issubclass(subclass, cls):
             return subclass
-        elif issubclass(cls, subclass):
+        if issubclass(cls, subclass):
             raise RuntimeError('Refusing to create an inheritance cycle')
-        else:
-            cls._abc_registry.add(subclass)
-            ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
-            return subclass
+        cls._abc_registry.add(subclass)
+        ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
+        return subclass
 
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
@@ -136,31 +135,28 @@ class ABCMeta(type):
         if subtype is subclass:
             if instance._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
                 return False
-            else:
-                return
-        else:
-            return (any)(CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'))
+            return
+        return (any)(CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'))
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         if subclass in cls._abc_cache:
             return True
-        elif cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
+        if cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
             cls._abc_negative_cache = WeakSet()
             cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
-        elif subclass in cls._abc_negative_cache:
-            return False
         else:
+            if subclass in cls._abc_negative_cache:
+                return False
             ok = cls.__subclasshook__(subclass)
             if ok is not NotImplemented:
                 if not isinstance(ok, bool):
                     raise AssertionError
-                elif ok:
+                if ok:
                     return cls._abc_cache.add(subclass)
-                else:
-                    cls._abc_negative_cache.add(subclass)
-                    return ok
-            elif cls in getattr(subclass, '__mro__', ()):
+                cls._abc_negative_cache.add(subclass)
+                return ok
+            if cls in getattr(subclass, '__mro__', ()):
                 cls._abc_cache.add(subclass)
                 return True
 

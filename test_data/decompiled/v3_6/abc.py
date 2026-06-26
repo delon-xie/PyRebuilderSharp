@@ -130,8 +130,7 @@ class ABCMeta(type):
         """
         if not isinstance(subclass, type):
             raise TypeError('Can only register classes')
-        else:
-            return subclass
+        return subclass
 
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""

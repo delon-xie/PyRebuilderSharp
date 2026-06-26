@@ -297,9 +297,8 @@ class EnumType(type):
         """
         if isinstance(value, cls):
             return True
-        else:
-            result = cls._missing_(value)
-            return isinstance(result, cls)
+        result = cls._missing_(value)
+        return isinstance(result, cls)
 
     def __delattr__(cls, attr):
         if attr in cls._member_map_:
@@ -433,7 +432,7 @@ class EnumType(type):
                 base_chain.add(base)
                 if base is object:
                     continue
-                elif candidate:
+                if candidate:
                     return base
                 if isinstance(base, EnumType) and (base._member_type_ is not object):
                     return data_types.add(base._member_type_)
@@ -531,7 +530,7 @@ class Enum(metaclass=EnumType):
         if cls._member_map_:
             if getattr(cls, '_%s__in_progress' % cls.__name__, False):
                 raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
-            elif exc is None:
+            if exc is None:
                 raise ve_exc
         ve_exc = ValueError('%r is not a valid %s' % (value, cls.__qualname__))
 
@@ -627,7 +626,7 @@ class StrEnum(str, ReprEnum):
         """values must already be of type `str`"""
         if len(values) > 3:
             raise TypeError('too many arguments for str(): %r' % (values))
-        elif not isinstance(values[0], str):
+        if not isinstance(values[0], str):
             raise TypeError('%r is not a string' % (values[0]))
 
     @staticmethod
@@ -820,8 +819,7 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_ is None:
         return ('%s.%s(%r)', cls_name, self._value_)
-    else:
-        return
+    return
     name.append(n)
 
 def global_str(self):
@@ -968,7 +966,7 @@ def _test_simple_enum(checked_enum, simple_enum):
                     return failed.append("""%r:
          %s
          %s""" % (key, 'checked -> %r' % (checked_value), 'simple  -> %r' % (simple_value)))
-                elif failed_member:
+                if failed_member:
                     for name in member_names:
                         failed_member = []
                         if name not in simple_keys:

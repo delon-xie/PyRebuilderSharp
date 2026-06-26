@@ -4247,6 +4247,24 @@ public class AstBuilder
             };
         }
 
+        // 先单独应用规则 0: 展开 if+else 中 body 以 return/raise 结尾的无效 else
+        // 当 if body 以不可达终止符结尾时，else 体可以安全提升为顺序代码。
+        // 此规则放在主循环前独立扫描，因为主循环从 Count-2 开始（配对需要），
+        // 会错过位于最后的 If 节点。
+        for (int ri = stmts.Count - 1; ri >= 0; ri--)
+        {
+            if (stmts[ri] is If ifStmt0
+                && ifStmt0.Orelse is { Count: > 0 }
+                && ifStmt0.Body.Count > 0
+                && ifStmt0.Body[^1] is Return or Raise or Continue or Break)
+            {
+                var inlined = new List<Stmt> { new If(ifStmt0.Test, ifStmt0.Body, null) };
+                inlined.AddRange(ifStmt0.Orelse);
+                stmts.RemoveAt(ri);
+                stmts.InsertRange(ri, inlined);
+            }
+        }
+
         // 从后向前扫描可折叠模式（保证删除不影响前向索引）
         for (int i = stmts.Count - 2; i >= 0; i--)
         {

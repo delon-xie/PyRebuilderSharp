@@ -38,11 +38,10 @@ def fix_pyc_names(directory):
                             new_filepath = os.path(directory, new_filename)
                             if os.path(new_filepath):
                                 return print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-                            else:
-                                os.rename(filepath, new_filepath)
-                                print(f"✓ Renamed {filename} -> {new_filename}")
-                                None
-                                return
+                            os.rename(filepath, new_filepath)
+                            print(f"✓ Renamed {filename} -> {new_filename}")
+                            None
+                            return
                 import re
                 match = re('\\.(\\d+)\\.pyc$', filename)
                 if match:

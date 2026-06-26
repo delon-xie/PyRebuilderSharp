@@ -13,9 +13,8 @@ def recursive_repr(fillvalue = '...'):
             key = (id(self), get_ident())
             if key in repr_running:
                 return fillvalue
-            else:
-                repr_running(key)
-                repr_running.add
+            repr_running(key)
+            repr_running.add
             result = user_function(self)
             repr_running(key)
             return result
@@ -63,8 +62,7 @@ class Repr:
         module = getattr(cls, '__module__', None)
         if module == self._lookup[typename]:
             return method(x, level)
-        else:
-            return self(x, level)
+        return self(x, level)
         return self(x, level)
 
     def _join(self, pieces, level):
@@ -73,8 +71,7 @@ class Repr:
         indent = self.indent
         if isinstance(indent, int) and (indent < 0):
             raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
-        else:
-            indent *= ' '
+        indent *= ' '
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
         if -len(indent):
@@ -95,8 +92,7 @@ class Repr:
             if trail:
                 right = trail + right
             return f"{left!s}{s!s}{right!s}"
-        else:
-            return f"{left!s}{s!s}{right!s}"
+        return f"{left!s}{s!s}{right!s}"
         pieces = <listcomp>()
         if n > maxiter:
             pass
@@ -114,23 +110,20 @@ class Repr:
     def repr_array(self, x, level):
         if not x:
             return 'array(\'%s\')' % x.typecode
-        else:
-            header = 'array(\'%s\', [' % x.typecode
-            return self(x, level, header, '])', self.maxarray)
+        header = 'array(\'%s\', [' % x.typecode
+        return self(x, level, header, '])', self.maxarray)
 
     def repr_set(self, x, level):
         if not x:
             return 'set()'
-        else:
-            x = _possibly_sorted(x)
-            return self(x, level, '{', '}', self.maxset)
+        x = _possibly_sorted(x)
+        return self(x, level, '{', '}', self.maxset)
 
     def repr_frozenset(self, x, level):
         if not x:
             return 'frozenset()'
-        else:
-            x = _possibly_sorted(x)
-            return self(x, level, 'frozenset({', '})', self.maxfrozenset)
+        x = _possibly_sorted(x)
+        return self(x, level, 'frozenset({', '})', self.maxfrozenset)
 
     def repr_deque(self, x, level):
         return self(x, level, 'deque([', '])', self.maxdeque)
@@ -139,12 +132,11 @@ class Repr:
         n = len(x)
         if n == 0:
             return '{}'
-        elif level <= 0:
+        if level <= 0:
             return '{' + self.fillvalue + '}'
-        else:
-            newlevel = level - 1
-            repr1 = self.repr1
-            pieces = []
+        newlevel = level - 1
+        repr1 = self.repr1
+        pieces = []
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])

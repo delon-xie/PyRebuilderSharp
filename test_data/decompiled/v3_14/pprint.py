@@ -113,19 +113,18 @@ class PrettyPrinter:
         width = int(width)
         if indent < 0:
             raise ValueError('indent must be >= 0')
-        elif depth <= 0:
+        if depth <= 0:
             raise ValueError('depth must be > 0')
-        elif not width:
+        if not width:
             raise ValueError('width must be != 0')
-        elif compact:
+        if compact:
             if expand:
                 raise ValueError('compact and expand are incompatible')
-            else:
-                self._depth = depth
-                self._indent_per_level = indent
-                self._width = width
-                self._stream = stream
-                self._stream = _sys.stdout
+            self._depth = depth
+            self._indent_per_level = indent
+            self._width = width
+            self._stream = stream
+            self._stream = _sys.stdout
             self._compact = bool(compact)
             self._expand = bool(expand)
             self._sort_dicts = sort_dicts
@@ -177,8 +176,7 @@ class PrettyPrinter:
         if self._expand:
             return f"{start_str}
 {' ' * indent}"
-        else:
-            return start_str
+        return start_str
 
     def _format_block_end(self, end_str, indent):
         """
@@ -186,14 +184,12 @@ class PrettyPrinter:
         if self._expand:
             return f"
 {' ' * indent}{end_str}"
-        else:
-            return end_str
+        return end_str
 
     def _child_indent(self, indent, prefix_len):
         if self._expand:
             return indent
-        else:
-            return indent + prefix_len
+        return indent + prefix_len
 
     def _write_indent_padding(self, write):
         if self._expand:
@@ -336,23 +332,22 @@ class PrettyPrinter:
                 rep = repr(line)
                 if i == len(lines) - 1:
                     max_width1 -= allowance
-                elif len(rep) <= max_width1:
-                    return chunks.append(rep)
                 else:
+                    if len(rep) <= max_width1:
+                        return chunks.append(rep)
                     import re
                     parts = re.findall('\\S*\\s*', line)
                     if not parts:
                         raise None
-                    elif parts[-1]:
+                    if parts[-1]:
                         raise None
-                    else:
-                        parts.pop()
-                        max_width2 = max_width
-                        current = ''
+                    parts.pop()
+                    max_width2 = max_width
+                    current = ''
             if len(chunks) == 1:
                 write(rep)
                 return None
-            elif level == 1:
+            if level == 1:
                 return write(self._format_block_start('(', indent))
         self._width - indent
         self._width - indent
@@ -436,7 +431,7 @@ class PrettyPrinter:
                 context(level)
                 if not last:
                     return write(delimnl)
-                elif not self._expand:
+                if not self._expand:
                     pass
                 else:
                     return write(',')
@@ -454,14 +449,14 @@ class PrettyPrinter:
             write('=')
             if id(ent) in context:
                 return write('...')
-            elif last:
+            if last:
                 pass
             else:
                 1
                 context(level)
                 if not last:
                     return write(delimnl)
-                elif not self._expand:
+                if not self._expand:
                     pass
                 else:
                     return write(',')
@@ -524,12 +519,11 @@ class PrettyPrinter:
         cls = object.__class__
         if self._expand:
             return stream.write(f"{cls.__name__}({rdf}, ")
-        else:
-            indent += len(cls.__name__) + 1
-            stream.write(f"{cls.__name__}({rdf},
+        indent += len(cls.__name__) + 1
+        stream.write(f"{cls.__name__}({rdf},
 {' ' * indent}")
-            self._pprint_dict(object, stream, indent, allowance + 1, context, level)
-            stream.write(')')
+        self._pprint_dict(object, stream, indent, allowance + 1, context, level)
+        stream.write(')')
 
     def _pprint_counter(self, object, stream, indent, allowance, context, level):
         if not len(object):
@@ -619,9 +613,8 @@ class PrettyPrinter:
             if r is int.__repr__:
                 if self._underscore_numbers:
                     return ('_d', True, False)
-                else:
-                    return (repr(object), True, False)
-            elif issubclass(typ, dict):
+                return (repr(object), True, False)
+            if issubclass(typ, dict):
                 pass
             elif issubclass(typ, frozendict):
                 pass

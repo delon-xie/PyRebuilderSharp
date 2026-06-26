@@ -305,9 +305,8 @@ class EnumType(type):
         """
         if isinstance(value, cls):
             return True
-        else:
-            result = cls._missing_(value)
-            return
+        result = cls._missing_(value)
+        return
 
     def __delattr__(cls, attr):
         if attr in cls._member_map_:
@@ -640,7 +639,7 @@ class StrEnum(str, ReprEnum):
         """values must already be of type `str`"""
         if len(values) > 3:
             raise TypeError('too many arguments for str(): %r' % (values))
-        elif not isinstance(values[0], str):
+        if not isinstance(values[0], str):
             raise TypeError('%r is not a string' % (values[0]))
 
     @staticmethod
@@ -835,8 +834,7 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_ is None:
         return ('%s.%s(%r)', cls_name, self._value_)
-    else:
-        return
+    return
     name.append(n)
 
 def global_str(self):

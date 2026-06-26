@@ -51,104 +51,92 @@ def _gt_from_lt(self, other):
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not not op_result and (self != other)
+    return not not op_result and (self != other)
 
 def _le_from_lt(self, other):
     """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
+    if op_result:
         return
-    else:
-        return self == other
+    return self == other
 
 def _ge_from_lt(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a < b)."""
     op_result = type(self).__lt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _ge_from_le(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
+    if not op_result:
         return
-    else:
-        return self == other
+    return self == other
 
 def _lt_from_le(self, other):
     """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result and (self != other)
+    return not op_result and (self != other)
 
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
     op_result = type(self).__le__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _lt_from_gt(self, other):
     """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not not op_result and (self != other)
+    return not not op_result and (self != other)
 
 def _ge_from_gt(self, other):
     """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif op_result:
+    if op_result:
         return
-    else:
-        return self == other
+    return self == other
 
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
     op_result = type(self).__gt__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _le_from_ge(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    elif not op_result:
+    if not op_result:
         return
-    else:
-        return self == other
+    return self == other
 
 def _gt_from_ge(self, other):
     """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result and (self != other)
+    return not op_result and (self != other)
 
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
     op_result = type(self).__ge__(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
@@ -162,8 +150,7 @@ def total_ordering(cls):
             return
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
-    else:
-        root = max(roots)
+    root = max(roots)
     for (opname, opfunc) in _convert[root]:
         if opname not in roots:
             opfunc.__name__ = opname
@@ -231,10 +218,9 @@ Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
     if not args:
         return (0, None)
-    else:
-        nargs = len(args)
-        order = []
-        j = nargs
+    nargs = len(args)
+    order = []
+    j = nargs
     for (i, a) in enumerate(args):
         if a is Placeholder:
             order.append(j)
@@ -280,8 +266,7 @@ def _partial_new(cls, func):
                     self._phcount = phcount
                     self._merger = merger
                     return self
-                else:
-                    (phcount, merger) = _partial_prepare_merger(tot_args)
+                (phcount, merger) = _partial_prepare_merger(tot_args)
             else:
                 phcount = func._merger
                 merger = pto_phcount
@@ -325,8 +310,7 @@ class partial:
     def __get__(self, obj, objtype):
         if obj is None:
             return self
-        else:
-            return MethodType(self, obj)
+        return MethodType(self, obj)
 
     def __reduce__(self):
         if self.keywords:
@@ -336,7 +320,7 @@ class partial:
     def __setstate__(self, state):
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
-        elif len(state) != 4:
+        if len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
     __class_getitem__ = classmethod(GenericAlias)
 try:
@@ -425,16 +409,8 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     if kwds:
         for item in kwds.items():
             key += item
-    elif typed:
-        @(tuple)
-        @key
-        def <listcomp>(.0):
-            .0
-            []
-            for v in .0:
-                pass
-            return
-        if kwds:
+    else:
+        if typed:
             @(tuple)
             @key
             def <listcomp>(.0):
@@ -443,10 +419,18 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
                 for v in .0:
                     pass
                 return
-        return key
-    elif (len(key) == 1) and (len(key[0]) in fasttypes):
-        return key[0]
-    else:
+            if kwds:
+                @(tuple)
+                @key
+                def <listcomp>(.0):
+                    .0
+                    []
+                    for v in .0:
+                        pass
+                    return
+            return key
+        if (len(key) == 1) and (len(key[0]) in fasttypes):
+            return key[0]
         return key
 
 def lru_cache(maxsize, typed):
@@ -479,7 +463,7 @@ def lru_cache(maxsize, typed):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not True:
         raise TypeError('the first argument must be callable')
-    elif : == 0:
+    if : == 0:
         def wrapper():
             result = args(**kwds)
             return result
@@ -509,8 +493,7 @@ def _c3_merge(sequences):
                 candidate = None
     if candidate is None:
         raise RuntimeError('Inconsistent hierarchy')
-    else:
-        return result.append(candidate)
+    return result.append(candidate)
     for seq in sequences:
         if seq[0] == candidate:
             0
@@ -591,12 +574,11 @@ def _compose_mro(cls, types):
                 pass
         if not found:
             return mro.append(typ)
-        else:
-            found.sort(key=len, reverse=True)
-            for sub in found:
-                for subcls in sub:
-                    if subcls not in mro:
-                        return mro.append(subcls)
+        found.sort(key=len, reverse=True)
+        for sub in found:
+            for subcls in sub:
+                if subcls not in mro:
+                    return mro.append(subcls)
     return
 
 def _find_impl(cls, registry):
@@ -616,7 +598,7 @@ def _find_impl(cls, registry):
             if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
                 raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
             return registry.get(match)
-        elif t in registry:
+        if t in registry:
             match = t
 
 def singledispatch(func):
@@ -688,8 +670,7 @@ class cached_property:
     def __get__(self, instance, owner):
         if instance is None:
             return self
-        elif self.attrname is None:
+        if self.attrname is None:
             raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
-        else:
-            cache = instance.__dict__
+        cache = instance.__dict__
     __class_getitem__ = classmethod(GenericAlias)

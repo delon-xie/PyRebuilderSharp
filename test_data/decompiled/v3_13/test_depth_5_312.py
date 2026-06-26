@@ -6,8 +6,7 @@ def depth_5_if(x0, x1, x2, x3, x4):
         if x4 > 4:
             result = 42
             return None
-        else:
-            result = 41
+        result = 41
         result = 40
         return None
         result = 30
@@ -16,8 +15,7 @@ def depth_5_if(x0, x1, x2, x3, x4):
         return None
         result = 10
         return None
-    else:
-        result = 40
+    result = 40
     result = 30
     result = 20
     result = 10

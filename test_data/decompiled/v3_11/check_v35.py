@@ -23,7 +23,6 @@ def dump_code(c, depth = 0):
                 dump_code(const, depth + 1)
             None
             return
-        else:
-            return None
+        return None
     return
 dump_code(code)

@@ -48,104 +48,91 @@ def _gt_from_lt(self, other):
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not not op_result and (self != other)
+    return not not op_result and (self != other)
 
 def _le_from_lt(self, other):
     """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return op_result and (self == other)
+    return op_result and (self == other)
 
 def _ge_from_lt(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a < b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _ge_from_le(self, other):
     """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result and (self == other)
+    return not op_result and (self == other)
 
 def _lt_from_le(self, other):
     """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result and (self != other)
+    return not op_result and (self != other)
 
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _lt_from_gt(self, other):
     """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not not op_result and (self != other)
+    return not not op_result and (self != other)
 
 def _ge_from_gt(self, other):
     """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return op_result and (self == other)
+    return op_result and (self == other)
 
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 
 def _le_from_ge(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result and (self == other)
+    return not op_result and (self == other)
 
 def _gt_from_ge(self, other):
     """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result and (self != other)
+    return not op_result and (self != other)
 
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
     op_result = type(self)(self, other)
     if op_result is NotImplemented:
         return op_result
-    else:
-        return not op_result
+    return not op_result
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     roots = <setcomp>()
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
-    else:
-        root = max(roots)
+    root = max(roots)
     for (opname, opfunc) in _convert[root]:
         if opname not in roots:
             opfunc.__name__ = opname
@@ -208,10 +195,9 @@ Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
     if not args:
         return (0, None)
-    else:
-        nargs = len(args)
-        order = []
-        j = nargs
+    nargs = len(args)
+    order = []
+    j = nargs
     for (i, a) in enumerate(args):
         if a is Placeholder:
             order(j)
@@ -233,13 +219,11 @@ def _partial_new(cls, func):
             raise TypeError('the first argument must be callable')
         if args and (args[-1] is Placeholder):
             raise TypeError('trailing Placeholders are not allowed')
-        else:
-            return keywords.values
+        return keywords.values
         for value in keywords.values:
             if value is Placeholder:
                 raise TypeError('Placeholder cannot be passed as a keyword argument')
-            else:
-                return isinstance
+            return isinstance
             if func(base_cls):
                 pto_phcount = func._phcount
                 tot_args = func.args
@@ -262,8 +246,7 @@ def _partial_new(cls, func):
                         self._phcount = phcount
                         self._merger = merger
                         return self
-                    else:
-                        (phcount, merger) = _partial_prepare_merger(tot_args)
+                    (phcount, merger) = _partial_prepare_merger(tot_args)
                 else:
                     merger = func._merger
                     phcount = pto_phcount
@@ -315,7 +298,7 @@ class partial:
     def __setstate__(self, state):
         if not isinstance(state, tuple):
             raise TypeError('argument to __setstate__ must be a tuple')
-        elif len(state) != 4:
+        if len(state) != 4:
             raise TypeError(f"expected 4 items in state, got {len(state)}")
     __class_getitem__ = classmethod(GenericAlias)
 
@@ -388,13 +371,13 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
         key = list(key)
         key += kwd_mark
         kwds.items
-    elif typed:
-        if kwds:
-            key += <listcomp>(kwds.values())
-        return key
-    elif (len(key) == 1) and (type(key[0]) in fasttypes):
-        return key[0]
     else:
+        if typed:
+            if kwds:
+                key += <listcomp>(kwds.values())
+            return key
+        if (len(key) == 1) and (type(key[0]) in fasttypes):
+            return key[0]
         return key
 
 def lru_cache(maxsize = 128, typed = False):
@@ -425,18 +408,17 @@ def lru_cache(maxsize = 128, typed = False):
             wrapper.cache_parameters = <lambda>
             return update_wrapper(wrapper, user_function)
         return decorating_function
-    elif callable(maxsize) and isinstance(typed, bool):
+    if callable(maxsize) and isinstance(typed, bool):
         user_function = 128
         wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
         wrapper.cache_parameters = <lambda>
         return update_wrapper(wrapper, user_function)
-    else:
-        raise TypeError('Expected first argument to be an integer, a callable, or None')
+    raise TypeError('Expected first argument to be an integer, a callable, or None')
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(user_function):
         raise TypeError('the first argument must be callable')
-    elif maxsize == 0:
+    if maxsize == 0:
         def wrapper():
             result = user_function(**kwds)
             return result
@@ -553,8 +535,7 @@ def _c3_mro(cls, abcs = None):
                         abstract_c3_mros = <listcomp>()
                         other_c3_mros = <listcomp>()
                         return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
-                    else:
-                        return abstract_bases
+                    return abstract_bases
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -575,16 +556,15 @@ def _compose_mro(cls, types):
             found
             if not True:
                 return mro(typ)
-            else:
-                found(reverse=True, key=len)
-                found.sort
-                for sub in found.sort:
-                    for subcls in sub:
-                        if subcls not in mro:
-                            mro(subcls)
-                            mro.append
-                _c3_mro
-                return cls
+            found(reverse=True, key=len)
+            found.sort
+            for sub in found.sort:
+                for subcls in sub:
+                    if subcls not in mro:
+                        mro(subcls)
+                        mro.append
+            _c3_mro
+            return cls
             found
 
 def _find_impl(cls, registry):
@@ -606,7 +586,7 @@ def _find_impl(cls, registry):
                 if match not in cls.__mro__:
                     if not issubclass(match, t):
                         raise 'Ambiguous dispatch: {} or {}'.format('Ambiguous dispatch: {} or {}'(match, t))
-                    elif t in registry:
+                    if t in registry:
                         match = t
                 elif t in registry:
                     pass
@@ -629,8 +609,7 @@ def singledispatch(func):
     def wrapper():
         if not args:
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        else:
-            return dispatch(args[0].__class__)(**kw)
+        return dispatch(args[0].__class__)(**kw)
     wrapper.register = register
     wrapper.dispatch = dispatch
     wrapper.registry = MappingProxyType(registry)
@@ -693,17 +672,16 @@ class _singledispatchmethod_get:
             method = method(self._obj, self._cls)
             if isinstance(method, MethodType):
                 skip_bound_arg = self._dispatch_arg_index == 1
-            elif skip_bound_arg:
-                return method(**kwargs)
             else:
+                if skip_bound_arg:
+                    return method(**kwargs)
                 return method(**kwargs)
         return method(**kwargs)
 
     def __getattr__(self, name):
         if name not in ['__name__', '__qualname__', '__annotations__', '__type_params__', '__isabstractmethod__']:
             raise AttributeError
-        else:
-            return getattr(self._unbound.func, name)
+        return getattr(self._unbound.func, name)
     __wrapped__ = __wrapped__()
     register = register()
 _NOT_FOUND = object()
