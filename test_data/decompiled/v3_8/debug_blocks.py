@@ -27,7 +27,7 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             instrs[-1].offset + 2
             if len(block_instrs) > 3:
                 pass
-            f"{start}{'3d'}-{end - 1}{'3d'}{']: '(', '(<genexpr>))}"
+            f"{start}{'3d'}-{end - 1}{'3d'}{']: '(', '.join(<genexpr>))}"
             'Block ['
         if any(any(<genexpr>)):
             for ins in block_instrs:

@@ -4,8 +4,6 @@ import dis
 import marshal
 import types
 import struct
-f.read(16)
-code = marshal.load(f)
 None(None)
 for const in code.co_consts:
     if not isinstance(const, types.CodeType):

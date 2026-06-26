@@ -46,13 +46,3 @@ def mixed_3(n):
 
 def mixed_4(n):
     total = 0
-    if n > 0:
-        pass
-    for i in range(n):
-        j = 0
-        while i:
-            if not True:
-                pass
-            else:
-                j += 1
-                total += j

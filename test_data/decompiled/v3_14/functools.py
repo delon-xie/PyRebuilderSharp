@@ -2,7 +2,7 @@
 
 """functools.py - Tools for working with functions and callable objects
 """
-__all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
+__all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']
 from abc import get_cache_token
 from collections import namedtuple
 from operator import itemgetter
@@ -45,7 +45,7 @@ def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     This is a convenience function to simplify applying partial() to
     update_wrapper().
 """
-    return partial(update_wrapper, updated=updated, assigned=assigned, wrapped=wrapped)
+    return partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)
 
 def _gt_from_lt(self, other):
     """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
@@ -172,7 +172,6 @@ def cmp_to_key(mycmp):
             return mycmp(self.obj, other.obj) >= 0
         __hash__ = None
     return K
-[]
 _initial_missing = sentinel('_initial_missing')
 
 def reduce(function, sequence, /, initial = _initial_missing):
@@ -303,7 +302,7 @@ class partial:
         else:
             pto_args = self.args
             keywords = keywords
-            return pto_args(**keywords)
+            return None(pto_args, args, **keywords)
 
     def __get__(self, obj, objtype = None):
         return self
@@ -348,7 +347,7 @@ class partialmethod:
             else:
                 pto_args = self.args
                 keywords = keywords
-                return pto_args(**keywords)
+                return None(cls_or_self, pto_args, args, **keywords)
         _method.__isabstractmethod__ = self.__isabstractmethod__
         _method.__partialmethod__ = self
         return _method
@@ -359,8 +358,7 @@ class partialmethod:
         result = None
         new_func = get(obj, cls)
         if new_func is not self.func:
-            result = [new_func](**self.keywords)
-            partial
+            result = partial(new_func, self.args, **self.keywords)
         result = self._make_unbound_method().__get__(obj, cls)
         return result
     __isabstractmethod__ = __isabstractmethod__()
@@ -462,23 +460,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             key := make_key(args, kwds, typed)
             lock
             __module__
-            link = cache_get(key)
-            last = root[PREV]
-            result
-            hits + 1
-            *link
-            *link
-            *link
-            *link
             None(None, None)
             return
-            misses + 1(None, None, None)
-            result = None(**kwds)
-            __name__()
-            lock
-            user_function
-            lock
-            __module__
             if key in cache:
                 pass
             elif full:
@@ -492,7 +475,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             oldroot = root
             oldkey = root[KEY]
             oldresult = root[RESULT]
-            return result
         def cache_info():
             """Report cache statistics"""
             __name__()

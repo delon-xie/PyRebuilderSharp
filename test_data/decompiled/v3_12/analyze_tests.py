@@ -4,7 +4,6 @@ next_line = lines[j]
 line = lines[i]
 import re
 from collections import defaultdict
-output = f.read()
 None(None)
 
 @defaultdict

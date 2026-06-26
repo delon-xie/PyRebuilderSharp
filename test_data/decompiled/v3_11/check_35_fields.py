@@ -4,7 +4,7 @@
 import subprocess
 import struct
 import os
-py = os.path('~/.pyenv/versions/3.5.10/bin/python')
+py = os.path.expanduser('~/.pyenv/versions/3.5.10/bin/python')
 r = subprocess.run([py, '-c', """
 import marshal, struct
 c = compile('a=1', '<t>', 'exec')
@@ -15,5 +15,5 @@ print('c.co_stacksize:', c.co_stacksize)
 print('c.co_flags:', hex(c.co_flags))
 print('len(m):', len(m))
 print('m:', ' '.join('{:02x}'.format(b) for b in m), end='')
-"""], timeout=10, text=True, capture_output=True)
+"""], capture_output=True, text=True, timeout=10)
 print(r.stdout)

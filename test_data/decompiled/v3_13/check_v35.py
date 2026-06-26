@@ -3,9 +3,6 @@
 import marshal
 import sys
 open(sys.argv[1], 'rb')
-magic = f.read(4)
-f.read(8)
-code = marshal.load(f)
 None(None)
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)

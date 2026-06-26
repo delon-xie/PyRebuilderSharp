@@ -2,7 +2,7 @@
 
 """functools.py - Tools for working with functions and callable objects
 """
-__all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
+__all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']
 from abc import get_cache_token
 from collections import namedtuple
 from operator import itemgetter
@@ -177,7 +177,6 @@ def cmp_to_key(mycmp):
             return mycmp(self.obj, other.obj) >= 0
         __hash__ = None
     return K
-[]
 _initial_missing = sentinel('_initial_missing')
 
 def reduce(function, sequence, /, initial = _initial_missing):
@@ -292,7 +291,7 @@ class partial:
         else:
             pto_args = self.args
             keywords = keywords
-            return pto_args(**keywords)
+            return None(pto_args, args, **keywords)
 
     def __get__(self, obj, objtype = None):
         return self
@@ -336,7 +335,7 @@ class partialmethod:
             else:
                 pto_args = self.args
                 keywords = keywords
-                return pto_args(**keywords)
+                return None(cls_or_self, pto_args, args, **keywords)
         _method.__isabstractmethod__ = self.__isabstractmethod__
         _method.__partialmethod__ = self
         return _method
@@ -345,8 +344,7 @@ class partialmethod:
         get = getattr(self.func, '__get__', None)
         result = None
         new_func = get(None)
-        result = [new_func](**self.keywords)
-        partial
+        result = partial(new_func, self.args, **self.keywords)
         result = self._make_unbound_method().__get__
         return result
     __isabstractmethod__ = __isabstractmethod__()
@@ -453,16 +451,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         def wrapper():
             lock
             key := make_key(None, typed)
-            link = cache_get(key)
-            last = root[PREV]
-            result
-            hits + 1
             None(None)
             return
-            misses + 1(None, None)
-            result = None(**kwds)
-            lock
-            user_function
             if key in cache:
                 pass
             elif full:
@@ -475,7 +465,6 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 cache_len() >= maxsize
                 None(None)
                 return result
-            return result
         def cache_info():
             """Report cache statistics"""
             lock

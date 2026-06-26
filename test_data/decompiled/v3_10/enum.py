@@ -3,7 +3,7 @@
 import sys
 import builtins as bltns
 from types import MappingProxyType, DynamicClassAttribute
-__all__ = ('EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin')
+__all__ = ['EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin']
 Enum = None
 Flag = None
 EJECT = None
@@ -207,8 +207,6 @@ class _proto_member:
                 args = (args)
             elif not enum_class._use_args_:
                 enum_member = enum_class._new_member_(enum_class)
-            else:
-                enum_member = enum_class._new_member_(enum_class, **args)
         enum_member = canonical_member
 
 class EnumDict(dict):
@@ -580,7 +578,7 @@ class EnumType(type):
             members = list(cls._member_map_.keys())
         else:
             members = cls._member_names_
-            interesting = [](('__class__', '__contains__', '__doc__', '__getitem__', '__iter__', '__len__', '__members__', '__module__', '__name__', '__qualname__', '_generate_next_value_', '_missing_') + members)
+            interesting = set(['__class__', '__contains__', '__doc__', '__getitem__', '__iter__', '__len__', '__members__', '__module__', '__name__', '__qualname__', '_generate_next_value_', '_missing_'] + members)
             if cls._new_member_ is not object.__new__:
                 return interesting.add('__new__')
             if cls.__init_subclass__ is not object.__init_subclass__:
@@ -946,7 +944,7 @@ class Enum(metaclass=EnumType):
                     pass
                 elif name not in self._member_map_:
                     return interesting.add(name)
-        names = set([](('__class__', '__doc__', '__eq__', '__hash__', '__module__')) | interesting)
+        names = sorted(set(['__class__', '__doc__', '__eq__', '__hash__', '__module__']) | interesting)
         return names
 
     def __format__(self, format_spec):
@@ -1233,7 +1231,7 @@ def unique(enumeration):
     return enumeration
 
 def _dataclass_repr(self):
-    return self.__dataclass_fields__((', '.join, ', ')(_dataclass_repr.<locals>.<genexpr>))
+    return self.__dataclass_fields__((dcf, ', '.join)(_dataclass_repr.<locals>.<genexpr>))
 
 def global_enum_repr(self):
     """
@@ -1387,7 +1385,6 @@ def _simple_enum(etype, *, boundary, use_args):
                         elif __new__:
                             if not isinstance(value, tuple):
                                 value = (value)
-                            member = new_member(enum_class, **value)
                             value = value[0]
                             if __new__ is None:
                                 member._value_ = value
@@ -1426,7 +1423,6 @@ def _simple_enum(etype, *, boundary, use_args):
                         if __new__:
                             if not isinstance(value, tuple):
                                 value = (value)
-                            member = new_member(enum_class, **value)
                             value = value[0]
                             if __new__ is None:
                                 member._value_ = value
@@ -1458,7 +1454,6 @@ def _simple_enum(etype, *, boundary, use_args):
                                             if __new__:
                                                 if not isinstance(value, tuple):
                                                     value = (value)
-                                                member = new_member(enum_class, **value)
                                                 value = value[0]
                                                 if __new__ is None:
                                                     member._value_ = value

@@ -831,7 +831,7 @@ def unique(enumeration):
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
 
 def _dataclass_repr(self):
-    return self.__dataclass_fields__((', '.join, ', ')(_dataclass_repr.<locals>.<genexpr>))
+    return self.__dataclass_fields__((dcf, ', '.join)(_dataclass_repr.<locals>.<genexpr>))
 
 def global_enum_repr(self):
     """

@@ -7,7 +7,6 @@ __name__()
 open(sys.argv[1], 'rb')
 __module__
 open(sys.argv[1], 'rb')
-raw = f.read()
 None(None, None)
 f = open(sys.argv[1], 'rb')
 magic = f.read(4)

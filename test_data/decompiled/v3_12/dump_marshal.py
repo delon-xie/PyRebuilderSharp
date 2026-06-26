@@ -3,7 +3,6 @@
 import marshal
 import struct
 import sys
-data = f.read()
 None(None)
 pos = 16
 raw = data[pos]

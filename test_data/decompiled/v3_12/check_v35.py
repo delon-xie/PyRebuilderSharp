@@ -2,9 +2,6 @@
 
 import marshal
 import sys
-magic = f.read(4)
-f.read(8)
-code = marshal.load(f)
 None(None)
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)

@@ -1,13 +1,13 @@
 # Decompiled from: <module>
 
 import struct
-data = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.3.5.pyc', 'rb')()
+data = open('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.3.5.pyc', 'rb').read()
 print(f"Total bytes: {len(data)}")
-'Full hex: '(f"{data[:48].hex}{data[:48]()}")
+print(f"Full hex: {data[:48].hex()}")
 print("""
 --- Assuming 12-byte header (old format) ---""")
 magic = data[:4]
-'Magic: '(f"{magic.hex}{magic()}")
+print(f"Magic: {magic.hex()}")
 ts = struct.unpack('<I', data[4:8])[0]
 size = struct.unpack('<I', data[8:12])[0]
 print(f"Timestamp={ts}, Size={size}")
@@ -41,4 +41,4 @@ sz2 = struct.unpack('<I', data[12:16])[0]
 print(f"Flags={flags2}, Timestamp={ts2}, Size={sz2}")
 pos2 = 16
 'Marshal at offset '(f"{pos2}: byte={data[pos2]}{'#x'}")
-'Bytes from 16: '(f"{data[16:40].hex}{data[16:40]()}")
+print(f"Bytes from 16: {data[16:40].hex()}")

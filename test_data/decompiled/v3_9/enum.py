@@ -3,7 +3,7 @@
 import sys
 import builtins as bltns
 from types import MappingProxyType, DynamicClassAttribute
-__all__ = ('EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin')
+__all__ = ['EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin']
 Enum = None
 Flag = None
 EJECT = None
@@ -329,7 +329,7 @@ class EnumType(type):
             raise AttributeError('%r cannot delete member %r.' % (cls.__name__, attr))
 
     def __dir__(cls):
-        interesting = [](('__class__', '__contains__', '__doc__', '__getitem__', '__iter__', '__len__', '__members__', '__module__', '__name__', '__qualname__', '_generate_next_value_', '_missing_') + members)
+        interesting = set(['__class__', '__contains__', '__doc__', '__getitem__', '__iter__', '__len__', '__members__', '__module__', '__name__', '__qualname__', '_generate_next_value_', '_missing_'] + members)
         if issubclass(cls, Flag):
             members = list(cls._member_map_.keys())
 
@@ -836,7 +836,7 @@ def unique(enumeration):
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
 
 def _dataclass_repr(self):
-    return self.__dataclass_fields__((', '.join, ', ')(_dataclass_repr.<locals>.<genexpr>))
+    return self.__dataclass_fields__((dcf, ', '.join)(_dataclass_repr.<locals>.<genexpr>))
 
 def global_enum_repr(self):
     """
@@ -908,7 +908,6 @@ def _simple_enum(etype, *, boundary, use_args):
             cls_name._use_args_
         setattr(enum_class, name, enum_method)
         gnv_last_values = []
-        member = new_member(enum_class, **value)
         value = value[0]
         contained = value2member_map.get(member._value_)
         contained = m
@@ -922,7 +921,6 @@ def _simple_enum(etype, *, boundary, use_args):
         member_names.append(name)
         single_bits |= value
         enum_class._iter_member_ = enum_class._iter_member_by_def_
-        member = new_member(enum_class, **value)
         value = value[0]
         contained = value2member_map.get(member._value_)
         contained = m

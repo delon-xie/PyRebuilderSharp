@@ -2,7 +2,6 @@
 
 import struct
 import sys
-data = f.read()
 None(None)
 off = 16
 raw = data[off]

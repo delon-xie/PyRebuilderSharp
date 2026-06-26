@@ -4,7 +4,6 @@ import marshal
 import struct
 import sys
 open(sys.argv[1], 'rb')
-data = f.read()
 None(None)
 pos = 16
 raw = data[pos]

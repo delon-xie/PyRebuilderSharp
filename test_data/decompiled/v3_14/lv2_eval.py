@@ -9,10 +9,9 @@ for n in range(5):
         pass
     elif not n == 1:
         pass
-    x = 1 / 0
     try:
-        f = open('test.txt')
-    except IOError:
-        f = None
-    else:
-        return None
+        x = 1 / 0
+    finally:
+        x = 0
+    f = open('test.txt')
+    return None

@@ -8,8 +8,6 @@ __name__()
 open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb')
 __module__
 open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb')
-f.read(16)
-code = marshal.load(f)
 None(None, None)
 for const in __name__():
     if not isinstance(const, types.CodeType):

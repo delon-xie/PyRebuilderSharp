@@ -10,7 +10,6 @@ def get_python_version(filepath):
     open(filepath, 'rb')
     __module__
     open(filepath, 'rb')
-    magic = fp.read(4)
     None(None, None)
     return MAGIC_NUMBERS.get(magic, 'unknown')
 

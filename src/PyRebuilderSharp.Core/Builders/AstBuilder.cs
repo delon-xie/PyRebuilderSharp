@@ -1590,16 +1590,30 @@ public class AstBuilder
         {
             return null;
         }
+        bool isFinally = false;
         bool hasExcMatch = handlerBlock.Instructions.Any(i =>
             i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
         if (!hasExcMatch)
         {
-            // 标记 handler 及后继块为已访问，避免误处理
-            visited.Add(handlerBlock);
-            foreach (var hsucc in handlerBlock.Successors)
-                if (!visited.Contains(hsucc))
-                    visited.Add(hsucc);
-            return null;
+            // 无 CHECK_EXC_MATCH = try/finally or cleanup entry.
+            // 仅当 try 体有实质性语句时才处理为 finally，跳过纯清理条目。
+            var finallyTryBlocks = GetBlocksInRange(matchingEntry.StartOffset, matchingEntry.EndOffset);
+            if (finallyTryBlocks.Count == 0) return null;
+            bool tryHasStatements = finallyTryBlocks.Any(tb =>
+            {
+                var r = _blockResults.GetValueOrDefault(tb.Id);
+                return r?.Statements != null && r.Statements.Any(s => s is not Raise and not CommentBlock and not ExprStmt);
+            });
+            if (!tryHasStatements)
+            {
+                // 清理条目：标记 handler 为已访问，但实际语句仍需保留
+                visited.Add(handlerBlock);
+                foreach (var hsucc in handlerBlock.Successors)
+                    if (!visited.Contains(hsucc))
+                        visited.Add(hsucc);
+                return null;
+            }
+            isFinally = true;
         }
 
         // 跳过 with 语句的隐式 ET 条目：BEFORE_WITH 在 entry 范围内
@@ -1803,6 +1817,16 @@ public class AstBuilder
                 visited.Add(succ);
                 _processedBlockIds.Add(succ.Id);
             }
+        }
+
+        if (isFinally)
+        {
+            // try/finally: handler 是无 CHECK_EXC_MATCH 的 finally 体
+            var finalBody = handlerResult?.Statements
+                ?.Where(s => s is not Raise and not CommentBlock)
+                .ToList() ?? new List<Stmt>();
+            visited.Add(handlerBlock);
+            return new List<Stmt> { new Try(tryBody, new List<ExceptHandler>(), elseBody, finalBody) };
         }
 
         bool isGroup = handlerBlock.Instructions.Any(i => i.Opcode == Opcode.CHECK_EG_MATCH);

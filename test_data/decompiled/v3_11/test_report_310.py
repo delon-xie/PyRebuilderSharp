@@ -2,8 +2,8 @@
 
 import subprocess
 import re
-result = subprocess.run(['python3', 'tests/run_tests.py'], cwd='/Users/admin/codes/Tools/PyRebuild/ref/pycdc', text=True, capture_output=True)
-lines = result.stdout("""
+result = subprocess.run(['python3', 'tests/run_tests.py'], capture_output=True, text=True, cwd='/Users/admin/codes/Tools/PyRebuild/ref/pycdc')
+lines = result.stdout.split("""
 """)
 print('============================================================')
 print('Python 3.10 版本测试报告')
@@ -15,22 +15,21 @@ current_test_fail = False
 
 def remove_ansi(text):
     return re.sub('\\x1b\\[[0-9;]*m', '', text)
-result.stdout.split
-for line in result.stdout.split:
+for line in lines:
     clean_line = remove_ansi(line)
-    line_stripped = clean_line()
-    if line_stripped('*** '):
+    line_stripped = clean_line.strip()
+    if line_stripped.startswith('*** '):
         if current_test and current_test_fail:
             print(f"✗ {current_test}")
             failed += 1
         else:
             print(f"✓ {current_test}")
             passed += 1
-            current_test = line_stripped[4:](':')[0]
+            current_test = line_stripped[4:].split(':')[0]
             current_test_fail = False
             if 'FAIL' in line_stripped:
                 current_test_fail = True
-        current_test = line_stripped[4:](':')[0]
+        current_test = line_stripped[4:].split(':')[0]
         current_test_fail = False
         if 'FAIL' in line_stripped:
             pass

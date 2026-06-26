@@ -5,9 +5,9 @@ import dis
 import types
 import sys
 f = open(sys.argv[1], 'rb')
-magic = f(4)
-f(12)
-raw = f()
+magic = f.read(4)
+f.read(12)
+raw = f.read()
 code = marshal.loads(raw)
 
 def dump_bytecode(c, depth = 0):
@@ -23,10 +23,10 @@ def dump_bytecode(c, depth = 0):
                 f""
                 if et:
                     for i in range(0, len(et), 8):
-                        s = int(et[i:i + 2], 'little')
-                        e = int(et[i + 2:i + 4], 'little')
-                        t = int(et[i + 4:i + 6], 'little')
-                        dl = int(et[i + 6:i + 8], 'little')
+                        s = int.from_bytes(et[i:i + 2], 'little')
+                        e = int.from_bytes(et[i + 2:i + 4], 'little')
+                        t = int.from_bytes(et[i + 4:i + 6], 'little')
+                        dl = int.from_bytes(et[i + 6:i + 8], 'little')
                         print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
                 else:
                     dis

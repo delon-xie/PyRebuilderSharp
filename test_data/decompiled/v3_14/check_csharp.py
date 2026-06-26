@@ -6,7 +6,6 @@ __name__()
 open(sys.argv[1], 'rb')
 __module__
 open(sys.argv[1], 'rb')
-data = f.read()
 None(None, None)
 off = 16
 raw = data[off]

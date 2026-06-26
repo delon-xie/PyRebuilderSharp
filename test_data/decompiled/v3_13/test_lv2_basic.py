@@ -14,6 +14,9 @@ else:
         i += 1
     for n in range(10):
         m = n + 1
-    a = 1
+    try:
+        a = 1
+    finally:
+        a = 0
 j = i * 2
 i += 1

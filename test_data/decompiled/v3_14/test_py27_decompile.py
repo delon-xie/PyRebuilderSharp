@@ -12,7 +12,6 @@ __name__()
 open(INPUT_PY)
 __module__
 open(INPUT_PY)
-content = f.read()
 None(None, None)
 outc = os.path.join(OUTPUT_DIR, '{}.2.7.pyc'.format(BASENAME))
 result = subprocess.run([PY27, '-c', """import py_compile, sys
@@ -21,10 +20,10 @@ try:
     py_compile.compile(src, cfile=dst, doraise=True)
     print('OK')
 except Exception as e:
-    print('FAIL:' + str(e))""", INPUT_PY, outc], timeout=30, text=True, capture_output=True)
+    print('FAIL:' + str(e))""", INPUT_PY, outc], capture_output=True, text=True, timeout=30)
 print('2.7 compile:', result.stdout + result.stderr.strip())
 OUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData')
-result2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], timeout=60, text=True, capture_output=True)
+result2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', 'decompile', outc, '--output-dir', '/tmp/py27_test'], capture_output=True, text=True, timeout=60)
 if len(result2.stdout) > 500:
     pass
 else:

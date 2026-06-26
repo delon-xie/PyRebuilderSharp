@@ -10,5 +10,9 @@ for n in range(5):
         pass
     elif n == 1:
         pass
-x = 1 / 0
-f = open('test.txt')
+try:
+    x = 1 / 0
+finally:
+    x = 0
+try:
+    f = open('test.txt')

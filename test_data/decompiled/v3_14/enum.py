@@ -84,14 +84,7 @@ def _make_class_unpicklable(obj):
         setattr(obj, '__module__', '<unknown>')
 
 def _iter_bits_lsb(num):
-    original = num
-    if isinstance(num, Enum):
-        num = num.value
-    elif num < 0:
-        raise ValueError('%r is not a positive integer' % original)
-    b = num & ~num + 1
-    b
-    num ^= b
+    pass
 
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
@@ -194,8 +187,7 @@ class _proto_member:
             elif not enum_class._use_args_:
                 enum_member = enum_class._new_member_(enum_class)
             else:
-                enum_member = [enum_class](**None)
-                None
+                enum_member = None(enum_class, args, **None)
                 enum_class._new_member_
 
 class EnumDict(dict):
@@ -280,7 +272,7 @@ class EnumType(type):
 """
     __prepare__ = __prepare__()
 
-    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
+    def __new__(metacls, cls, bases, classdict, *, boundary = None, _simple = False):
         """_ignore_"""
         if _simple:
             return None(metacls, cls, bases, classdict, **kwds)
@@ -367,7 +359,7 @@ class EnumType(type):
 """
         return True
 
-    def __call__(cls, value, names = _not_given, *, module, qualname, type, start, boundary):
+    def __call__(cls, value, names = _not_given, *, module = None, qualname = None, type = None, start = 1, boundary = None):
         """
     Either returns an existing member, or creates a new enum class.
 
@@ -435,7 +427,7 @@ class EnumType(type):
             members = list(cls._member_map_.keys())
         else:
             members = cls._member_names_
-            interesting = [](('__class__', '__contains__', '__doc__', '__getitem__', '__iter__', '__len__', '__members__', '__module__', '__name__', '__qualname__', '_generate_next_value_', '_missing_') + members)
+            interesting = set(['__class__', '__contains__', '__doc__', '__getitem__', '__iter__', '__len__', '__members__', '__module__', '__name__', '__qualname__', '_generate_next_value_', '_missing_'] + members)
             if cls._new_member_ is not object.__new__:
                 return interesting.add('__new__')
             if cls.__init_subclass__ is not object.__init_subclass__:
@@ -486,7 +478,7 @@ class EnumType(type):
             raise AttributeError(f"cannot reassign member {name}")
         return super().__setattr__(name, value)
 
-    def _create_(cls, class_name, names, *, module, qualname, type, start, boundary):
+    def _create_(cls, class_name, names, *, module = None, qualname = None, type = None, start = 1, boundary = None):
         """
     Convenience method to create a new Enum class.
 
@@ -509,7 +501,7 @@ class EnumType(type):
         _make_class_unpicklable(classdict)
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
 
-    def _convert_(cls, name, module, filter, source = None, *, boundary, as_global):
+    def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
         """
     Create a new Enum subclass that replaces a collection of global constants
 """
@@ -673,7 +665,7 @@ class Enum(metaclass=EnumType):
                         pass
                     else:
                         return interesting.add(name)
-        names = set([](('__class__', '__doc__', '__eq__', '__hash__', '__module__')) | interesting)
+        names = sorted(set(['__class__', '__doc__', '__eq__', '__hash__', '__module__']) | interesting)
         return names
 
     def __format__(self, format_spec):
@@ -924,7 +916,7 @@ def global_enum(cls, update_str = False):
             return cls
         cls.__str__ = global_str
 
-def _simple_enum(etype = Enum, *, boundary, use_args):
+def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -953,7 +945,7 @@ def _simple_enum(etype = Enum, *, boundary, use_args):
         for (obj, name) in etype._boundary_:
             if name in ('__dict__', '__weakref__'):
                 pass
-        enum_class = type(cls_name, (etype), body, _simple=True, boundary=boundary)
+        enum_class = type(cls_name, (etype), body, boundary=boundary, _simple=True)
         for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
             if not name not in body:
                 pass
@@ -975,7 +967,7 @@ def _simple_enum(etype = Enum, *, boundary, use_args):
                     elif use_args:
                         if not isinstance(value, tuple):
                             value = (value)
-                        member = [enum_class](**None)
+                        member = None(enum_class, value, **None)
                         value = value[0]
                         member._value_ = value
                         try:
@@ -1012,7 +1004,7 @@ def _simple_enum(etype = Enum, *, boundary, use_args):
                     if use_args:
                         if not isinstance(value, tuple):
                             value = (value)
-                        member = [enum_class](**None)
+                        member = None(enum_class, value, **None)
                         value = value[0]
                         member._value_ = value
                         contained = value2member_map.get(member._value_)
@@ -1171,7 +1163,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
 
-def _old_convert_(etype, name, module, filter, source = None, *, boundary):
+def _old_convert_(etype, name, module, filter, source = None, *, boundary = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
 """

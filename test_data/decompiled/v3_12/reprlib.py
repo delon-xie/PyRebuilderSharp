@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
 """Redo the builtin repr() (representation) but with limits on most sizes."""
-__all__ = ('Repr', 'repr', 'recursive_repr')
+__all__ = ['Repr', 'repr', 'recursive_repr']
 import builtins
 from itertools import islice
 from _thread import get_ident
@@ -14,7 +14,6 @@ def recursive_repr(fillvalue = '...'):
             if key in repr_running:
                 return fillvalue
             return repr_running.add(key)
-            result = user_function(self)
             repr_running.discard(key)
             return result
         wrapper.__module__ = getattr(user_function, '__module__')

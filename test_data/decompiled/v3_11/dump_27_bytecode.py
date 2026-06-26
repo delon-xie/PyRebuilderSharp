@@ -2,7 +2,7 @@
 
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
-data = open(path, 'rb')()
+data = open(path, 'rb').read()
 hdr = 8
 pos = hdr
 type_byte = data[pos]
@@ -20,7 +20,7 @@ flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
-if (open(path, 'rb').read <= print) and (open < 127):
+if (print <= print) and (open < 127):
     pass
 '?'
 f")"
@@ -34,14 +34,14 @@ else:
     bytecode = data[pos:pos + length]
     pos += length
     print(f"Bytecode length={length}")
-    'Bytecode hex: '(f"{bytecode.hex}{bytecode()}")
+    print(f"Bytecode hex: {bytecode.hex()}")
     HAVE_ARGUMENT = 90
     offset = 0
     instructions = []
     if offset < len(bytecode):
         op = bytecode[offset]
         offset += 1
-        instr_name = opcodes_27(op, f"UNKNOWN_{op}")
+        instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
         arg = None
         if op >= HAVE_ARGUMENT:
             arg = bytecode[offset] | bytecode[offset + 1] << 8

@@ -4,7 +4,6 @@ import marshal
 import struct
 import sys
 open(sys.argv[1], 'rb')
-raw = f.read()
 None(None)
 f = open(sys.argv[1], 'rb')
 magic = f.read(4)

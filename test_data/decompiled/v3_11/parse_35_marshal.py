@@ -24,7 +24,7 @@ pos += 1
 cl = struct.unpack_from('<I', m, pos)[0]
 pos += 4
 print('  TYPE_STRING (0x%02x) at pos=%d, len=%d' % (t, pos - 5, cl))
-'  Code bytes: '(' '.join + ' '(<genexpr>()))
+print('  Code bytes: ' + ' '.join(<genexpr>()))
 pos += cl
 print('  Next byte at pos=%d: 0x%02x' % (pos, m[pos]))
 print()

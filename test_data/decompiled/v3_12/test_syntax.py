@@ -3108,17 +3108,17 @@ foo()""", 'expected an indented block', subclass=IndentationError)
         self._check_error('int(**{\'base\': 10}, *[\'2\'])', 'iterable argument unpacking follows keyword argument unpacking')
 
     def test_generator_in_function_call(self):
-        self._check_error('foo(x,    y for y in range(3) for z in range(2) if z    , p)', 'Generator expression must be parenthesized', end_offset=53, offset=11, end_lineno=1, lineno=1)
+        self._check_error('foo(x,    y for y in range(3) for z in range(2) if z    , p)', 'Generator expression must be parenthesized', lineno=1, end_lineno=1, offset=11, end_offset=53)
 
     def test_except_then_except_star(self):
         self._check_error("""try: pass
 except ValueError: pass
-except* TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', end_offset=8, offset=1, end_lineno=3, lineno=3)
+except* TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', lineno=3, end_lineno=3, offset=1, end_offset=8)
 
     def test_except_star_then_except(self):
         self._check_error("""try: pass
 except* ValueError: pass
-except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', end_offset=7, offset=1, end_lineno=3, lineno=3)
+except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', lineno=3, end_lineno=3, offset=1, end_offset=7)
 
     def test_empty_line_after_linecont(self):
         s = """\\
@@ -3170,14 +3170,14 @@ def func2():
         self._check_error(code, 'expected \':\'')
 
     def test_invalid_line_continuation_error_position(self):
-        self._check_error('a = 3 \\ 4', 'unexpected character after line continuation character', offset=8, lineno=1)
+        self._check_error('a = 3 \\ 4', 'unexpected character after line continuation character', lineno=1, offset=8)
         self._check_error("""1,\\#
-2""", 'unexpected character after line continuation character', offset=4, lineno=1)
+2""", 'unexpected character after line continuation character', lineno=1, offset=4)
         self._check_error("""
 fgdfgf
 1,\\#
 2
-""", 'unexpected character after line continuation character', offset=4, lineno=3)
+""", 'unexpected character after line continuation character', lineno=3, offset=4)
 
     def test_invalid_line_continuation_left_recursive(self):
         self._check_error('A.Ɗ\\ ', 'unexpected character after line continuation character')
@@ -3256,14 +3256,14 @@ a=1
                     pass
                 except ValueError as obj.attr:
                     pass
-                """), end_offset=22 + len('obj.attr'), offset=22, end_lineno=4, lineno=4, errtext='cannot use except statement with attribute')
+                """), errtext='cannot use except statement with attribute', lineno=4, end_lineno=4, offset=22, end_offset=22 + len('obj.attr'))
 
     def test_match_stmt_invalid_as_expr(self):
         self._check_error(textwrap.dedent("""
                 match 1:
                     case x as obj.attr:
                         ...
-                """), end_offset=15 + len('obj.attr'), offset=15, end_lineno=3, lineno=3, errtext='cannot use attribute as pattern target')
+                """), errtext='cannot use attribute as pattern target', lineno=3, end_lineno=3, offset=15, end_offset=15 + len('obj.attr'))
 
     def test_ifexp_else_stmt(self):
         msg = 'expected expression after \'else\', but statement is given'

@@ -3,7 +3,6 @@
 import marshal
 import struct
 import sys
-raw = f.read()
 None(None)
 f = open(sys.argv[1], 'rb')
 magic = f.read(4)

@@ -17,15 +17,12 @@ for off in [1, 5]:
         if vals[2] == c.co_stacksize:
             print('FOUND at offset', off)
 """
-versions.items
-for (ver, py_path) in versions.items:
-    py = os.path(py_path)
-    r = subprocess.run([py, '-c', script], timeout=10, text=True, capture_output=True)
-    out = r.stdout()
+for (ver, py_path) in versions.items():
+    py = os.path.expanduser(py_path)
+    r = subprocess.run([py, '-c', script], capture_output=True, text=True, timeout=10)
+    out = r.stdout.strip()
     print(f"=== {ver} ===")
-    out.split
-    r.stdout.strip
-    os.path.expanduser
-    for line in out.split:
+    for line in out.split("""
+"""):
         print(f"  {line}")
     None

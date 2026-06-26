@@ -23,7 +23,7 @@ import py_compile
 import sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2])
 """
-    result = subprocess.run([python310_path, '-c', compile_script, input_path, output_path], text=True, capture_output=True)
+    result = subprocess.run([python310_path, '-c', compile_script, input_path, output_path], capture_output=True, text=True)
     if result.returncode == 0:
         print(f"✓ {py_file} -> {output_name}")
         success_count += 1

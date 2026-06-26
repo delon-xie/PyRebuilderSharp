@@ -2,7 +2,7 @@
 
 """functools.py - Tools for working with functions and callable objects
 """
-__all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
+__all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']
 from abc import get_cache_token
 from collections import namedtuple
 from operator import itemgetter
@@ -288,7 +288,7 @@ class partialmethod:
         if get is not None:
             new_func = get(obj, cls)
             if new_func is not self.func:
-                result = [new_func](**self.keywords)
+                result = partial(new_func, self.args, **self.keywords)
                 try:
                     result.__self__ = new_func.__self__
                 except AttributeError:

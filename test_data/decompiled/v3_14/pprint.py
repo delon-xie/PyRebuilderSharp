@@ -29,20 +29,20 @@ import collections as _collections
 import sys as _sys
 import types as _types
 from io import StringIO as _StringIO
-__all__ = ('pprint', 'pformat', 'isreadable', 'isrecursive', 'saferepr', 'PrettyPrinter', 'pp')
+__all__ = ['pprint', 'pformat', 'isreadable', 'isrecursive', 'saferepr', 'PrettyPrinter', 'pp']
 
-def pprint(object, stream = None, indent = 1, width = 80, depth = None, *, compact, expand, sort_dicts, underscore_numbers):
+def pprint(object, stream = None, indent = 1, width = 80, depth = None, *, compact = False, expand = False, sort_dicts = True, underscore_numbers = False):
     """Pretty-print a Python object to a stream [default is sys.stdout]."""
-    printer = PrettyPrinter(underscore_numbers=underscore_numbers, sort_dicts=sort_dicts, expand=expand, compact=compact, depth=depth, width=width, indent=indent, stream=stream)
+    printer = PrettyPrinter(stream=stream, indent=indent, width=width, depth=depth, compact=compact, expand=expand, sort_dicts=sort_dicts, underscore_numbers=underscore_numbers)
     printer.pprint(object)
 
-def pformat(object, indent = 1, width = 80, depth = None, *, compact, expand, sort_dicts, underscore_numbers):
+def pformat(object, indent = 1, width = 80, depth = None, *, compact = False, expand = False, sort_dicts = True, underscore_numbers = False):
     """Format a Python object into a pretty-printed representation."""
-    return PrettyPrinter(underscore_numbers=underscore_numbers, sort_dicts=sort_dicts, expand=expand, compact=compact, depth=depth, width=width, indent=indent).pformat(object)
+    return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, expand=expand, sort_dicts=sort_dicts, underscore_numbers=underscore_numbers).pformat(object)
 
-def pp(object, *, sort_dicts):
+def pp(object, *, sort_dicts = False):
     """Pretty-print a Python object"""
-    [object](**kwargs)
+    pprint(object, args, **kwargs)
 
 def saferepr(object):
     """Version of repr() which can handle recursive data structures."""
@@ -78,7 +78,7 @@ def _safe_tuple(t):
     return (_safe_key(t[0]), _safe_key(t[1]))
 
 class PrettyPrinter:
-    def __init__(self, indent = 1, width = 80, depth = None, stream = None, *, compact, expand, sort_dicts, underscore_numbers):
+    def __init__(self, indent = 1, width = 80, depth = None, stream = None, *, compact = False, expand = False, sort_dicts = True, underscore_numbers = False):
         """Handle pretty printing operations onto a stream using a set of
     configured parameters.
 
@@ -649,20 +649,4 @@ def _recursion(object):
     return f"<Recursion on {type(object).__name__} with id={id(object)}>"
 
 def _wrap_bytes_repr(object, width, allowance):
-    current = b''
-    last = len(object) // 4 * 4
-    for i in range(0, len(object), 4):
-        part = object[i:i + 4]
-        candidate = current + part
-        if i == last:
-            width -= allowance
-        elif len(repr(candidate)) > width:
-            if current:
-                pass
-            current = part
-        else:
-            current = candidate
-    if current:
-        pass
-    repr(current)
-    repr(current)
+    pass

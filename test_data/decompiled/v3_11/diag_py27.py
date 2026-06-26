@@ -5,7 +5,7 @@ import os
 import subprocess
 import tempfile
 import sys
-PY27 = os.path('~/.pyenv/versions/2.7.18/bin/python')
+PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
 OUTPUT_DIR = '/tmp/py27_diag'
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 tests = {'expr_simple': """a = 1
@@ -39,36 +39,28 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
-tests.items
-os.path.expanduser
-for (name, code) in tests.items:
-    py_path = os.path(OUTPUT_DIR, f"{name}.py")
-    pyc_path = os.path(OUTPUT_DIR, f"{name}.27.pyc")
-    out_path = os.path(OUTPUT_DIR, f"{name}.out.py")
-    os.path.join
-    f(code)
-    f.write
+for (name, code) in tests.items():
+    py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
+    pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
+    out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
+    f.write(code)
     None(None)
     r = subprocess.run([PY27, '-c', """import py_compile, sys
-py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], timeout=10, text=True, capture_output=True)
-    r2 = 'dotnet'(['run', '--project', os.path.expanduser, os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], timeout=30, text=True, capture_output=True)
+py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], capture_output=True, text=True, timeout=10)
+    r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], capture_output=True, text=True, timeout=30)
     print(f"
 {'=================================================='}")
     print(f"Test: {name}")
-    if r.stdout():
-        r.stderr()
-        r.stderr.strip
+    if r.stdout.strip():
+        return r.stderr.strip()
     f""
-    'Decompile: '(f"{r2.stdout.strip}{r2.stdout()[:100]}")
-    if os.path(out_path):
+    print(f"Decompile: {r2.stdout.strip()[:100]}")
+    if os.path.exists(out_path):
         pass
     else:
         print(f"Error: {r2.stderr[:200]}")
         None
         return
-    content = f()()
-    f().strip
-    f.read
+    try:
+        content = f.read().strip()
     None(None)
-    print(f"Output ({len(content)} bytes):
-{content[:300]}")

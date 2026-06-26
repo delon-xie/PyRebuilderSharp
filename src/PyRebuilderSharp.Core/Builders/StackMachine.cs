@@ -382,6 +382,29 @@ public class StackMachine
                 return null;
             }
 
+            // ---- 3.12+ LIST_EXTEND: extend list with iterable ----
+            case Opcode.LIST_EXTEND:
+            {
+                // Stack: [..., list, iterable]
+                // TOS = iterable (tuple constant from marshal, or Name for *args)
+                // TOS1 = list to extend (e.g., empty BUILD_LIST)
+                var iterable = SafePop();
+                var listExpr = _exprStack.Count > 0 ? _exprStack.Peek() : null;
+                if (listExpr is ListLiteral listLit && iterable != null)
+                {
+                    if (iterable is ListLiteral extendList)
+                        listLit.Elts.AddRange(extendList.Elts);
+                    else if (iterable is Constant { Value: System.Collections.IList ilist })
+                    {
+                        foreach (var item in ilist)
+                            listLit.Elts.Add(new Constant(item));
+                    }
+                    else
+                        listLit.Elts.Add(iterable);
+                }
+                return null;
+            }
+
             case Opcode.BUILD_MAP:
             {
                 var count = instr.Argument ?? 0;
@@ -679,8 +702,9 @@ public class StackMachine
 
             case Opcode.CALL_METHOD:
             {
-                // Python 3.7-3.9: CALL_METHOD pops method, self, then args
-                // Stack: [method, self, arg0, arg1, ...] → pop argCount+2 elements total
+                // Python 3.7-3.11: CALL_METHOD pops method, then args
+                // (self is now embedded in the Attribute from LOAD_METHOD,
+                // no longer pushed separately)
                 var callArgCount = instr.Argument ?? 0;
                 var callArgs = new List<Expr>();
                 for (int i = 0; i < callArgCount && _exprStack.Count > 0; i++)
@@ -688,7 +712,6 @@ public class StackMachine
                     var a = SafePop();
                     if (a != null) callArgs.Insert(0, a);
                 }
-                SafePop(); // self (not needed for the call expression)
                 var method = SafePop();
                 if (method == null) return null;
                 _exprStack.Push(new Call(method, callArgs, new List<Keyword>()));
@@ -697,17 +720,17 @@ public class StackMachine
 
             case Opcode.LOAD_METHOD:
             {
-                // Python 3.7-3.9: pops obj, pushes (method, self)
-                // Stack after: [method_expr, self_obj]
-                // CALL_METHOD will consume: pop self, pop method, pop args
+                // Python 3.7-3.11: pushes (method, self) for CALL_METHOD/PRECALL+CALL.
+                // The self is embedded in the Attribute expression, so we DON'T push
+                // the self separately — CALL would leave it orphaned.
+                // ref: CPython Python/ceval.c LOAD_METHOD
                 var methodName = GetName(instr);
                 var obj = SafePop();
                 if (obj == null) return null;
                 var attr = new Models.AST.Attribute(obj, methodName, ExpressionContext.Load);
-                // Push method expression first (top of stack for CALL_METHOD)
+                // Push ONLY the method expression. The self is redundant because
+                // Attribute already captures obj. CALL will see only [method, args...].
                 _exprStack.Push(attr);
-                // Push self reference below (so CALL_METHOD pops it first as "self")
-                _exprStack.Push(obj);
                 return null;
             }
             case Opcode.CALL_FUNCTION_EX:
@@ -998,12 +1021,12 @@ public class StackMachine
                     {
                         int kwCount = kwList.Count;
                         int posCount = argCount - kwCount;
-                        // Pop keyword values (TOS, after kw_names)
+                        // Pop keyword values (TOS, after kw_names) — insert at front
                         for (int i = kwCount - 1; i >= 0; i--)
                         {
                             var kwVal = SafePop();
                             if (kwVal != null)
-                                keywords.Add(new Keyword(kwList[i]?.ToString() ?? "", kwVal));
+                                keywords.Insert(0, new Keyword(kwList[i]?.ToString() ?? "", kwVal));
                         }
                         // Pop positional args
                         for (int i = 0; i < posCount && _exprStack.Count > 0; i++)
@@ -1027,12 +1050,12 @@ public class StackMachine
                 {
                     int kwCount = kwList.Count;
                     int posCount = argCount - kwCount;
-                    // Pop keyword values (TOS)
+                    // Pop keyword values (TOS) — insert at front to restore source order
                     for (int i = kwCount - 1; i >= 0; i--)
                     {
                         var kwVal = SafePop();
                         if (kwVal != null)
-                            keywords.Add(new Keyword(kwList[i]?.ToString() ?? "", kwVal));
+                            keywords.Insert(0, new Keyword(kwList[i]?.ToString() ?? "", kwVal));
                     }
                     // Pop positional args
                     for (int i = 0; i < posCount && _exprStack.Count > 0; i++)
@@ -1194,7 +1217,8 @@ public class StackMachine
             {
                 // PRECALL marks the boundary between args and function on stack.
                 // In 3.11, CALL follows and actually executes.
-                // For decompilation: PRECALL is a no-op because CALL_311 handles the actual args.
+                // For decompilation: PRECALL is a no-op. LOAD_METHOD already handles
+                // building the method call expression (self is embedded in Attribute).
                 // The arg is the number of positional args (same as CALL's arg).
                 return null;
             }
@@ -1652,7 +1676,32 @@ public class StackMachine
 
                 if ((sfaFlags & 0x08) != 0) _ = SafePop(); // closure — skip
                 if ((sfaFlags & 0x04) != 0) _ = SafePop(); // annotations — skip
-                if ((sfaFlags & 0x02) != 0) _ = SafePop(); // kwdefaults — skip
+                if ((sfaFlags & 0x02) != 0) // kwdefaults
+                {
+                    // Pop kwdefaults dict — store on FunctionRef
+                    // Structure: dict {keyword_name: default_value, ...}
+                    var kwDefExpr = SafePop();
+                    if (kwDefExpr is DictLiteral dictLit)
+                    {
+                        var kwDefaults = new Dictionary<string, Expr?>();
+                        foreach (var entry in dictLit.Entries)
+                        {
+                            if (entry.Key is Constant keyConst && keyConst.Value is string keyStr)
+                                kwDefaults[keyStr] = entry.Value;
+                        }
+                        funcRef = funcRef with { KwDefaultExprs = kwDefaults };
+                    }
+                    else if (kwDefExpr is Constant kdc && kdc.Value is System.Collections.IDictionary dict)
+                    {
+                        var kwDefaults = new Dictionary<string, Expr?>();
+                        foreach (System.Collections.DictionaryEntry entry in dict)
+                        {
+                            if (entry.Key is string keyStr)
+                                kwDefaults[keyStr] = new Constant(entry.Value);
+                        }
+                        funcRef = funcRef with { KwDefaultExprs = kwDefaults };
+                    }
+                }
                 if ((sfaFlags & 0x01) != 0)
                 {
                     var defaultsExpr = SafePop();
@@ -1713,7 +1762,23 @@ public class StackMachine
 
             // 3.13+ CALL_INTRINSIC_1: intrinsic function call type 1
             case Opcode.CALL_INTRINSIC_1_313:
+            {
+                // arg 6 = INTRINSIC_LIST_TO_TUPLE: converts list to tuple for *args
+                // Other intrinsics are no-ops for decompilation.
+                if (instr.Argument == 6) // INTRINSIC_LIST_TO_TUPLE
+                {
+                    var listExpr = SafePop();
+                    if (listExpr is ListLiteral listLit && listLit.Kind == ContainerKind.List)
+                    {
+                        _exprStack.Push(new ListLiteral(new List<Expr>(listLit.Elts), ContainerKind.Tuple));
+                    }
+                    else if (listExpr != null)
+                    {
+                        _exprStack.Push(listExpr);
+                    }
+                }
                 return null;
+            }
 
             // 3.13+ CALL_INTRINSIC_2: intrinsic function call type 2
             case Opcode.CALL_INTRINSIC_2_313:

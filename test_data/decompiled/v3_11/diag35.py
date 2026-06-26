@@ -4,8 +4,8 @@
 import subprocess
 import tempfile
 import os
-SRC = os.path('~/codes/Tools/PyRebuilderSharp')
-PROJECT = os.path(SRC, 'src/PyRebuilderSharp.Cli')
+SRC = os.path.expanduser('~/codes/Tools/PyRebuilderSharp')
+PROJECT = os.path.join(SRC, 'src/PyRebuilderSharp.Cli')
 test_code = """
 using PyRebuilderSharp.Core;
 using PyRebuilderSharp.Core.Readers;
@@ -31,9 +31,8 @@ try {
     Console.Error.WriteLine("ERROR: " + ex.GetType().Name + ": " + ex.Message);
 }
 """
-f(test_code)
-f.write
+f.write(test_code)
 None(None)
-r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], timeout=30, text=True, capture_output=True)
+r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], capture_output=True, text=True, timeout=30)
 print('Stdout:', r.stdout[:500])
 print('Stderr:', r.stderr[:500])

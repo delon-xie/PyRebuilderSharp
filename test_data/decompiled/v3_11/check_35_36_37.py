@@ -3,13 +3,11 @@
 """Show actual decompiled output for 3.5, 3.6, 3.7"""
 import os
 import subprocess
-PROJECT = os.path('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-COMPILED_DIR = os.path('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
-os.path.expanduser
-os.path.expanduser
-for ver in os.path.expanduser:
-    pyc = os.path(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-    r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
+PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+for ver in ('3.5', '3.6', '3.7'):
+    pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
+    r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
     print(f"
 === {ver} ===")
     if r.stdout:

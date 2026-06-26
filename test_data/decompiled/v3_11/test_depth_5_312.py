@@ -57,5 +57,3 @@ def depth_5_while():
 
 def depth_5_try():
     result = 0
-    result = 42
-    result = -4

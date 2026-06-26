@@ -5,26 +5,26 @@ import dis
 import marshal
 import types
 f = open(sys.argv[1], 'rb')
-magic = f(4)
-'Magic: '(f"{magic.hex}{magic()}")
-flags = f.read(f(4), 'little')
-ts = f.read(f(4), 'little')
-size = f.read(f(4), 'little')
+magic = f.read(4)
+print(f"Magic: {magic.hex()}")
+flags = int.from_bytes(f.read(4), 'little')
+ts = int.from_bytes(f.read(4), 'little')
+size = int.from_bytes(f.read(4), 'little')
 print(f"Header: flags={flags} ts={ts} size={size}")
-raw = f()
+raw = f.read()
 code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable'):
     if code.co_exceptiontable:
-        for i in print:
+        for i in range(0, len(et), 8):
             if i + 7 >= len(et):
                 pass
             else:
-                start = int(et[i:i + 2], 'little')
-                end = int(et[i + 2:i + 4], 'little')
-                target = int(et[i + 4:i + 6], 'little')
-                dl = int(et[i + 6:i + 8], 'little')
+                start = int.from_bytes(et[i:i + 2], 'little')
+                end = int.from_bytes(et[i + 2:i + 4], 'little')
+                target = int.from_bytes(et[i + 4:i + 6], 'little')
+                dl = int.from_bytes(et[i + 6:i + 8], 'little')
                 print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
             code
     code
@@ -35,8 +35,7 @@ if hasattr(code, 'co_exceptiontable'):
             print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
             if hasattr(const, 'co_exceptiontable'):
                 if const.co_exceptiontable:
-                    '  bytes: '(f"{const.co_exceptiontable.hex}{const.co_exceptiontable()}")
-                    print
+                    return print(f"  bytes: {const.co_exceptiontable.hex()}")
                 None
                 return
             else:

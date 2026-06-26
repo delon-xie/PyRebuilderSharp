@@ -5,25 +5,24 @@ import subprocess
 input_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/input'
 output_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 os.makedirs(output_dir, exist_ok=True)
-python310_path = os.path('~/.pyenv/versions/3.10.20/bin/python')
+python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 py_files = <listcomp>()
 print(f"找到 {len(py_files)} 个 Python 文件")
 print(f"使用 Python: {python310_path}")
 print('============================================================')
 success_count = 0
 fail_count = 0
-os.path.expanduser
-for py_file in os.path.expanduser:
-    input_path = os.path(input_dir, py_file)
-    base_name = os.path(py_file)[0]
+for py_file in sorted(py_files):
+    input_path = os.path.join(input_dir, py_file)
+    base_name = os.path.splitext(py_file)[0]
     output_name = f"{base_name}.3.10.pyc"
-    output_path = os.path(output_dir, output_name)
+    output_path = os.path.join(output_dir, output_name)
     compile_script = """
 import py_compile
 import sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2])
 """
-    result = subprocess.run([python310_path, '-c', compile_script, input_path, output_path], text=True, capture_output=True)
+    result = subprocess.run([python310_path, '-c', compile_script, input_path, output_path], capture_output=True, text=True)
     if result.returncode == 0:
         print(f"✓ {py_file} -> {output_name}")
         success_count += 1

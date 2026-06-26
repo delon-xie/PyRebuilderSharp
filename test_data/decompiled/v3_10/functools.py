@@ -2,7 +2,7 @@
 
 """functools.py - Tools for working with functions and callable objects
 """
-__all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
+__all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']
 from abc import get_cache_token
 from collections import namedtuple
 from operator import itemgetter
@@ -302,10 +302,10 @@ class partial:
                 raise
                 pto_args = self.args
                 keywords = keywords
-                return pto_args(**keywords)
+                return self.func(pto_args, args, **keywords)
         pto_args = self.args
         keywords = keywords
-        return pto_args(**keywords)
+        return self.func(pto_args, args, **keywords)
 
     def __get__(self, obj, objtype):
         if obj is None:
@@ -350,10 +350,10 @@ class partialmethod:
                     raise
                     pto_args = cls_or_self.args
                     keywords = keywords
-                    return pto_args(**keywords)
+                    return cls_or_self.func(cls_or_self, pto_args, args, **keywords)
             pto_args = cls_or_self.args
             keywords = keywords
-            return pto_args(**keywords)
+            return cls_or_self.func(cls_or_self, pto_args, args, **keywords)
         _method.__isabstractmethod__ = self.__isabstractmethod__
         _method.__partialmethod__ = self
         return _method
@@ -364,7 +364,7 @@ class partialmethod:
         if get is not None:
             new_func = get(obj, cls)
             if new_func is not self.func:
-                result = [new_func](**self.keywords)
+                result = partial(new_func, self.args, **self.keywords)
                 try:
                     result.__self__ = new_func.__self__
                 except AttributeError:

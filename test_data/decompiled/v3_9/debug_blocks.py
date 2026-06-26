@@ -25,7 +25,7 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
             instrs[-1].offset + 2
             if len(block_instrs) > 3:
                 pass
-            f"{start}{'3d'}-{end - 1}{'3d'}{']: '(', '(<genexpr>))}"
+            f"{start}{'3d'}-{end - 1}{'3d'}{']: '(', '.join(<genexpr>))}"
             'Block ['
             last = block_instrs[-1]
             print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
