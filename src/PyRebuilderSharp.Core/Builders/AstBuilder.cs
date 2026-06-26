@@ -2790,10 +2790,15 @@ public class AstBuilder
 
         // 检测 while 循环模式：bodyBranch 是循环头（LoopHeader）
         // 在 Python 3.10 中，while 循环的条件在前驱块，body 是独立的 LoopHeader
+        // 在 Python 3.11+ 中，while 循环的条件块本身就是 LoopHeader
+        // 参考 CPython 3.12: Python/ceval.c LOAD_FAST+POP_JUMP_IF_FALSE 构成 while 条件
         // 排除 for-loop 头（有 GET_ITER/FOR_ITER 指令的 LoopHeader），for-loop 走 GetStructuredBlockStmts
         var isForLoop = bodyBranch != null && bodyBranch.Instructions.Any(
             i => i.Opcode is Opcode.GET_ITER or Opcode.FOR_ITER);
-        if (bodyBranch != null && bodyBranch.Flags.HasFlag(BlockFlags.LoopHeader) && !isForLoop)
+        var isWhileLoop = (header.Flags.HasFlag(BlockFlags.LoopHeader)
+                          || bodyBranch?.Flags.HasFlag(BlockFlags.LoopHeader) == true)
+                          && !isForLoop;
+        if (isWhileLoop)
         {
             // 直接获取 entry 块的初始化语句（block 已被 visited，不能用 BuildBlockOnly）
             var initStmts = new List<Stmt>();
