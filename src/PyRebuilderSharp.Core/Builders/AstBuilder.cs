@@ -86,6 +86,13 @@ public class AstBuilder
             {
                 var entryBlock = FindBlockByOffset(entry.StartOffset);
                 if (entryBlock == null || visited.Contains(entryBlock)) continue;
+
+                // 跳过 for 循环体内的 ET 条目（try/except 在 for 循环体中时，
+                // 块属于 for-loop body，由 BuildForLoop 的 GetStructuredBlockStmts 处理）。
+                // 检测：entryBlock 的任何前驱是包含 FOR_ITER 的循环头。
+                bool isInsideForLoop = entryBlock.Predecessors.Any(p =>
+                    p.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER));
+                if (isInsideForLoop) continue;
                 var etStmts = BuildTryFromExceptionTable(entryBlock, visited);
                 if (etStmts != null)
                 {
