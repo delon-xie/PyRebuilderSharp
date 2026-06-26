@@ -49,7 +49,7 @@ for ver in []:
                                     print('           actual=  %s' % a)
                         match
                 match
-passed = <genexpr>(results.items())
+passed = (None for (v, r) in .0)
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

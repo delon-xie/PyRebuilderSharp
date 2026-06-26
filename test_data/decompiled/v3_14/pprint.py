@@ -30,16 +30,16 @@ import sys as _sys
 import types as _types
 from io import StringIO as _StringIO
 __all__ = ('pprint', 'pformat', 'isreadable', 'isrecursive', 'saferepr', 'PrettyPrinter', 'pp')
-def pprint(object, stream = None, indent = 1, width = 80, depth = None):
+def pprint(object, stream, indent, width, depth, *, compact = None, expand = 1, sort_dicts = 80, underscore_numbers = None):
     """Pretty-print a Python object to a stream [default is sys.stdout]."""
     printer = PrettyPrinter(underscore_numbers=underscore_numbers, sort_dicts=sort_dicts, expand=expand, compact=compact, depth=depth, width=width, indent=indent, stream=stream)
     printer.pprint(object)
 
-def pformat(object, indent = 1, width = 80, depth = None):
+def pformat(object, indent, width, depth, *, compact, expand = 1, sort_dicts = 80, underscore_numbers = None):
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(underscore_numbers=underscore_numbers, sort_dicts=sort_dicts, expand=expand, compact=compact, depth=depth, width=width, indent=indent).pformat(object)
 
-def pp(object):
+def pp(object, *, sort_dicts):
     """Pretty-print a Python object"""
     [object](**kwargs)
 
@@ -80,7 +80,7 @@ def _safe_tuple(t):
     return (_safe_key(t[0]), _safe_key(t[1]))
 
 class PrettyPrinter:
-    def __init__(self, indent = 1, width = 80, depth = None, stream = None):
+    def __init__(self, indent, width, depth, stream, *, compact = 1, expand = 80, sort_dicts = None, underscore_numbers = None):
         """Handle pretty printing operations onto a stream using a set of
     configured parameters.
 

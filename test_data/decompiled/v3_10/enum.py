@@ -340,7 +340,7 @@ class EnumType(type):
             getattr(first_enum, '_generate_next_value_', None)
         return enum_dict
 
-    def __new__(metacls, cls, bases, classdict):
+    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
         if _simple:
             return super().__new__(metacls, cls, bases, classdict, **kwds)
         else:
@@ -484,7 +484,7 @@ class EnumType(type):
         """
         return True
 
-    def __call__(cls, value, names):
+    def __call__(cls, value, names, *, module, qualname, type, start, boundary):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -622,7 +622,7 @@ class EnumType(type):
         else:
             return super().__setattr__(name, value)
 
-    def _create_(cls, class_name, names):
+    def _create_(cls, class_name, names, *, module, qualname, type, start, boundary):
         """
         Convenience method to create a new Enum class.
 
@@ -657,7 +657,7 @@ class EnumType(type):
             elif names is None:
                 pass
 
-    def _convert_(cls, name, module, filter, source):
+    def _convert_(cls, name, module, filter, source, *, boundary, as_global):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -1289,7 +1289,7 @@ def global_enum(cls, update_str):
         else:
             cls.__str__ = global_str
 
-def _simple_enum(etype):
+def _simple_enum(etype, *, boundary, use_args):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1625,7 +1625,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
 
-def _old_convert_(etype, name, module, filter, source):
+def _old_convert_(etype, name, module, filter, source, *, boundary):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """

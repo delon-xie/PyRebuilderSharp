@@ -208,6 +208,7 @@ class EnumDict(dict):
     enumeration member names.
     """
     def __init__(self, cls_name = None):
+        super(__class__, self).__init__()
         self._member_names = {}
         self._last_values = []
         self._ignore = []
@@ -241,7 +242,7 @@ class EnumDict(dict):
                     else:
                         value
                         setattr(self, '_generate_next_value', _gnv)
-                        key(value)
+                        super(__class__, self).__setitem__(key, value)
                 elif (key == '_ignore_') and isinstance(value, str):
                     value = value.replace(',', ' ').split()
                 else:
@@ -251,7 +252,7 @@ class EnumDict(dict):
                     if already:
                         raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
                     else:
-                        return key(value)
+                        return super(__class__, self).__setitem__(key, value)
             elif key == '_generate_next_value_':
                 pass
             elif key == '_ignore_':
@@ -259,7 +260,7 @@ class EnumDict(dict):
         elif _is_dunder(key):
             if key == '__order__':
                 key = '_order_'
-            key(value)
+            super(__class__, self).__setitem__(key, value)
         elif key in self._member_names:
             raise TypeError(f"{key!r} already defined as {self[key]!r}")
         elif key in self._ignore:
@@ -295,13 +296,14 @@ class EnumType(type):
     Metaclass for Enum
     """
     __prepare__ = __prepare__()
-    def __new__(metacls, cls, bases, classdict):
+    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
         try:
+            enum_class = super(__class__, metacls).__new__(metacls, cls, bases, classdict, **kwds)
             delattr(enum_class, '_%s__in_progress' % cls)
         except Exception:
             pass
         if _simple:
-            return
+            return super(__class__, metacls).__new__(metacls, cls, bases, classdict, **kwds)
         else:
             classdict.setdefault('_ignore_', []).append('_ignore_')
             ignore = classdict['_ignore_']
@@ -404,7 +406,7 @@ class EnumType(type):
         """
         return True
 
-    def __call__(cls, value, names = _not_given):
+    def __call__(cls, value, names, *, module = None, qualname = 1, type = None, start = None, boundary = _not_given):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -469,7 +471,7 @@ class EnumType(type):
         if attr in cls._member_map_:
             raise AttributeError(f"{cls.__name__!r} cannot delete member {attr!r}.")
         else:
-            return attr
+            return super(__class__, cls).__delattr__(attr)
 
     def __dir__(cls):
         if issubclass(cls, Flag):
@@ -528,9 +530,9 @@ class EnumType(type):
         if name in member_map:
             raise AttributeError(f"cannot reassign member {name!r}")
         else:
-            return name(value)
+            return super(__class__, cls).__setattr__(name, value)
 
-    def _create_(cls, class_name, names):
+    def _create_(cls, class_name, names, *, module = None, qualname = 1, type = None, start = None, boundary = None):
         """
         Convenience method to create a new Enum class.
 
@@ -561,7 +563,7 @@ class EnumType(type):
         _make_class_unpicklable(classdict)
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
 
-    def _convert_(cls, name, module, filter, source = None):
+    def _convert_(cls, name, module, filter, source, *, boundary = False, as_global = None):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -1013,7 +1015,7 @@ def global_enum(cls, update_str = False):
         else:
             cls.__str__ = global_str
 
-def _simple_enum(etype = Enum):
+def _simple_enum(etype, *, boundary = None, use_args = Enum):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1296,7 +1298,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
 
-def _old_convert_(etype, name, module, filter, source = None):
+def _old_convert_(etype, name, module, filter, source, *, boundary = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """

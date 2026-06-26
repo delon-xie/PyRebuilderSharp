@@ -204,6 +204,7 @@ class EnumDict(dict):
     enumeration member names.
 """
     def __init__(self, cls_name = None):
+        super(__class__, self).__init__()
         self._member_names = {}
         self._last_values = []
         self._ignore = []
@@ -236,6 +237,7 @@ class EnumDict(dict):
                     else:
                         value
                         setattr(self, '_generate_next_value', _gnv)
+                        super(__class__, self).__setitem__
                 elif (key == '_ignore_') and isinstance(value, str):
                     value = value.replace(',', ' ').split()
                 else:
@@ -276,7 +278,7 @@ class EnumType(type):
     Metaclass for Enum
 """
     __prepare__ = __prepare__()
-    def __new__(metacls, cls, bases, classdict):
+    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
         try:
             delattr(enum_class, '_%s__in_progress' % cls)
         except Exception:
@@ -391,7 +393,7 @@ class EnumType(type):
 """
         return True
 
-    def __call__(cls, value, names = _not_given):
+    def __call__(cls, value, names, *, module, qualname, type, start, boundary = _not_given):
         """
     Either returns an existing member, or creates a new enum class.
 
@@ -510,7 +512,7 @@ class EnumType(type):
 """
         raise AttributeError(f"cannot reassign member {name}")
 
-    def _create_(cls, class_name, names):
+    def _create_(cls, class_name, names, *, module, qualname, type, start, boundary):
         """
     Convenience method to create a new Enum class.
 
@@ -539,7 +541,7 @@ class EnumType(type):
         _make_class_unpicklable(classdict)
         return metacls.__new__
 
-    def _convert_(cls, name, module, filter, source = None):
+    def _convert_(cls, name, module, filter, source, *, boundary, as_global = None):
         """
     Create a new Enum subclass that replaces a collection of global constants
 """
@@ -987,7 +989,7 @@ def global_enum(cls, update_str = False):
         else:
             cls.__str__ = global_str
 
-def _simple_enum(etype = Enum):
+def _simple_enum(etype, *, boundary, use_args = Enum):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1244,7 +1246,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
 
-def _old_convert_(etype, name, module, filter, source = None):
+def _old_convert_(etype, name, module, filter, source, *, boundary = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
 """

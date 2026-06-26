@@ -50,7 +50,7 @@ for ver in []:
                         False
 print(f"
 {'========================================'}")
-passed = <genexpr>(results.items())
+passed = (None for (v, r) in .0)
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
 print(f"❌ {ver}: AST parse failed - {e}")

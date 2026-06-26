@@ -45,7 +45,7 @@ class abstractclassmethod(classmethod):
     def __init__(self, callable):
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
-        callable
+        super(__class__, self).__init__(callable)
 
 class abstractstaticmethod(staticmethod):
     """A decorator indicating abstract staticmethods.
@@ -65,7 +65,7 @@ class abstractstaticmethod(staticmethod):
     def __init__(self, callable):
         warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
-        callable
+        super(__class__, self).__init__(callable)
 
 class abstractproperty(property):
     """A decorator indicating abstract properties.
@@ -84,7 +84,7 @@ class abstractproperty(property):
     __isabstractmethod__ = True
     def __init__(self, fget = None, fset = None, fdel = None, doc = None):
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
-        fget(fset, fdel, doc)
+        super(__class__, self).__init__(fget, fset, fdel, doc)
 
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).

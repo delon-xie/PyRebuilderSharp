@@ -307,7 +307,7 @@ class EnumType(type):
     Metaclass for Enum
     """
     __prepare__ = __prepare__()
-    def __new__(metacls, cls, bases, classdict):
+    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
         if _simple:
             return super().__new__(metacls, cls, bases, classdict, **kwds)
         else:
@@ -357,47 +357,21 @@ class EnumType(type):
                             p.value = (bits & p.value[0]) + p.value[1:]
                     delattr(enum_class, '_%s__in_progress' % cls)
                     super().__new__(metacls, cls, bases, classdict, **kwds)
-                    classdict(enum_class.__dict__)
-                    if (ReprEnum in bases) and (member_type is object):
-                        raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
-                    elif '__format__' not in classdict:
-                        enum_class.__format__ = member_type.__format__
-                    elif '__str__' not in classdict:
-                        method = member_type.__str__
-                        if method is object.__str__:
-                            method = member_type.__repr__
-                        enum_class.__str__ = method
-                        for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
-                            if name not in classdict:
-                                enum_method = getattr(first_enum, name)
-                                found_method = getattr(enum_class, name)
-                                object_method = getattr(object, name)
-                                data_type_method = getattr(member_type, name)
-                                if found_method in (data_type_method, object_method):
-                                    return setattr(enum_class, name, enum_method)
-                                Flag
-                                if issubclass(enum_class, Flag):
-                                    for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
-                                        if name not in classdict:
-                                            enum_method = getattr(Flag, name)
-                                            setattr(enum_class, name, enum_method)
-                                else:
-                                    Enum
-                                    if save_new:
-                                        enum_class.__new_member__ = __new__
-                                    enum_class.__new__ = Enum.__new__
-                                    if isinstance(_order_, str):
-                                        _order_ = _order_(',', ' ')()
-                                        _order_(',', ' ').split
-                                        _order_.replace
-                            Flag
-                        if issubclass(enum_class, Flag):
-                            pass
-                        else:
-                            return Enum
         if hasattr(e, '__notes__'):
             return e
         raise
+        classdict(enum_class.__dict__)
+        method = member_type.__str__
+        enum_method = getattr(first_enum, name)
+        found_method = getattr(enum_class, name)
+        object_method = getattr(object, name)
+        data_type_method = getattr(member_type, name)
+        enum_class.__new__ = Enum.__new__
+        delattr(enum_class, '_boundary_')
+        delattr(enum_class, '_flag_mask_')
+        delattr(enum_class, '_singles_mask_')
+        delattr(enum_class, '_all_bits_')
+        delattr(enum_class, '_inverted_')
 
     def __bool__(cls):
         """
@@ -405,7 +379,7 @@ class EnumType(type):
         """
         return True
 
-    def __call__(cls, value, names = _not_given):
+    def __call__(cls, value, names, *, module = None, qualname = 1, type = None, start = None, boundary = _not_given):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -528,7 +502,7 @@ class EnumType(type):
         else:
             return super()(name, value)
 
-    def _create_(cls, class_name, names):
+    def _create_(cls, class_name, names, *, module = None, qualname = 1, type = None, start = None, boundary = None):
         """
         Convenience method to create a new Enum class.
 
@@ -556,7 +530,7 @@ class EnumType(type):
                 names((name, value))
         module = sys._getframe(2).f_globals['__name__']
 
-    def _convert_(cls, name, module, filter, source = None):
+    def _convert_(cls, name, module, filter, source, *, boundary = False, as_global = None):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -1014,7 +988,7 @@ def global_enum(cls, update_str = False):
         else:
             cls.__str__ = global_str
 
-def _simple_enum(etype = Enum):
+def _simple_enum(etype, *, boundary = None, use_args = Enum):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1215,7 +1189,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     else:
         return failed
 
-def _old_convert_(etype, name, module, filter, source = None):
+def _old_convert_(etype, name, module, filter, source, *, boundary = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """

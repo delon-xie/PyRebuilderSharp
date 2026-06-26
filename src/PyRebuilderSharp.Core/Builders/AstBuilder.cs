@@ -4464,13 +4464,18 @@ public class AstBuilder
         }
 
         // 1d. Set default values for trailing positional args (from DefaultExprs)
+        // 注意：DefaultExprs 只应用于 POSITIONAL 参数（posonly + positional-or-keyword），
+        // 不可污染 keyword-only 参数。args.Count 可能包含 kwonly 参数。
+        int totalPosArgsCount = posOnlyCount + (totalPosArgs - posOnlyCount); // = childCode.ArgCount
+        int positionalArgsInList = args.Count - kwOnlyCount; // 排除 kwonly 后的位置参数数
         if (funcRef.DefaultExprs != null && funcRef.DefaultExprs.Count > 0)
         {
-            int startIdx = args.Count - funcRef.DefaultExprs.Count;
+            int startIdx = positionalArgsInList - funcRef.DefaultExprs.Count;
+            if (startIdx < 0) startIdx = 0; // 安全防护
             for (int i = 0; i < funcRef.DefaultExprs.Count; i++)
             {
                 int argIdx = startIdx + i;
-                if (argIdx >= 0 && argIdx < args.Count)
+                if (argIdx >= 0 && argIdx < positionalArgsInList) // 只限位置参数范围
                 {
                     var existing = args[argIdx];
                     args[argIdx] = new Parameter(existing.Name, existing.Annotation,

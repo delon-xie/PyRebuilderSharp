@@ -188,7 +188,7 @@ def cmp_to_key(mycmp):
     return K
 []
 _initial_missing = sentinel('_initial_missing')
-def reduce(function, sequence, initial = _initial_missing):
+def reduce(function, sequence, /, initial = _initial_missing):
     """
     reduce(function, iterable, /[, initial]) -> value
 

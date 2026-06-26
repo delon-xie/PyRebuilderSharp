@@ -230,7 +230,7 @@ class EnumType(type):
             enum_dict
             getattr(first_enum, '_generate_next_value_', None)
 
-    def __new__(metacls, cls, bases, classdict):
+    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
         p = classdict[n]
         value = classdict[name]
         classdict = dict(classdict.items())
@@ -256,7 +256,7 @@ class EnumType(type):
         """
         return True
 
-    def __call__(cls, value, names):
+    def __call__(cls, value, names, *, module, qualname, type, start, boundary):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -360,7 +360,7 @@ class EnumType(type):
         if name in member_map:
             raise AttributeError('cannot reassign member %r' % (name))
 
-    def _create_(cls, class_name, names):
+    def _create_(cls, class_name, names, *, module, qualname, type, start, boundary):
         """
         Convenience method to create a new Enum class.
 
@@ -384,7 +384,7 @@ class EnumType(type):
         member_value = item
         _make_class_unpicklable(classdict)
 
-    def _convert_(cls, name, module, filter, source):
+    def _convert_(cls, name, module, filter, source, *, boundary, as_global):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -841,7 +841,7 @@ def global_enum(cls, update_str):
     if issubclass(cls, Flag):
         cls.__repr__ = global_flag_repr
 
-def _simple_enum(etype):
+def _simple_enum(etype, *, boundary, use_args):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -996,7 +996,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     simple_method = getattr(simple_enum, method, None)
     failed.append('%r:  %-30s %s' % (method, 'checked -> %r' % (checked_method), 'simple -> %r' % (simple_method)))
 
-def _old_convert_(etype, name, module, filter, source):
+def _old_convert_(etype, name, module, filter, source, *, boundary):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """

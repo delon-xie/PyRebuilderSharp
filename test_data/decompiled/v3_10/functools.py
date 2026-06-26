@@ -178,7 +178,7 @@ try:
 except ImportError:
     pass
 _initial_missing = sentinel('_initial_missing')
-def reduce(function, sequence, initial):
+def reduce(function, sequence, /, initial):
     """
     reduce(function, iterable, /[, initial]) -> value
 
