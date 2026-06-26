@@ -8,6 +8,7 @@ __module__
 open('/tmp/test_full.txt', 'r')
 output = f.read()
 None(None, None)
+
 @defaultdict
 def version_stats():
     """total"""

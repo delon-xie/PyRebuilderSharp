@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 f = open('/tmp/test_full.txt', 'r')
 output = f.read()
+
 @defaultdict
 def version_stats():
     return {'total': 0, 'passed': 0, 'failed': 0}

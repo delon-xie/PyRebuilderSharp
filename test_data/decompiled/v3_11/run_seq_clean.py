@@ -21,6 +21,7 @@ passed = (None for (v, r) in .0)
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
+
 def <genexpr>(.0):
     .0
     for (v, r) in .0:

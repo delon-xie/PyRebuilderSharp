@@ -323,7 +323,9 @@ public class PythonCodeGenerator : ICodeGenerator
         bool prevIsIf = previous is If;
         // 定义之间
         if (curIsDef && prevIsDef) { _output.AppendLine(); return; }
-        // 定义与 import 之间
+        // 任意语句（docstring/import/assign）后的定义 → 空行
+        if (curIsDef && !prevIsDef) { _output.AppendLine(); return; }
+        // 定义后的 import → 空行（但保持 import 组连续）
         if (curIsDef && prevIsImport) { _output.AppendLine(); return; }
         if (curIsImport && prevIsDef) { _output.AppendLine(); return; }
         // if 与前一个定义之间

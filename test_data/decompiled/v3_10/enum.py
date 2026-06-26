@@ -8,6 +8,7 @@ Enum = None
 Flag = None
 EJECT = None
 ReprEnum = None
+
 class nonmember(object):
     """
     Protects item from becoming an Enum member during class creation.
@@ -124,10 +125,12 @@ class _not_given:
     def __repr__(self):
         return '<not given>'
 _not_given = _not_given()
+
 class _auto_null:
     def __repr__(self):
         return '_auto_null'
 _auto_null = _auto_null()
+
 class auto:
     """
     Instances are replaced with an appropriate value in Enum class suites.
@@ -149,6 +152,7 @@ class property(DynamicClassAttribute):
     member = None
     _attr_type = None
     _cls_type = None
+
     def __get__(self, instance, ownerclass):
         if instance is None:
             if self.member is not None:
@@ -317,6 +321,7 @@ class EnumDict(dict):
         for (name, value) in more_members.items():
             pass
 _EnumDict = EnumDict
+
 class EnumType(type):
     """
     Metaclass for Enum
@@ -682,7 +687,7 @@ class EnumType(type):
             def <listcomp>(.0):
                 .0
                 []
-                ? = [(name, value) for (name, value) in '?' if .0(name)]
+                ? = [(name, value) for (name, value) in .0 if .0(name)]
             try:
                 members.sort(key=EnumType._convert_.<locals>.<lambda>)
             except TypeError:
@@ -828,6 +833,7 @@ class EnumType(type):
             return Signature([Parameter('values', Parameter.VAR_POSITIONAL)])
         return Signature([Parameter('new_class_name', Parameter.POSITIONAL_ONLY), Parameter('names', Parameter.POSITIONAL_OR_KEYWORD), Parameter('module', Parameter.KEYWORD_ONLY, default=None), Parameter('qualname', Parameter.KEYWORD_ONLY, default=None), Parameter('type', Parameter.KEYWORD_ONLY, default=None), Parameter('start', Parameter.KEYWORD_ONLY, default=1), Parameter('boundary', Parameter.KEYWORD_ONLY, default=None)])
 EnumMeta = EnumType
+
 class Enum(metaclass=EnumType):
     """
     Create a collection of name/value pairs.
@@ -1016,6 +1022,7 @@ class StrEnum(str, ReprEnum):
 def pickle_by_global_name(self, proto):
     return self.name
 _reduce_ex_by_global_name = pickle_by_global_name
+
 def pickle_by_enum_name(self, proto):
     return (getattr, (self.__class__, self._name_))
 
@@ -1035,11 +1042,13 @@ STRICT = *FlagBoundary
 CONFORM = *FlagBoundary
 EJECT = *FlagBoundary
 KEEP = *FlagBoundary
+
 class Flag(Enum, boundary=STRICT):
     """
     Support for flags
     """
     _numeric_repr_ = repr
+
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         """
@@ -1060,6 +1069,7 @@ class Flag(Enum, boundary=STRICT):
         for val in _iter_bits_lsb(value & cls._flag_mask_):
             yield cls._value2member_map_.get(val)
     _iter_member_ = _iter_member_by_value_
+
     @classmethod
     def _iter_member_by_def_(cls, value):
         """
@@ -1487,6 +1497,7 @@ EnumCheck = _simple_enum(StrEnum)(__build_class__(EnumCheck, 'EnumCheck'))
 CONTINUOUS = *EnumCheck
 NAMED_FLAGS = *EnumCheck
 UNIQUE = *EnumCheck
+
 class verify:
     """
     Check an enumeration for various constraints. (see EnumCheck)
@@ -1605,7 +1616,7 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
         def <listcomp>(.0):
             .0
             []
-            ? = [(name, value) for (name, value) in '?' if .0(name)]
+            ? = [(name, value) for (name, value) in .0 if .0(name)]
         try:
             members.sort(key=_old_convert_.<locals>.<lambda>)
         except TypeError:

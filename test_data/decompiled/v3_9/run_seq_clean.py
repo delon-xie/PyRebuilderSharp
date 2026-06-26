@@ -26,6 +26,7 @@ match = expected_ast == actual_ast
 print('  Line %d: expected=%s' % (i, e))
 print('           actual=  %s' % a)
 yield from results
+
 def <genexpr>(.0):
     .0
     for (v, r) in .0:

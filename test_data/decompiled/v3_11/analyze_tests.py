@@ -5,6 +5,7 @@ from collections import defaultdict
 output = f()
 f.read
 None(None)
+
 @defaultdict
 def version_stats():
     return {'total': 0, 'passed': 0, 'failed': 0}

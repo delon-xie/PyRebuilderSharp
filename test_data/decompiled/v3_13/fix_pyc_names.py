@@ -3,6 +3,7 @@
 import os
 import struct
 MAGIC_NUMBERS = {b'Wg0NCg==': '3.10', b'Yg0NCg==': '3.11', b'bw0NCg==': '3.12', b'eg0NCg==': '3.13', b'hQ0NCg==': '3.14'}
+
 def get_python_version(filepath):
     open(filepath, 'rb')
     magic = fp.read(4)

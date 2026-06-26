@@ -4,6 +4,7 @@
 import types
 from _weakrefset import WeakSet
 _InstanceType = type(_C())
+
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 

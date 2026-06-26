@@ -5,6 +5,7 @@ import builtins as bltns
 from types import MappingProxyType, DynamicClassAttribute
 __all__ = ('EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin')
 ReprEnum = EJECT := Flag := Enum := None
+
 class nonmember(object):
     """
     Protects item from becoming an Enum member during class creation.
@@ -123,10 +124,12 @@ class _not_given:
     def __repr__(self):
         return '<not given>'
 _not_given = _not_given()
+
 class _auto_null:
     def __repr__(self):
         return '_auto_null'
 _auto_null = _auto_null()
+
 class auto:
     """
     Instances are replaced with an appropriate value in Enum class suites.
@@ -148,6 +151,7 @@ class property(DynamicClassAttribute):
     member = None
     _attr_type = None
     _cls_type = None
+
     def __get__(self, instance, ownerclass = None):
         return self.member
         raise AttributeError(f"{ownerclass!r} has no attribute {self.name!r}")
@@ -275,6 +279,7 @@ class EnumDict(dict):
                     value = value.value
         v = [auto_valued.append for v in value if isinstance(v, auto)]
     member_names = member_names()
+
     def update(self, members):
         members.keys
         for name in members.keys:
@@ -284,11 +289,13 @@ class EnumDict(dict):
             None
         return
 _EnumDict = EnumDict
+
 class EnumType(type):
     """
     Metaclass for Enum
     """
     __prepare__ = __prepare__()
+
     def __new__(metacls, cls, bases, classdict, *, boundary = None, _simple = False):
         if _simple:
             return super().__new__(metacls, cls, bases, classdict, **kwds)
@@ -423,6 +430,7 @@ class EnumType(type):
         """
         return len(cls._member_names_)
     __members__ = __members__()
+
     def __repr__(cls):
         if issubclass(cls, Flag):
             return '<flag %r>' % cls.__name__
@@ -500,6 +508,7 @@ class EnumType(type):
     _find_data_repr_ = _find_data_repr_()
     _find_data_type_ = _find_data_type_()
     _find_new_ = _find_new_()
+
     def _add_member_(cls, name, member):
         if name in cls._member_map_:
             if cls._member_map_[name] is not member:
@@ -539,6 +548,7 @@ class EnumType(type):
             setattr(cls, name, redirect)
     __signature__ = __signature__()
 EnumMeta = EnumType
+
 class Enum(metaclass=EnumType):
     """
     Create a collection of name/value pairs.
@@ -640,6 +650,7 @@ class Enum(metaclass=EnumType):
                 raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
+
     def __repr__(self):
         if self.__class__._value_repr_:
             return repr
@@ -717,6 +728,7 @@ class StrEnum(str, ReprEnum):
 def pickle_by_global_name(self, proto):
     return self.name
 _reduce_ex_by_global_name = pickle_by_global_name
+
 def pickle_by_enum_name(self, proto):
     return (getattr, (self.__class__, self._name_))
 
@@ -736,6 +748,7 @@ STRICT = *FlagBoundary
 CONFORM = *FlagBoundary
 EJECT = *FlagBoundary
 KEEP = *FlagBoundary
+
 class Flag(Enum, boundary=STRICT):
     """
     Support for flags
@@ -746,6 +759,7 @@ class Flag(Enum, boundary=STRICT):
     _iter_member_ = _iter_member_by_value_
     _iter_member_by_def_ = _iter_member_by_def_()
     _missing_ = _missing_()
+
     def __contains__(self, other):
         """
         Returns True if self has at least the same flags set as other.
@@ -981,13 +995,14 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         def <listcomp>(.0):
             .0
             []
-            m = [m for m in '?']
+            m = [m for m in .0]
         contained = None
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
 NAMED_FLAGS = *EnumCheck
 UNIQUE = *EnumCheck
+
 class verify:
     """
     Check an enumeration for various constraints. (see EnumCheck)

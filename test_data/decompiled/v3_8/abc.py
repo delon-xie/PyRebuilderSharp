@@ -36,6 +36,7 @@ class abstractclassmethod(classmethod):
 
     """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
@@ -57,6 +58,7 @@ class abstractstaticmethod(staticmethod):
 
     """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
@@ -78,6 +80,7 @@ class abstractproperty(property):
 
     """
     __isabstractmethod__ = True
+
     def __init__(self, fget, fset, fdel, doc):
         import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
@@ -86,6 +89,7 @@ try:
     from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
 except ImportError:
     pass
+
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).
 

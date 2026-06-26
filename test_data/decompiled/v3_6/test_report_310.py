@@ -12,6 +12,7 @@ passed = 0
 failed = 0
 current_test = None
 current_test_fail = False
+
 def remove_ansi(text):
     return re.sub('\\x1b\\[[0-9;]*m', '', text)
 for line in lines:

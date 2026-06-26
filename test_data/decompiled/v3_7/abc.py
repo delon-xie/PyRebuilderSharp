@@ -36,6 +36,7 @@ class abstractclassmethod(classmethod):
     'abstractmethod' instead.
     """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
@@ -56,6 +57,7 @@ class abstractstaticmethod(staticmethod):
     'abstractmethod' instead.
     """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
@@ -92,6 +94,7 @@ try:
     from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
 except ImportError:
     pass
+
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).
 

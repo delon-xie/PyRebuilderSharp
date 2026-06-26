@@ -9,6 +9,7 @@ magic = f(4)
 f(12)
 raw = f()
 code = marshal.loads(raw)
+
 def dump_bytecode(c, depth = 0):
     p = '  ' * depth
     for const in c.co_consts:

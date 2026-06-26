@@ -106,6 +106,7 @@ class ABCMeta(type):
     """
     _abc_invalidation_counter = 0
     __new__ = 'ABCMeta.__new__'
+
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
 

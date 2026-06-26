@@ -6,6 +6,7 @@ f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 f.read(8)
 code = marshal.load(f)
+
 def dump_code(c, depth):
     prefix = '  ' * depth
     for const in c.co_consts:

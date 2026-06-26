@@ -3222,6 +3222,7 @@ if x:
     test_nested_named_except_blocks = test_nested_named_except_blocks()
     test_with_statement_many_context_managers = test_with_statement_many_context_managers()
     test_async_with_statement_many_context_managers = test_async_with_statement_many_context_managers()
+
     def test_barry_as_flufl_with_syntax_errors(self):
         """
     def func1():
@@ -3354,6 +3355,7 @@ a=1
     test_syntax_error_on_deeply_nested_blocks = test_syntax_error_on_deeply_nested_blocks()
     test_error_on_parser_stack_overflow = test_error_on_parser_stack_overflow()
     test_deep_invalid_rule = test_deep_invalid_rule()()
+
     def test_except_stmt_invalid_as_expr(self):
         """
                 try:

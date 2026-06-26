@@ -24,6 +24,7 @@ actual_ast = ast.dump(ast.parse(actual_src), indent=2)
 match = expected_ast == actual_ast
 print(f"  Line {i}: expected={e}")
 print(f"           actual=  {a}")
+
 def <genexpr>(.0):
     .0
     for (v, r) in .0:

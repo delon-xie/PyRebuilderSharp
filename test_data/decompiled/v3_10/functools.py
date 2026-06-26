@@ -11,6 +11,7 @@ from types import FunctionType, GenericAlias, MethodType, MappingProxyType, Unio
 from _thread import RLock
 WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
 WRAPPER_UPDATES = ('__dict__',)
+
 def update_wrapper(wrapper, wrapped, assigned, updated):
     """Update a wrapper function to look like the wrapped function
 
@@ -138,13 +139,14 @@ def _lt_from_ge(self, other):
         return op_result
     return not op_result
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
+
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     @()
     def <setcomp>(.0):
         .0
         {}
-        op = {op for op in '?' if getattr(.0, op, None) is not getattr(object, op, None)}
+        op = {op for op in .0 if getattr(.0, op, None) is not getattr(object, op, None)}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -163,6 +165,7 @@ try:
 except ImportError:
     pass
 _initial_missing = sentinel('_initial_missing')
+
 def reduce(function, sequence, /, initial):
     """
     reduce(function, iterable, /[, initial]) -> value
@@ -192,6 +195,7 @@ try:
     from _functools import reduce
 except ImportError:
     pass
+
 class _PlaceholderType:
     """The type of the Placeholder singleton.
 
@@ -199,6 +203,7 @@ class _PlaceholderType:
     """
     _PlaceholderType__instance = None
     __slots__ = []
+
     def __init_subclass__(cls):
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
 
@@ -213,6 +218,7 @@ class _PlaceholderType:
     def __reduce__(self):
         return 'Placeholder'
 Placeholder = _PlaceholderType()
+
 def _partial_prepare_merger(args):
     if not args:
         return (0, None)
@@ -284,6 +290,7 @@ class partial:
     __slots__ = ('func', 'args', 'keywords', '_phcount', '_merger', '__dict__', '__weakref__')
     __new__ = _partial_new
     __repr__ = recursive_repr()(_partial_repr)
+
     def __call__(self):
         phcount = self._phcount
         if phcount:
@@ -320,6 +327,7 @@ try:
     from _functools import partial, Placeholder, _PlaceholderType
 except ImportError:
     pass
+
 class partialmethod:
     """Method descriptor with partial application of the given arguments
     and keywords.
@@ -329,6 +337,7 @@ class partialmethod:
     """
     __new__ = _partial_new
     __repr__ = _partial_repr
+
     def _make_unbound_method(self):
         def _method(cls_or_self):
             phcount = cls_or_self._phcount
@@ -392,6 +401,7 @@ def _unwrap_partialmethod(func):
                 pass
     func = getattr(func, 'func')
 _CacheInfo = namedtuple('CacheInfo', ('hits', 'misses', 'maxsize', 'currsize'))
+
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
 
@@ -543,6 +553,7 @@ try:
     from _functools import _lru_cache_wrapper
 except ImportError:
     pass
+
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
     return lru_cache(maxsize=None)(user_function)
@@ -715,6 +726,7 @@ class singledispatchmethod:
 __build_class__(_singledispatchmethod_get, '_singledispatchmethod_get')
 (None,)
 _NOT_FOUND = object()
+
 class cached_property:
     def __init__(self, func):
         self.func = func

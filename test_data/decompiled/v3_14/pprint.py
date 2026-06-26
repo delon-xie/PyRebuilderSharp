@@ -30,6 +30,7 @@ import sys as _sys
 import types as _types
 from io import StringIO as _StringIO
 __all__ = ('pprint', 'pformat', 'isreadable', 'isrecursive', 'saferepr', 'PrettyPrinter', 'pp')
+
 def pprint(object, stream = None, indent = 1, width = 80, depth = None, *, compact, expand, sort_dicts, underscore_numbers):
     """Pretty-print a Python object to a stream [default is sys.stdout]."""
     printer = PrettyPrinter(underscore_numbers=underscore_numbers, sort_dicts=sort_dicts, expand=expand, compact=compact, depth=depth, width=width, indent=indent, stream=stream)
@@ -65,6 +66,7 @@ class _safe_key:
 
 """
     __slots__ = ['obj']
+
     def __init__(self, obj):
         self.obj = obj
 
@@ -212,6 +214,7 @@ class PrettyPrinter:
             self._format_namespace_items(items, stream, indent, allowance, context, level)
             stream.write(self._format_block_end(')', indent - self._indent_per_level))
     _dispatch = {}
+
     def _pprint_dict(self, object, stream, indent, allowance, context, level):
         """{"""
         write = stream.write
@@ -279,6 +282,7 @@ class PrettyPrinter:
     {}
     for _ in {}:
         pass
+
     def _pprint_list(self, object, stream, indent, allowance, context, level):
         """["""
         stream.write(self._format_block_start('[', indent))
@@ -602,6 +606,7 @@ class PrettyPrinter:
             self._format_items(items, stream, indent, allowance, context, level)
             stream.write(')')
     t = ('<f-string>')
+
     def _safe_repr(self, object, context, maxlevels, level):
         typ = type(object)
         if typ in _builtin_scalars:
@@ -638,6 +643,7 @@ class PrettyPrinter:
         __classdictcell__ = __classdict__
         return None
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})
+
 def _recursion(object):
     """<Recursion on """
     return f"<Recursion on {type(object).__name__} with id={id(object)}>"

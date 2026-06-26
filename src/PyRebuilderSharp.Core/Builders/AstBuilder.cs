@@ -1173,6 +1173,40 @@ public class AstBuilder
                 break;
             }
         }
+        // Pass 2: 前向扫描 — BUILD_SET 在前驱块（无 GET_ITER）中，找 LOAD_GLOBAL
+        foreach (var block in new[] { header }.Concat(header.Predecessors))
+        {
+            if (block.Instructions.Any(i => i.Opcode == Opcode.GET_ITER)) continue;
+            bool afterBuildSet = false;
+            for (int i = 0; i < block.Instructions.Count; i++)
+            {
+                var ins = block.Instructions[i];
+                if (!afterBuildSet && (ins.Opcode == Opcode.BUILD_SET
+                    || ins.Opcode == Opcode.BUILD_LIST || ins.Opcode == Opcode.BUILD_MAP))
+                { afterBuildSet = true; continue; }
+                if (!afterBuildSet) continue;
+                if (ins.Opcode == Opcode.LOAD_GLOBAL && ins.Argument.HasValue
+                    && ins.Argument.Value < _codeObject.Names.Count)
+                {
+                    string n = _codeObject.Names[ins.Argument.Value];
+                    if (n.StartsWith("__")) continue;
+                    return new Name(n, ExpressionContext.Load);
+                }
+                if (ins.Opcode == Opcode.LOAD_FAST && ins.Argument.HasValue
+                    && ins.Argument.Value < _codeObject.Varnames.Count)
+                    return new Name(_codeObject.Varnames[ins.Argument.Value], ExpressionContext.Load);
+                if (ins.Opcode == Opcode.LOAD_DEREF && ins.Argument.HasValue)
+                {
+                    int idx = ins.Argument.Value;
+                    if (idx < _codeObject.Cellvars.Count)
+                        return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
+                    int fi = idx - _codeObject.Cellvars.Count;
+                    if (fi < _codeObject.Freevars.Count)
+                        return new Name(_codeObject.Freevars[fi], ExpressionContext.Load);
+                    continue;
+                }
+            }
+        }
         return null;
     }
 
