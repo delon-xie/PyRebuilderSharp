@@ -51,7 +51,9 @@ public record FunctionDef(
     List<Expr>? Decorators = null,
     Expr? Returns = null,
     bool IsGenerator = false,
-    bool IsAsync = false
+    bool IsAsync = false,
+    int PosOnlyCount = 0,
+    int KwOnlyCount = 0
 ) : Stmt;
 
 public record AsyncFunctionDef(

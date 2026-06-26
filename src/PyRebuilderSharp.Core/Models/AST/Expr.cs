@@ -83,6 +83,8 @@ public record FunctionRef(Bytecode.CodeObject? Code, string Name) : Expr
 {
     /// <summary>默认参数值表达式列表，对应最后 N 个位置参数</summary>
     public List<Expr>? DefaultExprs { get; set; }
+    /// <summary>关键字参数默认值，对应 kwonly 参数</summary>
+    public Dictionary<string, Expr?>? KwDefaultExprs { get; set; }
 }
 
 // --- Walrus (NamedExpr) ---

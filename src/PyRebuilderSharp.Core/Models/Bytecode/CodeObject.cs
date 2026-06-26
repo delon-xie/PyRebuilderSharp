@@ -31,6 +31,7 @@ public class CodeObject
     // ---- 函数签名 ----
     public int ArgCount { get; set; }
     public int KwOnlyArgCount { get; set; }
+    public int PosOnlyArgCount { get; set; }
     public bool HasVarargs { get; set; }
     public bool HasVarkw { get; set; }
 

@@ -137,7 +137,7 @@ public class PycReader
             {
                 // Python 3.11+ TYPE_CODE: argcount, posonlyargcount, kwonlyargcount, stacksize, flags
                 // （无 nlocals — 由 localsplusnames+kinds 派生）
-                var posOnlyArgCount = br.ReadInt32();
+                code.PosOnlyArgCount = br.ReadInt32();
                 code.KwOnlyArgCount = br.ReadInt32();
                 var stacksize = br.ReadInt32();
                 var flags = br.ReadInt32();
@@ -148,7 +148,7 @@ public class PycReader
             else if (_strategy.HasPosOnlyArgCount && !isSimple)
             {
                 // Python 3.8+: argcount, posonlyargcount, kwonlyargcount, nlocals, stacksize, flags
-                var posOnlyArgCount = br.ReadInt32();
+                code.PosOnlyArgCount = br.ReadInt32();
                 code.KwOnlyArgCount = br.ReadInt32();
                 var nlocals = br.ReadInt32();
                 var stacksize = br.ReadInt32();

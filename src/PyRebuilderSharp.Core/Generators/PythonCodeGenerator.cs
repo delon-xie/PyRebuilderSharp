@@ -338,9 +338,29 @@ public class PythonCodeGenerator : ICodeGenerator
         _output.Append(func.Name);
         _output.Append("(");
 
-        for (int i = 0; i < func.Args.Count; i++)
+        int posOnlyCount = func.PosOnlyCount;
+        int kwOnlyCount = func.KwOnlyCount;
+        int totalArgs = func.Args.Count;
+        int kwOnlyStart = totalArgs - kwOnlyCount; // where kwonly args begin
+
+        for (int i = 0; i < totalArgs; i++)
         {
             if (i > 0) _output.Append(", ");
+
+            // Positional-only separator: after posOnlyCount args, emit "/"
+            if (i == posOnlyCount && posOnlyCount > 0)
+            {
+                if (i == kwOnlyStart && kwOnlyCount > 0)
+                    _output.Append("/, *"); // both / and * at same position
+                else
+                    _output.Append("/");
+                _output.Append(", ");
+            }
+            else if (i == kwOnlyStart && kwOnlyCount > 0)
+            {
+                _output.Append("*, ");
+            }
+
             VisitParameter(func.Args[i]);
         }
 

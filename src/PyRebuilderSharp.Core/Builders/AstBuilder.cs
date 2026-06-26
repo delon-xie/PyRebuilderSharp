@@ -536,7 +536,8 @@ public class AstBuilder
                     ConvertAugAssign(funcDef.Body),
                     funcDef.Decorators,
                     funcDef.Returns,
-                    funcDef.IsGenerator, funcDef.IsAsync));
+                    funcDef.IsGenerator, funcDef.IsAsync,
+                    funcDef.PosOnlyCount, funcDef.KwOnlyCount));
             }
             else if (stmt is ClassDef classDef)
             {
@@ -4284,13 +4285,31 @@ public class AstBuilder
 
         // 1. 提取函数参数
         var args = new List<Parameter>();
-        for (int i = 0; i < childCode.ArgCount && i < childCode.Varnames.Count; i++)
+        var varnames = childCode.Varnames;
+        int posOnlyCount = childCode.PosOnlyArgCount;
+        int totalPosArgs = childCode.ArgCount;  // posonly + positional-or-keyword
+        int kwOnlyCount = childCode.KwOnlyArgCount;
+        int kwOnlyStart = totalPosArgs;  // kwonly args start after all positional args
+
+        // 1a. Positional-only args: indices [0, posOnlyCount)
+        for (int i = 0; i < posOnlyCount && i < varnames.Count; i++)
+            args.Add(new Parameter(varnames[i]));
+
+        // 1b. Positional-or-keyword args: indices [posOnlyCount, totalPosArgs)
+        for (int i = posOnlyCount; i < totalPosArgs && i < varnames.Count; i++)
+            args.Add(new Parameter(varnames[i]));
+
+        // 1c. Keyword-only args: indices [kwOnlyStart, kwOnlyStart + kwOnlyCount)
+        for (int i = kwOnlyStart; i < kwOnlyStart + kwOnlyCount && i < varnames.Count; i++)
         {
-            args.Add(new Parameter(childCode.Varnames[i]));
+            var param = new Parameter(varnames[i]);
+            // Attach kwdefault if available
+            if (funcRef.KwDefaultExprs?.TryGetValue(varnames[i], out var kwDefault) == true && kwDefault != null)
+                param = param with { Default = kwDefault };
+            args.Add(param);
         }
 
-        // 1.5 设置默认参数值（从 FunctionRef.DefaultExprs 获取）
-        //    defaults 列表对应最后 N 个位置参数（从后往前）
+        // 1d. Set default values for trailing positional args (from DefaultExprs)
         if (funcRef.DefaultExprs != null && funcRef.DefaultExprs.Count > 0)
         {
             int startIdx = args.Count - funcRef.DefaultExprs.Count;
@@ -4334,7 +4353,9 @@ public class AstBuilder
             args,
             body,
             IsGenerator: childCode.IsGenerator,
-            IsAsync: childCode.IsCoroutine || childCode.IsAsyncGenerator
+            IsAsync: childCode.IsCoroutine || childCode.IsAsyncGenerator,
+            PosOnlyCount: posOnlyCount,
+            KwOnlyCount: kwOnlyCount
         );
     }
 

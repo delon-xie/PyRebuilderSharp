@@ -1428,6 +1428,30 @@ public class StackMachine
                                     .Select(v => new Constant(v) as Expr).ToList();
                         }
 
+                        // Store kwdefaults (keyword-only arg defaults)
+                        if (kwDefaults != null)
+                        {
+                            if (kwDefaults is DictLiteral dictLit)
+                            {
+                                funcRef.KwDefaultExprs = new Dictionary<string, Expr?>();
+                                foreach (var entry in dictLit.Entries)
+                                {
+                                    if (entry.Key is Constant keyConst && keyConst.Value is string keyStr)
+                                        funcRef.KwDefaultExprs[keyStr] = entry.Value;
+                                }
+                            }
+                            else if (kwDefaults is Constant kdc
+                                && kdc.Value is System.Collections.IDictionary dict)
+                            {
+                                funcRef.KwDefaultExprs = new Dictionary<string, Expr?>();
+                                foreach (System.Collections.DictionaryEntry entry in dict)
+                                {
+                                    if (entry.Key is string keyStr)
+                                        funcRef.KwDefaultExprs[keyStr] = new Constant(entry.Value);
+                                }
+                            }
+                        }
+
                         // 后备：当块分拆导致 StackMachine 栈为空时，从指令列表回溯查找 defaults 常量
                         if (funcRef.DefaultExprs == null && (flags & 0x01) != 0 && childCode != null)
                         {
