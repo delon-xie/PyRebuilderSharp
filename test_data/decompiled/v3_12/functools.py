@@ -28,7 +28,8 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
             value = getattr(wrapped, attr)
         except AttributeError:
             pass
-        setattr(wrapper, attr, value)
+        else:
+            setattr(wrapper, attr, value)
     for attr in updated:
         getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     wrapper.__wrapped__ = wrapped
@@ -735,7 +736,6 @@ class _singledispatchmethod_get:
         else:
             return 0
         self.__doc__ = func.__doc__
-        raise
 
     def __repr__(self):
         return f"<bound single dispatch method {name} of {self._obj!r}>"
@@ -786,6 +786,4 @@ class cached_property:
         else:
             return val
         return val
-        raise
     __class_getitem__ = classmethod(GenericAlias)
-raise

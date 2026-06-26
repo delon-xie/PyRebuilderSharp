@@ -187,7 +187,6 @@ class _proto_member:
             else:
                 enum_member = enum_class._new_member_(enum_class, **args)
                 None
-        raise
 
 class EnumDict(dict):
     """
@@ -371,7 +370,6 @@ class EnumType(type):
   {enum_class._member_names_!r}
   {_order_!r}")
         return enum_class
-        raise
 
     def __bool__(cls):
         """
@@ -522,7 +520,6 @@ class EnumType(type):
                 names.append((name, value))
         _make_class_unpicklable(classdict)
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
-        raise
 
     def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
         """

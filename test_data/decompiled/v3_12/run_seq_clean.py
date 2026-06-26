@@ -54,4 +54,3 @@ passed = sum(<genexpr>())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-raise

@@ -3203,7 +3203,6 @@ def fib(n):
 """
         compile(s1, '<string>', 'exec')
         compile(s2, '<string>', 'exec')
-        raise
 
     def test_continuation_bad_indentation(self):
         """\

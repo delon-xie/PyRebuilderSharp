@@ -60,4 +60,3 @@ for i in range(max(len(exp_lines), len(act_lines))):
             else:
                 print('  Line %d: expected=%s' % (i, e))
                 print('           actual=  %s' % a)
-raise

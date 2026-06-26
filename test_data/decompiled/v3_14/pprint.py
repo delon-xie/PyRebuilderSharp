@@ -497,7 +497,6 @@ class PrettyPrinter:
                 pass
             else:
                 return 1
-        raise
 
     def _repr(self, object, context, level):
         if not readable:

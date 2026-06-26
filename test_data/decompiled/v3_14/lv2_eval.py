@@ -14,4 +14,5 @@ for n in range(5):
         f = open('test.txt')
     except IOError:
         f = None
-    return None
+    else:
+        return None

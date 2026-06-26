@@ -63,5 +63,6 @@ for ver in []:
                                             pass
                                         except Exception:
                                             pass
-                                        print(f"  Line {i}: expected={e}
+                                        else:
+                                            print(f"  Line {i}: expected={e}
            actual=  {a}")

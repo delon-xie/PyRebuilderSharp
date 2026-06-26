@@ -3182,7 +3182,36 @@ public class AstBuilder
         {
             var etTry = BuildTryFromExceptionTable(block, visited);
             if (etTry != null)
-                return etTry;
+            {
+                // 处理 try/except 的 else 体：follow try body 后继中未被 visited 的块。
+                // 在 for 循环体内，else 体位于 try body 的 POP_BLOCK 之后（ET 范围外），
+                // 作为 entry block 的直接后继而非 handler 后继。
+                // 参考 CPython 3.12: compiler_try_except 生成 POP_BLOCK → else_body → JUMP → end
+                var tryStmtsList = new List<Stmt>();
+                foreach (var s in etTry) tryStmtsList.Add(s);
+                
+                // 合并 else 体到 Try 节点的 Orelse 中
+                for (int ti = 0; ti < tryStmtsList.Count; ti++)
+                {
+                    if (tryStmtsList[ti] is Try tryNode && tryNode.Handlers.Count > 0 && (tryNode.Orelse == null || tryNode.Orelse.Count == 0))
+                    {
+                        var elseStmts = new List<Stmt>();
+                        foreach (var succ in block.Successors)
+                        {
+                            if (!visited.Contains(succ))
+                            {
+                                var elseBlockStmts = GetStructuredBlockStmts(succ, visited);
+                                elseStmts.AddRange(elseBlockStmts);
+                            }
+                        }
+                        if (elseStmts.Count > 0)
+                            tryStmtsList[ti] = new Try(tryNode.Body, tryNode.Handlers,
+                                elseStmts, tryNode.Finalbody);
+                        break;
+                    }
+                }
+                return tryStmtsList;
+            }
         }
 
         // 检测 if/else 条件分支
