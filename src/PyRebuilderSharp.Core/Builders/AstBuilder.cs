@@ -1516,6 +1516,20 @@ public class AstBuilder
                 .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
             if (hdrJump.Argument.HasValue)
                 scanEnd = hdrJump.Offset + 2 + hdrJump.Argument.Value;
+            else
+            {
+                // handler 本身可能没有 JUMP_FORWARD（只有 CHECK_EXC_MATCH），
+                // 其后的 except 体块可能有 JUMP_FORWARD 标记 else 体边界。
+                var afterHandler = _sortedBlocks
+                    .FirstOrDefault(b => b.StartOffset > handlerBlock.StartOffset && !visited.Contains(b));
+                if (afterHandler != null)
+                {
+                    var excJump = afterHandler.Instructions
+                        .FirstOrDefault(i => i.Opcode == Opcode.JUMP_FORWARD && i.Argument.HasValue);
+                    if (excJump.Argument.HasValue)
+                        scanEnd = excJump.Offset + 2 + excJump.Argument.Value;
+                }
+            }
 
             var elseCandidates = _sortedBlocks
                 .Where(b => b.StartOffset > scanStart
@@ -1523,6 +1537,7 @@ public class AstBuilder
                     && !visited.Contains(b))
                 .OrderBy(b => b.StartOffset)
                 .ToList();
+            Console.Error.WriteLine($"[ET_ELSE] found {elseCandidates.Count} candidates: {string.Join(",", elseCandidates.Select(b => $"{b.Id}@{b.StartOffset}"))}");
             if (elseCandidates.Count > 0)
             {
                 elseBody = new List<Stmt>();
