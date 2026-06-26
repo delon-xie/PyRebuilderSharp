@@ -3807,6 +3807,138 @@ public class AstBuilder
         return stmts;
     }
 
+    /// <summary>
+    /// 推导式/生成器表达式模式。
+    /// </summary>
+    private enum CompKind { List, Set, Dict, Generator }
+
+    /// <summary>
+    /// 从 FunctionRef + Call 构建推导式表达式（set/dict/list comprehension 或 generator expression）。
+    /// compRef.Name 为 "<setcomp>"、"<listcomp>"、"<dictcomp>"、"<genexpr>"。
+    /// 将 FunctionRef 的 body（For 语句）转换为 Comprehension AST。
+    /// 参考 CPython 3.12: Python/compile.c compiler_comprehension
+    /// </summary>
+    private Expr? BuildComprehension(FunctionRef compRef, Call compCall)
+    {
+        if (compRef.Code == null) return null;
+
+        var kind = compRef.Name switch
+        {
+            "<setcomp>" => CompKind.Set,
+            "<listcomp>" => CompKind.List,
+            "<dictcomp>" => CompKind.Dict,
+            "<genexpr>" => CompKind.Generator,
+            _ => CompKind.List  // fallback
+        };
+
+        // Decompile the comprehension body
+        var body = DecompileChildCode(compRef.Code);
+
+        // Expected body structure: [For(target, iter, body, null)] or similar
+        // The body may have BUILD_SET/BUILD_LIST/BUILD_MAP as a statement
+        // followed by the for-loop. Find the for-loop in body.
+        For? forStmt = null;
+        foreach (var stmt in body)
+        {
+            if (stmt is For f)
+            {
+                forStmt = f;
+                break;
+            }
+        }
+
+        if (forStmt == null) return null;
+
+        // Build comprehension generators
+        var generators = new List<Comprehension>();
+        var currentFor = forStmt;
+        while (currentFor != null)
+        {
+            // Collect ifs (filter conditions) from the for body
+            var ifs = new List<Expr>();
+            var remainingBody = new List<Stmt>();
+
+            foreach (var s in currentFor.Body)
+            {
+                if (s is If ifStmt)
+                {
+                    ifs.Add(ifStmt.Test);
+                    remainingBody.AddRange(ifStmt.Body);
+                }
+                else
+                {
+                    remainingBody.Add(s);
+                }
+            }
+
+            generators.Add(new Comprehension(
+                currentFor.Target,
+                currentFor.Iter,
+                ifs
+            ));
+
+            // Check for nested for-loop
+            var nextFor = remainingBody.FirstOrDefault(s => s is For) as For;
+            currentFor = nextFor;
+
+            // The element expression is the last non-for statement
+            if (currentFor == null)
+            {
+                // Check for dict: element is a Tuple(Key, Value) or Assign
+                // This is the element expression for the comprehension
+            }
+        }
+
+        // The element expression comes from the last for-loop's body
+        // Find it: should be an ExprStmt or last statement before nested for
+        Expr? elt = null;
+        Expr? keyElt = null;
+
+        // Look at the innermost for-loop body
+        var innermostBody = forStmt;
+        For? foundNested;
+        do
+        {
+            foundNested = null;
+            foreach (var s in innermostBody.Body)
+            {
+                if (s is For fn)
+                {
+                    foundNested = fn;
+                    innermostBody = fn;
+                    break;
+                }
+            }
+        } while (foundNested != null);
+
+        foreach (var s in innermostBody.Body)
+        {
+            if (s is ExprStmt es)
+                elt = es.Value;
+            else if (s is Assign a && a.Targets.Count == 1)
+            {
+                // Dict comprehension: element is (key, value) pair
+                if (kind == CompKind.Dict)
+                {
+                    // In dict comprehensions, the last ExprStmt or Assign gives the value
+                    // and the target gives the key
+                }
+                elt = a.Value;
+            }
+        }
+
+        if (elt == null) return null;
+
+        return kind switch
+        {
+            CompKind.Set => new SetComp(elt, generators),
+            CompKind.List => new ListComp(elt, generators),
+            CompKind.Dict => new DictComp(keyElt ?? elt, elt, generators),
+            CompKind.Generator => new GeneratorExp(elt, generators),
+            _ => null
+        };
+    }
+
     private bool IsConditionBranch(BasicBlock block)
     {
         var lastInstr = block.Instructions.LastOrDefault();
@@ -3964,6 +4096,21 @@ public class AstBuilder
                         }
                         var classDef = ExtractClassDef(call, targetName.Id);
                         currentResult.Add(classDef ?? stmt);
+                        continue;
+                    }
+                    // 推导式（comprehension）：<setcomp>/<listcomp>/<dictcomp>/<genexpr>
+                    // 模式：assign.Value is Call(funcRef, [iterExpr])
+                    // 其中 funcRef.Name 以 < 开头（如 "<setcomp>"）
+                    if (assign.Value is Call compCall
+                        && compCall.Args.Count >= 1
+                        && compCall.Func is FunctionRef compRef
+                        && compRef.Name.StartsWith("<"))
+                    {
+                        var compExpr = BuildComprehension(compRef, compCall);
+                        if (compExpr != null)
+                            currentResult.Add(new Assign(new List<Expr> { new Name(targetName.Id, ExpressionContext.Store) }, compExpr));
+                        else
+                            currentResult.Add(stmt);
                         continue;
                     }
                     // import

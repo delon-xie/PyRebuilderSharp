@@ -173,6 +173,64 @@ public class PythonCodeGenerator : ICodeGenerator
             case SetLiteral sl:
                 VisitSetLiteral(sl);
                 break;
+            case SetComp sc:
+                _output.Append("{");
+                Visit(sc.Elt);
+                _output.Append(" for ");
+                Visit(sc.Generators[0].Target);
+                _output.Append(" in ");
+                Visit(sc.Generators[0].Iter);
+                foreach (var ifExpr in sc.Generators[0].Ifs)
+                {
+                    _output.Append(" if ");
+                    Visit(ifExpr);
+                }
+                _output.Append("}");
+                break;
+            case ListComp lc:
+                _output.Append("[");
+                Visit(lc.Elt);
+                _output.Append(" for ");
+                Visit(lc.Generators[0].Target);
+                _output.Append(" in ");
+                Visit(lc.Generators[0].Iter);
+                foreach (var ifExpr in lc.Generators[0].Ifs)
+                {
+                    _output.Append(" if ");
+                    Visit(ifExpr);
+                }
+                _output.Append("]");
+                break;
+            case DictComp dc:
+                _output.Append("{");
+                Visit(dc.Key);
+                _output.Append(": ");
+                Visit(dc.Value);
+                _output.Append(" for ");
+                Visit(dc.Generators[0].Target);
+                _output.Append(" in ");
+                Visit(dc.Generators[0].Iter);
+                foreach (var ifExpr in dc.Generators[0].Ifs)
+                {
+                    _output.Append(" if ");
+                    Visit(ifExpr);
+                }
+                _output.Append("}");
+                break;
+            case GeneratorExp ge:
+                _output.Append("(");
+                Visit(ge.Elt);
+                _output.Append(" for ");
+                Visit(ge.Generators[0].Target);
+                _output.Append(" in ");
+                Visit(ge.Generators[0].Iter);
+                foreach (var ifExpr in ge.Generators[0].Ifs)
+                {
+                    _output.Append(" if ");
+                    Visit(ifExpr);
+                }
+                _output.Append(")");
+                break;
             case NamedExpr ne:
                 Visit(ne.Target);
                 _output.Append(" := ");

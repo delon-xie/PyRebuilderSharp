@@ -113,6 +113,12 @@ public class VersionStrategy312 : VersionStrategyBase
             49 => Models.Bytecode.Opcode.WITH_EXCEPT_START_312,
             53 => Models.Bytecode.Opcode.BEFORE_WITH_312,
 
+            // 推导式操作码（3.12 原始值不同于 3.13+ 的重新编号）
+            // CPython 3.12 Include/opcode.h: SET_ADD=17, LIST_APPEND=18, MAP_ADD=19
+            17 => Models.Bytecode.Opcode.SET_ADD_313,      // 3.12 raw 17 → SET_ADD (3.13+ enum=239)
+            18 => Models.Bytecode.Opcode.LIST_APPEND_313,   // 3.12 raw 18 → LIST_APPEND (3.13+ enum=236)
+            19 => Models.Bytecode.Opcode.MAP_ADD_313,       // 3.12 raw 19 → MAP_ADD (3.13+ enum=237)
+
             90 => Models.Bytecode.Opcode.STORE_NAME,
             111 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,
             112 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,

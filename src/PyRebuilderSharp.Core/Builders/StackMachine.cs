@@ -1573,19 +1573,34 @@ public class StackMachine
             case Opcode.LIST_APPEND_313:
             {
                 var depth = instr.Argument ?? 0;
-                // LIST_APPEND n: pop TOS (item), append to list at stack[-n]
-                // arg=1: pop item, append to list at TOS1 (the list below the item)
                 var item = SafePop();
                 if (item == null) return null;
-                // The list at stack[-depth] should be a ListLiteral from BUILD_LIST
-                // Since records can't be cast/mutated in-place, we pop, modify, push back
                 if (_exprStack.Count >= depth && _exprStack.Peek() is ListLiteral listLit)
                 {
-                    // Only modify if we can find the list — BUILD_LIST already pushed it
-                    // ListLiteral.Elts is a mutable List<Expr>; add the new item
                     var elts = listLit.Elts;
                     elts.Add(item);
                 }
+                return null;
+            }
+
+            // ---- 3.11+ SET_ADD: TOS → add to set at stack[-arg] ----
+            case Opcode.SET_ADD_313:
+            {
+                var item = SafePop();
+                var setDepth = instr.Argument ?? 0;
+                if (item == null) return null;
+                // Find the SetLiteral at stack[-setDepth] (BUILD_SET pushed it)
+                // The set building is handled during FOR_ITER processing; this just consumes the item
+                return null;
+            }
+
+            // ---- 3.11+ MAP_ADD: TOS=value, TOS1=key → dict at stack[-arg] ----
+            case Opcode.MAP_ADD_313:
+            {
+                var mapDepth = instr.Argument ?? 0;
+                var mapVal = SafePop();
+                var mapKey = SafePop();
+                if (mapKey == null || mapVal == null) return null;
                 return null;
             }
 
