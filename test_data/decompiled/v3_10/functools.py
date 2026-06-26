@@ -510,7 +510,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 link = link_next(key)
                 (link_prev, link_next, _key, result) = link
                 last = .cell[key]
-                yield from last
+                yield from hits
                 last + 1(None, None, None)
                 return kwds
                 yield from .cell + 1
@@ -605,7 +605,7 @@ def _c3_mro(cls, abcs):
             explicit_bases = list(cls.__bases__[:boundary])
             abstract_bases = []
             other_bases = list(cls.__bases__[boundary:])
-            cls
+            abcs
             _ = [_ for _ in '?' if issubclass(cls, base) and not cls((any)(_c3_mro.<locals>.<genexpr>))]
             for _ in abstract_bases:
                 abcs.remove(base)
@@ -641,15 +641,15 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    found
+    type_set
     set(types)
-    sub
-    (typ)(_compose_mro.<locals>.<listcomp>)
+    types
+    (is_strict_base)(_compose_mro.<locals>.<listcomp>)
     _compose_mro.<locals>.is_strict_base
-    (sub)
-    (mro)(_compose_mro.<locals>.<listcomp>)
+    (types)
+    (is_related)(_compose_mro.<locals>.<listcomp>)
     _compose_mro.<locals>.is_related
-    (set(cls.__mro__), cls)
+    (set(cls.__mro__), bases)
     typ = [[sub for sub in '?' if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
     return _c3_mro(cls, abcs=mro)
 

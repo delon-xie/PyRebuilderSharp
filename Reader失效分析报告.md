@@ -126,10 +126,15 @@ MarshalType.TYPE_STRING => ReadMarshalBytesDirect(br), // 115 = 0x73
 ```csharp
 switch (kind)
 {
-    case 2: freevars.Add(localsplusnames[i]); break;
-    case 1: cellvars.Add(localsplusnames[i]); break;
-    default:
-    case 0: varnames.Add(localsplusnames[i]); break;
+    // localspluskinds uses bit flags matching CPython's CO_FAST_* constants:
+    // CO_FAST_LOCAL=0x20, CO_FAST_CELL=0x40, CO_FAST_FREE=0x80
+    // NOT simple 0/1/2 values!
+    if ((kind & 0x80) != 0)        // CO_FAST_FREE
+        freevars.Add(localsplusnames[i]);
+    else if ((kind & 0x40) != 0)   // CO_FAST_CELL
+        cellvars.Add(localsplusnames[i]);
+    else                            // CO_FAST_LOCAL (0x20) or HIDDEN
+        varnames.Add(localsplusnames[i]);
 }
 ```
 

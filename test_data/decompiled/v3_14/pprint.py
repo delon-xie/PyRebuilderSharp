@@ -640,7 +640,7 @@ class PrettyPrinter:
     with ('<f-string>') as t:
         _safe_repr = _safe_repr
         __static_attributes__ = ('_compact', '_depth', '_expand', '_indent_per_level', '_readable', '_recursive', '_sort_dicts', '_stream', '_underscore_numbers', '_width')
-        __classdictcell__ = __classdict__
+        __classdictcell__ = indent
         return None
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})
 

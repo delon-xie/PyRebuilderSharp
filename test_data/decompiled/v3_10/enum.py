@@ -1304,7 +1304,7 @@ def _simple_enum(etype, *, boundary, use_args):
     def convert_class(cls):
         cls_name = cls.__name__
         if __new__ is None:
-            __new__
+            use_args
             cls_name._use_args_
         __new__ = cls.__dict__.get('__new__')
         if __new__ is not None:

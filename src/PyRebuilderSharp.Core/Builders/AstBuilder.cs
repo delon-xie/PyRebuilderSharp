@@ -1149,11 +1149,27 @@ public class AstBuilder
                 if (ins.Opcode == Opcode.LOAD_DEREF && ins.Argument.HasValue)
                 {
                     int idx = ins.Argument.Value;
-                    if (idx < _codeObject.Cellvars.Count)
-                        return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
-                    int fi = idx - _codeObject.Cellvars.Count;
-                    if (fi < _codeObject.Freevars.Count)
-                        return new Name(_codeObject.Freevars[fi], ExpressionContext.Load);
+                    // 3.11+ localsplus: [varnames | cellvars | freevars]
+                    // pre-3.11:         [cellvars | freevars]
+                    if (_codeObject.Version >= PythonVersion.Py311)
+                    {
+                        if (idx < _codeObject.Varnames.Count)
+                            return new Name(_codeObject.Varnames[idx], ExpressionContext.Load);
+                        idx -= _codeObject.Varnames.Count;
+                        if (idx < _codeObject.Cellvars.Count)
+                            return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
+                        idx -= _codeObject.Cellvars.Count;
+                        if (idx < _codeObject.Freevars.Count)
+                            return new Name(_codeObject.Freevars[idx], ExpressionContext.Load);
+                    }
+                    else
+                    {
+                        if (idx < _codeObject.Cellvars.Count)
+                            return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
+                        int fi = idx - _codeObject.Cellvars.Count;
+                        if (fi < _codeObject.Freevars.Count)
+                            return new Name(_codeObject.Freevars[fi], ExpressionContext.Load);
+                    }
                     continue;
                 }
                 if (ins.Opcode == Opcode.LOAD_CONST || ins.Opcode == Opcode.BUILD_SET
@@ -1198,11 +1214,27 @@ public class AstBuilder
                 if (ins.Opcode == Opcode.LOAD_DEREF && ins.Argument.HasValue)
                 {
                     int idx = ins.Argument.Value;
-                    if (idx < _codeObject.Cellvars.Count)
-                        return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
-                    int fi = idx - _codeObject.Cellvars.Count;
-                    if (fi < _codeObject.Freevars.Count)
-                        return new Name(_codeObject.Freevars[fi], ExpressionContext.Load);
+                    // 3.11+ localsplus: [varnames | cellvars | freevars]
+                    // pre-3.11:         [cellvars | freevars]
+                    if (_codeObject.Version >= PythonVersion.Py311)
+                    {
+                        if (idx < _codeObject.Varnames.Count)
+                            return new Name(_codeObject.Varnames[idx], ExpressionContext.Load);
+                        idx -= _codeObject.Varnames.Count;
+                        if (idx < _codeObject.Cellvars.Count)
+                            return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
+                        idx -= _codeObject.Cellvars.Count;
+                        if (idx < _codeObject.Freevars.Count)
+                            return new Name(_codeObject.Freevars[idx], ExpressionContext.Load);
+                    }
+                    else
+                    {
+                        if (idx < _codeObject.Cellvars.Count)
+                            return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
+                        int fi = idx - _codeObject.Cellvars.Count;
+                        if (fi < _codeObject.Freevars.Count)
+                            return new Name(_codeObject.Freevars[fi], ExpressionContext.Load);
+                    }
                     continue;
                 }
             }

@@ -135,7 +135,7 @@ def abstractmethod(funcobj):
   code (bytecodes)              consts
   consts                       names
   names                        localsplusnames ← NEW! 合并 varnames+freevars+cellvars
-  varnames                     localspluskinds ← NEW! 类型位: 0=varname 1=cellvar 2=freevar
+  varnames                     localspluskinds ← NEW! 类型位: bit flags 0x20=local 0x40=cell 0x80=free
   freevars                     filename
   cellvars                     name
   filename                     qualname ← NEW!

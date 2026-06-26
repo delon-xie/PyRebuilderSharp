@@ -939,9 +939,9 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         new_member = __new__.__func__
         new_member = etype._member_type_.__new__
         etype._use_args_
-        .freevar_2
-        .freevar_1
-        .freevar_0
+        use_args
+        etype
+        boundary
         attrs = {}
         body = {}
         if issubclass(etype, Flag) and not boundary:

@@ -433,22 +433,22 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     else:
         def wrapper():
             key = make_key(args, kwds, typed)
-            .freevar_15
-            .freevar_14
-            .freevar_13
-            .freevar_12
-            .freevar_11
-            .freevar_10
-            .freevar_9
-            .freevar_8
-            .freevar_7
-            .freevar_6
-            .freevar_5
-            .freevar_4
-            .freevar_3
-            .freevar_2
-            .freevar_1
-            .freevar_0
+            user_function
+            typed
+            root
+            misses
+            maxsize
+            make_key
+            lock
+            hits
+            full
+            cache_len
+            cache_get
+            cache
+            RESULT
+            PREV
+            NEXT
+            KEY
             link = cache_get(key)
             (link_prev, link_next, _key, result) = link
             last = root[PREV]
@@ -474,23 +474,23 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
         def cache_info():
             """Report cache statistics"""
-            .freevar_5
-            .freevar_4
-            .freevar_3
-            .freevar_2
-            .freevar_1
-            .freevar_0
+            misses
+            maxsize
+            lock
+            hits
+            cache_len
+            _CacheInfo
             _CacheInfo(hits, misses, maxsize, cache_len())
             None(None)
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
-            .freevar_5
-            .freevar_4
-            .freevar_3
-            .freevar_2
-            .freevar_1
-            .freevar_0
+            root
+            misses
+            lock
+            hits
+            full
+            cache
             cache.clear()
             False
             0
@@ -584,8 +584,8 @@ def _compose_mro(cls, types):
     []
     n = [n for n in '?' if not is_related(n)]
     def is_strict_base(typ):
-        .freevar_0
-        for other in .freevar_0:
+        types
+        for other in types:
             if not typ != other:
                 pass
             elif not typ in other.__mro__:
@@ -598,7 +598,7 @@ def _compose_mro(cls, types):
     n = [n for n in '?' if is_strict_base(n)]
     type_set = set(types)
     mro = []
-    typ = [[sub for sub in typ if not sub not in bases] for typ in set if not found]
+    typ = [[sub for sub in typ if not sub not in cls] for typ in types if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

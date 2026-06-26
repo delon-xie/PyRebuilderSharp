@@ -899,7 +899,7 @@ def _simple_enum(etype, *, boundary, use_args):
         __new__ = cls.__dict__.get('__new__')
         cls_name = cls.__name__
         if __new__ is None:
-            __new__
+            use_args
             cls_name._use_args_
         setattr(enum_class, name, enum_method)
         gnv_last_values = []

@@ -862,7 +862,7 @@ def unique(enumeration):
     return enumeration
 
 def _dataclass_repr(self):
-    return <genexpr>(dcf.keys())
+    return <genexpr>(self.keys())
 
 def global_enum_repr(self):
     """
@@ -929,9 +929,9 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         new_member = etype._member_type_.__new__
         cls.__dict__.get
         etype._use_args_
-        .freevar_2
-        .freevar_1
-        .freevar_0
+        use_args
+        etype
+        boundary
         attrs = {}
         body = {}
         if issubclass(etype, Flag) and boundary:

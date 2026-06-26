@@ -426,15 +426,15 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    found
+    type_set
     set(types)
-    sub
-    (typ)(_compose_mro.<locals>.<listcomp>)
+    types
+    (is_strict_base)(_compose_mro.<locals>.<listcomp>)
     _compose_mro.<locals>.is_strict_base
-    (sub)
-    (mro)(_compose_mro.<locals>.<listcomp>)
+    (types)
+    (is_related)(_compose_mro.<locals>.<listcomp>)
     _compose_mro.<locals>.is_related
-    (set(cls.__mro__), cls)
+    (set(cls.__mro__), bases)
     typ = [[sub for sub in sub if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
     return _c3_mro(cls, abcs=mro)
 

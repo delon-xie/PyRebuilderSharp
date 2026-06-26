@@ -114,7 +114,7 @@ Phase 4 P0-1 发现了 Python 3.11+ marshal 格式的根本性变化并逐一修
   code (bytecodes)              consts
   consts                       names
   names                        localsplusnames ← 合并 varnames+freevars+cellvars
-  varnames                     localspluskinds ← 类型位: 0=varname 1=cellvar 2=freevar
+  varnames                     localspluskinds ← 0x20=local 0x40=cell 0x80=free
   freevars                     filename
   cellvars                     name
   filename                     qualname ← 新增
@@ -444,7 +444,7 @@ v3.10- format:                v3.11+ format:
   code (bytecodes)              consts
   consts                       names
   names                        localsplusnames (merged varnames+freevars+cellvars)
-  varnames                     localspluskinds (0=varname 1=cellvar 2=freevar)
+  varnames                     localspluskinds (0x20=local 0x40=cell 0x80=free)
   freevars                     filename
   cellvars                     name
   filename                     qualname ← NEW

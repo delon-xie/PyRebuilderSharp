@@ -443,20 +443,20 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     else:
         def wrapper():
             key = make_key(args, kwds, typed)
-            .freevar_13
-            .freevar_12
-            .freevar_11
-            .freevar_10
-            .freevar_9
-            .freevar_8
-            .freevar_7
-            .freevar_6
-            .freevar_5
-            .freevar_4
-            .freevar_3
-            .freevar_2
-            .freevar_1
-            .freevar_0
+            root
+            misses
+            maxsize
+            make_key
+            lock
+            hits
+            full
+            cache_len
+            cache_get
+            cache
+            RESULT
+            PREV
+            NEXT
+            KEY
             link = cache_get(key)
             (link_prev, link_next, _key, result) = link
             last = root[PREV]
@@ -480,19 +480,19 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 return result
         def cache_info():
             """Report cache statistics"""
-            .freevar_3
-            .freevar_2
-            .freevar_1
-            .freevar_0
+            lock
+            hits
+            cache_len
+            _CacheInfo
             _CacheInfo(hits, misses, maxsize, cache_len())
             None(None)
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
-            .freevar_3
-            .freevar_2
-            .freevar_1
-            .freevar_0
+            lock
+            hits
+            full
+            cache
             cache()
             False
             0
@@ -549,8 +549,8 @@ def _c3_mro(cls, abcs = None):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
-    for (i, base) in enumerate(reversed(cls.__bases__)):
-        if hasattr(base, '__abstractmethods__'):
+    for (i, cell_10) in enumerate(reversed(cls.__bases__)):
+        if hasattr(abcs, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
         else:
             0
@@ -561,7 +561,7 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                base = [base for base in '?' if issubclass(cls, base)]
+                cell_10 = [cell_10 for cell_10 in abcs if issubclass(cls, abcs)]
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -577,7 +577,7 @@ def _compose_mro(cls, types):
     <listcomp>()
     is_related
     set(cls.__mro__)
-    typ = [[found for sub in '?' if (sub not in bases) and issubclass(cls, sub) if not True] for typ in '?']
+    typ = [[found for sub in '?' if (sub not in cls) and issubclass(cls, sub) if not True] for typ in types]
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.

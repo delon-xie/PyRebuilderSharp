@@ -612,7 +612,7 @@ def _compose_mro(cls, types):
     _ = [n() for _ in '?']
     type_set = set(types)
     mro = []
-    typ = [[sub for sub in '?' if not sub not in bases] for typ in set if not found]
+    typ = [[sub for sub in '?' if not sub not in cls] for typ in types if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

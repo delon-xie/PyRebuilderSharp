@@ -204,14 +204,40 @@ public class StackMachine
             {
                 var idx = instr.Argument ?? 0;
                 string cellName;
-                // CPython 3.12+ uses varname index for cell variables,
-                // and len(varnames) + freevar_index for free variables
-                if (idx < _code.Varnames.Count)
-                    cellName = _code.Varnames[idx];
-                else if (idx - _code.Varnames.Count < _code.Freevars.Count)
-                    cellName = _code.Freevars[idx - _code.Varnames.Count];
+                // 3.11+ localsplus layout: [varnames | cellvars | freevars]
+                // Pre-3.11 layout:        [cellvars | freevars]
+                // LOAD_DEREF arg follows localsplus index (3.11+)
+                // or cellvars→freevars (pre-3.11).
+                // ref: CPython Python/ceval.c LOAD_DEREF
+                if (_code.Version >= PythonVersion.Py311)
+                {
+                    if (idx < _code.Varnames.Count)
+                        cellName = _code.Varnames[idx];
+                    else
+                    {
+                        idx -= _code.Varnames.Count;
+                        if (idx < _code.Cellvars.Count)
+                            cellName = _code.Cellvars[idx];
+                        else
+                        {
+                            idx -= _code.Cellvars.Count;
+                            if (idx < _code.Freevars.Count)
+                                cellName = _code.Freevars[idx];
+                            else
+                                cellName = $"cell_{instr.Argument}";
+                        }
+                    }
+                }
                 else
-                    cellName = $"cell_{idx}";
+                {
+                    // Pre-3.11: [cellvars | freevars]
+                    if (idx < _code.Cellvars.Count)
+                        cellName = _code.Cellvars[idx];
+                    else if (idx - _code.Cellvars.Count < _code.Freevars.Count)
+                        cellName = _code.Freevars[idx - _code.Cellvars.Count];
+                    else
+                        cellName = $"cell_{idx}";
+                }
                 _exprStack.Push(new Name(cellName, ExpressionContext.Load));
                 return null;
             }

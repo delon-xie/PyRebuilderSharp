@@ -2,7 +2,7 @@
 
 def outer():
     def inner():
-        .freevar_0
+        lock
         None(None)
         print(lk)
         None(None)

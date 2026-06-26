@@ -73,7 +73,7 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        @(self.repr1, x)
+        @(self.repr1, repr1)
         def <listcomp>(.0):
             .0
             []
@@ -89,7 +89,7 @@ class Repr:
             return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
-        @(self.repr1, x)
+        @(self.repr1, repr1)
         def <listcomp>(.0):
             .0
             []

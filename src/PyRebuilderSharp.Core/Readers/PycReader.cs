@@ -226,18 +226,39 @@ public class PycReader
                 catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.localspluskinds", ex); }
                 
                 // 按类型拆分为 varnames/cellvars/freevars
+                // localspluskinds stores bit flags matching CPython's CO_FAST_* constants:
+                //   CO_FAST_LOCAL = 0x20 (local variable)
+                //   CO_FAST_CELL  = 0x40 (cell variable, in closure)
+                //   CO_FAST_FREE  = 0x80 (free variable, from outer scope)
+                //   CO_FAST_HIDDEN = 0x10 (3.12+, hidden temporary local)
+                //   CO_FAST_ARG_* = 0x02|0x04|0x08 (3.14+, arg role hints)
+                // Variables with both LOCAL+CELL (0x60) appear in varnames AND cellvars.
+                // ref: CPython Objects/codeobject.c get_localsplus_counts()
                 var varnames = new List<string>();
                 var cellvars = new List<string>();
                 var freevars = new List<string>();
                 for (int i = 0; i < localsplusnames.Count; i++)
                 {
                     var kind = (localspluskinds != null && i < localspluskinds.Length) ? localspluskinds[i] : (byte)0;
-                    switch (kind)
+                    var name = localsplusnames[i];
+                    if ((kind & 0x20) != 0)  // CO_FAST_LOCAL
                     {
-                        case 2: freevars.Add(localsplusnames[i]); break;
-                        case 1: cellvars.Add(localsplusnames[i]); break;
-                        default:
-                        case 0: varnames.Add(localsplusnames[i]); break;
+                        varnames.Add(name);
+                        if ((kind & 0x40) != 0)  // CO_FAST_CELL
+                            cellvars.Add(name);
+                    }
+                    else if ((kind & 0x40) != 0)  // CO_FAST_CELL (pure)
+                    {
+                        cellvars.Add(name);
+                    }
+                    else if ((kind & 0x80) != 0)  // CO_FAST_FREE (pure)
+                    {
+                        freevars.Add(name);
+                    }
+                    else
+                    {
+                        // CO_FAST_HIDDEN, CO_FAST_ARG_*, or unknown — treat as local
+                        varnames.Add(name);
                     }
                 }
                 code.Varnames = varnames;
