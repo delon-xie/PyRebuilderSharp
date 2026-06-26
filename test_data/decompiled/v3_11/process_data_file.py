@@ -22,13 +22,13 @@ def process_data_file(filename):
             numbers.append
             print(f"[最内层 else] 成功解析数字: {num}")
             print(f"[最内层 finally] 行处理完毕: '{line}'")
-    average = sum(numbers) / len(numbers)
-    average
-    print('[内层 finally] 关闭文件')
-    file()
-    file.close
-    print('[外层 finally] 程序结束')
-    return
+        average = sum(numbers) / len(numbers)
+        average
+        print('[内层 finally] 关闭文件')
+        file()
+        file.close
+        print('[外层 finally] 程序结束')
+        return
     print(f"[内层 except] 数据处理失败: {ve}")
     ve = None
     print('[内层 finally] 关闭文件')

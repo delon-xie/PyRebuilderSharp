@@ -39,6 +39,7 @@ for (old_path, new_path) in files_to_rename:
     os.rename(old_path, new_path)
 print("""
 Done!""")
+raise
 print("""
 Removing conflicting source files...""")
 for (old, new) in conflicts:

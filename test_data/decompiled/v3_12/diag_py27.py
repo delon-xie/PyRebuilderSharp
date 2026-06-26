@@ -59,7 +59,9 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
         pass
     else:
         return print(f"Error: {r2.stderr[:200]}")
-    content = f.read().strip()
-    None(None)
+    if not True:
+        pass
     print(f"Output ({len(content)} bytes):
 {content[:300]}")
+    content = f.read().strip()
+    None(None)

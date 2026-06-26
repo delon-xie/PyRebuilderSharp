@@ -1029,12 +1029,32 @@ def _simple_enum(etype = Enum, *, boundary, use_args):
                         member = [enum_class](**None)
                         value = value[0]
                         member._value_ = value
+                        try:
+                            contained = value2member_map.get(member._value_)
+                        except TypeError:
+                            contained = None
                     else:
                         member = new_member(enum_class)
                 elif use_args:
                     pass
                 else:
                     member = new_member(enum_class)
+                contained._add_alias_(name)
+                member._name_ = name
+                member.__objclass__ = enum_class
+                member.__init__(value)
+                member._sort_order_ = len(member_names)
+                if name not in ('name', 'value'):
+                    return setattr(member)
+                else:
+                    enum_class._add_member_(name, member)
+                    hashable_values.append(value)
+                    if _is_single_bit(value):
+                        member_names.append(name)
+                        single_bits |= value
+                    else:
+                        multi_bits |= value
+                        gnv_last_values.append(value)
         else:
             for (name, value) in attrs.items():
                 if isinstance(value, auto):
@@ -1072,22 +1092,6 @@ def _simple_enum(etype = Enum, *, boundary, use_args):
                 enum_class.__new_member__ = enum_class.__new__
             enum_class.__new__ = Enum.__new__
             return enum_class
-        contained._add_alias_(name)
-        member._name_ = name
-        member.__objclass__ = enum_class
-        member.__init__(value)
-        member._sort_order_ = len(member_names)
-        if name not in ('name', 'value'):
-            return setattr(member)
-        else:
-            enum_class._add_member_(name, member)
-            hashable_values.append(value)
-            if _is_single_bit(value):
-                member_names.append(name)
-                single_bits |= value
-            else:
-                multi_bits |= value
-                gnv_last_values.append(value)
         enum_class._flag_mask_ = single_bits | multi_bits
         enum_class._singles_mask_ = single_bits
         enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1

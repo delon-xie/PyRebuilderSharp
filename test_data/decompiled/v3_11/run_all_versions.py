@@ -48,17 +48,11 @@ for ver in []:
                                     print(f"  Line {i}: expected={e}")
                                     print(f"           actual=  {a}")
                         False
+    print(f"❌ {ver}: AST parse failed - {e}")
+    print(f"  Decompiled: {actual_src[:200]}")
+    e = None
 print(f"
 {'========================================'}")
 passed = (None for (v, r) in .0)
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-print(f"❌ {ver}: AST parse failed - {e}")
-print(f"  Decompiled: {actual_src[:200]}")
-def <genexpr>(.0):
-    .0
-    for (v, r) in .0:
-        yield 1
-        r
-        None
-    return

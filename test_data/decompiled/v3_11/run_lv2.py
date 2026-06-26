@@ -35,7 +35,6 @@ for ver in []:
                         if e != a:
                             return print(f"  Line {i}: expected={e}
            actual=  {a}")
-return
-print(f"❌ {ver!s}: parse error: {ex!s}")
-print('  Output: %s' % r.stdout[:200])
-ex = None
+    print(f"❌ {ver!s}: parse error: {ex!s}")
+    print('  Output: %s' % r.stdout[:200])
+    ex = None

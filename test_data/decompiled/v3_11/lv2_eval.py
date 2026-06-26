@@ -11,3 +11,4 @@ for n in range(5):
     elif n == 1:
         pass
 x = 1 / 0
+f = open('test.txt')

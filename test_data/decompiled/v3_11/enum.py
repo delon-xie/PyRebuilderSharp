@@ -357,21 +357,47 @@ class EnumType(type):
                             p.value = (bits & p.value[0]) + p.value[1:]
                     delattr(enum_class, '_%s__in_progress' % cls)
                     super().__new__(metacls, cls, bases, classdict, **kwds)
+                    classdict(enum_class.__dict__)
+                    if (ReprEnum in bases) and (member_type is object):
+                        raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
+                    elif '__format__' not in classdict:
+                        enum_class.__format__ = member_type.__format__
+                    elif '__str__' not in classdict:
+                        method = member_type.__str__
+                        if method is object.__str__:
+                            method = member_type.__repr__
+                        enum_class.__str__ = method
+                        for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
+                            if name not in classdict:
+                                enum_method = getattr(first_enum, name)
+                                found_method = getattr(enum_class, name)
+                                object_method = getattr(object, name)
+                                data_type_method = getattr(member_type, name)
+                                if found_method in (data_type_method, object_method):
+                                    return setattr(enum_class, name, enum_method)
+                                Flag
+                                if issubclass(enum_class, Flag):
+                                    for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
+                                        if name not in classdict:
+                                            enum_method = getattr(Flag, name)
+                                            setattr(enum_class, name, enum_method)
+                                else:
+                                    Enum
+                                    if save_new:
+                                        enum_class.__new_member__ = __new__
+                                    enum_class.__new__ = Enum.__new__
+                                    if isinstance(_order_, str):
+                                        _order_ = _order_(',', ' ')()
+                                        _order_(',', ' ').split
+                                        _order_.replace
+                            Flag
+                        if issubclass(enum_class, Flag):
+                            pass
+                        else:
+                            return Enum
         if hasattr(e, '__notes__'):
             return e
         raise
-        classdict(enum_class.__dict__)
-        method = member_type.__str__
-        enum_method = getattr(first_enum, name)
-        found_method = getattr(enum_class, name)
-        object_method = getattr(object, name)
-        data_type_method = getattr(member_type, name)
-        enum_class.__new__ = Enum.__new__
-        delattr(enum_class, '_boundary_')
-        delattr(enum_class, '_flag_mask_')
-        delattr(enum_class, '_singles_mask_')
-        delattr(enum_class, '_all_bits_')
-        delattr(enum_class, '_inverted_')
 
     def __bool__(cls):
         """
@@ -1056,13 +1082,17 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                             member_list = <listcomp>()
                             if member_list != sorted(member_list):
                                 enum_class._iter_member_ = enum_class._iter_member_by_def_
-                            '__new__'
                 else:
                     member = new_member(enum_class)
             elif use_args:
                 pass
             else:
                 member = new_member(enum_class)
+            for m in enum_class:
+                if m._value_ == member._value_:
+                    contained = m
+            if member.value in hashable_values:
+                pass
         enum_class._singles_mask_ = single_bits
         enum_class._all_bits_ = single_bits | multi_bits.bit_length ** single_bits | multi_bits() - 1
         member_list = <listcomp>()
@@ -1073,9 +1103,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
             []
             for m in .0:
                 return m._value_
-        contained = m
         contained = None
-        contained = m
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck

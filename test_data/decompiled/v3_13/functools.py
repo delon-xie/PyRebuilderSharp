@@ -24,11 +24,14 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
     function (defaults to functools.WRAPPER_UPDATES)
 """
     for attr in assigned:
-        pass
+        try:
+            value = getattr
+        except AttributeError:
+            pass
+        setattr(value)
     for attr in updated:
         getattr.update(getattr, {})
     return wrapper
-    setattr(value)
 
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
@@ -409,6 +412,7 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     return key
     for _ in v:
         pass
+    raise
 
 def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.
@@ -511,7 +515,7 @@ def _c3_merge(sequences):
 
 """
     result = []
-    for sequences in s:
+    for s in s:
         for _ in s:
             if not True:
                 pass

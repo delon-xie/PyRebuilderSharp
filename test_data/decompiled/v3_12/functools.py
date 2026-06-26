@@ -24,12 +24,15 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
        function (defaults to functools.WRAPPER_UPDATES)
     """
     for attr in assigned:
-        pass
+        try:
+            value = getattr(wrapped, attr)
+        except AttributeError:
+            pass
+        setattr(wrapper, attr, value)
     for attr in updated:
         getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     wrapper.__wrapped__ = wrapped
     return wrapper
-    setattr(wrapper, attr, value)
 
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
@@ -375,6 +378,7 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
     []
     for v in []:
         pass
+    raise
 
 def lru_cache(maxsize = 128, typed = False):
     """Least-recently-used cache decorator.

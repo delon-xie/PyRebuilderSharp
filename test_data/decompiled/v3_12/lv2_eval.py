@@ -10,3 +10,8 @@ for n in range(5):
     elif not n == 1:
         pass
     x = 1 / 0
+    try:
+        f = open('test.txt')
+    except IOError:
+        f = None
+    return None

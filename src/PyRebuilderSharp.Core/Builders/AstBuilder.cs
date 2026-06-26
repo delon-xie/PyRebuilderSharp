@@ -81,7 +81,23 @@ public class AstBuilder
         // 3.11+: 在 BuildStatements 之前预处理 ExceptionTable try/except
         if (_codeObject.ExceptionTable.Count > 0)
         {
-            // 第一步：处理 ET 条目（优先于 preBlocks，确保 visited 干净）
+            // 第一步：构建 for-loop 体块集合（ET 预处理需要知道哪些块在 for-loop 体内，
+            // 这些块的 try/except 由 BuildForLoop 的 GetStructuredBlockStmts 处理，
+            // 不应在此处被 ET 预处理消耗。）
+            var forLoopBodyBlocks = new HashSet<int>();
+            foreach (var block in _allBlocks)
+            {
+                if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                {
+                    var headerBlock = block;
+                    foreach (var succ in headerBlock.Successors)
+                    {
+                        CollectForLoopBodyBlocks(succ, headerBlock, forLoopBodyBlocks, new HashSet<int>());
+                    }
+                }
+            }
+
+            // 第二步：处理 ET 条目（优先于 preBlocks，确保 visited 干净）
             foreach (var entry in _sortedExceptionTable)
             {
                 var entryBlock = FindBlockByOffset(entry.StartOffset);
@@ -89,10 +105,7 @@ public class AstBuilder
 
                 // 跳过 for 循环体内的 ET 条目（try/except 在 for 循环体中时，
                 // 块属于 for-loop body，由 BuildForLoop 的 GetStructuredBlockStmts 处理）。
-                // 检测：entryBlock 的任何前驱是包含 FOR_ITER 的循环头。
-                bool isInsideForLoop = entryBlock.Predecessors.Any(p =>
-                p.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER));
-                if (isInsideForLoop) continue;
+                if (forLoopBodyBlocks.Contains(entryBlock.Id)) continue;
                 var etStmts = BuildTryFromExceptionTable(entryBlock, visited);
                 if (etStmts != null)
                 {
@@ -3817,6 +3830,19 @@ public class AstBuilder
     /// 推导式/生成器表达式模式。
     /// </summary>
     private enum CompKind { List, Set, Dict, Generator }
+
+    /// <summary>
+    /// 递归收集 for 循环体块（遍历后继直到回到 header 或已访问）。
+    /// </summary>
+    private static void CollectForLoopBodyBlocks(BasicBlock? entry, BasicBlock header, HashSet<int> bodyBlocks, HashSet<int> visited)
+    {
+        if (entry == null || entry == header || visited.Contains(entry.Id))
+            return;
+        visited.Add(entry.Id);
+        bodyBlocks.Add(entry.Id);
+        foreach (var succ in entry.Successors)
+            CollectForLoopBodyBlocks(succ, header, bodyBlocks, visited);
+    }
 
     /// <summary>
     /// 从 FunctionRef + Call 构建推导式表达式（set/dict/list comprehension 或 generator expression）。

@@ -49,6 +49,9 @@ for ver in []:
                                     print('           actual=  %s' % a)
                         match
                 match
+    print(f"❌ {ver!s}: AST parse failed - {e!s}")
+    print('  Decompiled: %s' % actual_src[:200])
+    e = None
 passed = (None for (v, r) in .0)
 total = len(results)
 print("""
@@ -60,6 +63,3 @@ def <genexpr>(.0):
         r
         None
     return
-print(f"❌ {ver!s}: AST parse failed - {e!s}")
-print('  Decompiled: %s' % actual_src[:200])
-e = None
