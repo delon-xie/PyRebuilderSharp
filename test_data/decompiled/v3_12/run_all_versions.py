@@ -14,7 +14,7 @@ expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 []
-passed = [os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc") for ver in versions if not os.path.exists(pyc)]
+passed = [os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc") for ver in '?' if not os.path.exists(pyc)]
 print(f"
 {'========================================'}")
 passed = sum(<genexpr>())

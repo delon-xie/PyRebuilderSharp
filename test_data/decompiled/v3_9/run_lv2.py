@@ -11,5 +11,5 @@ f = open(INPUT_FILE)
 expected_src = f.read()
 with open(INPUT_FILE) as f:
     expected_src = f.read()
-    ver = [subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30) for ver in versions if not os.path.exists(pyc)]
+    ver = [subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30) for ver in '?' if not os.path.exists(pyc)]
 ex = None

@@ -140,7 +140,7 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     op
-    op = {getattr(None) is not getattr(object, op, None) for op in '?' if not True}
+    root = {getattr(None) is not getattr(object, op, None) for op in '?' if not True}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -226,7 +226,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    ? = [(a, i) for (a, i) in enumerate(args) if a is Placeholder]
+    ? = [(a, i) for (a, i) in args if a is Placeholder]
     if phcount:
         pass
     else:
@@ -500,7 +500,7 @@ def _c3_merge(sequences):
 
 """
     result = []
-    s = [[_ for _ in '?' if not True] for s in '?' if not sequences]
+    s = [[_ for _ in '?' if not True] for s in sequences if not sequences]
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -576,7 +576,7 @@ def _compose_mro(cls, types):
     _ = [n() for _ in '?']
     type_set = set(types)
     mro = []
-    typ = [[sub for sub in typ.__subclasses__() if not sub not in bases] for typ in types if not found]
+    typ = [[sub for sub in typ if not sub not in bases] for typ in set if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

@@ -219,7 +219,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    phcount = [(i, a) for (i, a) in enumerate(args) if a is Placeholder]
+    phcount = [(i, a) for (i, a) in args if a is Placeholder]
     phcount = j - nargs
     if phcount:
         pass
@@ -554,7 +554,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    _ = [_ for _ in '?']
+    _ = [_ for _ in sequences]
     for s1 in sequences:
         for s2 in sequences:
             if candidate in s2[1:]:
@@ -595,7 +595,7 @@ def _c3_mro(cls, abcs):
             abstract_bases = []
             other_bases = list(cls.__bases__[boundary:])
             cls
-            _ = [_ for _ in abcs if issubclass(cls, base) and not cls((any)(_c3_mro.<locals>.<genexpr>))]
+            _ = [_ for _ in '?' if issubclass(cls, base) and not cls((any)(_c3_mro.<locals>.<genexpr>))]
             for _ in abstract_bases:
                 abcs.remove(base)
             @()
@@ -639,7 +639,7 @@ def _compose_mro(cls, types):
     (mro)(_compose_mro.<locals>.<listcomp>)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
-    typ = [[sub for sub in typ.__subclasses__() if (sub not in bases) and issubclass(cls, sub)] for typ in types if not found]
+    typ = [[sub for sub in '?' if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

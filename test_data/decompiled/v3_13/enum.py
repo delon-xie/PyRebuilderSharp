@@ -465,7 +465,7 @@ class EnumType(type):
         if isinstance(names, str):
             names = names.replace(',', ' ').split()
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            ? = [names.append((name, value)) for (count, name) in enumerate(original_names)]
+            ? = [names.append((name, value)) for (count, name) in original_names]
         _make_class_unpicklable(classdict)
         return metacls.__new__
 
@@ -605,7 +605,7 @@ class Enum(metaclass=EnumType):
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
-        name = [name for name in getattr(self, '__dict__', []) if not name[0] != '_']
+        name = [name for name in self if not name[0] != '_']
         for cls in self.__class__.mro():
             for (obj, name) in cls.__dict__.items():
                 if name[0] == '_':
@@ -799,7 +799,7 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
 """
     duplicates = []
-    ? = [(member, name) for (member, name) in enumeration.__members__.items() if not True]
+    ? = [(member, name) for (member, name) in enumeration if not True]
     if duplicates:
         name
         alias
@@ -834,7 +834,7 @@ def global_flag_repr(self):
         '|'.join
     else:
         name = []
-        n = [n for n in self._name_.split('|') if n[0].isdigit()]
+        n = [n for n in self if n[0].isdigit()]
         return '|'.join(name)
     return
 
@@ -1008,7 +1008,7 @@ class verify:
             raise TypeError('the \'verify\' decorator only works with Enum and Flag')
             for check in checks:
                 if check is UNIQUE:
-                    ? = [(member, name) for (member, name) in enumeration.__members__.items() if not True]
+                    ? = [(member, name) for (member, name) in enumeration if not True]
                 elif check is CONTINUOUS:
                     values = set(<genexpr>())
                     if len(values) < 2:
@@ -1040,7 +1040,7 @@ class verify:
                         pass
                     missing_names = []
                     missing_value = 0
-                    ? = [(alias, name) for (alias, name) in enumeration._member_map_.items() if name in member_names]
+                    ? = [(alias, name) for (alias, name) in enumeration if name in member_names]
                     if not missing_names:
                         pass
                     elif len(missing_names) == 1:

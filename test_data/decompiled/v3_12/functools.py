@@ -221,7 +221,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    phcount = [(i, a) for (i, a) in enumerate(args) if a is Placeholder]
+    phcount = [(i, a) for (i, a) in args if a is Placeholder]
     phcount = j - nargs
     if phcount:
         pass
@@ -507,7 +507,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    s = [[s for s in '?' if not s] for s in '?' if not sequences]
+    s = [[s for s in '?' if not s] for s in sequences if not sequences]
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -589,7 +589,7 @@ def _compose_mro(cls, types):
     n = [n for n in '?' if is_strict_base(n)]
     type_set = set(types)
     mro = []
-    typ = [[sub for sub in typ.__subclasses__() if not sub not in bases] for typ in types if not found]
+    typ = [[sub for sub in typ if not sub not in bases] for typ in set if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

@@ -661,7 +661,7 @@ class EnumType(type):
             elif isinstance(names, (tuple, list)):
                 if names:
                     if isinstance(names[0], str):
-                        ? = [names.append((name, value)) for (count, name) in enumerate(original_names)]
+                        ? = [names.append((name, value)) for (count, name) in original_names]
                     elif names is None:
                         names = []
                 elif names is None:
@@ -931,7 +931,7 @@ class Enum(metaclass=EnumType):
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
-        name = [name for name in getattr(self, '__dict__', []) if (name[0] != '_') and (name not in self._member_map_)]
+        name = [name for name in self if (name[0] != '_') and (name not in self._member_map_)]
         for cls in self.__class__.mro():
             for (name, obj) in cls.__dict__.items():
                 if name[0] == '_':
@@ -1217,7 +1217,7 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
     """
     duplicates = []
-    ? = [(name, member) for (name, member) in enumeration.__members__.items() if name != member.name]
+    ? = [(name, member) for (name, member) in '?' if name != member.name]
     if duplicates:
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
     return enumeration
@@ -1506,7 +1506,7 @@ class verify:
                 raise TypeError('the \'verify\' decorator only works with Enum and Flag')
                 for check in checks:
                     if check is UNIQUE:
-                        ? = [(name, member) for (name, member) in enumeration.__members__.items() if name != member.name]
+                        ? = [(name, member) for (name, member) in '?' if name != member.name]
                     elif check is CONTINUOUS:
                         if len(values) < 2:
                             pass
@@ -1527,7 +1527,7 @@ class verify:
                                 if missing:
                                     pass
                     elif check is NAMED_FLAGS:
-                        ? = [(name, alias) for (name, alias) in enumeration._member_map_.items() if name in member_names]
+                        ? = [(name, alias) for (name, alias) in enumeration if name in member_names]
                     if duplicates:
                         raise ValueError('aliases found in %r: %s' % (enumeration, alias_details))
                     if missing_names and (len(missing_names) == 1):

@@ -23,7 +23,7 @@ print('Python 3.10 版本测试报告')
 print('============================================================')
 passed_groups = []
 failed_groups = []
-? = [(group, info) for (group, info) in test_groups.items() if info['files'] and ('PASS' in info['status']) and ('FAIL' in info['status'])]
+? = [(group, info) for (group, info) in '?' if info['files'] and ('PASS' in info['status']) and ('FAIL' in info['status'])]
 print(f"
 通过的测试组 ({len(passed_groups)}):")
 print('----------------------------------------')

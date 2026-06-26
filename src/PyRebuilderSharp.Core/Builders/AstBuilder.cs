@@ -1106,7 +1106,7 @@ public class AstBuilder
         
         var generators = new List<Comprehension>
         {
-            new Comprehension(target, new Constant("?"), ifs)
+            new Comprehension(target, ExtractIterExprRaw(header) ?? new Constant("?"), ifs)
         };
         
         Expr? compExpr = containerKind switch
@@ -1121,6 +1121,59 @@ public class AstBuilder
             return new Assign(new List<Expr> { new Name(storeTarget, ExpressionContext.Store) }, compExpr);
         string targetName = target is Name tn ? tn.Id : "?";
         return new Assign(new List<Expr> { new Name(targetName, ExpressionContext.Store) }, compExpr);
+    }
+
+    /// <summary>从前驱/header 块的指令中反向扫描提取内联推导式的迭代表达式。</summary>
+    private Expr? ExtractIterExprRaw(BasicBlock header)
+    {
+        foreach (var block in new[] { header }.Concat(header.Predecessors))
+        {
+            int getIterIdx = -1;
+            for (int i = 0; i < block.Instructions.Count; i++)
+                if (block.Instructions[i].Opcode == Opcode.GET_ITER)
+                { getIterIdx = i; break; }
+            if (getIterIdx < 0) continue;
+            for (int i = getIterIdx - 1; i >= 0; i--)
+            {
+                var ins = block.Instructions[i];
+                if (ins.Opcode == Opcode.LOAD_GLOBAL && ins.Argument.HasValue
+                    && ins.Argument.Value < _codeObject.Names.Count)
+                {
+                    string name = _codeObject.Names[ins.Argument.Value];
+                    if (name.StartsWith("__")) continue;
+                    return new Name(name, ExpressionContext.Load);
+                }
+                if (ins.Opcode == Opcode.LOAD_FAST && ins.Argument.HasValue
+                    && ins.Argument.Value < _codeObject.Varnames.Count)
+                    return new Name(_codeObject.Varnames[ins.Argument.Value], ExpressionContext.Load);
+                if (ins.Opcode == Opcode.LOAD_DEREF && ins.Argument.HasValue)
+                {
+                    int idx = ins.Argument.Value;
+                    if (idx < _codeObject.Cellvars.Count)
+                        return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
+                    int fi = idx - _codeObject.Cellvars.Count;
+                    if (fi < _codeObject.Freevars.Count)
+                        return new Name(_codeObject.Freevars[fi], ExpressionContext.Load);
+                    continue;
+                }
+                if (ins.Opcode == Opcode.LOAD_CONST || ins.Opcode == Opcode.BUILD_SET
+                    || ins.Opcode == Opcode.BUILD_LIST || ins.Opcode == Opcode.BUILD_MAP
+                    || ins.Opcode == Opcode.SWAP || ins.Opcode == Opcode.PUSH_NULL
+                    || ins.Opcode == Opcode.MAKE_FUNCTION || ins.Opcode == Opcode.SET_FUNCTION_ATTRIBUTE_313
+                    || ins.Opcode == Opcode.CALL || ins.Opcode == Opcode.CALL_FUNCTION
+                    || ins.Opcode == Opcode.CALL_FUNCTION_EX || ins.Opcode == Opcode.CALL_FUNCTION_KW
+                    || ins.Opcode == Opcode.LOAD_ATTR || ins.Opcode == Opcode.LOAD_NAME
+                    || ins.Opcode == Opcode.STORE_FAST || ins.Opcode == Opcode.STORE_NAME
+                    || ins.Opcode == Opcode.STORE_ATTR || ins.Opcode == Opcode.POP_TOP
+                    || ins.Opcode == Opcode.DUP_TOP || ins.Opcode == Opcode.ROT_TWO
+                    || ins.Opcode == Opcode.ROT_THREE || ins.Opcode == Opcode.BINARY_OP
+                    || ins.Opcode == Opcode.BINARY_SUBSCR || ins.Opcode == Opcode.UNARY_NEGATIVE
+                    || ins.Opcode == Opcode.UNARY_NOT || ins.Opcode == Opcode.COMPARE_OP)
+                    continue;
+                break;
+            }
+        }
+        return null;
     }
 
     /// <summary>

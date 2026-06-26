@@ -821,7 +821,7 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
     """
     duplicates = []
-    ? = [(name, member) for (name, member) in enumeration.__members__.items() if name != member.name]
+    ? = [(name, member) for (name, member) in '?' if name != member.name]
     if duplicates:
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
 
