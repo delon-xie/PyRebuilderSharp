@@ -196,7 +196,7 @@ class EnumDict(dict):
     enumeration member names.
 """
     def __init__(self, cls_name = None):
-        super(__class__, self).__init__()
+        super().__init__()
         self._member_names = {}
         self._last_values = []
         self._ignore = []
@@ -225,7 +225,7 @@ class EnumDict(dict):
                     else:
                         value
                         setattr(self, '_generate_next_value', _gnv)
-                        super(__class__, self).__setitem__
+                        super().__setitem__
                         if self:
                             value = t(**auto_valued)
                         raise

@@ -1138,6 +1138,19 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitCall(Call call)
     {
+        // super(__class__, self/cls) → super() 压缩
+        bool isSuper = call.Func is Name { Id: "super" }
+            && call.Args.Count == 2
+            && call.Args[0] is Name { Id: "__class__" }
+            && call.Args[1] is Name arg1
+            && (arg1.Id == "self" || arg1.Id == "cls");
+        
+        if (isSuper)
+        {
+            _output.Append("super()");
+            return;
+        }
+        
         Visit(call.Func);
         _output.Append("(");
 

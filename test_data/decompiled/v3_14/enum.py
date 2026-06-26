@@ -206,7 +206,7 @@ class EnumDict(dict):
     enumeration member names.
 """
     def __init__(self, cls_name = None):
-        super(__class__, self).__init__()
+        super().__init__()
         self._member_names = {}
         self._last_values = []
         self._ignore = []
@@ -236,7 +236,7 @@ class EnumDict(dict):
                     else:
                         value
                         setattr(self, '_generate_next_value', _gnv)
-                        super(__class__, self).__setitem__(key, value)
+                        super().__setitem__(key, value)
                 elif (key == '_ignore_') and isinstance(value, str):
                     value = value.replace(',', ' ').split()
                 else:
@@ -427,7 +427,7 @@ class EnumType(type):
         """ cannot delete member """
         if attr in cls._member_map_:
             raise AttributeError(f"{cls.__name__} cannot delete member {attr}.")
-        return super(__class__, cls).__delattr__(attr)
+        return super().__delattr__(attr)
 
     def __dir__(cls):
         """__class__"""
@@ -484,7 +484,7 @@ class EnumType(type):
 """
         if name in member_map:
             raise AttributeError(f"cannot reassign member {name}")
-        return super(__class__, cls).__setattr__(name, value)
+        return super().__setattr__(name, value)
 
     def _create_(cls, class_name, names, *, module, qualname, type, start, boundary):
         """

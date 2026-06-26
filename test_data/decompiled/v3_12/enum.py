@@ -200,7 +200,7 @@ class EnumDict(dict):
     enumeration member names.
     """
     def __init__(self, cls_name = None):
-        super(__class__, self).__init__()
+        super().__init__()
         self._member_names = {}
         self._last_values = []
         self._ignore = []
@@ -230,7 +230,7 @@ class EnumDict(dict):
                     else:
                         value
                         setattr(self, '_generate_next_value', _gnv)
-                        super(__class__, self).__setitem__(key, value)
+                        super().__setitem__(key, value)
                         value = None(**auto_valued)
                 elif (key == '_ignore_') and isinstance(value, str):
                     value = value.replace(',', ' ').split()
@@ -240,7 +240,7 @@ class EnumDict(dict):
                     already = set(value) & set(self._member_names)
                     if already:
                         raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
-                    return super(__class__, self).__setitem__(key, value)
+                    return super().__setitem__(key, value)
             elif key == '_generate_next_value_':
                 pass
             elif key == '_ignore_':
@@ -248,7 +248,7 @@ class EnumDict(dict):
         elif _is_dunder(key):
             if key == '__order__':
                 key = '_order_'
-            super(__class__, self).__setitem__(key, value)
+            super().__setitem__(key, value)
         else:
             if key in self._member_names:
                 raise TypeError(f"{key!r} already defined as {self[key]!r}")
@@ -427,7 +427,7 @@ class EnumType(type):
     def __delattr__(cls, attr):
         if attr in cls._member_map_:
             raise AttributeError(f"{cls.__name__!r} cannot delete member {attr!r}.")
-        return super(__class__, cls).__delattr__(attr)
+        return super().__delattr__(attr)
 
     def __dir__(cls):
         if issubclass(cls, Flag):
@@ -484,7 +484,7 @@ class EnumType(type):
         member_map = cls.__dict__.get('_member_map_', {})
         if name in member_map:
             raise AttributeError(f"cannot reassign member {name!r}")
-        return super(__class__, cls).__setattr__(name, value)
+        return super().__setattr__(name, value)
 
     def _create_(cls, class_name, names, *, module = None, qualname = None, type = None, start = 1, boundary = None):
         """
