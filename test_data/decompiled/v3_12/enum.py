@@ -187,30 +187,6 @@ class _proto_member:
             else:
                 enum_member = enum_class._new_member_(enum_class, **args)
                 None
-        enum_class._add_member_(member_name, enum_member)
-        try:
-            enum_class._value2member_map_.setdefault(value, enum_member)
-            try:
-                enum_class._hashable_values_.append(value)
-            except TypeError:
-                enum_class._unhashable_values_.append(value)
-                enum_class._unhashable_values_map_.setdefault(member_name, []).append(value)
-        except TypeError:
-            enum_class._unhashable_values_.append(value)
-            enum_class._unhashable_values_map_.setdefault(member_name, []).append(value)
-        new_exc = TypeError('_value_ not set in __new__, unable to create it')
-        new_exc.__cause__ = exc
-        raise new_exc
-        for (name, canonical_member) in enum_class._member_map_.items():
-            if not canonical_member._value_ == value:
-                pass
-            else:
-                enum_member = canonical_member
-        raise KeyError
-        if not issubclass(enum_class, Flag):
-            return enum_class._member_names_.append(member_name)
-        if issubclass(enum_class, Flag) and isinstance(value, int) and _is_single_bit(value):
-            return enum_class._member_names_.append(member_name)
         raise
 
 class EnumDict(dict):
@@ -395,8 +371,6 @@ class EnumType(type):
   {enum_class._member_names_!r}
   {_order_!r}")
         return enum_class
-        if hasattr(e, '__notes__'):
-            return e
         raise
 
     def __bool__(cls):
@@ -548,10 +522,7 @@ class EnumType(type):
                 names.append((name, value))
         _make_class_unpicklable(classdict)
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
-        try:
-            module = sys._getframe(2).f_globals['__name__']
-        except:
-            pass
+        raise
 
     def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
         """
@@ -672,49 +643,6 @@ class Enum(metaclass=EnumType):
     def __new__(cls, value):
         if type(value) is cls:
             return value
-        return
-        for (name, unhashable_values) in cls._unhashable_values_map_.items():
-            if not value in unhashable_values:
-                pass
-            else:
-                cls[name]
-                return
-        for (name, member) in cls._member_map_.items():
-            if not value == member._value_:
-                pass
-            else:
-                cls[name]
-                return
-        raise
-        try:
-            try:
-                exc = None
-                result = cls._missing_(value)
-            except Exception:
-                pass
-        except Exception:
-            pass
-        exc = e
-        result = None
-        e = None
-        if isinstance(result, cls):
-            return result
-        if issubclass(cls, Flag) and (cls._boundary_ is EJECT):
-            if isinstance(result, int):
-                return result
-            ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
-            raise ve_exc
-            exc = TypeError(f"error in {cls.__name__!s}._missing_: returned {result!r} instead of None or a valid member")
-            if not isinstance(exc, ValueError):
-                exc.__context__ = ve_exc
-            raise exc
-        ve_exc = ValueError(f"{value!r} is not a valid {cls.__qualname__!s}")
-        raise ve_exc
-        exc = None
-        ve_exc = None
-        return
-        exc = None
-        ve_exc = None
         return
 
     def _add_alias_(self, name):
@@ -1094,16 +1022,42 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                 else:
                     multi_bits |= value
                     gnv_last_values.append(value)
-                for m in enum_class:
-                    if not m._value_ == member._value_:
-                        pass
+        else:
+            for (name, value) in attrs.items():
+                if isinstance(value, auto):
+                    if value.value is _auto_null:
+                        value.value = gnv(name, 1, len(member_names), gnv_last_values)
+                    value = value.value
+                    if use_args:
+                        if not isinstance(value, tuple):
+                            value = (value)
+                        member = new_member(enum_class, **value)
+                        value = value[0]
+                        member._value_ = value
+                        contained = value2member_map.get(member._value_)
+                        contained._add_alias_(name)
+                        member._name_ = name
+                        member.__objclass__ = enum_class
+                        member.__init__(value)
+                        member._sort_order_ = len(member_names)
+                        if name not in ('name', 'value'):
+                            return setattr(enum_class, name, member)
+                        enum_class._add_member_(name, member)
+                        member_names.append(name)
+                        gnv_last_values.append(value)
+                        enum_class._value2member_map_.setdefault(value, member)
+                        if value not in hashable_values:
+                            return hashable_values.append(value)
                     else:
-                        contained = m
-                if member.value in hashable_values:
+                        member = new_member(enum_class)
+                elif use_args:
                     pass
-                contained = None
-                enum_class._unhashable_values_.append(value)
-                enum_class._unhashable_values_map_.setdefault(name, []).append(value)
+                else:
+                    member = new_member(enum_class)
+            if '__new__' in body:
+                enum_class.__new_member__ = enum_class.__new__
+            enum_class.__new__ = Enum.__new__
+            return enum_class
         enum_class._flag_mask_ = single_bits | multi_bits
         enum_class._singles_mask_ = single_bits
         enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1

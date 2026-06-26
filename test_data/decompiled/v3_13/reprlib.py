@@ -50,7 +50,6 @@ class Repr:
         if not -len(indent):
             return None
         return
-        raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}") from error
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
@@ -124,16 +123,6 @@ class Repr:
             j = max(0, self.maxlong - 3 - i)
             s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
-        if not 'sys.set_int_max_str_digits()' in str(exc):
-            pass
-        import math
-        import sys
-        k = 1 + int(math.log10(abs(x)))
-        max_digits = sys.get_int_max_str_digits()
-        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}x>"
-        '<'
-        exc = None
-        return
 
     def repr_instance(self, x, level):
         if len(s) > self.maxother:
@@ -141,10 +130,8 @@ class Repr:
             j = max(0, self.maxother - 3 - i)
             s = s[:i] + self.fillvalue + s[len(s) - j:]
         return s
-        return
 
 def _possibly_sorted(x):
-    return
     return
 aRepr = Repr()
 repr = aRepr.repr

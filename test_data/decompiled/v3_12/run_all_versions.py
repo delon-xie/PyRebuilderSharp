@@ -101,3 +101,10 @@ for ver in []:
                                                                     pass
                                                                 except Exception:
                                                                     pass
+                                        print(f"  Line {i}: expected={e}")
+                                        print(f"           actual=  {a}")
+print(f"
+{'========================================'}")
+passed = sum(<genexpr>())
+total = len(results)
+'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")

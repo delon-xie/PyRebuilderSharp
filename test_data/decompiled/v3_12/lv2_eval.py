@@ -15,4 +15,3 @@ for n in range(5):
     except IOError:
         f = None
     return None
-    return None

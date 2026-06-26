@@ -70,7 +70,6 @@ class _safe_key:
 
     def __lt__(self, other):
         return
-        return
 
 def _safe_tuple(t):
     """Helper function for comparing 2-tuples"""
@@ -477,26 +476,27 @@ class PrettyPrinter:
         last = False
         while last:
             ent = next_ent
-        if self._compact:
-            rep = self._repr(level)
-            w = len(rep) + 2
-            if width < w:
-                width = max_width
-                if delim:
-                    delim = delimnl
+            next_ent = next(it)
+            if self._compact:
+                rep = self._repr(level)
+                w = len(rep) + 2
+                if width < w:
+                    width = max_width
+                    if delim:
+                        delim = delimnl
+                    elif width >= w:
+                        width -= w
+                        write(delim)
+                        delim = ', '
+                        write(rep)
                 elif width >= w:
-                    width -= w
-                    write(delim)
-                    delim = ', '
-                    write(rep)
-            elif width >= w:
+                    pass
+            write(delim)
+            delim = delimnl
+            if last:
                 pass
-        write(delim)
-        delim = delimnl
-        if last:
-            pass
-        else:
-            return 1
+            else:
+                return 1
         raise
 
     def _repr(self, object, context, level):

@@ -195,6 +195,8 @@ def reduce(function, sequence, /, initial = _initial_missing):
             value = function(value, element)
         return value
 
+from _functools import reduce
+
 class _PlaceholderType:
     """The type of the Placeholder singleton.
 
@@ -326,6 +328,8 @@ class partial:
             raise TypeError('invalid partial state')
         raise TypeError('invalid partial state')
     __class_getitem__ = classmethod(GenericAlias)
+
+from _functools import partial, Placeholder, _PlaceholderType
 
 class partialmethod:
     """Method descriptor with partial application of the given arguments
@@ -510,6 +514,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear
         return wrapper
+
+from _functools import _lru_cache_wrapper
 
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
@@ -736,7 +742,6 @@ class singledispatchmethod:
     def __repr__(self):
         """?"""
         return f"<single dispatch method descriptor {name}>"
-        raise
 
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
@@ -749,12 +754,12 @@ class _singledispatchmethod_get:
             pass
         else:
             return 0
+        self.__doc__ = func.__doc__
         raise
 
     def __repr__(self):
         """?"""
         return f"<bound single dispatch method {name} of {self._obj}>"
-        raise
 
     def __call__(self):
         """__name__"""
@@ -802,10 +807,6 @@ class cached_property:
         else:
             return val
         return val
-        msg = f"The '__dict__' attribute on {type(instance).__name__} instance does not support item assignment for caching {self.attrname} property."
-        raise TypeError(msg) from None
         raise
     __class_getitem__ = classmethod(GenericAlias)
-raise
-raise
 raise

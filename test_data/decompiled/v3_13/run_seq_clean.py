@@ -21,107 +21,35 @@ for ver in []:
     else:
         r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
         actual_src = r.stdout
-        try:
-            actual_ast = ast.dump(ast.parse(actual_src), indent=2)
-            match = expected_ast == actual_ast
-        except Exception:
+        actual_ast = ast.dump(ast.parse(actual_src), indent=2)
+        match = expected_ast == actual_ast
+        if match:
             pass
         else:
-            try:
-                pass
-            except Exception:
+            '❌'
+            if match:
                 pass
             else:
-                '❌'
-                try:
-                    pass
-                except Exception:
-                    pass
-                else:
-                    try:
-                        pass
-                    except Exception:
-                        pass
-                    else:
-                        try:
-                            pass
-                        except Exception:
+                'MISMATCH'
+                f""
+                if not match:
+                    for i in range(max(len(exp_lines), len(act_lines))):
+                        if i < len(exp_lines):
                             pass
                         else:
-                            'MISMATCH'
-                            try:
-                                pass
-                            except Exception:
+                            '(missing)'
+                            if i < len(act_lines):
                                 pass
                             else:
-                                f""
-                                try:
-                                    pass
-                                except Exception:
+                                '(missing)'
+                                e != a
+                                if not True:
                                     pass
                                 else:
-                                    exp_lines = expected_ast.split("""
-""")
-                                    act_lines = actual_ast.split("""
-""")
-                                    for i in range(max(len(exp_lines), len(act_lines))):
-                                        try:
-                                            pass
-                                        except Exception:
-                                            pass
-                                        else:
-                                            try:
-                                                pass
-                                            except Exception:
-                                                pass
-                                            else:
-                                                try:
-                                                    pass
-                                                except Exception:
-                                                    pass
-                                                else:
-                                                    '(missing)'
-                                                    try:
-                                                        pass
-                                                    except Exception:
-                                                        pass
-                                                    else:
-                                                        try:
-                                                            pass
-                                                        except Exception:
-                                                            pass
-                                                        else:
-                                                            try:
-                                                                pass
-                                                            except Exception:
-                                                                pass
-                                                            else:
-                                                                '(missing)'
-                                                                try:
-                                                                    pass
-                                                                except Exception:
-                                                                    pass
-                                                                else:
-                                                                    e != a
-                                        if not True:
-                                            pass
-                                        else:
-                                            print('  Line %d: expected=%s' % (i, e))
-                                            print('           actual=  %s' % a)
-    print(f"❌ {ver}: AST parse failed - {e}")
-    print('  Decompiled: %s' % actual_src[:200])
-    e = None
+                                    print('  Line %d: expected=%s' % (i, e))
+                                    print('           actual=  %s' % a)
 passed = sum(<genexpr>())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-print('Failed to parse expected source:', e)
-sys.exit(1)
-def <genexpr>(.0):
-    for (r, v) in .0:
-        r
-        if not True:
-            pass
-        else:
-            return 1
-[]
+raise

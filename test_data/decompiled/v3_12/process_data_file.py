@@ -7,13 +7,6 @@ def process_data_file(filename):
     """
     print('[外层 finally] 程序结束')
     return
-    print(f"[内层 except] 数据处理失败: {ve}")
-    ve = None
-    print('[外层 finally] 程序结束')
-    print('[外层 finally] 程序结束')
-    print(f"[外层 except] 没有权限读取文件: {filename}")
-    print('[外层 finally] 程序结束')
-    raise
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')
