@@ -1399,10 +1399,9 @@ public class StackMachine
                     case PythonVersion.Py311:
                     case PythonVersion.Py312:
                         // Python 3.11-3.12: MAKE_FUNCTION pops code + optional args per flags
-                        // 参考 CPython 3.11: Python/ceval.c TARGET(MAKE_FUNCTION)
-                        // 栈布局（从下到上）：defaults?, kwdefaults?, annotations?, closure?, code
-                        // CPython POP 顺序（从上到下）：code → closure → annotations → kwdefaults → defaults
-                        // arg 标志位: 0x01=defaults, 0x02=kwdefaults, 0x04=annotations, 0x08=closure
+                        // 注意：3.12 的 qualname 不在栈上（来自 co_qualname），3.11 的 qualname
+                        // 在栈上但本 handler 不显式 pop（通过 default 分支处理 qualname 的版本已分离）。
+                        // 参考 CPython 3.11-3.12: Python/ceval.c TARGET(MAKE_FUNCTION)
                     {
                         int flags = instr.Argument ?? 0;
                         var codeExpr = SafePop();                     // 必选：代码对象
@@ -1475,9 +1474,11 @@ public class StackMachine
 
                     case PythonVersion.Py313:
                     case PythonVersion.Py314:
-                        // Python 3.13+: MAKE_FUNCTION 无 arg（opcode < HAVE_ARGUMENT）。
-                        // 只弹出 code object。defaults/closure 由后续 SET_FUNCTION_ATTRIBUTE 处理。
-                        // 参考 CPython 3.13: Python/ceval.c TARGET(MAKE_FUNCTION)
+                        // Python 3.12+: MAKE_FUNCTION 只弹出 code object。
+                        // 3.12 移除了 3.11 的 flags 机制；qualname 来自 co_qualname。
+                        // defaults/kwdefaults/annotations/closure 由 3.13+ 的
+                        // SET_FUNCTION_ATTRIBUTE 处理，3.12 用 PRECALL+CALL 协议。
+                        // 参考 CPython 3.12: Python/ceval.c TARGET(MAKE_FUNCTION)
                     {
                         var codeExpr = SafePop();
                         if (codeExpr is Constant c2 && c2.Value is CodeObject co)
