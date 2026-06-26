@@ -19,7 +19,7 @@ def process_data_file(filename):
                 pass
         except:
             pass
-        line = [line.strip() for line in '?' if not line]
+        line = [line.strip() for line in lines if not line]
     except PermissionError:
         pass
 print('==================================================')

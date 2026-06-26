@@ -217,7 +217,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    phcount = [(i, a) for (i, a) in '?' if a is Placeholder]
+    phcount = [(i, a) for (i, a) in enumerate(args) if a is Placeholder]
 
 def _partial_new(cls, func):
     if issubclass(cls, partial):
@@ -552,7 +552,7 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                base = [base for base in '?' if issubclass(cls, base)]
+                base = [base for base in abcs if issubclass(cls, base)]
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -568,7 +568,7 @@ def _compose_mro(cls, types):
     <listcomp>()
     is_related
     set(cls.__mro__)
-    typ = [[found for sub in '?' if (sub not in bases) and issubclass(cls, sub) if not True] for typ in '?']
+    typ = [[found for sub in typ() if (sub not in bases) and issubclass(cls, sub) if not True] for typ in types]
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.

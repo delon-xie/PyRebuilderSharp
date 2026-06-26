@@ -13,4 +13,4 @@ None(None)
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 []
-ver = [None for ver in '?' if not os.path.exists(pyc)]
+ver = [None for ver in versions if not os.path.exists(pyc)]

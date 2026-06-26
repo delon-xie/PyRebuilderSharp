@@ -221,7 +221,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    phcount = [(i, a) for (i, a) in '?' if a is Placeholder]
+    phcount = [(i, a) for (i, a) in enumerate(args) if a is Placeholder]
     phcount = j - nargs
     if phcount:
         pass
@@ -538,7 +538,7 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                base = [base for base in '?' if not issubclass(cls, base)]
+                base = [base for base in abcs if not issubclass(cls, base)]
                 for base in abstract_bases:
                     abcs.remove(base)
                 base
@@ -589,7 +589,7 @@ def _compose_mro(cls, types):
     n = [n for n in '?' if is_strict_base(n)]
     type_set = set(types)
     mro = []
-    typ = [[sub for sub in '?' if not sub not in bases] for typ in '?' if not found]
+    typ = [[sub for sub in typ.__subclasses__() if not sub not in bases] for typ in types if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

@@ -17,7 +17,7 @@ None(None, None)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 []
-e = [os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver) for ver in '?' if not os.path.exists(pyc)]
+e = [os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver) for ver in versions if not os.path.exists(pyc)]
 passed = sum(<genexpr>())
 total = len(results)
 print("""

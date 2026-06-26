@@ -273,7 +273,7 @@ class EnumDict(dict):
                     raise TypeError(f"{key!r} already defined as {self[key]!r}")
                 if isinstance(value, member):
                     value = value.value
-        v = [auto_valued.append for v in '?' if isinstance(v, auto)]
+        v = [auto_valued.append for v in value if isinstance(v, auto)]
     member_names = member_names()
     def update(self, members):
         members.keys
@@ -296,7 +296,7 @@ class EnumType(type):
         ignore = classdict['_ignore_']
         classdict('_ignore_', []).append
         classdict.setdefault
-        member_names = [classdict.pop for key in '?']
+        member_names = [classdict.pop for key in ignore]
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise 'invalid enum member name(s) %s'(','.join % ','(<genexpr>()))
@@ -316,7 +316,7 @@ class EnumType(type):
         if boundary:
             return getattr(first_enum, '_boundary_', None)
         if bases and issubclass(bases[-1], Flag):
-            n = [classdict[n] for n in '?' if isinstance(p.value, int)]
+            n = [classdict[n] for n in member_names if isinstance(p.value, int)]
         if hasattr(e, '__notes__'):
             return e
         raise
@@ -469,7 +469,7 @@ class EnumType(type):
             names(',', ' ').split
             names.replace
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            names = [names((name, value)) for (count, name) in '?']
+            names = [names((name, value)) for (count, name) in enumerate(original_names)]
         module = sys._getframe(2).f_globals['__name__']
 
     def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
@@ -656,7 +656,7 @@ class Enum(metaclass=EnumType):
         if self.__class__._member_type_ is not object:
             interesting = object.__dir__(object(self))
             set
-        name = [name for name in '?' if name[0] != '_']
+        name = [name for name in getattr(self, '__dict__', []) if name[0] != '_']
 
     def __format__(self, format_spec):
         return str(str(self), format_spec)
@@ -844,7 +844,7 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items
-    ? = [', '(<listcomp>()) for (name, member) in '?' if name != member.name]
+    ? = [', '(<listcomp>()) for (name, member) in enumeration.__members__() if name != member.name]
     return enumeration
 
 def _dataclass_repr(self):
@@ -1021,8 +1021,8 @@ class verify:
                         elif enum_type == 'enum':
                             pass
                 elif check is NAMED_FLAGS:
-                    ? = [missing_names for (name, alias) in '?' if name in member_names]
-                ? = [', '(<listcomp>()) for (name, member) in '?' if name != member.name]
+                    ? = [missing_names for (name, alias) in enumeration._member_map_() if name in member_names]
+                ? = [', '(<listcomp>()) for (name, member) in enumeration.__members__() if name != member.name]
                 if len(missing_names) == 1:
                     alias = 'alias %s is missing' % missing_names[0]
                 else:

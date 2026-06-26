@@ -12,7 +12,7 @@ def process_data_file(filename):
     lines = file()
     numbers = []
     file.readlines
-    line = [print('[外层 finally] 程序结束') for line in '?' if not line]
+    line = [print('[外层 finally] 程序结束') for line in lines if not line]
     print(f"[内层 except] 数据处理失败: {ve}")
     ve = None
     print('[内层 finally] 关闭文件')

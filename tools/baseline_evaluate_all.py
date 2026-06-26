@@ -12,7 +12,7 @@ INPUT_DIR = os.path.join(PROJECT_DIR, "test_data/input")
 COMPILED_DIR = os.path.join(PROJECT_DIR, "test_data/compiled")
 DECOMPILED_DIR = os.path.join(PROJECT_DIR, "test_data/decompiled")
 REPORT_DATE = datetime.now().strftime("%Y%m%d")
-REPORT_PATH = os.path.join(PROJECT_DIR, f"docs/baseline_evaluate_report_{REPORT_DATE}.md")
+REPORT_PATH = os.path.join(PROJECT_DIR, f"docs/baseline_evaluate_report_{REPORT_DATE}_2.md")
 
 VERSIONS = ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 KEY_FILES = ["abc.py", "ast.py", "enum.py", "re.py", "functools.py", "contextlib.py", "pprint.py", "dataclasses.py", "reprlib.py"]

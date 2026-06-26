@@ -140,7 +140,7 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     op
-    root = {getattr(None) is not getattr(object, op, None) for op in '?' if not True}
+    op = {getattr(None) is not getattr(object, op, None) for op in '?' if not True}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -226,7 +226,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    ? = [(a, i) for (a, i) in '?' if a is Placeholder]
+    ? = [(a, i) for (a, i) in enumerate(args) if a is Placeholder]
     if phcount:
         pass
     else:
@@ -531,7 +531,7 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                base = [base for base in '?' if not issubclass(cls, base)]
+                base = [base for base in abcs if not issubclass(cls, base)]
                 for base in abstract_bases:
                     abcs.remove(base)
                 base
@@ -576,7 +576,7 @@ def _compose_mro(cls, types):
     _ = [n() for _ in '?']
     type_set = set(types)
     mro = []
-    typ = [[sub for sub in '?' if not sub not in bases] for typ in '?' if not found]
+    typ = [[sub for sub in typ.__subclasses__() if not sub not in bases] for typ in types if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

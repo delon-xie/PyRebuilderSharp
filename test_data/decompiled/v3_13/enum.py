@@ -259,7 +259,7 @@ class EnumType(type):
             return
         classdict.setdefault('_ignore_', []).append('_ignore_')
         ignore = classdict['_ignore_']
-        _order_ = [classdict.pop(key, None) for key in '?']
+        _order_ = [classdict.pop(key, None) for key in ignore]
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
@@ -275,7 +275,7 @@ class EnumType(type):
         if not boundary:
             return getattr(first_enum, '_boundary_', None)
         if bases and issubclass(bases[-1], Flag):
-            n = [classdict[n] for n in '?' if isinstance(p.value, int)]
+            n = [classdict[n] for n in member_names if isinstance(p.value, int)]
         for p in inverted:
             if isinstance(p.value, int):
                 p.value = bits & p.value
@@ -465,7 +465,7 @@ class EnumType(type):
         if isinstance(names, str):
             names = names.replace(',', ' ').split()
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            ? = [names.append((name, value)) for (count, name) in '?']
+            ? = [names.append((name, value)) for (count, name) in enumerate(original_names)]
         _make_class_unpicklable(classdict)
         return metacls.__new__
 
@@ -605,7 +605,7 @@ class Enum(metaclass=EnumType):
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
-        name = [name for name in '?' if not name[0] != '_']
+        name = [name for name in getattr(self, '__dict__', []) if not name[0] != '_']
         for cls in self.__class__.mro():
             for (obj, name) in cls.__dict__.items():
                 if name[0] == '_':
@@ -799,7 +799,7 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
 """
     duplicates = []
-    ? = [(member, name) for (member, name) in '?' if not True]
+    ? = [(member, name) for (member, name) in enumeration.__members__.items() if not True]
     if duplicates:
         name
         alias
@@ -834,7 +834,7 @@ def global_flag_repr(self):
         '|'.join
     else:
         name = []
-        n = [n for n in '?' if n[0].isdigit()]
+        n = [n for n in self._name_.split('|') if n[0].isdigit()]
         return '|'.join(name)
     return
 
@@ -1008,7 +1008,7 @@ class verify:
             raise TypeError('the \'verify\' decorator only works with Enum and Flag')
             for check in checks:
                 if check is UNIQUE:
-                    ? = [(member, name) for (member, name) in '?' if not True]
+                    ? = [(member, name) for (member, name) in enumeration.__members__.items() if not True]
                 elif check is CONTINUOUS:
                     values = set(<genexpr>())
                     if len(values) < 2:
@@ -1040,7 +1040,7 @@ class verify:
                         pass
                     missing_names = []
                     missing_value = 0
-                    ? = [(alias, name) for (alias, name) in '?' if name in member_names]
+                    ? = [(alias, name) for (alias, name) in enumeration._member_map_.items() if name in member_names]
                     if not missing_names:
                         pass
                     elif len(missing_names) == 1:

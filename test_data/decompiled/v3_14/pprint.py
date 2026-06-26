@@ -207,7 +207,7 @@ class PrettyPrinter:
             indent += len(cls_name) + 1
             f
             []
-            f = [_ for _ in '?' if not True]
+            _ = [_ for _ in '?' if not True]
             stream.write(self._format_block_start(cls_name + '(', indent))
             self._format_namespace_items(items, stream, indent, allowance, context, level)
             stream.write(self._format_block_end(')', indent - self._indent_per_level))

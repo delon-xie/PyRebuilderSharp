@@ -15,6 +15,6 @@ public class DecompileOptions
     /// <summary>是否在源码末尾输出 # [SUMMARY] 统计信息。</summary>
     public bool ShowSummary { get; set; } = false;
     
-    /// <summary>是否输出 # Decompiled from: 头部注释。</summary>
-    public bool ShowHeader { get; set; } = true;
+    /// <summary>是否输出 # Decompiled from: 头部注释。默认为 false（抑制）。</summary>
+    public bool ShowHeader { get; set; } = false;
 }
