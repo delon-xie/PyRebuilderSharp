@@ -1032,9 +1032,39 @@ public class StackMachine
                 return null;
             }
 
-            // ---- 3.5-3.10 CALL_FUNCTION_KW: call with keyword args ----
+            // ---- 3.5-3.10 CALL_FUNCTION_KW / 3.12+ LOAD_SUPER_ATTR ----
+            // 注意：CALL_FUNCTION_KW (3.5-3.10) 和 LOAD_SUPER_ATTR (3.12+)
+            // 在 Opcode 枚举中共用值 141，通过版本区分。
             case Opcode.CALL_FUNCTION_KW:
             {
+                // 3.12+: LOAD_SUPER_ATTR — super().__init__() / super().attr
+                // 参考 CPython 3.12: Python/generated_cases.c.h LOAD_SUPER_ATTR
+                // Stack before: [..., super_func, __class__, self] (3 items)
+                // Stack after: [..., super.__init__]
+                // oparg >> 2 = name index in co_names
+                if (_code.Version is PythonVersion.Py312 or PythonVersion.Py313 or PythonVersion.Py314)
+                {
+                    var arg = instr.Argument ?? 0;
+                    var attrNameIdx = arg >> 2;
+                    var attrName = attrNameIdx < _code.Names.Count
+                        ? _code.Names[attrNameIdx]
+                        : $"name_{attrNameIdx}";
+                    var selfExpr = SafePop();
+                    var classExpr = SafePop();
+                    var superFunc = SafePop();
+                    var superArgs = new List<Expr>();
+                    if (classExpr != null) superArgs.Add(classExpr);
+                    if (selfExpr != null) superArgs.Add(selfExpr);
+                    var superCall = new Call(
+                        superFunc ?? new Name("super", ExpressionContext.Load),
+                        superArgs,
+                        new List<Keyword>());
+                    var attrExpr = new AstAttribute(superCall, attrName, ExpressionContext.Load);
+                    _exprStack.Push(attrExpr);
+                    return null;
+                }
+
+                // 3.5-3.10: CALL_FUNCTION_KW — call with keyword args
                 // Stack: [func, arg0, arg1, ..., argN-1, keyword_names_tuple]
                 // keyword_names_tuple = (kw_name0, kw_name1, ...)
                 // arg = total number of arguments (positional + keyword)

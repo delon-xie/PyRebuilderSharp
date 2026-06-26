@@ -872,8 +872,10 @@ public class PycReader
 
             // Python 3.12+ wordcode: LOAD_ATTR 编码 (name_idx << 1) | self_or_null
             // 3.12+ 才使用此编码；3.11 的 LOAD_ATTR arg 是原始 name index
+            // 注意：只处理 LOAD_ATTR，不处理 LOAD_SUPER_ATTR（后者使用 name_idx << 2 | flags）
+            // 参考 CPython 3.12: Include/opcode.h LOAD_SUPER_ATTR 的 oparg 格式
             if (arg.HasValue
-                && op is Models.Bytecode.Opcode.LOAD_ATTR or Models.Bytecode.Opcode.LOAD_SUPER_ATTR
+                && op == Models.Bytecode.Opcode.LOAD_ATTR
                 && _strategy.Version >= PythonVersion.Py312)
             {
                 arg = arg.Value >> 1;
