@@ -1366,7 +1366,9 @@ public class StackMachine
 
             case Opcode.GET_ITER:
             {
-                // L1: GET_ITER — 消耗栈顶的迭代对象，防止残留导致伪 ExprStmt
+                // GET_ITER — 消耗栈顶的迭代对象。
+                // 注意：不推回栈，因为 for 循环的 FOR_ITER 在后继块独立处理迭代表达式。
+                // 推导式的 CALL 通过 handler 内的 args 回溯找到 iterable。
                 var iterable = SafePop();
                 if (iterable == null)
                     Console.Error.WriteLine($"[GET_ITER] v{_code.Version} func={_code.Name} stackEmpty");

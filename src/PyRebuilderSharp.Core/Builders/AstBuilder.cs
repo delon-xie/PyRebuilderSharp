@@ -3881,82 +3881,54 @@ public class AstBuilder
 
         if (forStmt == null) return null;
 
-        // Build comprehension generators
+        // Build comprehension generators: find the For loop and its filters
         var generators = new List<Comprehension>();
-        var currentFor = forStmt;
-        while (currentFor != null)
+
+        // Find the innermost for-loop (for nested comprehensions)
+        var innermostFor = forStmt;
+        while (true)
         {
-            // Collect ifs (filter conditions) from the for body
-            var ifs = new List<Expr>();
-            var remainingBody = new List<Stmt>();
+            For? nested = null;
+            foreach (var s in innermostFor.Body)
+                if (s is For f) { nested = f; break; }
+            if (nested == null) break;
+            innermostFor = nested;
+        }
 
-            foreach (var s in currentFor.Body)
+        // Collect filters from innermost for's body (preceding the element expr)
+        var ifs = new List<Expr>();
+        var bodyCopy = new List<Stmt>(innermostFor.Body);
+        foreach (var s in bodyCopy)
+        {
+            if (s is If ifStmt)
             {
-                if (s is If ifStmt)
-                {
-                    ifs.Add(ifStmt.Test);
-                    remainingBody.AddRange(ifStmt.Body);
-                }
-                else
-                {
-                    remainingBody.Add(s);
-                }
-            }
-
-            generators.Add(new Comprehension(
-                currentFor.Target,
-                currentFor.Iter,
-                ifs
-            ));
-
-            // Check for nested for-loop
-            var nextFor = remainingBody.FirstOrDefault(s => s is For) as For;
-            currentFor = nextFor;
-
-            // The element expression is the last non-for statement
-            if (currentFor == null)
-            {
-                // Check for dict: element is a Tuple(Key, Value) or Assign
-                // This is the element expression for the comprehension
+                ifs.Add(ifStmt.Test);
+                // Remove the if from body
+                innermostFor.Body.Remove(s);
             }
         }
 
-        // The element expression comes from the last for-loop's body
-        // Find it: should be an ExprStmt or last statement before nested for
+        // Build generators list from outermost to innermost for
+        var cur = forStmt;
+        while (cur != null)
+        {
+            var genIfs = (cur == innermostFor) ? ifs : new List<Expr>();
+            generators.Add(new Comprehension(cur.Target, cur.Iter, genIfs));
+
+            For? next = null;
+            foreach (var s in cur.Body)
+                if (s is For f) { next = f; break; }
+            cur = next;
+        }
+
+        // Element expression: the last non-for, non-continue statement in innermost body
         Expr? elt = null;
         Expr? keyElt = null;
-
-        // Look at the innermost for-loop body
-        var innermostBody = forStmt;
-        For? foundNested;
-        do
+        for (int i = innermostFor.Body.Count - 1; i >= 0; i--)
         {
-            foundNested = null;
-            foreach (var s in innermostBody.Body)
-            {
-                if (s is For fn)
-                {
-                    foundNested = fn;
-                    innermostBody = fn;
-                    break;
-                }
-            }
-        } while (foundNested != null);
-
-        foreach (var s in innermostBody.Body)
-        {
-            if (s is ExprStmt es)
-                elt = es.Value;
-            else if (s is Assign a && a.Targets.Count == 1)
-            {
-                // Dict comprehension: element is (key, value) pair
-                if (kind == CompKind.Dict)
-                {
-                    // In dict comprehensions, the last ExprStmt or Assign gives the value
-                    // and the target gives the key
-                }
-                elt = a.Value;
-            }
+            var s = innermostFor.Body[i];
+            if (s is ExprStmt es) { elt = es.Value; break; }
+            if (s is Assign aa) { elt = aa.Value; break; }
         }
 
         if (elt == null) return null;
@@ -4131,10 +4103,11 @@ public class AstBuilder
                         continue;
                     }
                     // 推导式（comprehension）：<setcomp>/<listcomp>/<dictcomp>/<genexpr>
-                    // 模式：assign.Value is Call(funcRef, [iterExpr])
+                    // 模式：assign.Value is Call(funcRef, [iterExpr?])
                     // 其中 funcRef.Name 以 < 开头（如 "<setcomp>"）
+                    // 注意：CALL 的 Args 可能为空（GET_ITER 消耗了迭代表达式，
+                    // 迭代器通过函数参数 .0 隐式传入）。
                     if (assign.Value is Call compCall
-                        && compCall.Args.Count >= 1
                         && compCall.Func is FunctionRef compRef
                         && compRef.Name.StartsWith("<"))
                     {
