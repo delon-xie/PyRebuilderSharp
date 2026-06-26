@@ -1178,23 +1178,31 @@ public class StackMachine
             case Opcode.BUILD_CONST_KEY_MAP:
             {
                 // Build map from keys tuple + values
-                // Stack: ..., keys_tuple, value0, value1, ..., valueN-1
+                // Stack: ..., value0, value1, ..., valueN-1, keys_tuple
                 // where keys_tuple is a tuple constant with N key names
+                // CPython 3.12: Python/ceval.c TARGET(BUILD_CONST_KEY_MAP)
+                // keys = POP(); for i in range(oparg): dict[keys[i]] = next value
+                // 注意：values 从栈底到栈顶为 [val0, val1, ..., val_{N-1}]，
+                // 但 SafePop() 从栈顶弹出。所以 val0 最后弹出，val_{N-1} 最先弹出。
+                // 当前弹出顺序 val_{N-1}...val0。需要配对 keys[0..N-1] 与 val0..val_{N-1}。
+                // 因此从 keys 的末尾开始配对：popped_val_i ↔ keys[N-1-i]
                 var count = instr.Argument ?? 0;
                 var entries = new List<(Expr Key, Expr Value)>();
-                var keysExpr = SafePop();  // keys tuple
+                var keysExpr = SafePop();  // keys tuple (TOS)
+                var values = new List<Expr>();
                 for (int i = 0; i < count && _exprStack.Count > 0; i++)
                 {
                     var val = SafePop();
-                    if (val != null && keysExpr != null)
+                    if (val != null) values.Insert(0, val);  // collected in push order
+                }
+                // Now values[0..N-1] = val0..val_{N-1} in push order
+                if (keysExpr is Constant c && c.Value is System.Collections.IList keyList)
+                {
+                    int maxIdx = Math.Min(count, keyList.Count);
+                    for (int i = 0; i < maxIdx && i < values.Count; i++)
                     {
-                        // Extract key name from tuple
-                        Expr key;
-                        if (keysExpr is Constant c && c.Value is System.Collections.IList list && i < list.Count)
-                            key = new Constant(list[i]);
-                        else
-                            key = new Constant($"key_{i}");
-                        entries.Insert(0, (key, val));
+                        var key = new Constant(keyList[i]);
+                        entries.Add((key, values[i]));
                     }
                 }
                 _exprStack.Push(new DictLiteral(entries));
@@ -1371,7 +1379,6 @@ public class StackMachine
 
             case Opcode.MAKE_FUNCTION:
             {
-                Console.Error.WriteLine($"[MF] version={_code.Version} func={_code.Name} arg={instr.Argument}");
                 // MAKE_FUNCTION 的栈布局因 Python 版本而异。
                 // 参考 CPython:
                 //   - 2.7: 栈顶只有 code object（无 qualname）— Python/ceval.c 2.7 make_function

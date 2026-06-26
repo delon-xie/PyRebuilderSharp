@@ -15,7 +15,7 @@ for line in output.split("""
             status = parts[1].strip()
             current_group
             test_groups
-            {'files': status, 'status': []}
+            {'status': status, 'files': []}
     elif current_group and line.strip().endswith('.3.10.pyc'):
         return test_groups[current_group]['files'].append(line.strip())
 print('============================================================')

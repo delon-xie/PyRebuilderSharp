@@ -8,17 +8,17 @@ import sys
 PY27 = os.path('~/.pyenv/versions/2.7.18/bin/python')
 OUTPUT_DIR = '/tmp/py27_diag'
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-tests = {'expr_all': """a = 1
+tests = {'expr_simple': """a = 1
 b = 2
 c = a + b
-""", 'expr_bool': """def foo():
+""", 'expr_func': """def foo():
     return 42
 x = foo()
-""", 'expr_func': """x = True
+""", 'expr_bool': """x = True
 y = False
 z = x and y
 w = x or y
-""", 'expr_simple': """# Complete expressions for 2.7
+""", 'expr_all': """# Complete expressions for 2.7
 a = 1
 b = True
 c = None

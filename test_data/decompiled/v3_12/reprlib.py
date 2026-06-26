@@ -29,8 +29,8 @@ def recursive_repr(fillvalue = '...'):
     return decorating_function
 
 class Repr:
-    _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
-    def __init__(self, *, maxlevel = None, maxtuple = '...', maxlist = 30, maxarray = 40, maxdict = 30, maxset = 6, maxfrozenset = 6, maxdeque = 6, maxstring = 4, maxlong = 5, maxother = 6, fillvalue = 6, indent = 6):
+    _lookup = {'tuple': 'builtins', 'list': 'builtins', 'array': 'array', 'set': 'builtins', 'frozenset': 'builtins', 'deque': 'collections', 'dict': 'builtins', 'str': 'builtins', 'int': 'builtins'}
+    def __init__(self, *, maxlevel = 6, maxtuple = 6, maxlist = 6, maxarray = 5, maxdict = 4, maxset = 6, maxfrozenset = 6, maxdeque = 6, maxstring = 30, maxlong = 40, maxother = 30, fillvalue = '...', indent = None):
         self.maxlevel = maxlevel
         self.maxtuple = maxtuple
         self.maxlist = maxlist
@@ -65,11 +65,6 @@ class Repr:
         return self.repr_instance(x, level)
 
     def _join(self, pieces, level):
-        try:
-            sep = """,
-""" + (self.maxlevel - level + 1) * indent
-        except TypeError:
-            pass
         return ', '.join(pieces)
         return ''
         indent = self.indent
@@ -155,10 +150,6 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except ValueError:
-            pass
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
@@ -166,10 +157,6 @@ class Repr:
         return s
 
     def repr_instance(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except Exception:
-            '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
@@ -177,10 +164,6 @@ class Repr:
         return s
 
 def _possibly_sorted(x):
-    try:
-        sorted(x)
-    except Exception:
-        list(x)
     return
 aRepr = Repr()
 repr = aRepr.repr

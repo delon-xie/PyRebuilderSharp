@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    expected_ast = ast.dump(ast.parse(expected_src), indent=2)
-except Exception:
-    pass
 """Run AST comparison for test_seq_clean across all versions"""
 import os
 import subprocess

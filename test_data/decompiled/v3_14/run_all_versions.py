@@ -1,10 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    actual_ast = ast.dump(ast.parse(actual_src), indent=2)
-    match = expected_ast == actual_ast
-except Exception:
-    pass
 """Run AST comparison for test_expr_basic across all versions"""
 import os
 import subprocess

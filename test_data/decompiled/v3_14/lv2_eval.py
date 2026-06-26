@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    f = open('test.txt')
-except IOError:
-    f = None
 for i in range(10):
     a = i
 for x in items:

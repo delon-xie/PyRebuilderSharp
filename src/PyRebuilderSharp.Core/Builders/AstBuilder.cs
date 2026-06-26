@@ -91,12 +91,11 @@ public class AstBuilder
                 // 块属于 for-loop body，由 BuildForLoop 的 GetStructuredBlockStmts 处理）。
                 // 检测：entryBlock 的任何前驱是包含 FOR_ITER 的循环头。
                 bool isInsideForLoop = entryBlock.Predecessors.Any(p =>
-                    p.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER));
+                p.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER));
                 if (isInsideForLoop) continue;
                 var etStmts = BuildTryFromExceptionTable(entryBlock, visited);
                 if (etStmts != null)
                 {
-                    stmts.AddRange(etStmts);
                     foreach (var b in GetBlocksInRange(entry.StartOffset, entry.EndOffset))
                     {
                         _processedBlockIds.Add(b.Id);

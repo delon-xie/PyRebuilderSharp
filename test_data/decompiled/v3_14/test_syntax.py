@@ -2957,10 +2957,6 @@ class SyntaxErrorTestCase(unittest.TestCase):
     text of the exception raised.  If subclass is specified it
     is the expected subclass of SyntaxError (e.g. IndentationError).
 """
-        try:
-            compile(code, filename, mode)
-        except SyntaxError:
-            pass
         self.fail('compile() did not raise SyntaxError')
 
     def test_expression_with_assignment(self):
@@ -3187,10 +3183,6 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
 
     pass
 """
-        try:
-            compile(s, '<string>', 'exec')
-        except SyntaxError:
-            self.fail('Empty line after a line continuation character is valid.')
         s = """\\
 pass
         \\

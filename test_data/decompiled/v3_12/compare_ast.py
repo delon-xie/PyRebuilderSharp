@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    expected_ast = ast.dump(ast.parse(expected), indent=2)
-except Exception:
-    pass
 """Compare ASTs of expected vs decompiled"""
 import ast
 import sys

@@ -1,10 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
-    ok = expected_ast == actual_ast
-except Exception:
-    pass
 """Run AST comparison for test_control_flow across all versions"""
 import os
 import subprocess

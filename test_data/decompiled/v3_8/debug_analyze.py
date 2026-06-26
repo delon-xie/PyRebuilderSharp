@@ -6,7 +6,7 @@ f = open('/tmp/test_full.txt', 'r')
 output = f.read()
 @defaultdict
 def version_stats():
-    return {'failed': 0, 'passed': 0, 'total': 0}
+    return {'total': 0, 'passed': 0, 'failed': 0}
 lines = output.split("""
 """)
 i = 0

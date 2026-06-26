@@ -57,11 +57,6 @@ class Repr:
         return self.repr_instance(x, level)
 
     def _join(self, pieces, level):
-        try:
-            sep = """,
-""" + (self.maxlevel - level + 1) * indent
-        except TypeError:
-            pass
         return ', '.join(pieces)
         return ''
         indent = self.indent
@@ -154,10 +149,6 @@ class Repr:
 
     def repr_int(self, x, level):
         """sys.set_int_max_str_digits()"""
-        try:
-            s = builtins.repr(x)
-        except ValueError:
-            pass
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
@@ -166,10 +157,6 @@ class Repr:
 
     def repr_instance(self, x, level):
         """<%s instance at %#x>"""
-        try:
-            s = builtins.repr(x)
-        except Exception:
-            '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
@@ -177,10 +164,6 @@ class Repr:
         return s
 
 def _possibly_sorted(x):
-    try:
-        sorted(x)
-    except Exception:
-        list(x)
     return
 aRepr = Repr()
 repr = aRepr.repr

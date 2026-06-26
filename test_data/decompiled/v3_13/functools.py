@@ -1,9 +1,5 @@
 # Decompiled from: <module>
 
-try:
-    from _functools import cmp_to_key
-except ImportError:
-    pass
 """functools.py - Tools for working with functions and callable objects
 """
 __all__ = ('update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder')
@@ -27,10 +23,6 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
     are updated with the corresponding attribute from the wrapped
     function (defaults to functools.WRAPPER_UPDATES)
 """
-    try:
-        value = getattr
-    except AttributeError:
-        pass
     for attr in assigned:
         pass
     for attr in updated:
@@ -144,7 +136,7 @@ def _lt_from_ge(self, other):
         return op_result
     else:
         return not op_result
-_convert = frozendict({'__ge__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__gt__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__le__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__lt__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
+_convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     op
@@ -201,10 +193,6 @@ def reduce(function, sequence, /, initial = _initial_missing):
     For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
     calculates ((((1 + 2) + 3) + 4) + 5).
 """
-    try:
-        value = next(it)
-    except StopIteration:
-        pass
     it = iter(sequence)
     if initial is _initial_missing:
         pass
@@ -301,10 +289,6 @@ class partial:
     __new__ = _partial_new
     __repr__ = recursive_repr()(_partial_repr)
     def __call__(self):
-        try:
-            pto_args = self._merger(self.args + args)
-        except IndexError:
-            pass
         phcount = self._phcount
         if phcount:
             pass
@@ -350,10 +334,6 @@ class partialmethod:
     __repr__ = _partial_repr
     def _make_unbound_method(self):
         def _method(cls_or_self):
-            try:
-                pto_args = self._merger(self.args + args)
-            except IndexError:
-                pass
             if phcount:
                 pass
             else:
@@ -365,10 +345,6 @@ class partialmethod:
         return _method
 
     def __get__(self, obj, cls = None):
-        try:
-            result.__self__ = new_func.__self__
-        except AttributeError:
-            pass
         get = getattr(self.func, '__get__', None)
         result = None
         new_func = get(None)
@@ -724,18 +700,10 @@ class singledispatchmethod:
         return _singledispatchmethod_get(cls)
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
-        try:
-            name = self.func.__qualname__
-        except AttributeError:
-            pass
         return f"<single dispatch method descriptor {name}>"
 
 class _singledispatchmethod_get:
     def __init__(self, unbound, obj, cls):
-        try:
-            self.__module__ = func.__module__
-        except AttributeError:
-            pass
         self._dispatch = unbound.dispatcher.dispatch
         func = unbound.func
         if isinstance(func, FunctionType):
@@ -745,10 +713,6 @@ class _singledispatchmethod_get:
         self.__doc__ = func.__doc__
 
     def __repr__(self):
-        try:
-            name = self.__qualname__
-        except AttributeError:
-            return f"<single dispatch method {name}>"
         return f"<bound single dispatch method {name} of {self._obj}>"
 
     def __call__(self):
@@ -785,10 +749,6 @@ class cached_property:
         raise TypeError(f"Cannot assign the same cached_property to two different names ({self.attrname} and {name}).")
 
     def __get__(self, instance, owner = None):
-        try:
-            cache = instance.__dict__
-        except AttributeError:
-            msg = f"No '__dict__' attribute on {type(instance).__name__} instance to cache {self.attrname} property."
         return self
         raise TypeError('Cannot use cached_property instance without calling __set_name__ on it.')
         val = cache.get(self.attrname, _NOT_FOUND)

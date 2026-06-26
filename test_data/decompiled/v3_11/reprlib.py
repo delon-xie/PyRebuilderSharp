@@ -30,8 +30,8 @@ def recursive_repr(fillvalue = '...'):
     return decorating_function
 
 class Repr:
-    _lookup = {'int': 'builtins', 'str': 'builtins', 'dict': 'array', 'deque': 'builtins', 'frozenset': 'builtins', 'set': 'collections', 'array': 'builtins', 'list': 'builtins', 'tuple': 'builtins'}
-    def __init__(self, *, maxlevel = None, maxtuple = '...', maxlist = 30, maxarray = 40, maxdict = 30, maxset = 6, maxfrozenset = 6, maxdeque = 6, maxstring = 4, maxlong = 5, maxother = 6, fillvalue = 6, indent = 6):
+    _lookup = {'tuple': 'builtins', 'list': 'builtins', 'array': 'array', 'set': 'builtins', 'frozenset': 'builtins', 'deque': 'collections', 'dict': 'builtins', 'str': 'builtins', 'int': 'builtins'}
+    def __init__(self, *, maxlevel = 6, maxtuple = 6, maxlist = 6, maxarray = 5, maxdict = 4, maxset = 6, maxfrozenset = 6, maxdeque = 6, maxstring = 30, maxlong = 40, maxother = 30, fillvalue = '...', indent = None):
         self.maxlevel = maxlevel
         self.maxtuple = maxtuple
         self.maxlist = maxlist

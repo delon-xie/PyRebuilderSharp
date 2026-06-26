@@ -10,7 +10,7 @@ print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
 print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
-known = {'flags': code.co_argcount, 'stacksize': code.co_nlocals, 'nlocals': code.co_stacksize, 'argcount': code.co_flags}
+known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
 print(print, 'Known values:'(<dictcomp>))
 for start in range(0, 8):
     if start + 16 > len(m):

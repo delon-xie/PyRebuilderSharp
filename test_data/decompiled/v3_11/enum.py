@@ -379,7 +379,7 @@ class EnumType(type):
         """
         return True
 
-    def __call__(cls, value, names, *, module = None, qualname = 1, type = None, start = None, boundary = _not_given):
+    def __call__(cls, value, names = _not_given, *, module = None, qualname = None, type = None, start = 1, boundary = None):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -502,7 +502,7 @@ class EnumType(type):
         else:
             return super()(name, value)
 
-    def _create_(cls, class_name, names, *, module = None, qualname = 1, type = None, start = None, boundary = None):
+    def _create_(cls, class_name, names, *, module = None, qualname = None, type = None, start = 1, boundary = None):
         """
         Convenience method to create a new Enum class.
 
@@ -530,7 +530,7 @@ class EnumType(type):
                 names((name, value))
         module = sys._getframe(2).f_globals['__name__']
 
-    def _convert_(cls, name, module, filter, source, *, boundary = False, as_global = None):
+    def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
@@ -988,7 +988,7 @@ def global_enum(cls, update_str = False):
         else:
             cls.__str__ = global_str
 
-def _simple_enum(etype, *, boundary = None, use_args = Enum):
+def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1189,7 +1189,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     else:
         return failed
 
-def _old_convert_(etype, name, module, filter, source, *, boundary = None):
+def _old_convert_(etype, name, module, filter, source = None, *, boundary = None):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """

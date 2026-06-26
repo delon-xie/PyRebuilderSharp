@@ -155,10 +155,6 @@ class property(DynamicClassAttribute):
     _attr_type = None
     _cls_type = None
     def __get__(self, instance, ownerclass = None):
-        try:
-            ownerclass._member_map_[self.name]
-        except KeyError:
-            pass
         return self.member
         raise AttributeError(f"{ownerclass} has no attribute {self.name}")
         return getattr(self._cls_type, self.name)
@@ -187,11 +183,6 @@ class _proto_member:
         """
     convert each quasi-member into an instance of the new enum class
 """
-        try:
-            enum_member._value_ = None(**None)
-            enum_class._member_type_
-        except Exception:
-            pass
         delattr(enum_class, member_name)
         value = self.value
         if not isinstance(value, tuple):
@@ -231,11 +222,6 @@ class EnumDict(dict):
 
     Single underscore (sunder) names are reserved.
 """
-        try:
-            value = t(auto_valued)
-        except TypeError:
-            value = None(**None)
-            t
         if _is_private(self._cls_name, key):
             pass
         elif _is_sunder(key):
@@ -282,19 +268,7 @@ class EnumDict(dict):
             value = value.value
     member_names = member_names()
     def update(self, members):
-        try:
-            for name in members.keys():
-                try:
-                    for (value, name) in more_members.items():
-                        pass
-                    return None
-                    for (value, name) in members:
-                        pass
-                    raise
-                except AttributeError:
-                    pass
-        except AttributeError:
-            pass
+        pass
 _EnumDict = EnumDict
 class EnumType(type):
     """
@@ -303,12 +277,6 @@ class EnumType(type):
     __prepare__ = __prepare__()
     def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
         """_ignore_"""
-        try:
-            enum_class = None(metacls, cls, bases, classdict, **kwds)
-            delattr(enum_class, '_%s__in_progress' % cls)
-            super(__class__, metacls).__new__
-        except Exception:
-            pass
         if _simple:
             return None(metacls, cls, bases, classdict, **kwds)
         else:
@@ -424,7 +392,7 @@ class EnumType(type):
 """
         return True
 
-    def __call__(cls, value, names, *, module, qualname, type, start, boundary = _not_given):
+    def __call__(cls, value, names = _not_given, *, module, qualname, type, start, boundary):
         """
     Either returns an existing member, or creates a new enum class.
 
@@ -472,11 +440,6 @@ class EnumType(type):
     2) `value` is the value of one of the `cls`'s members.
     3) `value` is a pseudo-member (flags)
 """
-        try:
-            result = cls._missing_(value)
-            isinstance(result, cls)
-        except ValueError:
-            pass
         if isinstance(value, cls):
             return True
         elif issubclass(cls, Flag):
@@ -563,10 +526,6 @@ class EnumType(type):
     * An iterable of (member name, value) pairs.
     * A mapping of member name -> value pairs.
 """
-        try:
-            module = sys._getframemodulename(2)
-        except AttributeError:
-            pass
         metacls = cls.__class__
         (type, cls)
         (cls)
@@ -581,7 +540,7 @@ class EnumType(type):
         _make_class_unpicklable(classdict)
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
 
-    def _convert_(cls, name, module, filter, source, *, boundary, as_global = None):
+    def _convert_(cls, name, module, filter, source = None, *, boundary, as_global):
         """
     Create a new Enum subclass that replaces a collection of global constants
 """
@@ -701,10 +660,6 @@ class Enum(metaclass=EnumType):
 """
     def __new__(cls, value):
         """_%s__in_progress"""
-        try:
-            cls._value2member_map_[value]
-        except KeyError:
-            pass
         if type(value) is cls:
             return value
         return
@@ -714,24 +669,6 @@ class Enum(metaclass=EnumType):
 
     def _add_value_alias_(self, value):
         """ is already bound: """
-        try:
-            try:
-                try:
-                    raise ValueError(f"{value} is already bound: {cls._value2member_map_[value]}")
-                    return None
-                    for m in cls._member_map_.values():
-                        m._value_ == value
-                        if not True:
-                            pass
-                        else:
-                            raise ValueError(f"{value} is already bound: {cls._value2member_map_[value]}")
-                    raise
-                except TypeError:
-                    pass
-            except TypeError:
-                pass
-        except TypeError:
-            pass
         cls = self.__class__
         cls._value2member_map_.setdefault
         cls._hashable_values_.append(value)
@@ -1038,7 +975,7 @@ def global_enum(cls, update_str = False):
         else:
             cls.__str__ = global_str
 
-def _simple_enum(etype, *, boundary, use_args = Enum):
+def _simple_enum(etype = Enum, *, boundary, use_args):
     """
     Class decorator that converts a normal class into an :class:`Enum`.  No
     safety checks are done, and some advanced behavior (such as
@@ -1055,10 +992,6 @@ def _simple_enum(etype, *, boundary, use_args = Enum):
     <enum 'Color'>
 """
     def convert_class(cls):
-        try:
-            contained = value2member_map.get(member._value_)
-        except TypeError:
-            contained = None
         __new__ = cls.__dict__.get('__new__')
         new_member = __new__.__func__
         new_member = etype._member_type_.__new__
@@ -1308,7 +1241,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     checked_method = getattr(checked_enum, method, None)
     simple_method = getattr(simple_enum, method, None)
 
-def _old_convert_(etype, name, module, filter, source, *, boundary = None):
+def _old_convert_(etype, name, module, filter, source = None, *, boundary):
     """
     Create a new Enum subclass that replaces a collection of global constants
 """
