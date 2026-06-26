@@ -377,43 +377,84 @@ class EnumType(type):
                             return inverted.append(p)
                         bits |= p.value[0]
             try:
-                '_%s__in_progress' % cls(delattr, '_%s__in_progress' % cls)
+                delattr(enum_class, '_%s__in_progress' % cls)
             except Exception:
                 raise
                 e = None
                 raise
                 raise
-                e(classdict.__dict__)
+                classdict.update(enum_class.__dict__)
                 raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
-                member_type.__format__.__format__ = '__str__' not in classdict
+                enum_class.__format__ = member_type.__format__
                 method = member_type.__str__
-                method.__str__ = method is object.__str__
+                enum_class.__str__ = method
                 method = member_type.__repr__
+            classdict.update(enum_class.__dict__)
             if (ReprEnum is not None) and (ReprEnum in bases) and (member_type is object):
                 raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
             if '__format__' not in classdict:
+                enum_class.__format__ = member_type.__format__
                 '__format__'
                 classdict
+                enum_class.__format__
             elif '__str__' not in classdict:
                 method = member_type.__str__
                 if method is object.__str__:
                     method = member_type.__repr__
+                enum_class.__str__ = method
                 '__str__'
                 classdict
+                enum_class.__str__
                 for name in '__str__':
                     if name not in classdict:
                         enum_method = getattr(first_enum, name)
+                        found_method = getattr(enum_class, name)
                         object_method = getattr(object, name)
                         data_type_method = getattr(member_type, name)
                         if found_method in (data_type_method, object_method):
-                            pass
+                            return setattr(enum_class, name, enum_method)
                 if Flag is not None:
-                    for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
-                        if name not in classdict:
-                            enum_method = getattr(Flag, name)
-                            name
-                            classdict
-                            enum_method
+                    if issubclass(enum_class, Flag):
+                        for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
+                            if name not in classdict:
+                                enum_method = getattr(Flag, name)
+                                setattr(enum_class, name, enum_method)
+                                name
+                                classdict
+                                enum_method
+                    elif Enum is not None:
+                        if save_new:
+                            enum_class.__new_member__ = __new__
+                        enum_class.__new__ = Enum.__new__
+                        if _order_ is not None:
+                            if isinstance(_order_, str):
+                                _order_ = _order_.replace(',', ' ').split()
+                            elif Flag is None:
+                                pass
+                            elif Flag is not None:
+                                pass
+                            elif Flag is not None:
+                                pass
+                            elif _order_:
+                                pass
+                        elif Flag is None:
+                            pass
+                        elif Flag is not None:
+                            pass
+                        elif Flag is not None:
+                            pass
+                        elif _order_:
+                            pass
+                    elif _order_ is not None:
+                        pass
+                    elif Flag is None:
+                        pass
+                    elif Flag is not None:
+                        pass
+                    elif Flag is not None:
+                        pass
+                    elif _order_:
+                        pass
                 elif Enum is not None:
                     pass
                 elif _order_ is not None:
@@ -427,30 +468,30 @@ class EnumType(type):
                 elif _order_:
                     pass
             try:
-                '_%s__in_progress' % cls(delattr, '_%s__in_progress' % cls)
+                delattr(enum_class, '_%s__in_progress' % cls)
             except Exception:
                 raise
                 e = None
                 raise
                 raise
-                e(classdict.__dict__)
+                classdict.update(enum_class.__dict__)
                 raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
-                member_type.__format__.__format__ = '__str__' not in classdict
+                enum_class.__format__ = member_type.__format__
                 method = member_type.__str__
-                method.__str__ = method is object.__str__
+                enum_class.__str__ = method
                 method = member_type.__repr__
             try:
-                '_%s__in_progress' % cls(delattr, '_%s__in_progress' % cls)
+                delattr(enum_class, '_%s__in_progress' % cls)
             except Exception:
                 raise
                 e = None
                 raise
                 raise
-                e(classdict.__dict__)
+                classdict.update(enum_class.__dict__)
                 raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
-                member_type.__format__.__format__ = '__str__' not in classdict
+                enum_class.__format__ = member_type.__format__
                 method = member_type.__str__
-                method.__str__ = method is object.__str__
+                enum_class.__str__ = method
                 method = member_type.__repr__
         else:
             return getattr(first_enum, '_boundary_', None)
@@ -565,7 +606,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return
+        return ()(EnumType.__iter__.<locals>.<genexpr>)
 
     def __len__(cls):
         """
@@ -593,7 +634,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return
+        return ()(EnumType.__reversed__.<locals>.<genexpr>)
 
     def __setattr__(cls, name, value):
         """
@@ -657,6 +698,8 @@ class EnumType(type):
                 .0
                 []
                 for (name, value) in .0:
+                    if .0(name):
+                        pass
                     for _ in .0:
                         pass
                     return
@@ -1204,7 +1247,7 @@ def unique(enumeration):
     return enumeration
 
 def _dataclass_repr(self):
-    return
+    return self.__dataclass_fields__((', '.join, ', ')(_dataclass_repr.<locals>.<genexpr>))
 
 def global_enum_repr(self):
     """
@@ -1223,9 +1266,9 @@ def global_flag_repr(self):
     """
     cls_name = self.__class__.__name__
     if self._name_ is None:
-        return ('%s.%s(%r)', cls_name, self._value_)
+        return '%s.%s(%r)' % (module, cls_name, self._value_)
     if _is_single_bit(self._value_):
-        return ('%s.%s', self._name_)
+        return '%s.%s' % (module, self._name_)
     if self._boundary_ is not FlagBoundary.KEEP:
         return
     name = []
@@ -1274,11 +1317,14 @@ def _simple_enum(etype, *, boundary, use_args):
     """
     def convert_class(cls):
         cls_name = cls.__name__
-        __new__
+        if __new__ is None:
+            __new__
+            cls_name._use_args_
         __new__ = cls.__dict__.get('__new__')
         if __new__ is not None:
             new_member = __new__.__func__
         else:
+            new_member = cls_name._member_type_.__new__
             attrs = {}
             body = {}
             if __new__ is not None:
@@ -1292,7 +1338,7 @@ def _simple_enum(etype, *, boundary, use_args):
             hashable_values = '_hashable_values_'
             unhashable_values = '_unhashable_values_'
             member_type = '_member_type_'
-            if '_value_repr_'(issubclass, Flag) and new_member:
+            if issubclass(cls_name, Flag) and cls:
                 '__invert__'
                 body
                 Flag.__invert__
@@ -1328,6 +1374,8 @@ def _simple_enum(etype, *, boundary, use_args):
                 None
                 '_boundary_'
                 body
+            else:
+                return cls_name._boundary_
             for (name, obj) in '__invert__':
                 if name in ('__dict__', '__weakref__'):
                     pass
@@ -1335,8 +1383,10 @@ def _simple_enum(etype, *, boundary, use_args):
                 '__doc__'
                 body
                 'An enumeration.'
+            enum_class = type(cls_name, (cls_name), body, boundary=cls, _simple=True)
             for name in '__doc__':
                 if name not in body:
+                    enum_method = getattr(cls_name, name)
                     found_method = getattr(enum_class, name)
                     object_method = getattr(object, name)
                     data_type_method = getattr(member_type, name)
@@ -1348,7 +1398,7 @@ def _simple_enum(etype, *, boundary, use_args):
                     if isinstance(value, auto):
                         if auto.value is _auto_null:
                             value = gnv(name, 1, len(member_names), gnv_last_values)
-                        elif value:
+                        elif __new__:
                             if not isinstance(value, tuple):
                                 value = (value)
                             member = new_member(enum_class, **value)
@@ -1377,7 +1427,7 @@ def _simple_enum(etype, *, boundary, use_args):
                                 gnv_last_values.append(value)
                         else:
                             member = new_member(enum_class)
-                    elif value:
+                    elif __new__:
                         pass
                     else:
                         member = new_member(enum_class)
@@ -1387,7 +1437,7 @@ def _simple_enum(etype, *, boundary, use_args):
                         if value.value is _auto_null:
                             value.value = gnv(name, 1, len(member_names), gnv_last_values)
                         value = value.value
-                        if value:
+                        if __new__:
                             if not isinstance(value, tuple):
                                 value = (value)
                             member = new_member(enum_class, **value)
@@ -1419,7 +1469,7 @@ def _simple_enum(etype, *, boundary, use_args):
                                             if value.value is _auto_null:
                                                 value.value = gnv(name, 1, len(member_names), gnv_last_values)
                                             value = value.value
-                                            if value:
+                                            if __new__:
                                                 if not isinstance(value, tuple):
                                                     value = (value)
                                                 member = new_member(enum_class, **value)
@@ -1440,7 +1490,7 @@ def _simple_enum(etype, *, boundary, use_args):
                                                     return setattr(enum_class, name, member)
                                                 return enum_class._add_member_(name, member)
                                             member = new_member(enum_class)
-                                        elif value:
+                                        elif __new__:
                                             pass
                                         else:
                                             member = new_member(enum_class)
@@ -1448,7 +1498,7 @@ def _simple_enum(etype, *, boundary, use_args):
                                 enum_class._unhashable_values_map_.setdefault(name, []).append(value)
                         else:
                             member = new_member(enum_class)
-                    elif value:
+                    elif __new__:
                         pass
                     else:
                         member = new_member(enum_class)
@@ -1515,6 +1565,8 @@ class verify:
                                     .0
                                     []
                                     for v in .0:
+                                        if v not in .0:
+                                            pass
                                         for _ in .0:
                                             pass
                                         return
@@ -1599,6 +1651,8 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
             .0
             []
             for (name, value) in .0:
+                if .0(name):
+                    pass
                 for _ in .0:
                     pass
                 return

@@ -143,7 +143,26 @@ def total_ordering(cls):
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    K = K('K', object)
+    class K(object):
+        __slots__ = ['obj']
+        def __init__(self, obj):
+            self.obj = obj
+
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+
+        def __gt__(self, other):
+            return mycmp(self.obj, other.obj) > 0
+
+        def __eq__(self, other):
+            return mycmp(self.obj, other.obj) == 0
+
+        def __le__(self, other):
+            return mycmp(self.obj, other.obj) <= 0
+
+        def __ge__(self, other):
+            return mycmp(self.obj, other.obj) >= 0
+        __hash__ = None
     return K
 []
 from _functools import cmp_to_key
@@ -373,8 +392,10 @@ def _make_key(args, kwds, typed, kwd_mark = (object()), fasttypes = {int, str}, 
         kwds.items
     else:
         if typed:
+            key += tuple(<listcomp>())
             if kwds:
-                key += <listcomp>(kwds.values())
+                key = tuple + <listcomp>(kwds.values())
+                key
             return key
         if (len(key) == 1) and (type(key[0]) in fasttypes):
             return key[0]
@@ -425,6 +446,20 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     else:
         def wrapper():
             key = make_key(args, kwds, typed)
+            .freevar_13
+            .freevar_12
+            .freevar_11
+            .freevar_10
+            .freevar_9
+            .freevar_8
+            .freevar_7
+            .freevar_6
+            .freevar_5
+            .freevar_4
+            .freevar_3
+            .freevar_2
+            .freevar_1
+            .freevar_0
             link = cache_get(key)
             (link_prev, link_next, _key, result) = link
             last = root[PREV]
@@ -448,11 +483,19 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 return result
         def cache_info():
             """Report cache statistics"""
+            .freevar_3
+            .freevar_2
+            .freevar_1
+            .freevar_0
             _CacheInfo(hits, misses, maxsize, cache_len())
             None(None)
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
+            .freevar_3
+            .freevar_2
+            .freevar_1
+            .freevar_0
             cache()
             False
             0
@@ -524,12 +567,13 @@ def _c3_mro(cls, abcs = None):
                 other_bases = list(cls.__bases__[boundary:])
                 for base in []:
                     if issubclass(cls, base):
-                        if not <genexpr>():
+                        if not any(<genexpr>()):
                             abstract_bases(base)
                             abstract_bases.append
                         abstract_bases
                         for base in abstract_bases:
                             abcs(base)
+                            abcs
                             abcs.remove
                         explicit_c3_mros = <listcomp>()
                         abstract_c3_mros = <listcomp>()
@@ -547,12 +591,17 @@ def _compose_mro(cls, types):
     mro = []
     set(types)
     <listcomp>()
+    is_strict_base
+    <listcomp>()
+    is_related
+    set(cls.__mro__)
     for typ in set(types):
         found = []
         typ.__subclasses__
         for sub in typ.__subclasses__:
             if (sub not in bases) and issubclass(cls, sub):
-                return found.append(<listcomp>())
+                found(<listcomp>())
+                found.append
             found
             if not True:
                 return mro(typ)

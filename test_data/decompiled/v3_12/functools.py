@@ -149,7 +149,26 @@ def total_ordering(cls):
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    K = K('K', object)
+    class K(object):
+        __slots__ = ['obj']
+        def __init__(self, obj):
+            self.obj = obj
+
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+
+        def __gt__(self, other):
+            return mycmp(self.obj, other.obj) > 0
+
+        def __eq__(self, other):
+            return mycmp(self.obj, other.obj) == 0
+
+        def __le__(self, other):
+            return mycmp(self.obj, other.obj) <= 0
+
+        def __ge__(self, other):
+            return mycmp(self.obj, other.obj) >= 0
+        __hash__ = None
     return K
 []
 _initial_missing = sentinel('_initial_missing')
@@ -411,6 +430,22 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     else:
         def wrapper():
             key = make_key(args, kwds, typed)
+            .freevar_15
+            .freevar_14
+            .freevar_13
+            .freevar_12
+            .freevar_11
+            .freevar_10
+            .freevar_9
+            .freevar_8
+            .freevar_7
+            .freevar_6
+            .freevar_5
+            .freevar_4
+            .freevar_3
+            .freevar_2
+            .freevar_1
+            .freevar_0
             link = cache_get(key)
             (link_prev, link_next, _key, result) = link
             last = root[PREV]
@@ -436,11 +471,23 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             return result
         def cache_info():
             """Report cache statistics"""
+            .freevar_5
+            .freevar_4
+            .freevar_3
+            .freevar_2
+            .freevar_1
+            .freevar_0
             _CacheInfo(hits, misses, maxsize, cache_len())
             None(None)
             return
         def cache_clear():
             """Clear the cache and cache statistics"""
+            .freevar_5
+            .freevar_4
+            .freevar_3
+            .freevar_2
+            .freevar_1
+            .freevar_0
             cache.clear()
             False
             0
@@ -515,7 +562,7 @@ def _c3_mro(cls, abcs = None):
                 for base in []:
                     if not issubclass(cls, base):
                         pass
-                    elif <genexpr>():
+                    elif any(<genexpr>()):
                         pass
                     else:
                         return abstract_bases.append(base)
@@ -551,12 +598,14 @@ def _compose_mro(cls, types):
         return
         return
     n
+    set(cls.__mro__)
     []
     for n in []:
         if not is_related(n):
             pass
     def is_strict_base(typ):
-        for other in types:
+        .freevar_0
+        for other in .freevar_0:
             if not typ != other:
                 pass
             elif not typ in other.__mro__:

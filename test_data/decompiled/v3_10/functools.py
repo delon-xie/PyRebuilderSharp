@@ -145,6 +145,8 @@ def total_ordering(cls):
         .0
         {}
         for op in .0:
+            if getattr(.0, op, None) is not getattr(object, op, None):
+                pass
             for _ in .0:
                 pass
             return
@@ -154,7 +156,8 @@ def total_ordering(cls):
     for (opname, opfunc) in _convert[root]:
         if opname not in roots:
             opfunc.__name__ = opname
-    return
+            setattr(cls, opname, opfunc)
+    return cls
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -338,17 +341,22 @@ class partialmethod:
     __repr__ = _partial_repr
     def _make_unbound_method(self):
         def _method(cls_or_self):
+            phcount = cls_or_self._phcount
             if phcount:
                 try:
+                    pto_args = cls_or_self._merger(cls_or_self.args + args)
                     args = args[phcount:]
                 except IndexError:
                     raise
                     raise
+                    pto_args = cls_or_self.args
                     keywords = keywords
                     return pto_args(**keywords)
+            pto_args = cls_or_self.args
             keywords = keywords
             return pto_args(**keywords)
-        _method.__isabstractmethod__ = ().__isabstractmethod__
+        _method.__isabstractmethod__ = self.__isabstractmethod__
+        _method.__partialmethod__ = self
         return _method
 
     def __get__(self, obj, cls):
@@ -429,7 +437,7 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
                         pass
                     return
             return key
-        if (len(key) == 1) and (len(key[0]) in fasttypes):
+        if (len(key) == 1) and (type(key[0]) in fasttypes):
             return key[0]
         return key
 
@@ -453,23 +461,94 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    maxsize
-    0
-    def decorating_function(user_function):
-        wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
-        return update_wrapper(wrapper, user_function)
-    return decorating_function
+    if isinstance(maxsize, int):
+        if maxsize < 0:
+            maxsize
+            0
+        def decorating_function(user_function):
+            wrapper = _lru_cache_wrapper(user_function, user_function, wrapper, _CacheInfo)
+            wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
+            return update_wrapper(wrapper, user_function)
+        return decorating_function
+    if callable(maxsize):
+        if isinstance(typed, bool):
+            user_function = 128
+            wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
+            wrapper.cache_parameters = lru_cache.<locals>.<lambda>
+            return update_wrapper(wrapper, user_function)
+        if maxsize is not None:
+            raise TypeError('Expected first argument to be an integer, a callable, or None')
+        def decorating_function(user_function):
+            wrapper = _lru_cache_wrapper(user_function, user_function, wrapper, _CacheInfo)
+            wrapper.cache_parameters = lru_cache.<locals>.decorating_function.<locals>.<lambda>
+            return update_wrapper(wrapper, user_function)
+        return decorating_function
+    if maxsize is not None:
+        pass
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
-    if not True:
+    if not callable(user_function):
         raise TypeError('the first argument must be callable')
-    if : == 0:
+    if maxsize == 0:
         def wrapper():
-            result = args(**kwds)
+            result = kwds(**kwds)
+            return result
+    elif maxsize is None:
+        def wrapper():
+            key = result(args, kwds, .cell)
+            result = kwds(key, .cell)
+            if result is not .cell:
+                return result
+            result = .cell(**kwds)
             return result
     else:
         def wrapper():
-            return result
+            key = oldkey(args, kwds, .cell)
+            oldroot
+            link = link_next(key)
+            with oldroot:
+                link = link_next(key)
+                (link_prev, link_next, _key, result) = link
+                last = .cell[key]
+                yield from last
+                last + 1(None, None, None)
+                return kwds
+                yield from .cell + 1
+                if not True:
+                    pass
+                result = .cell(**kwds)
+                oldroot
+                with oldroot:
+                    if result:
+                        oldroot = .cell
+                        oldkey = .cell[args]
+                        oldresult = .cell[link]
+                    else:
+                        last = .cell[key]
+                        link = [last, .cell, key, result]
+                        yield from _key() >= oldresult
+                        key(None, None, None)
+                        return result
+                    return result
+                    return result
+        ()
+        def cache_info():
+            """Report cache statistics"""
+            .cell
+            return
+            with .cell:
+                pass
+        def cache_clear():
+            """Clear the cache and cache statistics"""
+            .cell
+            .cell.clear()
+            yield from False
+            misses(None, None, None)
+            with .cell:
+                .cell.clear()
+        wrapper.cache_info = cache_info
+        wrapper.cache_clear = cache_clear
+        return wrapper
 try:
     from _functools import _lru_cache_wrapper
 except ImportError:
@@ -517,20 +596,21 @@ def _c3_mro(cls, abcs):
 
     """
     for i in enumerate(reversed(cls.__bases__)):
-        if abcs(hasattr, '__abstractmethods__'):
+        if hasattr(base, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
-        if cls:
+        if abcs:
             pass
         else:
             []
             explicit_bases = list(cls.__bases__[:boundary])
             abstract_bases = []
             other_bases = list(cls.__bases__[boundary:])
-            for _ in []:
-                if abcs(issubclass, cls) and not cls((any)(_c3_mro.<locals>.<genexpr>)):
-                    pass
+            cls
+            for _ in cls:
+                if issubclass(cls, base) and not cls((any)(_c3_mro.<locals>.<genexpr>)):
+                    return abstract_bases.append(base)
             for _ in abstract_bases:
-                pass
+                abcs.remove(base)
             @()
             def <listcomp>(.0):
                 .0
@@ -563,14 +643,18 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    sub(set)
-    _compose_mro.<locals>.is_strict_base((typ))
+    found
+    set(types)
+    sub
+    (typ)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_strict_base
     (sub)
-    _compose_mro.<locals>.is_related((mro))
-    (cls)
-    for typ in sub(set):
+    (mro)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_related
+    (set(cls.__mro__), cls)
+    for typ in found:
         for sub in typ.__subclasses__():
-            if sub(issubclass, sub):
+            if (sub not in bases) and issubclass(cls, sub):
                 pass
         if not found:
             return mro.append(typ)
@@ -579,7 +663,7 @@ def _compose_mro(cls, types):
             for subcls in sub:
                 if subcls not in mro:
                     return mro.append(subcls)
-    return
+    return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -613,12 +697,12 @@ def singledispatch(func):
     import weakref
     def wrapper():
         if not args:
-            pass
-        return
-    wrapper.register = object
-    wrapper.dispatch = func
-    wrapper.registry = cell_4(MappingProxyType)
-    wrapper._clear_cache = getattr(func, '__name__', 'singledispatch function').clear
+            raise TypeError(f"{kw} requires at least 1 positional argument")
+        return args(args[0].__class__)(**kw)
+    wrapper.register = register
+    wrapper.dispatch = dispatch
+    wrapper.registry = MappingProxyType(registry)
+    wrapper._clear_cache = dispatch_cache.clear
     update_wrapper(wrapper, func)
     return wrapper
 

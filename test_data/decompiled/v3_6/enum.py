@@ -244,11 +244,20 @@ class EnumType(type):
         inverted.append(p)
         inverted.append(p)
         p.value = bits & p.value
+        classdict.update(enum_class.__dict__)
         method = member_type.__str__
         enum_method = getattr(first_enum, name)
+        found_method = getattr(enum_class, name)
         object_method = getattr(object, name)
         data_type_method = getattr(member_type, name)
+        setattr(enum_class, name, enum_method)
         enum_method = getattr(Flag, name)
+        setattr(enum_class, name, enum_method)
+        delattr(enum_class, '_boundary_')
+        delattr(enum_class, '_flag_mask_')
+        delattr(enum_class, '_singles_mask_')
+        delattr(enum_class, '_all_bits_')
+        delattr(enum_class, '_inverted_')
 
     def __bool__(cls):
         """
@@ -319,7 +328,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return
+        return ()(EnumType.__iter__.<locals>.<genexpr>)
 
     def __len__(cls):
         """
@@ -345,7 +354,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return
+        return ()(EnumType.__reversed__.<locals>.<genexpr>)
 
     def __setattr__(cls, name, value):
         """
@@ -799,7 +808,7 @@ def unique(enumeration):
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
 
 def _dataclass_repr(self):
-    return
+    return self.__dataclass_fields__((self, ', '.join)(_dataclass_repr.<locals>.<genexpr>))
 
 def global_enum_repr(self):
     """
@@ -818,9 +827,10 @@ def global_flag_repr(self):
     """
     cls_name = self.__class__.__name__
     if self._name_ is None:
-        return ('%s.%s(%r)', cls_name, self._value_)
+        return '%s.%s(%r)' % (module, cls_name, self._value_)
     return
     name.append(n)
+    name.append('%s.%s' % (module, n))
 
 def global_str(self):
     """
@@ -856,6 +866,7 @@ def _simple_enum(etype, *, boundary, use_args):
         <enum 'Color'>
     """
     def convert_class(cls):
+        enum_method = getattr(cls_name, name)
         found_method = getattr(enum_class, name)
         object_method = getattr(object, name)
         data_type_method = getattr(member_type, name)
@@ -864,7 +875,9 @@ def _simple_enum(etype, *, boundary, use_args):
         new_member = __new__.__func__
         __new__ = cls.__dict__.get('__new__')
         cls_name = cls.__name__
-        __new__
+        if __new__ is None:
+            __new__
+            cls_name._use_args_
         setattr(enum_class, name, enum_method)
         gnv_last_values = []
         member = new_member(enum_class, **value)

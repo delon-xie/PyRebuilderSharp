@@ -774,9 +774,54 @@ public class StackMachine
             case Opcode.NOP:
             case Opcode.RESUME:
             case Opcode.INTERPRETER_EXIT:
-            case Opcode.COPY_FREE_VARS:
             case Opcode.SETUP_ANNOTATIONS:
                 return null;
+
+            // ---- 3.12+ COPY_FREE_VARS: push freevar cell references ----
+            // 参考 CPython 3.12: Python/generated_cases.c.h TARGET(COPY_FREE_VARS)
+            // 将 oparg 个自由变量的 cell 引用从当前作用域复制到栈上
+            // （后续 BUILD_TUPLE 将它们打包为闭包元组，供 MAKE_FUNCTION 消费）。
+            case Opcode.COPY_FREE_VARS:
+            {
+                int nfree = instr.Argument ?? 0;
+                // COPY_FREE_VARS n 从当前作用域复制 n 个自由变量的 cell 引用到栈上。
+                // 即使名字不精确，也必须推 n 个占位符，否则 BUILD_TUPLE 将消费
+                // 不相关的 stack 项（如 __build_class__），破坏后续 CALL 协议。
+                if (_code.Freevars != null)
+                {
+                    int count = Math.Min(nfree, _code.Freevars.Count);
+                    for (int i = 0; i < count; i++)
+                        _exprStack.Push(new Name(_code.Freevars[i], ExpressionContext.Load));
+                    for (int i = count; i < nfree; i++)
+                        _exprStack.Push(new Name($".freevar_{i}", ExpressionContext.Load));
+                }
+                else
+                {
+                    for (int i = 0; i < nfree; i++)
+                        _exprStack.Push(new Name($".freevar_{i}", ExpressionContext.Load));
+                }
+                return null;
+            }
+
+            // ---- LOAD_CLOSURE（3.11+ 以及部分早期版本）：推 cell 引用 ----
+            // LOAD_CLOSURE i 将局部变量索引 i 的 cell 引用推至栈顶。
+            // 参考 CPython 3.12: Python/generated_cases.c.h TARGET(LOAD_CLOSURE)
+            // 用于 BUILD_TUPLE 构建闭包元组，供 MAKE_FUNCTION 的 flags&0x08 分支消费。
+            // 注意：此操作码在不同版本均有出现，必须正确处理，否则 BUILD_TUPLE
+            // 将消费 __build_class__ 等不相关栈项。
+            case Opcode.LOAD_CLOSURE:
+            {
+                // 推一个 Name 表达式表示 cell 引用变量
+                int cellIdx = instr.Argument ?? 0;
+                string cellName = ".cell";
+                // 尝试从 cellvars 或 varnames 获取名称
+                if (_code.Cellvars != null && cellIdx < _code.Cellvars.Count)
+                    cellName = _code.Cellvars[cellIdx];
+                else if (_code.Varnames != null && cellIdx < _code.Varnames.Count)
+                    cellName = _code.Varnames[cellIdx];
+                _exprStack.Push(new Name(cellName, ExpressionContext.Load));
+                return null;
+            }
 
             // ---- 3.11+ BINARY_OP (arg 指定操作类型) ----
             // 注意: CPython 3.13+ 扩展了 BINARY_OP, arg=26 = subscript ([])
@@ -1414,6 +1459,12 @@ public class StackMachine
                     {
                         int flags = instr.Argument ?? 0;
                         var codeExpr = SafePop();                     // 必选：代码对象
+                        
+                        if (codeExpr is Constant cTest && cTest.Value is CodeObject cod && cod.Name == "K")
+                        {
+                            Console.Error.WriteLine($"[MF_DEBUG] class body K: flags=0x{flags:X2} codeExpr={codeExpr} stackCount={_exprStack.Count} top3={string.Join(",", _exprStack.TakeLast(Math.Min(3, _exprStack.Count)).Reverse())}");
+                        }
+                        
                         Expr? closureExpr = (flags & 0x08) != 0 ? SafePop() : null;
                         Expr? annotations = (flags & 0x04) != 0 ? SafePop() : null;
                         Expr? kwDefaults = (flags & 0x02) != 0 ? SafePop() : null;

@@ -147,7 +147,10 @@ class ABCMeta(type):
         """Override for isinstance(instance, cls)."""
         subtype = type(instance)
         subclass = instance.__class__
-        return True
+        if subclass in cls._abc_cache:
+            return True
+        if (cls._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and (subclass in cls._abc_negative_cache):
+            return False
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""

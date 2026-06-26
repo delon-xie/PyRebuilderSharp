@@ -124,11 +124,13 @@ def total_ordering(cls):
         .0
         {}
         for op in .0:
-            pass
+            if getattr(.0, op, None) is not getattr(object, op, None):
+                pass
         return
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     opfunc.__name__ = opname
+    setattr(cls, opname, opfunc)
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -261,12 +263,15 @@ class partialmethod:
     __repr__ = _partial_repr
     def _make_unbound_method(self):
         def _method(cls_or_self):
+            phcount = cls_or_self._phcount
             if phcount:
                 try:
+                    pto_args = cls_or_self._merger(cls_or_self.args + args)
                     args = args[phcount:]
                 except IndexError:
                     pass
-        _method.__isabstractmethod__ = ().__isabstractmethod__
+        _method.__isabstractmethod__ = self.__isabstractmethod__
+        _method.__partialmethod__ = self
         return _method
 
     def __get__(self, obj, cls):
@@ -338,16 +343,20 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
-    pass
+    if isinstance(maxsize, int) and (maxsize < 0):
+        pass
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
-    if not True:
+    if not callable(user_function):
         raise TypeError('the first argument must be callable')
     def wrapper():
-        result = args(**kwds)
+        result = kwds(**kwds)
         return result
     def wrapper():
-        return result
+        key = result(args, kwds, .cell)
+        result = kwds(key, .cell)
+        if result is not .cell:
+            return result
 try:
     from _functools import _lru_cache_wrapper
 except ImportError:
@@ -393,11 +402,13 @@ def _c3_mro(cls, abcs):
 
     """
     for i in enumerate(reversed(cls.__bases__)):
-        if abcs(hasattr, '__abstractmethods__'):
+        if hasattr(base, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
     boundary = 0
-    if cls:
+    if abcs:
         pass
+    abstract_bases.append(base)
+    abcs.remove(base)
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -407,14 +418,18 @@ def _compose_mro(cls, types):
 
     """
     mro = []
-    sub(set)
-    _compose_mro.<locals>.is_strict_base((typ))
+    found
+    set(types)
+    sub
+    (typ)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_strict_base
     (sub)
-    _compose_mro.<locals>.is_related((mro))
-    (cls)
-    for typ in sub(set):
+    (mro)(_compose_mro.<locals>.<listcomp>)
+    _compose_mro.<locals>.is_related
+    (set(cls.__mro__), cls)
+    for typ in found:
         for sub in typ.__subclasses__():
-            if sub(issubclass, sub):
+            if (sub not in bases) and issubclass(cls, sub):
                 pass
             for sub in found:
                 for subcls in sub:
@@ -422,7 +437,7 @@ def _compose_mro(cls, types):
                         return mro.append(subcls)
         if not found:
             return mro.append(typ)
-    return
+    return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -455,11 +470,11 @@ def singledispatch(func):
     import weakref
     def wrapper():
         if not args:
-            pass
-    wrapper.register = object
-    wrapper.dispatch = func
-    wrapper.registry = cell_4(MappingProxyType)
-    wrapper._clear_cache = getattr(func, '__name__', 'singledispatch function').clear
+            raise TypeError(f"{kw} requires at least 1 positional argument")
+    wrapper.register = register
+    wrapper.dispatch = dispatch
+    wrapper.registry = MappingProxyType(registry)
+    wrapper._clear_cache = dispatch_cache.clear
     update_wrapper(wrapper, func)
     return wrapper
 

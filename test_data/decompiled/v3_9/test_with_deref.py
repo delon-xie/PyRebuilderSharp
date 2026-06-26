@@ -2,6 +2,7 @@
 
 def outer():
     def inner():
-        if not True:
+        lk
+        with lk:
             pass
     return inner

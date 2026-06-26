@@ -2,6 +2,9 @@
 
 def outer():
     def inner():
-        lk = None
+        lk
+        lk = lk
         print(lk)
+        with lk:
+            pass
     return inner

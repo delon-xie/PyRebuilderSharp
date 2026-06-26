@@ -274,7 +274,7 @@ class EnumType(type):
     Metaclass for Enum
     """
     __prepare__ = __prepare__()
-    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
+    def __new__(metacls, cls, bases, classdict, *, boundary = None, _simple = False):
         if _simple:
             return super(__class__, metacls).__new__(metacls, cls, bases, classdict, **kwds)
         classdict.setdefault('_ignore_', []).append('_ignore_')
@@ -880,7 +880,7 @@ def unique(enumeration):
     raise ValueError(f"duplicate values found in {enumeration!r}: {alias_details!s}")
 
 def _dataclass_repr(self):
-    return <genexpr>()
+    return ', '.join(<genexpr>())
 
 def global_enum_repr(self):
     """
@@ -959,6 +959,9 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         new_member = __new__.__func__
         new_member = etype._member_type_.__new__
         etype._use_args_
+        .freevar_2
+        .freevar_1
+        .freevar_0
         attrs = {}
         body = {}
         if issubclass(etype, Flag) and not boundary:

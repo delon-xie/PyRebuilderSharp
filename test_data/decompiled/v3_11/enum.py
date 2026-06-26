@@ -305,7 +305,7 @@ class EnumType(type):
     Metaclass for Enum
     """
     __prepare__ = __prepare__()
-    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
+    def __new__(metacls, cls, bases, classdict, *, boundary = None, _simple = False):
         if _simple:
             return super().__new__(metacls, cls, bases, classdict, **kwds)
         classdict('_ignore_', [])('_ignore_')
@@ -1019,6 +1019,9 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         new_member = etype._member_type_.__new__
         cls.__dict__.get
         etype._use_args_
+        .freevar_2
+        .freevar_1
+        .freevar_0
         attrs = {}
         body = {}
         if issubclass(etype, Flag) and boundary:

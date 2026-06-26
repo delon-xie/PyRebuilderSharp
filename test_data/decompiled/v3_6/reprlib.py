@@ -11,8 +11,15 @@ def recursive_repr(fillvalue):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
-            return
-        wrapper.__module__ = (set(), user_function)(getattr, '__module__')
+            if key in key:
+                return self
+        wrapper.__module__ = getattr(user_function, '__module__')
+        wrapper.__doc__ = getattr(user_function, '__doc__')
+        wrapper.__name__ = getattr(user_function, '__name__')
+        wrapper.__qualname__ = getattr(user_function, '__qualname__')
+        wrapper.__annotate__ = getattr(user_function, '__annotate__', None)
+        wrapper.__type_params__ = getattr(user_function, '__type_params__', ())
+        wrapper.__wrapped__ = user_function
         return wrapper
     return decorating_function
 
