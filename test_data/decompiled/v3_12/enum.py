@@ -279,8 +279,7 @@ class EnumType(type):
             return super(__class__, metacls).__new__(metacls, cls, bases, classdict, **kwds)
         classdict.setdefault('_ignore_', []).append('_ignore_')
         ignore = classdict['_ignore_']
-        for key in ignore:
-            classdict.pop(key, None)
+        member_names = [classdict.pop(key, None) for key in '?']
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
@@ -297,22 +296,7 @@ class EnumType(type):
         if not boundary:
             return getattr(first_enum, '_boundary_', None)
         if bases and issubclass(bases[-1], Flag):
-            for n in member_names:
-                p = classdict[n]
-                if isinstance(p.value, int):
-                    if p.value < 0:
-                        return inverted.append(p)
-                    bits |= p.value
-                elif not isinstance(p.value, tuple):
-                    pass
-                elif not p.value:
-                    pass
-                elif not isinstance(p.value[0], int):
-                    pass
-                else:
-                    if p.value[0] < 0:
-                        return inverted.append(p)
-                    bits |= p.value[0]
+            n = [classdict[n] for n in '?' if isinstance(p.value, int)]
         for p in inverted:
             if isinstance(p.value, int):
                 p.value = bits & p.value
@@ -514,10 +498,7 @@ class EnumType(type):
         if isinstance(names, str):
             names = names.replace(',', ' ').split()
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            for (count, name) in enumerate(original_names):
-                value = first_enum._generate_next_value_(name, start, count, last_values[:])
-                last_values.append(value)
-                names.append((name, value))
+            ? = [names.append((name, value)) for (count, name) in '?']
         _make_class_unpicklable(classdict)
         return metacls.__new__(metacls, class_name, bases, classdict, boundary=boundary)
 
@@ -533,9 +514,7 @@ class EnumType(type):
             value
             name
             []
-            for (name, value) in []:
-                if filter(name):
-                    return (name, value)
+            ? = [(name, value) for (name, value) in '?' if filter(name)]
             members.sort(key=<lambda>)
             t
             {}
@@ -664,13 +643,7 @@ class Enum(metaclass=EnumType):
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
-        for name in getattr(self, '__dict__', []):
-            if not name[0] != '_':
-                pass
-            elif not name not in self._member_map_:
-                pass
-            else:
-                return interesting.add(name)
+        name = [name for name in '?' if not name[0] != '_']
         for cls in self.__class__.mro():
             for (name, obj) in cls.__dict__.items():
                 if name[0] == '_':
@@ -867,11 +840,7 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
     """
     duplicates = []
-    for (name, member) in enumeration.__members__.items():
-        if not name != member.name:
-            pass
-        else:
-            return duplicates.append((name, member.name))
+    ? = [(name, member) for (name, member) in '?' if not name != member.name]
     if duplicates:
         name
         alias
@@ -906,10 +875,7 @@ def global_flag_repr(self):
         '|'.join
     else:
         name = []
-        for n in self._name_.split('|'):
-            if n[0].isdigit():
-                return name.append(n)
-            return name.append(f"{module!s}.{n!s}")
+        n = [n for n in '?' if n[0].isdigit()]
         return '|'.join(name)
     return
 
@@ -1089,11 +1055,7 @@ class verify:
             raise TypeError('the \'verify\' decorator only works with Enum and Flag')
             for check in checks:
                 if check is UNIQUE:
-                    for (name, member) in enumeration.__members__.items():
-                        if not name != member.name:
-                            pass
-                        else:
-                            return duplicates.append((name, member.name))
+                    ? = [(name, member) for (name, member) in '?' if not name != member.name]
                 elif check is CONTINUOUS:
                     values = set(<genexpr>())
                     if len(values) < 2:
@@ -1130,24 +1092,7 @@ class verify:
                                         pass
                                     missing_names = []
                                     missing_value = 0
-                                    for (name, alias) in enumeration._member_map_.items():
-                                        if name in member_names:
-                                            pass
-                                        elif alias.value < 0:
-                                            pass
-                                        else:
-                                            values = list(_iter_bits_lsb(alias.value))
-                                            v
-                                            []
-                                            for v in []:
-                                                if not v not in member_values:
-                                                    pass
-                                            if not missed:
-                                                pass
-                                            else:
-                                                missing_names.append(name)
-                                                for val in missed:
-                                                    missing_value |= val
+                                    ? = [(name, alias) for (name, alias) in '?' if name in member_names]
                                     if not missing_names:
                                         pass
                                     elif len(missing_names) == 1:
@@ -1233,9 +1178,7 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         value
         name
         []
-        for (name, value) in []:
-            if filter(name):
-                return (name, value)
+        ? = [(name, value) for (name, value) in '?' if filter(name)]
         members.sort(key=<lambda>)
         if not boundary:
             return KEEP

@@ -24,7 +24,7 @@ for const in code.co_consts:
                         pass
                     else:
                         instrs[-1].offset + 2
-                        block_instrs = [ins for ins in .0 if ins.offset <= start]
+                        block_instrs = <listcomp>()
                         if len(block_instrs) > 3:
                             pass
                         else:

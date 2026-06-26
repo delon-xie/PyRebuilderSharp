@@ -20,19 +20,7 @@ def process_data_file(filename):
                 print(f"[外层 except] 没有权限读取文件: {filename}")
         except:
             pass
-        for line in lines:
-            line = line.strip()
-            if not line:
-                pass
-            try:
-                try:
-                    num = int(line)
-                    numbers.append(num)
-                except:
-                    print(f"[最内层 finally] 行处理完毕: '{line}'")
-                print(f"[最内层 else] 成功解析数字: {num}")
-            finally:
-                pass
+        line = [line.strip() for line in '?' if not line]
     finally:
         return None
     ve = None

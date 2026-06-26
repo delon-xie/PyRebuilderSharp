@@ -6,7 +6,7 @@ input_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/input'
 output_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 os.makedirs(output_dir, exist_ok=True)
 python310_path = os.path('~/.pyenv/versions/3.10.20/bin/python')
-py_files = [f for f in .0]
+py_files = <listcomp>()
 print(f"找到 {len(py_files)} 个 Python 文件")
 print(f"使用 Python: {python310_path}")
 print('============================================================')

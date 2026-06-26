@@ -129,7 +129,7 @@ def _lt_from_ge(self, other):
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = {op for op in .0}
+    roots = <setcomp>()
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -217,19 +217,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    for (i, a) in enumerate(args):
-        if a is Placeholder:
-            order(j)
-            j += 1
-        else:
-            order(i)
-            j
-            order.append
-            if phcount:
-                pass
-            else:
-                None
-                return (phcount, merger)
+    phcount = [(i, a) for (i, a) in '?' if a is Placeholder]
 
 def _partial_new(cls, func):
     if issubclass(cls, partial):
@@ -519,8 +507,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    for _ in sequences:
-        return result
+    _ = [_ for _ in '?']
     for s1 in sequences:
         candidate = s1[0]
         for s2 in sequences:
@@ -565,21 +552,7 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                for base in []:
-                    if issubclass(cls, base):
-                        if not any(<genexpr>()):
-                            abstract_bases(base)
-                            abstract_bases.append
-                        abstract_bases
-                        for base in abstract_bases:
-                            abcs(base)
-                            abcs
-                            abcs.remove
-                        explicit_c3_mros = [base for base in .0]
-                        abstract_c3_mros = [base for base in .0]
-                        other_c3_mros = [base for base in .0]
-                        return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
-                    return abstract_bases
+                base = [base for base in '?' if issubclass(cls, base)]
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -595,26 +568,7 @@ def _compose_mro(cls, types):
     <listcomp>()
     is_related
     set(cls.__mro__)
-    for typ in set(types):
-        found = []
-        typ.__subclasses__
-        for sub in typ.__subclasses__:
-            if (sub not in bases) and issubclass(cls, sub):
-                found(<listcomp>())
-                found.append
-            found
-            if not True:
-                return mro(typ)
-            found(reverse=True, key=len)
-            found.sort
-            for sub in found.sort:
-                for subcls in sub:
-                    if subcls not in mro:
-                        mro(subcls)
-                        mro.append
-            _c3_mro
-            return cls
-            found
+    typ = [[found for sub in '?' if (sub not in bases) and issubclass(cls, sub) if not True] for typ in '?']
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.

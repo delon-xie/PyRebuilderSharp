@@ -134,9 +134,7 @@ def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
     op
     {}
-    for op in {}:
-        if not getattr(cls, op, None) is not getattr(object, op, None):
-            pass
+    op = {op for op in '?' if not getattr(cls, op, None) is not getattr(object, op, None)}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -223,12 +221,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    for (i, a) in enumerate(args):
-        if a is Placeholder:
-            order.append(j)
-            j += 1
-        else:
-            return order.append(i)
+    phcount = [(i, a) for (i, a) in '?' if a is Placeholder]
     phcount = j - nargs
     if phcount:
         pass
@@ -514,22 +507,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    for s in s:
-        for s in []:
-            if not s:
-                pass
-        if not sequences:
-            return result
-        for s1 in sequences:
-            for s2 in sequences:
-                if not candidate in s2[1:]:
-                    pass
-                else:
-                    candidate = None
-            raise RuntimeError('Inconsistent hierarchy')
-            for seq in sequences:
-                if not seq[0] == candidate:
-                    pass
+    s = [[s for s in '?' if not s] for s in '?' if not sequences]
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -560,13 +538,7 @@ def _c3_mro(cls, abcs = None):
                 explicit_bases = list(cls.__bases__[:boundary])
                 abstract_bases = []
                 other_bases = list(cls.__bases__[boundary:])
-                for base in []:
-                    if not issubclass(cls, base):
-                        pass
-                    elif any(<genexpr>()):
-                        pass
-                    else:
-                        return abstract_bases.append(base)
+                base = [base for base in '?' if not issubclass(cls, base)]
                 for base in abstract_bases:
                     abcs.remove(base)
                 base
@@ -601,9 +573,7 @@ def _compose_mro(cls, types):
     n
     set(cls.__mro__)
     []
-    for n in []:
-        if not is_related(n):
-            pass
+    n = [n for n in '?' if not is_related(n)]
     def is_strict_base(typ):
         .freevar_0
         for other in .freevar_0:
@@ -616,33 +586,10 @@ def _compose_mro(cls, types):
                 return False
     n
     []
-    for n in []:
-        if is_strict_base(n):
-            pass
+    n = [n for n in '?' if is_strict_base(n)]
     type_set = set(types)
     mro = []
-    for typ in types:
-        for sub in typ.__subclasses__():
-            if not sub not in bases:
-                pass
-            elif not issubclass(cls, sub):
-                pass
-            else:
-                s
-                found.append
-                []
-                for s in []:
-                    if not s in type_set:
-                        pass
-        if not found:
-            return mro.append(typ)
-        found.sort(reverse=True, key=len)
-        for sub in found:
-            for subcls in sub:
-                if not subcls not in mro:
-                    pass
-                else:
-                    return mro.append(subcls)
+    typ = [[sub for sub in '?' if not sub not in bases] for typ in '?' if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

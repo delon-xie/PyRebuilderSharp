@@ -1414,6 +1414,8 @@ public class StackMachine
                 // GET_ITER — 消耗栈顶的迭代对象。
                 // 注意：不推回栈，因为 for 循环的 FOR_ITER 在后继块独立处理迭代表达式。
                 // 推导式的 CALL 通过 handler 内的 args 回溯找到 iterable。
+                // 3.12+ 内联推导式中，迭代对象必须保留供 ExtractIterExpression 回溯。
+                // 但 SET_ADD 的 depth 参数不包含迭代对象，所以仍要弹出。
                 var iterable = SafePop();
                 if (iterable == null)
                     Console.Error.WriteLine($"[GET_ITER] v{_code.Version} func={_code.Name} stackEmpty");

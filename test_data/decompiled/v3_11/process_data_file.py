@@ -12,23 +12,7 @@ def process_data_file(filename):
     lines = file()
     numbers = []
     file.readlines
-    for line in file.readlines:
-        line = line()
-        if not line:
-            pass
-        else:
-            num = int(line)
-            numbers(num)
-            numbers.append
-            print(f"[最内层 else] 成功解析数字: {num}")
-            print(f"[最内层 finally] 行处理完毕: '{line}'")
-        average = sum(numbers) / len(numbers)
-        average
-        print('[内层 finally] 关闭文件')
-        file()
-        file.close
-        print('[外层 finally] 程序结束')
-        return
+    line = [print('[外层 finally] 程序结束') for line in '?' if not line]
     print(f"[内层 except] 数据处理失败: {ve}")
     ve = None
     print('[内层 finally] 关闭文件')

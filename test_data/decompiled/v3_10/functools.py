@@ -144,12 +144,7 @@ def total_ordering(cls):
     def <setcomp>(.0):
         .0
         {}
-        for op in .0:
-            if getattr(.0, op, None) is not getattr(object, op, None):
-                pass
-            for _ in .0:
-                pass
-            return
+        op = {op for op in '?' if getattr(.0, op, None) is not getattr(object, op, None)}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -224,12 +219,7 @@ def _partial_prepare_merger(args):
     nargs = len(args)
     order = []
     j = nargs
-    for (i, a) in enumerate(args):
-        if a is Placeholder:
-            order.append(j)
-            j += 1
-        else:
-            return order.append(i)
+    phcount = [(i, a) for (i, a) in '?' if a is Placeholder]
     phcount = j - nargs
     if phcount:
         pass
@@ -564,8 +554,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    for _ in sequences:
-        return result
+    _ = [_ for _ in '?']
     for s1 in sequences:
         for s2 in sequences:
             if candidate in s2[1:]:
@@ -606,9 +595,7 @@ def _c3_mro(cls, abcs):
             abstract_bases = []
             other_bases = list(cls.__bases__[boundary:])
             cls
-            for _ in cls:
-                if issubclass(cls, base) and not cls((any)(_c3_mro.<locals>.<genexpr>)):
-                    return abstract_bases.append(base)
+            _ = [_ for _ in '?' if issubclass(cls, base) and not cls((any)(_c3_mro.<locals>.<genexpr>))]
             for _ in abstract_bases:
                 abcs.remove(base)
             @()
@@ -652,17 +639,7 @@ def _compose_mro(cls, types):
     (mro)(_compose_mro.<locals>.<listcomp>)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
-    for typ in found:
-        for sub in typ.__subclasses__():
-            if (sub not in bases) and issubclass(cls, sub):
-                pass
-        if not found:
-            return mro.append(typ)
-        found.sort(key=len, reverse=True)
-        for sub in found:
-            for subcls in sub:
-                if subcls not in mro:
-                    return mro.append(subcls)
+    typ = [[sub for sub in '?' if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

@@ -16,42 +16,7 @@ expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ('2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 results = {}
 []
-for ver in []:
-    pyc = os.path(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
-    if not os.path(pyc):
-        return print('⏭ %s: .pyc not found' % ver)
-    else:
-        r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], timeout=30, text=True, capture_output=True)
-        actual_src = r.stdout
-        actual_ast = ast.dump(ast.parse(actual_src), indent=2)
-        match = expected_ast == actual_ast
-        if match:
-            pass
-        else:
-            '❌'
-            if match:
-                pass
-            else:
-                'MISMATCH'
-                f""
-                if not match:
-                    for i in actual_ast.split:
-                        if i < len(exp_lines):
-                            pass
-                        else:
-                            '(missing)'
-                            if i < len(act_lines):
-                                pass
-                            else:
-                                '(missing)'
-                                if e != a:
-                                    print('  Line %d: expected=%s' % (i, e))
-                                    print('           actual=  %s' % a)
-                        match
-                match
-    print(f"❌ {ver!s}: AST parse failed - {e!s}")
-    print('  Decompiled: %s' % actual_src[:200])
-    e = None
+passed = [None for ver in '?' if not os.path(pyc)]
 passed = (None for (v, r) in .0)
 total = len(results)
 print("""

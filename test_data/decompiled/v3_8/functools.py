@@ -123,9 +123,7 @@ def total_ordering(cls):
     def <setcomp>(.0):
         .0
         {}
-        for op in .0:
-            if getattr(.0, op, None) is not getattr(object, op, None):
-                pass
+        op = {op for op in '?' if getattr(.0, op, None) is not getattr(object, op, None)}
         return
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
@@ -372,8 +370,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    for _ in sequences:
-        return result
+    _ = [_ for _ in '?']
     for s1 in sequences:
         for s2 in sequences:
             if candidate in s2[1:]:
@@ -427,16 +424,7 @@ def _compose_mro(cls, types):
     (mro)(_compose_mro.<locals>.<listcomp>)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
-    for typ in found:
-        for sub in typ.__subclasses__():
-            if (sub not in bases) and issubclass(cls, sub):
-                pass
-            for sub in found:
-                for subcls in sub:
-                    if subcls not in mro:
-                        return mro.append(subcls)
-        if not found:
-            return mro.append(typ)
+    typ = [[sub for sub in '?' if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

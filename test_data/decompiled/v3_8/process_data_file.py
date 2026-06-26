@@ -19,20 +19,7 @@ def process_data_file(filename):
                 print('[外层 finally] 程序结束')
         except:
             print(f"[外层 except] 文件不存在: {filename}")
-        for line in lines:
-            line = line.strip()
-            if not line:
-                pass
-            try:
-                try:
-                    num = int(line)
-                    numbers.append(num)
-                except:
-                    pass
-                print(f"[最内层 else] 成功解析数字: {num}")
-            finally:
-                pass
-            print(f"[最内层 finally] 行处理完毕: '{line}'")
+        line = [print(f"[最内层 finally] 行处理完毕: '{line}'") for line in '?' if not line]
         if numbers:
             average = sum(numbers) / len(numbers)
             return

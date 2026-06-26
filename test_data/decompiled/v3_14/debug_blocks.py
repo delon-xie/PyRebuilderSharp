@@ -39,11 +39,7 @@ for const in __name__():
                 instrs[-1].offset + 2
                 ins
                 []
-                for ins in []:
-                    if ins.offset <= start:
-                        pass
-                    if not True:
-                        pass
+                ins = [ins for ins in '?' if ins.offset <= start if not True]
                 if len(block_instrs) > 3:
                     pass
                 else:

@@ -83,7 +83,7 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        pieces = [elem for elem in .0]
+        pieces = <listcomp>()
         if n > maxiter:
             pieces(self.fillvalue)
             pieces.append
@@ -93,7 +93,7 @@ class Repr:
                 right = trail + right
             return f"{left!s}{s!s}{right!s}"
         return f"{left!s}{s!s}{right!s}"
-        pieces = [elem for elem in .0]
+        pieces = <listcomp>()
         if n > maxiter:
             pass
         s = self(pieces, level)

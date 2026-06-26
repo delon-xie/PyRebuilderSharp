@@ -273,23 +273,7 @@ class EnumDict(dict):
                     raise TypeError(f"{key!r} already defined as {self[key]!r}")
                 if isinstance(value, member):
                     value = value.value
-        for v in value:
-            if isinstance(v, auto):
-                non_auto_store = False
-                if v.value == _auto_null:
-                    v.value = self(key, 1, len(self._member_names), self._last_values[:])
-                    self._auto_called = True
-                    self._generate_next_value
-                v = v.value
-                self._last_values(v)
-                self._last_values.append
-                auto_valued(v)
-                single
-                auto_valued.append
-                value = auto_valued[0]
-            auto_valued(v)
-            single
-            auto_valued.append
+        v = [auto_valued.append for v in '?' if isinstance(v, auto)]
     member_names = member_names()
     def update(self, members):
         members.keys
@@ -312,10 +296,7 @@ class EnumType(type):
         ignore = classdict['_ignore_']
         classdict('_ignore_', []).append
         classdict.setdefault
-        for key in classdict('_ignore_', []).append:
-            classdict(key, None)
-            classdict
-            classdict.pop
+        member_names = [classdict.pop for key in '?']
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise 'invalid enum member name(s) %s'(','.join % ','(<genexpr>()))
@@ -335,62 +316,7 @@ class EnumType(type):
         if boundary:
             return getattr(first_enum, '_boundary_', None)
         if bases and issubclass(bases[-1], Flag):
-            for n in member_names:
-                p = classdict[n]
-                if isinstance(p.value, int):
-                    if p.value < 0:
-                        return inverted(p)
-                    bits |= p.value
-                else:
-                    if isinstance(p.value, tuple) and p.value and isinstance(p.value[0], int) and (p.value[0] < 0):
-                        return inverted(p)
-                    bits |= p.value[0]
-                    inverted
-                    for p in inverted:
-                        if isinstance(p.value, int):
-                            p.value = bits & p.value
-                        else:
-                            p.value = (bits & p.value[0]) + p.value[1:]
-                    delattr(enum_class, '_%s__in_progress' % cls)
-                    super().__new__(metacls, cls, bases, classdict, **kwds)
-                    classdict(enum_class.__dict__)
-                    if (ReprEnum in bases) and (member_type is object):
-                        raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
-                    if '__format__' not in classdict:
-                        enum_class.__format__ = member_type.__format__
-                    elif '__str__' not in classdict:
-                        method = member_type.__str__
-                        if method is object.__str__:
-                            method = member_type.__repr__
-                        enum_class.__str__ = method
-                        for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
-                            if name not in classdict:
-                                enum_method = getattr(first_enum, name)
-                                found_method = getattr(enum_class, name)
-                                object_method = getattr(object, name)
-                                data_type_method = getattr(member_type, name)
-                                if found_method in (data_type_method, object_method):
-                                    return setattr(enum_class, name, enum_method)
-                                Flag
-                                if issubclass(enum_class, Flag):
-                                    for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__'):
-                                        if name not in classdict:
-                                            enum_method = getattr(Flag, name)
-                                            setattr(enum_class, name, enum_method)
-                                else:
-                                    Enum
-                                    if save_new:
-                                        enum_class.__new_member__ = __new__
-                                    enum_class.__new__ = Enum.__new__
-                                    if isinstance(_order_, str):
-                                        _order_ = _order_(',', ' ')()
-                                        _order_(',', ' ').split
-                                        _order_.replace
-                            Flag
-                        if issubclass(enum_class, Flag):
-                            pass
-                        else:
-                            return Enum
+            n = [classdict[n] for n in '?' if isinstance(p.value, int)]
         if hasattr(e, '__notes__'):
             return e
         raise
@@ -543,10 +469,7 @@ class EnumType(type):
             names(',', ' ').split
             names.replace
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            for (count, name) in enumerate(original_names):
-                value = first_enum(name, start, count, last_values[:])
-                last_values(value)
-                names((name, value))
+            names = [names((name, value)) for (count, name) in '?']
         module = sys._getframe(2).f_globals['__name__']
 
     def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
@@ -733,28 +656,7 @@ class Enum(metaclass=EnumType):
         if self.__class__._member_type_ is not object:
             interesting = object.__dir__(object(self))
             set
-        for name in set:
-            if name[0] != '_':
-                if name not in self._member_map_:
-                    interesting(name)
-                    interesting.add
-                self
-                for cls in self:
-                    for (name, obj) in cls.__dict__.items:
-                        if name[0] == '_':
-                            pass
-                        else:
-                            if isinstance(obj, property):
-                                if name not in self._member_map_:
-                                    return interesting(name)
-                                return interesting(name)
-                            if name not in self._member_map_:
-                                interesting(name)
-                                interesting.add
-                    sorted
-                names = set([](('__class__', '__doc__', '__eq__', '__hash__', '__module__')) | interesting)
-                return names
-            return self
+        name = [name for name in '?' if name[0] != '_']
 
     def __format__(self, format_spec):
         return str(str(self), format_spec)
@@ -942,13 +844,7 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items
-    for (name, member) in enumeration.__members__.items:
-        if name != member.name:
-            duplicates((name, member.name))
-            duplicates.append
-        duplicates
-        alias_details = ', '(<listcomp>())
-        raise ValueError(f"duplicate values found in {enumeration!r}: {alias_details!s}")
+    ? = [', '(<listcomp>()) for (name, member) in '?' if name != member.name]
     return enumeration
 
 def _dataclass_repr(self):
@@ -1063,7 +959,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                         gnv_last_values.append
                         enum_class._singles_mask_ = single_bits
                         enum_class._all_bits_ = single_bits | multi_bits.bit_length ** single_bits | multi_bits() - 1
-                        member_list = [m for m in .0]
+                        member_list = <listcomp>()
                         if member_list != sorted(member_list):
                             enum_class._iter_member_ = enum_class._iter_member_by_def_
                 else:
@@ -1079,14 +975,13 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                 pass
         enum_class._singles_mask_ = single_bits
         enum_class._all_bits_ = single_bits | multi_bits.bit_length ** single_bits | multi_bits() - 1
-        member_list = [m for m in .0]
+        member_list = <listcomp>()
         if member_list != sorted(member_list):
             pass
         def <listcomp>(.0):
             .0
             []
-            for m in .0:
-                return m._value_
+            m = [m for m in '?']
         contained = None
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
@@ -1126,25 +1021,8 @@ class verify:
                         elif enum_type == 'enum':
                             pass
                 elif check is NAMED_FLAGS:
-                    for (name, alias) in enumeration._member_map_.items:
-                        if name in member_names:
-                            pass
-                        elif alias.value < 0:
-                            pass
-                        else:
-                            values = list(_iter_bits_lsb(alias.value))
-                            missed = [v for v in .0]
-                            if missed:
-                                for val in missing_names.append:
-                                    missing_value |= val
-                        missing_names
-                for (name, member) in enumeration.__members__.items:
-                    if name != member.name:
-                        duplicates((name, member.name))
-                        duplicates.append
-                    duplicates
-                    alias_details = ', '(<listcomp>())
-                    raise ValueError(f"aliases found in {enumeration!r}: {alias_details!s}")
+                    ? = [missing_names for (name, alias) in '?' if name in member_names]
+                ? = [', '(<listcomp>()) for (name, member) in '?' if name != member.name]
                 if len(missing_names) == 1:
                     alias = 'alias %s is missing' % missing_names[0]
                 else:

@@ -337,8 +337,7 @@ class EnumType(type):
             return super().__new__(metacls, cls, bases, classdict, **kwds)
         classdict.setdefault('_ignore_', []).append('_ignore_')
         ignore = classdict['_ignore_']
-        for key in ignore:
-            classdict.pop(key, None)
+        member_names = [classdict.pop(key, None) for key in '?']
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
@@ -364,18 +363,7 @@ class EnumType(type):
             value = classdict[name]
         if boundary:
             if (Flag is not None) and bases and issubclass(bases[-1], Flag):
-                for n in member_names:
-                    p = classdict[n]
-                    if isinstance(p.value, int):
-                        if p.value < 0:
-                            return inverted.append(p)
-                        bits |= p.value
-                    elif p.value is None:
-                        pass
-                    else:
-                        if isinstance(p.value, tuple) and p.value and isinstance(p.value[0], int) and (p.value[0] < 0):
-                            return inverted.append(p)
-                        bits |= p.value[0]
+                n = [classdict[n] for n in '?' if isinstance(p.value, int)]
             try:
                 delattr(enum_class, '_%s__in_progress' % cls)
             except Exception:
@@ -673,10 +661,7 @@ class EnumType(type):
             elif isinstance(names, (tuple, list)):
                 if names:
                     if isinstance(names[0], str):
-                        for (count, name) in enumerate(original_names):
-                            value = first_enum._generate_next_value_(name, start, count, last_values[:])
-                            last_values.append(value)
-                            names.append((name, value))
+                        ? = [names.append((name, value)) for (count, name) in '?']
                     elif names is None:
                         names = []
                 elif names is None:
@@ -697,12 +682,7 @@ class EnumType(type):
             def <listcomp>(.0):
                 .0
                 []
-                for (name, value) in .0:
-                    if .0(name):
-                        pass
-                    for _ in .0:
-                        pass
-                    return
+                ? = [(name, value) for (name, value) in '?' if .0(name)]
             try:
                 members.sort(key=EnumType._convert_.<locals>.<lambda>)
             except TypeError:
@@ -951,9 +931,7 @@ class Enum(metaclass=EnumType):
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
-        for name in getattr(self, '__dict__', []):
-            if (name[0] != '_') and (name not in self._member_map_):
-                return interesting.add(name)
+        name = [name for name in '?' if (name[0] != '_') and (name not in self._member_map_)]
         for cls in self.__class__.mro():
             for (name, obj) in cls.__dict__.items():
                 if name[0] == '_':
@@ -1239,9 +1217,7 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
     """
     duplicates = []
-    for (name, member) in enumeration.__members__.items():
-        if name != member.name:
-            return duplicates.append((name, member.name))
+    ? = [(name, member) for (name, member) in '?' if name != member.name]
     if duplicates:
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
     return enumeration
@@ -1530,9 +1506,7 @@ class verify:
                 raise TypeError('the \'verify\' decorator only works with Enum and Flag')
                 for check in checks:
                     if check is UNIQUE:
-                        for (name, member) in enumeration.__members__.items():
-                            if name != member.name:
-                                return duplicates.append((name, member.name))
+                        ? = [(name, member) for (name, member) in '?' if name != member.name]
                     elif check is CONTINUOUS:
                         if len(values) < 2:
                             pass
@@ -1553,26 +1527,7 @@ class verify:
                                 if missing:
                                     pass
                     elif check is NAMED_FLAGS:
-                        for (name, alias) in self:
-                            if name in member_names:
-                                pass
-                            elif alias.value < 0:
-                                pass
-                            else:
-                                values = list(_iter_bits_lsb(alias.value))
-                                @()
-                                def <listcomp>(.0):
-                                    .0
-                                    []
-                                    for v in .0:
-                                        if v not in .0:
-                                            pass
-                                        for _ in .0:
-                                            pass
-                                        return
-                                if missed:
-                                    for val in missed:
-                                        missing_value |= val
+                        ? = [(name, alias) for (name, alias) in '?' if name in member_names]
                     if duplicates:
                         raise ValueError('aliases found in %r: %s' % (enumeration, alias_details))
                     if missing_names and (len(missing_names) == 1):
@@ -1650,12 +1605,7 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
         def <listcomp>(.0):
             .0
             []
-            for (name, value) in .0:
-                if .0(name):
-                    pass
-                for _ in .0:
-                    pass
-                return
+            ? = [(name, value) for (name, value) in '?' if .0(name)]
         try:
             members.sort(key=_old_convert_.<locals>.<lambda>)
         except TypeError:

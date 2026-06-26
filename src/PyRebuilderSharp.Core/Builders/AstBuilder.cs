@@ -1050,7 +1050,77 @@ public class AstBuilder
         while (bodyStmts.Count > 0 && bodyStmts[^1] is Continue)
             bodyStmts.RemoveAt(bodyStmts.Count - 1);
 
+        // 检测 3.12+ 内联推导式
+        var compResult = TryDetectInlinedComprehension(header, target, bodyStmts, exitBlock);
+        if (compResult != null)
+            return new List<Stmt> { compResult };
+
         return new List<Stmt> { new For(target, iterExpr, bodyStmts, null) };
+    }
+
+    private Stmt? TryDetectInlinedComprehension(BasicBlock header, Expr target,
+        List<Stmt> bodyStmts, BasicBlock? exitBlock)
+    {
+        bool hasIf = bodyStmts.Any(s => s is If);
+        if (!hasIf && bodyStmts.Count == 0) return null;
+        
+        string? containerKind = null;
+        foreach (var chk in new[] { header }.Concat(header.Predecessors))
+            foreach (var ins in chk.Instructions)
+            {
+                if (ins.Opcode == Opcode.BUILD_SET && ins.Argument == 0) containerKind = "set";
+                else if (ins.Opcode == Opcode.BUILD_LIST && ins.Argument == 0) containerKind = "list";
+                if (containerKind != null) break;
+            }
+        if (containerKind == null) return null;
+        
+        Expr? elt = target;
+        foreach (var s in bodyStmts) {
+            if (s is ExprStmt es) elt = es.Value;
+            if (s is Assign aa) elt = aa.Value;
+        }
+        
+        var ifs = new List<Expr>();
+        foreach (var s in bodyStmts)
+            if (s is If ifS) ifs.Add(ifS.Test);
+        
+        // 找 exit 块的 STORE_FAST 目标
+        string? storeTarget = null;
+        var fi = header.Instructions.FirstOrDefault(i => i.Opcode == Opcode.FOR_ITER);
+        if (fi.Argument.HasValue)
+        {
+            int cacheExtra = _codeObject.Version >= PythonVersion.Py311 ? 2 : 0;
+            int exitOffset = fi.Offset + 2 + cacheExtra + fi.Argument.Value;
+            var realExit = _sortedBlocks.FirstOrDefault(b => b.StartOffset >= exitOffset);
+            if (realExit != null)
+                foreach (var i in realExit.Instructions)
+                {
+                    if (i.Opcode == Opcode.STORE_FAST && i.Argument.HasValue
+                        && i.Argument.Value < _codeObject.Varnames.Count)
+                    { storeTarget = _codeObject.Varnames[i.Argument.Value]; break; }
+                    if (i.Opcode == Opcode.STORE_NAME && i.Argument.HasValue
+                        && i.Argument.Value < _codeObject.Names.Count)
+                    { storeTarget = _codeObject.Names[i.Argument.Value]; break; }
+                }
+        }
+        
+        var generators = new List<Comprehension>
+        {
+            new Comprehension(target, new Constant("?"), ifs)
+        };
+        
+        Expr? compExpr = containerKind switch
+        {
+            "set" => new SetComp(elt, generators),
+            "list" => new ListComp(elt, generators),
+            _ => null
+        };
+        if (compExpr == null) return null;
+        
+        if (storeTarget != null)
+            return new Assign(new List<Expr> { new Name(storeTarget, ExpressionContext.Store) }, compExpr);
+        string targetName = target is Name tn ? tn.Id : "?";
+        return new Assign(new List<Expr> { new Name(targetName, ExpressionContext.Store) }, compExpr);
     }
 
     /// <summary>
