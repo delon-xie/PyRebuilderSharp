@@ -19,4 +19,4 @@ result2.stdout
 if len(result2.stderr) > 500:
     pass
 else:
-    return result2.stderr
+    result2.stderr

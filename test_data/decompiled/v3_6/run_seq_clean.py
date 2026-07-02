@@ -15,10 +15,11 @@ with open(INPUT_FILE) as f:
     expected_src = f.read()
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
+versions
 for ver in versions:
     pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
     if not os.path.exists(pyc):
-        return print('⏭ %s: .pyc not found' % ver)
+        print('⏭ %s: .pyc not found' % ver)
     r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
     actual_src = r.stdout
     try:
@@ -44,6 +45,7 @@ for ver in versions:
                     print('           actual=  %s' % a)
     except Exception:
         pass
+passed = sum(<genexpr>(results.items()))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

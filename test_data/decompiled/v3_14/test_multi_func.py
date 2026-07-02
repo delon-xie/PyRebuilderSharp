@@ -1,7 +1,8 @@
 # Decompiled from: <module>
 
 def f():
-    pass
+    var_0
 
 def g():
-    pass
+    var_0
+var_2

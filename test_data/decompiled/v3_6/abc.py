@@ -114,11 +114,13 @@ class ABCMeta(type):
 
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
+        abstracts = <setcomp>(namespace.items())
+        bases
         for base in bases:
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
                 if getattr(value, '__isabstractmethod__', False):
-                    return abstracts.add(name)
+                    abstracts.add(name)
         cls.__abstractmethods__ = frozenset(abstracts)
         cls._abc_registry = WeakSet()
         cls._abc_cache = WeakSet()
@@ -139,6 +141,7 @@ class ABCMeta(type):
         """Debug helper to print the ABC registry."""
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
         print('Inv.counter: %s' % ABCMeta._abc_invalidation_counter, file=file)
+        sorted(cls.__dict__)
         for name in sorted(cls.__dict__):
             if name.startswith('_abc_'):
                 value = getattr(cls, name)

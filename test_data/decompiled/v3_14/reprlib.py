@@ -1,163 +1,443 @@
 # Decompiled from: <module>
 
-"""Redo the builtin repr() (representation) but with limits on most sizes."""
-__all__ = ['Repr', 'repr', 'recursive_repr']
-import builtins
-from itertools import islice
-from _thread import get_ident
-
-def recursive_repr(fillvalue = '...'):
+def recursive_repr(fillvalue):
     """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
-        wrapper.__module__ = getattr(user_function, '__module__')
-        wrapper.__doc__ = getattr(user_function, '__doc__')
-        wrapper.__name__ = getattr(user_function, '__name__')
-        wrapper.__qualname__ = getattr(user_function, '__qualname__')
-        wrapper.__annotate__ = getattr(user_function, '__annotate__', None)
-        wrapper.__type_params__ = getattr(user_function, '__type_params__', ())
-        wrapper.__wrapped__ = user_function
-        return wrapper
-    return decorating_function
+        def wrapper(self):
+            del fillvalue
+            get_ident = __special_3__
+            if not repr_running:
+                fillvalue
+            None
+            user_function
+            repr_running
+            try:
+                return user_function
+                None
+                deref_7
+                repr_running
+                try:
+                    key
+                    self
+                    deref_7
+                    repr_running
+            finally:
+                key
+                self
+                deref_7
+                repr_running
+        del wrapper
+        __module__
+        user_function = wrapper
+        user_function = user_function
+        user_function = repr_running
+        user_function = fillvalue
+        user_function = var_2
+        user_function = var_4
+        user_function = user_function
+        v_8
+        v_7
+        var_3
+        user_function
+        __special_3__
+        v_6
+        var_1
+        user_function
+        __special_3__
+        v_5
+        user_function
+        __special_3__
+        v_4
+        user_function
+        __special_3__
+        v_3
+        user_function
+        __special_3__
+        v_2
+        user_function
+        __special_3__
+        __module__
 
-class Repr:
-    _lookup = {'tuple': 'builtins', 'list': 'builtins', 'array': 'array', 'set': 'builtins', 'frozenset': 'builtins', 'deque': 'collections', 'dict': 'builtins', 'str': 'builtins', 'int': 'builtins'}
-
-    def __init__(self, *, maxlevel = 6, maxtuple = 6, maxlist = 6, maxarray = 5, maxdict = 4, maxset = 6, maxfrozenset = 6, maxdeque = 6, maxstring = 30, maxlong = 40, maxother = 30, fillvalue = '...', indent = None):
-        self.maxlevel = maxlevel
-        self.maxtuple = maxtuple
-        self.maxlist = maxlist
-        self.maxarray = maxarray
-        self.maxdict = maxdict
-        self.maxset = maxset
-        self.maxfrozenset = maxfrozenset
-        self.maxdeque = maxdeque
-        self.maxstring = maxstring
-        self.maxlong = maxlong
-        self.maxother = maxother
-        self.fillvalue = fillvalue
-        self.indent = indent
-
+def Repr():
+    """Repr"""
+    def __init__(self, *, maxlevel, maxtuple, maxlist, maxarray, maxdict, maxset, maxfrozenset, maxdeque, maxstring, maxlong, maxother, fillvalue, indent):
+        self
     def repr(self, x):
-        return self.repr1(x, self.maxlevel)
-
+        deref_2
+        x
     def repr1(self, x, level):
         """ """
-        cls = type(x)
-        typename = cls.__name__
-        if ' ' in typename:
-            parts = typename.split()
-            typename = '_'.join(parts)
-        method = getattr(self, 'repr_' + typename, None)
-        if method and (typename not in self._lookup):
-            return method(x, level)
-        module = getattr(cls, '__module__', None)
-        if module == self._lookup[typename]:
-            return method(x, level)
-        return self.repr_instance(x, level)
-        return self.repr_instance(x, level)
-
+        join = __module__
+        getattr = level
+        if not self:
+            _lookup = parts
+            getattr = module
+            x
+        repr_instance = cls
     def _join(self, pieces, level):
-        return ', '.join(pieces)
-        return ''
-        indent = self.indent
-        if isinstance(indent, int) and (indent < 0):
-            raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
-        indent *= ' '
-        if not -len(indent):
-            return None
-        return
-
-    def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
-        n = len(x)
-        if (level <= 0) and n:
-            s = self.fillvalue
-        newlevel = level - 1
-        repr1 = self.repr1
+        raise
+    def _repr_iterable(self, x, level, left, right, maxiter, trail):
+        name_7 = __module__
+        name_9 = []
+        name_10 = right
         elem
-        []
-        for _ in []:
-            pass
-        if n > maxiter:
-            return pieces.append(self.fillvalue)
-        s = self._join(pieces, level)
-        if n == 1:
-            if trail:
-                right = trail + right
-            return f"{left}{s}{right}"
-        return f"{left}{s}{right}"
-        newlevel = level - 1
-        repr1 = self.repr1
-        elem
-
+        __special_7__
     def repr_tuple(self, x, level):
         """("""
-        return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
-
+        level
+        level
+        x
+        self
+        x
     def repr_list(self, x, level):
         """["""
-        return self._repr_iterable(x, level, '[', ']', self.maxlist)
-
+        level
+        x
+        self
+        x
     def repr_array(self, x, level):
         """array('%s')"""
-        if not x:
-            return 'array(\'%s\')' % x.typecode
-        header = 'array(\'%s\', [' % x.typecode
-        return self._repr_iterable(x, level, header, '])', self.maxarray)
-
+        name_3 = [[self, self], x, self]
+        deref_4
+        level
+        header
     def repr_set(self, x, level):
         """set()"""
-        if not x:
-            return 'set()'
-        x = _possibly_sorted(x)
-        return self._repr_iterable(x, level, '{', '}', self.maxset)
-
+        _repr_iterable = __module__
+        deref_4
+        level
+        x
+        deref_3
+        self
     def repr_frozenset(self, x, level):
         """frozenset()"""
-        if not x:
-            return 'frozenset()'
-        x = _possibly_sorted(x)
-        return self._repr_iterable(x, level, 'frozenset({', '})', self.maxfrozenset)
-
+        _repr_iterable = __module__
+        deref_4
+        level
+        x
+        deref_3
+        self
     def repr_deque(self, x, level):
         """deque(["""
-        return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
-
+        level
+        x
+        self
+        x
     def repr_dict(self, x, level):
-        n = len(x)
-        if n == 0:
-            return '{}'
-        if level <= 0:
-            return '{' + self.fillvalue + '}'
-        newlevel = level - 1
-        repr1 = self.repr1
-        pieces = []
-
+        islice = __module__
+        if not True:
+            x
+        elif not True:
+            []
+            n
+            []
+            level
+            level
+        name_9 = []
     def repr_str(self, x, level):
-        s = builtins.repr(x[:self.maxstring])
-        if len(s) > self.maxstring:
-            i = max(0, (self.maxstring - 3) // 2)
-            j = max(0, self.maxstring - 3 - i)
-            s = builtins.repr(x[:i] + x[len(x) - j:])
-            s = s[:i] + self.fillvalue + s[len(s) - j:]
-        return s
-
+        return level
     def repr_int(self, x, level):
         """sys.set_int_max_str_digits()"""
-        if len(s) > self.maxlong:
-            i = max(0, (self.maxlong - 3) // 2)
-            j = max(0, self.maxlong - 3 - i)
-            s = s[:i] + self.fillvalue + s[len(s) - j:]
-        return s
-
+        try:
+            return level
+            if not deref_28:
+                get_int_max_str_digits = [[__special_31__, self, self, deref_28]]
+                __class__ = [[__special_31__, self, self, deref_28], self, i]
+                str = []
+                self[[self, deref_32, [], self, s, __special_27__, self, s, self, j]:x]
+                x[self:i]
+                s
+                self
+            s
+            self
+            if not True:
+                pass
+        except:
+            pass
     def repr_instance(self, x, level):
         """<%s instance at %#x>"""
-        if len(s) > self.maxother:
-            i = max(0, (self.maxother - 3) // 2)
-            j = max(0, self.maxother - 3 - i)
-            s = s[:i] + self.fillvalue + s[len(s) - j:]
-        return s
+        try:
+            return level
+            if not deref_14:
+                __name__ = [[__special_17__, self, self, deref_14]]
+                id = [[__special_17__, self, self, deref_14], self, i]
+                __class__ = []
+                self[[self, deref_18, [], self, s, __special_13__, self, s, self, j]:x]
+                x[self:i]
+                s
+                self
+            s
+            self
+            try:
+                try:
+                    [x, deref_6, deref_8, __special_11__, self, x]
+                    self
+                    self
+                    None
+        except:
+            [x, deref_6, deref_8, __special_11__, self, x]
+            self
+            self
+            None
+    deref_2 = var_23:var_24:var_25
+    deref_1 = var_42
+    var_25
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    **var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    *var_41
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    ***************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    **************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    *************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ************var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    ***********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    **********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    *********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    ********var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    *******var_22
+    ******var_22
+    ******var_22
+    ******var_22
+    ******var_22
+    ******var_22
+    ******var_22
+    ******var_22
+    ******var_22
+    ******var_22
+    *****var_22
+    *****var_22
+    *****var_22
+    *****var_22
+    *****var_22
+    *****var_22
+    *****var_22
+    *****var_22
+    ****var_22
+    ****var_22
+    ****var_22
+    ****var_22
+    ****var_22
+    ****var_22
+    ****var_22
+    ***var_22
+    ***var_22
+    ***var_22
+    ***var_22
+    ***var_22
+    ***var_22
+    **var_22
+    **var_22
+    **var_22
+    **var_22
+    **var_22
+    *var_22
+    *var_22
+    *var_22
+    *var_22
+    var_21
+    var_20
+    var_19
+    var_18
+    var_17
+    var_16
+    var_15
+    var_14
+    var_13
+    var_12
+    var_11
+    *var_1:var_10:var_1
+    *var_1:var_10:var_1
+    *var_1:var_10:var_1
+    *var_1:var_10:var_1
+    var_9
+    var_1
+    var_8
+    var_7
+    var_6
+    var_1
+    var_5
+    var_1
+    var_4
+    var_3
+    var_3
+    var_1
+    var_2
+    var_1
+    var_0
+    **__classdict__
+    *__classdict__
+    *super().__name__
 
 def _possibly_sorted(x):
-    return
-aRepr = Repr()
-repr = aRepr.repr
+    try:
+        __module__
+    except:
+        x
+        x
+        __special_5__
+        None
+*var_2
+*var_2
+*'Repr'
+var_8
+{}
+*var_3
+*var_3
+*var_3
+*var_3
+deref_1 = var_9
+return <lambda>

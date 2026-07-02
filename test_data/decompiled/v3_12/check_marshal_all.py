@@ -17,6 +17,7 @@ for off in [1, 5]:
         if vals[2] == c.co_stacksize:
             print('FOUND at offset', off)
 """
+versions.items()
 for (ver, py_path) in versions.items():
     for line in out.split("""
 """):

@@ -5,5 +5,5 @@ def test():
     lock
     None(None)
     lock
-    print(lk)
-    None(None)
+    try:
+        print(lk)

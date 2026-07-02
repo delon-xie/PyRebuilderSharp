@@ -1,17 +1,8 @@
 # Decompiled from: <module>
 
-import marshal
-import sys
-open(sys.argv[1], 'rb')
-None(None)
-print('Module:', code.co_name)
-print('  argc:', code.co_argcount)
-print('  nlocals:', code.co_nlocals)
-print('  code len:', len(code.co_code))
-print('  code hex:', code.co_code.hex()[:60])
-
-def dump_code(c, depth = 0):
+def dump_code(c, depth):
     prefix = '  ' * depth
+    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
@@ -20,4 +11,11 @@ def dump_code(c, depth = 0):
         else:
             print(f"{prefix}Function: {const.co_name}")
             dump_code + 1
-dump_code(code)
+
+import marshal
+import sys
+open(sys.argv[1], 'rb')
+try:
+    magic = f.read(4)
+    f.read(8)
+    code = marshal.load(f)

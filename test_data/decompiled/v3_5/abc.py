@@ -1,6 +1,14 @@
 # Decompiled from: <module>
 
+def ABC():
+    """ABC"""
+    __module__ = __name__
+    __qualname__ = 'ABC'
+    __doc__ = """Helper class that provides a standard way to create an ABC using
+    inheritance.
+    """
 """Abstract Base Classes (ABCs) according to PEP 3119."""
+
 from _weakrefset import WeakSet
 
 def abstractmethod(funcobj):
@@ -23,7 +31,10 @@ def abstractmethod(funcobj):
     return funcobj
 
 class abstractclassmethod(classmethod):
-    """
+    def __init__(self, callable):
+        callable.__isabstractmethod__ = True
+        super().__init__(callable)
+    __doc__ = """
     A decorator indicating abstract classmethods.
 
     Similar to abstractmethod.
@@ -42,7 +53,10 @@ class abstractclassmethod(classmethod):
     __init__ = 'abstractclassmethod.__init__'
 
 class abstractstaticmethod(staticmethod):
-    """
+    def __init__(self, callable):
+        callable.__isabstractmethod__ = True
+        super().__init__(callable)
+    __doc__ = """
     A decorator indicating abstract staticmethods.
 
     Similar to abstractmethod.
@@ -91,7 +105,21 @@ class abstractproperty(property):
     __isabstractmethod__ = True
 
 class ABCMeta(type):
-    """Metaclass for defining Abstract Base Classes (ABCs).
+    def __new__(mcls, name, bases, namespace):
+        cls = super().__new__(mcls, name, bases, namespace)
+        abstracts = {(name, value) for (name, value) in .0}
+        bases
+        for base in bases:
+            for name in getattr(base, '__abstractmethods__', set()):
+                value = getattr(cls, name, None)
+        cls.__abstractmethods__ = frozenset(abstracts)
+        cls._abc_registry = WeakSet()
+        cls._abc_cache = WeakSet()
+        cls._abc_negative_cache = WeakSet()
+        cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
+        return cls
+        abstracts.add(name)
+    __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
 
     Use this metaclass to create an ABC.  An ABC can be subclassed
     directly, and then acts as a mix-in class.  You can also register
@@ -124,6 +152,7 @@ class ABCMeta(type):
 
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
+        sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
             pass
         value = getattr(cls, name)
@@ -139,7 +168,7 @@ class ABCMeta(type):
                 return False
             return cls.__subclasscheck__(subclass)
             return cls.__subclasscheck__(subclass)
-        return (any)(CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'))
+        return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'({subclass, subtype}))
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
@@ -156,12 +185,15 @@ class ABCMeta(type):
                 if not isinstance(ok, bool):
                     raise AssertionError
                 if ok:
-                    return cls._abc_cache.add(subclass)
-                cls._abc_negative_cache.add(subclass)
-                return ok
-            if cls in getattr(subclass, '__mro__', ()):
-                cls._abc_cache.add(subclass)
-                return True
+                    cls._abc_cache.add(subclass)
+                else:
+                    cls._abc_negative_cache.add(subclass)
+                    return ok
+            else:
+                if cls in getattr(subclass, '__mro__', ()):
+                    cls._abc_cache.add(subclass)
+                    return True
+                cls._abc_registry
 
 def get_cache_token():
     """Returns the current ABC cache token.

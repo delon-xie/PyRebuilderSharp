@@ -9,10 +9,8 @@ def test_match(x):
     return 'other'
 
 def test_match_with_guard(x):
-    match x:
-        case str():
-            return 'long string'
-        case str():
-            pass
+    if len(s) > 5:
+        return 'long string'
+    return 'short string'
 result = test_match(1)
 result2 = test_match_with_guard('hello')

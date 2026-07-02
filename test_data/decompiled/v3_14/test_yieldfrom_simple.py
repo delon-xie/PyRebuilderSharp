@@ -1,4 +1,7 @@
 # Decompiled from: <module>
 
 def f():
-    range(3)
+    None
+    try:
+        {__module__, __build_class__, var_1}
+var_1

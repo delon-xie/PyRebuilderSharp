@@ -53,6 +53,7 @@ else:
             (op, instr_name, arg)
             if offset < len(bytecode):
                 pass
+            instructions
             for (off, op, name, arg) in instructions:
                 ''
                 arg

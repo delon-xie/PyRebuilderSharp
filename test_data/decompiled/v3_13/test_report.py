@@ -6,21 +6,26 @@ result = subprocess.run(['python3', 'tests/run_tests.py'], capture_output=True, 
 output = result.stdout + result.stderr
 test_groups = {}
 current_group = None
+output.split("""
+""")
 line = [line for line in '?' if line.startswith('***')]
 print('============================================================')
 print('Python 3.10 版本测试报告')
 print('============================================================')
 passed_groups = []
 failed_groups = []
+test_groups.items()
 ? = [(group, info) for (group, info) in '?' if not info['files']]
 print(f"
 通过的测试组 ({len(passed_groups)}):")
 print('----------------------------------------')
+passed_groups
 for group in passed_groups:
     print(f"  ✓ {group}")
 print(f"
 失败的测试组 ({len(failed_groups)}):")
 print('----------------------------------------')
+failed_groups
 for group in failed_groups:
     for f in test_groups[group]['files']:
         print(f"    - {f}")

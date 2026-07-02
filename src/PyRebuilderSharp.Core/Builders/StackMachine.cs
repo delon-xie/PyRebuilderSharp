@@ -1509,13 +1509,18 @@ public class StackMachine
 
             case Opcode.GET_ITER:
             {
-                // GET_ITER — 消耗栈顶的迭代对象。
-                // 注意：不推回栈，因为 for 循环的 FOR_ITER 在后继块独立处理迭代表达式。
-                // 推导式的 CALL 通过 handler 内的 args 回溯找到 iterable。
-                // 3.12+ 内联推导式中，迭代对象必须保留供 ExtractIterExpression 回溯。
-                // 但 SET_ADD 的 depth 参数不包含迭代对象，所以仍要弹出。
+                // GET_ITER — 获取栈顶的迭代对象。
+                // 在 CPython ceval.c 中，GET_ITER 将可迭代对象转换为迭代器：
+                //   x = PyObject_GetIter(v); PUSH(x);
+                // 在 AST 层面，我们保留原始迭代表达式（不转换为迭代器），
+                // 因为：
+                //   - 推导式 CALL_FUNCTION 的 arg 需要迭代表达式
+                //   - FOR_ITER 已在 for 循环独立处理迭代表达式（ExtractIterExpression）
+                // 所以弹出再推回 = 对 AST 透明。
                 var iterable = SafePop();
-                if (iterable == null)
+                if (iterable != null)
+                    _exprStack.Push(iterable);  // 推回，供 CALL_FUNCTION 或 FOR_ITER 使用
+                else
                     Console.Error.WriteLine($"[GET_ITER] v{_code.Version} func={_code.Name} stackEmpty");
                 return null;
             }
@@ -1675,10 +1680,23 @@ public class StackMachine
                         {
                             // TOS1 是 code（标准 qualname + code 顺序）
                             childCode = co2;
-                            if (tos is Constant cStr && cStr.Value is string s)
+                            // 优先使用 code object 的内建名称（对 comprehension 等 < 开头的名称保持原样）
+                            var codeName = co2.Name ?? "<lambda>";
+                            if (codeName.StartsWith("<"))
+                            {
+                                // 推导式/生成器：使用 code object 的原始名称（如 <setcomp>、<genexpr>）
+                                // qualname（如 'ABCMeta.__new__.<locals>.<setcomp>'）不用于 AST 函数名
+                                funcName = codeName;
+                            }
+                            else if (tos is Constant cStr && cStr.Value is string s)
+                            {
+                                // 普通函数：使用 qualname 作为函数名
                                 funcName = s;
+                            }
                             else
-                                funcName = co2.Name ?? "<lambda>";
+                            {
+                                funcName = codeName;
+                            }
                             // tos1(code) 已作 FunctionRef 源，tos(qualname) 已被消费
                         }
                         // 如果都没匹配到 code，childCode 保持 null

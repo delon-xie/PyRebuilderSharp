@@ -39,6 +39,7 @@ q = items[1:10]
 r = obj.attr
 s = x if cond else y
 """}
+tests.items()
 for (name, code) in tests.items():
     py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
     pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
@@ -63,6 +64,6 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
             print(f"Output ({len(content)} bytes):
 {content[:300]}")
         else:
-            return print(f"Error: {r2.stderr[:200]}")
+            print(f"Error: {r2.stderr[:200]}")
     else:
-        return r.stderr.strip()
+        r.stderr.strip()

@@ -1,9 +1,13 @@
 # Decompiled from: <module>
 
 def test():
-    lock = object()
-    __name__()
+    object = __module__
+    try:
+        None
+    finally:
+        None
     lock
-    __module__
-    lock
-    None(None, None)
+    None
+    None
+    None
+var_1

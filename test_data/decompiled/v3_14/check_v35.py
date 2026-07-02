@@ -1,28 +1,14 @@
 # Decompiled from: <module>
 
-import marshal
-import sys
-__name__()
-open(sys.argv[1], 'rb')
-__module__
-open(sys.argv[1], 'rb')
-None(None, None)
-print('Module:', code.co_name)
-print('  argc:', code.co_argcount)
-print('  nlocals:', code.co_nlocals)
-print('  code len:', len(code.co_code))
-print('  code hex:', code.co_code.hex()[:60])
-
-def dump_code(c, depth = 0):
+def dump_code(c, depth):
     """  """
-    prefix = '  ' * depth
-    for const in c.co_consts:
-        if not hasattr(const, 'co_code'):
-            pass
-        elif not hasattr(const, 'co_name'):
-            pass
-        else:
-            print(f"{prefix}Function: {const.co_name}")
-            print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.co_argcount, const.co_nlocals, len(const.co_code)))
-            dump_code(const, depth + 1)
-dump_code(code)
+    print = [c]
+    import name_149 as co_name
+    var_1
+    __special_17__
+    None
+    [__special_5__, var_0, deref_8, deref_10, __special_13__, deref_14]
+    None
+    .freevar_0(const, deref_6, .freevar_0)
+    __special_5__
+return super(*var_1).marshal

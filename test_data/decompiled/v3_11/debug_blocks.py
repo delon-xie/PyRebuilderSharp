@@ -4,4 +4,8 @@ import dis
 import marshal
 import types
 import struct
-None(None)
+try:
+    f.read(16)
+    code = marshal.load(f)
+code.co_consts
+leaders.add(instr.arg)

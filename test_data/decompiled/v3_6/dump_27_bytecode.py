@@ -22,6 +22,7 @@ pos += 4
 next_type = data[pos]
 if not next_type <= next_type:
     pass
+instructions
 for (off, op, name, arg) in instructions:
     if arg is not None:
         pass

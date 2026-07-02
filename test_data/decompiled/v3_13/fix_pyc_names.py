@@ -6,10 +6,12 @@ MAGIC_NUMBERS = {b'Wg0NCg==': '3.10', b'Yg0NCg==': '3.11', b'bw0NCg==': '3.12', 
 
 def get_python_version(filepath):
     open(filepath, 'rb')
-    None(None)
+    try:
+        magic = fp.read(4)
     return MAGIC_NUMBERS.get(magic, 'unknown')
 
 def fix_pyc_names(directory):
+    os.listdir(directory)
     for filename in os.listdir(directory):
         if not filename.endswith('.pyc'):
             pass
@@ -22,6 +24,7 @@ def fix_pyc_names(directory):
                 pass
             else:
                 new_filename = filename
+                MAGIC_NUMBERS.values()
                 for version in MAGIC_NUMBERS.values():
                     if not f".{version}.pyc" in new_filename:
                         pass
@@ -32,9 +35,10 @@ def fix_pyc_names(directory):
                         else:
                             new_filepath = os.path.join
                             if os.path.exists(new_filepath):
-                                return print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-                            os.rename(None)
-                            print(f"✓ Renamed {filename} -> {new_filename}")
+                                print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
+                            else:
+                                os.rename(None)
+                                print(f"✓ Renamed {filename} -> {new_filename}")
                 import re
                 match = re.search('\\.(\\d+)\\.pyc$', filename)
                 if match:

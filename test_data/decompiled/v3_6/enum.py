@@ -1,5 +1,16 @@
 # Decompiled from: <module>
 
+def EnumCheck():
+    """EnumCheck"""
+    __module__ = __name__
+    __qualname__ = 'EnumCheck'
+    __doc__ = """
+    various conditions to check an enumeration for
+    """
+    CONTINUOUS = 'no skipped integer values'
+    NAMED_FLAGS = 'multi-flag aliases may not contain unnamed flags'
+    UNIQUE = 'one name per value'
+
 import sys
 import builtins as bltns
 from types import MappingProxyType, DynamicClassAttribute
@@ -28,7 +39,7 @@ def _is_descriptor(obj):
     Returns True if obj is a descriptor, False otherwise.
     """
     if hasattr(obj, '__get__') and hasattr(obj, '__set__'):
-        return hasattr(obj, '__delete__')
+        hasattr(obj, '__delete__')
 
 def _is_dunder(name):
     """
@@ -333,7 +344,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return ()(EnumType.__iter__.<locals>.<genexpr>)
+        return <genexpr>(cls._member_names_)
 
     def __len__(cls):
         """
@@ -359,7 +370,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return ()(EnumType.__reversed__.<locals>.<genexpr>)
+        return <genexpr>(reversed(cls._member_names_))
 
     def __setattr__(cls, name, value):
         """
@@ -408,6 +419,7 @@ class EnumType(type):
 
     @classmethod
     def _check_for_existing_members_(mcls, class_name, bases):
+        bases
         for chain in bases:
             for base in chain.__mro__:
                 if isinstance(base, EnumType) and base._member_names_:
@@ -427,6 +439,7 @@ class EnumType(type):
 
     @classmethod
     def _find_data_repr_(mcls, class_name, bases):
+        bases
         for chain in bases:
             for base in chain.__mro__:
                 if base is object:
@@ -441,20 +454,21 @@ class EnumType(type):
     def _find_data_type_(mcls, class_name, bases):
         data_types = set()
         base_chain = set()
+        bases
         for chain in bases:
             for base in chain.__mro__:
                 base_chain.add(base)
                 if base is object:
                     continue
                 if candidate:
-                    return base
+                    base
                 if isinstance(base, EnumType) and (base._member_type_ is not object):
-                    return data_types.add(base._member_type_)
+                    data_types.add(base._member_type_)
                 if '__new__' in base.__dict__:
                     if '__dataclass_fields__' in base.__dict__:
                         pass
                 if candidate:
-                    return base
+                    base
         if len(data_types) > 1:
             raise TypeError('too many data types for %r: %r' % (class_name, data_types))
 
@@ -580,7 +594,7 @@ class Enum(metaclass=EnumType):
 
     def __repr__(self):
         if self.__class__._value_repr_:
-            return repr
+            repr
 
     def __str__(self):
         return '%s.%s' % (self.__class__.__name__, self._name_)
@@ -700,6 +714,7 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition (i.e. increasing value) order.
         """
+        _iter_bits_lsb(value & cls._flag_mask_)
         for val in _iter_bits_lsb(value & cls._flag_mask_):
             yield cls._value2member_map_.get(val)
     _iter_member_ = _iter_member_by_value_
@@ -709,7 +724,7 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition order.
         """
-        yield from sorted(cls._iter_member_by_value_(value), key=Flag._iter_member_by_def_.<locals>.<lambda>)
+        yield from sorted(cls._iter_member_by_value_(value), key=<lambda>)
 
     @classmethod
     def _missing_(cls, value):
@@ -754,7 +769,7 @@ class Flag(Enum, boundary=STRICT):
     def __repr__(self):
         cls_name = self.__class__.__name__
         if self.__class__._value_repr_:
-            return repr
+            repr
 
     def __str__(self):
         cls_name = self.__class__.__name__
@@ -811,12 +826,14 @@ def unique(enumeration):
     Class decorator for enumerations ensuring unique member values.
     """
     duplicates = []
+    enumeration.__members__.items()
     ? = [(name, member) for (name, member) in enumeration if name != member.name]
     if duplicates:
+        alias_details = ', '.join(<listcomp>(duplicates))
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
 
 def _dataclass_repr(self):
-    return self.__dataclass_fields__((dcf, ', '.join)(_dataclass_repr.<locals>.<genexpr>))
+    return (self, ', '.join)(<genexpr>(dcf.keys()))
 
 def global_enum_repr(self):
     """
@@ -836,7 +853,7 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_ is None:
         return '%s.%s(%r)' % (module, cls_name, self._value_)
-    return
+    return ('|'.join)(<listcomp>(self.name.split('|')))
     name.append(n)
     name.append('%s.%s' % (module, n))
 
@@ -884,18 +901,13 @@ def _simple_enum(etype, *, boundary, use_args):
         __new__ = cls.__dict__.get('__new__')
         cls_name = cls.__name__
         if __new__ is None:
-            use_args
+            __new__
             cls_name._use_args_
         setattr(enum_class, name, enum_method)
         gnv_last_values = []
         member = new_member(enum_class, **value)
         value = value[0]
-        def <listcomp>(.0):
-            .0
-            []
-            for m in .0:
-                pass
-            return
+        contained = None
         contained = m
         contained._add_alias_(name)
         member._name_ = name
@@ -973,9 +985,9 @@ def _test_simple_enum(checked_enum, simple_enum):
             if key in member_names:
                 continue
             if key not in simple_keys:
-                return failed.append('missing key: %r' % (key))
+                failed.append('missing key: %r' % (key))
             if key not in checked_keys:
-                return failed.append('extra key:   %r' % (key))
+                failed.append('extra key:   %r' % (key))
             checked_value = checked_dict[key]
             simple_value = simple_dict[key]
             if callable(checked_value):
@@ -985,31 +997,31 @@ def _test_simple_enum(checked_enum, simple_enum):
                 compressed_checked_value = checked_value.replace(' ', '').replace('\t', '')
                 compressed_simple_value = simple_value.replace(' ', '').replace('\t', '')
                 if compressed_checked_value != compressed_simple_value:
-                    return failed.append("""%r:
+                    failed.append("""%r:
          %s
          %s""" % (key, 'checked -> %r' % (checked_value), 'simple  -> %r' % (simple_value)))
-                if failed_member:
+                elif failed_member:
                     for name in member_names:
                         failed_member = []
                         if name not in simple_keys:
-                            return failed.append('missing member from simple enum: %r' % name)
+                            failed.append('missing member from simple enum: %r' % name)
                         if name not in checked_keys:
-                            return failed.append('extra member in simple enum: %r' % name)
+                            failed.append('extra member in simple enum: %r' % name)
                         for key in set(checked_member_keys + simple_member_keys):
                             if key in ('__module__', '__objclass__', '_inverted_'):
                                 continue
                             if key not in simple_member_keys:
-                                return failed_member.append('missing key %r not in the simple enum member %r' % (key, name))
+                                failed_member.append('missing key %r not in the simple enum member %r' % (key, name))
                             if key not in checked_member_keys:
-                                return failed_member.append('extra key %r in simple enum member %r' % (key, name))
+                                failed_member.append('extra key %r in simple enum member %r' % (key, name))
                             checked_value = checked_member_dict[key]
                             simple_value = simple_member_dict[key]
                             if checked_value != simple_value:
-                                return failed_member.append("""%r:
+                                failed_member.append("""%r:
          %s
          %s""" % (key, 'checked member -> %r' % (checked_value), 'simple member  -> %r' % (simple_value)))
             if checked_value != simple_value:
-                return failed.append("""%r:
+                failed.append("""%r:
          %s
          %s""" % (key, 'checked -> %r' % (checked_value), 'simple  -> %r' % (simple_value)))
     checked_method = getattr(checked_enum, method, None)

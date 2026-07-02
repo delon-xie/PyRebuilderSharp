@@ -38,6 +38,7 @@ class abstractclassmethod(classmethod):
     __isabstractmethod__ = True
 
     def __init__(self, callable):
+        import warnings
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
@@ -59,6 +60,7 @@ class abstractstaticmethod(staticmethod):
     __isabstractmethod__ = True
 
     def __init__(self, callable):
+        import warnings
         warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
@@ -80,8 +82,15 @@ class abstractproperty(property):
     __isabstractmethod__ = True
 
     def __init__(self, fget = None, fset = None, fdel = None, doc = None):
+        import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
-        warnings := warnings(super().__init__)
+        __class__(super().__init__)
+try:
+    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
+except ImportError:
+    from _py_abc import ABCMeta
+    from _py_abc import get_cache_token
+    ABCMeta.__module__ = 'abc'
 
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).
@@ -151,18 +160,20 @@ def update_abstractmethods(cls):
     if not hasattr(cls, '__abstractmethods__'):
         return cls
     abstracts = set()
+    cls.__bases__
     for scls in cls.__bases__:
         for name in getattr(scls, '__abstractmethods__', ()):
             value = getattr(None)
             if not getattr(value, '__isabstractmethod__', False):
                 pass
             else:
-                return abstracts.add(name)
+                abstracts.add(name)
+    cls.__dict__.items()
     for (value, name) in cls.__dict__.items():
         if not getattr(value, '__isabstractmethod__', False):
             pass
         else:
-            return abstracts.add(name)
+            abstracts.add(name)
     cls.__abstractmethods__ = frozenset(abstracts)
     return cls
 

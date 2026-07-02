@@ -9,6 +9,7 @@ code = marshal.load(f)
 
 def dump_code(c, depth):
     prefix = '  ' * depth
+    c.co_consts
     for const in c.co_consts:
         pass
 dump_code(code)

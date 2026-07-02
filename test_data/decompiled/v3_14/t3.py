@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
-a1 = None
-a2 = True
-b1 = x
+var_0
+*super(*var_1).a1
+*super(*var_1).a1
+*super(*var_1).a1

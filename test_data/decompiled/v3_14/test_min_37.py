@@ -1,3 +1,3 @@
 # Decompiled from: <module>
 
-a1 = None
+var_0

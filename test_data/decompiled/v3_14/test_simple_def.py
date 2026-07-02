@@ -1,4 +1,5 @@
 # Decompiled from: <module>
 
 def f():
-    x = 1
+    var_0
+var_1

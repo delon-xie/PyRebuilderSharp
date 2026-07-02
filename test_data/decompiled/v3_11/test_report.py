@@ -6,6 +6,8 @@ result = subprocess.run(['python3', 'tests/run_tests.py'], capture_output=True, 
 output = result.stdout + result.stderr
 test_groups = {}
 current_group = None
+output.split("""
+""")
 for line in output.split("""
 """):
     if line.startswith('***'):
@@ -14,4 +16,4 @@ for line in output.split("""
             current_group = parts[0].strip().replace('*** ', '')
             status = parts[1].strip()
     elif current_group and line.strip().endswith('.3.10.pyc'):
-        return test_groups[current_group]['files'].append(line.strip())
+        test_groups[current_group]['files'].append(line.strip())

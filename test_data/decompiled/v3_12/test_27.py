@@ -9,11 +9,12 @@ pyc = os.path.join(COMPILED_DIR, 'test_expr_basic.2.7.pyc')
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
 lines = r.stdout.split("""
 """)
+enumerate(lines)
 for (i, line) in enumerate(lines):
     if not 'items[' in line:
         pass
     else:
-        return print(f"Line {i}: {line}")
+        print(f"Line {i}: {line}")
 print("""
 --- ACTUAL AST ---""")
 actual_ast = ast.dump(ast.parse(r.stdout), indent=2)

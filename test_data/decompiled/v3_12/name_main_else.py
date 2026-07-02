@@ -9,4 +9,4 @@ def main():
 if __name__ == '__main__':
     main()
 else:
-    return print('Not main')
+    print('Not main')

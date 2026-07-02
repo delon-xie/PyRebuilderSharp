@@ -1,3 +1,3 @@
 # Decompiled from: <module>
 
-a = 1
+var_1

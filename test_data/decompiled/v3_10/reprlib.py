@@ -73,15 +73,9 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        @(self.repr1, repr1)
-        def <listcomp>(.0):
-            .0
-            []
-            for elem in .0:
-                pass
-            return
+        pieces = [elem for elem in .0]
         if n > maxiter:
-            return pieces.append(self.fillvalue)
+            pieces.append(self.fillvalue)
         s = self._join(pieces, level)
         if (n == 1) and trail:
             if self.indent is None:
@@ -89,13 +83,7 @@ class Repr:
             return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
-        @(self.repr1, repr1)
-        def <listcomp>(.0):
-            .0
-            []
-            for elem in .0:
-                pass
-            return
+        pieces = [elem for elem in .0]
         if n > maxiter:
             pass
         s = self._join(pieces, level)
@@ -139,6 +127,7 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
+        islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])

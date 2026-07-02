@@ -2,3 +2,4 @@
 
 def f():
     range(3)
+    raise

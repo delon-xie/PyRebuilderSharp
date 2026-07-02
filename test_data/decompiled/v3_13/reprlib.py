@@ -9,6 +9,18 @@ from _thread import get_ident
 def recursive_repr(fillvalue = '...'):
     """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
+        repr_running = set()
+        def wrapper(self):
+            key = (id(self), get_ident())
+            if key in repr_running:
+                return fillvalue
+            repr_running.add(key)
+            result = user_function(self)
+            repr_running.discard(key)
+            return result
+            repr_running.discard(key)
+            raise
+            raise
         wrapper.__module__ = getattr(user_function, '__module__')
         wrapper.__doc__ = getattr(user_function, '__doc__')
         wrapper.__name__ = getattr(user_function, '__name__')
@@ -42,35 +54,33 @@ class Repr:
         return self.repr_instance
 
     def _join(self, pieces, level):
-        return ', '.join(pieces)
-        return ''
         indent = self.indent
-        if isinstance(indent, int) and (indent < 0):
-            raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
-        indent *= ' '
-        if not -len(indent):
-            return None
-        return
+        return ', '.join(pieces)
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
-        if (level <= 0) and n:
-            s = self.fillvalue
-        newlevel = level - 1
-        repr1 = self.repr1
-        elem
-        for _ in elem:
-            pass
-        pieces.append(self.fillvalue)
-        s = self._join
-        if n == 1:
-            if trail:
+        if level <= 0:
+            if n:
+                s = self.fillvalue
+            newlevel = level - 1
+            repr1 = self.repr1
+            elem
+            islice
+            []
+            for _ in []:
                 pass
+            pieces.append(self.fillvalue)
+            s = self._join
+            if n == 1:
+                if trail:
+                    pass
+                return f"{left}{s}{right}"
             return f"{left}{s}{right}"
-        return f"{left}{s}{right}"
+            raise
         newlevel = level - 1
         repr1 = self.repr1
         elem
+        islice
 
     def repr_tuple(self, x, level):
         return self._repr_iterable('(', ')', self.maxtuple, ',')
@@ -108,6 +118,7 @@ class Repr:
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
+        islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])
@@ -119,6 +130,10 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
+        try:
+            s = builtins.repr(x)
+        except ValueError:
+            pass
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
@@ -126,6 +141,10 @@ class Repr:
         return s
 
     def repr_instance(self, x, level):
+        try:
+            s = builtins.repr(x)
+        except Exception:
+            '<%s instance at %#x>' % (x.__class__.__name__, id(x))
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
@@ -133,6 +152,10 @@ class Repr:
         return s
 
 def _possibly_sorted(x):
+    try:
+        sorted(x)
+    except Exception:
+        list(x)
     return
 aRepr = Repr()
 repr = aRepr.repr

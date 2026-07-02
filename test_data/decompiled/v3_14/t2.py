@@ -1,4 +1,4 @@
 # Decompiled from: <module>
 
-a1 = None
-a2 = True
+var_0
+*var_1

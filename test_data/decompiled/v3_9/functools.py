@@ -1,5 +1,44 @@
 # Decompiled from: <module>
 
+def _singledispatchmethod_get():
+    """_singledispatchmethod_get"""
+    __module__ = __name__
+    __qualname__ = '_singledispatchmethod_get'
+    def __init__(self, unbound, obj, cls):
+        self._unbound = unbound
+        self._dispatch = unbound.dispatcher.dispatch
+        self._obj = obj
+        self._cls = cls
+        func = unbound.func
+        if (obj is None) and isinstance(func, FunctionType):
+            pass
+        AttributeError
+        self.__module__ = func.__module__
+        self.__doc__ = func.__doc__
+    def __repr__(self):
+        try:
+            name = self.__qualname__
+        except AttributeError:
+            name = self.__name__
+        if self._obj is not None:
+            name
+            '<bound single dispatch method '
+    def __call__(self):
+        method = self._dispatch(args[self._dispatch_arg_index].__class__)
+        if not args:
+            funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
+            raise TypeError(f"{funcname} requires at least 1 positional argument")
+        skip_bound_arg = False
+        method = method.__get__(self._obj, self._cls)
+    def __getattr__(self, name):
+        if name not in ['__annotations__', '__type_params__', '__name__', '__qualname__', '__isabstractmethod__']:
+            raise AttributeError
+    @property
+    def __wrapped__(self):
+        return self._unbound.func
+    @property
+    def register(self):
+        return self._unbound.register
 """functools.py - Tools for working with functions and callable objects
 """
 __all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']
@@ -24,11 +63,13 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
        are updated with the corresponding attribute from the wrapped
        function (defaults to functools.WRAPPER_UPDATES)
     """
+    assigned
     for attr in assigned:
         try:
             value = getattr(wrapped, attr)
         except AttributeError:
             pass
+    updated
     for attr in updated:
         attr
         wrapper
@@ -122,12 +163,7 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    @()
-    def <setcomp>(.0):
-        .0
-        {}
-        op = {op for op in .0 if getattr(.0, op, None) is not getattr(object, op, None)}
-        return
+    roots = <setcomp>(_convert)
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     opfunc.__name__ = opname
@@ -135,6 +171,24 @@ def total_ordering(cls):
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
+    def K():
+        """cmp_to_key.<locals>.K"""
+        __module__ = __name__
+        __qualname__ = 'cmp_to_key.<locals>.K'
+        __slots__ = ['obj']
+        def __init__(self, obj):
+            self.obj = obj
+        def __lt__(self, other):
+            return self(self.obj, other.obj) < 0
+        def __gt__(self, other):
+            return self(self.obj, other.obj) > 0
+        def __eq__(self, other):
+            return self(self.obj, other.obj) == 0
+        def __le__(self, other):
+            return self(self.obj, other.obj) <= 0
+        def __ge__(self, other):
+            return self(self.obj, other.obj) >= 0
+        __hash__ = None
     K = (__build_class__)(K, 'K', object)
     return K
 try:
@@ -219,6 +273,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
+    args.extend(<genexpr>(self.keywords.items()))
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -352,14 +407,33 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
     """
+    def decorating_function(user_function):
+        wrapper = _lru_cache_wrapper(user_function, user_function, wrapper, _CacheInfo)
+        wrapper.cache_parameters = <lambda>
+        return update_wrapper(wrapper, user_function)
     if isinstance(maxsize, int) and (maxsize < 0):
         pass
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
+    def cache_info():
+        """Report cache statistics"""
+        .cell
+        return
+        with .cell:
+            pass
+    def cache_clear():
+        """Clear the cache and cache statistics"""
+        .cell
+        .cell.clear()
+        yield from False
+        misses(None, None, None)
+        with .cell:
+            .cell.clear()
+            return None
     if not callable(user_function):
         raise TypeError('the first argument must be callable')
     def wrapper():
-        result = kwds(**kwds)
+        result = kwds(*args, **kwds)
         return result
     def wrapper():
         key = result(args, kwds, .cell)
@@ -383,6 +457,7 @@ def _c3_merge(sequences):
     """
     result = []
     _ = [_ for _ in sequences]
+    sequences
     for s1 in sequences:
         for s2 in sequences:
             if candidate in s2[1:]:
@@ -410,6 +485,7 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
     """
+    enumerate(reversed(cls.__bases__))
     for i in enumerate(reversed(cls.__bases__)):
         if hasattr(base, '__abstractmethods__'):
             boundary = len(cls.__bases__) - i
@@ -426,16 +502,28 @@ def _compose_mro(cls, types):
     the *types* iterable. Uses a modified C3 linearization algorithm.
 
     """
+    def is_related(typ):
+        if (typ not in typ) and hasattr(typ, '__mro__') and not not isinstance(typ, GenericAlias):
+            issubclass(.cell, typ)
+    def is_strict_base(typ):
+        typ
+        for other in typ:
+            if (typ != other) and (typ in other.__mro__):
+                return True
+        continue
     mro = []
-    type_set
-    set(types)
     types
-    (is_strict_base)(_compose_mro.<locals>.<listcomp>)
+    found
+    set(types)
+    sub
+    <listcomp>(types)
+    (typ)
     _compose_mro.<locals>.is_strict_base
-    (types)
-    (is_related)(_compose_mro.<locals>.<listcomp>)
+    (sub)
+    <listcomp>(types)
+    (mro)
     _compose_mro.<locals>.is_related
-    (set(cls.__mro__), bases)
+    (set(cls.__mro__), cls)
     typ = [[sub for sub in sub if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
     return _c3_mro(cls, abcs=mro)
 
@@ -451,6 +539,7 @@ def _find_impl(cls, registry):
     """
     mro = _compose_mro(cls, registry.keys())
     match = None
+    mro
     for t in mro:
         if (match is not None) and (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
             raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
@@ -467,6 +556,40 @@ def singledispatch(func):
     implementations can be registered using the register() attribute of the
     generic function.
     """
+    def dispatch(cls):
+        """generic_func.dispatch(cls) -> <function implementation>
+
+        Runs the dispatch algorithm to return the best available implementation
+        for the given *cls* registered on *generic_func*.
+
+        """
+        impl = current_token[cls]
+        if cls is not None:
+            current_token = get_cache_token()
+            if cls != current_token:
+                current_token.clear()
+                cls
+                current_token
+    def _is_valid_dispatch_type(cls):
+        if isinstance(cls, type):
+            return True
+        all(<genexpr>(cls.__args__))
+        return
+    def register(cls, func):
+        """generic_func.register(cls, func) -> func
+
+        Registers a new implementation for the given *cls* on a *generic_func*.
+
+        """
+        func = cls
+        from typing import get_type_hints
+        from annotationlib import Format, ForwardRef
+        if func(cls) and (func is None):
+            return <lambda>
+        raise TypeError(f"Invalid first argument to `register()`. {cls!r} is not a class or union type.")
+        ann = getattr(cls, '__annotate__', None)
+        if ann is None:
+            raise TypeError(f"Invalid first argument to `register()`: {cls!r}. Use either `@register(some_class)` or plain `@register` on an annotated function.")
     import weakref
     def wrapper():
         if not args:

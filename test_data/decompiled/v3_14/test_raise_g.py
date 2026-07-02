@@ -2,4 +2,5 @@
 
 def g():
     """bad"""
-    raise ValueError('bad')
+    __module__
+var_1

@@ -2869,8 +2869,8 @@ class SyntaxWarningTest(unittest.TestCase):
         errtest is a regular expression that must be present in the
         text of the warning raised.
         """
-        compile(code, filename, mode)
-        None(None)
+        try:
+            compile(code, filename, mode)
 
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -2905,6 +2905,7 @@ class SyntaxWarningTest(unittest.TestCase):
         self.check_warning(source, '\'return\' in a \'finally\' block')
 
     def test_break_and_continue_in_finally(self):
+        ('break', 'continue')
         for kw in ('break', 'continue'):
             source = textwrap.dedent(f"
                 for abc in range(10):
@@ -2940,6 +2941,130 @@ class SyntaxWarningTest(unittest.TestCase):
         return
 
 class SyntaxErrorTestCase(unittest.TestCase):
+    def test_disallowed_type_param_names(self):
+        self._check_error('class A[__classdict__]: pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
+        self._check_error('def f[__classdict__](): pass', 'reserved name \'__classdict__\' cannot be used for type parameter')
+        self._check_error('type T[__classdict__] = tuple[__classdict__]', 'reserved name \'__classdict__\' cannot be used for type parameter')
+        ('__class__', '__classcell__', '__classdictcell__')
+        for name in ('__class__', '__classcell__', '__classdictcell__'):
+            compile(f"
+class A:
+    class B[{name}]: pass
+                ", '<testcase>', mode='exec')
+            None
+        return
+
+    def test_nested_named_except_blocks(self):
+        code = ''
+        range(12)
+        for i in range(12):
+            code += f"{'    ' * i}try:
+"
+            code += f"{'    ' * (i + 1)}raise Exception
+"
+            code += f"{'    ' * i}except Exception as e:
+"
+            code
+        self._check_error(code, 'too many statically nested blocks')
+
+    def test_with_statement_many_context_managers(self):
+        def get_code(n):
+            code = textwrap.dedent("""
+                def bug():
+                    with (
+                    a
+                """)
+            range(n)
+            for i in range(n):
+                code += f"    as a{i}, a
+"
+                code
+            return code
+        CO_MAXBLOCKS = 21
+        MAX_MANAGERS = CO_MAXBLOCKS - 1
+        range(MAX_MANAGERS)
+        for n in range(MAX_MANAGERS):
+            try:
+                compile(get_code(n), '<string>', 'exec')
+            range
+        MAX_MANAGERS(MAX_MANAGERS + 5)
+        for n in MAX_MANAGERS(MAX_MANAGERS + 5):
+            try:
+                self._check_error(get_code(n), 'too many statically nested blocks')
+            None
+        return
+
+    def test_async_with_statement_many_context_managers(self):
+        def get_code(n):
+            code = [textwrap.dedent("""
+                async def bug():
+                    async with (
+                    a
+                """)]
+            range(n)
+            for i in range(n):
+                code.append(f"    as a{i}, a
+")
+                code
+            '): yield a'
+            return ''.join(code)
+        CO_MAXBLOCKS = 21
+        MAX_MANAGERS = CO_MAXBLOCKS - 1
+        range(MAX_MANAGERS)
+        for n in range(MAX_MANAGERS):
+            try:
+                compile(get_code(n), '<string>', 'exec')
+            range
+        MAX_MANAGERS(MAX_MANAGERS + 5)
+        for n in MAX_MANAGERS(MAX_MANAGERS + 5):
+            try:
+                self._check_error(get_code(n), 'too many statically nested blocks')
+            None
+        return
+
+    def test_syntax_error_on_deeply_nested_blocks(self):
+        source = """
+while 1:
+ while 2:
+  while 3:
+   while 4:
+    while 5:
+     while 6:
+      while 8:
+       while 9:
+        while 10:
+         while 11:
+          while 12:
+           while 13:
+            while 14:
+             while 15:
+              while 16:
+               while 17:
+                while 18:
+                 while 19:
+                  while 20:
+                   while 21:
+                    while 22:
+                     while 23:
+                      break
+"""
+        self._check_error(source, 'too many statically nested blocks')
+
+    def test_error_on_parser_stack_overflow(self):
+        source = '-' * 100000 + '4'
+        ('exec', 'eval', 'single')
+        for mode in ('exec', 'eval', 'single'):
+            try:
+                compile(source, '<string>', mode)
+            None(None)
+            None
+        return
+
+    def test_deep_invalid_rule(self):
+        source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
+        try:
+            compile(source, '<string>', 'exec')
+
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
         """Check that compiling code raises SyntaxError with errtext.
 
@@ -2947,9 +3072,8 @@ class SyntaxErrorTestCase(unittest.TestCase):
         text of the exception raised.  If subclass is specified it
         is the expected subclass of SyntaxError (e.g. IndentationError).
         """
-        compile(code, filename, mode)
-        self.fail('compile() did not raise SyntaxError')
-        err = None
+        try:
+            compile(code, filename, mode)
 
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
@@ -3131,7 +3255,10 @@ pass
 
 pass
 """
-        compile(s, '<string>', 'exec')
+        try:
+            compile(s, '<string>', 'exec')
+        finally:
+            self.fail('Empty line after a line continuation character is valid.')
         s1 = """\\
 def fib(n):
     \\
@@ -3144,8 +3271,6 @@ def fib(n):
     '''Print a Fibonacci series up to n.'''
     a, b = 0, 1
 """
-        compile(s1, '<string>', 'exec')
-        compile(s2, '<string>', 'exec')
 
     def test_continuation_bad_indentation(self):
         code = """\\
@@ -3190,6 +3315,7 @@ fgdfgf
 """, 'unexpected EOF while parsing')
 
     def test_error_parenthesis(self):
+        """([{"""
         for paren in '([{':
             self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
             '([{'
@@ -3274,6 +3400,7 @@ a=1
 
     def test_ifexp_else_stmt(self):
         msg = 'expected expression after \'else\', but statement is given'
+        ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *')
         for stmt in ('pass', 'return', 'return 2', 'raise Exception(\'a\')', 'del a', 'yield 2', 'assert False', 'break', 'continue', 'import', 'import ast', 'from', 'from ast import *'):
             self._check_error(f"x = 1 if 1 else {stmt}", msg)
             None
@@ -3281,6 +3408,7 @@ a=1
 
     def test_ifexp_body_stmt_else_expression(self):
         msg = 'expected expression before \'if\', but statement is given'
+        ('pass', 'break', 'continue')
         for stmt in ('pass', 'break', 'continue'):
             self._check_error(f"x = {stmt} if 1 else 1", msg)
             None
@@ -3288,6 +3416,7 @@ a=1
 
     def test_ifexp_body_stmt_else_stmt(self):
         msg = 'expected expression before \'if\', but statement is given'
+        (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast'))
         for (lhs_stmt, rhs_stmt) in (('pass', 'pass'), ('break', 'pass'), ('continue', 'import ast')):
             self._check_error(f"x = {lhs_stmt} if 1 else {rhs_stmt}", msg)
             None

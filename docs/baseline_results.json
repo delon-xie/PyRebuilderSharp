@@ -1,0 +1,421 @@
+{
+  "parse_data": {
+    "2.7": {
+      "ok": 47,
+      "fail": 4,
+      "fail_details": [
+        [
+          "abc.py",
+          119,
+          "invalid decimal literal"
+        ],
+        [
+          "check_py27_magic.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "parse_35_marshal.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "run_seq_clean.py",
+          3,
+          "invalid syntax"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 51
+    },
+    "3.5": {
+      "ok": 53,
+      "fail": 4,
+      "fail_details": [
+        [
+          "abc.py",
+          155,
+          "invalid decimal literal"
+        ],
+        [
+          "check_py27_magic.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "parse_35_marshal.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "run_seq_clean.py",
+          3,
+          "invalid syntax"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 57
+    },
+    "3.6": {
+      "ok": 74,
+      "fail": 23,
+      "fail_details": [
+        [
+          "abc.py",
+          116,
+          "invalid syntax"
+        ],
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_marshal_37.py",
+          24,
+          "unterminated string literal (detected at line 24)"
+        ],
+        [
+          "check_py27_magic.py",
+          3,
+          "invalid syntax"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 97
+    },
+    "3.7": {
+      "ok": 76,
+      "fail": 21,
+      "fail_details": [
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_marshal_37.py",
+          24,
+          "unterminated string literal (detected at line 24)"
+        ],
+        [
+          "check_py27_magic.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "debug_analyze.py",
+          3,
+          "invalid syntax"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 97
+    },
+    "3.8": {
+      "ok": 77,
+      "fail": 22,
+      "fail_details": [
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_marshal_37.py",
+          24,
+          "unterminated string literal (detected at line 24)"
+        ],
+        [
+          "check_py27_magic.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "debug_analyze.py",
+          3,
+          "invalid syntax"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 99
+    },
+    "3.9": {
+      "ok": 78,
+      "fail": 21,
+      "fail_details": [
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_marshal_37.py",
+          24,
+          "unterminated string literal (detected at line 24)"
+        ],
+        [
+          "check_py27_magic.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "debug_analyze.py",
+          3,
+          "invalid syntax"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 99
+    },
+    "3.10": {
+      "ok": 80,
+      "fail": 22,
+      "fail_details": [
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_marshal_37.py",
+          24,
+          "unterminated string literal (detected at line 24)"
+        ],
+        [
+          "check_py27_magic.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "debug_analyze.py",
+          3,
+          "invalid syntax"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 102
+    },
+    "3.11": {
+      "ok": 59,
+      "fail": 41,
+      "fail_details": [
+        [
+          "abc.py",
+          50,
+          "invalid syntax"
+        ],
+        [
+          "actual_lv2.py",
+          14,
+          "expected 'except' or 'finally' block"
+        ],
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_csharp.py",
+          7,
+          "expected 'except' or 'finally' block"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 100
+    },
+    "3.12": {
+      "ok": 67,
+      "fail": 37,
+      "fail_details": [
+        [
+          "abc.py",
+          50,
+          "invalid syntax"
+        ],
+        [
+          "actual_lv2.py",
+          15,
+          "expected 'except' or 'finally' block"
+        ],
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_csharp.py",
+          6,
+          "expected 'except' or 'finally' block"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 104
+    },
+    "3.13": {
+      "ok": 63,
+      "fail": 37,
+      "fail_details": [
+        [
+          "abc.py",
+          50,
+          "invalid syntax"
+        ],
+        [
+          "actual_lv2.py",
+          15,
+          "expected 'except' or 'finally' block"
+        ],
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_csharp.py",
+          7,
+          "expected 'except' or 'finally' block"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 100
+    },
+    "3.14": {
+      "ok": 64,
+      "fail": 38,
+      "fail_details": [
+        [
+          "abc.py",
+          52,
+          "invalid syntax"
+        ],
+        [
+          "actual_lv2.py",
+          13,
+          "expected 'except' or 'finally' block"
+        ],
+        [
+          "analyze_tests.py",
+          3,
+          "invalid syntax"
+        ],
+        [
+          "check_35_36_37.py",
+          11,
+          "unterminated string literal (detected at line 11)"
+        ],
+        [
+          "check_csharp.py",
+          10,
+          "expected 'except' or 'finally' block"
+        ]
+      ],
+      "genexpr_files": [],
+      "genexpr_count": 0,
+      "total": 102
+    }
+  },
+  "genexpr_totals": {
+    "abc.py": 3,
+    "check_py27_magic.py": 11,
+    "parse_35_marshal.py": 11,
+    "run_seq_clean.py": 11,
+    "check_marshal_37.py": 9,
+    "debug_blocks.py": 9,
+    "definitive_marshal.py": 9,
+    "enum.py": 9,
+    "run_all_versions.py": 9,
+    "functools.py": 7
+  },
+  "try_fail_totals": {
+    "actual_lv2.py": 4,
+    "check_csharp.py": 4,
+    "check_v311.py": 4,
+    "check_v35.py": 4,
+    "check_versions.py": 4,
+    "compare_ast.py": 1,
+    "debug_test_expr.py": 4,
+    "diag35.py": 4,
+    "fix_pyc_names.py": 4,
+    "mixed5_out.py": 1,
+    "test_for_try.py": 4,
+    "test_minimal_if.py": 4,
+    "test_py27_decompile.py": 4,
+    "test_with.py": 4,
+    "test_with_deref.py": 4,
+    "test_with_simple.py": 4,
+    "diag_py27.py": 3,
+    "dump_marshal.py": 3,
+    "process_data_file.py": 3,
+    "run_lv2.py": 3
+  },
+  "str_fail_totals": {
+    "check_35_36_37.py": 9,
+    "check_marshal_37.py": 9,
+    "debug_exc.py": 9,
+    "definitive_marshal.py": 9,
+    "diag_py27.py": 6,
+    "dump_27_bytecode.py": 5,
+    "find_break.py": 9,
+    "process_data_file.py": 6,
+    "run_all_versions.py": 3,
+    "run_lv2.py": 4,
+    "test_report.py": 6,
+    "test_syntax.py": 7,
+    "rename_pyc.py": 4,
+    "enum.py": 3,
+    "pprint.py": 1
+  },
+  "total_ok": 738,
+  "total_all": 1008
+}

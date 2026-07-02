@@ -1,5 +1,8 @@
 # Decompiled from: <module>
 
-a1 = 1
-b2 = obj.attr
-b3 = items[0]
+var_1
+*[super().a1, *deref_4(*deref_4, *deref_4).obj]
+*[super().a1, *deref_4(*deref_4, *deref_4).obj]
+*[super().a1, *deref_4(*deref_4, *deref_4).obj]
+*[super().a1, *deref_4(*deref_4, *deref_4).obj]
+*[super().a1, *deref_4(*deref_4, *deref_4).obj]

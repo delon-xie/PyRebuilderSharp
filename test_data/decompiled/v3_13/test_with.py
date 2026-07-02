@@ -2,5 +2,5 @@
 
 lock = object()
 lock
-print('hello')
-None(None)
+try:
+    print('hello')

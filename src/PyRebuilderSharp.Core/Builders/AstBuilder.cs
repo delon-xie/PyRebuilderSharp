@@ -749,6 +749,12 @@ public class AstBuilder
                         }
                     }
                 }
+                // 处理 try body 的 fallthrough 后继（try 结束后的顺序块，如abc.py的类定义）
+                foreach (var succ in block.Successors.OrderBy(s => s.StartOffset))
+                {
+                    if (!visited.Contains(succ))
+                        stmts.AddRange(BuildStatements(succ, visited));
+                }
                 return stmts;
             }
             
@@ -4312,6 +4318,18 @@ public class AstBuilder
                             currentResult.Add(stmt);
                         continue;
                     }
+                    // Comprehension: <genexpr>/<setcomp>/<listcomp>/<dictcomp>
+                    // 直接赋值的 FunctionRef（无外层 CALL）—— 如 Module 级推导式赋值
+                    if (assign.Value is FunctionRef compFuncRef
+                        && compFuncRef.Name.StartsWith("<"))
+                    {
+                        var compExpr = BuildComprehension(compFuncRef, new Call(compFuncRef, new List<Expr>(), new List<Keyword>()));
+                        if (compExpr != null)
+                            currentResult.Add(new Assign(new List<Expr> { new Name(targetName.Id, ExpressionContext.Store) }, compExpr));
+                        else
+                            currentResult.Add(new CommentBlock($"# [{compFuncRef.Name}]: comprehension expression"));
+                        continue;
+                    }
                     // FunctionDef
                     if (assign.Value is FunctionRef funcRef)
                     {
@@ -4710,6 +4728,12 @@ public class AstBuilder
     {
         if (funcRef.Code == null) return null;
 
+        // 推导式（comprehension）：<genexpr>/<setcomp>/<listcomp>/<dictcomp>
+        // 这些名字以 "<" 开头的 FunctionRef 不应生成 FunctionDef，
+        // 而应由 BuildComprehension 在 CALL 站点处理。
+        if (name.StartsWith("<"))
+            return null;
+
         var childCode = funcRef.Code;
 
         // 1. 提取函数参数
@@ -4936,7 +4960,8 @@ public class AstBuilder
             if (stmt is Assign assignFn && assignFn.Targets.Count == 1
                 && assignFn.Targets[0] is Name targetNameFn
                 && assignFn.Value is FunctionRef fnRef
-                && fnRef.Code != null)
+                && fnRef.Code != null
+                && !fnRef.Name.StartsWith("<"))  // 跳过推导式（已在 PostProcessFunctionDefs 中处理）
             {
                 childIdx++;
                 var funcDef = BuildFunctionDef(fnRef.Name ?? targetNameFn.Id, fnRef);

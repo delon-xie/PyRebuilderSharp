@@ -25,10 +25,12 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
             target = int.from_bytes(et[i + 4:i + 6], 'little')
             dl = int.from_bytes(et[i + 6:i + 8], 'little')
             print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
+code.co_consts
 for const in code.co_consts:
     if isinstance(const, types.CodeType):
         print(f"
 --- Nested: {const.co_name} ---")
         print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
         if hasattr(const, 'co_exceptiontable') and const.co_exceptiontable:
-            return print(f"  bytes: {const.co_exceptiontable.hex()}")
+            print(f"  bytes: {const.co_exceptiontable.hex()}")
+code.co_consts

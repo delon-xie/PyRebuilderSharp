@@ -35,11 +35,11 @@ if hasattr(code, 'co_exceptiontable'):
             print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
             if hasattr(const, 'co_exceptiontable'):
                 if const.co_exceptiontable:
-                    return print(f"  bytes: {const.co_exceptiontable.hex()}")
+                    print(f"  bytes: {const.co_exceptiontable.hex()}")
                 None
                 return
             else:
                 return None
         None
 else:
-    return code
+    code

@@ -1,8 +1,11 @@
 # Decompiled from: <module>
 
-x = 10
-if x > 0:
-    for n in range(x):
-        y = n
+if not super().x:
+    return super().x
 else:
-    y = -1
+    var_1
+    *var_2
+    *var_2
+    *var_2
+    var_1
+    *super(*name_5, *name_5).x

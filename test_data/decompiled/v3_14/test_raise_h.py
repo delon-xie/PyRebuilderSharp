@@ -2,4 +2,6 @@
 
 def h():
     """bad"""
-    raise ValueError('bad') from None
+    var_0
+    __module__
+var_1

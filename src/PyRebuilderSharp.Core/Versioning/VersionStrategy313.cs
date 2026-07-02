@@ -129,7 +129,7 @@ public class VersionStrategy313 : VersionStrategyBase
             91 => Models.Bytecode.Opcode.LOAD_GLOBAL,        // enum=116
             92 => Models.Bytecode.Opcode.LOAD_NAME,          // enum=101
             93 => Models.Bytecode.Opcode.LOAD_SUPER_ATTR,    // enum=141
-            94 => Models.Bytecode.Opcode.LOAD_SMALL_INT_314,       // LOAD_SMALL_INT (3.13+)
+            94 => Models.Bytecode.Opcode.MAKE_CELL_313,       // MAKE_CELL (CPython 3.13 raw=94, 3.11 raw=135)
             95 => Models.Bytecode.Opcode.MAP_ADD_313,
             96 => Models.Bytecode.Opcode.MATCH_CLASS_313,    // -> MATCH_CLASS_312=183
             97 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,  // enum=114

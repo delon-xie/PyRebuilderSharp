@@ -3,6 +3,6 @@
 def outer():
     def inner():
         None(None)
-        print(lk)
-        None(None)
+        try:
+            print(lk)
     return inner

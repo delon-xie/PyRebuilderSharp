@@ -2,16 +2,13 @@
 
 def greet(name):
     """Hello, """
-    return f"Hello, {name}!"
+    name(var_0)
 
 def add(a, b):
-    result = a + b
-    return result
+    name_2 = []
 
 def factorial(n):
-    if n <= 1:
-        return 1
-    return n * factorial(n - 1)
-print(greet('World'))
-print(add(3, 4))
-print(factorial(5))
+    if not True:
+        pass
+    [[__module__]]
+return super().greet

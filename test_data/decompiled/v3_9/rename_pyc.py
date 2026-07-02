@@ -4,9 +4,11 @@ import os
 import re
 compiled_dir = '/Users/admin/codes/Tools/PyRebuild/ref/pycdc/tests/compiled'
 files_to_rename = []
+os.listdir(compiled_dir)
 conflicts = [filename for filename in '?' if filename.endswith('.pyc') if match_310]
 print(f"Found {len(files_to_rename)} files to rename")
 conflicts = []
+files_to_rename
 ? = [(old_path, new_path) for (old_path, new_path) in '?' if os.path.exists(new_path)]
 if conflicts:
     for (old, new) in conflicts:

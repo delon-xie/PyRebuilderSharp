@@ -12,6 +12,7 @@ code = marshal.loads(raw)
 
 def dump_bytecode(c, depth = 0):
     p = '  ' * depth
+    c.co_consts
     for const in c.co_consts:
         if not hasattr(const, 'co_code'):
             pass
