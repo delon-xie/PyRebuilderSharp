@@ -1,6 +1,6 @@
 # PyRebuilderSharp 白盒测试基线评估报告
 
-**生成日期**: 2026-07-02 10:25:54
+**生成日期**: 2026-07-02 11:01:06
 **测试数据目录**: /Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData
 **总耗时**: 2.8 秒
 
@@ -33,20 +33,68 @@
 
 ## 3. Top 失败原因
 
-- Exception: InvalidOperationException: Reached end of file while looking for closing """ (×2)
-- AST mismatch:\n  Line 2:\n    expected:     AnnAssign(\n    actual:       Expr(\n  Line 3:\n    expected:       target=Name(id='a', ctx=Store()),\n    actual:         value=Name(id='b', ctx=Load())),\n  Line 4:\n    expected:       annotation=Name(id='int', ctx=Load()),\n    actual:       Assign(\n  Line 5:\n    expected:       simple=1),\n    actual:         targets=[\n  Line 6:\n    expected:     Expr(\n    actual:           Name(id='c', ctx=Store())],\n  Line 7:\n    expected:       value=Name(id='b', ctx=Load())),\n    actual:         value=Constant(value='no annotation')),\n  Line 10:\n    expected:         Name(id='c', ctx=Store())],\n    actual:           Name(id='x', ctx=Store())],\n  Line 11:\n    expected:       value=Constant(value='no annotation')),\n    actual:         value=Constant(value=10)),\n  Line 12:\n    expected:     AnnAssign(\n    actual:       Assign(\n  Line 13:\n    expected:       target=Name(id='x', ctx=Store()),\n    actual:         targets=[ (×1)
-- Token mismatch:\nLine 0: expected [async] (WORD), got [while] (WORD)\nLine 0: expected [for] (WORD), got [c] (WORD)\nLine 0: expected [b] (WORD), got [:] (SYMBOL)\nLine 0: expected [in] (WORD), got [try] (WORD)\nLine 0: expected [c] (WORD), got [:] (SYMBOL)\nLine 0: expected [:] (SYMBOL), got [pass] (WORD)\nLine 0: expected [try] (WORD), got [for] (WORD)\nLine 0: expected [:] (SYMBOL), got [b] (WORD)\nLine 0: expected [STUFF] (WORD), got [in] (WORD)\nLine 0: expected [except] (WORD), got [c] (WORD) (×1)
-- Exception: InvalidOperationException: Unrecognized tokens: "\' inside'}'''")" at line 25 (×1)
-- AST mismatch:\n  Line 11:\n    expected:               value=Name(id='print', ctx=Load())),\n    actual:                 value=Name(id='print', ctx=Load()))],\n  Line 12:\n    expected:             Continue(),\n    actual:             handlers=[\n  Line 13:\n    expected:             Expr(\n    actual:               ExceptHandler(\n  Line 14:\n    expected:               value=Name(id='print', ctx=Load()))],\n    actual:                 body=[\n  Line 15:\n    expected:           handlers=[\n    actual:                   Pass()])]),\n  Line 16:\n    expected:             ExceptHandler(\n    actual:           Continue(),\n  Line 17:\n    expected:               body=[\n    actual:           Expr(\n  Line 18:\n    expected:                 Pass()])])])])\n    actual:             value=Name(id='print', ctx=Load()))])]) (×1)
-- Token mismatch:\nLine 0: expected [1] (INT), got [3] (INT)\nLine 0: expected [2] (INT), got [4] (INT)\nLine 0: expected [@] (SYMBOL), got [m] (WORD)\nLine 0: expected [[] (SYMBOL), got [?] (WORD)\nLine 0: expected [3] (INT), got [=] (SYMBOL)\nLine 0: expected [,] (SYMBOL), got [[] (SYMBOL)\nLine 0: expected [4] (INT), got [5] (INT)\nLine 0: expected []] (SYMBOL), got [,] (SYMBOL)\nLine 0: expected [m] (WORD), got [6] (INT)\nLine 0: expected [@=] (SYMBOL), got []] (SYMBOL) (×1)
-- AST mismatch:\n  Line 4:\n    expected:         Name(id='x', ctx=Store())],\n    actual:           Name(id='a', ctx=Store())],\n  Line 8:\n    expected:         Name(id='y', ctx=Store())],\n    actual:           Name(id='b', ctx=Store())],\n  Line 9:\n    expected:       value=Constant(value=3.14)),\n    actual:         value=Constant(value=3.14159)),\n  Line 12:\n    expected:         Name(id='z', ctx=Store())],\n    actual:           Name(id='c', ctx=Store())],\n  Line 13:\n    expected:       value=BinOp(\n    actual:         value=Constant(value='test')),\n  Line 14:\n    expected:         left=Name(id='x', ctx=Load()),\n    actual:       Assign(\n  Line 15:\n    expected:         op=Add(),\n    actual:         targets=[\n  Line 16:\n    expected:         right=Name(id='y', ctx=Load())))])\n    actual:           Name(id='d', ctx=Store())],\n  Line 17:\n    expected: (missing)\n    actual:         value=Tuple(\n  Line 18:\n    expected: (missing)\n    actual:           elts=[ (×1)
-- AST mismatch:\n  Line 537:\n    expected:             Expr(\n    actual:               Return(\n  Line 547:\n    expected:                   Constant(value='\x1bE')]))],\n    actual:                     Constant(value='\x1bE')]))]),\n  Line 548:\n    expected:           orelse=[\n    actual:           Expr(\n  Line 549:\n    expected:             Expr(\n    actual:             value=Call(\n  Line 550:\n    expected:               value=Call(\n    actual:               func=Attribute(\n  Line 551:\n    expected:                 func=Attribute(\n    actual:                 value=Attribute(\n  Line 552:\n    expected:                   value=Attribute(\n    actual:                   value=Name(id='sys', ctx=Load()),\n  Line 553:\n    expected:                     value=Name(id='sys', ctx=Load()),\n    actual:                   attr='stderr',\n  Line 554:\n    expected:                     attr='stderr',\n    actual:                   ctx=Load()),\n  Line 555:\n    expected:                     ctx=Load()),\n    actual:                 attr='write', (×1)
-- AST mismatch:\n  Line 10:\n    expected:       value=Constant(value='Unicode', kind='u')),\n    actual:         value=Constant(value='Unicode')),\n  Line 14:\n    expected:       value=Constant(value=b'Bytes')),\n    actual:         value=Constant(value=b'Qnl0ZXM=')), (×1)
-- AST mismatch:\n  Line 3:\n    expected:       name='greet',\n    actual:         name='x0',\n  Line 4:\n    expected:       args=arguments(\n    actual:         args=arguments(),\n  Line 5:\n    expected:         args=[\n    actual:         body=[\n  Line 6:\n    expected:           arg(arg='name')]),\n    actual:           Pass()]),\n  Line 7:\n    expected:       body=[\n    actual:       FunctionDef(\n  Line 8:\n    expected:         Return(\n    actual:         name='x1',\n  Line 9:\n    expected:           value=JoinedStr(\n    actual:         args=arguments(\n  Line 10:\n    expected:             values=[\n    actual:           args=[\n  Line 11:\n    expected:               Constant(value='Hello, '),\n    actual:             arg(arg='arg1')]),\n  Line 12:\n    expected:               FormattedValue(\n    actual:         body=[ (×1)
+- AST mismatch:\n  Line 12:\n    expected:           value=Await(\n    actual:             value=YieldFrom( (×1)
+- AST mismatch:\n  Line 10:\n    expected:         Expr(\n    actual:           Return(\n  Line 14:\n    expected:               Constant(value='true')]))]),\n    actual:                 Constant(value='true')]))])])\n  Line 15:\n    expected:     Expr(\n    actual:   (missing)\n  Line 16:\n    expected:       value=Call(\n    actual:   (missing)\n  Line 17:\n    expected:         func=Name(id='print', ctx=Load()),\n    actual:   (missing)\n  Line 18:\n    expected:         args=[\n    actual:   (missing)\n  Line 19:\n    expected:           Constant(value='false (so jumping forward)')]))])\n    actual:   (missing) (×1)
+- AST mismatch:\n  Line 2:\n    expected:     Assign(\n    actual:       Expr(\n  Line 3:\n    expected:       targets=[\n    actual:         value=Call(\n  Line 4:\n    expected:         Name(id='a', ctx=Store())],\n    actual:           func=Name(id='print', ctx=Load()),\n  Line 5:\n    expected:       value=Constant(value=1)),\n    actual:           args=[\n  Line 6:\n    expected:     Assign(\n    actual:             Name(id='result', ctx=Load())])),\n  Line 7:\n    expected:       targets=[\n    actual:       Assign(\n  Line 8:\n    expected:         Name(id='result', ctx=Store())],\n    actual:         targets=[\n  Line 9:\n    expected:       value=IfExp(\n    actual:           Name(id='a', ctx=Store())],\n  Line 10:\n    expected:         test=Compare(\n    actual:         value=Constant(value=2)),\n  Line 11:\n    expected:           left=BinOp(\n    actual:       Expr( (×1)
+- AST mismatch:\n  Line 63:\n    expected:                   value=Constant(value=2))])],\n    actual:                     value=Constant(value=2))])]),\n  Line 64:\n    expected:           orelse=[\n    actual:           Assign(\n  Line 65:\n    expected:             Assign(\n    actual:             targets=[\n  Line 66:\n    expected:               targets=[\n    actual:               Name(id='a', ctx=Store())],\n  Line 67:\n    expected:                 Name(id='a', ctx=Store())],\n    actual:             value=Constant(value=3)),\n  Line 68:\n    expected:               value=Constant(value=3))]),\n    actual:           Assign(\n  Line 69:\n    expected:         Assign(\n    actual:             targets=[\n  Line 70:\n    expected:           targets=[\n    actual:               Name(id='b', ctx=Store())],\n  Line 71:\n    expected:             Name(id='b', ctx=Store())],\n    actual:             value=Constant(value='--------'))]),\n  Line 72:\n    expected:           value=Constant(value='--------'))]),\n    actual:       FunctionDef( (×1)
+- AST mismatch:\n  Line 8:\n    expected:             Name(id='x', ctx=Store())],\n    actual:               Name(id='my_class', ctx=Store())],\n  Line 9:\n    expected:           value=Constant(value=1)),\n    actual:             value=Call(\n  Line 10:\n    expected:         ClassDef(\n    actual:               func=Name(id='__build_class__', ctx=Load()),\n  Line 11:\n    expected:           name='my_class',\n    actual:               args=[\n  Line 12:\n    expected:           body=[\n    actual:                 Name(id='my_class', ctx=Load()),\n  Line 13:\n    expected:             Assign(\n    actual:                 Constant(value='my_class')]))])])\n  Line 14:\n    expected:               targets=[\n    actual:   (missing)\n  Line 15:\n    expected:                 Name(id='y', ctx=Store())],\n    actual:   (missing)\n  Line 16:\n    expected:               value=Name(id='x', ctx=Load()))])])])\n    actual:   (missing) (×1)
+- AST mismatch:\n  Line 21:\n    expected:     Assign(\n    actual:       Expr(\n  Line 22:\n    expected:       targets=[\n    actual:         value=Call(\n  Line 23:\n    expected:         Subscript(\n    actual:           func=Name(id='print', ctx=Load()),\n  Line 24:\n    expected:           value=Name(id='a', ctx=Load()),\n    actual:           args=[\n  Line 25:\n    expected:           slice=Slice(\n    actual:             Name(id='a', ctx=Load())]))])\n  Line 26:\n    expected:             lower=Constant(value=13)),\n    actual:   (missing)\n  Line 27:\n    expected:           ctx=Store())],\n    actual:   (missing)\n  Line 28:\n    expected:       value=Name(id='l', ctx=Load())),\n    actual:   (missing)\n  Line 29:\n    expected:     Assign(\n    actual:   (missing)\n  Line 30:\n    expected:       targets=[\n    actual:   (missing) (×1)
+- AST mismatch:\n  Line 22:\n    expected:                 Return(\n    actual:                   Pass()])])])])\n  Line 23:\n    expected:                   value=Constant(value='value'))])]),\n    actual:   (missing)\n  Line 24:\n    expected:         Return(\n    actual:   (missing)\n  Line 25:\n    expected:           value=Constant(value='ok'))])])\n    actual:   (missing) (×1)
+- AST mismatch:\n  Line 13:\n    expected:         Tuple(\n    actual:           Name(id='a', ctx=Store())],\n  Line 14:\n    expected:           elts=[\n    actual:         value=Starred(\n  Line 15:\n    expected:             Name(id='a', ctx=Store()),\n    actual:           value=Name(id='x', ctx=Load()),\n  Line 16:\n    expected:             Name(id='b', ctx=Store()),\n    actual:           ctx=Load())),\n  Line 17:\n    expected:             Name(id='c', ctx=Store())],\n    actual:       Assign(\n  Line 18:\n    expected:           ctx=Store())],\n    actual:         targets=[\n  Line 19:\n    expected:       value=Name(id='x', ctx=Load())),\n    actual:           Name(id='b', ctx=Store())],\n  Line 20:\n    expected:     Assign(\n    actual:         value=Starred(\n  Line 21:\n    expected:       targets=[\n    actual:           value=Name(id='x', ctx=Load()),\n  Line 22:\n    expected:         Name(id='x', ctx=Store())],\n    actual:           ctx=Load())), (×1)
+- Token mismatch:\nLine 0: expected [for] (WORD), got [?] (WORD)\nLine 0: expected [i] (WORD), got [=] (SYMBOL)\nLine 0: expected [,] (SYMBOL), got [[] (SYMBOL)\nLine 0: expected [x] (WORD), got [res] (WORD)\nLine 0: expected [in] (WORD), got [.] (SYMBOL)\nLine 0: expected [enumerate] (WORD), got [append] (WORD)\nLine 0: expected [lst] (WORD), got [func] (WORD)\nLine 0: expected [)] (SYMBOL), got [(] (SYMBOL)\nLine 0: expected [:] (SYMBOL), got [i] (WORD)\nLine 0: expected [res] (WORD), got [,] (SYMBOL) (×1)
+- AST mismatch:\n  Line 2:\n    expected:     Expr(\n    actual:       Assign(\n  Line 3:\n    expected:       value=Constant(value="\ntest_integers.py -- source test pattern for integers\n\nThis source is part of the decompyle test suite.\nSnippet taken from python libs's test_class.py\n\ndecompyle is a Python byte-code decompiler\nSee http://www.goebel-consult.de/decompyle/ for download and\nfor further information\n")),\n    actual:         targets=[\n  Line 4:\n    expected:     Import(\n    actual:           Name(id='name_0', ctx=Store())],\n  Line 5:\n    expected:       names=[\n    actual:         value=Constant(value="\ntest_integers.py -- source test pattern for integers\n\nThis source is part of the decompyle test suite.\nSnippet taken from python libs's test_class.py\n\ndecompyle is a Python byte-code decompiler\nSee http://www.goebel-consult.de/decompyle/ for download and\nfor further information\n")),\n  Line 6:\n    expected:         alias(name='sys')]),\n    actual:       Import(\n  Line 7:\n    expected:     Assign(\n    actual:         names=[\n  Line 8:\n    expected:       targets=[\n    actual:           alias(name='name_1')]),\n  Line 9:\n    expected:         Name(id='i', ctx=Store())],\n    actual:       Assign(\n  Line 10:\n    expected:       value=Constant(value=1)),\n    actual:         targets=[\n  Line 11:\n    expected:     Assign(\n    actual:           Name(id='name_2', ctx=Store())], (×1)
 
 ---
 
 ## 4. 失败测试详情
+
+### async_def
+
+**错误**: AST mismatch:\n  Line 12:\n    expected:           value=Await(\n    actual:             value=YieldFrom(
+
+### test_pop_jump_forward_if_false
+
+**错误**: AST mismatch:\n  Line 10:\n    expected:         Expr(\n    actual:           Return(\n  Line 14:\n    expected:        
+
+### conditional_expressions
+
+**错误**: AST mismatch:\n  Line 2:\n    expected:     Assign(\n    actual:       Expr(\n  Line 3:\n    expected:       targets=[\n
+
+### test_exceptions
+
+**错误**: AST mismatch:\n  Line 63:\n    expected:                   value=Constant(value=2))])],\n    actual:                    
+
+### load_classderef
+
+**错误**: AST mismatch:\n  Line 8:\n    expected:             Name(id='x', ctx=Store())],\n    actual:               Name(id='my_c
+
+### store_slice
+
+**错误**: AST mismatch:\n  Line 21:\n    expected:     Assign(\n    actual:       Expr(\n  Line 22:\n    expected:       targets=[
+
+### test_exception_match_py311
+
+**错误**: AST mismatch:\n  Line 22:\n    expected:                 Return(\n    actual:                   Pass()])])])])\n  Line 2
+
+### unpack_assign
+
+**错误**: AST mismatch:\n  Line 13:\n    expected:         Tuple(\n    actual:           Name(id='a', ctx=Store())],\n  Line 14:\n
+
+### iter_unpack
+
+**错误**: Token mismatch:\nLine 0: expected [for] (WORD), got [?] (WORD)\nLine 0: expected [i] (WORD), got [=] (SYMBOL)\nLine 0: e
+
+### test_integers_py3
+
+**错误**: AST mismatch:\n  Line 2:\n    expected:     Expr(\n    actual:       Assign(\n  Line 3:\n    expected:       value=Const
+
+### binary_ops
+
+**错误**: AST mismatch:\n  Line 4:\n    expected:         Tuple(\n    actual:           Name(id='a', ctx=Store())],\n  Line 5:\n  
+
+### test_class_method
+
+**错误**: AST mismatch:\n  Line 20:\n    expected:                 Expr(\n    actual:                   Return(\n  Line 24:\n    e
 
 ### variable_annotations
 
@@ -58,11 +106,11 @@
 
 ### f-string
 
-**错误**: Exception: InvalidOperationException: Unrecognized tokens: "\' inside'}'''")" at line 25
+**错误**: Exception: InvalidOperationException: Unrecognized tokens: "\' inside'}'''")" at line 24
 
 ### test_slices
 
-**错误**: Exception: InvalidOperationException: Reached end of file while looking for closing """
+**错误**: Token mismatch:\nLine 0: expected [1] (INT), got [:] (SYMBOL)\nLine 0: expected []] (SYMBOL), got [42] (INT)\nLine 0: ex
 
 ### test_loops2
 
@@ -92,73 +140,21 @@
 
 **错误**: AST mismatch:\n  Line 26:\n    expected:                         Name(id='a', ctx=Store())],\n    actual:               
 
-### swap
-
-**错误**: AST mismatch:\n  Line 26:\n    expected:           value=Constant(value=3)),\n    actual:             value=Constant(val
-
-### contains_op
-
-**错误**: AST mismatch:\n  Line 16:\n    expected:       test=Compare(\n    actual:         test=BoolOp(\n  Line 17:\n    expected
-
-### unicode
-
-**错误**: AST mismatch:\n  Line 5:\n    expected:       value=Constant(value='Unicode', kind='u')),\n    actual:         value=Con
-
-### unpack_empty
-
-**错误**: Token mismatch:\nLine 0: expected [(] (SYMBOL), got [y] (WORD)\nLine 0: expected [)] (SYMBOL), got [=] (SYMBOL)\nLine 0:
-
-### test_loops3
-
-**错误**: AST mismatch:\n  Line 63:\n    expected:             For(\n    actual:               Assign(\n  Line 64:\n    expected: 
-
-### async_for
-
-**错误**: Token mismatch:\nLine 0: expected [async] (WORD), got [while] (WORD)\nLine 0: expected [for] (WORD), got [c] (WORD)\nLin
-
-### test_raise_varargs
-
-**错误**: AST mismatch:\n  Line 31:\n    expected:                   Constant(value='Input bytes length must be a multiple of 4 fo
-
-### nan_inf
-
-**错误**: Exception: InvalidOperationException: Unrecognized tokens: "∞" at line 5
-
-### test_worker
-
-**错误**: Exception: InvalidOperationException: Reached end of file while looking for closing """
-
-### test_pop_jump_forward_if_true
-
-**错误**: AST mismatch:\n  Line 12:\n    expected:         Expr(\n    actual:           Return(\n  Line 16:\n    expected:        
-
-### is_op
-
-**错误**: AST mismatch:\n  Line 11:\n    expected:       test=Compare(\n    actual:         test=BoolOp(\n  Line 12:\n    expected
-
-### binary_ops
-
-**错误**: AST mismatch:\n  Line 4:\n    expected:         Tuple(\n    actual:           Name(id='a', ctx=Store())],\n  Line 5:\n  
-
-### test_class_method
-
-**错误**: AST mismatch:\n  Line 20:\n    expected:                 Expr(\n    actual:                   Return(\n  Line 24:\n    e
-
 ### test_sets
 
 **错误**: AST mismatch:\n  Line 24:\n    expected:       value=Set(\n    actual:         value=List(\n  Line 29:\n    expected:   
 
-### test_exception_match_py311
+### test_decorators
 
-**错误**: AST mismatch:\n  Line 22:\n    expected:                 Return(\n    actual:                   Pass()])])])])\n  Line 2
+**错误**: AST mismatch:\n  Line 3:\n    expected:       name='simple_decorator',\n    actual:         name='square',\n  Line 6:\n 
 
-### unpack_assign
+### test_with
 
-**错误**: AST mismatch:\n  Line 13:\n    expected:         Tuple(\n    actual:           Name(id='a', ctx=Store())],\n  Line 14:\n
+**错误**: AST mismatch:\n  Line 2:\n    expected:     With(\n    actual:       Expr(\n  Line 3:\n    expected:       items=[\n    
 
-### async_def
+### private_name
 
-**错误**: AST mismatch:\n  Line 12:\n    expected:           value=Await(\n    actual:             value=YieldFrom(
+**错误**: AST mismatch:\n  Line 43:\n    expected:             Name(id='__private_var', ctx=Store())],\n    actual:               
 
 ### op_precedence
 
@@ -167,6 +163,10 @@
 ### chain_assignment
 
 **错误**: AST mismatch:\n  Line 4:\n    expected:         Name(id='a', ctx=Store()),\n    actual:           Name(id='a', ctx=Store
+
+### test_main
+
+**错误**: Token mismatch:\nLine 0: expected [from] (WORD), got [,] (SYMBOL)\nLine 0: expected [app] (WORD), got [sync] (WORD)\nLin
 
 
 ---
