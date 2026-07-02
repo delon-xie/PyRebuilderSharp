@@ -78,169 +78,16 @@ public class AstBuilder
         var stmts = new List<Stmt>();
         var visited = new HashSet<BasicBlock>();
 
-        // 3.11+: 在 BuildStatements 之前预处理 ExceptionTable try/except
-        if (_codeObject.ExceptionTable.Count > 0)
+        // 输出所有 ET 条目（调试用）
+        Console.Error.WriteLine($"[ET_DUMP] {_codeObject.Name} has {_codeObject.ExceptionTable.Count} ET entries:");
+        for (int i = 0; i < _codeObject.ExceptionTable.Count; i++)
         {
-            // 第一步：构建 for-loop 体块集合（ET 预处理需要知道哪些块在 for-loop 体内，
-            // 这些块的 try/except 由 BuildForLoop 的 GetStructuredBlockStmts 处理，
-            // 不应在此处被 ET 预处理消耗。）
-            var forLoopBodyBlocks = new HashSet<int>();
-            foreach (var block in _allBlocks)
-            {
-                if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
-                {
-                    var headerBlock = block;
-                    foreach (var succ in headerBlock.Successors)
-                    {
-                        CollectForLoopBodyBlocks(succ, headerBlock, forLoopBodyBlocks, new HashSet<int>());
-                    }
-                }
-            }
-
-            // 第二步：处理 ET 条目（优先于 preBlocks，确保 visited 干净）
-            foreach (var entry in _sortedExceptionTable)
-            {
-                var entryBlock = FindBlockByOffset(entry.StartOffset);
-                if (entryBlock == null || visited.Contains(entryBlock)) continue;
-
-                // 跳过 for 循环体内的 ET 条目（try/except 在 for 循环体中时，
-                // 块属于 for-loop body，由 BuildForLoop 的 GetStructuredBlockStmts 处理）。
-                if (forLoopBodyBlocks.Contains(entryBlock.Id)) continue;
-                var etStmts = BuildTryFromExceptionTable(entryBlock, visited);
-                if (etStmts != null)
-                {
-                    foreach (var b in GetBlocksInRange(entry.StartOffset, entry.EndOffset))
-                    {
-                        _processedBlockIds.Add(b.Id);
-                        visited.Add(b);
-                    }
-                    var handler = FindBlockByOffset(entry.TargetOffset);
-                    if (handler != null)
-                    {
-                        _processedBlockIds.Add(handler.Id);
-                        visited.Add(handler);
-                        // Handler 后继：只处理前向边（偏移 ≥ handler 起始），且跳过自身也是 ET handler 的块
-                        foreach (var succ in handler.Successors)
-                        {
-                            if (!visited.Contains(succ)
-                                && succ.StartOffset >= entry.TargetOffset
-                                && !_codeObject.ExceptionTable.Any(e => e.TargetOffset == succ.StartOffset))
-                            {
-                                visited.Add(succ);
-                                stmts.AddRange(BuildStatements(succ, visited));
-                            }
-                        }
-                    }
-                    
-                    // 标记所有共享同一 handler 的 ET 条目的 try 体块为已处理
-                    // 这些是相同 try/except 结构的嵌套清理条目（depth>0），不应生成独立 try/except
-                    foreach (var sibling in _sortedExceptionTable
-                        .Where(e => e.TargetOffset == entry.TargetOffset && e.StartOffset != entry.StartOffset))
-                    {
-                        foreach (var b in GetBlocksInRange(sibling.StartOffset, sibling.EndOffset))
-                        {
-                            if (!visited.Contains(b))
-                            {
-                                _processedBlockIds.Add(b.Id);
-                                visited.Add(b);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 第二步：处理第一个 ET 条目之前的块（docstring、def/class 定义等）
-            var firstET = _sortedExceptionTable.First();
-            var preBlocks = GetBlocksInRange(0, firstET.StartOffset)
-                .Where(b => !visited.Contains(b))
-                .ToList();
-            foreach (var preBlock in preBlocks)
-            {
-                stmts.AddRange(BuildStatements(preBlock, visited));
-            }
-
-            // 第三步：处理 try 体结束与 handler 起始之间的 fall-through 块
-            // 这些块是 try 体成功执行后的正常流程（如 ABCMeta 类定义等顶层声明）
-            foreach (var entry in _sortedExceptionTable)
-            {
-                var fallthroughStart = entry.EndOffset;
-                var fallthroughEnd = entry.TargetOffset;
-                // 仅当 handler 在 try 体之后（前向）时处理 fall-through
-                if (fallthroughEnd <= fallthroughStart) continue;
-
-                var fallthroughBlocks = GetBlocksInRange(fallthroughStart, fallthroughEnd)
-                    .Where(b => !visited.Contains(b))
-                    .ToList();
-                foreach (var fb in fallthroughBlocks)
-                {
-                    stmts.AddRange(BuildStatements(fb, visited));
-                }
-            }
-
-            // 第四步：处理每个 ET 条目
-            foreach (var entry in _sortedExceptionTable)
-            {
-                var entryBlock = FindBlockByOffset(entry.StartOffset);
-                if (entryBlock == null || visited.Contains(entryBlock)) continue;
-
-                var etStmts = BuildTryFromExceptionTable(entryBlock, visited);
-                if (etStmts != null)
-                {
-                    stmts.AddRange(etStmts);
-                    // Mark try body blocks as processed
-                    foreach (var b in GetBlocksInRange(entry.StartOffset, entry.EndOffset))
-                    {
-                        _processedBlockIds.Add(b.Id);
-                        visited.Add(b);
-                    }
-                    // Mark handler and successors
-                    var handler = FindBlockByOffset(entry.TargetOffset);
-                    if (handler != null)
-                    {
-                        _processedBlockIds.Add(handler.Id);
-                        visited.Add(handler);
-                        foreach (var succ in handler.Successors)
-                        {
-                            // 跳过通过 RERAISE/RAISE_VARARGS 的人工 fallthrough 边连接到类/函数定义的后继块。
-                            // 这些边是 BlockScanner 为保持 CFG 连通性添加的人工边，但类/函数定义应作为
-                            // try/except 后的正常代码流处理，而非 handler 的后继。
-                            bool isHandlerFallthroughToDefinition = succ.Instructions.Count > 0
-                                && (succ.Instructions[0].Opcode == Opcode.LOAD_BUILD_CLASS
-                                    || succ.Instructions[0].Opcode == Opcode.MAKE_FUNCTION);
-                            if (!visited.Contains(succ)
-                                && succ.StartOffset >= entry.TargetOffset
-                                && !_codeObject.ExceptionTable.Any(e => e.TargetOffset == succ.StartOffset)
-                                && !isHandlerFallthroughToDefinition)
-                            {
-                                visited.Add(succ);
-                                stmts.AddRange(BuildStatements(succ, visited));
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // etStmts 为 null（如 handler 已被访问），但 entry 块仍需标记为已处理
-                    // 避免残余块变为孤儿
-                    _processedBlockIds.Add(entryBlock.Id);
-                    visited.Add(entryBlock);
-                    // 同时标记 try 体中的块
-                    foreach (var b in GetBlocksInRange(entry.StartOffset, entry.EndOffset))
-                    {
-                        if (!visited.Contains(b))
-                        {
-                            _processedBlockIds.Add(b.Id);
-                            visited.Add(b);
-                        }
-                    }
-                }
-            }
+            var et = _codeObject.ExceptionTable[i];
+            Console.Error.WriteLine($"[ET_DUMP]   Entry {i}: Start={et.StartOffset:X4}, End={et.EndOffset:X4}, Target={et.TargetOffset:X4}, Depth={et.Depth}, Lasti={et.Lasti}");
         }
-        else
-        {
-            // No ET: normal single-pass BuildStatements
-            stmts.AddRange(BuildStatements(cfg.Entry, visited));
-        }
+
+        // 使用统一的 BuildStatements 遍历，ET 条目由 BuildStatementsInternal 处理
+        stmts.AddRange(BuildStatements(cfg.Entry, visited));
 
         // 确保所有块都被处理
         // 使用 _processedBlockIds（BuildStatements 实际处理的块）而非 CollectVisited（只跟随 successor 边）
@@ -606,6 +453,7 @@ public class AstBuilder
         }
 
         visited.Add(block);
+        Console.Error.WriteLine($"[BS] block#{block.Id} offset={block.StartOffset:X4} start processing");
 
         try
         {
@@ -824,8 +672,10 @@ public class AstBuilder
                 _diagETPrinted = true;
             }
             var try311Stmts = BuildTryFromExceptionTable(block, visited);
+            Console.Error.WriteLine($"[BSI_ET] block#{block.Id} try311Stmts={try311Stmts?.Count ?? 0}");
             if (try311Stmts != null)
             {
+                Console.Error.WriteLine($"[BSI] try311Stmts={try311Stmts.Count} types={string.Join(",", try311Stmts.Select(s => s.GetType().Name))}");
                 stmts.AddRange(try311Stmts);
                 // 继续处理 try/except 后面的块（else 分支、类定义等）
                 var firstTry = try311Stmts.FirstOrDefault() as Try;
@@ -836,6 +686,12 @@ public class AstBuilder
                 else if (firstTry != null)
                 {
                     // 处理 handler 块的后缀块（类定义等在 try/except 之后的代码）
+                    // 注意：try/finally 没有 else 分支，跳过 elseBody 构建
+                    if (firstTry.Finalbody?.Count > 0)
+                    {
+                        // try/finally：无需构建 elseBody，但继续处理 try/finally 之后的代码
+                    }
+
                     var matchingEntry = _codeObject.ExceptionTable
                         .FirstOrDefault(e => block.Instructions.Count > 0
                             && block.Instructions[0].Offset >= e.StartOffset
@@ -905,6 +761,13 @@ public class AstBuilder
             }
         }
 
+        // 检查是否为条件分支（在 ExceptionTable 之后）
+        if (IsConditionBranch(block))
+        {
+            stmts.AddRange(BuildIfElse(block, visited));
+            return stmts;
+        }
+
         // 检测 match/case 内联模式：COPY+MATCH_CLASS
         if (block.Instructions.Any(i => i.Opcode == Opcode.COPY)
             && block.Instructions.Any(i =>
@@ -919,13 +782,6 @@ public class AstBuilder
                 stmts.AddRange(matchStmts);
                 return stmts;
             }
-        }
-
-        // 检查是否为条件分支
-        if (IsConditionBranch(block))
-        {
-            stmts.AddRange(BuildIfElse(block, visited));
-            return stmts;
         }
 
         // ❗ 核心：如果块反编译失败，使用注释兜底
@@ -1287,13 +1143,17 @@ public class AstBuilder
         }
         int first = lo;
 
-        // Collect blocks from first until StartOffset >= endExclusive
+        // Collect blocks that overlap with [startInclusive, endExclusive)
+        // A block overlaps if its StartOffset < endExclusive
         var result = new List<BasicBlock>();
         for (int i = first; i < list.Count; i++)
         {
-            if (list[i].Instructions[0].Offset >= endExclusive)
+            var block = list[i];
+            int blockStart = block.Instructions[0].Offset;
+            // Continue while block start is before end of range
+            if (blockStart >= endExclusive)
                 break;
-            result.Add(list[i]);
+            result.Add(block);
         }
         return result;
     }
@@ -1561,6 +1421,7 @@ public class AstBuilder
         var instrs = block.Instructions;
         if (instrs.Count == 0) return null;
         var blockStart = instrs[0].Offset;
+        Console.Error.WriteLine($"[TRY_FROM_ET] block#{block.Id} offset={blockStart:X4}");
         var blockEnd = instrs.Last().Offset;
 
         // Find the outermost entry that covers this block (lowest depth = 0 or 1 first)
@@ -1568,6 +1429,11 @@ public class AstBuilder
             .Where(e => blockStart >= e.StartOffset && blockEnd <= e.EndOffset)
             .OrderBy(e => e.Depth)
             .FirstOrDefault();
+        Console.Error.WriteLine($"[TRY_FROM_ET] matchingEntry: {matchingEntry}");
+        if (matchingEntry != null)
+        {
+            Console.Error.WriteLine($"[TRY_FROM_ET]   Start={matchingEntry.StartOffset:X4}, End={matchingEntry.EndOffset:X4}, Target={matchingEntry.TargetOffset:X4}, Depth={matchingEntry.Depth}");
+        }
         if (matchingEntry == null)
         {
             return null;
@@ -1590,6 +1456,11 @@ public class AstBuilder
         {
             return null;
         }
+        Console.Error.WriteLine($"[TRY_FROM_ET] handlerBlock#{handlerBlock.Id} offset={handlerBlock.StartOffset:X4} instructions={handlerBlock.Instructions.Count}");
+        if (handlerBlock.Instructions.Count > 0)
+        {
+            Console.Error.WriteLine($"[TRY_FROM_ET]   handler ops={string.Join(",", handlerBlock.Instructions.Select(i => i.Opcode))}");
+        }
         bool isFinally = false;
         bool hasExcMatch = handlerBlock.Instructions.Any(i =>
             i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
@@ -1602,8 +1473,14 @@ public class AstBuilder
             bool tryHasStatements = finallyTryBlocks.Any(tb =>
             {
                 var r = _blockResults.GetValueOrDefault(tb.Id);
-                return r?.Statements != null && r.Statements.Any(s => s is not Raise and not CommentBlock and not ExprStmt);
+                bool hasStmt = r?.Statements != null && r.Statements.Any(s => s is not Raise and not CommentBlock);
+                if (r?.Statements != null)
+                {
+                    Console.Error.WriteLine($"[TRY_FROM_ET] finallyTryBlock#{tb.Id} stmts={r.Statements.Count} types={string.Join(",", r.Statements.Select(s => s.GetType().Name))}");
+                }
+                return hasStmt;
             });
+            Console.Error.WriteLine($"[TRY_FROM_ET] tryHasStatements={tryHasStatements}");
             if (!tryHasStatements)
             {
                 // 清理条目：标记 handler 为已访问，但实际语句仍需保留
@@ -1641,7 +1518,11 @@ public class AstBuilder
                 .Where(tb => tb.Instructions.Count == 0
                     || tb.Instructions[0].Offset < matchingEntry.TargetOffset)
                 .ToList();
-            if (tryBlocks.Count == 0) return null;
+            if (tryBlocks.Count == 0)
+            {
+                Console.Error.WriteLine($"[TRY_FROM_ET] RETURN NULL: tryBlocks empty after excluding handler");
+                return null;
+            }
         }
 
         // 在 try 体中查找 POP_BLOCK 或 JUMP_FORWARD 分界：
@@ -1693,12 +1574,19 @@ public class AstBuilder
         }
         if (elseBody.Count == 0) elseBody = null;
 
+        foreach (var tb in tryBlocks)
+        {
+            visited.Add(tb);
+            _processedBlockIds.Add(tb.Id);
+        }
+
         // 跳过仅有基础设施指令（Raise/异常处理）的 try 体
         // 这些是 CPython 嵌套清理条目，不应生成独立 try/except
+        // 注意：ExprStmt 可能是有效的 try 体内容（如 repr_running.add(key)），不应排除
         if (tryBody.Count == 0 && tryBlocks.All(tb =>
         {
             var r = _blockResults.GetValueOrDefault(tb.Id);
-            return r?.Statements == null || r.Statements.All(s => s is Raise or ExprStmt);
+            return r?.Statements == null || r.Statements.All(s => s is Raise);
         }))
         {
             return null;
@@ -1709,7 +1597,8 @@ public class AstBuilder
         // 收集 else 体：扫描 handler 块末尾后的指令流，查找类/函数定义块。
         // 在 abc.py 中，ABCMeta class 定义位于 handler 的末尾与 handler 的
         // JUMP_FORWARD 目标之间，且不是 handler 后继。
-        if (elseBody == null)
+        // 注意：try/finally 没有 else 分支，跳过 else 体构建
+        if (elseBody == null && !isFinally)
         {
             // 从 handler 末尾偏移开始，向前扫描指令
             int scanStart = handlerBlock.Instructions.LastOrDefault().Offset;
@@ -1756,6 +1645,11 @@ public class AstBuilder
         }
 
         var handlerResult = _blockResults.GetValueOrDefault(handlerBlock.Id);
+        Console.Error.WriteLine($"[TRY_FROM_ET] handlerBlock#{handlerBlock.Id} result={handlerResult != null}, stmts={handlerResult?.Statements?.Count ?? 0}");
+        if (handlerResult?.Statements != null)
+        {
+            Console.Error.WriteLine($"[TRY_FROM_ET]   handler stmt types={string.Join(",", handlerResult.Statements.Select(s => s.GetType().Name))}");
+        }
         var handlerBody = handlerResult?.Statements
             ?.Where(s => s is not Raise and not CommentBlock)
             .ToList() ?? new List<Stmt>();
@@ -1774,6 +1668,11 @@ public class AstBuilder
             if (vsucc.Instructions.Count == 0) continue;
             if (!visited.Contains(vsucc)) continue;
             var vsr = _blockResults.GetValueOrDefault(vsucc.Id);
+            Console.Error.WriteLine($"[TRY_FROM_ET] visited succ#{vsucc.Id} stmts={vsr?.Statements?.Count ?? 0}");
+            if (vsr?.Statements != null && vsr.Statements.Count > 0)
+            {
+                Console.Error.WriteLine($"[TRY_FROM_ET]   visited succ stmt types={string.Join(",", vsr.Statements.Select(s => s.GetType().Name))}");
+            }
             if (vsr?.Statements != null && vsr.Statements.Count > 0
                 && vsr.Statements.Any(s => s is not Raise and not CommentBlock))
             {
@@ -1781,8 +1680,10 @@ public class AstBuilder
             }
         }
 
+        Console.Error.WriteLine($"[TRY_FROM_ET] handlerBlock#{handlerBlock.Id} successors={handlerBlock.Successors.Count}");
         foreach (var succ in handlerBlock.Successors.OrderBy(s => s.StartOffset))
         {
+            Console.Error.WriteLine($"[TRY_FROM_ET]   successor#{succ.Id} offset={succ.StartOffset:X4} visited={visited.Contains(succ)}");
             if (succ.Instructions.Count == 0) continue;
             var succStart = succ.Instructions[0].Offset;
             if (succStart >= matchingEntry.TargetOffset && succStart < handlerEnd
@@ -1822,11 +1723,80 @@ public class AstBuilder
         if (isFinally)
         {
             // try/finally: handler 是无 CHECK_EXC_MATCH 的 finally 体
-            var finalBody = handlerResult?.Statements
-                ?.Where(s => s is not Raise and not CommentBlock)
-                .ToList() ?? new List<Stmt>();
+            // 使用 handlerBody（已包含 handlerBlock 和其后继块的语句）
+            Console.Error.WriteLine($"[TRY_FROM_ET] isFinally=True, handlerBody={handlerBody.Count}, tryBody={tryBody.Count}");
+            if (handlerBody.Count > 0)
+            {
+                Console.Error.WriteLine($"[TRY_FROM_ET]   handlerBody types={string.Join(",", handlerBody.Select(s => s.GetType().Name))}");
+            }
+            if (tryBody.Count > 0)
+            {
+                Console.Error.WriteLine($"[TRY_FROM_ET]   tryBody types={string.Join(",", tryBody.Select(s => s.GetType().Name))}");
+            }
+            var finalBody = handlerBody;
             visited.Add(handlerBlock);
-            return new List<Stmt> { new Try(tryBody, new List<ExceptHandler>(), elseBody, finalBody) };
+            _processedBlockIds.Add(handlerBlock.Id);
+            
+            // 在 Python 3.11+ 字节码中，finally 体被复制了：
+            // - 内联 finally 块：位于 [EndOffset, TargetOffset) 范围内，是正常路径上的 finally 代码
+            // - handler 块：是异常路径上的 finally 代码（带有 PUSH_EXC_INFO/RERAISE）
+            // 我们使用 handler 作为 finally 体，但需要处理内联 finally 块：
+            // 1. 标记所有内联 finally 块为 visited，防止重复输出
+            // 2. 从最后一个内联 finally 块中提取 Return 语句作为 try/finally 之后的代码
+            var afterFinallyStmts = new List<Stmt>();
+            
+            var inlineFinallyBlocks = GetBlocksInRange(matchingEntry.EndOffset, matchingEntry.TargetOffset);
+            foreach (var inlineBlock in inlineFinallyBlocks)
+            {
+                visited.Add(inlineBlock);
+                _processedBlockIds.Add(inlineBlock.Id);
+            }
+            
+            if (inlineFinallyBlocks.Count > 0)
+            {
+                var lastInlineBlock = inlineFinallyBlocks.OrderByDescending(b => b.StartOffset).First();
+                var lastInlineResult = _blockResults.GetValueOrDefault(lastInlineBlock.Id);
+                if (lastInlineResult?.Statements != null)
+                {
+                    var returnStmts = lastInlineResult.Statements.Where(s => s is Return).ToList();
+                    if (returnStmts.Count > 0)
+                    {
+                        afterFinallyStmts.AddRange(returnStmts);
+                    }
+                }
+            }
+            
+            if (afterFinallyStmts.Count == 0)
+            {
+                var handlerEndOffset = handlerEnd;
+                foreach (var afterBlock in _sortedBlocks)
+                {
+                    if (afterBlock.Instructions.Count == 0) continue;
+                    var afterBlockStart = afterBlock.Instructions[0].Offset;
+                    if (afterBlockStart >= handlerEndOffset && !visited.Contains(afterBlock))
+                    {
+                        var afterBlockResult = _blockResults.GetValueOrDefault(afterBlock.Id);
+                        if (afterBlockResult?.Statements != null)
+                        {
+                            var nonRaiseStmts = afterBlockResult.Statements.Where(s => s is not Raise and not CommentBlock).ToList();
+                            if (nonRaiseStmts.Count > 0)
+                            {
+                                afterFinallyStmts.AddRange(nonRaiseStmts);
+                                visited.Add(afterBlock);
+                                _processedBlockIds.Add(afterBlock.Id);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            var result = new List<Stmt> { new Try(tryBody, new List<ExceptHandler>(), elseBody, finalBody) };
+            if (afterFinallyStmts.Count > 0)
+            {
+                result.AddRange(afterFinallyStmts);
+            }
+            return result;
         }
 
         bool isGroup = handlerBlock.Instructions.Any(i => i.Opcode == Opcode.CHECK_EG_MATCH);
@@ -4058,9 +4028,16 @@ public class AstBuilder
 
         var body = ifStmt.Body;
         // 检查 body 末尾的裸 ExprStmt（AND 链终端 body 会丢 Return）
+        // 但排除副作用表达式：函数调用、方法调用等通常返回 None 的表达式不应该被包装为 Return
         if (body.Count == 1 && body[0] is ExprStmt expr)
         {
-            body = new List<Stmt> { new Return(expr.Value) };
+            // 只有当表达式不是函数/方法调用时，才包装为 Return
+            // 函数/方法调用（如 set.add()）通常是副作用操作，返回 None，不应该被包装
+            bool isCallLike = expr.Value is Call or Models.AST.Attribute or Name;
+            if (!isCallLike)
+            {
+                body = new List<Stmt> { new Return(expr.Value) };
+            }
         }
 
         return new If(ifStmt.Test, body, orelse);
@@ -4072,7 +4049,12 @@ public class AstBuilder
         var last = stmts[^1];
         if (last is ExprStmt expr && stmts.Count == 1)
         {
-            stmts[^1] = new Return(expr.Value);
+            // 排除副作用表达式：函数/方法调用等通常返回 None 的表达式不应该被包装为 Return
+            bool isCallLike = expr.Value is Call or Models.AST.Attribute or Name;
+            if (!isCallLike)
+            {
+                stmts[^1] = new Return(expr.Value);
+            }
         }
         else if (last is If innerIf)
         {

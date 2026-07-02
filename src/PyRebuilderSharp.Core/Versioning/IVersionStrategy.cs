@@ -59,6 +59,12 @@ public interface IVersionStrategy
     int GetCacheCount(byte rawOp);
 
     /// <summary>
+    /// 判断原始操作码是否需要参数。默认根据 HaveArgument 阈值判断。
+    /// 某些版本（如 3.14）可能有例外情况。
+    /// </summary>
+    bool RequiresArgument(byte rawOp);
+
+    /// <summary>
     /// 判断操作码是否为跳转指令（用于 word offset 转换）。
     /// </summary>
     bool IsJumpInstruction(Opcode op);

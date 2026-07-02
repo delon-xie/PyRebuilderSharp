@@ -173,6 +173,17 @@ public class VersionStrategy314 : VersionStrategyBase
     /// 3.14 的缓存条目数（CPython 3.14 Lib/opcode.py _cache_format）。
     /// 使用 3.14 原始操作码字节值，因为 3.14 的操作码编号与 3.13 完全不同。
     /// </summary>
+    public override bool RequiresArgument(byte rawOp)
+    {
+        if (rawOp >= HaveArgument)
+            return true;
+        return rawOp switch
+        {
+            4 => true,   // CALL_FUNCTION_EX (flags)
+            _ => false,
+        };
+    }
+
     public override int GetCacheCount(byte rawOp)
     {
         return rawOp switch

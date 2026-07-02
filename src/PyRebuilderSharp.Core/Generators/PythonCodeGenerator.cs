@@ -1171,7 +1171,7 @@ public class PythonCodeGenerator : ICodeGenerator
             }
             else
             {
-                _output.Append("**");  // **kwargs dict unpacking
+                _output.Append(kw.IsStarArg ? "*" : "**");
             }
             Visit(kw.Value);
         }

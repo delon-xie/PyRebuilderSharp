@@ -41,7 +41,7 @@ public enum BoolOperator { And, Or }
 
 // --- 函数调用 ---
 public record Call(Expr Func, List<Expr> Args, List<Keyword> Keywords) : Expr;
-public record Keyword(string? Arg, Expr Value);
+public record Keyword(string? Arg, Expr Value, bool IsStarArg = false);
 
 // --- 属性/下标 ---
 public record Attribute(Expr Value, string Attr, ExpressionContext Ctx) : Expr

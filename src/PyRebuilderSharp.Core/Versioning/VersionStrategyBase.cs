@@ -31,6 +31,11 @@ public abstract class VersionStrategyBase : IVersionStrategy
 
     public virtual int GetCacheCount(byte rawOp) => 0;
 
+    public virtual bool RequiresArgument(byte rawOp)
+    {
+        return rawOp >= HaveArgument;
+    }
+
     public virtual bool IsJumpInstruction(Opcode op) => op switch
     {
         Opcode.JUMP_FORWARD or Opcode.JUMP_BACKWARD

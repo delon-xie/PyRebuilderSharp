@@ -735,32 +735,40 @@ public class StackMachine
             }
             case Opcode.CALL_FUNCTION_EX:
             {
-                var flags = instr.Argument ?? 0;
                 var args = new List<Expr>();
                 var keywords = new List<Keyword>();
                 
-                // CPython 3.10 implementation (ceval.c):
+                // CPython implementation:
                 // Stack: [func, args, kwargs]  — kwargs TOS, args TOS1, func TOS2
-                // flags & 0x01 = kwargs dict is present (dict on TOS)
-                // flags & 0x02 = args tuple is present (tuple on TOS1)
-                // Even when a flag is 0, the corresponding value IS on the stack,
-                // it just means kwargs=None or args=empty_tuple.
-                // But for decompilation: always pop both then func.
+                // 
+                // Python 3.10: flags & 0x01 = kwargs present, flags & 0x02 = args present
+                // Python 3.14+: flags is always 0, check stack values directly:
+                //   - args is None: no *args
+                //   - kwargs is None or empty dict: no **kwargs
                 
                 var kwargsExpr = SafePop(); // TOS = kwargs dict or None
                 var argsExpr = SafePop();   // TOS1 = args tuple
                 var func = SafePop();       // TOS2 = func
                 if (func == null) return null;
                 
+                bool hasArgs = argsExpr != null && !(argsExpr is Name { Id: "None" });
+                bool hasKwargs = kwargsExpr != null && !(kwargsExpr is Name { Id: "None" });
+                
+                // Python 3.14+: BUILD_MAP 0 followed by DICT_MERGE creates the kwargs dict
+                // If kwargsExpr is a DictLiteral with no items, it might be from BUILD_MAP 0
+                if (kwargsExpr is DictLiteral dictLit && dictLit.Entries.Count == 0)
+                    hasKwargs = false;
+                
                 if (argsExpr is ListLiteral listLit)
                     args.AddRange(listLit.Elts);
-                
-                if (kwargsExpr != null)
+                else if (hasArgs && argsExpr != null)
                 {
-                    if (kwargsExpr is Name kn)
-                        keywords.Add(new Keyword(null, kn));
-                    else
-                        keywords.Add(new Keyword(null, kwargsExpr));
+                    keywords.Add(new Keyword(null, argsExpr, IsStarArg: true));
+                }
+                
+                if (hasKwargs && kwargsExpr != null)
+                {
+                    keywords.Add(new Keyword(null, kwargsExpr));
                 }
                 
                 var call = new Call(func, args, keywords);

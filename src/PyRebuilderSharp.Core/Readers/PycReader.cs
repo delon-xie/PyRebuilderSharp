@@ -855,9 +855,9 @@ public class PycReader
                 continue;
             }
 
-            // Instructions with arguments: HAVE_ARGUMENT threshold
+            // Instructions with arguments
             int? arg = null;
-            if (rawOp >= _strategy.HaveArgument)
+            if (_strategy.RequiresArgument(rawOp))
                 arg = (extArg << 8) | rawArg;
             extArg = 0;
 
