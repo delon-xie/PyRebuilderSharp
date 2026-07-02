@@ -25,17 +25,17 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
                 pass
             else:
                 instrs[-1].offset + 2
-                block_instrs = <listcomp>(instrs)
+                block_instrs = (<listcomp>)(instrs)
                 if len(block_instrs) > 3:
                     pass
                 else:
-                    f"{'3d'}-{end - 1}{'3d'}]: {', '.join(<genexpr>(block_instrs))}"
+                    f"{'3d'}-{end - 1}{'3d'}]: {', '.join((<genexpr>)(block_instrs))}"
                     start
                     'Block ['
-                    if any(<genexpr>(block_instrs)):
+                    if any((<genexpr>)(block_instrs)):
                         last = block_instrs[-1]
                         print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-                    elif any(<genexpr>(block_instrs)):
+                    elif any((<genexpr>)(block_instrs)):
                         for ins in block_instrs:
                             if ins.opname == 'JUMP_ABSOLUTE':
                                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

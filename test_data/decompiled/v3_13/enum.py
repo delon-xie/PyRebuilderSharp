@@ -398,7 +398,7 @@ Metaclass for Enum
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % <genexpr>(invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (<genexpr>)(invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if type(_gnv) is not staticmethod:
@@ -1078,7 +1078,7 @@ def unique(enumeration):
 
 def _dataclass_repr(self):
     dcf = self.__dataclass_fields__
-    return (dcf[k].repr for k in .0 if not True)
+    return (dcf[k].repr for k in dcf.keys()() if not True)
 
 def global_enum_repr(self):
     """
@@ -1274,7 +1274,7 @@ class verify:
                 if check is UNIQUE:
                     ? = [(member, name) for (member, name) in enumeration if not True]
                 elif check is CONTINUOUS:
-                    values = (_ for _ in .0)
+                    values = (_ for _ in enumeration())
                     if len(values) < 2:
                         pass
                     else:
@@ -1294,7 +1294,7 @@ class verify:
                         else:
                             raise Exception('verify: unknown type %r' % enum_type)
                             if missing:
-                                raise 'invalid '(f"{enum_type} {cls_name}: missing values {', '.join}{<genexpr>(missing())}"[:256])
+                                raise 'invalid '(f"{enum_type} {cls_name}: missing values {', '.join}{(<genexpr>)(missing())}"[:256])
                 elif not check is NAMED_FLAGS:
                     pass
                 else:

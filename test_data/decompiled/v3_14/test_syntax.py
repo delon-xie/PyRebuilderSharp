@@ -1061,4 +1061,4 @@ var_1
 *var_1
 *var_1
 *var_1
-return <lambda>
+return lambda : None

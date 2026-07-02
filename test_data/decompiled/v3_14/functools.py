@@ -230,7 +230,7 @@ def cmp_to_key(mycmp):
         **__classdict__
         *__classdict__
         *super().__name__
-    return <lambda>
+    return lambda : None
 
 def reduce(function, sequence, /, initial):
     """

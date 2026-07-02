@@ -49,6 +49,6 @@ for ver in versions:
     except Exception:
         pass
 print(f"\n{'========================================'}")
-passed = sum(((v, r) for (v, r) in .0 if r))
+passed = sum(((v, r) for (v, r) in results.items() if r))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")

@@ -165,7 +165,12 @@ public class PythonCodeGenerator : ICodeGenerator
                 VisitLambda(l);
                 break;
             case FunctionRef fr:
-                _output.Append(fr.Name);
+                if (fr.Name == "<lambda>")
+                    _output.Append("lambda: None");  // fallback for unlinked lambda
+                else if (fr.Name.StartsWith("<"))
+                    _output.Append($"({fr.Name})");  // other <name> become comments
+                else
+                    _output.Append(fr.Name);
                 break;
             case Slice s:
                 VisitSliceLiteral(s);
@@ -264,7 +269,6 @@ public class PythonCodeGenerator : ICodeGenerator
                     }
                 }
                 _output.Append('"');
-                break;
                 break;
             default:
                 _output.Append($"# Unknown node: {node.GetType().Name}");

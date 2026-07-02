@@ -345,4 +345,4 @@ def ABC():
     **var_0
     *var_0
     *super().__name__
-return <lambda>
+return lambda : None

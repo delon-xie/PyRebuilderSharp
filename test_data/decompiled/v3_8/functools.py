@@ -123,7 +123,7 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = <setcomp>(_convert)
+    roots = {{} for op in _convert}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     opfunc.__name__ = opname
@@ -233,7 +233,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    args.extend(((k, v) for (k, v) in .0))
+    args.extend(((k, v) for (k, v) in self.keywords.items()))
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -474,11 +474,11 @@ def _compose_mro(cls, types):
     found
     set(types)
     sub
-    <listcomp>(types)
+    [[] for n in types]
     (typ)
     _compose_mro.<locals>.is_strict_base
     (sub)
-    <listcomp>(types)
+    [[] for n in types]
     (mro)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
@@ -536,7 +536,7 @@ def singledispatch(func):
     def _is_valid_dispatch_type(cls):
         if isinstance(cls, type):
             return True
-        all((arg for arg in .0))
+        all((arg for arg in cls.__args__))
         return
     def register(cls, func):
         """generic_func.register(cls, func) -> func

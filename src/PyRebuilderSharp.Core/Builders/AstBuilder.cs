@@ -4150,7 +4150,12 @@ public class AstBuilder
             }
         }
 
-        if (forStmt == null) return null;
+        if (forStmt == null)
+        {
+            // Some comprehension bodies (set/dict via SET_ADD/MAP_ADD) don't have a For loop.
+            // Use fallback: extract iterable, target, and element from the body.
+            return BuildComprehensionFallback(body, kind, compCall);
+        }
 
         // Build comprehension generators: find the For loop and its filters
         var generators = new List<Comprehension>();
@@ -4178,13 +4183,17 @@ public class AstBuilder
                 innermostFor.Body.Remove(s);
             }
         }
-
         // Build generators list from outermost to innermost for
+        int argIdx = 0;
         var cur = forStmt;
         while (cur != null)
         {
             var genIfs = (cur == innermostFor) ? ifs : new List<Expr>();
-            generators.Add(new Comprehension(cur.Target, cur.Iter, genIfs));
+            // Replace .0/.1/.2 implicit parameters with actual call args
+            var actualIter = cur.Iter;
+            if (actualIter is Name dotName && dotName.Id.StartsWith(".") && int.TryParse(dotName.Id.AsSpan(1), out int di) && di < compCall.Args.Count)
+                actualIter = compCall.Args[di];
+            generators.Add(new Comprehension(cur.Target, actualIter, genIfs));
 
             For? next = null;
             foreach (var s in cur.Body)
@@ -4206,6 +4215,68 @@ public class AstBuilder
         elt ??= innermostFor.Target;
 
         if (elt == null) return null;
+
+        return kind switch
+        {
+            CompKind.Set => new SetComp(elt, generators),
+            CompKind.List => new ListComp(elt, generators),
+            CompKind.Dict => new DictComp(keyElt ?? elt, elt, generators),
+            CompKind.Generator => new GeneratorExp(elt, generators),
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// 替代 BuildComprehension for 没有 For 循环的推导式 body。
+    /// body 结构：[ExprStmt(.0), element_expr, Assign(target) or If(filter, Assign(target)), Return]
+    /// </summary>
+    private Expr? BuildComprehensionFallback(List<Stmt> body, CompKind kind, Call compCall)
+    {
+        // body[0]: .0 parameter (Name)
+        // body[1]: element expression (ExprStmt)
+        // body[2]: target assignment (Assign) or If(filter, Assign(target))
+        // body[3]: Return (ignored)
+
+        Expr? elt = null;
+        Expr? keyElt = null;
+        Expr? target = null;
+        List<Expr> ifs = new List<Expr>();
+
+        foreach (var stmt in body)
+        {
+            if (stmt is ExprStmt es && es.Value is not Name)
+            {
+                elt = es.Value;
+            }
+            else if (stmt is Assign a && a.Targets.Count == 1 && a.Targets[0] is Name n && n.Id != "?")
+            {
+                target = n;
+            }
+            else if (stmt is If ifStmt)
+            {
+                foreach (var s in ifStmt.Body)
+                {
+                    if (s is Assign innerAssign && innerAssign.Targets.Count == 1 && innerAssign.Targets[0] is Name n2 && n2.Id != "?")
+                    {
+                        target = n2;
+                        ifs.Add(ifStmt.Test);
+                    }
+                }
+            }
+        }
+
+        // Determine iterable from call args
+        Expr? iter = compCall.Args.Count > 0 ? compCall.Args[0] : null;
+        if (kind == CompKind.Dict && compCall.Args.Count > 1)
+            iter = compCall.Args[1];
+
+        if (elt == null || target == null || iter == null)
+            return null;
+
+        var generators = new List<Comprehension>
+        {
+            new Comprehension(target, iter, ifs)
+        };
 
         return kind switch
         {
@@ -4264,25 +4335,42 @@ public class AstBuilder
     {
         if (expr == null) return null;
         // Detect Call(FunctionRef<...>, ...) → comprehension expression
+        // Must check BEFORE the general Call recursion to intercept generation/comp expressions
         if (expr is Call call && call.Func is FunctionRef compRef
-            && compRef.Name.StartsWith("<"))
+            && compRef.Name.StartsWith("<") && compRef.Name != "<lambda>")
         {
             var compExpr = BuildComprehension(compRef, call);
             if (compExpr != null)
                 return compExpr;
+            // If comprehensions fails, try lambda
+            if (compRef.Name == "<lambda>")
+            {
+                var lambda = BuildLambda(compRef);
+                if (lambda != null)
+                {
+                    // Create new Call with lambda as function
+                    var newArgs = call.Args.Select(a => ConvertComprehensionExpr(a)).ToList();
+                    var newKeywords = call.Keywords.Select(k => new Keyword(k.Arg, ConvertComprehensionExpr(k.Value))).ToList();
+                    return new Call(lambda, newArgs, newKeywords);
+                }
+            }
         }
         // Detect standalone FunctionRef<lambda> → Lambda expression
         if (expr is FunctionRef lambdaRef && lambdaRef.Name == "<lambda>")
         {
-            Console.Error.WriteLine($"[COMP_LAMBDA] detected <lambda>, code={lambdaRef.Code?.Name}");
+            Console.Error.WriteLine($"[COMP_LAMBDA] detected standalone <lambda>, code={lambdaRef.Code?.Name}, funcRef type={lambdaRef.GetType().Name}");
             var lambda = BuildLambda(lambdaRef);
             Console.Error.WriteLine($"[COMP_LAMBDA] BuildLambda returned {(lambda != null ? "non-null" : "null")}");
             if (lambda != null)
                 return lambda;
+            // Fallback: create a minimal lambda with no args and None body
+            Console.Error.WriteLine("[COMP_LAMBDA] using fallback lambda");
+            return new Lambda(new List<Parameter>(), new Constant(null));
         }
         // Recurse into sub-expressions: Call args, BinOp, etc.
         if (expr is Call call2)
         {
+            Console.Error.WriteLine($"[COMP_RECURSE] Call func={call2.Func?.GetType().Name}, args={string.Join(",", call2.Args.Select(a => a?.GetType().Name ?? "null"))}");
             var newArgs = call2.Args.Select(a => ConvertComprehensionExpr(a)).ToList();
             var newKeywords = call2.Keywords.Select(k => {
                 Console.Error.WriteLine($"[COMP_DEBUG] keyword: {k.Arg ?? "(null)"}, valueType={k.Value?.GetType().Name}, valueStr={k.Value}");
@@ -4996,6 +5084,8 @@ public class AstBuilder
     private Lambda? BuildLambda(FunctionRef funcRef)
     {
         if (funcRef.Code == null) return null;
+        // Note: if the code is null (unlinked), we return null and the caller renders <lambda> as-is.
+        // This can happen for test/utility code objects where the lambda is used before definition.
         var childCode = funcRef.Code;
 
         // 1. 提取参数

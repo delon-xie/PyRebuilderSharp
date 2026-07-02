@@ -357,7 +357,7 @@ class EnumType(type):
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise ValueError('invalid enum member name(s) %s' % ','.join(<genexpr>(invalid_names)))
+            raise ValueError('invalid enum member name(s) %s' % ','.join((<genexpr>)(invalid_names)))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if (_gnv is not None) and (type(_gnv) is not staticmethod):
@@ -616,7 +616,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return (name for name in .0)
+        return (name for name in cls._member_names_)
 
     def __len__(cls):
         """
@@ -644,7 +644,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return (name for name in .0)
+        return (name for name in reversed(cls._member_names_))
 
     def __setattr__(cls, name, value):
         """
@@ -700,12 +700,12 @@ class EnumType(type):
             source = source.__dict__
         else:
             source = module_globals
-            members = <listcomp>(source.items())
+            members = (<listcomp>)(source.items())
             try:
                 members.sort(key=lambda t: (t[1], t[0]))
             except TypeError:
                 pass
-            body = {t: t for t in .0}
+            body = {t: t for t in members}
             tmp_cls = type(name, (object), body)
             if boundary:
                 if as_global:
@@ -1248,12 +1248,12 @@ def unique(enumeration):
     enumeration.__members__.items()
     ? = [(name, member) for (name, member) in '?' if name != member.name]
     if duplicates:
-        alias_details = ', '.join([(alias, name) for (alias, name) in .0])
+        alias_details = ', '.join([(alias, name) for (alias, name) in duplicates])
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
     return enumeration
 
 def _dataclass_repr(self):
-    return (self, ', '.join)((_ for k in .0))
+    return (self, ', '.join)((_ for k in dcf.keys()))
 
 def global_enum_repr(self):
     """
@@ -1276,7 +1276,7 @@ def global_flag_repr(self):
     if _is_single_bit(self._value_):
         return '%s.%s' % (module, self._name_)
     if self._boundary_ is not FlagBoundary.KEEP:
-        return ('|'.join)([name for name in .0])
+        return ('|'.join)([name for name in self.name.split('|')])
     name = []
     self._name_.split('|')
 
@@ -1548,7 +1548,7 @@ class verify:
                     if check is UNIQUE:
                         ? = [(name, member) for (name, member) in '?' if name != member.name]
                     elif check is CONTINUOUS:
-                        values = set((e for e in .0))
+                        values = set((e for e in enumeration))
                         if len(values) < 2:
                             pass
                         else:
@@ -1566,11 +1566,11 @@ class verify:
                             else:
                                 raise Exception('verify: unknown type %r' % enum_type)
                                 if missing:
-                                    raise ValueError('invalid %s %r: missing values %s' % (enum_type, cls_name, ', '.join(<genexpr>(missing)))[:256])
+                                    raise ValueError('invalid %s %r: missing values %s' % (enum_type, cls_name, ', '.join((<genexpr>)(missing)))[:256])
                     elif check is NAMED_FLAGS:
                         ? = [(name, alias) for (name, alias) in enumeration if name in member_names]
                     if duplicates:
-                        alias_details = ', '.join([(alias, name) for (alias, name) in .0])
+                        alias_details = ', '.join([(alias, name) for (alias, name) in duplicates])
                         raise ValueError('aliases found in %r: %s' % (enumeration, alias_details))
                     if missing_names and (len(missing_names) == 1):
                         alias = 'alias %s is missing' % missing_names[0]
@@ -1643,7 +1643,7 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
         source = source.__dict__
     else:
         source = module_globals
-        members = <listcomp>(source.items())
+        members = (<listcomp>)(source.items())
         try:
             members.sort(key=lambda t: (t[1], t[0]))
         except TypeError:

@@ -591,4 +591,4 @@ deref_1 = var_7
 deref_2 = var_8:var_9:var_5
 deref_1 = var_7
 deref_2 = var_7:var_5
-return <lambda>
+return lambda : None

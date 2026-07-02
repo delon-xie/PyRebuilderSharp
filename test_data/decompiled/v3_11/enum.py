@@ -417,7 +417,7 @@ class EnumType(type):
         member_names = [classdict for key in ignore]
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % <genexpr>(invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (<genexpr>)(invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if type(_gnv) is not staticmethod:
@@ -605,7 +605,7 @@ class EnumType(type):
         else:
             source = module_globals
             members = source.items()()
-            <listcomp>
+            (<listcomp>)
             try:
                 members.sort(key=lambda t: (t[1], t[0]))
             else:
@@ -1057,11 +1057,11 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items()
-    ? = [<listcomp>(duplicates()) for (name, member) in '?' if name != member.name]
+    ? = [(<listcomp>)(duplicates()) for (name, member) in '?' if name != member.name]
     return enumeration
 
 def _dataclass_repr(self):
-    return (dcf[k].repr for k in .0)
+    return (dcf[k].repr for k in dcf.keys()())
 
 def global_enum_repr(self):
     """
@@ -1175,7 +1175,7 @@ class verify:
                     duplicates = []
                     enumeration.__members__.items()
                 elif check is CONTINUOUS:
-                    values = (None for e in .0)
+                    values = (None for e in enumeration())
                     if len(values) < 2:
                         pass
                     else:
@@ -1188,7 +1188,7 @@ class verify:
                             range(low + 1, high)
                 elif check is NAMED_FLAGS:
                     ? = [missing_names for (name, alias) in enumeration if name in member_names]
-                ? = [<listcomp>(duplicates()) for (name, member) in '?' if name != member.name]
+                ? = [(<listcomp>)(duplicates()) for (name, member) in '?' if name != member.name]
                 if len(missing_names) == 1:
                     alias = 'alias %s is missing' % missing_names[0]
                 else:
@@ -1252,7 +1252,7 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
     else:
         source = module_globals
         members = source.items()()
-        <listcomp>
+        (<listcomp>)
         try:
             members.sort(key=lambda t: (t[1], t[0]))
         else:

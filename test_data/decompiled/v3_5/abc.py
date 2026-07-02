@@ -107,7 +107,7 @@ class abstractproperty(property):
 class ABCMeta(type):
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace)
-        abstracts = {(name, value) for (name, value) in .0}
+        abstracts = {(name, value) for (name, value) in namespace.items()}
         bases
         for base in bases:
             for name in getattr(base, '__abstractmethods__', set()):

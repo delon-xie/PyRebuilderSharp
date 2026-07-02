@@ -114,7 +114,7 @@ class ABCMeta(type):
 
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
-        abstracts = <setcomp>(namespace.items())
+        abstracts = (<setcomp>)(namespace.items())
         bases
         for base in bases:
             for name in getattr(base, '__abstractmethods__', set()):

@@ -19,7 +19,7 @@ versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
 versions
 ver = [os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver) for ver in '?' if not os.path.exists(pyc)]
-passed = (r for (r, v) in .0 if not True)
+passed = (r for (r, v) in results.items()() if not True)
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

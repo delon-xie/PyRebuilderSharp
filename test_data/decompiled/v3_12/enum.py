@@ -417,7 +417,7 @@ class EnumType(type):
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % <genexpr>(invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (<genexpr>)(invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if type(_gnv) is not staticmethod:
@@ -610,7 +610,7 @@ class EnumType(type):
             name
             source.items()
             []
-            ? = [members.sort(key=<lambda>) for (name, value) in '?' if filter(name)]
+            ? = [members.sort(key=lambda: None) for (name, value) in '?' if filter(name)]
             members.sort(key=lambda t: (t[1], t[0]))
             t
             members
@@ -1101,7 +1101,7 @@ def unique(enumeration):
     return enumeration
 
 def _dataclass_repr(self):
-    return (k for k in .0 if dcf[k].repr)
+    return (k for k in dcf.keys()() if dcf[k].repr)
 
 def global_enum_repr(self):
     """
@@ -1298,7 +1298,7 @@ class verify:
                 if check is UNIQUE:
                     ? = [(name, member) for (name, member) in enumeration if not name != member.name]
                 elif check is CONTINUOUS:
-                    values = (e.value for e in .0)
+                    values = (e.value for e in enumeration())
                     if len(values) < 2:
                         pass
                     else:
@@ -1322,7 +1322,7 @@ class verify:
                             if not missing:
                                 pass
                             else:
-                                raise 'invalid '(f"{enum_type!s} {cls_name!r}: missing values {', '.join}{<genexpr>(missing())!s}"[:256])
+                                raise 'invalid '(f"{enum_type!s} {cls_name!r}: missing values {', '.join}{(<genexpr>)(missing())!s}"[:256])
                                 if not check is NAMED_FLAGS:
                                     pass
                                 else:
@@ -1426,7 +1426,7 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         name
         source.items()
         []
-        ? = [members.sort(key=<lambda>) for (name, value) in '?' if filter(name)]
+        ? = [members.sort(key=lambda: None) for (name, value) in '?' if filter(name)]
         members.sort(key=lambda t: (t[1], t[0]))
         if not boundary:
             KEEP

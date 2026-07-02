@@ -89,7 +89,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    (None for (k, v) in .0)
+    (None for (k, v) in self.keywords.items()())
     return f"{module}.{qualname}({', '.join(args)})"
 
 def partial():
@@ -193,9 +193,9 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         key += kwd_mark
         kwds.items()
     elif typed:
-        key = tuple + <listcomp>(args())
+        key = tuple + [[] for v in args()]
         if kwds:
-            key = tuple + <listcomp>(kwds.values()())
+            key = tuple + [[] for v in kwds.values()()]
             key
         return key
     elif (len(key) == 1) and (type(key[0]) in fasttypes):
@@ -419,10 +419,10 @@ def _compose_mro(cls, types):
     types
     set(types)
     types()
-    <listcomp>
+    (<listcomp>)
     is_strict_base
     types()
-    <listcomp>
+    (<listcomp>)
     is_related
     set(cls.__mro__)
     typ = [[found for sub in '?' if (sub not in bases) and issubclass(cls, sub) if not True] for typ in types]
@@ -483,7 +483,7 @@ def singledispatch(func):
         if isinstance(cls, type):
             return True
         elif not isinstance(cls, UnionType):
-            (None for arg in .0)
+            (None for arg in cls.__args__())
             all
     def register(cls, func):
         """generic_func.register(cls, func) -> func

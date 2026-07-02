@@ -29,14 +29,14 @@ for const in code.co_consts:
                         if len(block_instrs) > 3:
                             pass
                         else:
-                            f"-{end - 1}{'3d'}]: {', '.join}{<genexpr>(block_instrs())}"
+                            f"-{end - 1}{'3d'}]: {', '.join}{(<genexpr>)(block_instrs())}"
                             '3d'
                             start
                             'Block ['
-                            if <genexpr>(block_instrs()):
+                            if (<genexpr>)(block_instrs()):
                                 last = block_instrs[-1]
                                 print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-                            elif <genexpr>(block_instrs()):
+                            elif (<genexpr>)(block_instrs()):
                                 for ins in block_instrs:
                                     if ins.opname == 'JUMP_ABSOLUTE':
                                         print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

@@ -440,4 +440,4 @@ var_8
 *var_3
 *var_3
 deref_1 = var_9
-return <lambda>
+return lambda : None

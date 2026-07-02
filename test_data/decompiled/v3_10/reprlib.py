@@ -73,7 +73,7 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        pieces = [elem for elem in .0]
+        pieces = [elem for elem in islice(x, maxiter)]
         if n > maxiter:
             pieces.append(self.fillvalue)
         s = self._join(pieces, level)
@@ -83,7 +83,7 @@ class Repr:
             return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
-        pieces = [elem for elem in .0]
+        pieces = [elem for elem in islice(x, maxiter)]
         if n > maxiter:
             pass
         s = self._join(pieces, level)

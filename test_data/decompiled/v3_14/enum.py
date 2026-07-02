@@ -2552,4 +2552,4 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
 *var_1
 *var_1
 var_2
-return <lambda>
+return lambda : None

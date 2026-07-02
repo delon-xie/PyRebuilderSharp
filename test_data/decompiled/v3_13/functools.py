@@ -286,7 +286,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    (f"{k}={v}" for (v, k) in .0)
+    (f"{k}={v}" for (v, k) in self.keywords.items()())
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -715,7 +715,7 @@ def singledispatch(func):
         if isinstance(cls, type):
             return True
         if isinstance(cls, UnionType):
-            (isinstance(arg, type) for arg in .0)
+            (isinstance(arg, type) for arg in cls.__args__())
             all
     def register(cls, func = None):
         """generic_func.register(cls, func) -> func

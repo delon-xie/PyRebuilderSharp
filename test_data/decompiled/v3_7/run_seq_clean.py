@@ -45,7 +45,7 @@ for ver in versions:
                     print('           actual=  %s' % a)
     except Exception:
         pass
-passed = sum(((v, r) for (v, r) in .0 if r))
+passed = sum(((v, r) for (v, r) in results.items() if r))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

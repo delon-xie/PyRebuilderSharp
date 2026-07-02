@@ -13,7 +13,7 @@ print('============================================================')
 success_count = 0
 fail_count = 0
 sorted(py_files)
-<listcomp>
+(<listcomp>)
 for py_file in sorted(py_files):
     input_path = os.path.join(input_dir, py_file)
     base_name = os.path.splitext(py_file)[0]

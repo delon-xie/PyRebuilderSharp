@@ -21,7 +21,7 @@ results = {}
 versions
 ver = [os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc") for ver in '?' if not os.path.exists(pyc)]
 print(f"\n========================================")
-passed = (r for (r, v) in .0 if not True)
+passed = (r for (r, v) in results.items()() if not True)
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}.0f%)")
 if not True:
