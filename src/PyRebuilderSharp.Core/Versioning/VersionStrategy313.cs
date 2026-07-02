@@ -129,7 +129,7 @@ public class VersionStrategy313 : VersionStrategyBase
             91 => Models.Bytecode.Opcode.LOAD_GLOBAL,        // enum=116
             92 => Models.Bytecode.Opcode.LOAD_NAME,          // enum=101
             93 => Models.Bytecode.Opcode.LOAD_SUPER_ATTR,    // enum=141
-            94 => Models.Bytecode.Opcode.MAKE_CELL_313,      // 3.13+ (was 135 in 3.11)
+            94 => Models.Bytecode.Opcode.LOAD_SMALL_INT_314,       // LOAD_SMALL_INT (3.13+)
             95 => Models.Bytecode.Opcode.MAP_ADD_313,
             96 => Models.Bytecode.Opcode.MATCH_CLASS_313,    // -> MATCH_CLASS_312=183
             97 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,  // enum=114
@@ -144,7 +144,7 @@ public class VersionStrategy313 : VersionStrategyBase
             106 => Models.Bytecode.Opcode.SET_FUNCTION_ATTRIBUTE_313, // 3.13+ new
             107 => Models.Bytecode.Opcode.SET_UPDATE,        // enum=163
             108 => Models.Bytecode.Opcode.STORE_ATTR,        // enum=95
-            109 => Models.Bytecode.Opcode.STORE_DEREF,       // enum=138
+            109 => Models.Bytecode.Opcode.STORE_DEREF,       // enum=196
             110 => Models.Bytecode.Opcode.STORE_FAST,        // enum=125
             111 => Models.Bytecode.Opcode.STORE_FAST_LOAD_FAST_313, // 3.13+ new
             112 => Models.Bytecode.Opcode.STORE_FAST_STORE_FAST_313, // 3.13+ new

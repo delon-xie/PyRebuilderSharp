@@ -102,6 +102,41 @@ public class StackMachine
                 _exprStack.Push(new Constant(value));
                 return null;
 
+            // ---- 3.11+ 新操作码 ----
+            case Opcode.DELETE_DEREF:
+            {
+                var derefName = GetDerefVarname(instr);
+                return new Delete(new List<Expr> { new Name(derefName, ExpressionContext.Del) });
+            }
+
+            // ---- 3.12+ 新操作码 ----
+            case Opcode.SET_UPDATE:
+            {
+                // SET_UPDATE n: 在 Python 3.13+ 中，将栈顶 n 个元素作为集合的初始元素
+                // 栈布局：[item1, item2, ..., itemN] -> [set]
+                // 创建一个包含这些元素的新集合
+                var n = instr.Argument ?? 0;
+                var items = new List<Expr>();
+                for (int i = 0; i < n; i++)
+                {
+                    var item = SafePop();
+                    if (item != null)
+                        items.Insert(0, item);
+                }
+                
+                _exprStack.Push(new SetLiteral(items));
+                return null;
+            }
+
+            case Opcode.LOAD_FROM_DICT_OR_GLOBALS:
+                // LOAD_FROM_DICT_OR_GLOBALS: 从全局变量或内置名称加载
+                // 语义等价于 LOAD_GLOBAL，arg 是名称索引
+                var lfdgName = _code.Names.Count > (instr.Argument ?? 0) 
+                    ? _code.Names[instr.Argument ?? 0] 
+                    : $"name_{instr.Argument}";
+                _exprStack.Push(new Name(lfdgName, ExpressionContext.Load));
+                return null;
+
             // ---- 3.14 新操作码 ----
             case Opcode.LOAD_SMALL_INT_314:
                 // LOAD_SMALL_INT: arg 本身就是小整数值（0-255）
@@ -167,6 +202,23 @@ public class StackMachine
                 // NOT_TAKEN: JIT 提示标记，无栈效果
                 return null;
 
+            case Opcode.STORE_FAST_LOAD_FAST_313:
+            {
+                // STORE_FAST_LOAD_FAST: 3.13+ 超级指令
+                // 先存储 TOS 到第一个局部变量，再加载第二个局部变量到栈
+                // CPython wordcode: arg 高 4 位 = 存储索引，低 4 位 = 加载索引
+                var sflfArg = instr.Argument ?? 0;
+                int storeIdx = sflfArg >> 4;
+                int loadIdx = sflfArg & 0x0F;
+                var sflfStoreName = storeIdx < _code.Varnames.Count ? _code.Varnames[storeIdx] : $"v_{storeIdx}";
+                var sflfLoadName = loadIdx < _code.Varnames.Count ? _code.Varnames[loadIdx] : $"v_{loadIdx}";
+                var sflfVal = SafePop();
+                if (sflfVal == null) return null;
+                // 先压入要加载的变量（栈操作顺序）
+                _exprStack.Push(new Name(sflfLoadName, ExpressionContext.Load));
+                return new Assign(new List<Expr> { new Name(sflfStoreName, ExpressionContext.Store) }, sflfVal);
+            }
+
             case Opcode.BUILD_INTERPOLATION_314:
                 // BUILD_INTERPOLATION: f-string 插值构建
                 // 当前不构建具体的 f-string AST，后续可扩展
@@ -202,42 +254,7 @@ public class StackMachine
 
             case Opcode.LOAD_DEREF:
             {
-                var idx = instr.Argument ?? 0;
-                string cellName;
-                // 3.11+ localsplus layout: [varnames | cellvars | freevars]
-                // Pre-3.11 layout:        [cellvars | freevars]
-                // LOAD_DEREF arg follows localsplus index (3.11+)
-                // or cellvars→freevars (pre-3.11).
-                // ref: CPython Python/ceval.c LOAD_DEREF
-                if (_code.Version >= PythonVersion.Py311)
-                {
-                    if (idx < _code.Varnames.Count)
-                        cellName = _code.Varnames[idx];
-                    else
-                    {
-                        idx -= _code.Varnames.Count;
-                        if (idx < _code.Cellvars.Count)
-                            cellName = _code.Cellvars[idx];
-                        else
-                        {
-                            idx -= _code.Cellvars.Count;
-                            if (idx < _code.Freevars.Count)
-                                cellName = _code.Freevars[idx];
-                            else
-                                cellName = $"cell_{instr.Argument}";
-                        }
-                    }
-                }
-                else
-                {
-                    // Pre-3.11: [cellvars | freevars]
-                    if (idx < _code.Cellvars.Count)
-                        cellName = _code.Cellvars[idx];
-                    else if (idx - _code.Cellvars.Count < _code.Freevars.Count)
-                        cellName = _code.Freevars[idx - _code.Cellvars.Count];
-                    else
-                        cellName = $"cell_{idx}";
-                }
+                var cellName = GetDerefVarname(instr);
                 _exprStack.Push(new Name(cellName, ExpressionContext.Load));
                 return null;
             }
@@ -254,6 +271,14 @@ public class StackMachine
                     _exprStack.Push(new NamedExpr(new Name(storeName, ExpressionContext.Store), val));
                     return null;
                 }
+                return new Assign(new List<Expr> { new Name(storeName, ExpressionContext.Store) }, val);
+            }
+
+            case Opcode.STORE_DEREF:
+            {
+                var storeName = GetDerefVarname(instr);
+                var val = SafePop();
+                if (val == null) return null;
                 return new Assign(new List<Expr> { new Name(storeName, ExpressionContext.Store) }, val);
             }
 
@@ -952,12 +977,8 @@ public class StackMachine
 
             // ---- 3.11+ COPY: duplicate TOS[n] ----
             case Opcode.COPY:
-            case Opcode.COPY_FREE_VARS_313:
             {
                 var depth = instr.Argument ?? 0;
-                // COPY n: duplicate the element n positions below TOS
-                // In Python 3.12, COPY n copies stack[-1-n]. For walrus := pattern,
-                // COPY 1 is used with only 1 element on stack — copy TOS.
                 if (depth == 0 || depth > _exprStack.Count)
                 {
                     var top = SafePeek();
@@ -966,8 +987,6 @@ public class StackMachine
                 }
                 else
                 {
-                    // COPY n: push stack[-n], where stack[-1]=TOS.
-                    // In reversed array: TOS is at lastIdx, TOS1 at lastIdx-1.
                     var arr = _exprStack.ToArray();
                     Array.Reverse(arr);
                     int lastIdx = arr.Length - 1;
@@ -976,6 +995,27 @@ public class StackMachine
                         _exprStack.Push(arr[idx]);
                     _pendingCopyDepth = (int)depth;
                 }
+                return null;
+            }
+
+            // ---- 3.13+ COPY_FREE_VARS: push freevar cell references ----
+            case Opcode.COPY_FREE_VARS_313:
+            {
+                int nfree = instr.Argument ?? 0;
+                if (_code.Freevars != null)
+                {
+                    int count = Math.Min(nfree, _code.Freevars.Count);
+                    for (int i = 0; i < count; i++)
+                        _exprStack.Push(new Name(_code.Freevars[i], ExpressionContext.Load));
+                    for (int i = count; i < nfree; i++)
+                        _exprStack.Push(new Name($".freevar_{i}", ExpressionContext.Load));
+                }
+                return null;
+            }
+
+            // ---- 3.13+ MAKE_CELL: wrap TOS in a cell for closure ----
+            case Opcode.MAKE_CELL_313:
+            {
                 return null;
             }
 
@@ -1680,7 +1720,18 @@ public class StackMachine
             {
                 int sfaFlags = instr.Argument ?? 0;
                 var funcExpr = SafePop();
-                if (funcExpr is not FunctionRef funcRef) return null;
+                FunctionRef? funcRef = null;
+                
+                if (funcExpr is FunctionRef fr)
+                {
+                    funcRef = fr;
+                }
+                else if (funcExpr is Constant c && c.Value is CodeObject co)
+                {
+                    funcRef = new FunctionRef(co, co.Name ?? "<lambda>");
+                }
+                
+                if (funcRef == null) return null;
 
                 if ((sfaFlags & 0x08) != 0) _ = SafePop(); // closure — skip
                 if ((sfaFlags & 0x04) != 0) _ = SafePop(); // annotations — skip
@@ -1771,9 +1822,18 @@ public class StackMachine
             // 3.13+ CALL_INTRINSIC_1: intrinsic function call type 1
             case Opcode.CALL_INTRINSIC_1_313:
             {
+                // arg 0 = INTRINSIC_EMPTY_SET: 创建空集合
                 // arg 6 = INTRINSIC_LIST_TO_TUPLE: converts list to tuple for *args
                 // Other intrinsics are no-ops for decompilation.
-                if (instr.Argument == 6) // INTRINSIC_LIST_TO_TUPLE
+                if (instr.Argument == 0) // INTRINSIC_EMPTY_SET
+                {
+                    _exprStack.Push(new Call(
+                        new Name("set", ExpressionContext.Load),
+                        new List<Expr>(),
+                        new List<Keyword>()
+                    ));
+                }
+                else if (instr.Argument == 6) // INTRINSIC_LIST_TO_TUPLE
                 {
                     var listExpr = SafePop();
                     if (listExpr is ListLiteral listLit && listLit.Kind == ContainerKind.List)
@@ -1856,16 +1916,94 @@ public class StackMachine
     private string GetVarname(Instruction instr)
     {
         var idx = instr.Argument ?? 0;
+        if (_code.Version >= PythonVersion.Py311)
+        {
+            // Python 3.11+ localsplus layout: [varnames | cellvars | freevars]
+            // 但对于某些指令（如 LOAD_FAST_AND_CLEAR），索引直接对应各自的数组
+            // 需要根据具体指令类型来判断
+            if (idx < _code.Varnames.Count)
+            {
+                var name = _code.Varnames[idx];
+                if (!string.IsNullOrEmpty(name)) return name;
+            }
+            else
+            {
+                idx -= _code.Varnames.Count;
+                if (idx < _code.Cellvars.Count)
+                {
+                    var name = _code.Cellvars[idx];
+                    if (!string.IsNullOrEmpty(name)) return name;
+                }
+                else
+                {
+                    idx -= _code.Cellvars.Count;
+                    if (idx < _code.Freevars.Count)
+                    {
+                        var name = _code.Freevars[idx];
+                        if (!string.IsNullOrEmpty(name)) return name;
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Pre-3.11: only varnames
+            if (idx < _code.Varnames.Count)
+            {
+                var name = _code.Varnames[idx];
+                if (!string.IsNullOrEmpty(name)) return name;
+            }
+        }
+        return $"var_{idx}";
+    }
+
+    private string GetDerefVarname(Instruction instr)
+    {
+        var idx = instr.Argument ?? 0;
+        // Python 3.11+ localsplus 布局：varnames 和 cellvars 可能重叠
+        // 如果变量同时在 varnames 和 cellvars 中，只占用一个槽
+        // 布局：[varnames + (cellvars - overlapping_with_varnames) | freevars]
+        
         if (idx < _code.Varnames.Count)
         {
             var name = _code.Varnames[idx];
             if (!string.IsNullOrEmpty(name)) return name;
         }
-        foreach (var child in _code.ChildCodes)
+        else
         {
-            if (idx < child.Varnames.Count && !string.IsNullOrEmpty(child.Varnames[idx]))
-                return child.Varnames[idx];
+            idx -= _code.Varnames.Count;
+            // 计算 cellvars 中不与 varnames 重叠的部分
+            int nonOverlappingCellCount = 0;
+            foreach (var cellName in _code.Cellvars)
+            {
+                if (!_code.Varnames.Contains(cellName))
+                    nonOverlappingCellCount++;
+            }
+            
+            if (idx < nonOverlappingCellCount)
+            {
+                // 找到第 idx 个不重叠的 cellvar
+                int count = 0;
+                foreach (var cellName in _code.Cellvars)
+                {
+                    if (!_code.Varnames.Contains(cellName))
+                    {
+                        if (count == idx)
+                            return cellName;
+                        count++;
+                    }
+                }
+            }
+            else
+            {
+                idx -= nonOverlappingCellCount;
+                if (idx < _code.Freevars.Count)
+                {
+                    var name = _code.Freevars[idx];
+                    if (!string.IsNullOrEmpty(name)) return name;
+                }
+            }
         }
-        return $"var_{idx}";
+        return $"deref_{instr.Argument ?? 0}";
     }
 }

@@ -209,7 +209,7 @@ public enum Opcode
     MAKE_CELL = 135,         // 3.11+: make cell
     LOAD_CLOSURE = 136,      // 3.11+: load closure cell
     LOAD_DEREF = 137,        // 3.11+: load deref cell
-    STORE_DEREF = 138,       // 3.11+: store to deref cell
+    STORE_DEREF = 196,       // 3.11+: store to deref cell (was 138, moved to avoid conflict with PUSH_EXC_INFO)
     DELETE_DEREF = 139,      // 3.11+: delete deref cell
 
     LOAD_SUPER_ATTR = 141,   // 3.11+: super attribute

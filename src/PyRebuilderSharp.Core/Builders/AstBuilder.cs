@@ -1441,11 +1441,28 @@ public class AstBuilder
 
         // 3.11+ for 循环体有隐式 ET 条目（清理/异常安全），
         // 应跳过 try/except 检测 — for 循环已有独立块处理。
-        bool isForLoopBody = _codeObject.Instructions
-            .Any(i => i.Opcode == Opcode.FOR_ITER && i.Argument.HasValue
-                && i.Argument.Value == matchingEntry.StartOffset);
+        bool isForLoopBody = false;
+        
+        // 方法1：检查 ET 条目覆盖的范围内是否包含 FOR_ITER 指令
+        var forIterInRange = _codeObject.Instructions
+            .Where(i => i.Opcode == Opcode.FOR_ITER
+                && i.Offset >= matchingEntry.StartOffset
+                && i.Offset < matchingEntry.EndOffset);
+        if (forIterInRange.Any())
+        {
+            isForLoopBody = true;
+        }
+        
+        // 方法2：检查目标块是否包含 RERAISE 指令（for 循环清理条目的特征）
+        var forLoopHandlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
+        if (!isForLoopBody && forLoopHandlerBlock != null)
+        {
+            isForLoopBody = forLoopHandlerBlock.Instructions.Any(i => i.Opcode == Opcode.RERAISE);
+        }
+        
         if (isForLoopBody)
         {
+            Console.Error.WriteLine($"[TRY_FROM_ET] SKIP: for loop body ET entry");
             return null;
         }
 
@@ -4988,6 +5005,36 @@ public class AstBuilder
             }
             result.Add(stmt);
         }
+
+        // Python 3.13/3.14: 内层函数可能没有 MAKE_FUNCTION 或 LOAD_CONST→STORE_NAME 指令
+        // 而是直接通过 LOAD_FAST_AND_CLEAR 访问。这种情况下，需要在函数体开头添加
+        // 函数定义，因为 wrapper 的 code object 存在于 co_consts 中。
+        var remainingChildCodes = new List<CodeObject>();
+        for (int i = childIdx; i < childCodes.Count; i++)
+        {
+            var cc = childCodes[i];
+            if (!existingDefNames.Contains(cc.Name ?? "") && !localSeen.Contains(cc.Name ?? ""))
+            {
+                remainingChildCodes.Add(cc);
+            }
+        }
+
+        if (remainingChildCodes.Count > 0)
+        {
+            var newResult = new List<Stmt>();
+            foreach (var cc in remainingChildCodes)
+            {
+                var funcDef = BuildFunctionDef(cc.Name ?? "<lambda>", new FunctionRef(cc, cc.Name ?? "<lambda>"));
+                if (funcDef != null)
+                {
+                    newResult.Add(funcDef);
+                    localSeen.Add(funcDef.Name);
+                }
+            }
+            newResult.AddRange(result);
+            return newResult;
+        }
+
         return result;
     }
 

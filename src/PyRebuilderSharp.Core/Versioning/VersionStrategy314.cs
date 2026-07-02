@@ -152,7 +152,7 @@ public class VersionStrategy314 : VersionStrategyBase
             108 => Models.Bytecode.Opcode.SET_FUNCTION_ATTRIBUTE_313, // (enum=220)
             109 => Models.Bytecode.Opcode.SET_UPDATE,         // SET_UPDATE (enum=163)
             110 => Models.Bytecode.Opcode.STORE_ATTR,         // (enum=95)
-            111 => Models.Bytecode.Opcode.STORE_DEREF,        // (enum=138)
+            111 => Models.Bytecode.Opcode.STORE_DEREF,        // (enum=196)
             112 => Models.Bytecode.Opcode.STORE_FAST,         // (enum=125)
             113 => Models.Bytecode.Opcode.STORE_FAST_LOAD_FAST_313, // (enum=221)
             114 => Models.Bytecode.Opcode.STORE_FAST_STORE_FAST_313, // (enum=222)
