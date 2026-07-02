@@ -41,15 +41,6 @@ def _safe_key():
         except:
             yield self
     var_5
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
     *var_4
     *var_4
     *var_4
@@ -57,13 +48,17 @@ def _safe_key():
     *var_4
     *var_4
     *var_4
-    ***{var_1}
-    ***{var_1}
-    ***{var_1}
-    ***{var_1}
-    ***{var_1}
-    ***{var_1}
-    ***{var_1}
+    *var_4
+    *var_4
+    var_4
+    var_4
+    var_4
+    var_4
+    var_4
+    var_4
+    var_4
+    **{var_1}
+    **{var_1}
     **{var_1}
     **{var_1}
     **{var_1}
@@ -73,13 +68,18 @@ def _safe_key():
     *{var_1}
     *{var_1}
     *{var_1}
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    **__classdict__
+    *{var_1}
+    {var_1}
+    {var_1}
+    {var_1}
+    {var_1}
+    var_0
+    var_0
+    var_0
+    var_0
     *__classdict__
-    *super().__name__
+    __classdict__
+    super().__name__
 
 def _safe_tuple(t):
     """Helper function for comparing 2-tuples"""
@@ -557,12 +557,12 @@ def _wrap_bytes_repr(object, width, allowance):
     import name_88 as name_5
     name_7 = []
     range = []
-*var_1
-*var_1
-*var_1
-*var_1
-*var_1
-*var_1
+var_1
+var_1
+var_1
+var_1
+var_1
+var_1
 deref_2 = slice(var_8, var_9, var_5)
 deref_1 = var_7
 deref_2 = slice(var_8, var_9, var_5)

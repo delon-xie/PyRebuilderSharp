@@ -793,7 +793,9 @@ public class StackMachine
                 
                 if (hasKwargs && kwargsExpr != null)
                 {
-                    keywords.Add(new Keyword(null, kwargsExpr));
+                    // If kwargs was wrapped in Starred by DICT_MERGE, unwrap it
+                    var kwValue = kwargsExpr is Starred starred ? starred.Value : kwargsExpr;
+                    keywords.Add(new Keyword(null, kwValue));
                 }
                 
                 var call = new Call(func, args, keywords);
@@ -1262,7 +1264,7 @@ public class StackMachine
                 var source = SafePop(); // kwargs dict
                 SafePop(); // empty dict from BUILD_MAP
                 if (source != null)
-                    _exprStack.Push(source);
+                    _exprStack.Push(new Starred(source, ExpressionContext.Load, IsKwArgs: true));
                 return null;
             }
 

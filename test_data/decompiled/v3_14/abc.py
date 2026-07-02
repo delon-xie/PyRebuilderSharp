@@ -34,42 +34,42 @@ def abstractclassmethod():
         __class__
     super().__name__
     deref_8 = *var_0
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    **var_2
-    **var_2
-    **var_2
-    **var_2
-    **var_2
-    **var_2
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
     *var_2
     *var_2
     *var_2
     *var_2
     *var_2
     *var_2
-    **var_0
-    **var_0
-    **var_0
-    **var_0
-    **var_0
-    **var_0
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
     *var_0
     *var_0
     *var_0
-    *__classdict__
-    *__classdict__
-    *__classdict__
-    *__classdict__
-    **__class__
+    *var_0
+    *var_0
+    *var_0
+    var_0
+    var_0
+    var_0
+    __classdict__
+    __classdict__
+    __classdict__
+    __classdict__
     *__class__
+    __class__
     super().__name__
 
 def abstractstaticmethod():
@@ -86,42 +86,42 @@ def abstractstaticmethod():
         __class__
     super().__name__
     deref_8 = *var_0
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    **var_2
-    **var_2
-    **var_2
-    **var_2
-    **var_2
-    **var_2
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
     *var_2
     *var_2
     *var_2
     *var_2
     *var_2
     *var_2
-    **var_0
-    **var_0
-    **var_0
-    **var_0
-    **var_0
-    **var_0
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
     *var_0
     *var_0
     *var_0
-    *__classdict__
-    *__classdict__
-    *__classdict__
-    *__classdict__
-    **__class__
+    *var_0
+    *var_0
+    *var_0
+    var_0
+    var_0
+    var_0
+    __classdict__
+    __classdict__
+    __classdict__
+    __classdict__
     *__class__
+    __class__
     super().__name__
 
 def abstractproperty():
@@ -137,42 +137,42 @@ def abstractproperty():
     super().__name__
     deref_8 = var_3
     __classdict__ = *var_0
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    **var_2
-    **var_2
-    **var_2
-    **var_2
-    **var_2
-    **var_2
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
     *var_2
     *var_2
     *var_2
     *var_2
     *var_2
     *var_2
-    **var_0
-    **var_0
-    **var_0
-    **var_0
-    **var_0
-    **var_0
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
     *var_0
     *var_0
     *var_0
-    *__classdict__
-    *__classdict__
-    *__classdict__
-    *__classdict__
-    **__class__
+    *var_0
+    *var_0
+    *var_0
+    var_0
+    var_0
+    var_0
+    __classdict__
+    __classdict__
+    __classdict__
+    __classdict__
     *__class__
+    __class__
     super().__name__
 
 def ABCMeta():
@@ -208,31 +208,20 @@ def ABCMeta():
     super().__name__
     deref_8 = *__classdict__
     __classdict__ = var_8
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    *__module__
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
+    __module__
     *var_7
     *var_7
     *var_7
@@ -244,17 +233,17 @@ def ABCMeta():
     *var_7
     *var_7
     *var_7
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
-    ********__classdict__
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
     *******__classdict__
     *******__classdict__
     *******__classdict__
@@ -264,6 +253,9 @@ def ABCMeta():
     *******__classdict__
     *******__classdict__
     *******__classdict__
+    *******__classdict__
+    *******__classdict__
+    ******__classdict__
     ******__classdict__
     ******__classdict__
     ******__classdict__
@@ -279,6 +271,8 @@ def ABCMeta():
     *****__classdict__
     *****__classdict__
     *****__classdict__
+    *****__classdict__
+    ****__classdict__
     ****__classdict__
     ****__classdict__
     ****__classdict__
@@ -290,14 +284,20 @@ def ABCMeta():
     ***__classdict__
     ***__classdict__
     ***__classdict__
+    ***__classdict__
+    **__classdict__
     **__classdict__
     **__classdict__
     **__classdict__
     **__classdict__
     *__classdict__
     *__classdict__
-    **__class__
+    *__classdict__
+    *__classdict__
+    __classdict__
+    __classdict__
     *__class__
+    __class__
     super().__name__
 
 def update_abstractmethods(cls):
@@ -325,24 +325,24 @@ def update_abstractmethods(cls):
 def ABC():
     """ABC"""
     var_3
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    **var_0
-    **var_0
-    **var_0
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_1
+    var_1
+    var_1
+    var_1
     *var_0
-    *super().__name__
+    *var_0
+    *var_0
+    var_0
+    super().__name__
 return lambda : None

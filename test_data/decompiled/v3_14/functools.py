@@ -156,19 +156,6 @@ def cmp_to_key(mycmp):
         deref_8 = *****{mycmp}
         deref_8 = ******{mycmp}
         var_7
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
-        **var_8
         *var_8
         *var_8
         *var_8
@@ -180,27 +167,30 @@ def cmp_to_key(mycmp):
         *var_8
         *var_8
         *var_8
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *var_7
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
-        *******{mycmp}
+        *var_8
+        *var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_8
+        var_7
+        var_7
+        var_7
+        var_7
+        var_7
+        var_7
+        var_7
+        var_7
+        var_7
+        var_7
+        var_7
         ******{mycmp}
         ******{mycmp}
         ******{mycmp}
@@ -208,6 +198,10 @@ def cmp_to_key(mycmp):
         ******{mycmp}
         ******{mycmp}
         ******{mycmp}
+        ******{mycmp}
+        ******{mycmp}
+        ******{mycmp}
+        *****{mycmp}
         *****{mycmp}
         *****{mycmp}
         *****{mycmp}
@@ -219,6 +213,8 @@ def cmp_to_key(mycmp):
         ****{mycmp}
         ****{mycmp}
         ****{mycmp}
+        ****{mycmp}
+        ***{mycmp}
         ***{mycmp}
         ***{mycmp}
         ***{mycmp}
@@ -226,12 +222,16 @@ def cmp_to_key(mycmp):
         **{mycmp}
         **{mycmp}
         **{mycmp}
+        **{mycmp}
         *{mycmp}
         *{mycmp}
         *{mycmp}
-        **__classdict__
+        {mycmp}
+        {mycmp}
+        {mycmp}
         *__classdict__
-        *super().__name__
+        __classdict__
+        super().__name__
     return lambda : None
 
 def reduce(function, sequence, /, initial):
@@ -268,18 +268,6 @@ def _PlaceholderType():
         """Placeholder"""
         self
     var_2
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
     *var_7
     *var_7
     *var_7
@@ -290,16 +278,20 @@ def _PlaceholderType():
     *var_7
     *var_7
     *var_7
-    *****var_7
-    *****var_7
-    *****var_7
-    *****var_7
-    *****var_7
-    *****var_7
-    *****var_7
-    *****var_7
-    *****var_7
-    *****var_7
+    *var_7
+    *var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    ****var_7
+    ****var_7
     ****var_7
     ****var_7
     ****var_7
@@ -315,6 +307,8 @@ def _PlaceholderType():
     ***var_7
     ***var_7
     ***var_7
+    ***var_7
+    **var_7
     **var_7
     **var_7
     **var_7
@@ -326,19 +320,25 @@ def _PlaceholderType():
     *var_7
     *var_7
     *var_7
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_2
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_0
-    *__classdict__
-    *__classdict__
-    *super().__name__
+    *var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_2
+    var_2
+    var_2
+    var_2
+    var_2
+    var_1
+    var_1
+    var_1
+    var_1
+    var_0
+    __classdict__
+    __classdict__
+    super().__name__
 
 def _partial_prepare_merger(args):
     enumerate = __module__
@@ -769,18 +769,6 @@ def singledispatchmethod():
     deref_1 = var_9
     deref_1 = var_9
     var_3
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
-    **var_8
     *var_8
     *var_8
     *var_8
@@ -791,16 +779,18 @@ def singledispatchmethod():
     *var_8
     *var_8
     *var_8
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
-    ******var_1(****var_1, ****var_1).__qualname__
+    *var_8
+    *var_8
+    var_8
+    var_8
+    var_8
+    var_8
+    var_8
+    var_8
+    var_8
+    var_8
+    var_8
+    var_8
     *****var_1(****var_1, ****var_1).__qualname__
     *****var_1(****var_1, ****var_1).__qualname__
     *****var_1(****var_1, ****var_1).__qualname__
@@ -809,15 +799,21 @@ def singledispatchmethod():
     *****var_1(****var_1, ****var_1).__qualname__
     *****var_1(****var_1, ****var_1).__qualname__
     *****var_1(****var_1, ****var_1).__qualname__
-    ****var_1
-    ****var_1
-    ****var_1
-    ****var_1
+    *****var_1(****var_1, ****var_1).__qualname__
+    *****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
+    ****var_1(****var_1, ****var_1).__qualname__
     ***var_1
     ***var_1
     ***var_1
     ***var_1
-    ***var_1
+    **var_1
     **var_1
     **var_1
     **var_1
@@ -825,10 +821,14 @@ def singledispatchmethod():
     *var_1
     *var_1
     *var_1
-    *var_0
-    *__classdict__
-    *__classdict__
-    *super().__name__
+    *var_1
+    var_1
+    var_1
+    var_1
+    var_0
+    __classdict__
+    __classdict__
+    super().__name__
 
 def _singledispatchmethod_get():
     """_singledispatchmethod_get"""
@@ -893,18 +893,6 @@ def _singledispatchmethod_get():
         deref_2
         self
     var_8
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
     *var_7
     *var_7
     *var_7
@@ -915,31 +903,39 @@ def _singledispatchmethod_get():
     *var_7
     *var_7
     *var_7
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__
-    *****var_0
-    *****var_0
-    *****var_0
-    *****var_0
+    *var_7
+    *var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    var_7
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
+    *****var_0(*****var_0, *****var_0).__qualname__
+    *****var_0(*****var_0, *****var_0).__qualname__
+    *****var_0(*****var_0, *****var_0).__qualname__
+    *****var_0(*****var_0, *****var_0).__qualname__
+    *****var_0(*****var_0, *****var_0).__qualname__
+    *****var_0(*****var_0, *****var_0).__qualname__
     ****var_0
     ****var_0
     ****var_0
     ****var_0
-    ****var_0
+    ***var_0
     ***var_0
     ***var_0
     ***var_0
@@ -947,9 +943,13 @@ def _singledispatchmethod_get():
     **var_0
     **var_0
     **var_0
-    *__classdict__
-    *__classdict__
-    *super().__name__
+    **var_0
+    *var_0
+    *var_0
+    *var_0
+    __classdict__
+    __classdict__
+    super().__name__
 
 def cached_property():
     """cached_property"""
@@ -986,7 +986,7 @@ def cached_property():
     deref_1 = var_6
     return ****var_0(****var_0, ****var_0).__module__
 var_5
-*'partial'
+'partial'
 var_61
 {}
 None

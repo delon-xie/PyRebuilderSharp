@@ -35,26 +35,22 @@ def SyntaxWarningTest():
         return source
     deref_1 = var_6
     var_5
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
-    **var_4
     *var_4
     *var_4
     *var_4
     *var_4
     *var_4
     *var_4
-    ****var_0
-    ****var_0
-    ****var_0
-    ****var_0
-    ****var_0
-    ****var_0
+    *var_4
+    *var_4
+    var_4
+    var_4
+    var_4
+    var_4
+    var_4
+    var_4
+    ***var_0
+    ***var_0
     ***var_0
     ***var_0
     ***var_0
@@ -62,9 +58,13 @@ def SyntaxWarningTest():
     **var_0
     **var_0
     **var_0
-    *__classdict__
-    *__classdict__
-    *super().__name__
+    **var_0
+    *var_0
+    *var_0
+    *var_0
+    __classdict__
+    __classdict__
+    super().__name__
 
 def SyntaxErrorTestCase():
     """SyntaxErrorTestCase"""
@@ -943,21 +943,6 @@ def LazyImportRestrictionTestCase():
         var_0
         __module__
     var_12
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
-    **var_11
     *var_11
     *var_11
     *var_11
@@ -971,19 +956,21 @@ def LazyImportRestrictionTestCase():
     *var_11
     *var_11
     *var_11
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
-    **********var_1
+    *var_11
+    *var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
+    var_11
     *********var_1
     *********var_1
     *********var_1
@@ -995,6 +982,9 @@ def LazyImportRestrictionTestCase():
     *********var_1
     *********var_1
     *********var_1
+    *********var_1
+    *********var_1
+    ********var_1
     ********var_1
     ********var_1
     ********var_1
@@ -1014,6 +1004,8 @@ def LazyImportRestrictionTestCase():
     *******var_1
     *******var_1
     *******var_1
+    *******var_1
+    ******var_1
     ******var_1
     ******var_1
     ******var_1
@@ -1029,6 +1021,8 @@ def LazyImportRestrictionTestCase():
     *****var_1
     *****var_1
     *****var_1
+    *****var_1
+    ****var_1
     ****var_1
     ****var_1
     ****var_1
@@ -1040,6 +1034,8 @@ def LazyImportRestrictionTestCase():
     ***var_1
     ***var_1
     ***var_1
+    ***var_1
+    **var_1
     **var_1
     **var_1
     **var_1
@@ -1047,18 +1043,22 @@ def LazyImportRestrictionTestCase():
     *var_1
     *var_1
     *var_1
-    *var_0
-    *__classdict__
-    *__classdict__
-    *super().__name__
+    *var_1
+    var_1
+    var_1
+    var_1
+    var_0
+    __classdict__
+    __classdict__
+    super().__name__
 
 def load_tests(loader, tests, pattern):
     return deref_4
 var_1
-*var_1
-*var_1
-*var_1
-*var_1
-*var_1
-*var_1
+var_1
+var_1
+var_1
+var_1
+var_1
+var_1
 return lambda : None

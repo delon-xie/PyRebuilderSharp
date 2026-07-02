@@ -64,7 +64,11 @@ public class PythonCodeGenerator : ICodeGenerator
                 break;
             case ExprStmt e:
                 WriteIndent();
-                Visit(e.Value);
+                // 独立 Starred（*expr 或 **expr）是反编译错误，只输出内部值
+                if (e.Value is Starred starredExpr)
+                    Visit(starredExpr.Value);
+                else
+                    Visit(e.Value);
                 _output.AppendLine();
                 break;
             case Pass:

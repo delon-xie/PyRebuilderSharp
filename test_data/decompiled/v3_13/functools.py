@@ -284,8 +284,8 @@ def _partial_new(cls, func):
                         return self
                 else:
                     tot_args = args
-                    *_partial_prepare_merger(tot_args)
-                    *_partial_prepare_merger(tot_args)
+                    _partial_prepare_merger(tot_args)
+                    _partial_prepare_merger(tot_args)
         keywords.values()
     else:
         base_cls = partialmethod
