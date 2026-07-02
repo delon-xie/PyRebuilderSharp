@@ -8,14 +8,36 @@ test_groups = {}
 current_group = None
 output.split("""
 """)
-passed_groups = [line for line in '?' if line.startswith('***')]
+for line in output.split("""
+"""):
+    if line.startswith('***'):
+        parts = line.split(':')
+        if not len(parts) >= 2:
+            pass
+        else:
+            current_group = parts[0].strip().replace('*** ', '')
+            status = parts[1].strip()
+    elif not current_group:
+        pass
+    elif not line.strip().endswith('.3.10.pyc'):
+        pass
+    else:
+        test_groups[current_group]['files'].append(line.strip())
 print('============================================================')
 print('Python 3.10 版本测试报告')
 print('============================================================')
 passed_groups = []
 failed_groups = []
 test_groups.items()
-? = [(group, info) for (group, info) in '?' if not info['files']]
+for (group, info) in test_groups.items():
+    if not info['files']:
+        pass
+    elif 'PASS' in info['status']:
+        passed_groups.append(group)
+    elif not 'FAIL' in info['status']:
+        pass
+    else:
+        failed_groups.append(group)
 print(f"\n通过的测试组 ({len(passed_groups)}):")
 print('----------------------------------------')
 passed_groups

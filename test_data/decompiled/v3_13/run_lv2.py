@@ -13,7 +13,34 @@ None(None)
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 versions
-ver = [os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver) for ver in '?' if not os.path.exists(pyc)]
+for ver in versions:
+    pyc = os.path.join(COMPILED_DIR, 'test_control_flow.%s.pyc' % ver)
+    if not os.path.exists(pyc):
+        print('⏭ %s: no pyc' % ver)
+    else:
+        r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
+        actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
+        ok = expected_ast == actual_ast
+        if ok:
+            pass
+        else:
+            '❌'
+            if ok:
+                pass
+            else:
+                'MISMATCH'
+                if not ok:
+                    for i in enumerate(zip(expected_ast.split("""
+"""), actual_ast.split("""
+"""))):
+                        e != a
+                        if not True:
+                            pass
+                        else:
+                            try:
+                                print(f"  Line {i}: expected={e}\n           actual=  {a}")
+                            except Exception:
+                                pass
 if not True:
     pass
 raise

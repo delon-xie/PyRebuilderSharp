@@ -524,7 +524,10 @@ def _compose_mro(cls, types):
     (mro)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
-    typ = [[sub for sub in sub if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
+    for typ in types:
+        sub = [sub for sub in sub if (sub not in bases) and issubclass(cls, sub)]
+        if not found:
+            mro.append(typ)
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):

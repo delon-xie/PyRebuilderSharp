@@ -40,7 +40,13 @@ for const in code.co_consts:
                 ins
                 instrs
                 []
-                ins = [ins for ins in '?' if ins.offset <= start if not True]
+                for ins in []:
+                    if ins.offset <= start:
+                        pass
+                    else:
+                        raise
+                    if not True:
+                        pass
                 if len(block_instrs) > 3:
                     pass
                 else:

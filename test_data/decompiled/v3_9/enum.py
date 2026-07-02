@@ -848,7 +848,9 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items()
-    ? = [(name, member) for (name, member) in '?' if name != member.name]
+    for (name, member) in enumeration.__members__.items():
+        if name != member.name:
+            duplicates.append((name, member.name))
     if duplicates:
         alias_details = ', '.join([(alias, name) for (alias, name) in duplicates])
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))

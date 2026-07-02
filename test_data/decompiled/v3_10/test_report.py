@@ -26,7 +26,11 @@ print('============================================================')
 passed_groups = []
 failed_groups = []
 test_groups.items()
-? = [(group, info) for (group, info) in '?' if info['files'] and ('PASS' in info['status'])]
+for (group, info) in test_groups.items():
+    if info['files'] and ('PASS' in info['status']):
+        passed_groups.append(group)
+    elif 'FAIL' in info['status']:
+        failed_groups.append(group)
 print(f"\n通过的测试组 ({len(passed_groups)}):")
 print('----------------------------------------')
 passed_groups

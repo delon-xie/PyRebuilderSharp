@@ -683,7 +683,10 @@ class EnumType(type):
             elif isinstance(names, (tuple, list)):
                 if names:
                     if isinstance(names[0], str):
-                        ? = [names.append((name, value)) for (count, name) in original_names]
+                        for (count, name) in enumerate(original_names):
+                            value = first_enum._generate_next_value_(name, start, count, last_values[:])
+                            last_values.append(value)
+                            names.append((name, value))
                     elif names is None:
                         names = []
                 elif names is None:
@@ -700,7 +703,7 @@ class EnumType(type):
             source = source.__dict__
         else:
             source = module_globals
-            members = (<listcomp>)(source.items())
+            members = [_ for (name, value) in source.items()]
             try:
                 members.sort(key=lambda t: (t[1], t[0]))
             except TypeError:
@@ -1246,7 +1249,9 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items()
-    ? = [(name, member) for (name, member) in '?' if name != member.name]
+    for (name, member) in enumeration.__members__.items():
+        if name != member.name:
+            duplicates.append((name, member.name))
     if duplicates:
         alias_details = ', '.join([(alias, name) for (alias, name) in duplicates])
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
@@ -1546,7 +1551,9 @@ class verify:
                 checks
                 for check in checks:
                     if check is UNIQUE:
-                        ? = [(name, member) for (name, member) in '?' if name != member.name]
+                        for (name, member) in enumeration.__members__.items():
+                            if name != member.name:
+                                duplicates.append((name, member.name))
                     elif check is CONTINUOUS:
                         values = set((e for e in enumeration))
                         if len(values) < 2:
@@ -1568,7 +1575,17 @@ class verify:
                                 if missing:
                                     raise ValueError('invalid %s %r: missing values %s' % (enum_type, cls_name, ', '.join((<genexpr>)(missing)))[:256])
                     elif check is NAMED_FLAGS:
-                        ? = [(name, alias) for (name, alias) in enumeration if name in member_names]
+                        for (name, alias) in enumeration._member_map_.items():
+                            if name in member_names:
+                                pass
+                            elif alias.value < 0:
+                                pass
+                            else:
+                                values = list(_iter_bits_lsb(alias.value))
+                                missed = [[] for v in values]
+                                if missed:
+                                    for val in missed:
+                                        missing_value |= val
                     if duplicates:
                         alias_details = ', '.join([(alias, name) for (alias, name) in duplicates])
                         raise ValueError('aliases found in %r: %s' % (enumeration, alias_details))
@@ -1643,7 +1660,7 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
         source = source.__dict__
     else:
         source = module_globals
-        members = (<listcomp>)(source.items())
+        members = [_ for (name, value) in source.items()]
         try:
             members.sort(key=lambda t: (t[1], t[0]))
         except TypeError:

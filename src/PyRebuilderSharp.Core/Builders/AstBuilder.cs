@@ -968,9 +968,13 @@ public class AstBuilder
         
         var generators = new List<Comprehension>
         {
+            // Build restricted for-loop: get iter from header block instructions
             new Comprehension(target, ExtractIterExprRaw(header) ?? new Constant("?"), ifs)
         };
-        
+        // If iterable is '?' fallback, skip — let ConvertComprehensionCalls handle later
+        if (generators[0].Iter is Constant { Value: string sv } && sv == "?")
+            return null;
+
         Expr? compExpr = containerKind switch
         {
             "set" => new SetComp(elt, generators),
@@ -981,7 +985,10 @@ public class AstBuilder
         
         if (storeTarget != null)
             return new Assign(new List<Expr> { new Name(storeTarget, ExpressionContext.Store) }, compExpr);
-        string targetName = target is Name tn ? tn.Id : "?";
+        // If target name is not resolved, return null and let ConvertComprehensionCalls handle it later
+        if (target is not Name tn)
+            return null;
+        string targetName = tn.Id;
         return new Assign(new List<Expr> { new Name(targetName, ExpressionContext.Store) }, compExpr);
     }
 

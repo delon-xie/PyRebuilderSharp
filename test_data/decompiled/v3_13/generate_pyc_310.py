@@ -9,7 +9,12 @@ python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 f
 os.listdir(input_dir)
 []
-success_count = ['.py' for _ in '?' if not True]
+for _ in []:
+    '.py'
+    if not True:
+        pass
+    else:
+        raise
 print(f"找到 {len(py_files)} 个 Python 文件")
 print(f"使用 Python: {python310_path}")
 print('============================================================')

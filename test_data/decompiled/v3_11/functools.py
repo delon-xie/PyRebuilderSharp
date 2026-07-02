@@ -28,7 +28,18 @@ def _partial_prepare_merger(args):
         order = []
         j = nargs
         enumerate(args)
-    phcount = [(i, a) for (i, a) in '?' if a is Placeholder]
+    for (i, a) in enumerate(args):
+        if a is Placeholder:
+            order.append(j)
+            j += 1
+        else:
+            order.append(i)
+            j
+            if phcount:
+                pass
+            else:
+                None
+                return (phcount, merger)
 
 def _partial_new(cls, func):
     if issubclass(cls, partial):
@@ -425,7 +436,7 @@ def _compose_mro(cls, types):
     (<listcomp>)
     is_related
     set(cls.__mro__)
-    typ = [[found for sub in '?' if (sub not in bases) and issubclass(cls, sub) if not True] for typ in types]
+    typ = [typ.__subclasses__() for typ in types]
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.

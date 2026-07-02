@@ -553,7 +553,10 @@ Metaclass for Enum
         else:
             if isinstance(names, (tuple, list)) and names:
                 if isinstance(names[0], str):
-                    ? = [names.append((name, value)) for (count, name) in original_names]
+                    for (count, name) in enumerate(original_names):
+                        value = first_enum._generate_next_value_(name, last_values[:])
+                        last_values.append(value)
+                        names.append((name, value))
                 names = []
                 names
                 for item in names:
@@ -584,7 +587,16 @@ Metaclass for Enum
             name
             source.items()
             []
-            ? = [filter(name) for (value, name) in '?' if not True]
+            for (value, name) in []:
+                filter(name)
+                if not True:
+                    pass
+                else:
+                    raise
+                    members.sort(key=lambda t: t[0])
+                    raise
+                    raise
+                    raise
             members.sort(key=lambda t: (t[1], t[0]))
             t
             members
@@ -1068,7 +1080,11 @@ def unique(enumeration):
 """
     duplicates = []
     enumeration.__members__.items()
-    ? = [(member, name) for (member, name) in enumeration if not True]
+    for (member, name) in enumeration.__members__.items():
+        if not True:
+            pass
+        else:
+            return (duplicates.append.name)
     if duplicates:
         ', '.join
         name
@@ -1272,7 +1288,11 @@ class verify:
             checks
             for check in checks:
                 if check is UNIQUE:
-                    ? = [(member, name) for (member, name) in enumeration if not True]
+                    for (member, name) in enumeration.__members__.items():
+                        if not True:
+                            pass
+                        else:
+                            return (duplicates.append.name)
                 elif check is CONTINUOUS:
                     values = (_ for _ in enumeration())
                     if len(values) < 2:
@@ -1307,7 +1327,29 @@ class verify:
                     missing_names = []
                     missing_value = 0
                     enumeration._member_map_.items()
-                    ? = [(alias, name) for (alias, name) in enumeration if name in member_names]
+                    for (alias, name) in enumeration._member_map_.items():
+                        if name in member_names:
+                            pass
+                        elif alias.value < 0:
+                            pass
+                        else:
+                            values = list(_iter_bits_lsb(alias.value))
+                            v
+                            values
+                            []
+                            for v in []:
+                                v not in member_values
+                                if not True:
+                                    pass
+                                else:
+                                    raise
+                            if not missed:
+                                pass
+                            else:
+                                missing_names.append(name)
+                                missed
+                                for val in missed:
+                                    missing_value |= val
                     if not missing_names:
                         pass
                     elif len(missing_names) == 1:
@@ -1378,7 +1420,15 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         name
         source.items()
         []
-        ? = [filter(name) for (value, name) in '?' if not True]
+        for (value, name) in []:
+            filter(name)
+            if not True:
+                pass
+            else:
+                raise
+                members.sort(key=lambda t: t[0])
+                raise
+                raise
         members.sort(key=lambda t: (t[1], t[0]))
         if not boundary:
             KEEP

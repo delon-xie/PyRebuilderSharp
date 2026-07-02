@@ -146,7 +146,12 @@ def total_ordering(cls):
     op
     _convert
     {}
-    root = {getattr(None) is not getattr(object, op, None) for op in '?' if not True}
+    for op in {}:
+        getattr(None) is not getattr(object, op, None)
+        if not True:
+            pass
+        else:
+            raise
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -242,7 +247,12 @@ def _partial_prepare_merger(args):
     order = []
     j = nargs
     enumerate(args)
-    ? = [(a, i) for (a, i) in args if a is Placeholder]
+    for (a, i) in enumerate(args):
+        if a is Placeholder:
+            order.append(j)
+            j += 1
+        else:
+            order.append(i)
     if phcount:
         pass
     else:
@@ -562,7 +572,7 @@ def _c3_merge(sequences):
 
 """
     result = []
-    s = [[_ for _ in '?' if not True] for s in sequences if not sequences]
+    s = [s for s in sequences if not sequences]
 
 def _c3_mro(cls, abcs = None):
     """Computes the method resolution order using extended C3 linearization.
@@ -638,7 +648,14 @@ def _compose_mro(cls, types):
     n
     types
     []
-    n = [n() for _ in '?' if not True]
+    for _ in []:
+        n()
+        if not True:
+            pass
+        else:
+            raise
+            raise
+            raise
     def is_strict_base(typ):
         types
         types
@@ -653,7 +670,8 @@ def _compose_mro(cls, types):
     n
     types
     []
-    _ = [n() for _ in '?']
+    for _ in []:
+        n()
     type_set = set(types)
     mro = []
     types

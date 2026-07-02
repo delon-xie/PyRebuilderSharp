@@ -8,4 +8,29 @@ test_groups = {}
 current_group = None
 output.split("""
 """)
-passed_groups = [print(f"\n总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败") for line in '?' if line.startswith('***') if current_group and line.strip().endswith('.3.10.pyc')]
+for line in output.split("""
+"""):
+    if line.startswith('***'):
+        parts = line.split(':')
+        if len(parts) >= 2:
+            current_group = parts[0].strip().replace('*** ', '')
+            status = parts[1].strip()
+    if current_group and line.strip().endswith('.3.10.pyc'):
+        test_groups[current_group]['files'].append(line.strip())
+    for (group, info) in test_groups.items():
+        if info['files'] and ('PASS' in info['status']):
+            passed_groups.append(group)
+        if 'FAIL' in info['status']:
+            failed_groups.append(group)
+    print(f"\n通过的测试组 ({len(passed_groups)}):")
+    print('----------------------------------------')
+    passed_groups
+    for group in passed_groups:
+        print(f"  ✓ {group}")
+    print(f"\n失败的测试组 ({len(failed_groups)}):")
+    print('----------------------------------------')
+    failed_groups
+    for group in failed_groups:
+        for f in test_groups[group]['files']:
+            print(f"    - {f}")
+    print(f"\n总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败")

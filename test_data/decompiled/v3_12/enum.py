@@ -579,7 +579,10 @@ class EnumType(type):
         else:
             if isinstance(names, (tuple, list)) and names:
                 if isinstance(names[0], str):
-                    ? = [names.append((name, value)) for (count, name) in original_names]
+                    for (count, name) in enumerate(original_names):
+                        value = first_enum._generate_next_value_(name, start, count, last_values[:])
+                        last_values.append(value)
+                        names.append((name, value))
                 names = []
                 names
                 for item in names:
@@ -610,7 +613,11 @@ class EnumType(type):
             name
             source.items()
             []
-            ? = [members.sort(key=lambda: None) for (name, value) in '?' if filter(name)]
+            for (name, value) in []:
+                if filter(name):
+                    return (name, value)
+                raise
+                members.sort(key=lambda t: t[0])
             members.sort(key=lambda t: (t[1], t[0]))
             t
             members
@@ -1092,7 +1099,11 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items()
-    ? = [(name, member) for (name, member) in enumeration if not name != member.name]
+    for (name, member) in enumeration.__members__.items():
+        if not name != member.name:
+            pass
+        else:
+            duplicates.append((name, member.name))
     if duplicates:
         ', '.join
         name
@@ -1296,7 +1307,11 @@ class verify:
             checks
             for check in checks:
                 if check is UNIQUE:
-                    ? = [(name, member) for (name, member) in enumeration if not name != member.name]
+                    for (name, member) in enumeration.__members__.items():
+                        if not name != member.name:
+                            pass
+                        else:
+                            duplicates.append((name, member.name))
                 elif check is CONTINUOUS:
                     values = (e.value for e in enumeration())
                     if len(values) < 2:
@@ -1335,7 +1350,28 @@ class verify:
                                     missing_names = []
                                     missing_value = 0
                                     enumeration._member_map_.items()
-                                    ? = [(name, alias) for (name, alias) in enumeration if name in member_names]
+                                    for (name, alias) in enumeration._member_map_.items():
+                                        if name in member_names:
+                                            pass
+                                        elif alias.value < 0:
+                                            pass
+                                        else:
+                                            values = list(_iter_bits_lsb(alias.value))
+                                            v
+                                            values
+                                            []
+                                            for v in []:
+                                                if not v not in member_values:
+                                                    pass
+                                                else:
+                                                    raise
+                                            if not missed:
+                                                pass
+                                            else:
+                                                missing_names.append(name)
+                                                missed
+                                                for val in missed:
+                                                    missing_value |= val
                                     if not missing_names:
                                         pass
                                     elif len(missing_names) == 1:
@@ -1426,7 +1462,11 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         name
         source.items()
         []
-        ? = [members.sort(key=lambda: None) for (name, value) in '?' if filter(name)]
+        for (name, value) in []:
+            if filter(name):
+                return (name, value)
+            raise
+            members.sort(key=lambda t: t[0])
         members.sort(key=lambda t: (t[1], t[0]))
         if not boundary:
             KEEP

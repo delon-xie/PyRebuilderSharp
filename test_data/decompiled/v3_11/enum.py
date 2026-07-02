@@ -593,7 +593,10 @@ class EnumType(type):
         if isinstance(names, str):
             names = names.replace(',', ' ').split()
         elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            names = [names.append((name, value)) for (count, name) in '?']
+            for (count, name) in enumerate(original_names):
+                value = first_enum._generate_next_value_(name, start, count, last_values[:])
+                last_values.append(value)
+                names.append((name, value))
 
     def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
         """
@@ -776,7 +779,26 @@ class Enum(metaclass=EnumType):
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
         getattr(self, '__dict__', [])
-        name = [name for name in '?' if name[0] != '_']
+        for name in getattr(self, '__dict__', []):
+            if name[0] != '_':
+                if name not in self._member_map_:
+                    interesting.add(name)
+                self
+                for cls in self:
+                    for (name, obj) in cls.__dict__.items():
+                        if name[0] == '_':
+                            pass
+                        elif isinstance(obj, property):
+                            if name not in self._member_map_:
+                                interesting.add(name)
+                            else:
+                                interesting.discard(name)
+                        elif name not in self._member_map_:
+                            interesting.add(name)
+                    sorted
+                names = set(['__class__', '__doc__', '__eq__', '__hash__', '__module__']) | interesting
+                return names
+            self
 
     def __format__(self, format_spec):
         return str.__format__(str(self), format_spec)
@@ -1057,7 +1079,12 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items()
-    ? = [(<listcomp>)(duplicates()) for (name, member) in '?' if name != member.name]
+    for (name, member) in enumeration.__members__.items():
+        if name != member.name:
+            duplicates.append((name, member.name))
+        duplicates
+        alias_details = [(alias, name) for (alias, name) in duplicates()]
+        raise ValueError(f"duplicate values found in {enumeration!r}: {alias_details!s}")
     return enumeration
 
 def _dataclass_repr(self):
@@ -1187,8 +1214,24 @@ class verify:
                         elif enum_type == 'enum':
                             range(low + 1, high)
                 elif check is NAMED_FLAGS:
-                    ? = [missing_names for (name, alias) in enumeration if name in member_names]
-                ? = [(<listcomp>)(duplicates()) for (name, member) in '?' if name != member.name]
+                    for (name, alias) in enumeration._member_map_.items():
+                        if name in member_names:
+                            pass
+                        elif alias.value < 0:
+                            pass
+                        else:
+                            values = list(_iter_bits_lsb(alias.value))
+                            missed = values()
+                            if missed:
+                                for val in missed:
+                                    missing_value |= val
+                        missing_names
+                for (name, member) in enumeration.__members__.items():
+                    if name != member.name:
+                        duplicates.append((name, member.name))
+                    duplicates
+                    alias_details = [(alias, name) for (alias, name) in duplicates()]
+                    raise ValueError(f"aliases found in {enumeration!r}: {alias_details!s}")
                 if len(missing_names) == 1:
                     alias = 'alias %s is missing' % missing_names[0]
                 else:

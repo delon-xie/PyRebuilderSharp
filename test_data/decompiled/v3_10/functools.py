@@ -679,7 +679,9 @@ def _c3_mro(cls, abcs):
             other_bases = list(cls.__bases__[boundary:])
             abcs
             cls
-            _ = [_ for _ in '?' if issubclass(cls, base) and not (any)((<genexpr>)(cls.__bases__))]
+            for _ in abcs:
+                if issubclass(cls, base) and not (any)((<genexpr>)(cls.__bases__)):
+                    abstract_bases.append(base)
             abstract_bases
             for _ in abstract_bases:
                 abcs.remove(base)
@@ -718,7 +720,19 @@ def _compose_mro(cls, types):
     (mro)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
-    typ = [[sub for sub in '?' if (sub not in bases) and issubclass(cls, sub)] for typ in '?' if not found]
+    for typ in types:
+        for sub in typ.__subclasses__():
+            if (sub not in bases) and issubclass(cls, sub):
+                (found.append)([[] for s in sub.__mro__])
+        if not found:
+            mro.append(typ)
+        else:
+            found.sort(key=len, reverse=True)
+            found
+            for sub in found:
+                for subcls in sub:
+                    if subcls not in mro:
+                        mro.append(subcls)
     return _c3_mro(cls, abcs=mro)
 
 def _find_impl(cls, registry):
