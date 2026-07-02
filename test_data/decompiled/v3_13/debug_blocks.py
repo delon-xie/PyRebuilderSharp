@@ -50,7 +50,7 @@ for const in code.co_consts:
                 if len(block_instrs) > 3:
                     pass
                 else:
-                    f"-{end - 1}3d]: {', '.join}{(<genexpr>)(block_instrs())}"
+                    f"-{end - 1}3d]: {', '.join}{(_ for _ in block_instrs())}"
                     '3d'
                     start
                     'Block ['

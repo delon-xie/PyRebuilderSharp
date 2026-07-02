@@ -4161,6 +4161,7 @@ public class AstBuilder
         {
             // Some comprehension bodies (set/dict via SET_ADD/MAP_ADD) don't have a For loop.
             // Use fallback: extract iterable, target, and element from the body.
+            Console.Error.WriteLine($"[COMP_FALLBACK] kind={kind}, body.Count={body.Count}, first_types={string.Join(",", body.Take(4).Select(s => s.GetType().Name))}");
             return BuildComprehensionFallback(body, kind, compCall);
         }
 
@@ -4222,6 +4223,7 @@ public class AstBuilder
         elt ??= innermostFor.Target;
 
         if (elt == null) return null;
+        Console.Error.WriteLine($"[COMP_OK] kind={kind} elt={elt.GetType().Name} generators.Count={generators.Count}");
 
         return kind switch
         {
@@ -4320,6 +4322,7 @@ public class AstBuilder
             ExprStmt es => es with { Value = ConvertComprehensionExpr(es.Value) },
             YieldFrom yf => new YieldFrom(ConvertComprehensionExpr(yf.Value)),
             Yield y => y.Value != null ? new Yield(ConvertComprehensionExpr(y.Value)) : y,
+            Raise r => new Raise(ConvertComprehensionExpr(r.Exc)),
             If ifNode => new If(ifNode.Test,
                 ConvertComprehensionCalls(ifNode.Body),
                 ifNode.Orelse != null ? ConvertComprehensionCalls(ifNode.Orelse) : null),
@@ -4374,7 +4377,15 @@ public class AstBuilder
             Console.Error.WriteLine("[COMP_LAMBDA] using fallback lambda");
             return new Lambda(new List<Parameter>(), new Constant(null));
         }
-        // Recurse into sub-expressions: Call args, BinOp, etc.
+        // Recurse into sub-expressions: Call args, BinOp, JoinedStr, FormattedValue, etc.
+        if (expr is JoinedStr js)
+        {
+            return new JoinedStr(js.Values.Select(v => ConvertComprehensionExpr(v)).ToList());
+        }
+        if (expr is FormattedValue fv)
+        {
+            return new FormattedValue(ConvertComprehensionExpr(fv.Value), fv.Conversion, fv.FormatSpec != null ? ConvertComprehensionExpr(fv.FormatSpec) : null);
+        }
         if (expr is Call call2)
         {
             Console.Error.WriteLine($"[COMP_RECURSE] Call func={call2.Func?.GetType().Name}, args={string.Join(",", call2.Args.Select(a => a?.GetType().Name ?? "null"))}");

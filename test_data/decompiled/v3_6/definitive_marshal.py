@@ -27,7 +27,7 @@ for start in range(0, 8):
     if (a0 == known['argcount']) and (nl == known['nlocals']):
         print(f"\nMATCH at offset {start}:")
         print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-        print(f"  Bytes: {' '.join((<genexpr>)(m[start:start + 16]))}")
+        print(f"  Bytes: {' '.join((b for b in m[start:start + 16]))}")
 code2 = marshal.loads(m)
 print(f"\nRe-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
 print(f"Match: {code2.co_argcount == code.co_argcount}")

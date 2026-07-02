@@ -417,7 +417,7 @@ class EnumType(type):
         member_names = [classdict for key in ignore]
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % (<genexpr>)(invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (None for n in invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if type(_gnv) is not staticmethod:

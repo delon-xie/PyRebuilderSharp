@@ -20,7 +20,7 @@ for offset in range(0, 8):
         if vals[3] == code.co_flags:
             print(f"\nFields found at offset {offset}:")
             print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
-            '  Bytes: '(f"{' '.join}{(<genexpr>)(m[offset:offset + 16]())}")
+            '  Bytes: '(f"{' '.join}{(None for b in m[offset:offset + 16]())}")
             print
         None
         return

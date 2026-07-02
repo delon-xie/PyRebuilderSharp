@@ -558,7 +558,7 @@ class Enum(metaclass=EnumType):
                 return cls[name]
         if cls._member_map_:
             if getattr(cls, '_%s__in_progress' % cls.__name__, False):
-                raise TypeError('do not use `super().__new__; call the appropriate __new__ directly') from None
+                raise TypeError('do not use `super().__new__; call the appropriate __new__ directly')
             if exc is None:
                 raise ve_exc
         ve_exc = ValueError('%r is not a valid %s' % (value, cls.__qualname__))
