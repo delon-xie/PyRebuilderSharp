@@ -1147,6 +1147,9 @@ public class StackMachine
                 else if (func == null)
                 {
                     // func=null — argCount 可能多弹了一个（函数被当作参数消费）
+                    // 检查是否为 __exit__ 调用（所有参数为 None）：静默丢弃
+                    if (args.Count >= 2 && args.All(a => a is Constant { Value: null }))
+                        return null;
                     if (args.Count >= 2)
                     {
                         var recoveredFunc = args[0];
@@ -1159,6 +1162,9 @@ public class StackMachine
                     }
                     return null;
                 }
+                // __exit__ call: all args are None (Constant null), suppress
+                if (func is Constant { Value: null } && args.Count >= 1 && args.All(a => a is Constant { Value: null }))
+                    return null;
 
                 // If TOS is a null sentinel (PUSH_NULL), pop it
                 var peeked = SafePeek();
