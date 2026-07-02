@@ -15,7 +15,7 @@ public record Name(string Id, ExpressionContext Ctx = ExpressionContext.Load) : 
 }
 
 /// <summary>星号表达式 *expr（用于展开赋值 a, *b = ... 或函数调用 f(*args)）</summary>
-public record Starred(Expr Value, ExpressionContext Ctx = ExpressionContext.Load) : Expr;
+public record Starred(Expr Value, ExpressionContext Ctx = ExpressionContext.Load, bool IsKwArgs = false) : Expr;
 
 public enum ExpressionContext { Load, Store, Del, AugLoad, AugStore, Param }
 

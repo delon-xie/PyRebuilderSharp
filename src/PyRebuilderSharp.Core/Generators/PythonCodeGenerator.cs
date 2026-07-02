@@ -1306,7 +1306,7 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitStarred(Starred star)
     {
-        _output.Append('*');
+        _output.Append(star.IsKwArgs ? "**" : "*");
         Visit(star.Value);
     }
 
