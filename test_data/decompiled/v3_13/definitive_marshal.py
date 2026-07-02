@@ -38,12 +38,10 @@ for start in range(0, 8):
         elif not nl == known['nlocals']:
             pass
         else:
-            print(f"
-MATCH at offset {start}:")
+            print(f"\nMATCH at offset {start}:")
             print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
             '  Bytes: '(f"{' '.join}{<genexpr>(m[start:start + 16]())}")
     code2 = marshal.loads(m)
-    print(f"
-Re-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
+    print(f"\nRe-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
     print(f"Match: {code2.co_argcount == code.co_argcount}")
     return None

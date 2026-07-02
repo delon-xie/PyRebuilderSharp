@@ -22,7 +22,6 @@ end = int.from_bytes(et[i + 2:i + 4], 'little')
 target = int.from_bytes(et[i + 4:i + 6], 'little')
 dl = int.from_bytes(et[i + 6:i + 8], 'little')
 print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
-print(f"
---- Nested: {const.co_name} ---")
+print(f"\n--- Nested: {const.co_name} ---")
 print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
 print(f"  bytes: {const.co_exceptiontable.hex()}")

@@ -50,8 +50,7 @@ for ver in versions:
         pass
     else:
         continue
-print(f"
-{'========================================'}")
+print(f"\n{'========================================'}")
 passed = sum(((v, r) for (v, r) in .0 if r))
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")

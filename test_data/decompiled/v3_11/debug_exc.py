@@ -30,8 +30,7 @@ if hasattr(code, 'co_exceptiontable'):
     code
     for const in code:
         if isinstance(const, types.CodeType):
-            print(f"
---- Nested: {const.co_name} ---")
+            print(f"\n--- Nested: {const.co_name} ---")
             print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
             if hasattr(const, 'co_exceptiontable'):
                 if const.co_exceptiontable:

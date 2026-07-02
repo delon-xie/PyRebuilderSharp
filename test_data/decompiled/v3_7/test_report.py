@@ -8,5 +8,4 @@ test_groups = {}
 current_group = None
 output.split("""
 """)
-passed_groups = [print(f"
-总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败") for line in '?' if line.startswith('***') if current_group and line.strip().endswith('.3.10.pyc')]
+passed_groups = [print(f"\n总计: {len(passed_groups)} 组通过, {len(failed_groups)} 组失败") for line in '?' if line.startswith('***') if current_group and line.strip().endswith('.3.10.pyc')]

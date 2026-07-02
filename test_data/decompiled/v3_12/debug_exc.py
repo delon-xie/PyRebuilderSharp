@@ -29,8 +29,7 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
             if not isinstance(const, types.CodeType):
                 pass
             else:
-                print(f"
---- Nested: {const.co_name} ---")
+                print(f"\n--- Nested: {const.co_name} ---")
                 print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
                 if not hasattr(const, 'co_exceptiontable'):
                     pass

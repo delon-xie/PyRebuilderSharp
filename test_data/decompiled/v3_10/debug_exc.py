@@ -28,8 +28,7 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
 code.co_consts
 for const in code.co_consts:
     if isinstance(const, types.CodeType):
-        print(f"
---- Nested: {const.co_name} ---")
+        print(f"\n--- Nested: {const.co_name} ---")
         print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
         if hasattr(const, 'co_exceptiontable') and const.co_exceptiontable:
             print(f"  bytes: {const.co_exceptiontable.hex()}")

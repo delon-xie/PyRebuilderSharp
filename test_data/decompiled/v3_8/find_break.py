@@ -39,13 +39,10 @@ r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
 if r == 'OK':
     bp = find_breaking_point(all_exprs, 6, len(all_exprs) - 1)
-    print(f"
-Breaking expression: #{bp}: {all_exprs[bp]}")
-    print(f"
-Verification - up to #{bp}:")
+    print(f"\nBreaking expression: #{bp}: {all_exprs[bp]}")
+    print(f"\nVerification - up to #{bp}:")
     r = test_until_broken(all_exprs[:bp + 1])
     print(f"  {r}")
-    print(f"
-Verification - just #{bp}:")
+    print(f"\nVerification - just #{bp}:")
     r = test_until_broken(all_exprs[:bp])
     print(f"  {r}")

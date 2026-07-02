@@ -913,9 +913,7 @@ class Flag(Enum, boundary=STRICT):
         neg_value = None
         if (value <= ~all_bits) and (cls <= all_bits) and (cls._boundary_ is STRICT):
             max_bits = max(value.bit_length(), flag_mask.bit_length())
-            raise ValueError(f"{cls!r} invalid value {value!r}
-    given {bin(value, max_bits)!s}
-  allowed {bin(flag_mask, max_bits)!s}")
+            raise ValueError(f"{cls!r} invalid value {value!r}\n    given {bin(value, max_bits)!s}\n  allowed {bin(flag_mask, max_bits)!s}")
         if cls._boundary_ is CONFORM:
             value &= flag_mask
         else:
@@ -948,9 +946,7 @@ class Flag(Enum, boundary=STRICT):
                             pseudo_member = cls._member_type_.__new__(cls, value)
             else:
                 raise ValueError(f"{cls!r} unknown flag boundary {cls._boundary_!r}")
-        raise ValueError(f"{cls!r} invalid value {value!r}
-    given {bin(value, max_bits)!s}
-  allowed {bin(flag_mask, max_bits)!s}")
+        raise ValueError(f"{cls!r} invalid value {value!r}\n    given {bin(value, max_bits)!s}\n  allowed {bin(flag_mask, max_bits)!s}")
         pseudo_member._name_ = None
     __doc__ = """
     Support for flags

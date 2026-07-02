@@ -13,8 +13,7 @@ files_to_rename
 if conflicts:
     for (old, new) in conflicts:
         print(f"  {os.path.basename(old)} -> {os.path.basename(new)} [CONFLICT]")
-print(f"
-Renaming {len(files_to_rename)} files...")
+print(f"\nRenaming {len(files_to_rename)} files...")
 files_to_rename
 for (old_path, new_path) in files_to_rename:
     print(f"  {os.path.basename(old_path)} -> {os.path.basename(new_path)}")

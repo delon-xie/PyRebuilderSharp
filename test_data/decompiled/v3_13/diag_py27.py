@@ -50,8 +50,7 @@ for (name, code) in tests.items():
     r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], capture_output=True, text=True, timeout=10)
     r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], capture_output=True, text=True, timeout=30)
-    print(f"
-==================================================")
+    print(f"\n==================================================")
     print(f"Test: {name}")
     if not r.stdout.strip():
         r.stderr.strip()
@@ -69,5 +68,4 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
     raise
     content = f.read().strip()
     None(None)
-    print(f"Output ({len(content)} bytes):
-{content[:300]}")
+    print(f"Output ({len(content)} bytes):\n{content[:300]}")

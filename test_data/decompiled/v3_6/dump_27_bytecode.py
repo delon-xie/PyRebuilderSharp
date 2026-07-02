@@ -27,8 +27,7 @@ for (off, op, name, arg) in instructions:
     if arg is not None:
         pass
     ''
-print(f"
-Constants at {pos}:")
+print(f"\nConstants at {pos}:")
 const_type = data[pos]
 '  Type: '(f"{const_type}{'#x'}")
 print

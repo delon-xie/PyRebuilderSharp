@@ -2910,35 +2910,11 @@ class SyntaxWarningTest(unittest.TestCase):
     def test_break_and_continue_in_finally(self):
         ('break', 'continue')
         for kw in ('break', 'continue'):
-            source = textwrap.dedent(f"
-                for abc in range(10):
-                    try:
-                        pass
-                    finally:
-                        {kw}
-                ")
+            source = textwrap.dedent(f"\n                for abc in range(10):\n                    try:\n                        pass\n                    finally:\n                        {kw}\n                ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
-            source = textwrap.dedent(f"
-                for abc in range(10):
-                    try:
-                        pass
-                    finally:
-                        try:
-                            {kw}
-                        except:
-                            pass
-                ")
+            source = textwrap.dedent(f"\n                for abc in range(10):\n                    try:\n                        pass\n                    finally:\n                        try:\n                            {kw}\n                        except:\n                            pass\n                ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
-            source = textwrap.dedent(f"
-                for abc in range(10):
-                    try:
-                        pass
-                    finally:
-                        try:
-                            pass
-                        except:
-                            {kw}
-                ")
+            source = textwrap.dedent(f"\n                for abc in range(10):\n                    try:\n                        pass\n                    finally:\n                        try:\n                            pass\n                        except:\n                            {kw}\n                ")
             self.check_warning(source, f"'{kw}' in a 'finally' block")
 
 class SyntaxErrorTestCase(unittest.TestCase):
@@ -2948,21 +2924,15 @@ class SyntaxErrorTestCase(unittest.TestCase):
         self._check_error('type T[__classdict__] = tuple[__classdict__]', 'reserved name \'__classdict__\' cannot be used for type parameter')
         ('__class__', '__classcell__', '__classdictcell__')
         for name in ('__class__', '__classcell__', '__classdictcell__'):
-            compile(f"
-class A:
-    class B[{name}]: pass
-                ", '<testcase>', mode='exec')
+            compile(f"\nclass A:\n    class B[{name}]: pass\n                ", '<testcase>', mode='exec')
 
     def test_nested_named_except_blocks(self):
         code = ''
         range(12)
         for i in range(12):
-            code += f"{'    ' * i}try:
-"
-            code += f"{'    ' * (i + 1)}raise Exception
-"
-            code += f"{'    ' * i}except Exception as e:
-"
+            code += f"{'    ' * i}try:\n"
+            code += f"{'    ' * (i + 1)}raise Exception\n"
+            code += f"{'    ' * i}except Exception as e:\n"
         code += f"{'                                                '}pass"
         self._check_error(code, 'too many statically nested blocks')
 
@@ -2975,8 +2945,7 @@ class A:
                 """)
             range(n)
             for i in range(n):
-                code += f"    as a{i}, a
-"
+                code += f"    as a{i}, a\n"
             code += '): yield a'
             return code
         CO_MAXBLOCKS = 21
@@ -3004,8 +2973,7 @@ class A:
                 """)]
             range(n)
             for i in range(n):
-                code.append(f"    as a{i}, a
-")
+                code.append(f"    as a{i}, a\n")
             code.append('): yield a')
             return ''.join(code)
         CO_MAXBLOCKS = 21
@@ -3328,14 +3296,13 @@ fgdfgf
     def test_error_parenthesis(self):
         """([{"""
         for paren in '([{':
-            self._check_error(paren + '1 + 2', f"\{paren}' was never closed")
+            self._check_error(paren + '1 + 2', f"\\{paren}' was never closed")
         '([{'
         for paren in '([{':
-            self._check_error(f"a = {paren} 1, 2, 3
-b=3", f"\{paren}' was never closed")
+            self._check_error(f"a = {paren} 1, 2, 3\nb=3", f"\\{paren}' was never closed")
         ')]}'
         for paren in ')]}':
-            self._check_error(paren + '1 + 2', f"unmatched '\{paren}'")
+            self._check_error(paren + '1 + 2', f"unmatched '\\{paren}'")
         code = """func(
     a=["unclosed], # Need a quote in this comment: "
     b=2,

@@ -45,14 +45,12 @@ abc
 40
 """)
     result = process_data_file('test_numbers.txt')
-    print(f"最终结果: {result}
-")
+    print(f"最终结果: {result}\n")
     print('==================================================')
     print('测试2: 文件不存在')
     print('==================================================')
     result = process_data_file('nonexistent.txt')
-    print(f"最终结果: {result}
-")
+    print(f"最终结果: {result}\n")
     print('==================================================')
     print('测试3: 空文件')
     print('==================================================')

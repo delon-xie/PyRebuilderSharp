@@ -255,7 +255,7 @@ public class PythonCodeGenerator : ICodeGenerator
                 foreach (var part in js.Values)
                 {
                     if (part is Constant c && c.Value is string s)
-                        _output.Append(s);
+                        _output.Append(EscapeStringContent(s));
                     else
                     {
                         _output.Append('{');
@@ -264,6 +264,7 @@ public class PythonCodeGenerator : ICodeGenerator
                     }
                 }
                 _output.Append('"');
+                break;
                 break;
             default:
                 _output.Append($"# Unknown node: {node.GetType().Name}");
@@ -1422,6 +1423,33 @@ public class PythonCodeGenerator : ICodeGenerator
             sb.Append("\"\"\"");
         else
             sb.Append('\'');
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// 转义字符串内容（不含外层引号）。用于 f-string 内部的常量部分。
+    /// 将 \n → \\n, \r → \\r, \t → \\t, \ → \\ 等。
+    /// </summary>
+    private string EscapeStringContent(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (char c in s)
+        {
+            switch (c)
+            {
+                case '\n': sb.Append("\\n"); break;
+                case '\r': sb.Append("\\r"); break;
+                case '\t': sb.Append("\\t"); break;
+                case '\\': sb.Append("\\\\"); break;
+                case '"': sb.Append("\\\""); break;
+                default:
+                    if (c < 0x20 || c == 0x7F)
+                        sb.Append($"\\x{(int)c:x2}");
+                    else
+                        sb.Append(c);
+                    break;
+            }
+        }
         return sb.ToString();
     }
 

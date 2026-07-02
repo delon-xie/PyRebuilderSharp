@@ -34,7 +34,6 @@ for ver in versions:
 """), actual_ast.split("""
 """))):
                 if e != a:
-                    print(f"  Line {i}: expected={e}
-           actual=  {a}")
+                    print(f"  Line {i}: expected={e}\n           actual=  {a}")
     except Exception:
         pass
