@@ -15,8 +15,8 @@ public partial class TokenDumper
     [GeneratedRegex(@"\s+")]
     private static partial Regex WhitespaceRegex();
 
-    // Identifier tokens: [A-Za-z_][A-Za-z0-9_]*
-    [GeneratedRegex(@"[A-Za-z_][A-Za-z0-9_]*")]
+    // Identifier tokens: [A-Za-z_][A-Za-z0-9_]* + Unicode support + ? placeholder
+    [GeneratedRegex(@"[A-Za-z_\u0080-\uffff?][A-Za-z0-9_\u0080-\uffff?]*", RegexOptions.CultureInvariant)]
     private static partial Regex WordRegex();
 
     // Integer literals: decimal, hex, binary, octal
@@ -29,7 +29,7 @@ public partial class TokenDumper
     private static partial Regex FloatRegex();
 
     // String start: optional prefix followed by quotes
-    [GeneratedRegex(@"([rR][fFbB]?|[uU]|[fF][rR]?|[bB][rR]?)?('''|'|""""""|"")")]
+    [GeneratedRegex(@"([rR][fFbB]?|[uU]|[fF][rR]?|[bB][rR]?)?('''|""""""|'|"")", RegexOptions.None)]
     private static partial Regex StringStartRegex();
 
     /// <summary>
@@ -63,11 +63,13 @@ public partial class TokenDumper
         while (nLine < lines.Length)
         {
             var line = lines[nLine];
-            nLine++;
 
             // Skip empty lines and comment-only lines
             if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith('#'))
+            {
+                nLine++;
                 continue;
+            }
 
             // Track indentation changes (only when not inside brackets)
             if (contextStack.Count == 0)
@@ -89,13 +91,15 @@ public partial class TokenDumper
 
             // Tokenize the current line
             var remaining = line;
+            var startLine = nLine;
+
             while (true)
             {
                 remaining = remaining.TrimStart();
                 if (string.IsNullOrEmpty(remaining))
                     break;
                 if (remaining[0] == '#')
-                    break; // Rest of line is a comment
+                    break;
 
                 // Try symbolic tokens first (longest match)
                 var symbolToken = MatchSymbolicToken(remaining, nLine);
@@ -133,7 +137,7 @@ public partial class TokenDumper
                     continue;
                 }
 
-                // Try string
+                // Try string - can update nLine and remaining for multi-line strings
                 var stringToken = MatchStringToken(remaining, lines, ref nLine, ref remaining);
                 if (stringToken != null)
                 {
@@ -153,6 +157,8 @@ public partial class TokenDumper
                 throw new InvalidOperationException(
                     $"Unrecognized tokens: \"{remaining}\" at line {nLine}");
             }
+
+            nLine++;
 
             // Emit ENDLINE only when not inside brackets
             if (contextStack.Count == 0)
@@ -220,23 +226,30 @@ public partial class TokenDumper
 
         while (true)
         {
-            var end = currentLine.IndexOf(quotes, start, StringComparison.Ordinal);
-            if (end > 0 && currentLine[end - 1] == '\\')
+            var searchStart = start;
+            while (true)
             {
-                content.Append(currentLine.AsSpan(start, end + 1 - start));
-                start = end + 1;
-                continue;
-            }
-            if (end >= 0)
-            {
-                content.Append(currentLine.AsSpan(start, end - start));
-                // Remaining part after the closing quotes
-                lineRemaining = currentLine[(end + quotes.Length)..];
-                break;
+                var end = currentLine.IndexOf(quotes, searchStart, StringComparison.Ordinal);
+                if (end < 0)
+                    break;
+
+                int backslashCount = 0;
+                for (int i = end - 1; i >= 0 && currentLine[i] == '\\'; i--)
+                    backslashCount++;
+
+                if (backslashCount % 2 == 0)
+                {
+                    content.Append(currentLine.AsSpan(start, end - start));
+                    lineRemaining = currentLine[(end + quotes.Length)..];
+                    return new StringToken(prefix, content.ToString(), nLine);
+                }
+
+                searchStart = end + 1;
             }
 
-            // Need to read next line
             content.Append(currentLine.AsSpan(start));
+            if (nLine + 1 < lines.Length)
+                content.Append('\n');
             nLine++;
             if (nLine >= lines.Length)
                 throw new InvalidOperationException(
@@ -244,8 +257,6 @@ public partial class TokenDumper
             currentLine = lines[nLine];
             start = 0;
         }
-
-        return new StringToken(prefix, content.ToString(), nLine);
     }
 }
 

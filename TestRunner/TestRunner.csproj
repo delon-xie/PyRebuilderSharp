@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\PyRebuilderSharp.Core\PyRebuilderSharp.Core.csproj" />
+    <ProjectReference Include="..\tests\PyRebuilderSharp.Tests\PyRebuilderSharp.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

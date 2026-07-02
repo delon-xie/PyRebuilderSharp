@@ -80,4 +80,67 @@ public class TokenDumperTests
         dump.Should().Contain("<OUTDENT>");
         dump.Should().Contain("<EOL>");
     }
+
+    [Fact]
+    public void Tokenize_TripleQuoteWithEscapedBackslash_ClosesCorrectly()
+    {
+        var dumper = new TokenDumper();
+        var source = "x = \"\"\"hello \\\\\"\"\"\n";
+        var tokens = dumper.Tokenize(source);
+        tokens.Any(t => t is StringToken).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Tokenize_TripleQuoteMultiline_ClosesCorrectly()
+    {
+        var dumper = new TokenDumper();
+        var source = "x = \"\"\"line1\nline2\n\"\"\"\n";
+        var tokens = dumper.Tokenize(source);
+        tokens.Any(t => t is StringToken).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Tokenize_UnicodeIdentifier_RecognizesToken()
+    {
+        var dumper = new TokenDumper();
+        var source = "∞ = 42\n";
+        var tokens = dumper.Tokenize(source);
+        tokens[0].Should().BeOfType<WordToken>().Which.Word.Should().Be("∞");
+    }
+
+    [Fact]
+    public void Tokenize_PlaceholderToken_RecognizesQuestionMark()
+    {
+        var dumper = new TokenDumper();
+        var source = "? = 42\n";
+        var tokens = dumper.Tokenize(source);
+        tokens[0].Should().BeOfType<WordToken>().Which.Word.Should().Be("?");
+    }
+
+    [Fact]
+    public void Tokenize_FStringWithBrackets_HandlesNestedBraces()
+    {
+        var dumper = new TokenDumper();
+        var source = "x = f'{a} {b}'\n";
+        var tokens = dumper.Tokenize(source);
+        tokens.Any(t => t is StringToken).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Tokenize_FStringTripleQuotes_HandlesNestedBraces()
+    {
+        var dumper = new TokenDumper();
+        var source = "x = f\"\"\"{a} {b}\"\"\"\n";
+        var tokens = dumper.Tokenize(source);
+        tokens.Any(t => t is StringToken).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Tokenize_ChineseInString_HandlesChineseCharacters()
+    {
+        var dumper = new TokenDumper();
+        var source = "x = '从 VERSION 文件读取版本号'\n";
+        var tokens = dumper.Tokenize(source);
+        tokens.Any(t => t is StringToken).Should().BeTrue();
+    }
 }
