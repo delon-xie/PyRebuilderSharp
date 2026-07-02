@@ -2,7 +2,13 @@
 
 def outer():
     def inner():
+        lock
+        lock
         None(None)
-        try:
-            print(lk)
+        lock
+        print(lk)
+        None(None)
+        if not True:
+            pass
+        raise
     return inner

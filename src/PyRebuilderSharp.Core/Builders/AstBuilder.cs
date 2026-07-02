@@ -79,7 +79,7 @@ public class AstBuilder
         var visited = new HashSet<BasicBlock>();
 
         // 输出所有 ET 条目（调试用）
-        Console.Error.WriteLine($"[ET_DUMP] {_codeObject.Name} has {_codeObject.ExceptionTable.Count} ET entries:");
+        // ET entries count debug removed
         for (int i = 0; i < _codeObject.ExceptionTable.Count; i++)
         {
             var et = _codeObject.ExceptionTable[i];
@@ -453,7 +453,6 @@ public class AstBuilder
         }
 
         visited.Add(block);
-        Console.Error.WriteLine($"[BS] block#{block.Id} offset={block.StartOffset:X4} start processing");
 
         try
         {
@@ -675,7 +674,6 @@ public class AstBuilder
             Console.Error.WriteLine($"[BSI_ET] block#{block.Id} try311Stmts={try311Stmts?.Count ?? 0}");
             if (try311Stmts != null)
             {
-                Console.Error.WriteLine($"[BSI] try311Stmts={try311Stmts.Count} types={string.Join(",", try311Stmts.Select(s => s.GetType().Name))}");
                 stmts.AddRange(try311Stmts);
                 // 继续处理 try/except 后面的块（else 分支、类定义等）
                 var firstTry = try311Stmts.FirstOrDefault() as Try;
@@ -1427,7 +1425,6 @@ public class AstBuilder
         var instrs = block.Instructions;
         if (instrs.Count == 0) return null;
         var blockStart = instrs[0].Offset;
-        Console.Error.WriteLine($"[TRY_FROM_ET] block#{block.Id} offset={blockStart:X4}");
         var blockEnd = instrs.Last().Offset;
 
         // Find the outermost entry that covers this block (lowest depth = 0 or 1 first)
@@ -1435,11 +1432,6 @@ public class AstBuilder
             .Where(e => blockStart >= e.StartOffset && blockEnd <= e.EndOffset)
             .OrderBy(e => e.Depth)
             .FirstOrDefault();
-        Console.Error.WriteLine($"[TRY_FROM_ET] matchingEntry: {matchingEntry}");
-        if (matchingEntry != null)
-        {
-            Console.Error.WriteLine($"[TRY_FROM_ET]   Start={matchingEntry.StartOffset:X4}, End={matchingEntry.EndOffset:X4}, Target={matchingEntry.TargetOffset:X4}, Depth={matchingEntry.Depth}");
-        }
         if (matchingEntry == null)
         {
             return null;
@@ -1479,11 +1471,6 @@ public class AstBuilder
         {
             return null;
         }
-        Console.Error.WriteLine($"[TRY_FROM_ET] handlerBlock#{handlerBlock.Id} offset={handlerBlock.StartOffset:X4} instructions={handlerBlock.Instructions.Count}");
-        if (handlerBlock.Instructions.Count > 0)
-        {
-            Console.Error.WriteLine($"[TRY_FROM_ET]   handler ops={string.Join(",", handlerBlock.Instructions.Select(i => i.Opcode))}");
-        }
         bool isFinally = false;
         bool hasExcMatch = handlerBlock.Instructions.Any(i =>
             i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
@@ -1497,13 +1484,8 @@ public class AstBuilder
             {
                 var r = _blockResults.GetValueOrDefault(tb.Id);
                 bool hasStmt = r?.Statements != null && r.Statements.Any(s => s is not Raise and not CommentBlock);
-                if (r?.Statements != null)
-                {
-                    Console.Error.WriteLine($"[TRY_FROM_ET] finallyTryBlock#{tb.Id} stmts={r.Statements.Count} types={string.Join(",", r.Statements.Select(s => s.GetType().Name))}");
-                }
                 return hasStmt;
             });
-            Console.Error.WriteLine($"[TRY_FROM_ET] tryHasStatements={tryHasStatements}");
             if (!tryHasStatements)
             {
                 // 清理条目：标记 handler 为已访问，但实际语句仍需保留
@@ -1517,9 +1499,11 @@ public class AstBuilder
         }
 
         // 跳过 with 语句的隐式 ET 条目：BEFORE_WITH 在 entry 范围内
+        // 注意：ET 条目的 start 是 with 体的开始，BEFORE_WITH 可能在 start 之前 2 字节
+        var beforeWithRangeStart = Math.Max(0, matchingEntry.StartOffset - 6);
         var hasBeforeWith = _codeObject.Instructions
             .Any(i => i.Opcode == Opcode.BEFORE_WITH
-                && i.Offset >= matchingEntry.StartOffset
+                && i.Offset >= beforeWithRangeStart
                 && i.Offset < matchingEntry.EndOffset);
         if (hasBeforeWith)
         {
@@ -4363,7 +4347,7 @@ public class AstBuilder
                         if (!seenNames.Add(targetName.Id))
                         {
                             // 替换已存在的重复定义（保留最后一个，通常是正确的版本）
-                            Console.Error.WriteLine($"[DEDUP] ClassDef '{targetName.Id}' replaced at line {currentResult.Count}");
+                            // dedup log removed
                             // 搜索 FunctionDef 或 ClassDef
                             for (int si = currentResult.Count - 1; si >= 0; si--)
                             {

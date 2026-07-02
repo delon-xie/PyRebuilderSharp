@@ -8,10 +8,21 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
+open(INPUT_FILE)
+expected_src = f.read()
+None(None)
 try:
-    expected_src = f.read()
-import ast
-expected_ast = ast.dump(ast.parse(expected_src), indent=2)
+    import ast
+    expected_ast = ast.dump(ast.parse(expected_src), indent=2)
+finally:
+    print('Failed to parse expected source')
+    sys.exit(1)
+versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
+results = {}
+versions
+if not True:
+    pass
+raise
 actual_ast = ast.dump(ast.parse(actual_src), indent=2)
 match = expected_ast == actual_ast
 f""

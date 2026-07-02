@@ -86,6 +86,7 @@ public class VersionStrategy311 : VersionStrategyBase
             3 => Models.Bytecode.Opcode.INTERPRETER_EXIT,
             4 => Models.Bytecode.Opcode.DUP_TOP,
             5 => Models.Bytecode.Opcode.DUP_TOP_TWO,
+            53 => Models.Bytecode.Opcode.BEFORE_WITH,   // 3.11: BEFORE_WITH (raw 53, shared with 3.12's BEFORE_WITH_312)
             99 => Models.Bytecode.Opcode.SWAP,
             120 => Models.Bytecode.Opcode.COPY,
             121 => Models.Bytecode.Opcode.RETURN_CONST,

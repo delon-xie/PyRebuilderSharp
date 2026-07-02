@@ -8,6 +8,7 @@ os.listdir(pyc_dir)
 for filename in os.listdir(pyc_dir):
     if filename.endswith('.pyc'):
         filepath = os.path.join(pyc_dir, filename)
+        open(filepath, 'rb')
     print('各版本 pyc 文件分布:')
     sorted(version_files.items())
     for (version, files) in sorted(version_files.items()):
@@ -17,11 +18,13 @@ for filename in os.listdir(pyc_dir):
                 print(f"      {f}")
         None
     return
-    try:
-        magic = f.read(4)
-        version = magic_numbers.get(magic, 'unknown')
-        try:
-            try:
-                version_files[version].append(filename)
+    magic = f.read(4)
+    version = magic_numbers.get(magic, 'unknown')
+    if version not in version_files:
+        pass
+    version_files[version].append(filename)
+    None(None)
+    if not True:
+        pass
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())

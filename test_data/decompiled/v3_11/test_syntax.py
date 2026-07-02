@@ -2869,8 +2869,12 @@ class SyntaxWarningTest(unittest.TestCase):
         errtest is a regular expression that must be present in the
         text of the warning raised.
         """
-        try:
-            compile(code, filename, mode)
+        self.assertWarnsRegex(SyntaxWarning, errtext)
+        compile(code, filename, mode)
+        None(None)
+        if not True:
+            pass
+        raise
 
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -2984,15 +2988,25 @@ class A:
         MAX_MANAGERS = CO_MAXBLOCKS - 1
         range(MAX_MANAGERS)
         for n in range(MAX_MANAGERS):
-            try:
-                compile(get_code(n), '<string>', 'exec')
+            self.subTest(f"within range: n={n!r}")
+            compile(get_code(n), '<string>', 'exec')
+            None(None)
+            if not True:
+                pass
+            raise
             range
-        MAX_MANAGERS(MAX_MANAGERS + 5)
-        for n in MAX_MANAGERS(MAX_MANAGERS + 5):
-            try:
+            MAX_MANAGERS(MAX_MANAGERS + 5)
+            for n in MAX_MANAGERS(MAX_MANAGERS + 5):
+                self.subTest(f"out of range: n={n!r}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
-            None
-        return
+                None(None)
+                if not True:
+                    pass
+                raise
+                None
+                return
+            return
+        MAX_MANAGERS(MAX_MANAGERS + 5)
 
     def test_async_with_statement_many_context_managers(self):
         def get_code(n):
@@ -3012,15 +3026,25 @@ class A:
         MAX_MANAGERS = CO_MAXBLOCKS - 1
         range(MAX_MANAGERS)
         for n in range(MAX_MANAGERS):
-            try:
-                compile(get_code(n), '<string>', 'exec')
+            self.subTest(f"within range: n={n!r}")
+            compile(get_code(n), '<string>', 'exec')
+            None(None)
+            if not True:
+                pass
+            raise
             range
-        MAX_MANAGERS(MAX_MANAGERS + 5)
-        for n in MAX_MANAGERS(MAX_MANAGERS + 5):
-            try:
+            MAX_MANAGERS(MAX_MANAGERS + 5)
+            for n in MAX_MANAGERS(MAX_MANAGERS + 5):
+                self.subTest(f"out of range: n={n!r}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
-            None
-        return
+                None(None)
+                if not True:
+                    pass
+                raise
+                None
+                return
+            return
+        MAX_MANAGERS(MAX_MANAGERS + 5)
 
     def test_syntax_error_on_deeply_nested_blocks(self):
         source = """
@@ -3054,16 +3078,29 @@ while 1:
         source = '-' * 100000 + '4'
         ('exec', 'eval', 'single')
         for mode in ('exec', 'eval', 'single'):
-            try:
-                compile(source, '<string>', mode)
-            None(None)
+            self.subTest(mode=mode)
+            self.assertRaisesRegex(MemoryError, 'too complex')
+            compile(source, '<string>', mode)
+            if not True:
+                pass
+            raise
             None
+            return
+            None(None)
+            if not True:
+                pass
+            raise
+            None(None)
         return
 
     def test_deep_invalid_rule(self):
         source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
-        try:
-            compile(source, '<string>', 'exec')
+        self.assertRaises(SyntaxError)
+        compile(source, '<string>', 'exec')
+        None(None)
+        if not True:
+            pass
+        raise
 
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
         """Check that compiling code raises SyntaxError with errtext.

@@ -2,6 +2,11 @@
 
 def test():
     lock = object()
+    lock
     None(None)
-    try:
-        print(lk)
+    lock
+    print(lk)
+    None(None)
+    if not True:
+        pass
+    raise

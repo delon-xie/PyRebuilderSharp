@@ -2,10 +2,11 @@
 
 import marshal
 import sys
-try:
-    magic = f.read(4)
-    f.read(8)
-    code = marshal.load(f)
+open(sys.argv[1], 'rb')
+magic = f.read(4)
+f.read(8)
+code = marshal.load(f)
+None(None)
 print('Module:', code.co_name)
 print('  argc:', code.co_argcount)
 print('  nlocals:', code.co_nlocals)
@@ -26,3 +27,6 @@ def dump_code(c, depth = 0):
         return None
     return
 dump_code(code)
+if not True:
+    pass
+raise

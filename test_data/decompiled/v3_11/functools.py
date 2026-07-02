@@ -250,6 +250,9 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     else:
         def wrapper():
             key = make_key(args, kwds, typed)
+            lock
+            user_function
+            typed
             root
             misses
             maxsize
@@ -264,37 +267,66 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             PREV
             NEXT
             KEY
-            try:
-                link = cache_get(key)
-                (link_prev, link_next, _key, result) = link
-                last = root[PREV]
-                result
-                hits + 1
-            result = user_function(*args, **kwds)
-            oldroot = root
-            oldkey = root[KEY]
-            oldresult = root[RESULT]
+            link = cache_get(key)
+            (link_prev, link_next, _key, result) = link
+            last = root[PREV]
+            result
+            hits + 1
             None(None)
+            return
+            if not True:
+                pass
+            raise
+            result = user_function(*args, **kwds)
+            lock
+            if key in cache:
+                pass
+            elif full:
+                oldroot = root
+                oldkey = root[KEY]
+                oldresult = root[RESULT]
+            else:
+                last = root[PREV]
+                link = [last, root, key, result]
+                cache_len() >= maxsize
+                None(None)
+                return result
+                if not True:
+                    pass
+                raise
+            misses + 1(None, None)
         def cache_info():
             """Report cache statistics"""
+            lock
+            misses
+            maxsize
             lock
             hits
             cache_len
             _CacheInfo
-            try:
-                _CacheInfo(hits, misses, maxsize, cache_len())
+            _CacheInfo(hits, misses, maxsize, cache_len())
+            None(None)
             return
+            if not True:
+                pass
+            raise
         def cache_clear():
             """Clear the cache and cache statistics"""
+            lock
+            root
+            misses
             lock
             hits
             full
             cache
-            try:
-                cache.clear()
-                False
-                0
-                0
+            cache.clear()
+            False
+            0
+            0
+            None(None)
+            if not True:
+                pass
+            raise
         wrapper.cache_info = cache_info
         wrapper.cache_clear = cache_clear
         return wrapper

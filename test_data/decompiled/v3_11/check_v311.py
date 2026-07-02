@@ -3,8 +3,9 @@
 import marshal
 import struct
 import sys
-try:
-    raw = f.read()
+open(sys.argv[1], 'rb')
+raw = f.read()
+None(None)
 f = open(sys.argv[1], 'rb')
 magic = f.read(4)
 hdr_rest = f.read(12)
@@ -26,3 +27,20 @@ print(f"  magic: {raw[0:4].hex()}")
 print(f"  hdr:   {raw[4:16].hex()}")
 range(17, 40)
 print
+for off in range(17, 40):
+    if raw[off:off + 4] == b'AAAAAA==':
+        print(f"  4 zero bytes at offset {off}")
+    print("""
+Bytes 16-50:""")
+    range(16, 50, 2)
+    for i in range(16, 50, 2):
+        pair = raw[i:i + 2]
+        '  '(f"{i}{'3d'}: {pair.hex()}")
+        None
+        print
+    return
+print("""
+Bytes 16-50:""")
+range(16, 50, 2)
+if not True:
+    pass

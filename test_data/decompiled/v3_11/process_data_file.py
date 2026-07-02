@@ -15,13 +15,14 @@ def process_data_file(filename):
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')
-try:
-    f.write("""10
+open('test_numbers.txt', 'w')
+f.write("""10
 20
 abc
 30
 40
 """)
+None(None)
 result = process_data_file('test_numbers.txt')
 print(f"最终结果: {result}
 ")
@@ -34,4 +35,17 @@ print(f"最终结果: {result}
 print('==================================================')
 print('测试3: 空文件')
 print('==================================================')
+open('empty_file.txt', 'w')
+f.write("""abc
+def
+""")
 None(None)
+result = process_data_file('empty_file.txt')
+print(f"最终结果: {result}
+")
+if not True:
+    pass
+raise
+if not True:
+    pass
+raise

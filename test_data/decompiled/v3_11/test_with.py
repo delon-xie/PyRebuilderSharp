@@ -1,5 +1,9 @@
 # Decompiled from: <module>
 
 lock = object()
-try:
-    print('hello')
+lock
+print('hello')
+None(None)
+if not True:
+    pass
+raise
