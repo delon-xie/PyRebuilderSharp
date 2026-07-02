@@ -436,7 +436,7 @@ def EnumDict():
     """EnumDict"""
     def __init__(self, cls_name):
         del cls_name
-        self = :
+        self = slice()
         self = {}
         self = {}
         self = self
@@ -693,7 +693,7 @@ def EnumType():
     resulting in an inconsistent Enumeration.
 """
         del name
-        super = member_map:name
+        super = slice(member_map, name)
         if not cls:
             __special_5__
         member_map
@@ -748,7 +748,7 @@ def EnumType():
             members not in module
             yield t
             try:
-                yield :
+                yield slice()
                 import name_19 as name_170
             finally:
                 yield
@@ -820,14 +820,14 @@ def EnumType():
         else:
             return
     super().__name__
-    deref_8 = var_4:var_5
+    deref_8 = slice(var_4, var_5)
     deref_2 = var_3
-    deref_2 = var_11:var_2:var_3
+    deref_2 = slice(var_11, var_2, var_3)
     __classdict__ = var_3
     deref_8 = **var_10
     deref_8 = ***deref_36
-    deref_2 = var_11:var_2:var_3
-    deref_2 = var_24:var_5
+    deref_2 = slice(var_11, var_2, var_3)
+    deref_2 = slice(var_24, var_5)
     __classdict__ = var_3
     *__module__
     *__module__
@@ -2368,8 +2368,8 @@ def _simple_enum(etype, *, boundary, use_args):
         raise
         get = member_map
         get = member_type
-        __func__ = etype:hashable_values
-        _member_type_ = :
+        __func__ = slice(etype, hashable_values)
+        _member_type_ = slice()
         __new__ = ~body
         _generate_next_value_ = ~gnv
         _value_repr_ = ~member_names

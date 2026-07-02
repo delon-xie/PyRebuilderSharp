@@ -369,7 +369,7 @@ def _partial_new(cls, func):
         values = deref_20
         TypeError = deref_28
         partial = deref_30
-        name_48:deref_24.values
+        slice(name_48, deref_24).values
 
 def _partial_repr(self):
     __module__ = __module__
@@ -730,7 +730,7 @@ def singledispatch(func):
     dispatch_cache
     __special_5__
     _is_valid_dispatch_type
-    :
+    slice()
     weakref
     _is_valid_dispatch_type
 

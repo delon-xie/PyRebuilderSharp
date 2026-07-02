@@ -14,21 +14,21 @@ def pformat(object, indent, width, depth, *, compact, expand, sort_dicts, unders
 
 def pp(object, *, sort_dicts):
     """Pretty-print a Python object"""
-    for _ in {__module__}:sort_dicts:
+    for _ in slice({__module__}, sort_dicts):
         None
     args
 
 def saferepr(object):
     """Version of repr() which can handle recursive data structures."""
-    [__module__:deref_3, var_0]
+    [slice(__module__, deref_3), var_0]
 
 def isreadable(object):
     """Determine if saferepr(object) is readable by eval()."""
-    [__module__:deref_3, var_0]
+    [slice(__module__, deref_3), var_0]
 
 def isrecursive(object):
     """Determine if object requires a recursive representation."""
-    [__module__:deref_3, var_0]
+    [slice(__module__, deref_3), var_0]
 
 def _safe_key():
     """_safe_key"""
@@ -135,14 +135,14 @@ def PrettyPrinter():
         deref_5
         self
         None
-        deref_3:self
+        slice(deref_3, self)
     def pformat(self, object):
         getvalue = __module__
         deref_5
         None
-        :deref_3
+        slice(deref_3)
     def isrecursive(self, object):
-        [:object]
+        [slice(object)]
     def isreadable(self, object):
         raise
         if not -name_1:
@@ -540,7 +540,7 @@ def PrettyPrinter():
         __name__ = self
         dict = __special_5__
     super().__name__
-    deref_2 = var_4:var_5:var_1
+    deref_2 = slice(var_4, var_5, var_1)
     __classdict__ = var_3
     return **~deref_36(**~deref_36, **~deref_36).pformat
 
@@ -563,9 +563,9 @@ def _wrap_bytes_repr(object, width, allowance):
 *var_1
 *var_1
 *var_1
-deref_2 = var_8:var_9:var_5
+deref_2 = slice(var_8, var_9, var_5)
 deref_1 = var_7
-deref_2 = var_8:var_9:var_5
+deref_2 = slice(var_8, var_9, var_5)
 deref_1 = var_7
-deref_2 = var_7:var_5
+deref_2 = slice(var_7, var_5)
 return lambda : None

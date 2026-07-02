@@ -16,6 +16,7 @@ public class PythonCodeGenerator : ICodeGenerator
     private readonly StringBuilder _output = new();
     private int _indentLevel;
     private readonly CodeGenOptions _options;
+    private int _inSubscript;  // >0 when visiting inside a subscript expression
 
     public PythonCodeGenerator(CodeGenOptions? options = null)
     {
@@ -1193,6 +1194,7 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitSubscript(Subscript sub)
     {
+        _inSubscript++;
         Visit(sub.Value);
         _output.Append("[");
         if (sub.Slice is Slice slice)
@@ -1216,6 +1218,7 @@ public class PythonCodeGenerator : ICodeGenerator
             Visit(sub.Slice);
         }
         _output.Append("]");
+        _inSubscript--;
     }
 
     /// <summary>
@@ -1223,6 +1226,20 @@ public class PythonCodeGenerator : ICodeGenerator
     /// </summary>
     private void VisitSliceLiteral(Slice slice)
     {
+        // 独立 Slice（不在下标内）是反编译错误 → 输出 slice(start, stop, step)
+        if (_inSubscript <= 0)
+        {
+            bool slHasLower = !(slice.Lower is Constant { Value: null });
+            bool slHasUpper = !(slice.Upper is Constant { Value: null });
+            bool slHasStep = slice.Step != null && !(slice.Step is Constant { Value: null });
+            _output.Append("slice(");
+            int slArgCount = 0;
+            if (slHasLower) { if (slArgCount > 0) _output.Append(", "); Visit(slice.Lower); slArgCount++; }
+            if (slHasUpper) { if (slArgCount > 0) _output.Append(", "); Visit(slice.Upper); slArgCount++; }
+            if (slHasStep) { if (slArgCount > 0) _output.Append(", "); Visit(slice.Step); }
+            _output.Append(")");
+            return;
+        }
         // 优化: None 下限表示起始不指定 → 输出空（[:2] 而非 [None:2]）
         bool lowerIsNone = slice.Lower == null || slice.Lower is Constant { Value: null };
         if (!lowerIsNone)

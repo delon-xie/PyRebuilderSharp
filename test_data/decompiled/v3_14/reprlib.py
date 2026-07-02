@@ -176,7 +176,7 @@ def Repr():
             self
             self
             None
-    deref_2 = var_23:var_24:var_25
+    deref_2 = slice(var_23, var_24, var_25)
     deref_1 = var_42
     var_25
     **var_41
@@ -396,10 +396,10 @@ def Repr():
     var_13
     var_12
     var_11
-    *var_1:var_10:var_1
-    *var_1:var_10:var_1
-    *var_1:var_10:var_1
-    *var_1:var_10:var_1
+    *slice(var_1, var_10, var_1)
+    *slice(var_1, var_10, var_1)
+    *slice(var_1, var_10, var_1)
+    *slice(var_1, var_10, var_1)
     var_9
     var_1
     var_8
