@@ -607,9 +607,9 @@ class EnumType(type):
             members = source.items()()
             <listcomp>
             try:
-                members.sort(key=<lambda>)
+                members.sort(key=lambda t: (t[1], t[0]))
             else:
-                members.sort(key=<lambda>)
+                members.sort(key=lambda t: t[0])
                 body = members()
                 tmp_cls = type(name, (object), body)
                 if boundary:
@@ -897,7 +897,7 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition order.
         """
-        yield sorted(cls._iter_member_by_value_(value), key=<lambda>)
+        yield sorted(cls._iter_member_by_value_(value), key=lambda m: m._sort_order_)
 
     def _missing_(cls, value):
         """
@@ -1065,7 +1065,7 @@ def unique(enumeration):
     return enumeration
 
 def _dataclass_repr(self):
-    return <genexpr>(dcf.keys()())
+    return (dcf[k].repr for k in .0)
 
 def global_enum_repr(self):
     """
@@ -1258,9 +1258,9 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         members = source.items()()
         <listcomp>
         try:
-            members.sort(key=<lambda>)
+            members.sort(key=lambda t: (t[1], t[0]))
         else:
-            members.sort(key=<lambda>)
+            members.sort(key=lambda t: t[0])
             if boundary:
                 return cls
             KEEP

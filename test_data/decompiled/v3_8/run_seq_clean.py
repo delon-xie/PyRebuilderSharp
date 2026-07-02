@@ -45,7 +45,7 @@ for ver in versions:
                     print('           actual=  %s' % a)
     except Exception:
         pass
-passed = sum(<genexpr>(results.items()))
+passed = sum(((v, r) for (v, r) in .0 if r))
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))

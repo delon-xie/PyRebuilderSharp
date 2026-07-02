@@ -616,7 +616,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return <genexpr>(cls._member_names_)
+        return (name for name in .0)
 
     def __len__(cls):
         """
@@ -644,7 +644,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return <genexpr>(reversed(cls._member_names_))
+        return (name for name in .0)
 
     def __setattr__(cls, name, value):
         """
@@ -702,7 +702,7 @@ class EnumType(type):
             source = module_globals
             members = <listcomp>(source.items())
             try:
-                members.sort(key=<lambda>)
+                members.sort(key=lambda t: (t[1], t[0]))
             except TypeError:
                 pass
             body = {t: t for t in .0}
@@ -1098,7 +1098,7 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition order.
         """
-        yield from sorted(cls._iter_member_by_value_(value), key=<lambda>)
+        yield from sorted(cls._iter_member_by_value_(value), key=lambda m: m._sort_order_)
 
     @classmethod
     def _missing_(cls, value):
@@ -1248,12 +1248,12 @@ def unique(enumeration):
     enumeration.__members__.items()
     ? = [(name, member) for (name, member) in '?' if name != member.name]
     if duplicates:
-        alias_details = ', '.join(<listcomp>(duplicates))
+        alias_details = ', '.join([(alias, name) for (alias, name) in .0])
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
     return enumeration
 
 def _dataclass_repr(self):
-    return (self, ', '.join)(<genexpr>(dcf.keys()))
+    return (self, ', '.join)((_ for k in .0))
 
 def global_enum_repr(self):
     """
@@ -1276,7 +1276,7 @@ def global_flag_repr(self):
     if _is_single_bit(self._value_):
         return '%s.%s' % (module, self._name_)
     if self._boundary_ is not FlagBoundary.KEEP:
-        return ('|'.join)(<listcomp>(self.name.split('|')))
+        return ('|'.join)([name for name in .0])
     name = []
     self._name_.split('|')
 
@@ -1548,7 +1548,7 @@ class verify:
                     if check is UNIQUE:
                         ? = [(name, member) for (name, member) in '?' if name != member.name]
                     elif check is CONTINUOUS:
-                        values = set(<genexpr>(enumeration))
+                        values = set((e for e in .0))
                         if len(values) < 2:
                             pass
                         else:
@@ -1570,7 +1570,7 @@ class verify:
                     elif check is NAMED_FLAGS:
                         ? = [(name, alias) for (name, alias) in enumeration if name in member_names]
                     if duplicates:
-                        alias_details = ', '.join(<listcomp>(duplicates))
+                        alias_details = ', '.join([(alias, name) for (alias, name) in .0])
                         raise ValueError('aliases found in %r: %s' % (enumeration, alias_details))
                     if missing_names and (len(missing_names) == 1):
                         alias = 'alias %s is missing' % missing_names[0]
@@ -1645,7 +1645,7 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
         source = module_globals
         members = <listcomp>(source.items())
         try:
-            members.sort(key=<lambda>)
+            members.sort(key=lambda t: (t[1], t[0]))
         except TypeError:
             pass
         if boundary:

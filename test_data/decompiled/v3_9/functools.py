@@ -273,7 +273,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    args.extend(<genexpr>(self.keywords.items()))
+    args.extend(((k, v) for (k, v) in .0))
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -409,7 +409,7 @@ def lru_cache(maxsize, typed):
     """
     def decorating_function(user_function):
         wrapper = _lru_cache_wrapper(user_function, user_function, wrapper, _CacheInfo)
-        wrapper.cache_parameters = <lambda>
+        wrapper.cache_parameters = lambda : {'maxsize': .cell, 'typed': .cell}
         return update_wrapper(wrapper, user_function)
     if isinstance(maxsize, int) and (maxsize < 0):
         pass
@@ -433,7 +433,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if not callable(user_function):
         raise TypeError('the first argument must be callable')
     def wrapper():
-        result = kwds(*args, **kwds)
+        result = kwds(**args, **kwds)
         return result
     def wrapper():
         key = result(args, kwds, .cell)
@@ -573,7 +573,7 @@ def singledispatch(func):
     def _is_valid_dispatch_type(cls):
         if isinstance(cls, type):
             return True
-        all(<genexpr>(cls.__args__))
+        all((arg for arg in .0))
         return
     def register(cls, func):
         """generic_func.register(cls, func) -> func
@@ -585,7 +585,7 @@ def singledispatch(func):
         from typing import get_type_hints
         from annotationlib import Format, ForwardRef
         if func(cls) and (func is None):
-            return <lambda>
+            return lambda f: .cell(f, f)
         raise TypeError(f"Invalid first argument to `register()`. {cls!r} is not a class or union type.")
         ann = getattr(cls, '__annotate__', None)
         if ann is None:

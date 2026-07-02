@@ -355,7 +355,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return <genexpr>(cls._member_names_)
+        return (name for name in .0)
 
     def __len__(cls):
         """
@@ -381,7 +381,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return <genexpr>(reversed(cls._member_names_))
+        return (name for name in .0)
 
     def __setattr__(cls, name, value):
         """
@@ -745,7 +745,7 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition order.
         """
-        yield from sorted(cls._iter_member_by_value_(value), key=<lambda>)
+        yield from sorted(cls._iter_member_by_value_(value), key=lambda m: m._sort_order_)
 
     @classmethod
     def _missing_(cls, value):
@@ -850,11 +850,11 @@ def unique(enumeration):
     enumeration.__members__.items()
     ? = [(name, member) for (name, member) in '?' if name != member.name]
     if duplicates:
-        alias_details = ', '.join(<listcomp>(duplicates))
+        alias_details = ', '.join([(alias, name) for (alias, name) in .0])
         raise ValueError('duplicate values found in %r: %s' % (enumeration, alias_details))
 
 def _dataclass_repr(self):
-    return (self, ', '.join)(<genexpr>(dcf.keys()))
+    return (self, ', '.join)((k for k in .0 if .0[k].repr))
 
 def global_enum_repr(self):
     """
@@ -874,7 +874,7 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_ is None:
         return '%s.%s(%r)' % (module, cls_name, self._value_)
-    return ('|'.join)(<listcomp>(self.name.split('|')))
+    return ('|'.join)([name for name in .0])
     name.append(n)
     name.append('%s.%s' % (module, n))
 

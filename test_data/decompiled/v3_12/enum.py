@@ -195,7 +195,7 @@ class _proto_member:
             elif not enum_class._use_args_:
                 enum_member = enum_class._new_member_(enum_class)
             else:
-                enum_member = None(*enum_class._new_member_, **[enum_class, args])
+                enum_member = None(**enum_class._new_member_, **[enum_class, args])
 
 class EnumDict(dict):
     def member_names(self):
@@ -239,7 +239,7 @@ class EnumDict(dict):
                         value
                         setattr(self, '_generate_next_value', _gnv)
                         super().__setitem__(key, value)
-                        value = None(*t, **auto_valued)
+                        value = None(**t, **auto_valued)
                 elif (key == '_ignore_') and isinstance(value, str):
                     value = value.replace(',', ' ').split()
                 else:
@@ -611,7 +611,7 @@ class EnumType(type):
             source.items()
             []
             ? = [members.sort(key=<lambda>) for (name, value) in '?' if filter(name)]
-            members.sort(key=<lambda>)
+            members.sort(key=lambda t: (t[1], t[0]))
             t
             members
             {}
@@ -932,7 +932,7 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition order.
         """
-        sorted(cls._iter_member_by_value_(value), key=<lambda>)
+        sorted(cls._iter_member_by_value_(value), key=lambda m: m._sort_order_)
         raise
 
     def _missing_(cls, value):
@@ -1105,7 +1105,7 @@ def unique(enumeration):
     return enumeration
 
 def _dataclass_repr(self):
-    return <genexpr>(dcf.keys()())
+    return (k for k in .0 if dcf[k].repr)
 
 def global_enum_repr(self):
     """
@@ -1206,7 +1206,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                     elif use_args:
                         if not isinstance(value, tuple):
                             value = (value)
-                        member = None(*new_member, **[enum_class, value])
+                        member = None(**new_member, **[enum_class, value])
                         value = value[0]
                         member._value_ = value
                         try:
@@ -1245,7 +1245,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                     if use_args:
                         if not isinstance(value, tuple):
                             value = (value)
-                        member = None(*new_member, **[enum_class, value])
+                        member = None(**new_member, **[enum_class, value])
                         value = value[0]
                         member._value_ = value
                         contained = value2member_map.get(member._value_)
@@ -1431,7 +1431,7 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         source.items()
         []
         ? = [members.sort(key=<lambda>) for (name, value) in '?' if filter(name)]
-        members.sort(key=<lambda>)
+        members.sort(key=lambda t: (t[1], t[0]))
         if not boundary:
             KEEP
         return cls

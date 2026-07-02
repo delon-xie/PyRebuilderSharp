@@ -8,11 +8,11 @@ code = compile('a1 = None', '<test>', 'exec')
 m = bytes(marshal.dumps(code))
 print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
-print('Bytes:', ' '.join(<genexpr>(m[:60])))
+print('Bytes:', ' '.join((b for b in .0)))
 print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
 known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
-print('Known values:', <dictcomp>(known.items()))
+print('Known values:', {v: v for (k, v) in .0 if k == 'flags'})
 range(0, 8)
 print
 print

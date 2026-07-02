@@ -313,6 +313,8 @@ public class AstBuilder
         stmts = PostProcessFunctionDefs(stmts);
         // Fallback: position-based ChildCode matching
         stmts = ConvertChildCodesToFunctionDefs(stmts);
+        // Convert Call(FunctionRef<genexpr>, ...) to comprehension expressions in all statements
+        stmts = ConvertComprehensionCalls(stmts);
         
         // Fix co_names: extract names from bytecodes (works even when marshal co_names is wrong)
         if (_codeObject.Instructions != null && _codeObject.ChildCodes.Count > 0)
@@ -4123,6 +4125,17 @@ public class AstBuilder
 
         // Decompile the comprehension body
         var body = DecompileChildCode(compRef.Code);
+        // DEBUG: dump body
+        for (int di = 0; di < body.Count && di < 10; di++)
+        {
+            var s = body[di];
+            Console.Error.WriteLine($"[COMP_DEBUG] body[{di}]={s.GetType().Name}");
+            if (s is For f) Console.Error.WriteLine($"[COMP_DEBUG]   For(target={f.Target}, iter={f.Iter}, body.Count={f.Body.Count})");
+            if (s is If ifStmt) Console.Error.WriteLine($"[COMP_DEBUG]   If(test={ifStmt.Test}, body.Count={ifStmt.Body.Count})");
+            if (s is ExprStmt es) Console.Error.WriteLine($"[COMP_DEBUG]   ExprStmt(value={es.Value?.GetType().Name})");
+            if (s is Assign a && a.Targets.Count == 1 && a.Targets[0] is Name n) Console.Error.WriteLine($"[COMP_DEBUG]   Assign(target={n.Id})");
+            if (s is Return r) Console.Error.WriteLine($"[COMP_DEBUG]   Return(value={r.Value?.GetType().Name})");
+        }
 
         // Expected body structure: [For(target, iter, body, null)] or similar
         // The body may have BUILD_SET/BUILD_LIST/BUILD_MAP as a statement
@@ -4202,6 +4215,90 @@ public class AstBuilder
             CompKind.Generator => new GeneratorExp(elt, generators),
             _ => null
         };
+    }
+
+    /// <summary>
+    /// 递归转换所有语句中的 Call(FunctionRef&lt;...&gt;, ...) 为推导式表达式。
+    /// 覆盖 Assign、Return、ExprStmt 等所有上下文中的推导式调用。
+    /// </summary>
+    private List<Stmt> ConvertComprehensionCalls(List<Stmt> stmts)
+    {
+        var result = new List<Stmt>(stmts.Count);
+        foreach (var stmt in stmts)
+        {
+            result.Add(ConvertComprehensionCallInStmt(stmt));
+        }
+        return result;
+    }
+
+    private Stmt ConvertComprehensionCallInStmt(Stmt stmt)
+    {
+        return stmt switch
+        {
+            Assign a => a with { Value = ConvertComprehensionExpr(a.Value) },
+            Return r => r.Value != null
+                ? new Return(ConvertComprehensionExpr(r.Value))
+                : r,
+            ExprStmt es => es with { Value = ConvertComprehensionExpr(es.Value) },
+            YieldFrom yf => new YieldFrom(ConvertComprehensionExpr(yf.Value)),
+            Yield y => y.Value != null ? new Yield(ConvertComprehensionExpr(y.Value)) : y,
+            If ifNode => new If(ifNode.Test,
+                ConvertComprehensionCalls(ifNode.Body),
+                ifNode.Orelse != null ? ConvertComprehensionCalls(ifNode.Orelse) : null),
+            For forNode => new For(forNode.Target, forNode.Iter,
+                ConvertComprehensionCalls(forNode.Body),
+                forNode.Orelse != null ? ConvertComprehensionCalls(forNode.Orelse) : null),
+            While wNode => new While(wNode.Test,
+                ConvertComprehensionCalls(wNode.Body),
+                wNode.Orelse != null ? ConvertComprehensionCalls(wNode.Orelse) : null),
+            Try tNode => new Try(
+                ConvertComprehensionCalls(tNode.Body),
+                tNode.Handlers.Select(h => new ExceptHandler(h.Type, h.Name, ConvertComprehensionCalls(h.Body))).ToList(),
+                tNode.Orelse != null ? ConvertComprehensionCalls(tNode.Orelse) : null,
+                tNode.Finalbody != null ? ConvertComprehensionCalls(tNode.Finalbody) : null),
+            _ => stmt
+        };
+    }
+
+    private Expr ConvertComprehensionExpr(Expr? expr)
+    {
+        if (expr == null) return null;
+        // Detect Call(FunctionRef<...>, ...) → comprehension expression
+        if (expr is Call call && call.Func is FunctionRef compRef
+            && compRef.Name.StartsWith("<"))
+        {
+            var compExpr = BuildComprehension(compRef, call);
+            if (compExpr != null)
+                return compExpr;
+        }
+        // Detect standalone FunctionRef<lambda> → Lambda expression
+        if (expr is FunctionRef lambdaRef && lambdaRef.Name == "<lambda>")
+        {
+            Console.Error.WriteLine($"[COMP_LAMBDA] detected <lambda>, code={lambdaRef.Code?.Name}");
+            var lambda = BuildLambda(lambdaRef);
+            Console.Error.WriteLine($"[COMP_LAMBDA] BuildLambda returned {(lambda != null ? "non-null" : "null")}");
+            if (lambda != null)
+                return lambda;
+        }
+        // Recurse into sub-expressions: Call args, BinOp, etc.
+        if (expr is Call call2)
+        {
+            var newArgs = call2.Args.Select(a => ConvertComprehensionExpr(a)).ToList();
+            var newKeywords = call2.Keywords.Select(k => {
+                Console.Error.WriteLine($"[COMP_DEBUG] keyword: {k.Arg ?? "(null)"}, valueType={k.Value?.GetType().Name}, valueStr={k.Value}");
+                return new Keyword(k.Arg, ConvertComprehensionExpr(k.Value));
+            }).ToList();
+            return new Call(call2.Func, newArgs, newKeywords);
+        }
+        if (expr is BinOp binOp)
+        {
+            return new BinOp(ConvertComprehensionExpr(binOp.Left), binOp.Op, ConvertComprehensionExpr(binOp.Right));
+        }
+        if (expr is UnaryOp unaryOp)
+        {
+            return new UnaryOp(unaryOp.Op, ConvertComprehensionExpr(unaryOp.Operand));
+        }
+        return expr;
     }
 
     private bool IsConditionBranch(BasicBlock block)

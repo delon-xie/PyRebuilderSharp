@@ -8,7 +8,7 @@ code = compile('a1 = None', '<test>', 'exec')
 m = bytes(marshal.dumps(code))
 print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
-'Bytes:'(' '.join, <genexpr>(m[:60]()))
+'Bytes:'(' '.join, ('02x' for _ in .0))
 print()
 'Byte[0] = 0x'(f"{m[0]}02x ({m[0]})")
 known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}

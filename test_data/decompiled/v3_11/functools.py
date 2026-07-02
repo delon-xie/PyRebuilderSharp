@@ -89,7 +89,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    <genexpr>(self.keywords.items()())
+    (None for (k, v) in .0)
     return f"{module}.{qualname}({', '.join(args)})"
 
 def partial():
@@ -228,13 +228,13 @@ def lru_cache(maxsize, typed):
             return 0
         def decorating_function(user_function):
             wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
-            wrapper.cache_parameters = <lambda>
+            wrapper.cache_parameters = lambda : {'maxsize': maxsize, 'typed': typed}
             return update_wrapper(wrapper, user_function)
         return decorating_function
     elif callable(maxsize) and isinstance(typed, bool):
         user_function = 128
         wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
-        wrapper.cache_parameters = <lambda>
+        wrapper.cache_parameters = lambda : {'maxsize': maxsize, 'typed': typed}
         return update_wrapper(wrapper, user_function)
     else:
         raise TypeError('Expected first argument to be an integer, a callable, or None')
@@ -244,7 +244,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         raise TypeError('the first argument must be callable')
     elif maxsize == 0:
         def wrapper():
-            result = user_function(*args, **kwds)
+            result = user_function(**args, **kwds)
             return result
     else:
         def wrapper():
@@ -276,7 +276,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             if not True:
                 pass
             raise
-            result = user_function(*args, **kwds)
+            result = user_function(**args, **kwds)
             lock
             if key in cache:
                 pass
@@ -483,7 +483,7 @@ def singledispatch(func):
         if isinstance(cls, type):
             return True
         elif not isinstance(cls, UnionType):
-            <genexpr>(cls.__args__())
+            (None for arg in .0)
             all
     def register(cls, func):
         """generic_func.register(cls, func) -> func
@@ -492,7 +492,7 @@ def singledispatch(func):
 
         """
         if _is_valid_dispatch_type(cls):
-            return <lambda>
+            return lambda f: register(cls, f)
         else:
             raise TypeError(f"Invalid first argument to `register()`. {cls!r} is not a class or union type.")
         ann = getattr(cls, '__annotate__', None)
@@ -504,7 +504,7 @@ def singledispatch(func):
     def wrapper():
         if not args:
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        return dispatch(args[0].__class__)(*args, **kw)
+        return dispatch(args[0].__class__)(**args, **kw)
     wrapper.register = register
     wrapper.dispatch = dispatch
     wrapper.registry = MappingProxyType(registry)
@@ -578,9 +578,9 @@ def _singledispatchmethod_get():
                 skip_bound_arg = self._dispatch_arg_index == 1
             else:
                 if skip_bound_arg:
-                    return method(*args[1:], **kwargs)
-                return method(*args, **kwargs)
-        return method(*args, **kwargs)
+                    return method(**args[1:], **kwargs)
+                return method(**args, **kwargs)
+        return method(**args, **kwargs)
     def __getattr__(self, name):
         if name not in ['__name__', '__qualname__', '__annotations__', '__type_params__', '__isabstractmethod__']:
             raise AttributeError

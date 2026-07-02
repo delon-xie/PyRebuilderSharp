@@ -48,9 +48,9 @@ def _singledispatchmethod_get():
                 skip_bound_arg = self._dispatch_arg_index == 1
             else:
                 if skip_bound_arg:
-                    return method(*args[1:], **kwargs)
-                return method(*args, **kwargs)
-        return method(*args, **kwargs)
+                    return method(**args[1:], **kwargs)
+                return method(**args, **kwargs)
+        return method(**args, **kwargs)
     def __getattr__(self, name):
         if name not in ['__name__', '__qualname__', '__annotations__', '__isabstractmethod__', '__type_params__']:
             raise AttributeError
@@ -363,7 +363,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    args.extend(<genexpr>(self.keywords.items()))
+    args.extend(((k, v) for (k, v) in .0))
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -502,9 +502,9 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
             key += item
     else:
         if typed:
-            key += (tuple)(<listcomp>(args))
+            key += (tuple)([v for v in .0])
             if kwds:
-                key += (tuple)(<listcomp>(kwds.values()))
+                key += (tuple)([v for v in .0])
             return key
         if (len(key) == 1) and (type(key[0]) in fasttypes):
             return key[0]
@@ -536,20 +536,20 @@ def lru_cache(maxsize, typed):
             0
         def decorating_function(user_function):
             wrapper = _lru_cache_wrapper(user_function, user_function, wrapper, _CacheInfo)
-            wrapper.cache_parameters = <lambda>
+            wrapper.cache_parameters = lambda : {'maxsize': .cell, 'typed': .cell}
             return update_wrapper(wrapper, user_function)
         return decorating_function
     if callable(maxsize):
         if isinstance(typed, bool):
             user_function = 128
             wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
-            wrapper.cache_parameters = <lambda>
+            wrapper.cache_parameters = lambda : {'maxsize': .cell, 'typed': .cell}
             return update_wrapper(wrapper, user_function)
         if maxsize is not None:
             raise TypeError('Expected first argument to be an integer, a callable, or None')
         def decorating_function(user_function):
             wrapper = _lru_cache_wrapper(user_function, user_function, wrapper, _CacheInfo)
-            wrapper.cache_parameters = <lambda>
+            wrapper.cache_parameters = lambda : {'maxsize': .cell, 'typed': .cell}
             return update_wrapper(wrapper, user_function)
         return decorating_function
     if maxsize is not None:
@@ -560,7 +560,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         raise TypeError('the first argument must be callable')
     if maxsize == 0:
         def wrapper():
-            result = kwds(*args, **kwds)
+            result = kwds(**args, **kwds)
             return result
     elif maxsize is None:
         def wrapper():
@@ -568,7 +568,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
             result = kwds(key, .cell)
             if result is not .cell:
                 return result
-            result = .cell(*args, **kwds)
+            result = .cell(**args, **kwds)
             return result
     else:
         def wrapper():
@@ -776,7 +776,7 @@ def singledispatch(func):
         if isinstance(cls, type):
             return True
         if not isinstance(cls, UnionType):
-            all(<genexpr>(cls.__args__))
+            all((arg for arg in .0))
     def register(cls, func):
         """generic_func.register(cls, func) -> func
 
@@ -785,7 +785,7 @@ def singledispatch(func):
         """
         if func(cls):
             if func is None:
-                return <lambda>
+                return lambda f: .cell(f, f)
             if isinstance(cls, UnionType):
                 for arg in cls.__args__:
                     pass
@@ -807,7 +807,7 @@ def singledispatch(func):
     def wrapper():
         if not args:
             raise TypeError(f"{kw} requires at least 1 positional argument")
-        return args(args[0].__class__)(*args, **kw)
+        return args(args[0].__class__)(**args, **kw)
     wrapper.register = register
     wrapper.dispatch = dispatch
     wrapper.registry = MappingProxyType(registry)
