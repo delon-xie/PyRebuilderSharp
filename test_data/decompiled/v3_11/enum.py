@@ -195,8 +195,6 @@ class _proto_member:
                 args = (args)
             elif not enum_class._use_args_:
                 enum_member = enum_class._new_member_(enum_class)
-        enum_member = canonical_member
-        enum_class._value2member_map_.setdefault(value, enum_member)
 
 class EnumDict(dict):
     def member_names(self):
@@ -279,16 +277,8 @@ class EnumDict(dict):
         members.keys()
         for name in members.keys():
             pass
-        if AttributeError:
-            for (name, value) in members:
-                pass
-        else:
-            raise
-            raise
-            more_members.items()
-            for (name, value) in more_members.items():
-                None
-            return
+        for (name, value) in members:
+            pass
 _EnumDict = EnumDict
 
 class EnumType(type):
@@ -434,18 +424,6 @@ class EnumType(type):
                 n = [classdict[n] for n in member_names if isinstance(p.value, int)]
         else:
             getattr(first_enum, '_boundary_', None)
-        classdict.update(enum_class.__dict__)
-        method = member_type.__str__
-        enum_method = getattr(first_enum, name)
-        found_method = getattr(enum_class, name)
-        object_method = getattr(object, name)
-        data_type_method = getattr(member_type, name)
-        enum_class.__new__ = Enum.__new__
-        delattr(enum_class, '_boundary_')
-        delattr(enum_class, '_flag_mask_')
-        delattr(enum_class, '_singles_mask_')
-        delattr(enum_class, '_all_bits_')
-        delattr(enum_class, '_inverted_')
 
     def __bool__(cls):
         """
@@ -611,19 +589,10 @@ class EnumType(type):
             (<listcomp>)
             try:
                 members.sort(key=lambda t: (t[1], t[0]))
+            except TypeError:
+                pass
             else:
                 members.sort(key=lambda t: t[0])
-                body = members()
-                tmp_cls = type(name, (object), body)
-                if boundary:
-                    cls = tmp_cls
-                    if as_global:
-                        global_enum(cls)
-                    else:
-                        sys.modules[cls.__module__].__dict__.update(cls.__members__)
-                        return cls
-                else:
-                    KEEP
                 raise
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
@@ -689,7 +658,8 @@ class Enum(metaclass=EnumType):
             return start
         try:
             last_value = sorted(last_values).pop()
-        last_value + 1
+        except TypeError:
+            pass
 
     def _missing_(cls, value):
         pass
@@ -745,21 +715,32 @@ class Enum(metaclass=EnumType):
             return value
         try:
             cls._value2member_map_[value]
+        except KeyError:
+            pass
         return
-        exc = TypeError(f"error in {cls.__name__!s}._missing_: returned {result!r} instead of None or a valid member")
 
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
 
     def _add_value_alias_(self, value):
         cls = self.__class__
-        if value in cls._value2member_map_:
-            if cls._value2member_map_[value] is not self:
-                raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
-        else:
+        try:
             try:
-                cls._value2member_map_.setdefault(value, self)
-                cls._hashable_values_.append(value)
+                raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
+                for m in cls._member_map_.values():
+                    if (m._value_ == value) and (m is not self):
+                        raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
+                    return None
+                    raise
+                    try:
+                        cls._value2member_map_.setdefault(value, self)
+                        cls._hashable_values_.append(value)
+                    except TypeError:
+                        pass
+            except TypeError:
+                cls._member_map_.values()
+        except TypeError:
+            cls._member_map_.values()
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
 
@@ -903,7 +884,8 @@ class Flag(Enum, boundary=STRICT):
             last_value = max(last_values)
             try:
                 high_bit = _high_bit(last_value)
-            return 2 ** (high_bit + 1)
+            except Exception:
+                pass
 
     def _iter_member_by_value_(cls, value):
         """
@@ -1298,9 +1280,8 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         (<listcomp>)
         try:
             members.sort(key=lambda t: (t[1], t[0]))
+        except TypeError:
+            pass
         else:
             members.sort(key=lambda t: t[0])
-            if boundary:
-                return cls
-            KEEP
             raise

@@ -426,10 +426,7 @@ def _possibly_sorted(x):
     try:
         __module__
     except:
-        x
-        x
-        __special_5__
-        None
+        pass
 *var_2
 *var_2
 *'Repr'

@@ -141,21 +141,20 @@ class Repr:
     def repr_int(self, x, level):
         try:
             s = builtins.repr(x)
-        import math
-        import sys
-        k = 1 + int(math.log10(abs(x)))
-        max_digits = sys.get_int_max_str_digits()
-        f"{x.__class__.__name__} instance with roughly {k} digits (limit at {max_digits}) at 0x{id(x)}{'x'}>"
-        '<'
+        except ValueError:
+            pass
 
     def repr_instance(self, x, level):
         try:
             s = builtins.repr(x)
-        return
+        except Exception:
+            pass
 
 def _possibly_sorted(x):
     try:
         sorted(x)
+    except Exception:
+        pass
     return
 aRepr = Repr()
 repr = aRepr.repr

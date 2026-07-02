@@ -10,7 +10,7 @@ def process_data_file(filename):
         print(f"[外层] 尝试打开文件: {filename}")
         file = open(filename, 'r')
     except FileNotFoundError:
-        print(f"[外层 except] 文件不存在: {filename}")
+        pass
     print('[内层] 开始读取数据...')
     lines = file.readlines()
     numbers = []

@@ -773,8 +773,7 @@ class Enum(metaclass=EnumType):
                     cls._value2member_map_.setdefault(value, self)
                     cls._hashable_values_.append(value)
                 except TypeError:
-                    cls._unhashable_values_.append(value)
-                    cls._unhashable_values_map_.setdefault(self.name, []).append(value)
+                    pass
                 for m in cls._member_map_.values():
                     if not m._value_ == value:
                         pass

@@ -1483,7 +1483,7 @@ public class AstBuilder
         bool isFinally = false;
         bool hasExcMatch = handlerBlock.Instructions.Any(i =>
             i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
-        // bare except detection
+        Console.Error.WriteLine($"[TRY_DBG] handlerBlock#{handlerBlock.Id} offset={handlerBlock.StartOffset:X4} ops=[{string.Join(",", handlerBlock.Instructions.Select(i => $"{i.Opcode}({i.Opcode:D})"))}] hasExcMatch={hasExcMatch}");
         // 检测 bare except（无 CHECK_EXC_MATCH）：PUSH_EXC_INFO + POP_TOP → 裸 except:
         bool isBareExcept = !hasExcMatch && handlerBlock.Instructions.Count >= 2
             && handlerBlock.Instructions[0].Opcode == Opcode.PUSH_EXC_INFO_312
@@ -1648,10 +1648,12 @@ public class AstBuilder
                 }
             }
 
+            var handlerSuccessorSet = new HashSet<BasicBlock>(handlerBlock.Successors);
             var elseCandidates = _sortedBlocks
                 .Where(b => b.StartOffset > scanStart
                     && b.EndOffset < scanEnd
-                    && !visited.Contains(b))
+                    && !visited.Contains(b)
+                    && !handlerSuccessorSet.Contains(b))  // 跳过 handler 后继（它们是 handler body，不是 else）
                 .OrderBy(b => b.StartOffset)
                 .ToList();
             Console.Error.WriteLine($"[ET_ELSE] found {elseCandidates.Count} candidates: {string.Join(",", elseCandidates.Select(b => $"{b.Id}@{b.StartOffset}"))}");

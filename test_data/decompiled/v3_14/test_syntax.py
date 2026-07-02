@@ -77,8 +77,7 @@ def SyntaxErrorTestCase():
             None
             __module__
         except:
-            None
-            [errtext, self, subclass, end_lineno]
+            pass
         filename
         None
         code
@@ -466,12 +465,7 @@ def SyntaxErrorTestCase():
             s
             __module__
         except:
-            None
-            s2
-            deref_5
-            self
-            self
-            None
+            pass
         fail = var_0
         name_3 = var_1
         None

@@ -50,8 +50,13 @@ for ver in versions:
                                 if e != a:
                                     print(f"  Line {i}: expected={e}")
                                     print(f"           actual=  {a}")
-                                elif Exception:
-                                    pass
+                                else:
+                                    raise
+                                    raise
+                                    print(f"\n{'========================================'}")
+                                    passed = (r for (v, r) in results.items()())
+                                    total = len(results)
+                                    'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
                         False
     print(f"❌ {ver}: AST parse failed - {e}")
     print(f"  Decompiled: {actual_src[:200]}")

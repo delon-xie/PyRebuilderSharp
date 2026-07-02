@@ -12,10 +12,7 @@ def process_data_file(filename):
         None
         __module__(file)
     except:
-        None
-        var_5(filename, filename)
-        __module__
-        None
+        pass
     try:
         strip = line
         int = {}
@@ -28,10 +25,7 @@ def process_data_file(filename):
         None
         deref_11
     except:
-        None
-        num(filename, line, average)
-        __module__
-        None
+        pass
     None
     __module__(line)
     if not True:

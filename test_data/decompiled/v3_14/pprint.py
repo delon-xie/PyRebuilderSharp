@@ -39,25 +39,7 @@ def _safe_key():
             self
             self
         except:
-            self
-            other
-            self
-            __special_9__
-            self
-            other
-            self
-            __special_7__
-            __special_5__
-            self
-            self
-            self
-            __special_9__
-            self
-            self
-            self
-            __special_7__
-            __special_5__
-            None
+            pass
     var_5
     **var_4
     **var_4
@@ -373,7 +355,7 @@ def PrettyPrinter():
         try:
             name_13 = __special_11__
         except:
-            None
+            pass
         name_14 = allowance
         name_15 = next_ent
         self

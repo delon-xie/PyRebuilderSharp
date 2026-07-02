@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
-pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
 """Run AST comparison for test_seq_clean across all versions"""
 import os
 import subprocess
@@ -14,13 +13,8 @@ expected_src = f.read()
 None(None)
 try:
     expected_ast = ast.dump(ast.parse(expected_src), indent=2)
-print('Failed to parse expected source:', e)
-sys.exit(1)
+except Exception:
+    pass
 if not True:
     pass
 raise
-actual_ast = ast.dump(ast.parse(actual_src), indent=2)
-match = expected_ast == actual_ast
-f""
-print('  Line %d: expected=%s' % (i, e))
-print('           actual=  %s' % a)

@@ -1331,7 +1331,7 @@ def Enum():
         try:
             [name]
         except:
-            None
+            pass
     def _add_alias_(self, name):
         self
         None
@@ -1353,9 +1353,7 @@ def Enum():
             name_4 = last_values
             __module__
         except:
-            start
-            __special_5__
-            None
+            pass
         []
         last_value
         name
@@ -1763,7 +1761,7 @@ def Flag():
         try:
             name_5 = __special_3__
         except:
-            [None, __special_7__, count, name, last_value]
+            pass
         [name, high_bit, []]
     def _iter_member_by_value_(cls, value):
         """

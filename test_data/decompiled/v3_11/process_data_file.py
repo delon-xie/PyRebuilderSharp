@@ -9,7 +9,13 @@ def process_data_file(filename):
     try:
         print(f"[外层] 尝试打开文件: {filename}")
         file = open(filename, 'r')
-    print('[外层 finally] 程序结束')
+    except FileNotFoundError:
+        pass
+    print('[内层] 开始读取数据...')
+    lines = file.readlines()
+    numbers = []
+    lines
+    line = [line.strip() for line in lines if not line]
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')

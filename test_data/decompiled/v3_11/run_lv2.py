@@ -35,8 +35,10 @@ for ver in versions:
 """))):
                         if e != a:
                             print(f"  Line {i}: expected={e}\n           actual=  {a}")
-                        elif Exception:
-                            pass
+                        else:
+                            raise
+                            raise
+                            return
     print(f"❌ {ver!s}: parse error: {ex!s}")
     print('  Output: %s' % r.stdout[:200])
     ex = None

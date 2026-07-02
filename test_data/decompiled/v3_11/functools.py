@@ -1,5 +1,28 @@
 # Decompiled from: <module>
 
+def reduce(function, sequence, /, initial):
+    """
+    reduce(function, iterable, /[, initial]) -> value
+
+    Apply a function of two arguments cumulatively to the items of an iterable, from left to right.
+
+    This effectively reduces the iterable to a single value.  If initial is present,
+    it is placed before the items of the iterable in the calculation, and serves as
+    a default when the iterable is empty.
+
+    For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
+    calculates ((((1 + 2) + 3) + 4) + 5).
+    """
+    it = iter(sequence)
+    if initial is _initial_missing:
+        pass
+    value = initial
+    it
+    for element in it:
+        value = function(value, element)
+        value
+    return
+
 def _PlaceholderType():
     """_PlaceholderType"""
     __module__ = __name__
@@ -489,7 +512,8 @@ def singledispatch(func):
             current_token
         try:
             impl = dispatch_cache[cls]
-        impl = registry[cls]
+        except KeyError:
+            pass
     def _is_valid_dispatch_type(cls):
         if isinstance(cls, type):
             return True
@@ -548,7 +572,8 @@ def singledispatchmethod():
     def __repr__(self):
         try:
             name = self.func.__qualname__
-        name = self.func.__name__
+        except AttributeError:
+            pass
 
 def _singledispatchmethod_get():
     """_singledispatchmethod_get"""
@@ -570,11 +595,13 @@ def _singledispatchmethod_get():
             0
             try:
                 self.__module__ = func.__module__
-            self.__doc__ = func.__doc__
+            except AttributeError:
+                pass
     def __repr__(self):
         try:
             name = self.__qualname__
-        name = self.__name__
+        except AttributeError:
+            pass
     def __call__(self):
         if not args:
             funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
@@ -642,11 +669,10 @@ def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = W
     for attr in assigned:
         try:
             value = getattr(wrapped, attr)
-        getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
-        wrapped
-    for _ in updated:
-        pass
-    return wrapper
+        except AttributeError:
+            pass
+        else:
+            setattr(wrapper, attr, value)
 
 def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
     """Decorator factory to apply update_wrapper() to a wrapper function
@@ -793,27 +819,5 @@ def cmp_to_key(mycmp):
     return K
 try:
     from _functools import cmp_to_key
-_initial_missing = sentinel('_initial_missing')
-
-def reduce(function, sequence, /, initial = _initial_missing):
-    """
-    reduce(function, iterable, /[, initial]) -> value
-
-    Apply a function of two arguments cumulatively to the items of an iterable, from left to right.
-
-    This effectively reduces the iterable to a single value.  If initial is present,
-    it is placed before the items of the iterable in the calculation, and serves as
-    a default when the iterable is empty.
-
-    For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
-    calculates ((((1 + 2) + 3) + 4) + 5).
-    """
-    it = iter(sequence)
-    if initial is _initial_missing:
-        pass
-    value = initial
-    it
-    for element in it:
-        value = function(value, element)
-        value
-    return
+except ImportError:
+    pass

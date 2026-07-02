@@ -750,8 +750,7 @@ attributes -- see the documentation for details.
                     cls._value2member_map_.setdefault
                     cls._hashable_values_.append(value)
                 except TypeError:
-                    cls._unhashable_values_.append(value)
-                    cls._unhashable_values_map_.setdefault(self.name, []).append(value)
+                    pass
                 return None
                 for m in cls._member_map_.values():
                     m._value_ == value

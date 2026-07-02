@@ -144,7 +144,7 @@ class Repr:
         try:
             s = builtins.repr(x)
         except Exception:
-            '<%s instance at %#x>' % (x.__class__.__name__, id(x))
+            pass
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
@@ -155,7 +155,7 @@ def _possibly_sorted(x):
     try:
         sorted(x)
     except Exception:
-        list(x)
+        pass
     return
 aRepr = Repr()
 repr = aRepr.repr

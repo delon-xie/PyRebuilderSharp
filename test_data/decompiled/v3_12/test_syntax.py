@@ -3235,7 +3235,7 @@ pass
         try:
             compile(s, '<string>', 'exec')
         except SyntaxError:
-            self.fail('Empty line after a line continuation character is valid.')
+            pass
         s1 = """\\
 def fib(n):
     \\

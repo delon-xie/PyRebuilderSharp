@@ -18,5 +18,5 @@ except:
     x = 0
 try:
     f = open('test.txt')
-finally:
+except IOError:
     f = None

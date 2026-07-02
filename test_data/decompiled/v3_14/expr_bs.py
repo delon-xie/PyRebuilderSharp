@@ -1,5 +1,5 @@
 # Decompilation failed: OutOfMemoryException: Insufficient memory to continue the execution of the program.
-# Crash report: /Users/admin/.pyrebuilder/crashes/crash_20260702_224345_378.json
+# Crash report: /Users/admin/.pyrebuilder/crashes/crash_20260702_225329_748.json
 # Stack:    at System.Text.StringBuilder.AppendWithExpansion(Char value)
 #     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 159
 #     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1165

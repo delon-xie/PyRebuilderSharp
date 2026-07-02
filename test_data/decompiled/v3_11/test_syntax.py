@@ -3079,6 +3079,9 @@ while 1:
         """
         try:
             compile(code, filename, mode)
+        except SyntaxError:
+            pass
+        self.fail('compile() did not raise SyntaxError')
 
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
@@ -3262,18 +3265,8 @@ pass
 """
         try:
             compile(s, '<string>', 'exec')
-        s1 = """\\
-def fib(n):
-    \\
-'''Print a Fibonacci series up to n.'''
-    \\
-a, b = 0, 1
-"""
-        s2 = """\\
-def fib(n):
-    '''Print a Fibonacci series up to n.'''
-    a, b = 0, 1
-"""
+        except SyntaxError:
+            pass
 
     def test_continuation_bad_indentation(self):
         code = """\\

@@ -16,7 +16,7 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
     try:
         name_5 = __module__
     except:
-        None
+        pass
     import name_39 as __wrapped__
     wrapper = __module__
     attr
@@ -677,7 +677,7 @@ def singledispatch(func):
         try:
             KeyError = [dispatch_cache]
         except:
-            None
+            pass
     def _is_valid_dispatch_type(cls):
         if not -__qualname__:
             cls
@@ -749,7 +749,7 @@ def singledispatchmethod():
             __qualname__ = deref_2
             self
         except:
-            None
+            pass
         name(self, name, var_0)
     deref_1 = var_9
     deref_1 = var_9
@@ -829,7 +829,7 @@ def _singledispatchmethod_get():
             self = deref_20
             v_10
         except:
-            None
+            pass
         self = deref_24
         v_12
         self
@@ -838,7 +838,7 @@ def _singledispatchmethod_get():
         try:
             AttributeError = self
         except:
-            None
+            pass
         deref_6
         self
         self
@@ -959,18 +959,6 @@ def cached_property():
             AttributeError = msg
         except:
             type = self(self, self, .freevar_0, .freevar_1, msg)
-            msg
-            self
-            __special_3__
-            cache
-            .freevar_1
-            .freevar_0
-            deref_10
-            instance
-            self
-            __special_9__
-            owner
-            None
         __name__ = __special_14__
         if not True:
             __name__ = instance

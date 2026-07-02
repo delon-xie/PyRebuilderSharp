@@ -87,6 +87,8 @@ public class VersionStrategy311 : VersionStrategyBase
             4 => Models.Bytecode.Opcode.DUP_TOP,
             5 => Models.Bytecode.Opcode.DUP_TOP_TWO,
             35 => Models.Bytecode.Opcode.PUSH_EXC_INFO_312,  // 3.11: PUSH_EXC_INFO (raw 35)
+            7 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,   // 3.11: CHECK_EXC_MATCH (raw 7, enum=197)
+            36 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,  // 3.12-compat: CHECK_EXC_MATCH (raw 36)
             53 => Models.Bytecode.Opcode.BEFORE_WITH,   // 3.11: BEFORE_WITH (raw 53, shared with 3.12's BEFORE_WITH_312)
             99 => Models.Bytecode.Opcode.SWAP,
             120 => Models.Bytecode.Opcode.COPY,
@@ -126,6 +128,7 @@ public class VersionStrategy311 : VersionStrategyBase
     {
         return rawOp switch
         {
+            7 => 0,  // CHECK_EXC_MATCH (raw 7 in 3.11)
             1 => 0, 2 => 0, 4 => 0, 5 => 0, 9 => 0,
             11 => 0, 12 => 0, 15 => 0,
             25 => 0, 30 => 0, 31 => 0,
