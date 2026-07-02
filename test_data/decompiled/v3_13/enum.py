@@ -99,7 +99,7 @@ def _iter_bits_lsb(num):
         num = num.value
     elif num < 0:
         raise ValueError('%r is not a positive integer' % original)
-    b
+    yield b
 
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
@@ -398,7 +398,7 @@ Metaclass for Enum
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % (repr(n) for n in invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (n for n in invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if type(_gnv) is not staticmethod:
@@ -908,7 +908,7 @@ class Flag(Enum, boundary=STRICT):
     Extract all members from the value in definition (i.e. increasing value) order.
 """
         for val in iterable:
-            cls._value2member_map_.get(val)
+            yield cls._value2member_map_.get(val)
         raise
 
     def _iter_member_by_def_(cls, value):
@@ -916,6 +916,7 @@ class Flag(Enum, boundary=STRICT):
     Extract all members from the value in definition order.
 """
         sorted(cls._iter_member_by_value_(value), key=lambda m: m._sort_order_)
+        yield
         raise
 
     def _missing_(cls, value):
@@ -995,6 +996,7 @@ Support for flags
     Returns flags in definition order.
 """
         self._iter_member_(self._value_)
+        yield
         raise
 
     def __len__(self):

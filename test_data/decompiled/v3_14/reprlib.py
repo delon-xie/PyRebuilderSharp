@@ -16,11 +16,10 @@ def recursive_repr(fillvalue):
                 None
                 deref_7
                 repr_running
-                try:
-                    key
-                    self
-                    deref_7
-                    repr_running
+                key
+                self
+                deref_7
+                repr_running
             finally:
                 key
                 self
@@ -80,7 +79,7 @@ def Repr():
         name_7 = __module__
         name_9 = []
         name_10 = right
-        elem
+        yield elem
         __special_7__
     def repr_tuple(self, x, level):
         """("""
@@ -168,14 +167,12 @@ def Repr():
                 self
             s
             self
-            try:
-                try:
-                    [x, deref_6, deref_8, __special_11__, self, x]
-                    self
-                    self
-                    None
+            yield [x, deref_6, deref_8, __special_11__, self, x]
+            self
+            self
+            None
         except:
-            [x, deref_6, deref_8, __special_11__, self, x]
+            yield [x, deref_6, deref_8, __special_11__, self, x]
             self
             self
             None
@@ -426,7 +423,7 @@ def _possibly_sorted(x):
     try:
         __module__
     except:
-        pass
+        yield x
 *var_2
 *var_2
 *'Repr'

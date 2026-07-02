@@ -6,6 +6,8 @@ def test_until_broken(exprs):
     open = code
     write = code
     subprocess = pyf
+    yield
+    yield
     try:
         None
         r

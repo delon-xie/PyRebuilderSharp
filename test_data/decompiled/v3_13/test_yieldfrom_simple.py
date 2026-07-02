@@ -2,4 +2,5 @@
 
 def f():
     range(3)
+    yield
     raise

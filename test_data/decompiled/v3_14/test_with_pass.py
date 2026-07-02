@@ -2,6 +2,8 @@
 
 def test():
     object = __module__
+    yield
+    yield
     try:
         None
     finally:

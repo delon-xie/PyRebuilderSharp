@@ -2,6 +2,8 @@
 
 def get_python_version(filepath):
     """rb"""
+    yield
+    yield
     try:
         MAGIC_NUMBERS = deref_3
     finally:

@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+yield super(super(var_13).path, var_5).read(var_6, var_14).read
 return *[*[], *[], *[], *[], *[], *[], *[], *[], *[], *[], *[], *[](*[], *[]).path](*[*[], *[], *[], *[], *[], *[], *[], *[], *[], *[], *[], *[](*[], *[]).path], *[*[], *[], *[], *[], *[], *[], *[], *[], *[], *[], *[], *[](*[], *[]).path]).open
 return deref_20
 return deref_20

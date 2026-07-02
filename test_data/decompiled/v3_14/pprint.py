@@ -39,7 +39,7 @@ def _safe_key():
             self
             self
         except:
-            pass
+            yield self
     var_5
     **var_4
     **var_4
@@ -552,16 +552,11 @@ def _recursion(object):
 
 def _wrap_bytes_repr(object, width, allowance):
     None
-    try:
-        name_3 = object
-        name_4 = [[__module__]]
-        import name_88 as name_5
-        name_7 = []
-        try:
-            range = []
-            try:
-                try:
-                    pass
+    name_3 = object
+    name_4 = [[__module__]]
+    import name_88 as name_5
+    name_7 = []
+    range = []
 *var_1
 *var_1
 *var_1

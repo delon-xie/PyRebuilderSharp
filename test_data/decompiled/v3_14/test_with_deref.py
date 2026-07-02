@@ -3,6 +3,8 @@
 def outer():
     def inner():
         del lock
+        yield
+        yield
         try:
             None
         finally:

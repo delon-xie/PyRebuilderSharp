@@ -1821,12 +1821,17 @@ public class AstBuilder
                 }
             }
             
-            var result = new List<Stmt> { new Try(tryBody, new List<ExceptHandler>(), elseBody, finalBody) };
+            // 跳过空的 finally 体（生成器 cleanup 条目：无实际语义）
+            var resultList = new List<Stmt>();
+            if ((finalBody == null || finalBody.Count == 0) && (elseBody == null || elseBody.Count == 0))
+                resultList.AddRange(tryBody);
+            else
+                resultList.Add(new Try(tryBody, new List<ExceptHandler>(), elseBody, finalBody));
             if (afterFinallyStmts.Count > 0)
             {
-                result.AddRange(afterFinallyStmts);
+                resultList.AddRange(afterFinallyStmts);
             }
-            return result;
+            return resultList;
         }
 
         bool isGroup = handlerBlock.Instructions.Any(i => i.Opcode == Opcode.CHECK_EG_MATCH);

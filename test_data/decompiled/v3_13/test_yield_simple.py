@@ -1,5 +1,5 @@
 # Decompiled from: <module>
 
 def f():
-    1
+    yield 1
     raise

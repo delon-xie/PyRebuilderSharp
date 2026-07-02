@@ -1718,6 +1718,7 @@ public class StackMachine
                 _exprStack.Push(new Name("__build_class__", ExpressionContext.Load));
                 return null;
 
+            case Opcode.YIELD_VALUE_313:
             case Opcode.YIELD_VALUE:
             {
                 var yielded = SafePop();

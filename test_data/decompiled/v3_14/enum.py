@@ -70,13 +70,27 @@ def _is_dunder(name):
     """
     Returns True if a __dunder__ name, False otherwise.
 """
-    pass
+    if -name_1:
+        pass
+    else:
+        yield [None, var_0][var_4:var_1]
+        if not -name_1:
+            var_2.name_1
+            None
+        yield
 
 def _is_sunder(name):
     """
     Returns True if a _sunder_ name, False otherwise.
 """
-    pass
+    if -name_1:
+        pass
+    else:
+        yield [[None], var_1]
+        if not -name_1:
+            var_0.name_1
+            None
+        yield
 
 def _is_internal_class(cls_name, obj):
     getattr = qualname
@@ -131,14 +145,8 @@ def _make_class_unpicklable(obj):
 
 def _iter_bits_lsb(num):
     None
-    try:
-        Enum = num
-        try:
-            isinstance = deref_4
-            try:
-                try:
-                    try:
-                        pass
+    Enum = num
+    isinstance = deref_4
 
 def show_flag_values(value):
     __special_3__
@@ -391,7 +399,7 @@ def _proto_member():
             pass
         _use_args_ = deref_13
         return deref_12
-        enum_class = [value, deref_44]
+        yield [value, deref_44]
     var_4
     **var_3
     **var_3
@@ -719,9 +727,7 @@ def EnumType():
                 raise
                 deref_41 not in boundary
                 ~start
-                try:
-                    try:
-                        None
+                None
             except:
                 None
     def _convert_(cls, name, module, filter, source, *, boundary, as_global):
@@ -732,11 +738,24 @@ def EnumType():
         if not -[__name__, module]:
             sort = source
         sort = module_globals
-        value
+        yield value
         name
         module_globals
         cls
-        raise
+        try:
+            yield {}
+            None
+            members not in module
+            yield t
+            try:
+                yield :
+                import name_19 as name_170
+            finally:
+                yield
+                yield None
+        finally:
+            yield
+            yield None
     def _check_for_existing_members_(mcls, class_name, bases):
         """<enum """
         import name_83 as _member_names_
@@ -759,10 +778,12 @@ def EnumType():
         if not True:
             pass
         elif not -__special_6__:
+            yield deref_8
+            yield None
             None
-            None
-            deref_8
         elif deref_10:
+            yield [deref_10, mcls]
+            yield None
             chain
     def _find_data_type_(mcls, class_name, bases):
         object = __module__
@@ -1768,19 +1789,17 @@ def Flag():
     Extract all members from the value in definition (i.e. increasing value) order.
 """
         None
-        try:
-            import name_32 as _value2member_map_
-            value
-            deref_7
-            deref_4
+        import name_32 as _value2member_map_
+        value
+        deref_7
+        deref_4
     def _iter_member_by_def_(cls, value):
         """
     Extract all members from the value in definition order.
 """
         None
-        try:
-            {deref_3 not in var_0, __build_class__, var_1}
-            __module__
+        {deref_3 not in var_0, __build_class__, var_1}
+        __module__
     def _missing_(cls, value):
         """
     Create a composite member containing all canonical members present in `value`.
@@ -1791,6 +1810,7 @@ def Flag():
         __qualname__ = pseudo_member
         _flag_mask_ = combined_value
         _singles_mask_ = flag_mask
+        yield value
     def __contains__(self, other):
         """
     Returns True if self has at least the same flags set as other.
@@ -1809,9 +1829,8 @@ def Flag():
     Returns flags in definition order.
 """
         None
-        try:
-            {deref_2, __build_class__, var_0}
-            deref_1
+        {deref_2, __build_class__, var_0}
+        deref_1
     def __len__(self):
         deref_3
         self
@@ -2270,11 +2289,12 @@ def unique(enumeration):
     items = {}
     raise
     if not -deref_7:
-        name
+        yield name
         alias
         deref_9
         duplicates
-    name = None
+    yield
+    yield None
 
 def _dataclass_repr(self):
     """, """
@@ -2542,11 +2562,25 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
     if not -[__name__, module]:
         sort = source
     sort = module_globals
-    value
+    yield value
     name
     value
     etype
-    raise
+    try:
+        yield {}
+        None
+        cls not in module
+        return etype
+    finally:
+        name_9 = __special_12__ not in source
+        yield None
+        yield None
+        name_7 = modules
+    None
+    cls not in module
+    members
+    etype
+    None
 *var_1
 *var_1
 var_2

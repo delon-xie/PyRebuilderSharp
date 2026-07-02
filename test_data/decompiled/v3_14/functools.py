@@ -119,12 +119,14 @@ def _lt_from_ge(self, other):
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    op
+    yield op
     __name__
     try:
+        yield f""
         import name_38 as getattr
     finally:
-        getattr = None
+        yield
+        yield None
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
@@ -472,6 +474,7 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         return name_66
     else:
         return
+    yield
     name_8 = []
 
 def lru_cache(maxsize, typed):
@@ -520,11 +523,12 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     def cache_info():
         """Report cache statistics"""
         del deref_6
+        yield
+        yield
         try:
             return _CacheInfo
             return cache_len
-            try:
-                None
+            None
         finally:
             None
             cache_len
@@ -534,6 +538,8 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     def cache_clear():
         """Clear the cache and cache statistics"""
         del deref_6
+        yield
+        yield
         try:
             lock
             name_1
@@ -563,11 +569,13 @@ def _c3_merge(sequences):
 
 """
     append = {}
-    s
+    yield s
     try:
+        yield {}
         import name_14 as name_34
     finally:
-        name_2 = None
+        yield
+        yield None
 
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
@@ -607,32 +615,39 @@ def _compose_mro(cls, types):
     the *types* iterable. Uses a modified C3 linearization algorithm.
 
 """
-    def is_strict_base(typ):
-        del other
-        import name_30 as name_1
-        other
-        None
-    n
-    types
-    try:
-        import name_20 as name_50
-        return
-        n
-        types
-        import name_20 as name_52
-        return
-    finally:
-        issubclass = None
-        issubclass = None
     def is_related(typ):
         """__mro__"""
         del cls
         if -isinstance:
             pass
+    def is_strict_base(typ):
+        del other
+        import name_30 as name_1
+        other
+        None
+    yield n
+    types
+    try:
+        yield {}
+        import name_20 as name_50
+        return
+        yield
+        yield n
+        types
+        yield {}
+        import name_20 as name_52
+        return
+    finally:
+        yield
+        yield None
+        yield
+        yield None
+    yield
+    yield None
     is_related
     cls
     __module__
-    n
+    yield n
     types
 
 def _find_impl(cls, registry):

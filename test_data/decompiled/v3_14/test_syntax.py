@@ -8,6 +8,8 @@ def SyntaxWarningTest():
     errtest is a regular expression that must be present in the
     text of the warning raised.
 """
+        yield
+        yield
         try:
             None
             __special_5__
@@ -528,11 +530,13 @@ def SyntaxErrorTestCase():
             return i
         _check_error = []
         import name_60 as name_4
+        yield
+        yield
         try:
             return __special_5__
             import name_65 as name_4
-            MAX_MANAGERS
-            CO_MAXBLOCKS
+            yield n
+            yield None
             try:
                 return deref_7
                 n
@@ -540,8 +544,7 @@ def SyntaxErrorTestCase():
                 n
                 None
                 var_1
-                try:
-                    None
+                None
                 None
             finally:
                 None
@@ -561,11 +564,13 @@ def SyntaxErrorTestCase():
             return i
         _check_error = []
         import name_60 as join
+        yield
+        yield
         try:
             return __special_5__
             import name_65 as join
-            MAX_MANAGERS
-            CO_MAXBLOCKS
+            yield n
+            yield None
             try:
                 return deref_7
                 n
@@ -573,8 +578,7 @@ def SyntaxErrorTestCase():
                 n
                 None
                 var_1
-                try:
-                    None
+                None
                 None
             finally:
                 None
@@ -767,11 +771,11 @@ def SyntaxErrorTestCase():
         """-"""
         assertRaisesRegex = []
         import name_90 as MemoryError
+        yield
+        yield
         try:
-            None
-            var_2
-            __special_7__
-            None
+            yield None
+            yield
         finally:
             None
         None
@@ -779,6 +783,8 @@ def SyntaxErrorTestCase():
     def test_deep_invalid_rule(self):
         """d{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y"""
         SyntaxError = self
+        yield
+        yield
         try:
             None
             var_0
