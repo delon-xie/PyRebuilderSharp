@@ -120,8 +120,8 @@ public class VersionStrategy312 : VersionStrategyBase
             19 => Models.Bytecode.Opcode.MAP_ADD_313,       // 3.12 raw 19 → MAP_ADD (3.13+ enum=237)
 
             90 => Models.Bytecode.Opcode.STORE_NAME,
-            111 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,
-            112 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,
+            111 => Models.Bytecode.Opcode.JUMP_IF_FALSE_OR_POP,  // 3.12: raw=111
+            112 => Models.Bytecode.Opcode.JUMP_IF_TRUE_OR_POP,    // 3.12: raw=112
             114 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,
             115 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,
             151 => Models.Bytecode.Opcode.RESUME,

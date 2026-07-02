@@ -1,3 +1,0 @@
-# Decompiled from: <module>
-
-raise

@@ -103,8 +103,8 @@ public class VersionStrategy311 : VersionStrategyBase
 
             // --- 3.11 特有的值 ---
             90 => Models.Bytecode.Opcode.STORE_NAME,
-            111 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,
-            112 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,
+            111 => Models.Bytecode.Opcode.JUMP_IF_FALSE_OR_POP,  // 3.11: raw=111 (was POP_JUMP_IF_TRUE in 3.10, renamed in 3.11)
+            112 => Models.Bytecode.Opcode.JUMP_IF_TRUE_OR_POP,   // 3.11: raw=112 (was POP_JUMP_IF_FALSE in 3.10, renamed in 3.11)
             114 => Models.Bytecode.Opcode.POP_JUMP_IF_FALSE,   // 3.11: POP_JUMP_FORWARD_IF_FALSE (was STORE_NAME in 3.10)
             115 => Models.Bytecode.Opcode.POP_JUMP_IF_TRUE,   // 3.11: POP_JUMP_FORWARD_IF_TRUE (was DELETE_NAME in 3.10)
 
@@ -143,7 +143,7 @@ public class VersionStrategy311 : VersionStrategyBase
             106 => 0, // LOAD_ATTR (no cache in 3.11)
             107 => 2, // COMPARE_OP
             108 => 0, 109 => 0, 110 => 0,
-            111 => 0, 112 => 0, 113 => 0, 114 => 0, 115 => 0,
+            111 => 2, 112 => 2, 113 => 0, 114 => 2, 115 => 2, // JUMP_IF_FALSE_OR_POP: 2 caches
             116 => 0, // LOAD_GLOBAL (no cache in 3.11)
             117 => 0, 118 => 0, 119 => 0,
             120 => 0, 121 => 0, 122 => 1,  // BINARY_OP
