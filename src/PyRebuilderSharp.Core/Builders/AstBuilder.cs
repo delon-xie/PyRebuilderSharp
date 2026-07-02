@@ -1474,7 +1474,14 @@ public class AstBuilder
         bool isFinally = false;
         bool hasExcMatch = handlerBlock.Instructions.Any(i =>
             i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
-        if (!hasExcMatch)
+        // bare except detection
+        // 检测 bare except（无 CHECK_EXC_MATCH）：PUSH_EXC_INFO + POP_TOP → 裸 except:
+        bool isBareExcept = !hasExcMatch && handlerBlock.Instructions.Count >= 2
+            && handlerBlock.Instructions[0].Opcode == Opcode.PUSH_EXC_INFO_312
+            && (handlerBlock.Instructions[1].Opcode == Opcode.POP_TOP
+                || handlerBlock.Instructions[1].Opcode == Opcode.POP_EXCEPT
+                || handlerBlock.Instructions[1].Opcode == Opcode.STORE_NAME);
+        if (!hasExcMatch && !isBareExcept)
         {
             // 无 CHECK_EXC_MATCH = try/finally or cleanup entry.
             // 仅当 try 体有实质性语句时才处理为 finally，跳过纯清理条目。
@@ -1502,7 +1509,9 @@ public class AstBuilder
         // 注意：ET 条目的 start 是 with 体的开始，BEFORE_WITH 可能在 start 之前 2 字节
         var beforeWithRangeStart = Math.Max(0, matchingEntry.StartOffset - 6);
         var hasBeforeWith = _codeObject.Instructions
-            .Any(i => i.Opcode == Opcode.BEFORE_WITH
+            .Any(i => (i.Opcode == Opcode.BEFORE_WITH
+                       || i.Opcode == Opcode.BEFORE_WITH_312
+                       || i.Opcode == Opcode.BEFORE_WITH_313)
                 && i.Offset >= beforeWithRangeStart
                 && i.Offset < matchingEntry.EndOffset);
         if (hasBeforeWith)
@@ -1658,11 +1667,11 @@ public class AstBuilder
             Console.Error.WriteLine($"[TRY_FROM_ET]   handler stmt types={string.Join(",", handlerResult.Statements.Select(s => s.GetType().Name))}");
         }
         var handlerBody = handlerResult?.Statements
-            ?.Where(s => s is not Raise and not CommentBlock)
+            ?.Where(s => s is not Raise and not CommentBlock and not Return)
             .ToList() ?? new List<Stmt>();
 
-        // Collect body from all handler successor blocks within the handler range
-        // Handler range = from handler target to the EndOffset of the ET entry covering it
+        // 从 handler 的后继块中收集 handler 体语句（在 POP_EXCEPT/POP_EXCEPT 之前的语句）
+        // 同时也需要获取 handlerEnd（handler 的 ET 条目结束偏移）
         var handlerET = _codeObject.ExceptionTable
             .FirstOrDefault(e => e.StartOffset == matchingEntry.TargetOffset);
         var handlerEnd = handlerET != null
@@ -1683,7 +1692,9 @@ public class AstBuilder
             if (vsr?.Statements != null && vsr.Statements.Count > 0
                 && vsr.Statements.Any(s => s is not Raise and not CommentBlock))
             {
-                handlerBody.AddRange(vsr.Statements.Where(s => s is not Raise and not CommentBlock));
+                var filteredStmts = vsr.Statements.Where(s => s is not Raise and not CommentBlock and not Return).ToList();
+                if (filteredStmts.Count > 0)
+                    handlerBody.AddRange(filteredStmts);
             }
         }
 
@@ -1719,8 +1730,9 @@ public class AstBuilder
                 var succResult = _blockResults.GetValueOrDefault(succ.Id);
                 if (succResult?.Statements != null)
                 {
+                    // Handler successor 中的 Return 语句是 handler 退出路径，不是 handler body
                     handlerBody.AddRange(succResult.Statements
-                        .Where(s => s is not Raise and not CommentBlock));
+                        .Where(s => s is not Raise and not CommentBlock and not Return and not ExprStmt));
                 }
                 visited.Add(succ);
                 _processedBlockIds.Add(succ.Id);

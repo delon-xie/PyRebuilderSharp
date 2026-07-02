@@ -68,7 +68,7 @@ public class VersionStrategy313 : VersionStrategyBase
             30 => Models.Bytecode.Opcode.NOP,               // enum=9
             31 => Models.Bytecode.Opcode.POP_EXCEPT,         // enum=89
             32 => Models.Bytecode.Opcode.POP_TOP,            // enum=1
-            33 => Models.Bytecode.Opcode.PUSH_EXC_INFO,      // -> PUSH_EXC_INFO_312=179
+            33 => Models.Bytecode.Opcode.PUSH_EXC_INFO_312,  // PUSH_EXC_INFO (must use _312 for SafePop in handler)
             34 => Models.Bytecode.Opcode.PUSH_NULL,          // enum=2
             35 => Models.Bytecode.Opcode.RETURN_GENERATOR_313,
             36 => Models.Bytecode.Opcode.RETURN_VALUE,       // enum=83
