@@ -150,11 +150,11 @@ def cmp_to_key(mycmp):
             del other
             return mycmp
         del mycmp
-        deref_8 = **{mycmp}
-        deref_8 = ***{mycmp}
-        deref_8 = ****{mycmp}
-        deref_8 = *****{mycmp}
-        deref_8 = ******{mycmp}
+        deref_8 = *{mycmp}
+        deref_8 = *{mycmp}
+        deref_8 = *{mycmp}
+        deref_8 = *{mycmp}
+        deref_8 = *{mycmp}
         var_7
         *var_8
         *var_8
@@ -191,38 +191,38 @@ def cmp_to_key(mycmp):
         var_7
         var_7
         var_7
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        ******{mycmp}
-        *****{mycmp}
-        *****{mycmp}
-        *****{mycmp}
-        *****{mycmp}
-        *****{mycmp}
-        *****{mycmp}
-        *****{mycmp}
-        ****{mycmp}
-        ****{mycmp}
-        ****{mycmp}
-        ****{mycmp}
-        ****{mycmp}
-        ****{mycmp}
-        ***{mycmp}
-        ***{mycmp}
-        ***{mycmp}
-        ***{mycmp}
-        ***{mycmp}
-        **{mycmp}
-        **{mycmp}
-        **{mycmp}
-        **{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
+        *{mycmp}
         *{mycmp}
         *{mycmp}
         *{mycmp}
@@ -290,31 +290,31 @@ def _PlaceholderType():
     var_7
     var_7
     var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ****var_7
-    ***var_7
-    ***var_7
-    ***var_7
-    ***var_7
-    ***var_7
-    ***var_7
-    ***var_7
-    ***var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
-    **var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
+    *var_7
     *var_7
     *var_7
     *var_7
@@ -440,7 +440,7 @@ def partialmethod():
         deref_2
         __module__
     deref_1 = var_7
-    return ******var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(*****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, *****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__(******var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(*****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, *****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__, ******var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(*****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, *****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__).__firstlineno__
+    return ****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, ***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__(****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, ***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__, ****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, ***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__).__firstlineno__
 
 def _unwrap_partial(func):
     if not -__qualname__:
@@ -791,33 +791,33 @@ def singledispatchmethod():
     var_8
     var_8
     var_8
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    *****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ****var_1(****var_1, ****var_1).__qualname__
-    ***var_1
-    ***var_1
-    ***var_1
-    ***var_1
-    **var_1
-    **var_1
-    **var_1
-    **var_1
-    **var_1
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    **var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1(*var_1, *var_1).__qualname__
+    *var_1
+    *var_1
+    *var_1
+    *var_1
+    *var_1
+    *var_1
+    *var_1
+    *var_1
+    *var_1
     *var_1
     *var_1
     *var_1
@@ -858,7 +858,7 @@ def _singledispatchmethod_get():
         self
         self
         var_2(self, name, var_1)
-        self(self, deref_6, .freevar_0, .freevar_1, var_1)
+        self(self, deref_6, freevar_0, freevar_1, var_1)
         var_0
         name
         self
@@ -915,35 +915,35 @@ def _singledispatchmethod_get():
     var_7
     var_7
     var_7
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    ******var_0(*****var_0, *****var_0).__qualname__(******var_0(*****var_0, *****var_0).__qualname__, ******var_0(*****var_0, *****var_0).__qualname__).__qualname__
-    *****var_0(*****var_0, *****var_0).__qualname__
-    *****var_0(*****var_0, *****var_0).__qualname__
-    *****var_0(*****var_0, *****var_0).__qualname__
-    *****var_0(*****var_0, *****var_0).__qualname__
-    *****var_0(*****var_0, *****var_0).__qualname__
-    *****var_0(*****var_0, *****var_0).__qualname__
-    ****var_0
-    ****var_0
-    ****var_0
-    ****var_0
-    ***var_0
-    ***var_0
-    ***var_0
-    ***var_0
-    ***var_0
-    **var_0
-    **var_0
-    **var_0
-    **var_0
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
+    *var_0(*var_0, *var_0).__qualname__
+    *var_0(*var_0, *var_0).__qualname__
+    *var_0(*var_0, *var_0).__qualname__
+    *var_0(*var_0, *var_0).__qualname__
+    *var_0(*var_0, *var_0).__qualname__
+    *var_0(*var_0, *var_0).__qualname__
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
+    *var_0
     *var_0
     *var_0
     *var_0
@@ -973,7 +973,7 @@ def cached_property():
         try:
             AttributeError = msg
         except:
-            type = self(self, self, .freevar_0, .freevar_1, msg)
+            type = self(self, self, freevar_0, freevar_1, msg)
         __name__ = __special_14__
         if not True:
             __name__ = instance
@@ -984,7 +984,7 @@ def cached_property():
         val
         self
     deref_1 = var_6
-    return ****var_0(****var_0, ****var_0).__module__
+    return *var_0(*var_0, *var_0).__module__
 var_5
 'partial'
 var_61

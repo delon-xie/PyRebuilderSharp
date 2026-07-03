@@ -877,12 +877,12 @@ public class StackMachine
                     for (int i = 0; i < count; i++)
                         _exprStack.Push(new Name(_code.Freevars[i], ExpressionContext.Load));
                     for (int i = count; i < nfree; i++)
-                        _exprStack.Push(new Name($".freevar_{i}", ExpressionContext.Load));
+                        _exprStack.Push(new Name($"freevar_{i}", ExpressionContext.Load));
                 }
                 else
                 {
                     for (int i = 0; i < nfree; i++)
-                        _exprStack.Push(new Name($".freevar_{i}", ExpressionContext.Load));
+                        _exprStack.Push(new Name($"freevar_{i}", ExpressionContext.Load));
                 }
                 return null;
             }
@@ -1010,7 +1010,7 @@ public class StackMachine
                     for (int i = 0; i < count; i++)
                         _exprStack.Push(new Name(_code.Freevars[i], ExpressionContext.Load));
                     for (int i = count; i < nfree; i++)
-                        _exprStack.Push(new Name($".freevar_{i}", ExpressionContext.Load));
+                        _exprStack.Push(new Name($"freevar_{i}", ExpressionContext.Load));
                 }
                 return null;
             }

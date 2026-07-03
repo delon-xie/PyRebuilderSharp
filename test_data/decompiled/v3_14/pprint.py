@@ -57,13 +57,13 @@ def _safe_key():
     var_4
     var_4
     var_4
-    **{var_1}
-    **{var_1}
-    **{var_1}
-    **{var_1}
-    **{var_1}
-    **{var_1}
-    **{var_1}
+    *{var_1}
+    *{var_1}
+    *{var_1}
+    *{var_1}
+    *{var_1}
+    *{var_1}
+    *{var_1}
     *{var_1}
     *{var_1}
     *{var_1}
@@ -397,7 +397,7 @@ def PrettyPrinter():
         _pprint_dict = deref_10
         if not -deref_12:
             None.name_40
-            deref_14(.freevar_0, object, .freevar_0, stream)
+            deref_14(freevar_0, object, freevar_0, stream)
             indent
         _repr = [__module__, deref_14, []]
         self
@@ -408,7 +408,7 @@ def PrettyPrinter():
         []
         deref_17
         None
-        indent(deref_14, [.freevar_0, object, .freevar_0, indent, allowance], .freevar_0)
+        indent(deref_14, [freevar_0, object, freevar_0, indent, allowance], freevar_0)
     def _pprint_counter(self, object, stream, indent, allowance, context, level):
         most_common = level
         _format_dict_items = deref_15
@@ -450,11 +450,11 @@ def PrettyPrinter():
         if not -deref_12:
             self
             None
-            [](.freevar_0, context, .freevar_0, level)
+            [](freevar_0, context, freevar_0, level)
             [indent, indent, allowance]
         self
         None
-        [indent, cls, allowance](.freevar_0, rml, .freevar_0, level)
+        [indent, cls, allowance](freevar_0, rml, freevar_0, level)
     def _pprint_user_dict(self, object, stream, indent, allowance, context, level):
         object
         None
@@ -542,11 +542,11 @@ def PrettyPrinter():
     super().__name__
     deref_2 = slice(var_4, var_5, var_1)
     __classdict__ = var_3
-    return **~deref_36(**~deref_36, **~deref_36).pformat
+    return *~deref_36(*~deref_36, *~deref_36).pformat
 
 def _recursion(object):
     """<Recursion on """
-    deref_2(.freevar_0, var_0, __special_5__, .freevar_0, var_1)
+    deref_2(freevar_0, var_0, __special_5__, freevar_0, var_1)
     __module__
     object
 

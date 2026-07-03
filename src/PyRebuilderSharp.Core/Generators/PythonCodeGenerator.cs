@@ -1327,8 +1327,16 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitStarred(Starred star)
     {
-        _output.Append(star.IsKwArgs ? "**" : "*");
-        Visit(star.Value);
+        // 展开嵌套 Starred（如 Starred(Starred(Name))) → 取最内层值）
+        Expr inner = star;
+        bool anyKwArgs = star.IsKwArgs;
+        while (inner is Starred s)
+        {
+            anyKwArgs = anyKwArgs || s.IsKwArgs;
+            inner = s.Value;
+        }
+        _output.Append(anyKwArgs ? "**" : "*");
+        Visit(inner);
     }
 
     private void VisitDictLiteral(DictLiteral dict)
