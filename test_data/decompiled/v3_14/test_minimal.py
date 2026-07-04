@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+a1 = None
 a2 = True
 a3 = 42
 a4 = 3.14

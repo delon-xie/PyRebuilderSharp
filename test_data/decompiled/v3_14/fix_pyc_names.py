@@ -7,6 +7,7 @@ MAGIC_NUMBERS = {b'Wg0NCg==': '3.10', b'Yg0NCg==': '3.11', b'bw0NCg==': '3.12', 
 def get_python_version(filepath):
     """rb"""
     filepath
+    open
     try:
         __name__
         __module__
@@ -17,7 +18,7 @@ def get_python_version(filepath):
 
 def fix_pyc_names(directory):
     """.pyc"""
-    directory()
+    os.listdir(directory)
     if not filename.endswith('.pyc'):
         pass
     else:

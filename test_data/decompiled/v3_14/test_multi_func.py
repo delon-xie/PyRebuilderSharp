@@ -1,8 +1,7 @@
 # Decompiled from: <module>
 
 def f():
-    return
-f = lambda : None
+    pass
 
 def g():
-    return
+    pass

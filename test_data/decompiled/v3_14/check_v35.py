@@ -2,6 +2,7 @@
 
 def dump_code(c, depth):
     """  """
+    prefix = '  ' * depth
     c.co_consts
     if not hasattr(const, 'co_code'):
         pass

@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+"""Definitive test: field alignment in marshal data"""
 import struct
 import marshal
 import sys
@@ -7,7 +8,7 @@ code = compile('a1 = None', '<test>', 'exec')
 m = bytes(marshal.dumps(code))
 print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
-('02x' for b in iterable)
+('02x' for b in m[:60]())
 ' '.join
 'Bytes:'
 None

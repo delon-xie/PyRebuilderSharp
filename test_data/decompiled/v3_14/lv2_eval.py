@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-10()
+range(10)
 items
 5
 None

@@ -446,7 +446,7 @@ Metaclass for Enum
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % (<genexpr>)(invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (n for n in invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if Flag:
@@ -1267,7 +1267,7 @@ def unique(enumeration):
 
 def _dataclass_repr(self):
     dcf = self.__dataclass_fields__
-    return (<genexpr>)(dcf.keys()())
+    return (dcf[k].repr for k in dcf.keys()())
 
 def global_enum_repr(self):
     """

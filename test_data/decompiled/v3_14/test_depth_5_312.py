@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 def depth_5_if(x0, x1, x2, x3, x4):
+    result = 0
     if x0 > 0:
         if x1 > 1:
             if x2 > 2:
@@ -17,9 +18,9 @@ def depth_5_if(x0, x1, x2, x3, x4):
             result = 20
     else:
         result = 10
-depth_5_if = lambda : None
 
 def depth_5_for():
+    total = 0
     range(2)
     range(2)
     range(2)
@@ -28,6 +29,7 @@ def depth_5_for():
     total += 1
 
 def depth_5_while():
+    total = 0
     a = 2
     while a > 0:
         a -= 1
@@ -50,4 +52,4 @@ def depth_5_while():
         total += 1
 
 def depth_5_try():
-    pass
+    result = 0

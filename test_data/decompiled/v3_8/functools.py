@@ -121,7 +121,7 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = (<setcomp>)(_convert)
+    roots = {op for op in _convert}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     for (opname, opfunc) in _convert[root]:
@@ -433,7 +433,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    sequences = (<listcomp>)(sequences)
+    sequences = [s for s in sequences]
     if not sequences:
         return result
     if candidate in s2[1:]:
@@ -489,11 +489,11 @@ def _compose_mro(cls, types):
     found
     set(types)
     sub
-    (<listcomp>)(types)
+    [n for n in types]
     (typ)
     _compose_mro.<locals>.is_strict_base
     (sub)
-    (<listcomp>)(types)
+    [n for n in types]
     (mro)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
@@ -503,7 +503,7 @@ def _compose_mro(cls, types):
     if not found:
         mro.append(typ)
     if (sub not in bases) and issubclass(cls, sub):
-        (found.append)((<listcomp>)(sub.__mro__))
+        (found.append)([s for s in sub.__mro__])
     sub
     if subcls not in mro:
         mro.append(subcls)
@@ -557,7 +557,7 @@ def singledispatch(func):
     def _is_valid_dispatch_type(cls):
         if isinstance(cls, type):
             return True
-        all((<genexpr>)(cls.__args__))
+        all((arg for arg in cls.__args__))
         return
     def register(cls, func):
         """generic_func.register(cls, func) -> func

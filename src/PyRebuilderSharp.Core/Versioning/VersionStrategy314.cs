@@ -193,7 +193,7 @@ public class VersionStrategy314 : VersionStrategyBase
             106 => 1,  // SEND
             110 => 4,  // STORE_ATTR
             119 => 1,  // UNPACK_SEQUENCE
-            128 => 1,  // RESUME
+            128 => 0,   // RESUME (3.14 无 CACHE 条目)
             _ => 0,
         };
     }

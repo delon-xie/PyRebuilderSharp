@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-10()
+range(10)
 if i == 5:
     pass
 elif i == 1:

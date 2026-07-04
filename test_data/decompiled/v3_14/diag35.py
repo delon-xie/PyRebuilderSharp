@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+"""Diagnose 3.5 crash"""
 import subprocess
 import tempfile
 import os

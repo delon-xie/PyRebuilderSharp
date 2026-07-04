@@ -5,6 +5,7 @@ def process_data_file(filename):
     读取文件中的数字，计算平均值。
     演示嵌套的 try-except-else-finally 用法。
 """
+    None
     try:
         f"[外层] 尝试打开文件: {filename}"
         print
@@ -12,7 +13,6 @@ def process_data_file(filename):
         file.close
     '[外层 finally] 程序结束'
     print
-process_data_file = lambda : None
 print('==================================================')
 print('测试1: 正常文件')
 '=================================================='

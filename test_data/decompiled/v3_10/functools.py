@@ -204,7 +204,7 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = (<setcomp>)(_convert)
+    roots = {op for op in _convert}
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
     root = max(roots)
@@ -502,9 +502,9 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
             key += item
     else:
         if typed:
-            key += (tuple)((<listcomp>)(args))
+            key += (tuple)([v for v in args])
             if kwds:
-                key += (tuple)((<listcomp>)(kwds.values()))
+                key += (tuple)([v for v in kwds.values()])
             return key
         if (len(key) == 1) and (type(key[0]) in fasttypes):
             return key[0]
@@ -634,7 +634,7 @@ def _c3_merge(sequences):
 
     """
     result = []
-    sequences = (<listcomp>)(sequences)
+    sequences = [s for s in sequences]
     if not sequences:
         return result
     sequences
@@ -679,9 +679,9 @@ def _c3_mro(cls, abcs):
         abcs
         cls
         abstract_bases
-        explicit_c3_mros = (<listcomp>)(explicit_bases)
-        abstract_c3_mros = (<listcomp>)(abstract_bases)
-        other_c3_mros = (<listcomp>)(other_bases)
+        explicit_c3_mros = [base for base in explicit_bases]
+        abstract_c3_mros = [base for base in abstract_bases]
+        other_c3_mros = [base for base in other_bases]
         return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
         abcs.remove(base)
         if issubclass(cls, base) and not (any)((<genexpr>)(cls.__bases__)):
@@ -709,11 +709,11 @@ def _compose_mro(cls, types):
     found
     set(types)
     sub
-    (<listcomp>)(types)
+    [n for n in types]
     (typ)
     _compose_mro.<locals>.is_strict_base
     (sub)
-    (<listcomp>)(types)
+    [n for n in types]
     (mro)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
@@ -729,7 +729,7 @@ def _compose_mro(cls, types):
         if subcls not in mro:
             mro.append(subcls)
     if (sub not in bases) and issubclass(cls, sub):
-        (found.append)((<listcomp>)(sub.__mro__))
+        (found.append)([s for s in sub.__mro__])
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -785,7 +785,7 @@ def singledispatch(func):
         if isinstance(cls, type):
             return True
         if not isinstance(cls, UnionType):
-            all((<genexpr>)(cls.__args__))
+            all((arg for arg in cls.__args__))
     def register(cls, func):
         """generic_func.register(cls, func) -> func
 

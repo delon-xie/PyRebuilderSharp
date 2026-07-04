@@ -15,7 +15,7 @@ current_test_fail = False
 
 def remove_ansi(text):
     """\x1b\[[0-9;]*m"""
-    return '\\x1b\\[[0-9;]*m'('', text)
+    return re.sub('\\x1b\\[[0-9;]*m', '', text)
 lines
 if current_test and current_test_fail:
     print(f"✗ {current_test}")

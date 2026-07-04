@@ -2,6 +2,7 @@
 
 def abstractstaticmethod():
     """abstractstaticmethod"""
+    __module__ = __name__
     __qualname__ = 'abstractstaticmethod'
     __firstlineno__ = 52
     __doc__ = """A decorator indicating abstract staticmethods.
@@ -29,6 +30,7 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
 
 def abstractproperty():
     """abstractproperty"""
+    __module__ = __name__
     __qualname__ = 'abstractproperty'
     __firstlineno__ = 76
     __doc__ = """A decorator indicating abstract properties.
@@ -70,7 +72,7 @@ def update_abstractmethods(cls):
     If cls is not an instance of ABCMeta, does nothing.
 """
     value = getattr(cls, name, None)
-    if not cls('__abstractmethods__'):
+    if not hasattr(cls, '__abstractmethods__'):
         return cls
     for scls in cls.__bases__:
         pass
@@ -94,6 +96,7 @@ def update_abstractmethods(cls):
 
 def ABC():
     """ABC"""
+    __module__ = __name__
     __qualname__ = 'ABC'
     __firstlineno__ = 205
     __doc__ = """Helper class that provides a standard way to create an ABC using
@@ -101,6 +104,7 @@ inheritance.
 """
     __slots__ = ()
     __static_attributes__ = ()
+"""Abstract Base Classes (ABCs) according to PEP 3119."""
 
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
@@ -119,6 +123,7 @@ def abstractmethod(funcobj):
         def my_abstract_method(self, arg1, arg2, argN):
             ...
 """
+    funcobj.__isabstractmethod__ = True
     return funcobj
 
 class abstractclassmethod(classmethod):
@@ -142,7 +147,7 @@ class abstractclassmethod(classmethod):
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
-CodeObject: abstractstaticmethod (28 instrs)
+CodeObject: abstractstaticmethod (29 instrs)
 None
 __build_class__
 abstractstaticmethod = lambda: None('abstractstaticmethod', staticmethod)
@@ -172,19 +177,19 @@ class ABCMeta(type):
 
     Returns the subclass, to allow usage as a class decorator.
 """
-        return cls(subclass)
+        return _abc_register(cls, subclass)
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
-        return cls(instance)
+        return _abc_instancecheck(cls, instance)
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
-        return cls(subclass)
+        return _abc_subclasscheck(cls, subclass)
 
     def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
-        f"Class: {cls.__module__}.{cls.__qualname__}"
+        print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
         print(f"Inv. counter: {get_cache_token()}", file=file)
         print(f"_abc_registry: {_abc_registry}", file=file)
         print(f"_abc_cache: {_abc_cache}", file=file)
@@ -193,8 +198,8 @@ class ABCMeta(type):
 
     def _abc_registry_clear(cls):
         """Clear the registry (for debugging or testing)."""
-        cls
+        _reset_registry(cls)
 
     def _abc_caches_clear(cls):
         """Clear the caches (for debugging or testing)."""
-        cls
+        _reset_caches(cls)

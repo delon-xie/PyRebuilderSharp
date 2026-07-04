@@ -2,5 +2,4 @@
 
 def g():
     """bad"""
-    raise 'bad'
-g = lambda : None
+    raise ValueError('bad')

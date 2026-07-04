@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+lock = object()
 lock
 try:
     __name__

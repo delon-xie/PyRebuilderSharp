@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+"""编译 test_expressions_comprehensive.py 为 Python 2.7 .pyc"""
 import os
 import subprocess
 import shutil

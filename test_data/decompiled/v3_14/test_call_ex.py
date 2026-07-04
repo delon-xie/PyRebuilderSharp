@@ -1,8 +1,7 @@
 # Decompiled from: <module>
 
 def test_call_ex():
-    return
-test_call_ex = lambda : None
+    return print(**args, **kwargs)
 
 def test_call_ex2(args, kwargs):
-    return
+    return print(**args, **kwargs)

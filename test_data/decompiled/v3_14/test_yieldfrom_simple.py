@@ -1,5 +1,5 @@
 # Decompiled from: <module>
 
 def f():
+    None
     yield
-f = lambda : None

@@ -26,10 +26,10 @@ for (i, start) in enumerate(sorted_leaders):
     if i + 1 < len(sorted_leaders):
         pass
     instrs[-1].offset + 2
-    block_instrs = (<listcomp>)(instrs)
+    block_instrs = [start for ins in instrs]
     if len(block_instrs) > 3:
         pass
-    f"{'3d'}-{end - 1}{'3d'}]: {', '.join((<genexpr>)(block_instrs))}"
+    f"{'3d'}-{end - 1}{'3d'}]: {', '.join((ins for ins in block_instrs))}"
     start
     'Block ['
     if any((<genexpr>)(block_instrs)):

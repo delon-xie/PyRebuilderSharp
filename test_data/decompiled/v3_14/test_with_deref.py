@@ -1,7 +1,9 @@
 # Decompiled from: <module>
 
 def outer():
+    lock = object()
     def inner():
+        lock
         lock
         __module__
         lock
@@ -15,4 +17,3 @@ def outer():
             print
         None
     return inner
-outer = lambda : None

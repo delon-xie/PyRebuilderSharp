@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+"""Compare ASTs of expected vs decompiled"""
 import ast
 import sys
 open('/tmp/actual_expr.py').read

@@ -15,7 +15,7 @@ public class AstBuilder
     private readonly BlockDecompiler _blockDecompiler;
     private readonly CodeObject _codeObject;
     private int _buildTryDepth;
-    private const int MaxBuildTryDepth = 20;
+    private const int MaxBuildTryDepth = 60;
 
     private readonly DecompileOptions _options;
     private Dictionary<int, BlockResult> _blockResults = new();
@@ -5622,10 +5622,7 @@ public class AstBuilder
         {
             // Some comprehension bodies (set/dict via SET_ADD/MAP_ADD) don't have a For loop.
             // Use fallback: extract iterable, target, and element from the body.
-            if (_options.VerboseErrors)
-            {
             Console.Error.WriteLine($"[COMP_FALLBACK] kind={kind}, body.Count={body.Count}, first_types={string.Join(",", body.Take(4).Select(s => s.GetType().Name))}");
-            }
             return BuildComprehensionFallback(body, kind, compCall);
         }
 
@@ -5720,7 +5717,8 @@ public class AstBuilder
 
         foreach (var stmt in body)
         {
-            if (stmt is ExprStmt es && es.Value is not Name)
+            if (stmt is ExprStmt es && !(es.Value is Name n0 && n0.Id.StartsWith("."))
+                && es.Value is not ListLiteral and not SetLiteral and not DictLiteral)
             {
                 elt = es.Value;
             }
@@ -5743,6 +5741,32 @@ public class AstBuilder
 
         // Determine iterable from call args
         Expr? iter = compCall.Args.Count > 0 ? compCall.Args[0] : null;
+        // Elt fallback: use child code's last ExprStmt value (after .0 is excluded)
+        if (target == null)
+        {
+            // Extract loop target from child code's first STORE_FAST after FOR_ITER
+            var childCode = (compCall.Func as FunctionRef)?.Code;
+            if (childCode?.Instructions != null)
+            {
+                for (int ci = 0; ci < childCode.Instructions.Count - 1; ci++)
+                {
+                    if (childCode.Instructions[ci].Opcode == Opcode.FOR_ITER
+                        && childCode.Instructions[ci + 1].Opcode == Opcode.STORE_FAST
+                        && childCode.Instructions[ci + 1].Argument.HasValue)
+                    {
+                        int idx = childCode.Instructions[ci + 1].Argument.Value;
+                        if (idx >= 0 && idx < childCode.Varnames.Count)
+                            target = new Name(childCode.Varnames[idx], ExpressionContext.Store);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Fallback: use target as element when elt is unexpected
+        if (elt == null && target != null)
+            elt = target is Name n ? new Name(n.Id, ExpressionContext.Load) : target;
+
         if (kind == CompKind.Dict && compCall.Args.Count > 1)
             iter = compCall.Args[1];
 

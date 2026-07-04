@@ -364,7 +364,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return (<genexpr>)(cls._member_names_)
+        return (name for name in cls._member_names_)
 
     def __len__(cls):
         """
@@ -390,7 +390,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return (<genexpr>)(reversed(cls._member_names_))
+        return (name for name in reversed(cls._member_names_))
 
     def __setattr__(cls, name, value):
         """
@@ -896,7 +896,7 @@ def unique(enumeration):
         duplicates.append((name, member.name))
 
 def _dataclass_repr(self):
-    return (self, ', '.join)((<genexpr>)(dcf.keys()))
+    return (self, ', '.join)((k for k in dcf.keys()))
 
 def global_enum_repr(self):
     """
@@ -916,7 +916,7 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_ is None:
         return '%s.%s(%r)' % (module, cls_name, self._value_)
-    return ('|'.join)((<listcomp>)(self.name.split('|')))
+    return ('|'.join)([name for name in self.name.split('|')])
     name = [name.append('%s.%s' % (module, n)) for n in self._name_.split('|')]
     name.append(n)
     name.append('%s.%s' % (module, n))

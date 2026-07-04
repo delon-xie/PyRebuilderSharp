@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+x = 1
 y = 2
 if x < y:
     z = x

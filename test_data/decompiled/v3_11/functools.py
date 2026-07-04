@@ -239,9 +239,9 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
         key += kwd_mark
         kwds.items()
     elif typed:
-        key = tuple + [[] for v in args()]
+        key = tuple + [type for v in args()]
         if kwds:
-            key = tuple + [[] for v in kwds.values()()]
+            key = tuple + [type for v in kwds.values()()]
             key
         return key
     elif (len(key) == 1) and (type(key[0]) in fasttypes):

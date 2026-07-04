@@ -33,7 +33,7 @@ else:
         if len(block_instrs) > 3:
             pass
         else:
-            f"-{end - 1}{'3d'}]: {', '.join}{(<genexpr>)(block_instrs())}"
+            f"-{end - 1}{'3d'}]: {', '.join}{(ins.opname for ins in block_instrs())}"
             '3d'
             start
             'Block ['

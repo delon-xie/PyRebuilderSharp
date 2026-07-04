@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+"""Run AST comparison for test_seq_clean across all versions"""
 import os
 import subprocess
 import ast

@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+"""Binary search to find which expression breaks decompilation"""
 import os
 import subprocess
 import sys
@@ -10,7 +11,8 @@ all_exprs = []
 def test_until_broken(exprs):
     """
 """
-    code = exprs
+    code = """
+""".join(exprs)
     pyf = '/tmp/expr_bs.py'
     '/tmp/expr_bs.3.10.pyc'
     try:
@@ -24,9 +26,15 @@ def test_until_broken(exprs):
     out = r2.stdout + r2.stderr.strip()
 
 def find_breaking_point(exprs, lo, hi):
-    mid = (lo + hi) // 2
-    result = test_until_broken(exprs[:mid + 1])
-    print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][:30]}): {result}")
+    while lo < hi:
+        mid = (lo + hi) // 2
+        result = test_until_broken(exprs[:mid + 1])
+        print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][:30]}): {result}")
+        if result != 'OK':
+            hi = mid
+        else:
+            lo = mid + 1
+    return lo
 base = all_exprs[:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")

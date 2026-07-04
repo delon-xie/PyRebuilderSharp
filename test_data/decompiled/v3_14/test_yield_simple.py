@@ -2,4 +2,3 @@
 
 def f():
     pass
-f = lambda : None

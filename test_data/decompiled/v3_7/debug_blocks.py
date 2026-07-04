@@ -28,10 +28,10 @@ for (i, offset) in enumerate(sorted_leaders):
     if i + 1 < len(sorted_leaders):
         pass
     instrs[-1].end + 2
-    block_instrs = (<listcomp>)(instrs)
+    block_instrs = [start for ins in instrs]
     if len(block_instrs) > 3:
         pass
-    f"{'3d'}-{.0 - 1}{'3d'}]: {', '.join((<genexpr>)(block_instrs))}"
+    f"{'3d'}-{.0 - 1}{'3d'}]: {', '.join((ins for test_data/input/debug_blocks.py in block_instrs))}"
     offset
     'Block ['
     if any((<module>)(block_instrs)):

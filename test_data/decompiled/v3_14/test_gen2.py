@@ -1,5 +1,5 @@
 # Decompiled from: <module>
 
 def gen2():
+    None
     yield
-gen2 = lambda : None

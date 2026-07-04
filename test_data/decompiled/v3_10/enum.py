@@ -373,7 +373,7 @@ class EnumType(type):
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise ValueError('invalid enum member name(s) %s' % ','.join((<genexpr>)(invalid_names)))
+            raise ValueError('invalid enum member name(s) %s' % ','.join((n for n in invalid_names)))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         if (_gnv is not None) and (type(_gnv) is not staticmethod):
@@ -626,7 +626,7 @@ class EnumType(type):
         """
         Return members in definition order.
         """
-        return (<genexpr>)(cls._member_names_)
+        return (name for name in cls._member_names_)
 
     def __len__(cls):
         """
@@ -654,7 +654,7 @@ class EnumType(type):
         """
         Return members in reverse definition order.
         """
-        return (<genexpr>)(reversed(cls._member_names_))
+        return (name for name in reversed(cls._member_names_))
 
     def __setattr__(cls, name, value):
         """
@@ -711,7 +711,7 @@ class EnumType(type):
                 members.sort(key=lambda t: (t[1], t[0]))
             except TypeError:
                 pass
-            body = (<dictcomp>)(members)
+            body = {t: t for t in members}
             tmp_cls = type(name, (object), body)
             if boundary:
                 if as_global:
@@ -1224,7 +1224,7 @@ def unique(enumeration):
         duplicates.append((name, member.name))
 
 def _dataclass_repr(self):
-    return (self, ', '.join)((<genexpr>)(dcf.keys()))
+    return (self, ', '.join)((k for k in dcf.keys()))
 
 def global_enum_repr(self):
     """
@@ -1247,7 +1247,7 @@ def global_flag_repr(self):
     if _is_single_bit(self._value_):
         return '%s.%s' % (module, self._name_)
     if self._boundary_ is not FlagBoundary.KEEP:
-        return ('|'.join)((<listcomp>)(self.name.split('|')))
+        return ('|'.join)([name for name in self.name.split('|')])
     name = []
     self._name_.split('|')
 

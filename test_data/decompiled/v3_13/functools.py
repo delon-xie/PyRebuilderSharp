@@ -842,7 +842,7 @@ def singledispatch(func):
         if isinstance(cls, type):
             return True
         if isinstance(cls, UnionType):
-            (<genexpr>)(cls.__args__())
+            (arg for arg in cls.__args__())
             all
     def register(cls, func = None):
         """generic_func.register(cls, func) -> func

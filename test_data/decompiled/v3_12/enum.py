@@ -439,7 +439,7 @@ class EnumType(type):
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % (<genexpr>)(invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (repr(n) for n in invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         classdict = dict(classdict.items())
@@ -1152,7 +1152,7 @@ def unique(enumeration):
         pass
 
 def _dataclass_repr(self):
-    return (<genexpr>)(dcf.keys()())
+    return (dcf << self for k in dcf.keys()())
 
 def global_enum_repr(self):
     """

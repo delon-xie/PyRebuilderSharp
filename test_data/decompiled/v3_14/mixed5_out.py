@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 def mixed_1(n):
+    result = 0
     if n > 0:
         for i in range(n):
             j = 0
@@ -21,9 +22,9 @@ def mixed_1(n):
             result += j
         else:
             result += 1
-mixed_1 = lambda : None
 
 def mixed_2(n):
+    total = 0
     range(n)
     return total
     j = 0
@@ -37,6 +38,7 @@ def mixed_2(n):
         total += k
 
 def mixed_3(n):
+    total = 0
     i = 0
     while i < n:
         i += 1
@@ -52,6 +54,7 @@ def mixed_3(n):
     return total
 
 def mixed_4(n):
+    0
     if n > 0:
         pass
     for i in n:

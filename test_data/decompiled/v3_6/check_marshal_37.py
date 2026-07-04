@@ -8,7 +8,7 @@ print('Python 3.7 says:')
 print(f"  argcount={code.co_argcount} nlocals={code.co_nlocals} stacksize={code.co_stacksize} flags={hex(code.co_flags)}")
 m = bytes(marshal.dumps(code))
 print(f"\nMarshaled ({len(m)} bytes):")
-print(' '.join((<genexpr>)(m[:40])))
+print(' '.join((b for b in m[:40])))
 """
 Byte 0 = """(f"{m[0]}{'02x'}")
 range(0, 8)
