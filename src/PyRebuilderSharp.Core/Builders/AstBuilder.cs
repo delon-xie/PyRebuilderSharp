@@ -697,7 +697,8 @@ public class AstBuilder
         }
 
         // 检测 try/except (SETUP_FINALLY 模式)
-        var tryBodyStmts = BuildTryFromBlock(block, visited);
+        // 如果已经在构建 try 语句中（_buildTryDepth > 0），则跳过，避免在 try 体中创建另一个 try 语句
+        var tryBodyStmts = _buildTryDepth == 0 ? BuildTryFromBlock(block, visited) : null;
         if (tryBodyStmts != null)
         {
             stmts.AddRange(tryBodyStmts);
@@ -765,7 +766,8 @@ public class AstBuilder
         }
 
         // 3.11+: 通过 ExceptionTable 检测 try/except
-        if (_codeObject.ExceptionTable.Count > 0)
+        // 如果已经在构建 try 语句中（_buildTryDepth > 0），则跳过，避免在 try 体中创建另一个 try 语句
+        if (_codeObject.ExceptionTable.Count > 0 && _buildTryDepth == 0)
         {
             if (_codeObject.Name == "<module>" && !_diagETPrinted)
             {
@@ -4960,7 +4962,8 @@ public class AstBuilder
         }
 
         // 3.11+: ET-based try/except 检测（优先于 if/else，因为 ET 条目也可能包含条件跳转）
-        if (_codeObject.ExceptionTable != null && _codeObject.ExceptionTable.Count > 0)
+        // 如果已经在构建 try 语句中（_buildTryDepth > 0），则跳过，避免在 try 体中创建另一个 try 语句
+        if (_codeObject.ExceptionTable != null && _codeObject.ExceptionTable.Count > 0 && _buildTryDepth == 0)
         {
             var etTry = BuildTryFromExceptionTable(block, visited);
             if (etTry != null)

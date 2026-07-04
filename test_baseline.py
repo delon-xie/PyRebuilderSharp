@@ -27,7 +27,7 @@ KNOWN_PATTERNS = {
     "bare_elem": re.compile(r"(?<!\w)\belem\b(?!\s*=)", re.MULTILINE),
     "bare_list": re.compile(r"^\s*\[\]\s*$", re.MULTILINE),
     "empty_try": re.compile(r"try:\s*\n\s*(?:pass\s*\n)?\s*(?=\n|$)", re.MULTILINE),
-    "try_no_except_finally": re.compile(r"try:\s*\n(?:(?!except|finally).)*?(?=\n\s*return|\n\s*def|\Z)", re.DOTALL),
+    "try_no_except_finally": re.compile(r"(?<![a-zA-Z])try:\s*\n(?:(?!except|finally).)*?(?=\n\s*return|\n\s*def|\Z)", re.DOTALL),
     "for_empty": re.compile(r"for\s+\w+\s+in\s+\[\]:", re.MULTILINE),
     "stray_pass": re.compile(r"(?<!\n)\s*pass\s*(?=\n\s*(?:if|for|while|return|def))", re.MULTILINE),
 }
