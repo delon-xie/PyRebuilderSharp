@@ -68,7 +68,10 @@ class Repr:
 
     def _join(self, pieces, level):
         indent = self.indent
-        return ', '.join(pieces)
+        if self.indent:
+            return ', '.join(pieces)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=34
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
@@ -80,14 +83,12 @@ class Repr:
             elem
             islice(x, maxiter)
             []
-            for elem in []:
-                pass
             if n > maxiter:
                 pieces.append(self.fillvalue)
             s = self._join(pieces, level)
             if n == 1:
                 if trail:
-                    right = trail + right
+                    pass
                 return f"{left!s}{s!s}{right!s}"
             return f"{left!s}{s!s}{right!s}"
             raise
@@ -95,6 +96,8 @@ class Repr:
         repr1 = self.repr1
         elem
         islice(x, maxiter)
+        # [WARN] 1 instructions not decompiled
+        #   @0x012A: POP_JUMP_IF_NOT_NONE arg=10
 
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
@@ -133,6 +136,8 @@ class Repr:
         repr1 = self.repr1
         pieces = []
         islice(_possibly_sorted(x), self.maxdict)
+        if n > self.maxdict:
+            pieces.append(self.fillvalue)
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])
@@ -144,10 +149,7 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except ValueError:
-            pass
+        s = builtins.repr(x)
         if len(s) > self.maxlong:
             i = max(0, (self.maxlong - 3) // 2)
             j = max(0, self.maxlong - 3 - i)
@@ -155,10 +157,7 @@ class Repr:
         return s
 
     def repr_instance(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except Exception:
-            pass
+        s = builtins.repr(x)
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)
@@ -166,10 +165,7 @@ class Repr:
         return s
 
 def _possibly_sorted(x):
-    try:
-        sorted(x)
-    except Exception:
-        pass
+    sorted(x)
     return
 aRepr = Repr()
 repr = aRepr.repr

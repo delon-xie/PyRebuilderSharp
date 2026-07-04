@@ -68,7 +68,10 @@ class Repr:
 
     def _join(self, pieces, level):
         indent = self.indent
-        return ', '.join(pieces)
+        if self.indent:
+            return ', '.join(pieces)
+        # [WARN] 1 instructions not decompiled
+        #   @0x000E: POP_JUMP_IF_NOT_NONE arg=42
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
@@ -80,7 +83,7 @@ class Repr:
         s = self._join(pieces, level)
         if n == 1:
             if trail:
-                right = trail + right
+                pass
             return f"{left!s}{s!s}{right!s}"
         return f"{left!s}{s!s}{right!s}"
         pieces = islice(x, maxiter)()
@@ -90,6 +93,8 @@ class Repr:
         if n == 1:
             pass
         return f"{left!s}{s!s}{right!s}"
+        # [WARN] 1 instructions not decompiled
+        #   @0x011E: POP_JUMP_IF_NOT_NONE arg=10
 
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
@@ -139,22 +144,13 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except ValueError:
-            pass
+        s = builtins.repr(x)
 
     def repr_instance(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except Exception:
-            pass
+        s = builtins.repr(x)
 
 def _possibly_sorted(x):
-    try:
-        sorted(x)
-    except Exception:
-        pass
+    sorted(x)
     return
 aRepr = Repr()
 repr = aRepr.repr

@@ -2,13 +2,14 @@
 
 def greet(name):
     """Hello, """
-    name(var_0)
+    return f"{name}!"
+greet = lambda : None
 
 def add(a, b):
-    name_2 = []
+    return result
 
 def factorial(n):
-    if not True:
-        pass
-    [[__module__]]
-return super().greet
+    return 1
+print(greet('World'))
+print(add(3, 4))
+print(factorial(5))

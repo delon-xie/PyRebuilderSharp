@@ -1,12 +1,10 @@
 # Decompiled from: <module>
 
+import asyncio
+
 async def test_async():
-    None
-    return deref_2
-    {var_1}
-    {var_1}
+    yield 1()
+    return 'done'
 
 async def worker():
-    None
-    {var_0}
-var_1
+    yield

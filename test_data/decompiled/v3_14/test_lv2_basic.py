@@ -1,13 +1,17 @@
 # Decompiled from: <module>
 
-if not super(super().x).x:
-    *super().x.n
-    super().x
-elif not super(super().x).x:
-    *super().x.y
-    super().x
-elif not super().x:
-    []
-    []
-    *[super().x](*[super().x], *[super().x]).x
-    [super().x]
+y = 2
+if x < y:
+    z = x
+elif x > y:
+    z = y
+else:
+    z = 0
+    i = 0
+    while i < 5:
+        2
+        i
+        i
+    range(10)
+    a = 1
+    m = n + 1

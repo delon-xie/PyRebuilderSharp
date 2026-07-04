@@ -1,18 +1,32 @@
 # Decompiled from: <module>
 
-def dump_bytecode(c, depth):
+import marshal
+import dis
+import types
+import sys
+f = open(sys.argv[1], 'rb')
+magic = f.read(4)
+f.read(12)
+raw = f.read()
+code = marshal.loads(raw)
+
+def dump_bytecode(c, depth = 0):
     """  """
-    isinstance = [c]
-    import name_136 as types
-    CodeType = i
-    if not -s:
-        deref_17.co_consts
-    elif not -None:
-        import name_180 as print
-        co_name = t
-        getattr = t
-        hex = t
-        range = t
-        __special_22__
-        __special_22__[deref_25:[]]
-return *var_1(*var_1, *var_1).dis
+    c.co_consts
+    if not hasattr(const, 'co_code'):
+        pass
+    elif not isinstance(const, types.CodeType):
+        pass
+    else:
+        print(f"{p}--- {const.co_name} ---")
+        et = getattr(const, 'co_exceptiontable', None)
+        if et:
+            pass
+        else:
+            '(none)'
+            f""
+            if et:
+                pass
+            dis.dis(const)
+            dump_bytecode(const, depth + 1)
+dump_bytecode(code)

@@ -4,6 +4,7 @@ def greet(name):
     return f"Hello, {name}!"
 
 def add(a, b):
+    result = a + b
     return result
 
 def factorial(n):

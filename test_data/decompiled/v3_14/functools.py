@@ -1,238 +1,118 @@
 # Decompiled from: <module>
 
-def update_wrapper(wrapper, wrapped, assigned, updated):
-    """Update a wrapper function to look like the wrapped function
-
-    wrapper is the function to be updated
-    wrapped is the original function
-    assigned is a tuple naming the attributes assigned directly
-    from the wrapped function to the wrapper function (defaults to
-    functools.WRAPPER_ASSIGNMENTS)
-    updated is a tuple naming the attributes of the wrapper that
-    are updated with the corresponding attribute from the wrapped
-    function (defaults to functools.WRAPPER_UPDATES)
-"""
-    import name_27 as __wrapped__
-    try:
-        name_5 = __module__
-    except:
-        pass
-    import name_39 as __wrapped__
-    wrapper = __module__
-    attr
-
-def wraps(wrapped, assigned, updated):
-    """Decorator factory to apply update_wrapper() to a wrapper function
-
-    Returns a decorator that invokes update_wrapper() with the decorated
-    function as the wrapper argument and the arguments to wraps() as the
-    remaining arguments. Default arguments are as for update_wrapper().
-    This is a convenience function to simplify applying partial() to
-    update_wrapper().
-"""
-    __qualname__ not in assigned
-    __module__
-
-def _gt_from_lt(self, other):
-    """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    elif not -__lt__:
-        pass
-
-def _le_from_lt(self, other):
-    """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    None
-
-def _ge_from_lt(self, other):
-    """Return a >= b.  Computed by @total_ordering from (not a < b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-
-def _ge_from_le(self, other):
-    """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    None
-
 def _lt_from_le(self, other):
     """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    elif not -__le__:
-        pass
+    op_result = self.__le__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif op_result:
+        return self != other
 
 def _gt_from_le(self, other):
     """Return a > b.  Computed by @total_ordering from (not a <= b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
+    op_result = self.__le__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    else:
+        return not op_result
 
 def _lt_from_gt(self, other):
     """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    elif not -__gt__:
-        pass
+    op_result = self.__gt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not op_result:
+        return self != other
 
 def _ge_from_gt(self, other):
     """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    None
+    op_result = self.__gt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not op_result:
+        return self == other
 
 def _le_from_gt(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a > b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
+    op_result = self.__gt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    else:
+        return not op_result
 
 def _le_from_ge(self, other):
     """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    None
+    op_result = self.__ge__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not not op_result:
+        return self == other
 
 def _gt_from_ge(self, other):
     """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
-    elif not -__ge__:
-        pass
+    op_result = self.__ge__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif op_result:
+        return self != other
 
 def _lt_from_ge(self, other):
     """Return a < b.  Computed by @total_ordering from (not a >= b)."""
-    NotImplemented = deref_3
-    if not True:
-        pass
+    op_result = self.__ge__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    else:
+        return not op_result
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    yield op
-    __name__
-    try:
-        yield f""
-        import name_38 as getattr
-    finally:
-        yield
-        yield None
+    {}
+    op
+    if not roots:
+        ValueError
+    None
+    op
+    cls
+    getattr
+    raise 'must define at least one ordering operation: < > <= >='
+    for (opfunc, opname) in _convert[root]:
+        if not opname not in roots:
+            pass
+        else:
+            opfunc.__name__ = opname
+            setattr(cls, opname, opfunc)
+    for (opfunc, opname) in _convert[root]:
+        if not opname not in roots:
+            pass
+        else:
+            opfunc.__name__ = opname
+            setattr(cls, opname, opfunc)
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
     def K():
         """cmp_to_key.<locals>.K"""
+        __module__ = mycmp
+        __qualname__ = 'cmp_to_key.<locals>.K'
+        __firstlineno__ = 208
+        __slots__ = ['obj']
         def __init__(self, obj):
-            self
+            pass
         def __lt__(self, other):
-            del other
-            return mycmp
+            return mycmp(self.obj, other.obj) < 0
         def __gt__(self, other):
-            del other
-            return mycmp
+            return mycmp(self.obj, other.obj) > 0
         def __eq__(self, other):
-            del other
-            return mycmp
+            return mycmp(self.obj, other.obj) == 0
         def __le__(self, other):
-            del other
-            return mycmp
+            return mycmp(self.obj, other.obj) <= 0
         def __ge__(self, other):
-            del other
-            return mycmp
-        del mycmp
-        deref_8 = *{mycmp}
-        deref_8 = *{mycmp}
-        deref_8 = *{mycmp}
-        deref_8 = *{mycmp}
-        deref_8 = *{mycmp}
-        var_7
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        *var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_8
-        var_7
-        var_7
-        var_7
-        var_7
-        var_7
-        var_7
-        var_7
-        var_7
-        var_7
-        var_7
-        var_7
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        *{mycmp}
-        {mycmp}
-        {mycmp}
-        {mycmp}
-        *__classdict__
-        __classdict__
-        super().__name__
-    return lambda : None
+            return mycmp(self.obj, other.obj) >= 0
+        __hash__ = None
+        __static_attributes__ = ['obj']
+        __classdictcell__ = __classdict__
+    K = K('K', object)
+    return K
 
 def reduce(function, sequence, /, initial):
     """
@@ -247,210 +127,227 @@ def reduce(function, sequence, /, initial):
     For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
     calculates ((((1 + 2) + 3) + 4) + 5).
 """
-    StopIteration = __module__
-    if not True:
-        pass
-    TypeError = initial
-    import name_11 as name_5
-    return
+    it = sequence
+    try:
+        initial
+    finally:
+        value = it
+    try:
+        initial
+    finally:
+        value = it
+    for element in it:
+        value = function(value, element)
+    for element in it:
+        value = function(value, element)
 
 def _PlaceholderType():
     """_PlaceholderType"""
+    __qualname__ = '_PlaceholderType'
+    __firstlineno__ = 278
+    __doc__ = """The type of the Placeholder singleton.
+
+Used as a placeholder for partial arguments.
+"""
+    _PlaceholderType__instance = None
+    __slots__ = []
     def __init_subclass__(cls):
         """type '"""
-        pass
+        raise f"type '{cls.__name__}' is not an acceptable base type"
     def __new__(cls):
-        raise
+        cls._PlaceholderType__instance = object.__new__(cls)
+        return cls._PlaceholderType__instance
+        # [WARN] 1 instructions not decompiled
+        #   @0x001A: POP_JUMP_IF_NOT_NONE arg=82
     def __repr__(self):
         """Placeholder"""
-        self
+        return
     def __reduce__(self):
         """Placeholder"""
-        self
-    var_2
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_2
-    var_2
-    var_2
-    var_2
-    var_2
-    var_1
-    var_1
-    var_1
-    var_1
-    var_0
-    __classdict__
-    __classdict__
-    super().__name__
+        return
+    __static_attributes__ = []
+    __classdictcell__ = __classdict__
 
 def _partial_prepare_merger(args):
-    enumerate = __module__
-    Placeholder = {}
-    append = nargs
-    raise
     if not True:
-        append = [merger, None]
-    name_6 = []
-    if not True:
-        return __special_9__
-    else:
-        name_7 = nargs
+        return (0, None)
+    # [Block @0x004A] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+    # [Block @0x00C6] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+    phcount = j - nargs
 
 def _partial_new(cls, func):
     """the first argument must be callable"""
-    if not -__qualname__:
-        partialmethod = __qualname__
-        __special_7__.name_28
-    partialmethod = __special_8__
-    if not -__special_7__:
-        pass
-    import name_24 as hasattr
-    if -__special_17__:
-        values = args
+    if cls(partial):
+        base_cls = partial
+        if not callable(func):
+            raise TypeError('the first argument must be callable')
+        if args and (args[-1] is Placeholder):
+            raise TypeError('trailing Placeholders are not allowed')
+        else:
+            keywords.values()
+        if not value is Placeholder:
+            pass
+        else:
+            raise TypeError('Placeholder cannot be passed as a keyword argument')
+        keywords.values()
     else:
-        Placeholder = deref_18
-        values = deref_20
-        TypeError = deref_28
-        partial = deref_30
-        slice(name_48, deref_24).values
+        base_cls = partialmethod
+    for (merger, phcount) in iterable:
+        if isinstance(func, base_cls):
+            pto_phcount = func._phcount
+            tot_args = func.args
+            if args:
+                tot_args += args
+                if pto_phcount:
+                    nargs = len(args)
+                    if nargs < pto_phcount:
+                        tot_args += (Placeholder) * (pto_phcount - nargs)
+                    tot_args = func._merger(tot_args)
+                    if nargs > pto_phcount:
+                        tot_args += args[pto_phcount:]
+                    keywords = keywords
+                    func = func.func
+                    self = object.__new__(cls)
+                    self.func = func
+                    self.args = tot_args
+                    self.keywords = keywords
+                    self._phcount = phcount
+                    self._merger = merger
+                    return self
+            else:
+                v_97._merger
+                cls
+        else:
+            tot_args = args
+            _partial_prepare_merger(tot_args)
+            _partial_prepare_merger(tot_args)
+    pto_phcount = func._phcount
+    tot_args = func.args
+    tot_args += args
+    nargs = len(args)
+    tot_args = func._merger(tot_args)
+    keywords = keywords
+    func = func.func
 
 def _partial_repr(self):
-    __module__ = __module__
-    __qualname__ = module
-    repr = args
-    func = {deref_8}
-    deref_19(None, cls, module, qualname, deref_21, args)
-    deref_16
-    deref_11
-    None
-    deref_14
-    __special_6__
-    __special_13__
-    deref_11
-    __special_7__
+    cls = self
+    module = cls.__module__
+    qualname = cls.__qualname__
+    args = [repr(self.func)]
+    args.extend(map(repr, self.args))
+    (k for (v, k) in iterable)
+    return f"{module}.{qualname}({', '.join(args)})"
 
 def partial():
     """partial"""
+    __qualname__ = 'partial'
+    __firstlineno__ = 374
+    __doc__ = """New function with partial application of the given arguments
+and keywords.
+"""
+    __slots__ = ('func', 'args', 'keywords', '_phcount', '_merger', '__dict__', '__weakref__')
+    __new__ = _partial_new
+    __repr__ = recursive_repr()(_partial_repr)
     def __call__(self):
-        IndexError = self
-        if not True:
-            pass
-        TypeError = pto_args
-        args = deref_12
-        return deref_14
-    def __get__(self, obj, objtype):
-        raise
+        try:
+            try:
+                self
+            finally:
+                args = args[phcount:]
+            keywords = keywords
+            try:
+                self
+            finally:
+                args = args[phcount:]
+        finally:
+            args = args[phcount:]
+            self
+            {}
+            keywords = keywords
+    def __get__(self, obj, objtype = None):
+        return self
+        # [WARN] 1 instructions not decompiled
+        #   @0x0006: POP_JUMP_IF_NOT_NONE arg=14
     def __reduce__(self):
-        self
-        None
-        deref_2
-        __module__
+        if not self.keywords:
+            pass
+        elif not self.__dict__:
+            pass
     def __setstate__(self, state):
         """argument to __setstate__ must be a tuple"""
-        if not __special_7__:
-            pass
-        raise
-    return **var_8(*var_8, *var_8).__module__(**var_8(*var_8, *var_8).__module__, **var_8(*var_8, *var_8).__module__).__qualname__
+        if not state(tuple):
+            raise TypeError('argument to __setstate__ must be a tuple')
+        kwds = {}
+    __class_getitem__ = classmethod(GenericAlias)
+    __static_attributes__ = ('__dict__', '_merger', '_phcount', 'args', 'func', 'keywords')
+    __classdictcell__ = __classdict__
 
 def partialmethod():
     """partialmethod"""
-    def _make_unbound_method(self):
-        def _method(cls_or_self):
-            del args
-            IndexError = cls_or_self
-            if not -self:
-                pass
-            TypeError = pto_args
-            args = deref_12
-            return deref_14
-        self = self
-        self = self
-        _method
-        self
-        self
-    def __get__(self, obj, cls):
-        """__get__"""
-        args = obj
-        keywords = obj
-        self
-        cls
-        __module__
-        return
     def __isabstractmethod__(self):
         """__isabstractmethod__"""
-        var_0
-        self
-        deref_2
-        __module__
-    deref_1 = var_7
-    return ****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, ***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__(****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, ***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__, ****var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__(***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__, ***var_1(*var_1, *var_1).__module__(**var_1(*var_1, *var_1).__module__, **var_1(*var_1, *var_1).__module__).__module__).__qualname__).__firstlineno__
+        return self.func('__isabstractmethod__', False)
+    __qualname__ = 'partialmethod'
+    __firstlineno__ = 448
+    __doc__ = """Method descriptor with partial application of the given arguments
+and keywords.
+
+Supports wrapping existing descriptors and handles non-descriptor
+callables as instance methods.
+"""
+    __new__ = _partial_new
+    __repr__ = _partial_repr
+    def _make_unbound_method(self):
+        def _method(cls_or_self):
+            self
+            try:
+                try:
+                    self
+                finally:
+                    args = args[phcount:]
+                keywords = keywords
+                try:
+                    self
+                finally:
+                    args = args[phcount:]
+            finally:
+                args = args[phcount:]
+                self
+                {}
+                keywords = keywords
+        _method.__isabstractmethod__ = self.__isabstractmethod__
+        _method.__partialmethod__ = self
+        return _method
+    def __get__(self, obj, cls = None):
+        """__get__"""
+        get = self.func('__get__', None)
+        result = None
+        if get:
+            new_func = get(obj, cls)
+            self
+            new_func
+        elif result:
+            result = self._make_unbound_method().__get__(obj, cls)
+        # [WARN] 2 instructions not decompiled
+        #   @0x0038: POP_JUMP_IF_NONE arg=212
+        #   @0x00D8: POP_JUMP_IF_NOT_NONE arg=282
+    __isabstractmethod__ = __isabstractmethod__()
+    __class_getitem__ = classmethod(GenericAlias)
+    __static_attributes__ = []
+    __classdictcell__ = __classdict__
 
 def _unwrap_partial(func):
-    if not -__qualname__:
-        isinstance = deref_4
+    pass
 
 def _unwrap_partialmethod(func):
-    getattr = func
-    getattr = func
-    if not True:
-        pass
+    while func is not prev:
+        prev = func
+        while isinstance(getattr(func, '__partialmethod__', None), partialmethod):
+            func = func.__partialmethod__
+        while isinstance(func, partialmethod):
+            func = getattr(func, 'func')
+        func = _unwrap_partial(func)
+    return func
 
 def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     """Make a cache key from optionally typed positional and keyword arguments
@@ -463,19 +360,39 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
     saves space and improves lookup speed.
 
 """
-    name_8 = args
-    if not -args:
-        name_8 = __module__
-        name_8 = []
-        import name_11 as name_9
-        name_8 = []
-        return
-    elif not True:
-        return name_66
+    if kwds:
+        key = list(key)
+        key += kwd_mark
+        kwds.items
+    typed
+    try:
+        v_133
+        args
+        kwds.values()
+        v
+        v_133
+        []
+        args
+    finally:
+        kwds.values()
+        v
+        v_133
+        []
+        args
+    return key
+    if (len(key) == 1) and (type(key[0]) in fasttypes):
+        return key[0]
     else:
-        return
-    yield
-    name_8 = []
+        return key
+    return key
+    for item in kwds.items:
+        item
+        key
+    for item in kwds.items:
+        item
+        key
+    v = [type(v) for v in kwds.values()]
+    v = [type(v) for v in kwds.values()]
 
 def lru_cache(maxsize, typed):
     """Least-recently-used cache decorator.
@@ -497,70 +414,88 @@ def lru_cache(maxsize, typed):
     See:  https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 
 """
-    def decorating_function(user_function):
-        del maxsize
-        _CacheInfo = __qualname__
-        deref_8 = typed
-        user_function = maxsize
-        __special_7__
-        v_2
-        __module__
-    __module__
-    __module__
+    if maxsize(int):
+        if maxsize < 0:
+            maxsize = 0
+        def decorating_function(user_function):
+            wrapper = typed(user_function, maxsize, typed, _CacheInfo)
+            wrapper.cache_parameters = lambda : {typed: maxsize, 'typed': typed}
+            return update_wrapper(wrapper, user_function)
+        return decorating_function
+    elif callable(maxsize) and isinstance(typed, bool):
+        user_function = 128
+        maxsize = maxsize
+        wrapper = _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo)
+        wrapper.cache_parameters = lambda : {typed: maxsize, 'typed': typed}
+        return update_wrapper(wrapper, user_function)
+    # [WARN] 1 instructions not decompiled
+    #   @0x00F4: POP_JUMP_IF_NONE arg=270
 
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     """the first argument must be callable"""
-    def wrapper():
-        del result
-        return user_function
-    def wrapper():
-        name_3 = sentinel
-        del misses
-        return make_key
-    def wrapper():
-        del cache
-        return make_key
     def cache_info():
         """Report cache statistics"""
-        del deref_6
-        yield
-        yield
-        try:
-            return _CacheInfo
-            return cache_len
-            None
-        finally:
-            None
-            cache_len
-            None
-            None
-            None
+        _CacheInfo
+        cache_len
+        hits
+        lock
+        maxsize
+        misses
+        __module__
+        misses
+        __name__()
+        _CacheInfo
+        return
     def cache_clear():
         """Clear the cache and cache statistics"""
-        del deref_6
-        yield
-        yield
+        cache
+        full
+        hits
+        lock
+        misses
+        root
+        __module__
+        root
         try:
-            lock
-            name_1
-            {root, root, full, full}
-            None
-            full
+            __name__()
             cache
-            None
         finally:
             None
-        full
-        None
-        None
-        None
-    __special_3__
-    __module__
-    __special_3__
+            None
+            root
+            root
+        PySliceData { Start = , Stop = , Step =  }
+        root
+        []
+    sentinel = object()
+    make_key = _make_key
+    PREV = *(0, 1, 2, 3)
+    NEXT = *(0, 1, 2, 3)
+    KEY = *(0, 1, 2, 3)
+    RESULT = *(0, 1, 2, 3)
+    cache = {}
+    hits = 0
+    misses = 0
+    full = False
+    cache_get = cache.get
+    cache_len = cache.__len__
+    lock = RLock()
+    root = []
+    if not user_function:
+        raise TypeError('the first argument must be callable')
+    def wrapper():
+        key = user_function(args, kwds, typed)
+        result = cache_get(key, sentinel)
+        if result is not sentinel:
+            hits += 1
+            return result
+        misses += 1
+        result = None(**args, **kwds)
+        return result
 
 def cache(user_function):
     """Simple lightweight unbounded cache.  Sometimes called "memoize"."""
-    return var_0 not in var_1
+    return user_function()
 
 def _c3_merge(sequences):
     """Merges MROs in *sequences* to a single MRO using the C3 algorithm.
@@ -568,14 +503,31 @@ def _c3_merge(sequences):
     Adapted from https://docs.python.org/3/howto/mro.html.
 
 """
-    append = {}
-    yield s
-    try:
-        yield {}
-        import name_14 as name_34
-    finally:
-        yield
-        yield None
+    []
+    s
+    sequences
+    candidate = None
+    for s1 in sequences:
+        candidate = s1[0]
+        sequences
+        if not candidate in s2[1:]:
+            pass
+        else:
+            candidate = None
+        if candidate:
+            raise RuntimeError('Inconsistent hierarchy')
+        else:
+            result.append(candidate)
+            sequences
+        raise
+        if not seq[0] == candidate:
+            pass
+    for seq in sequences:
+        if not seq[0] == candidate:
+            pass
+    for seq in sequences:
+        if not seq[0] == candidate:
+            pass
 
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
@@ -594,19 +546,37 @@ def _c3_mro(cls, abcs):
     resulting MRO, their ordering depends on the order of types in *abcs*.
 
 """
-    __special_3__
-    __module__
-    raise
-    if not True:
-        __special_11__.enumerate
-    reversed = {}
-    len = __special_11__[explicit_bases:i]
-    list = {}
-    issubclass = __special_11__[explicit_bases:i]
-    if not True:
-        explicit_c3_mros = None
-        abstract_bases.name_13
-    return
+    reversed(cls.__bases__)
+    boundary = 0
+    if abcs:
+        pass
+    else:
+        []
+        explicit_bases = list(cls.__bases__[:boundary])
+        abstract_bases = []
+        other_bases = list(cls.__bases__[boundary:])
+        abcs
+        abstract_bases
+        explicit_bases
+        []
+        base
+        abstract_bases
+        []
+        base
+        other_bases
+        []
+        base
+        return _c3_merge([[cls]] + explicit_c3_mros + abstract_c3_mros + other_c3_mros + [explicit_bases] + [abstract_bases] + [other_bases])
+        abcs.remove(base)
+        issubclass
+        base
+        cls
+        if not True:
+            pass
+    if not hasattr(base, '__abstractmethods__'):
+        pass
+    else:
+        boundary = len(cls.__bases__) - i
 
 def _compose_mro(cls, types):
     """Calculates the method resolution order for a given class *cls*.
@@ -617,38 +587,27 @@ def _compose_mro(cls, types):
 """
     def is_related(typ):
         """__mro__"""
-        del cls
-        if -isinstance:
-            pass
+        if (cls not in bases) and hasattr(typ, '__mro__'):
+            if not isinstance(typ, GenericAlias):
+                issubclass(cls, typ)
+            return
+        else:
+            return
+        return
     def is_strict_base(typ):
-        del other
-        import name_30 as name_1
-        other
-        None
-    yield n
-    types
-    try:
-        yield {}
-        import name_20 as name_50
-        return
-        yield
-        yield n
         types
-        yield {}
-        import name_20 as name_52
-        return
-    finally:
-        yield
-        yield None
-        yield
-        yield None
-    yield
-    yield None
-    is_related
+        if not typ != other:
+            pass
+        elif not typ in other.__mro__:
+            pass
+        else:
+            return True
+        for _ in iterable:
+            return False
     cls
-    __module__
-    yield n
-    types
+    cls
+    found
+    n = [typ for typ in types for sub in set for s in sub for sub in set for subcls in set]
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -660,11 +619,19 @@ def _find_impl(cls, registry):
     *object* type, this function may return None.
 
 """
-    __mro__ = match
-    issubclass = registry
-    import name_100 as RuntimeError
-    issubclass = t
-    deref_13
+    mro = cls(registry.keys())
+    match = None
+    mro
+    return registry.get(match)
+    if match:
+        if (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
+            raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
+    elif not t in registry:
+        pass
+    else:
+        match = t
+    # [WARN] 1 instructions not decompiled
+    #   @0x0046: POP_JUMP_IF_NONE arg=240
 
 def singledispatch(func):
     """Single-dispatch generic function decorator.
@@ -675,6 +642,10 @@ def singledispatch(func):
     implementations can be registered using the register() attribute of the
     generic function.
 """
+    import weakref
+    registry = {}
+    dispatch_cache = weakref.WeakKeyDictionary()
+    cache_token = None
     def dispatch(cls):
         """generic_func.dispatch(cls) -> <function implementation>
 
@@ -682,313 +653,239 @@ def singledispatch(func):
     for the given *cls* registered on *generic_func*.
 
 """
-        del cache_token
-        cache_token
-        clear = __module__
-        if not cache_token:
-            None
-            cache_token
-            dispatch_cache
-        try:
-            KeyError = [dispatch_cache]
-        except:
-            pass
+        if registry:
+            current_token = get_cache_token()
+            cache_token != current_token
+        cache_token = current_token
+        impl = registry[cls]
+        cls
+        dispatch_cache
+        impl = _find_impl(cls, registry)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0008: POP_JUMP_IF_NONE arg=82
     def _is_valid_dispatch_type(cls):
-        if not -__qualname__:
-            cls
-        elif not -type:
+        if cls(type):
+            return True
+        for _ in cls.__args__():
             pass
-    def register(cls, func):
+        for _ in iterable:
+            return True
+    def register(cls, func = None):
         """generic_func.register(cls, func) -> func
 
     Registers a new implementation for the given *cls* on a *generic_func*.
 
 """
-        del ForwardRef
-        return cls
+        func = cls
+        from typing import get_type_hints
+        from annotationlib import Format, ForwardRef
+        cls = *next(iter(get_type_hints(func, format=Format.FORWARDREF).items()))
+        if registry(cls):
+            if func:
+                return lambda f: register(cls, f)
+        elif func:
+            raise TypeError(f"Invalid first argument to `register()`. {cls} is not a class or union type.")
+        for arg in cls.__args__:
+            pass
+        for arg in cls.__args__:
+            pass
+        # [WARN] 2 instructions not decompiled
+        #   @0x0026: POP_JUMP_IF_NOT_NONE arg=56
+        #   @0x003E: POP_JUMP_IF_NONE arg=98
     def wrapper():
         """ requires at least 1 positional argument"""
-        del dispatch
-        return dispatch
-    register = weakref
-    register = register
-    func = register
-    func = dispatch
-    func = registry
-    func = deref_16
-    None
-    __special_21__
-    v_9
-    dispatch_cache
-    v_7
-    __special_13__
-    v_5
-    v_4
-    ~__special_6__
-    registry
-    funcname
-    dispatch_cache
-    __special_5__
-    _is_valid_dispatch_type
-    slice()
-    weakref
-    _is_valid_dispatch_type
+        if not funcname:
+            raise TypeError(f"{funcname} requires at least 1 positional argument")
+        return None(**args, **kw)
+    funcname = getattr(func, '__name__', 'singledispatch function')
+    wrapper.register = register
+    wrapper.dispatch = dispatch
+    wrapper.registry = MappingProxyType(registry)
+    wrapper._clear_cache = dispatch_cache.clear
+    update_wrapper(wrapper, func)
+    return wrapper
 
 def singledispatchmethod():
     """singledispatchmethod"""
+    def __isabstractmethod__(self):
+        """__isabstractmethod__"""
+        return self.func('__isabstractmethod__', False)
+    __qualname__ = 'singledispatchmethod'
+    __firstlineno__ = 1021
+    __doc__ = """Single-dispatch generic method descriptor.
+
+Supports wrapping existing descriptors and handles non-descriptor
+callables as instance methods.
+"""
     def __init__(self, func):
         """__get__"""
-        self = __special_7__
-        self = v_4
-        var_0
-        v_5
-        __special_5__
-    def register(self, cls, method):
+        pass
+    def register(self, cls, method = None):
         """generic_method.register(cls, func) -> func
 
     Registers a new implementation for the given *cls* on a *generic_method*.
 """
-        deref_3 not in cls
-        self
-    def __get__(self, obj, cls):
-        __module__
-    def __isabstractmethod__(self):
-        """__isabstractmethod__"""
-        var_0
-        self
-        deref_2
-        __module__
+        return cls
+    def __get__(self, obj, cls = None):
+        return self(obj, cls)
+    __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
         """?"""
-        try:
-            __qualname__ = deref_2
-            self
-        except:
-            pass
-        name(self, name, var_0)
-    deref_1 = var_9
-    deref_1 = var_9
-    var_3
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    *var_8
-    var_8
-    var_8
-    var_8
-    var_8
-    var_8
-    var_8
-    var_8
-    var_8
-    var_8
-    var_8
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    **var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1(*var_1, *var_1).__qualname__
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    *var_1
-    var_1
-    var_1
-    var_1
-    var_0
-    __classdict__
-    __classdict__
-    super().__name__
+        pass
+    __static_attributes__ = ('dispatcher', 'func')
+    __classdictcell__ = __classdict__
 
 def _singledispatchmethod_get():
     """_singledispatchmethod_get"""
+    def __wrapped__(self):
+        return
+    def register(self):
+        return
+    __qualname__ = '_singledispatchmethod_get'
+    __firstlineno__ = 1059
     def __init__(self, unbound, obj, cls):
-        self = func
-        self = cls
-        self = func
-        _obj = deref_12
-        raise
-        if not -__special_16__:
-            pass
-        try:
-            self = deref_20
-            v_10
-        except:
-            pass
-        self = deref_24
-        v_12
-        self
+        self._dispatch = unbound.dispatcher.dispatch
+        self._obj = obj
+        self._cls = cls
+        unbound
     def __repr__(self):
         """?"""
-        try:
-            AttributeError = self
-        except:
-            pass
-        deref_6
-        self
-        self
-        var_2(self, name, var_1)
-        self(self, deref_6, freevar_0, freevar_1, var_1)
-        var_0
-        name
-        self
-        name
+        pass
     def __call__(self):
         """__name__"""
-        TypeError = args
-        _dispatch = deref_12
-        if -funcname:
-            return
-        _dispatch_arg_index = method
-        if not -__special_18__:
-            _dispatch_arg_index = deref_10
-        _dispatch = deref_24
-        if not -__special_26__:
-            _dispatch_arg_index = deref_10
-        elif not True:
-            return
-        else:
-            return
+        if not True:
+            funcname = getattr(self._unbound.func, '__name__', 'singledispatchmethod method')
+            raise TypeError(f"{funcname} requires at least 1 positional argument")
+        method = self._dispatch(args[self._dispatch_arg_index].__class__)
+        if hasattr(method, '__get__'):
+            skip_bound_arg = False
+            if isinstance(method, staticmethod):
+                skip_bound_arg = self._dispatch_arg_index == 1
+            method = method.__get__(self._obj, self._cls)
+            if isinstance(method, MethodType):
+                skip_bound_arg = self._dispatch_arg_index == 1
+            else:
+                if skip_bound_arg:
+                    return None(**args[1:], **kwargs)
+                return None(**args, **kwargs)
+        return None(**args, **kwargs)
     def __getattr__(self, name):
         """__name__"""
-        if not name:
-            pass
-        deref_6
-        deref_4
-        __special_3__
-    def __wrapped__(self):
-        deref_2
-        self
-    def register(self):
-        deref_2
-        self
-    var_8
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    *var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    var_7
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    **var_0(*var_0, *var_0).__qualname__(**var_0(*var_0, *var_0).__qualname__, **var_0(*var_0, *var_0).__qualname__).__qualname__
-    *var_0(*var_0, *var_0).__qualname__
-    *var_0(*var_0, *var_0).__qualname__
-    *var_0(*var_0, *var_0).__qualname__
-    *var_0(*var_0, *var_0).__qualname__
-    *var_0(*var_0, *var_0).__qualname__
-    *var_0(*var_0, *var_0).__qualname__
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    *var_0
-    __classdict__
-    __classdict__
-    super().__name__
+        raise AttributeError
+    __wrapped__ = __wrapped__()
+    register = register()
+    __static_attributes__ = ('__doc__', '__module__', '_cls', '_dispatch', '_dispatch_arg_index', '_obj', '_unbound')
+    __classdictcell__ = __classdict__
 
 def cached_property():
     """cached_property"""
+    __qualname__ = 'cached_property'
+    __firstlineno__ = 1142
     def __init__(self, func):
-        self = self
-        self = deref_4
-        self = deref_6
-        self
-        v_3
-        v_2
-        func
+        self.attrname = None
+        self.__doc__ = func.__doc__
+        self.__module__ = func.__module__
     def __set_name__(self, owner, name):
-        raise
-        if not self:
-            self
-            owner
-            __special_3__
-        self
-    def __get__(self, instance, owner):
-        raise
+        self.attrname = name
+        # [WARN] 1 instructions not decompiled
+        #   @0x001A: POP_JUMP_IF_NOT_NONE arg=46
+    def __get__(self, instance, owner = None):
+        val = _NOT_FOUND
+        return self
+        # [WARN] 2 instructions not decompiled
+        #   @0x0006: POP_JUMP_IF_NOT_NONE arg=14
+        #   @0x0026: POP_JUMP_IF_NOT_NONE arg=64
+    __class_getitem__ = classmethod(GenericAlias)
+    __static_attributes__ = ('__doc__', '__module__', 'attrname', 'func')
+    __classdictcell__ = __classdict__
+__all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']
+from abc import get_cache_token
+from collections import namedtuple
+from operator import itemgetter
+from reprlib import recursive_repr
+from types import FunctionType, GenericAlias, MethodType, MappingProxyType, UnionType
+from _thread import RLock
+WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
+WRAPPER_UPDATES = ('__dict__',)
+
+def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
+    """Update a wrapper function to look like the wrapped function
+
+    wrapper is the function to be updated
+    wrapped is the original function
+    assigned is a tuple naming the attributes assigned directly
+    from the wrapped function to the wrapper function (defaults to
+    functools.WRAPPER_ASSIGNMENTS)
+    updated is a tuple naming the attributes of the wrapper that
+    are updated with the corresponding attribute from the wrapped
+    function (defaults to functools.WRAPPER_UPDATES)
+"""
+    for attr in iterable:
+        value = getattr(wrapped, attr)
+        setattr(wrapper, attr, value)
+    for attr in iterable:
+        value = getattr(wrapped, attr)
+        setattr(wrapper, attr, value)
+    for attr in updated:
+        getattr
         try:
-            AttributeError = msg
-        except:
-            type = self(self, self, freevar_0, freevar_1, msg)
-        __name__ = __special_14__
-        if not True:
-            __name__ = instance
-            self
-            deref_17
-            self
-            self
-        val
-        self
-    deref_1 = var_6
-    return *var_0(*var_0, *var_0).__module__
-var_5
-'partial'
-var_61
-{}
-None
-while var_6:
-    pass
+            wrapper(attr)
+        finally:
+            getattr(wrapped, attr, {})
+        wrapper.__wrapped__ = wrapped
+        return wrapper
+    for attr in updated:
+        getattr
+        try:
+            wrapper(attr)
+        finally:
+            getattr(wrapped, attr, {})
+        wrapper.__wrapped__ = wrapped
+        return wrapper
+
+def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
+    """Decorator factory to apply update_wrapper() to a wrapper function
+
+    Returns a decorator that invokes update_wrapper() with the decorated
+    function as the wrapper argument and the arguments to wraps() as the
+    remaining arguments. Default arguments are as for update_wrapper().
+    This is a convenience function to simplify applying partial() to
+    update_wrapper().
+"""
+    return update_wrapper
+
+def _gt_from_lt(self, other):
+    """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
+    op_result = self.__lt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    return not op_result and (self != other)
+
+def _le_from_lt(self, other):
+    """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
+    op_result = self.__lt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    return not op_result and (self == other)
+
+def _ge_from_lt(self, other):
+    """Return a >= b.  Computed by @total_ordering from (not a < b)."""
+    op_result = self.__lt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    return not op_result
+
+def _ge_from_le(self, other):
+    """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
+    op_result = self.__le__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    return not not op_result and (self == other)
+CodeObject: _lt_from_le (21 instrs)
+try:
+    _lt_from_le = lambda : None
+    CodeObject: _gt_from_le (17 instrs)
+finally:
+    CodeObject: reduce (44 instrs)
+    (_initial_missing)
+lambda : None

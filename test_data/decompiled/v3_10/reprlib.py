@@ -73,7 +73,7 @@ class Repr:
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        pieces = [elem for elem in islice(x, maxiter)]
+        pieces = (<listcomp>)(islice(x, maxiter))
         if n > maxiter:
             pieces.append(self.fillvalue)
         s = self._join(pieces, level)
@@ -83,7 +83,7 @@ class Repr:
             return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
-        pieces = [elem for elem in islice(x, maxiter)]
+        pieces = (<listcomp>)(islice(x, maxiter))
         if n > maxiter:
             pass
         s = self._join(pieces, level)
@@ -128,6 +128,8 @@ class Repr:
         repr1 = self.repr1
         pieces = []
         islice(_possibly_sorted(x), self.maxdict)
+        if n > self.maxdict:
+            pieces.append(self.fillvalue)
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])

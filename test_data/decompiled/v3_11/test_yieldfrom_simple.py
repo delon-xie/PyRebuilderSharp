@@ -1,4 +1,5 @@
 # Decompiled from: <module>
 
 def f():
-    yield range(3)
+    range
+    yield 3

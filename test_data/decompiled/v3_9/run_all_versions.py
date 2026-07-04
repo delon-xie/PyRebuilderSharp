@@ -18,10 +18,12 @@ with open(INPUT_FILE) as f:
         expected_ast = ast.dump(ast.parse(expected_src), indent=2)
     except print:
         sys.exit(1)
+e = [r.stdout for ver in versions if expected_ast == actual_ast if i < len(exp_lines) if e != a for _ in ver]
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
 actual_src = r.stdout
 actual_ast = ast.dump(ast.parse(actual_src), indent=2)
 match = expected_ast == actual_ast
+ast = ['(missing)' for i in range(max(len(exp_lines), len(act_lines))) if i < len(exp_lines) if e != a]
 print(f"  Line {i}: expected={e}")
 print(f"           actual=  {a}")
 e = None

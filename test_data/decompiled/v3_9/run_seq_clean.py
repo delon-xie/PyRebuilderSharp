@@ -18,11 +18,13 @@ with open(INPUT_FILE) as f:
     except Exception:
         print('Failed to parse expected source:', e)
         sys.exit(1)
+i = [r.stdout for ver in versions if expected_ast == actual_ast if i < len(exp_lines) if e != a for _ in ver]
 print('⏭ %s: .pyc not found' % ver)
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
 actual_src = r.stdout
 actual_ast = ast.dump(ast.parse(actual_src), indent=2)
 match = expected_ast == actual_ast
+expected_ast = ['(missing)' for i in range(max(len(exp_lines), len(act_lines))) if i < len(exp_lines) if e != a]
 print('  Line %d: expected=%s' % (i, e))
 print('           actual=  %s' % a)
 yield from results

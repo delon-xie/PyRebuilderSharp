@@ -21,13 +21,6 @@ def update_abstractmethods(cls):
     else:
         abstracts = set()
         cls.__bases__
-    for scls in cls.__bases__:
-        getattr(scls, '__abstractmethods__', ())
-        for name in getattr(scls, '__abstractmethods__', ()):
-            value = getattr(cls, name, None)
-            if getattr(value, '__isabstractmethod__', False):
-                abstracts.add(name)
-        cls
     for (name, value) in cls:
         if getattr(value, '__isabstractmethod__', False):
             abstracts.add(name)
@@ -36,6 +29,12 @@ def update_abstractmethods(cls):
         return cls
     cls.__abstractmethods__ = abstracts
     return cls
+    getattr(scls, '__abstractmethods__', ())
+    for name in getattr(scls, '__abstractmethods__', ()):
+        value = getattr(cls, name, None)
+        if getattr(value, '__isabstractmethod__', False):
+            abstracts.add(name)
+    cls
 
 def ABC():
     """ABC"""

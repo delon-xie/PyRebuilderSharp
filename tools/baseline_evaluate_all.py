@@ -12,7 +12,7 @@ INPUT_DIR = os.path.join(PROJECT_DIR, "test_data/input")
 COMPILED_DIR = os.path.join(PROJECT_DIR, "test_data/compiled")
 DECOMPILED_DIR = os.path.join(PROJECT_DIR, "test_data/decompiled")
 REPORT_DATE = datetime.now().strftime("%Y%m%d")
-REPORT_PATH = os.path.join(PROJECT_DIR, f"docs/baseline_evaluate_report_{REPORT_DATE}_2.md")
+REPORT_PATH = os.path.join(PROJECT_DIR, f"docs/baseline_evaluate_report_{REPORT_DATE}_1.md")
 
 VERSIONS = ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 KEY_FILES = ["abc.py", "ast.py", "enum.py", "re.py", "functools.py", "contextlib.py", "pprint.py", "dataclasses.py", "reprlib.py"]
@@ -76,9 +76,9 @@ def main():
     for ver in VERSIONS:
         os.makedirs(os.path.join(DECOMPILED_DIR, ver_tag(ver)))
 
-    # Phase 1: Batch decompile
+    # Phase 1: Batch decompile (debug logs now gated behind VerboseErrors)
     print(f"{'='*60}")
-    print(f"Phase 1: Batch 反编译 (942 files, 1 dotnet run)")
+    print(f"Phase 1: Batch 反编译 ({len([f for f in os.listdir(COMPILED_DIR) if f.endswith('.pyc')])} files)")
     print(f"{'='*60}")
     batch_out = os.path.join(DECOMPILED_DIR, "_batch")
     os.makedirs(batch_out)
@@ -86,10 +86,15 @@ def main():
     r = subprocess.run(
         ["dotnet", "run", "--project", CLI_PROJECT, "-c", "Release", "--",
          "-d", COMPILED_DIR, "-o", batch_out],
-        capture_output=True, text=True, timeout=120, cwd=PROJECT_DIR
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        timeout=300, cwd=PROJECT_DIR
     )
     elapsed = time.time() - t0
-    print(f"  {elapsed:.1f}s — 942/942 ok")
+    success_count = len([f for f in os.listdir(batch_out) if f.endswith('.py')]) if os.path.exists(batch_out) else 0
+    # Recurse into subdirs
+    import glob as _glob
+    success_count = len(_glob.glob(os.path.join(batch_out, "**/*.py"), recursive=True))
+    print(f"  {elapsed:.1f}s — {success_count} files decompiled")
 
     # Organize by version
     all_results = {}

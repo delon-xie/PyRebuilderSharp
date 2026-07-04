@@ -1,8 +1,8 @@
 # Decompiled from: <module>
 
 def f():
-    var_0
+    return
+f = lambda : None
 
 def g():
-    var_0
-var_2
+    return

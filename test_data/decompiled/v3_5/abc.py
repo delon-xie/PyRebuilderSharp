@@ -107,18 +107,18 @@ class abstractproperty(property):
 class ABCMeta(type):
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace)
-        abstracts = {(name, value) for (name, value) in namespace.items()}
+        abstracts = (<setcomp>)(namespace.items())
         bases
-        for base in bases:
-            for name in getattr(base, '__abstractmethods__', set()):
-                value = getattr(cls, name, None)
         cls.__abstractmethods__ = frozenset(abstracts)
         cls._abc_registry = WeakSet()
         cls._abc_cache = WeakSet()
         cls._abc_negative_cache = WeakSet()
         cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         return cls
-        abstracts.add(name)
+        getattr(base, '__abstractmethods__', set())
+        value = getattr(cls, name, None)
+        if getattr(value, '__isabstractmethod__', False):
+            abstracts.add(name)
     __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
 
     Use this metaclass to create an ABC.  An ABC can be subclassed
@@ -153,9 +153,8 @@ class ABCMeta(type):
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         sorted(cls.__dict__.keys())
-        for name in sorted(cls.__dict__.keys()):
-            pass
-        value = getattr(cls, name)
+        if name.startswith('_abc_'):
+            value = getattr(cls, name)
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""

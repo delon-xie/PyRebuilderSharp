@@ -2,14 +2,17 @@
 
 def outer():
     def inner():
-        del lock
-        yield
-        yield
+        lock
+        __module__
+        lock
+        __name__()
+        None
+        None
         try:
             None
         finally:
-            None
+            lk
+            print
         None
-        None
-    __module__
-var_1
+    return inner
+outer = lambda : None

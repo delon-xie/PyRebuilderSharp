@@ -57,19 +57,6 @@ while i < len(lines):
                                         '版本'
                                         None
                                         print
-                                        for version in sorted(version_stats.keys()):
-                                            stats = version_stats[version]
-                                            t = stats['total']
-                                            p = stats['passed']
-                                            f = stats['failed']
-                                            if t > 0:
-                                                pass
-                                            else:
-                                                0
-                                                total_passed += p
-                                                total_failed += f
-                                                total += t
-                                                p(f"<10 {f}<10 {t}<10 {rate}>8.1f%")
                                         print('----------------------------------------------------------------------')
                                         if total > 0:
                                             pass
@@ -80,6 +67,18 @@ while i < len(lines):
                                             if not True:
                                                 pass
                                             raise
+                                        stats = version_stats[version]
+                                        t = stats['total']
+                                        p = stats['passed']
+                                        f = stats['failed']
+                                        if t > 0:
+                                            pass
+                                        else:
+                                            0
+                                            total_passed += p
+                                            total_failed += f
+                                            total += t
+                                            p(f"<10 {f}<10 {t}<10 {rate}>8.1f%")
                                         i += 1
                                         if i < len(lines):
                                             pass

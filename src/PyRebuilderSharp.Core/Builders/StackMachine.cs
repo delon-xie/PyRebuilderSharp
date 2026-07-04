@@ -3,6 +3,7 @@ using PyRebuilderSharp.Core.Models.AST;
 using AstAttribute = PyRebuilderSharp.Core.Models.AST.Attribute;
 using PyRebuilderSharp.Core.Models.Bytecode;
 using PyRebuilderSharp.Core.Versioning;
+using PyRebuilderSharp.Core.Diagnostics;
 
 namespace PyRebuilderSharp.Core.Builders;
 
@@ -78,6 +79,12 @@ public class StackMachine
     public Expr PopExpr()
     {
         return _exprStack.Pop();
+    }
+
+    /// <summary>压入表达式到表达式栈</summary>
+    public void PushExpr(Expr expr)
+    {
+        _exprStack.Push(expr);
     }
 
     /// <summary>弹出结果表达式</summary>
@@ -217,6 +224,21 @@ public class StackMachine
                 // 先压入要加载的变量（栈操作顺序）
                 _exprStack.Push(new Name(sflfLoadName, ExpressionContext.Load));
                 return new Assign(new List<Expr> { new Name(sflfStoreName, ExpressionContext.Store) }, sflfVal);
+            }
+
+            case Opcode.LOAD_FAST_LOAD_FAST_313:
+            {
+                // LOAD_FAST_LOAD_FAST: 3.13+ 超级指令
+                // 加载两个局部变量到栈
+                // CPython wordcode: arg 低 8 位 = 第一个变量索引，高 8 位 = 第二个变量索引
+                var lflfArg = instr.Argument ?? 0;
+                int idx1 = lflfArg & 0xFF;
+                int idx2 = (lflfArg >> 8) & 0xFF;
+                var lflfName1 = idx1 < _code.Varnames.Count ? _code.Varnames[idx1] : $"v_{idx1}";
+                var lflfName2 = idx2 < _code.Varnames.Count ? _code.Varnames[idx2] : $"v_{idx2}";
+                _exprStack.Push(new Name(lflfName2, ExpressionContext.Load));
+                _exprStack.Push(new Name(lflfName1, ExpressionContext.Load));
+                return null;
             }
 
             case Opcode.BUILD_INTERPOLATION_314:
@@ -387,6 +409,8 @@ public class StackMachine
                 var attr = GetName(instr);
                 var obj = SafePop();
                 if (obj == null) return null;
+                while (obj is Starred starred && starred.Ctx == ExpressionContext.Load)
+                    obj = starred.Value;
                 _exprStack.Push(new AstAttribute(obj, attr, ExpressionContext.Load));
                 return null;
             }
@@ -611,6 +635,9 @@ public class StackMachine
             case Opcode.RETURN_VALUE:
             {
                 var retValue = SafePop();
+                // 处理 UNPACK_SEQUENCE 产生的 Starred 返回值
+                if (retValue is Starred starred && starred.Ctx == ExpressionContext.Load)
+                    retValue = starred.Value;
                 return new Return(retValue);
             }
 
@@ -721,7 +748,22 @@ public class StackMachine
                 }
                 var func = SafePop();
                 if (func == null) return null;
-                _exprStack.Push(new Call(func, args, new List<Keyword>()));
+                
+                // 处理 Starred 参数：展开嵌套的 Starred
+                var processedArgs = new List<Expr>();
+                foreach (var arg in args)
+                {
+                    var unwrapped = arg;
+                    while (unwrapped is Starred starred && starred.Ctx == ExpressionContext.Load)
+                        unwrapped = starred.Value;
+                    processedArgs.Add(unwrapped);
+                }
+                
+                // 处理函数本身被 Starred 包装的情况
+                while (func is Starred starredFunc && starredFunc.Ctx == ExpressionContext.Load)
+                    func = starredFunc.Value;
+                
+                _exprStack.Push(new Call(func, processedArgs, new List<Keyword>()));
                 return null;
             }
 
@@ -739,7 +781,22 @@ public class StackMachine
                 }
                 var method = SafePop();
                 if (method == null) return null;
-                _exprStack.Push(new Call(method, callArgs, new List<Keyword>()));
+                
+                // 处理 Starred 参数：展开嵌套的 Starred
+                var processedArgs = new List<Expr>();
+                foreach (var arg in callArgs)
+                {
+                    var unwrapped = arg;
+                    while (unwrapped is Starred starred && starred.Ctx == ExpressionContext.Load)
+                        unwrapped = starred.Value;
+                    processedArgs.Add(unwrapped);
+                }
+                
+                // 处理方法本身被 Starred 包装的情况
+                while (method is Starred starredMethod && starredMethod.Ctx == ExpressionContext.Load)
+                    method = starredMethod.Value;
+                
+                _exprStack.Push(new Call(method, processedArgs, new List<Keyword>()));
                 return null;
             }
 
@@ -798,7 +855,21 @@ public class StackMachine
                     keywords.Add(new Keyword(null, kwValue));
                 }
                 
-                var call = new Call(func, args, keywords);
+                // 处理函数本身被 Starred 包装的情况
+                while (func is Starred starredFunc && starredFunc.Ctx == ExpressionContext.Load)
+                    func = starredFunc.Value;
+                
+                // 处理参数中的 Starred
+                var processedArgs = new List<Expr>();
+                foreach (var arg in args)
+                {
+                    var unwrapped = arg;
+                    while (unwrapped is Starred starred && starred.Ctx == ExpressionContext.Load)
+                        unwrapped = starred.Value;
+                    processedArgs.Add(unwrapped);
+                }
+                
+                var call = new Call(func, processedArgs, keywords);
                 _exprStack.Push(call);
                 return null;
             }
@@ -857,6 +928,7 @@ public class StackMachine
             // ---- 3.11+ no-ops (safe to skip) ----
             case Opcode.NOP:
             case Opcode.RESUME:
+            case Opcode.RESUME_313:
             case Opcode.INTERPRETER_EXIT:
             case Opcode.SETUP_ANNOTATIONS:
                 return null;
@@ -1160,7 +1232,27 @@ public class StackMachine
                     }
                     else if (args.Count == 1)
                     {
-                        _exprStack.Push(args[0]);
+                        // Python 3.14 对内置函数调用进行了优化，可能省略了 LOAD_GLOBAL
+                        // 对于 range(10) 这样的调用，栈上只有参数，函数对象被缓存
+                        // 尝试从常量或 names 中查找可能的函数
+                        var arg = args[0];
+                        // 检查是否为整数常量，如果是，可能是 range(N) 调用
+                        if (arg is Constant { Value: long })
+                        {
+                            // 尝试从 names 中查找 'range'
+                            if (_code.Names.Contains("range"))
+                            {
+                                _exprStack.Push(new Call(new Name("range", ExpressionContext.Load), args, keywords));
+                            }
+                            else
+                            {
+                                _exprStack.Push(arg);
+                            }
+                        }
+                        else
+                        {
+                            _exprStack.Push(arg);
+                        }
                     }
                     return null;
                 }
@@ -1175,9 +1267,22 @@ public class StackMachine
                     _exprStack.Pop(); // discard null sentinel
                 }
                 
-                // Create a dummy Call to capture the null sentinel issue
-                // If the null sentinel exists, wrap as call; otherwise just treat as func(args)
-                var call = new Call(func, args, keywords);
+                // 处理 Starred 参数：UNPACK_SEQUENCE 产生的 Starred 应作为普通参数传递
+                // 例如 super(*var_1) 应变为 super(var_1_value)
+                var processedArgs = new List<Expr>();
+                foreach (var arg in args)
+                {
+                    if (arg is Starred starred && starred.Ctx == ExpressionContext.Load)
+                        processedArgs.Add(starred.Value);
+                    else
+                        processedArgs.Add(arg);
+                }
+                
+                // 处理函数本身被 Starred 包装的情况
+                while (func is Starred starredFunc && starredFunc.Ctx == ExpressionContext.Load)
+                    func = starredFunc.Value;
+                
+                var call = new Call(func, processedArgs, keywords);
                 _exprStack.Push(call);
                 return null;
             }
@@ -1412,8 +1517,11 @@ public class StackMachine
                 var container = SafePop();
                 if (container == null) return null;
 
-                for (int i = count - 1; i >= 0; i--)
-                    _exprStack.Push(new Starred(container, ExpressionContext.Load));
+                if (count == 1)
+                    _exprStack.Push(container);
+                else
+                    for (int i = count - 1; i >= 0; i--)
+                        _exprStack.Push(new Starred(container, ExpressionContext.Load));
                 return null;
             }
 
@@ -1529,7 +1637,10 @@ public class StackMachine
                 if (iterable != null)
                     _exprStack.Push(iterable);  // 推回，供 CALL_FUNCTION 或 FOR_ITER 使用
                 else
+                    if (Diag.Verbose)
+                    {
                     Console.Error.WriteLine($"[GET_ITER] v{_code.Version} func={_code.Name} stackEmpty");
+                    }
                 return null;
             }
 
@@ -1575,7 +1686,10 @@ public class StackMachine
                         
                         if (codeExpr is Constant cTest && cTest.Value is CodeObject cod && cod.Name == "K")
                         {
+                            if (Diag.Verbose)
+                            {
                             Console.Error.WriteLine($"[MF_DEBUG] class body K: flags=0x{flags:X2} codeExpr={codeExpr} stackCount={_exprStack.Count} top3={string.Join(",", _exprStack.TakeLast(Math.Min(3, _exprStack.Count)).Reverse())}");
+                            }
                         }
                         
                         Expr? closureExpr = (flags & 0x08) != 0 ? SafePop() : null;
@@ -1811,16 +1925,22 @@ public class StackMachine
             case Opcode.CONVERT_VALUE_313:
                 return null;
 
-            // ---- 3.11+ LIST_APPEND: TOS → append to list at TOS[n] ----
+            // ---- 3.11+ LIST_APPEND: TOS → append to list at stack[-depth-1] ----
             case Opcode.LIST_APPEND_313:
             {
                 var depth = instr.Argument ?? 0;
                 var item = SafePop();
                 if (item == null) return null;
-                if (_exprStack.Count >= depth && _exprStack.Peek() is ListLiteral listLit)
+                // LIST_APPEND depth: append TOS to list at stack[-depth-1]
+                // e.g., depth=2: stack[0]=list, stack[1]=iter, stack[2]=current_item
+                int listIndex = _exprStack.Count - depth - 1;
+                if (listIndex >= 0)
                 {
-                    var elts = listLit.Elts;
-                    elts.Add(item);
+                    var listLit = _exprStack.Skip(listIndex).FirstOrDefault() as ListLiteral;
+                    if (listLit != null)
+                    {
+                        listLit.Elts.Add(item);
+                    }
                 }
                 return null;
             }

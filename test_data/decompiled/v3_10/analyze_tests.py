@@ -30,41 +30,31 @@ with open('/tmp/test_full.txt', 'r') as f:
                                     version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
                                     if version_match:
                                         version = version_match.group(1)
-                                        if (version in ('3.7', '3.8', '3.9', '3.10')) and (status == 'PASS'):
-                                            pass
-                                        else:
-                                            version_stats[version]['failed'] + 1
-                                            j = j + 1
-                                            if j < len(lines):
-                                                while j < i + 30:
-                                                    next_line = lines[j]
-                                                    if next_line.startswith('***'):
-                                                        pass
-                                                i = i + 1
-                                                if not i < len(lines):
-                                                    for version in sorted(version_stats.keys()):
-                                                        stats = version_stats[version]
-                                                        t = stats['total']
-                                                        p = stats['passed']
-                                                        f = stats['failed']
-                                                        if t > 0:
-                                                            pass
-                                                        else:
-                                                            0
-                                                            total_passed = total_passed + p
-                                                            total_failed = total_failed + f
-                                                            total = total + t
-                                                            p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
-                                                while '***' in line:
+                                        if version in ('3.7', '3.8', '3.9', '3.10'):
+                                            return version_stats[version]['total'] + 1
+                                        j = j + 1
+                                        if j < len(lines):
+                                            while j < i + 30:
+                                                next_line = lines[j]
+                                                if next_line.startswith('***'):
                                                     pass
                                             i = i + 1
                                             if not i < len(lines):
-                                                pass
+                                                for version in sorted(version_stats.keys()):
+                                                    stats = version_stats[version]
+                                                    t = stats['total']
+                                                    p = stats['passed']
+                                                    f = stats['failed']
+                                                    if t > 0:
+                                                        pass
+                                                    else:
+                                                        0
+                                                        total_passed = total_passed + p
+                                                        total_failed = total_failed + f
+                                                        total = total + t
+                                                        p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
                                             while '***' in line:
                                                 pass
-                                        j = j + 1
-                                        if j < len(lines):
-                                            pass
                                         i = i + 1
                                         if not i < len(lines):
                                             pass

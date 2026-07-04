@@ -2,7 +2,6 @@
 
 def test5():
     try:
-        for x in range(3):
-            y = x
+        y = x
     except:
         y = -1

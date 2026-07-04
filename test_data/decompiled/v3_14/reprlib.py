@@ -1,437 +1,142 @@
 # Decompiled from: <module>
 
-def recursive_repr(fillvalue):
+__all__ = ['Repr', 'repr', 'recursive_repr']
+import builtins
+from itertools import islice
+from _thread import get_ident
+
+def recursive_repr(fillvalue = '...'):
     """Decorator to make a repr function return fillvalue for a recursive call"""
     def decorating_function(user_function):
+        repr_running = fillvalue()
         def wrapper(self):
-            del fillvalue
-            get_ident = __special_3__
-            if not repr_running:
-                fillvalue
-            None
-            user_function
+            key = (user_function(self), get_ident())
             repr_running
-            try:
-                return user_function
-                None
-                deref_7
-                repr_running
-                key
-                self
-                deref_7
-                repr_running
-            finally:
-                key
-                self
-                deref_7
-                repr_running
-        del wrapper
-        __module__
-        user_function = wrapper
-        user_function = user_function
-        user_function = repr_running
-        user_function = fillvalue
-        user_function = var_2
-        user_function = var_4
-        user_function = user_function
-        v_8
-        v_7
-        var_3
-        user_function
-        __special_3__
-        v_6
-        var_1
-        user_function
-        __special_3__
-        v_5
-        user_function
-        __special_3__
-        v_4
-        user_function
-        __special_3__
-        v_3
-        user_function
-        __special_3__
-        v_2
-        user_function
-        __special_3__
-        __module__
+            key
+            repr_running
+            fillvalue
+        wrapper.__module__ = getattr(user_function, '__module__')
+        wrapper.__doc__ = getattr(user_function, '__doc__')
+        wrapper.__name__ = getattr(user_function, '__name__')
+        wrapper.__qualname__ = getattr(user_function, '__qualname__')
+        wrapper.__annotate__ = getattr(user_function, '__annotate__', None)
+        wrapper.__type_params__ = getattr(user_function, '__type_params__', ())
+        wrapper.__wrapped__ = user_function
+        return wrapper
+    return decorating_function
 
-def Repr():
-    """Repr"""
-    def __init__(self, *, maxlevel, maxtuple, maxlist, maxarray, maxdict, maxset, maxfrozenset, maxdeque, maxstring, maxlong, maxother, fillvalue, indent):
-        self
+class Repr:
+    _lookup = {'tuple': 'builtins', 'list': 'builtins', 'array': 'array', 'set': 'builtins', 'frozenset': 'builtins', 'deque': 'collections', 'dict': 'builtins', 'str': 'builtins', 'int': 'builtins'}
+
+    def __init__(self, *, maxlevel = 6, maxtuple = 6, maxlist = 6, maxarray = 5, maxdict = 4, maxset = 6, maxfrozenset = 6, maxdeque = 6, maxstring = 30, maxlong = 40, maxother = 30, fillvalue = '...', indent = None):
+        self.maxtuple = maxtuple
+        self.maxlist = maxlist
+        self.maxarray = maxarray
+        self.maxdict = maxdict
+        self.maxset = maxset
+        self.maxfrozenset = maxfrozenset
+        self.maxdeque = maxdeque
+        self.maxstring = maxstring
+        self.maxlong = maxlong
+        self.maxother = maxother
+        self.fillvalue = fillvalue
+        self.indent = indent
+
     def repr(self, x):
-        deref_2
-        x
+        return x(self.maxlevel)
+
     def repr1(self, x, level):
         """ """
-        join = __module__
-        getattr = level
-        if not self:
-            _lookup = parts
-            getattr = module
-            x
-        repr_instance = cls
+        cls = x
+        typename = cls.__name__
+        if ' ' in typename:
+            parts = typename.split()
+            typename = '_'.join(parts)
+        method = getattr(self, 'repr_' + typename, None)
+        if method and (typename not in self._lookup):
+            return method(x, level)
+        return self.repr_instance(x, level)
+        module = getattr(cls, '__module__', None)
+
     def _join(self, pieces, level):
-        raise
-    def _repr_iterable(self, x, level, left, right, maxiter, trail):
-        name_7 = __module__
-        name_9 = []
-        name_10 = right
-        yield elem
-        __special_7__
+        return ', '.join(pieces)
+        # [WARN] 1 instructions not decompiled
+        #   @0x001A: POP_JUMP_IF_NOT_NONE arg=64
+
+    def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
+        n = x
+        if (level <= 0) and n:
+            self
+        try:
+            pass
+        else:
+            1
+            level
+        pieces.append(self.fillvalue)
+        1
+        level
+        s = self._join(pieces, level)
+
     def repr_tuple(self, x, level):
         """("""
-        level
-        level
-        x
-        self
-        x
+        return x(level, '(', ')', self.maxtuple, ',')
+
     def repr_list(self, x, level):
         """["""
-        level
-        x
-        self
-        x
+        return x(level, '[', ']', self.maxlist)
+
     def repr_array(self, x, level):
         """array('%s')"""
-        name_3 = [[self, self], x, self]
-        deref_4
-        level
-        header
+        if not True:
+            return 'array(\'%s\')' % x.typecode
+        header = 'array(\'%s\', [' % x.typecode
+        return self._repr_iterable(x, level, header, '])', self.maxarray)
+
     def repr_set(self, x, level):
         """set()"""
-        _repr_iterable = __module__
-        deref_4
-        level
-        x
-        deref_3
-        self
+        if not True:
+            return 'set()'
+
     def repr_frozenset(self, x, level):
         """frozenset()"""
-        _repr_iterable = __module__
-        deref_4
-        level
-        x
-        deref_3
-        self
+        if not True:
+            return 'frozenset()'
+
     def repr_deque(self, x, level):
         """deque(["""
-        level
-        x
-        self
-        x
+        return x(level, 'deque([', '])', self.maxdeque)
+
     def repr_dict(self, x, level):
-        islice = __module__
-        if not True:
-            x
-        elif not True:
-            []
-            n
-            []
-            level
-            level
-        name_9 = []
+        n = x
+        if n == 0:
+            return '{}'
+        if level <= 0:
+            return '{' + self.fillvalue + '}'
+        newlevel = level - 1
+        repr1 = self.repr1
+        pieces = []
+        islice(_possibly_sorted(x), self.maxdict)
+        if n > self.maxdict:
+            pieces.append(self.fillvalue)
+
     def repr_str(self, x, level):
-        return level
+        s = x[:self.maxstring]()
+        if len(s) > self.maxstring:
+            i = max(0, (self.maxstring - 3) // 2)
+            j = max(0, self.maxstring - 3 - i)
+            s = builtins.repr(x[:i] + x[len(x) - j:])
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
+        return s
+
     def repr_int(self, x, level):
         """sys.set_int_max_str_digits()"""
-        try:
-            return level
-            if not deref_28:
-                get_int_max_str_digits = [[__special_31__, self, self, deref_28]]
-                __class__ = [[__special_31__, self, self, deref_28], self, i]
-                str = []
-                self[[self, deref_32, [], self, s, __special_27__, self, s, self, j]:x]
-                x[self:i]
-                s
-                self
-            s
-            self
-            if not True:
-                pass
-        except:
-            pass
+        s = x()
+
     def repr_instance(self, x, level):
         """<%s instance at %#x>"""
-        try:
-            return level
-            if not deref_14:
-                __name__ = [[__special_17__, self, self, deref_14]]
-                id = [[__special_17__, self, self, deref_14], self, i]
-                __class__ = []
-                self[[self, deref_18, [], self, s, __special_13__, self, s, self, j]:x]
-                x[self:i]
-                s
-                self
-            s
-            self
-            yield [x, deref_6, deref_8, __special_11__, self, x]
-            self
-            self
-            None
-        except:
-            yield [x, deref_6, deref_8, __special_11__, self, x]
-            self
-            self
-            None
-    deref_2 = slice(var_23, var_24, var_25)
-    deref_1 = var_42
-    var_25
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    *var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    var_41
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    *var_22
-    var_22
-    var_22
-    var_22
-    var_22
-    var_21
-    var_20
-    var_19
-    var_18
-    var_17
-    var_16
-    var_15
-    var_14
-    var_13
-    var_12
-    var_11
-    slice(var_1, var_10, var_1)
-    slice(var_1, var_10, var_1)
-    slice(var_1, var_10, var_1)
-    slice(var_1, var_10, var_1)
-    var_9
-    var_1
-    var_8
-    var_7
-    var_6
-    var_1
-    var_5
-    var_1
-    var_4
-    var_3
-    var_3
-    var_1
-    var_2
-    var_1
-    var_0
-    *__classdict__
-    __classdict__
-    super().__name__
+        s = x()
 
 def _possibly_sorted(x):
-    try:
-        __module__
-    except:
-        yield x
-var_2
-var_2
-'Repr'
-var_8
-{}
-var_3
-var_3
-var_3
-var_3
-deref_1 = var_9
-return lambda : None
+    pass
+aRepr = Repr()
+repr = aRepr.repr

@@ -125,9 +125,12 @@ def bin(num, max_bits = None):
         s = bltns.bin(~num ^ ceiling - 1 + ceiling)
         sign = s[:3]
         digits = s[3:]
-        if len(digits) < max_bits:
-            digits = sign[-1] * max_bits + digits[-max_bits:]
-        return f"{sign!s} {digits!s}"
+        if max_bits:
+            if len(digits) < max_bits:
+                digits = sign[-1] * max_bits + digits[-max_bits:]
+            return f"{sign!s} {digits!s}"
+    # [WARN] 1 instructions not decompiled
+    #   @0x0124: POP_JUMP_IF_NONE arg=84
 
 class _not_given:
     def __repr__(self):
@@ -162,13 +165,24 @@ class property(DynamicClassAttribute):
     _cls_type = None
 
     def __get__(self, instance, ownerclass = None):
-        return self.member
+        if instance:
+            if self.member:
+                return self.member
+        # [WARN] 2 instructions not decompiled
+        #   @0x0004: POP_JUMP_IF_NOT_NONE arg=78
+        #   @0x0012: POP_JUMP_IF_NONE arg=14
 
     def __set__(self, instance, value):
-        return self.fset(instance, value)
+        if self.fset:
+            return self.fset(instance, value)
+        # [WARN] 1 instructions not decompiled
+        #   @0x000E: POP_JUMP_IF_NONE arg=44
 
     def __delete__(self, instance):
-        return self.fdel(instance)
+        if self.fdel:
+            return self.fdel(instance)
+        # [WARN] 1 instructions not decompiled
+        #   @0x000E: POP_JUMP_IF_NONE arg=42
 
     def __set_name__(self, ownerclass, name):
         self.name = name
@@ -195,6 +209,18 @@ class _proto_member:
                 args = (args)
             elif not enum_class._use_args_:
                 enum_member = enum_class._new_member_(enum_class)
+        enum_class._flag_mask_ | value._flag_mask_ = enum_class
+        for (name, canonical_member) in enum_class._member_map_.items():
+            if canonical_member._value_ == value:
+                enum_member = canonical_member
+            else:
+                KeyError
+                raise
+        enum_member = canonical_member
+        enum_class._member_names_.append(member_name)
+        enum_class._value2member_map_.setdefault(value, enum_member)
+        # [WARN] 1 instructions not decompiled
+        #   @0x021C: POP_JUMP_IF_NONE arg=250
 
 class EnumDict(dict):
     def member_names(self):
@@ -223,60 +249,64 @@ class EnumDict(dict):
 
         Single underscore (sunder) names are reserved.
         """
-        if _is_private(self._cls_name, key):
-            pass
-        elif _is_sunder(key):
-            if key not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_'):
-                if not key.startswith('_repr_'):
-                    raise ValueError(f"_sunder_ names, such as {key!r}, are reserved for future Enum use")
-                if key == '_generate_next_value_':
-                    if self._auto_called:
-                        raise TypeError('_generate_next_value_ must be defined before members')
-                    if isinstance(value, staticmethod):
+        if self._cls_name:
+            if _is_private(self._cls_name, key):
+                pass
+            elif _is_sunder(key):
+                if key not in ('_order_', '_generate_next_value_', '_numeric_repr_', '_missing_', '_ignore_', '_iter_member_', '_iter_member_by_value_', '_iter_member_by_def_', '_add_alias_', '_add_value_alias_'):
+                    if not key.startswith('_repr_'):
+                        raise ValueError(f"_sunder_ names, such as {key!r}, are reserved for future Enum use")
+                    if key == '_generate_next_value_':
+                        if self._auto_called:
+                            raise TypeError('_generate_next_value_ must be defined before members')
+                        if isinstance(value, staticmethod):
+                            pass
+                        else:
+                            value
+                            setattr(self, '_generate_next_value', _gnv)
+                            super().__setitem__(key, value)
+                    elif (key == '_ignore_') and isinstance(value, str):
+                        value = value.replace(',', ' ').split()
+                    else:
+                        value = list(value)
+                        self._ignore = value
+                        already = set(value) & set(self._member_names)
+                        if already:
+                            raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
+                elif key == '_generate_next_value_':
+                    pass
+                elif key == '_ignore_':
+                    pass
+            elif _is_dunder(key):
+                if key == '__order__':
+                    key = '_order_'
+            else:
+                if key in self._member_names:
+                    raise TypeError(f"{key!r} already defined as {self[key]!r}")
+                if key in self._ignore:
+                    pass
+                elif isinstance(value, nonmember):
+                    value = value.value
+                elif _is_descriptor(value):
+                    pass
+                elif self._cls_name:
+                    if _is_internal_class(self._cls_name, value):
                         pass
                     else:
-                        value
-                        setattr(self, '_generate_next_value', _gnv)
-                        super().__setitem__(key, value)
-                elif (key == '_ignore_') and isinstance(value, str):
-                    value = value.replace(',', ' ').split()
-                else:
-                    value = list(value)
-                    self._ignore = value
-                    already = set(value) & set(self._member_names)
-                    if already:
-                        raise ValueError(f"_ignore_ cannot specify already set names: {already!r}")
-            elif key == '_generate_next_value_':
-                pass
-            elif key == '_ignore_':
-                pass
-        elif _is_dunder(key):
-            if key == '__order__':
-                key = '_order_'
-        else:
-            if key in self._member_names:
-                raise TypeError(f"{key!r} already defined as {self[key]!r}")
-            if key in self._ignore:
-                pass
-            elif isinstance(value, nonmember):
-                value = value.value
-            elif _is_descriptor(value):
-                pass
-            elif _is_internal_class(self._cls_name, value):
-                pass
-            else:
-                if key in self:
-                    raise TypeError(f"{key!r} already defined as {self[key]!r}")
-                if isinstance(value, member):
-                    value = value.value
+                        if key in self:
+                            raise TypeError(f"{key!r} already defined as {self[key]!r}")
+                        if isinstance(value, member):
+                            value = value.value
+        value = [single for v in value if v.value == _auto_null]
         non_auto_store = False
         value = auto_valued[0]
+        # [WARN] 2 instructions not decompiled
+        #   @0x0010: POP_JUMP_IF_NONE arg=46
+        #   @0x0372: POP_JUMP_IF_NONE arg=46
     member_names = member_names()
 
     def update(self, members):
         members.keys()
-        for name in members.keys():
-            pass
         for (name, value) in members:
             pass
 _EnumDict = EnumDict
@@ -286,7 +316,10 @@ class EnumType(type):
         metacls._check_for_existing_members_(cls, bases)
         enum_dict = EnumDict(cls)
         (member_type, first_enum) = metacls._get_mixins_(cls, bases)
-        return enum_dict
+        if first_enum:
+            pass
+        # [WARN] 1 instructions not decompiled
+        #   @0x0080: POP_JUMP_IF_NONE arg=40
 
     def __members__(cls):
         """
@@ -299,13 +332,12 @@ class EnumType(type):
 
     def _check_for_existing_members_(mcls, class_name, bases):
         bases
-        for chain in bases:
-            chain.__mro__
-            for base in chain.__mro__:
-                if isinstance(base, EnumType) and base._member_names_:
-                    raise TypeError(f"<enum {class_name!r}> cannot extend {base!r}")
-            None
         return
+        chain.__mro__
+        for base in chain.__mro__:
+            if isinstance(base, EnumType) and base._member_names_:
+                raise TypeError(f"<enum {class_name!r}> cannot extend {base!r}")
+        None
 
     def _get_mixins_(mcls, class_name, bases):
         """
@@ -325,43 +357,42 @@ class EnumType(type):
 
     def _find_data_repr_(mcls, class_name, bases):
         bases
-        for chain in bases:
-            for base in chain.__mro__:
-                if base is object:
-                    pass
-                else:
-                    if isinstance(base, EnumType):
-                        base._value_repr_
-                        return
-                    if ('__repr__' in base.__dict__) and ('__dataclass_fields__' in base.__dict__):
-                        if ('__dataclass_params__' in base.__dict__) and base.__dict__['__dataclass_params__'].repr:
-                            _dataclass_repr
-                            return
-                        base.__dict__['__repr__']
-                        return
-                        base.__dict__['__repr__']
-                        return
-                    base.__dict__['__repr__']
-                    return
-            None
         return
+        chain.__mro__
+        None
+        if base is object:
+            pass
+        else:
+            if isinstance(base, EnumType):
+                base._value_repr_
+                return
+            if ('__repr__' in base.__dict__) and ('__dataclass_fields__' in base.__dict__):
+                if ('__dataclass_params__' in base.__dict__) and base.__dict__['__dataclass_params__'].repr:
+                    _dataclass_repr
+                    return
+                base.__dict__['__repr__']
+                return
+                base.__dict__['__repr__']
+                return
+            base.__dict__['__repr__']
+            return
 
     def _find_data_type_(mcls, class_name, bases):
         data_types = set()
         base_chain = set()
         bases
-        for chain in bases:
-            for base in chain.__mro__:
-                base_chain.add(base)
-                if base is object:
-                    pass
-                elif isinstance(base, EnumType) and (base._member_type_ is not object):
-                    data_types.add(base._member_type_)
-            len
         if data_types > 1:
             raise TypeError(f"too many data types for {class_name!r}: {data_types!r}")
         if data_types:
             return data_types.pop()
+        candidate = None
+        chain.__mro__
+        len
+        base_chain.add(base)
+        if base is object:
+            pass
+        elif isinstance(base, EnumType) and (base._member_type_ is not object):
+            data_types.add(base._member_type_)
 
     def _find_new_(mcls, classdict, member_type, first_enum):
         """
@@ -371,22 +402,27 @@ class EnumType(type):
         member_type: the data type whose __new__ will be used by default
         first_enum: enumeration to check for an overriding __new__
         """
+        target = getattr(possible, method, None)
         __new__ = classdict.get('__new__', None)
         if not first_enum is not None:
             return __new__ is not None
-        ('__new_member__', '__new__')
+        if __new__:
+            return ('__new_member__', '__new__')
         for method in ('__new_member__', '__new__'):
             for possible in (member_type, first_enum):
                 target = getattr(possible, method, None)
                 if target not in {None, None.__new__, object.__new__, Enum.__new__}:
                     __new__ = target
                 __new__
-            object
-        if __new__ in (Enum.__new__, object.__new__):
-            use_args = False
-        else:
-            use_args = True
-            return (__new__, save_new, use_args)
+        for possible in (member_type, first_enum):
+            target = getattr(possible, method, None)
+            if target not in {None, None.__new__, object.__new__, Enum.__new__}:
+                __new__ = target
+            __new__
+        __new__ = target
+        use_args = False
+        # [WARN] 1 instructions not decompiled
+        #   @0x0040: POP_JUMP_IF_NOT_NONE arg=164
 
     def __signature__(cls):
         from inspect import Parameter, Signature
@@ -404,26 +440,41 @@ class EnumType(type):
         classdict.setdefault('_ignore_', []).append('_ignore_')
         ignore = classdict['_ignore_']
         ignore
-        member_names = [classdict for key in ignore]
+        ignore = [classdict for key in ignore]
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
             raise 'invalid enum member name(s) %s'(','.join % (None for n in invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
+        classdict = dict(classdict.items())
+        if _gnv:
+            pass
+        return super().__new__(metacls, cls, bases, classdict, **kwds)
         if type(_gnv) is not staticmethod:
             _gnv = staticmethod(_gnv)
         classdict = dict(classdict.items())
-        (member_type, first_enum) = metacls._get_mixins_(cls, bases)
-        (__new__, save_new, use_args) = metacls._find_new_(classdict, member_type, first_enum)
-        member_names
-        for name in member_names:
-            value = classdict[name]
-            []
-        if boundary:
-            if bases and issubclass(bases[-1], Flag):
-                n = [classdict[n] for n in member_names if isinstance(p.value, int)]
-        else:
-            getattr(first_enum, '_boundary_', None)
+        if _gnv:
+            pass
+        return super().__new__(metacls, cls, bases, classdict, **kwds)
+        ignore = [[] for name in member_names]
+        _gnv = [classdict[n] for n in member_names if p.value < 0]
+        p = classdict[n]
+        key = [p for p in inverted]
+        method = member_type.__str__
+        member_names = [Flag for name in ('__repr__', '__str__', '__format__', '__reduce_ex__')]
+        enum_method = getattr(first_enum, name)
+        found_method = getattr(enum_class, name)
+        object_method = getattr(object, name)
+        data_type_method = getattr(member_type, name)
+        key = [name for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__')]
+        delattr(enum_class, '_boundary_')
+        delattr(enum_class, '_flag_mask_')
+        delattr(enum_class, '_singles_mask_')
+        delattr(enum_class, '_all_bits_')
+        delattr(enum_class, '_inverted_')
+        # [WARN] 2 instructions not decompiled
+        #   @0x01CC: POP_JUMP_IF_NONE arg=74
+        #   @0x025C: POP_JUMP_IF_NONE arg=10
 
     def __bool__(cls):
         """
@@ -464,12 +515,14 @@ class EnumType(type):
                 value = (value, names) + values
             return cls.__new__(cls, value)
         if names is _not_given:
-            raise TypeError(f"{cls} has no members; specify `names=()` if you meant to create a new, empty, enum")
-        if names is _not_given:
+            pass
+        elif names is _not_given:
             pass
         else:
             names
             return
+        # [WARN] 1 instructions not decompiled
+        #   @0x0070: POP_JUMP_IF_NOT_NONE arg=36
 
     def __contains__(cls, value):
         """Return True if `value` is in `cls`.
@@ -528,9 +581,12 @@ class EnumType(type):
     __members__ = __members__()
 
     def __repr__(cls):
-        if issubclass(cls, Flag):
-            return '<flag %r>' % cls.__name__
-        return '<enum %r>' % cls.__name__
+        if Flag:
+            if issubclass(cls, Flag):
+                return '<flag %r>' % cls.__name__
+            return '<enum %r>' % cls.__name__
+        # [WARN] 1 instructions not decompiled
+        #   @0x000E: POP_JUMP_IF_NONE arg=62
 
     def __reversed__(cls):
         """
@@ -563,18 +619,18 @@ class EnumType(type):
         * An iterable of (member name, value) pairs.
         * A mapping of member name -> value pairs.
         """
-        metacls = cls.__class__
-        (type, cls)
-        (cls)
         (_, first_enum) = cls._get_mixins_(class_name, bases)
         classdict = metacls.__prepare__(class_name, bases)
-        if isinstance(names, str):
-            names = names.replace(',', ' ').split()
-        elif isinstance(names, (tuple, list)) and names and isinstance(names[0], str):
-            for (count, name) in enumerate(original_names):
-                value = first_enum._generate_next_value_(name, start, count, last_values[:])
-                last_values.append(value)
-                names.append((name, value))
+        metacls = cls.__class__
+        if type:
+            pass
+        # [Block @0x0196] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+        names = [item for item in names]
+        member_value = names[item]
+        member_name = item
+        _make_class_unpicklable(classdict)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0012: POP_JUMP_IF_NOT_NONE arg=6
 
     def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
         """
@@ -587,13 +643,7 @@ class EnumType(type):
             source = module_globals
             members = source.items()()
             (<listcomp>)
-            try:
-                members.sort(key=lambda t: (t[1], t[0]))
-            except TypeError:
-                pass
-            else:
-                members.sort(key=lambda t: t[0])
-                raise
+            members.sort(key=lambda t: (t[1], t[0]))
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -609,8 +659,21 @@ class EnumType(type):
             descriptor_type = None
             class_type = None
             cls.__mro__[1:]
-            for base in cls.__mro__[1:]:
-                attr = base.__dict__.get(name)
+            redirect = property()
+            redirect.member = member
+            redirect.__set_name__(cls, name)
+            if descriptor_type in ('enum', 'desc'):
+                redirect.fget = getattr(found_descriptor, 'fget', None)
+                redirect._get = getattr(found_descriptor, '__get__', None)
+                redirect.fset = getattr(found_descriptor, 'fset', None)
+                redirect._set = getattr(found_descriptor, '__set__', None)
+                redirect.fdel = getattr(found_descriptor, 'fdel', None)
+                redirect._del = getattr(found_descriptor, '__delete__', None)
+            redirect._attr_type = descriptor_type
+            redirect._cls_type = class_type
+            setattr(cls, name, redirect)
+            attr = base.__dict__.get(name)
+            if attr:
                 if isinstance(attr, (property, DynamicClassAttribute)):
                     found_descriptor = attr
                     class_type = base
@@ -627,20 +690,8 @@ class EnumType(type):
                 else:
                     descriptor_type = 'attr'
                     class_type = base
-                found_descriptor
-            redirect = property()
-            redirect.member = member
-            redirect.__set_name__(cls, name)
-            if descriptor_type in ('enum', 'desc'):
-                redirect.fget = getattr(found_descriptor, 'fget', None)
-                redirect._get = getattr(found_descriptor, '__get__', None)
-                redirect.fset = getattr(found_descriptor, 'fset', None)
-                redirect._set = getattr(found_descriptor, '__set__', None)
-                redirect.fdel = getattr(found_descriptor, 'fdel', None)
-                redirect._del = getattr(found_descriptor, '__delete__', None)
-            redirect._attr_type = descriptor_type
-            redirect._cls_type = class_type
-            setattr(cls, name, redirect)
+        # [WARN] 1 instructions not decompiled
+        #   @0x00D8: POP_JUMP_IF_NONE arg=132
     __signature__ = __signature__()
 EnumMeta = EnumType
 
@@ -656,10 +707,7 @@ class Enum(metaclass=EnumType):
         """
         if not last_values:
             return start
-        try:
-            last_value = sorted(last_values).pop()
-        except TypeError:
-            pass
+        last_value = sorted(last_values).pop()
 
     def _missing_(cls, value):
         pass
@@ -713,11 +761,13 @@ class Enum(metaclass=EnumType):
     def __new__(cls, value):
         if type(value) is cls:
             return value
-        try:
-            cls._value2member_map_[value]
-        except KeyError:
-            pass
+        cls._value2member_map_[value]
         return
+        # [WARN] 4 instructions not decompiled
+        #   @0x026A: POP_JUMP_IF_NONE arg=124
+        #   @0x031C: POP_JUMP_IF_NOT_NONE arg=8
+        #   @0x0320: POP_JUMP_IF_NOT_NONE arg=4
+        #   @0x0328: POP_JUMP_IF_NOT_NONE arg=54
 
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
@@ -732,11 +782,8 @@ class Enum(metaclass=EnumType):
                         raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
                     return None
                     raise
-                    try:
-                        cls._value2member_map_.setdefault(value, self)
-                        cls._hashable_values_.append(value)
-                    except TypeError:
-                        pass
+                    cls._value2member_map_.setdefault(value, self)
+                    cls._hashable_values_.append(value)
             except TypeError:
                 cls._member_map_.values()
         except TypeError:
@@ -760,26 +807,9 @@ class Enum(metaclass=EnumType):
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
         getattr(self, '__dict__', [])
-        for name in getattr(self, '__dict__', []):
-            if name[0] != '_':
-                if name not in self._member_map_:
-                    interesting.add(name)
-                self
-                for cls in self:
-                    for (name, obj) in cls.__dict__.items():
-                        if name[0] == '_':
-                            pass
-                        elif isinstance(obj, property):
-                            if name not in self._member_map_:
-                                interesting.add(name)
-                            else:
-                                interesting.discard(name)
-                        elif name not in self._member_map_:
-                            interesting.add(name)
-                    sorted
-                names = set(['__class__', '__doc__', '__eq__', '__hash__', '__module__']) | interesting
-                return names
-            self
+        name = [cls.__dict__.items() for name in getattr(self, '__dict__', []) if name[0] != '_']
+        # [WARN] 1 instructions not decompiled
+        #   @0x01D2: POP_JUMP_IF_NOT_NONE arg=18
 
     def __format__(self, format_spec):
         return str.__format__(str(self), format_spec)
@@ -877,15 +907,8 @@ class Flag(Enum, boundary=STRICT):
         count: the number of existing members
         last_values: the last value assigned or None
         """
-        if not count:
-            1
-            start
-        else:
-            last_value = max(last_values)
-            try:
-                high_bit = _high_bit(last_value)
-            except Exception:
-                pass
+        # [WARN] 1 instructions not decompiled
+        #   @0x0008: POP_JUMP_IF_NONE arg=4
 
     def _iter_member_by_value_(cls, value):
         """
@@ -901,7 +924,8 @@ class Flag(Enum, boundary=STRICT):
         """
         Extract all members from the value in definition order.
         """
-        yield sorted(cls._iter_member_by_value_(value), key=lambda m: m._sort_order_)
+        sorted
+        yield cls._iter_member_by_value_(value)
 
     def _missing_(cls, value):
         """
@@ -951,7 +975,11 @@ class Flag(Enum, boundary=STRICT):
             else:
                 raise ValueError(f"{cls!r} unknown flag boundary {cls._boundary_!r}")
         raise ValueError(f"{cls!r} invalid value {value!r}\n    given {bin(value, max_bits)!s}\n  allowed {bin(flag_mask, max_bits)!s}")
+        flag_mask = [aliases for m in cls._iter_member_(member_value)]
+        # [Block @0x0510] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         pseudo_member._name_ = None
+        # [WARN] 1 instructions not decompiled
+        #   @0x06DC: POP_JUMP_IF_NONE arg=20
     __doc__ = """
     Support for flags
     """
@@ -974,7 +1002,8 @@ class Flag(Enum, boundary=STRICT):
         """
         Returns flags in definition order.
         """
-        yield self._iter_member_(self._value_)
+        self
+        yield self._value_
 
     def __len__(self):
         return self._value_.bit_count()
@@ -982,12 +1011,18 @@ class Flag(Enum, boundary=STRICT):
     def __repr__(self):
         cls_name = self.__class__.__name__
         if self.__class__._value_repr_:
-            return f"<{cls_name!s}: {v_repr(self._value_)!s}>"
-        repr
+            pass
+        else:
+            repr
+        # [WARN] 1 instructions not decompiled
+        #   @0x004C: POP_JUMP_IF_NOT_NONE arg=46
 
     def __str__(self):
         cls_name = self.__class__.__name__
-        return f"{cls_name!s}({self._value_!r})"
+        if self._name_:
+            return f"{cls_name!s}({self._value_!r})"
+        # [WARN] 1 instructions not decompiled
+        #   @0x0026: POP_JUMP_IF_NOT_NONE arg=26
 
     def __bool__(self):
         return bool(self._value_)
@@ -1005,10 +1040,1011 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         value = self._value_
         (self, other)
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with |")
-            self
         return value | other_value
+        if self._get_value(flag):
+            raise TypeError(f"'{flag}' cannot be combined with other flags with |")
+        if other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        # [WARN] 3 instructions not decompiled
+        #   @0x005C: POP_JUMP_IF_NONE arg=4
+        #   @0x0060: POP_JUMP_IF_NOT_NONE arg=94
+        #   @0x0096: POP_JUMP_IF_NOT_NONE arg=38
 
     def __and__(self, other):
         other_value = self._get_value(other)
@@ -1016,10 +2052,1011 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         value = self._value_
         (self, other)
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with &")
-            self
         return value & other_value
+        if self._get_value(flag):
+            raise TypeError(f"'{flag}' cannot be combined with other flags with &")
+        if other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        # [WARN] 3 instructions not decompiled
+        #   @0x005C: POP_JUMP_IF_NONE arg=4
+        #   @0x0060: POP_JUMP_IF_NOT_NONE arg=94
+        #   @0x0096: POP_JUMP_IF_NOT_NONE arg=38
 
     def __xor__(self, other):
         other_value = self._get_value(other)
@@ -1027,18 +3064,1018 @@ class Flag(Enum, boundary=STRICT):
             return NotImplemented
         value = self._value_
         (self, other)
-        for flag in (self, other):
-            raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
-            self
         return value ^ other_value
+        if self._get_value(flag):
+            raise TypeError(f"'{flag}' cannot be combined with other flags with ^")
+        if other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        elif other_value:
+            pass
+        # [WARN] 3 instructions not decompiled
+        #   @0x005C: POP_JUMP_IF_NONE arg=4
+        #   @0x0060: POP_JUMP_IF_NOT_NONE arg=94
+        #   @0x0096: POP_JUMP_IF_NOT_NONE arg=38
 
     def __invert__(self):
-        raise TypeError(f"'{self}' cannot be inverted")
-        if self._boundary_ in (EJECT, KEEP):
-            self._inverted_ = self.__class__(~self._value_)
-        else:
-            self._inverted_ = self.__class__(self._singles_mask_ & ~self._value_)
-            return self._inverted_
+        if self._get_value(self):
+            raise TypeError(f"'{self}' cannot be inverted")
+        self._inverted_ = self.__class__(~self._value_)
+        # [WARN] 1 instructions not decompiled
+        #   @0x002A: POP_JUMP_IF_NOT_NONE arg=38
     __rand__ = __and__
     __ror__ = __or__
     __rxor__ = __xor__
@@ -1061,13 +4098,7 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items()
-    for (name, member) in enumeration.__members__.items():
-        if name != member.name:
-            duplicates.append((name, member.name))
-        duplicates
-        alias_details = [(alias, name) for (alias, name) in duplicates()]
-        raise ValueError(f"duplicate values found in {enumeration!r}: {alias_details!s}")
-    return enumeration
+    # [Block @0x0038] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 
 def _dataclass_repr(self):
     return (dcf[k].repr for k in dcf.keys()())
@@ -1088,14 +4119,21 @@ def global_flag_repr(self):
     the module is the last module in case of a multi-module name
     """
     cls_name = self.__class__.__name__
-    return f"{module!s}.{cls_name!s}({self._value_!r})"
+    if self._name_:
+        return f"{module!s}.{cls_name!s}({self._value_!r})"
+    name = [n for n in self._name_.split('|')]
+    # [WARN] 1 instructions not decompiled
+    #   @0x0072: POP_JUMP_IF_NOT_NONE arg=32
 
 def global_str(self):
     """
     use enum_name instead of class.enum_name
     """
-    cls_name = self.__class__.__name__
-    return f"{cls_name!s}({self._value_!r})"
+    if self._name_:
+        cls_name = self.__class__.__name__
+        return f"{cls_name!s}({self._value_!r})"
+    # [WARN] 1 instructions not decompiled
+    #   @0x000E: POP_JUMP_IF_NOT_NONE arg=50
 
 def global_enum(cls, update_str = False):
     """
@@ -1131,31 +4169,42 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         <enum 'Color'>
     """
     def convert_class(cls):
-        cls_name = cls.__name__
-        __new__ = cls.__dict__.get('__new__')
+        enum_method = getattr(etype, name)
+        found_method = getattr(enum_class, name)
+        object_method = getattr(object, name)
+        data_type_method = getattr(member_type, name)
         new_member = __new__.__func__
-        new_member = etype._member_type_.__new__
-        etype._use_args_
-        use_args
-        etype
-        boundary
-        attrs = {}
-        body = {}
-        if issubclass(etype, Flag) and boundary:
-            pass
-        else:
-            etype._boundary_
-        cls.__dict__.items()
-        for (name, obj) in cls.__dict__.items():
-            if name in ('__dict__', '__weakref__'):
-                pass
+        cls_name = cls.__name__
+        if use_args:
+            etype._use_args_
+        # [Block @0x02B0] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+        name = [[] for name in ('__repr__', '__str__', '__format__', '__reduce_ex__')]
+        # [Block @0x04E8] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         value = value[0]
         contained = None
+        new_member = [m for m in enum_class if m._value_ == member._value_]
         contained = m
+        member._name_ = name
+        member.__objclass__ = enum_class
+        member.__init__(value)
+        member._sort_order_ = len(member_names)
         setattr(enum_class, name, member)
         hashable_values.append(value)
         member_names.append(name)
         single_bits |= value
+        # [Block @0x0954] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+        value = value[0]
+        contained = None
+        new_member = [m for m in enum_class if m._value_ == member._value_]
+        contained = m
+        member._name_ = name
+        member.__objclass__ = enum_class
+        member.__init__(value)
+        member._sort_order_ = len(member_names)
+        setattr(enum_class, name, member)
+        enum_class._value2member_map_.setdefault(value, member)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0014: POP_JUMP_IF_NOT_NONE arg=14
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1172,14 +4221,15 @@ class verify:
     def __call__(self, enumeration):
         checks = self.checks
         cls_name = enumeration.__name__
-        if issubclass(enumeration, Flag):
-            enum_type = 'flag'
-        elif issubclass(enumeration, Enum):
-            enum_type = 'enum'
-        else:
-            raise TypeError('the \'verify\' decorator only works with Enum and Flag')
-            checks
-            for check in checks:
+        if Flag:
+            if issubclass(enumeration, Flag):
+                enum_type = 'flag'
+            elif issubclass(enumeration, Enum):
+                enum_type = 'enum'
+            else:
+                raise TypeError('the \'verify\' decorator only works with Enum and Flag')
+                checks
+                return
                 if check is UNIQUE:
                     duplicates = []
                     enumeration.__members__.items()
@@ -1195,41 +4245,15 @@ class verify:
                             range(_high_bit(low) + 1, _high_bit(high))
                         elif enum_type == 'enum':
                             range(low + 1, high)
-                elif check is NAMED_FLAGS:
-                    for (name, alias) in enumeration._member_map_.items():
-                        if name in member_names:
-                            pass
-                        elif alias.value < 0:
-                            pass
-                        else:
-                            values = list(_iter_bits_lsb(alias.value))
-                            missed = values()
-                            if missed:
-                                for val in missed:
-                                    missing_value |= val
-                        missing_names
-                for (name, member) in enumeration.__members__.items():
-                    if name != member.name:
-                        duplicates.append((name, member.name))
-                    duplicates
-                    alias_details = [(alias, name) for (alias, name) in duplicates()]
-                    raise ValueError(f"aliases found in {enumeration!r}: {alias_details!s}")
-                if len(missing_names) == 1:
-                    alias = 'alias %s is missing' % missing_names[0]
                 else:
-                    alias = f"aliases {', '.join(missing_names[:-1])!s} and {missing_names[-1]!s} are missing"
-                    if _is_single_bit(missing_value):
-                        value = 'value 0x%x' % missing_value
-                    else:
-                        value = 'combined values of 0x%x' % missing_value
-                        raise ValueError(f"invalid Flag {cls_name!r}: {alias!s} {value!s} [use enum.show_flag_values(value) for details]")
-                for i in range(_high_bit(low) + 1, _high_bit(high)):
-                    if 2 ** i not in values:
-                        missing.append(2 ** i)
-                for i in range(low + 1, high):
-                    if i not in values:
-                        missing.append(i)
-            return
+                    # [Block @0x0432] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+        # [Block @0x00FE] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+        enum_type = [i for i in range(_high_bit(low) + 1, _high_bit(high))]
+        enum_type = [i for i in range(low + 1, high)]
+        alias = 'alias %s is missing' % missing_names[0]
+        value = 'value 0x%x' % missing_value
+        # [WARN] 1 instructions not decompiled
+        #   @0x002C: POP_JUMP_IF_NONE arg=48
 
 def _test_simple_enum(checked_enum, simple_enum):
     """
@@ -1252,18 +4276,7 @@ def _test_simple_enum(checked_enum, simple_enum):
     """
     failed = []
     if checked_enum.__dict__ != simple_enum.__dict__:
-        for key in set(checked_keys + simple_keys):
-            if key in ('__module__', '_member_map_', '_value2member_map_', '__doc__', '__static_attributes__', '__firstlineno__'):
-                pass
-            elif key in member_names:
-                pass
-            elif key not in simple_keys:
-                failed.append(f"missing key: {key!r}")
-            elif key not in checked_keys:
-                failed.append(f"extra key:   {key!r}")
-            else:
-                checked_value = checked_dict[key]
-                simple_value = simple_dict[key]
+        compressed_checked_value = [key for key in set(checked_keys + simple_keys) if key == '__doc__' if checked_value != simple_value if compressed_checked_value != compressed_simple_value]
     else:
         failed
 
@@ -1278,10 +4291,4 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
         source = module_globals
         members = source.items()()
         (<listcomp>)
-        try:
-            members.sort(key=lambda t: (t[1], t[0]))
-        except TypeError:
-            pass
-        else:
-            members.sort(key=lambda t: t[0])
-            raise
+        members.sort(key=lambda t: (t[1], t[0]))

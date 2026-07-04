@@ -25,16 +25,14 @@ def update_wrapper(wrapper, wrapped, assigned, updated):
        function (defaults to functools.WRAPPER_UPDATES)
     """
     assigned
-    for attr in assigned:
-        try:
-            value = getattr(wrapped, attr)
-        except AttributeError:
-            pass
     updated
-    for attr in updated:
-        getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     wrapper.__wrapped__ = wrapped
     return wrapper
+    getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
+    try:
+        value = getattr(wrapped, attr)
+    except AttributeError:
+        pass
     setattr(wrapper, attr, value)
 
 def wraps(wrapped, assigned, updated):
@@ -123,9 +121,13 @@ _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_l
 
 def total_ordering(cls):
     """Class decorator that fills in missing ordering methods"""
-    roots = {{} for op in _convert}
+    roots = (<setcomp>)(_convert)
     if not roots:
         raise ValueError('must define at least one ordering operation: < > <= >=')
+    for (opname, opfunc) in _convert[root]:
+        if opname not in roots:
+            opfunc.__name__ = opname
+            setattr(cls, opname, opfunc)
     opfunc.__name__ = opname
     setattr(cls, opname, opfunc)
 
@@ -176,6 +178,8 @@ def reduce(function, sequence, /, initial):
             value = next(it)
         except StopIteration:
             pass
+    for element in it:
+        value = function(value, element)
     value = function(value, element)
 try:
     from _functools import reduce
@@ -207,6 +211,7 @@ Placeholder = _PlaceholderType()
 def _partial_prepare_merger(args):
     if not args:
         return (0, None)
+    # [Block @0x0020] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
     order.append(j)
     j += 1
     order.append(i)
@@ -218,6 +223,20 @@ def _partial_new(cls, func):
         base_cls = partial
         if not callable(func):
             raise TypeError('the first argument must be callable')
+    for value in keywords.values():
+        if value is Placeholder:
+            raise TypeError('Placeholder cannot be passed as a keyword argument')
+        tot_args += args[pto_phcount:]
+        (phcount, merger) = _partial_prepare_merger(tot_args)
+        keywords = keywords
+        func = func.func
+        self = object.__new__(cls)
+        self.func = func
+        self.args = tot_args
+        self.keywords = keywords
+        self._phcount = phcount
+        self._merger = merger
+        return self
     pto_phcount = func._phcount
     tot_args = func.args
     tot_args += args
@@ -233,7 +252,7 @@ def _partial_repr(self):
     qualname = cls.__qualname__
     args = [repr(self.func)]
     args.extend(map(repr, self.args))
-    args.extend(((k, v) for (k, v) in self.keywords.items()))
+    args.extend((<genexpr>)(self.keywords.items()))
     return f"{module}.{qualname}({', '.join(args)})"
 
 class partial:
@@ -414,17 +433,13 @@ def _c3_merge(sequences):
 
     """
     result = []
-    _ = [_ for _ in sequences]
-    sequences
-    for s1 in sequences:
-        for s2 in sequences:
-            if candidate in s2[1:]:
-                candidate = None
-                continue
-            if seq[0] == candidate:
-                pass
-    if candidate is None:
-        raise RuntimeError('Inconsistent hierarchy')
+    sequences = (<listcomp>)(sequences)
+    if not sequences:
+        return result
+    if candidate in s2[1:]:
+        candidate = [s1 for s1 in sequences for _ in s1]
+    if seq[0] == candidate:
+        pass
 
 def _c3_mro(cls, abcs):
     """Computes the method resolution order using extended C3 linearization.
@@ -444,13 +459,14 @@ def _c3_mro(cls, abcs):
 
     """
     enumerate(reversed(cls.__bases__))
-    for i in enumerate(reversed(cls.__bases__)):
-        if hasattr(base, '__abstractmethods__'):
-            boundary = len(cls.__bases__) - i
     boundary = 0
     if abcs:
         pass
+    if hasattr(base, '__abstractmethods__'):
+        boundary = len(cls.__bases__) - i
+    boundary = [_ for _ in abcs]
     abstract_bases.append(base)
+    i = [abcs.remove(base) for _ in abstract_bases]
     abcs.remove(base)
 
 def _compose_mro(cls, types):
@@ -465,28 +481,32 @@ def _compose_mro(cls, types):
             issubclass(.cell, typ)
     def is_strict_base(typ):
         typ
-        for other in typ:
-            if (typ != other) and (typ in other.__mro__):
-                return True
         continue
+        if (typ != other) and (typ in other.__mro__):
+            return True
     mro = []
     types
     found
     set(types)
     sub
-    [[] for n in types]
+    (<listcomp>)(types)
     (typ)
     _compose_mro.<locals>.is_strict_base
     (sub)
-    [[] for n in types]
+    (<listcomp>)(types)
     (mro)
     _compose_mro.<locals>.is_related
     (set(cls.__mro__), cls)
-    for typ in types:
-        sub = [sub for sub in sub if (sub not in bases) and issubclass(cls, sub)]
-        if not found:
-            mro.append(typ)
     return _c3_mro(cls, abcs=mro)
+    found = []
+    typ.__subclasses__()
+    if not found:
+        mro.append(typ)
+    if (sub not in bases) and issubclass(cls, sub):
+        (found.append)((<listcomp>)(sub.__mro__))
+    sub
+    if subcls not in mro:
+        mro.append(subcls)
 
 def _find_impl(cls, registry):
     """Returns the best matching implementation from *registry* for type *cls*.
@@ -501,12 +521,10 @@ def _find_impl(cls, registry):
     mro = _compose_mro(cls, registry.keys())
     match = None
     mro
-    for t in mro:
-        if (match is not None) and (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
-            raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
-        if t in registry:
-            match = t
     return registry.get(match)
+    if (match is not None) and (t in registry) and (t not in cls.__mro__) and (match not in cls.__mro__) and not issubclass(match, t):
+        raise RuntimeError('Ambiguous dispatch: {} or {}'.format(match, t))
+    match = t
 
 def singledispatch(func):
     """Single-dispatch generic function decorator.
@@ -539,7 +557,7 @@ def singledispatch(func):
     def _is_valid_dispatch_type(cls):
         if isinstance(cls, type):
             return True
-        all((arg for arg in cls.__args__))
+        all((<genexpr>)(cls.__args__))
         return
     def register(cls, func):
         """generic_func.register(cls, func) -> func
@@ -556,6 +574,8 @@ def singledispatch(func):
         ann = getattr(cls, '__annotate__', None)
         if ann is None:
             raise TypeError(f"Invalid first argument to `register()`: {cls!r}. Use either `@register(some_class)` or plain `@register` on an annotated function.")
+        for arg in cls.__args__:
+            pass
     import weakref
     def wrapper():
         if not args:

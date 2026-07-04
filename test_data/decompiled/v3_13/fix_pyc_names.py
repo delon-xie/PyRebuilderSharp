@@ -15,47 +15,36 @@ def get_python_version(filepath):
 
 def fix_pyc_names(directory):
     os.listdir(directory)
-    for filename in os.listdir(directory):
-        if not filename.endswith('.pyc'):
+    if not filename.endswith('.pyc'):
+        pass
+    else:
+        filepath = os.path.join(directory, filename)
+        actual_version = get_python_version(filepath)
+        if actual_version == 'unknown':
+            pass
+        elif f".{actual_version}.pyc" in filename:
             pass
         else:
-            filepath = os.path.join
-            actual_version = get_python_version(filepath)
-            if actual_version == 'unknown':
-                pass
-            elif f".{actual_version}.pyc" in filename:
+            new_filename = filename
+            MAGIC_NUMBERS.values()
+            import re
+            match = re.search('\\.(\\d+)\\.pyc$', filename)
+            if match:
+                old_ver = match.group(1)
+                new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
+            elif not directory != v_65:
                 pass
             else:
-                new_filename = filename
-                MAGIC_NUMBERS.values()
-                for version in MAGIC_NUMBERS.values():
-                    if not f".{version}.pyc" in new_filename:
-                        pass
-                    else:
-                        new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
-                        if not True:
-                            pass
-                        else:
-                            new_filepath = os.path.join
-                            if os.path.exists(new_filepath):
-                                print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
-                            else:
-                                os.rename(None)
-                                print(f"✓ Renamed {filename} -> {new_filename}")
-                import re
-                match = re.search('\\.(\\d+)\\.pyc$', filename)
-                if match:
-                    old_ver = match.group(1)
-                    new_filename = filename.replace(f".{old_ver}.pyc", f".{actual_version}.pyc")
-                elif not True:
-                    pass
+                new_filepath = os.path.join(directory, new_filename)
+                if os.path.exists(new_filepath):
+                    print(f"⚠️  Skipping {filename} -> {new_filename} (destination exists)")
                 else:
-                    new_filepath = os.path.join
-                    if os.path.exists(new_filepath):
-                        pass
-                    else:
-                        os.rename(None)
-                        print(f"✓ Renamed {filename} -> {new_filename}")
+                    os.rename(directory, v_41)
+                    print(f"✓ Renamed {filename} -> {new_filename}")
+            if not f".{version}.pyc" in new_filename:
+                pass
+            else:
+                new_filename = new_filename.replace(f".{version}.pyc", f".{actual_version}.pyc")
 
 if __name__ == '__main__':
     fix_pyc_names('tests/compiled')

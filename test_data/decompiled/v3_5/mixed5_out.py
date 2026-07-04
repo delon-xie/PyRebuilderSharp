@@ -16,11 +16,12 @@ def mixed_1(n):
 def mixed_2(n):
     total = 0
     range(n)
-    for i in range(n):
-        j = 0
-        while j < n:
-            j += 1
     return total
+    j = 0
+    while j < n:
+        j += 1
+    for k in range(i):
+        total += k
     total += k
 
 def mixed_3(n):
@@ -29,6 +30,11 @@ def mixed_3(n):
     while i < n:
         i += 1
     return total
+    for j in range(i):
+        k = j
+        while k > 0:
+            k -= 1
+            total += 1
     k -= 1
     total += 1
 

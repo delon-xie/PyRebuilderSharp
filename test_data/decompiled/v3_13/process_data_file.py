@@ -6,21 +6,19 @@ def process_data_file(filename):
     演示嵌套的 try-except-else-finally 用法。
 """
     data = None
-    try:
-        print(f"[外层] 尝试打开文件: {filename}")
-        file = open(filename, 'r')
-    except FileNotFoundError:
-        pass
+    print(f"[外层] 尝试打开文件: {filename}")
+    file = open(filename, 'r')
     print('[内层] 开始读取数据...')
     lines = file.readlines()
     numbers = []
     lines
-    line = [line.strip() for line in lines if not line]
-    if numbers:
-        average = sum(numbers) / len(numbers)
-        average
+    line = line.strip()
+    if not line:
+        pass
     else:
-        raise ValueError('文件中没有有效的数字')
+        num = int(line)
+        numbers.append(num)
+        print(f"[最内层 else] 成功解析数字: {num}")
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')

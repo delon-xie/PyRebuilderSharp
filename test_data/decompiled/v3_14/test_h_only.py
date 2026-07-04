@@ -2,6 +2,5 @@
 
 def h():
     """bad"""
-    var_0
-    __module__
-var_1
+    raise 'bad'
+h = lambda : None

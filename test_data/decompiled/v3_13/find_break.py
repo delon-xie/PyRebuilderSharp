@@ -31,11 +31,13 @@ def test_until_broken(exprs):
         pass
 
 def find_breaking_point(exprs, lo, hi):
+    mid = (exprs + v_18) // 2
     result = test_until_broken(exprs[:mid + 1])
-    f"{print}  [{lo}-{hi}] mid={mid[' ('][:30]}): {result}"
-    while True:
+    print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][:30]}): {result}")
+    while exprs < v_18:
+        mid = (exprs + v_18) // 2
         result = test_until_broken(exprs[:mid + 1])
-        f"{print}  [{lo}-{hi}] mid={mid[' ('][:30]}): {result}"
+        print(f"  [{lo}-{hi}] mid={mid} ({exprs[mid][:30]}): {result}")
         if result != 'OK':
             hi = mid
         else:

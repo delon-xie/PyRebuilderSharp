@@ -54,17 +54,7 @@ else:
             offset < len(bytecode)
             instructions
             for (off, op, name, arg) in instructions:
-                ''
-                arg
-                ' '
-                '20s'
-                name
-                ': '
-                '4d'
-                off
-                '  '
-                print
-                f""
+                pass
             print(f"\nConstants at {pos}:")
             const_type = data[pos]
             '  Type: '(f"{const_type}{'#x'}")
@@ -72,3 +62,5 @@ else:
             opcodes_27 = {130: 'RAISE_VARARGS', 131: 'CALL_FUNCTION', 132: 'MAKE_FUNCTION', 133: 'BUILD_SLICE', 134: 'MAKE_CLOSURE', 135: 'LOAD_CLOSURE', 136: 'LOAD_DEREF', 137: 'STORE_DEREF', 140: 'CALL_FUNCTION_VAR', 141: 'CALL_FUNCTION_KW', 142: 'CALL_FUNCTION_VAR_KW', 143: 'SETUP_WITH', 145: 'EXTENDED_ARG', 146: 'SET_ADD', 147: 'MAP_ADD'}
     instructions
 opcodes_27 = {130: 'RAISE_VARARGS', 131: 'CALL_FUNCTION', 132: 'MAKE_FUNCTION', 133: 'BUILD_SLICE', 134: 'MAKE_CLOSURE', 135: 'LOAD_CLOSURE', 136: 'LOAD_DEREF', 137: 'STORE_DEREF', 140: 'CALL_FUNCTION_VAR', 141: 'CALL_FUNCTION_KW', 142: 'CALL_FUNCTION_VAR_KW', 143: 'SETUP_WITH', 145: 'EXTENDED_ARG', 146: 'SET_ADD', 147: 'MAP_ADD'}
+# [WARN] 1 instructions not decompiled
+#   @0x04EA: POP_JUMP_IF_NONE arg=4

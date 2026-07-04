@@ -1,5 +1,6 @@
 using PyRebuilderSharp.Core.Models.Bytecode;
 using PyRebuilderSharp.Core.Models.CFG;
+using PyRebuilderSharp.Core.Diagnostics;
 
 namespace PyRebuilderSharp.Core.Scanners;
 
@@ -137,12 +138,45 @@ public class ControlFlowScanner : IControlFlowScanner
                     processedHeaders.Add(block);
 
                     var loopBody = CollectLoopBody(block, pred);
-                    var type = DetermineLoopType(block);
-                    var elseBlock = FindLoopElseBlock(block, loopBody);
+                    
+                    if (Diag.Verbose)
+                    {
+                    Console.Error.WriteLine($"[DECOMP_TRACE] stage=CFG loop_candidate block_offset=0x{block.StartOffset:X4} pred_offset=0x{pred.StartOffset:X4} loopBody_size={loopBody.Count}");
+                    }
+                    foreach (var b in loopBody)
+                    {
+                        var opStr = string.Join(",", b.Instructions.Select(i => i.Opcode.ToString()));
+                        if (Diag.Verbose)
+                        {
+                        Console.Error.WriteLine($"[DECOMP_TRACE] stage=CFG loop_body_block offset=0x{b.StartOffset:X4} opcodes=[{opStr}]");
+                        }
+                    }
+                    
+                    var type = DetermineLoopType(block, loopBody);
+                    
+                    if (Diag.Verbose)
+                    {
+                    Console.Error.WriteLine($"[DECOMP_TRACE] stage=CFG loop_type={type} header_has_foriter={block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER)}");
+                    }
+                    
+                    BasicBlock actualHeader = block;
+                    if (type == LoopType.For && !block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                    {
+                        var forIterBlock = cfg.Blocks.FirstOrDefault(b => 
+                            loopBody.Contains(b) && b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER));
+                        if (Diag.Verbose)
+                        {
+                        Console.Error.WriteLine($"[DECOMP_TRACE] stage=CFG forIterBlock_found={(forIterBlock != null ? $"0x{forIterBlock.StartOffset:X4}" : "null")}");
+                        }
+                        if (forIterBlock != null)
+                            actualHeader = forIterBlock;
+                    }
+                    
+                    var elseBlock = FindLoopElseBlock(actualHeader, loopBody);
 
                     var loop = new LoopStructure(
-                        Header: block,
-                        BodyEntry: FindBodyEntry(block, loopBody),
+                        Header: actualHeader,
+                        BodyEntry: FindBodyEntry(actualHeader, loopBody),
                         BackEdge: pred,
                         ElseBlock: elseBlock,
                         Type: type
@@ -151,7 +185,7 @@ public class ControlFlowScanner : IControlFlowScanner
 
                     foreach (var bodyBlock in loopBody)
                         bodyBlock.Flags |= BlockFlags.LoopBody;
-                    block.Flags |= BlockFlags.LoopHeader;
+                    actualHeader.Flags |= BlockFlags.LoopHeader;
                     pred.Flags |= BlockFlags.LoopBackEdge;
                 }
             }
@@ -214,10 +248,10 @@ public class ControlFlowScanner : IControlFlowScanner
         return body.ToList();
     }
 
-    private LoopType DetermineLoopType(BasicBlock header)
+    private LoopType DetermineLoopType(BasicBlock header, List<BasicBlock> loopBody)
     {
-        bool hasForPattern = header.Instructions.Any(i =>
-            i.Opcode == Opcode.GET_ITER || i.Opcode == Opcode.FOR_ITER);
+        bool hasForPattern = loopBody.Any(b => b.Instructions.Any(i =>
+            i.Opcode == Opcode.GET_ITER || i.Opcode == Opcode.FOR_ITER));
         if (hasForPattern) return LoopType.For;
 
         bool hasCondition = header.Instructions.Any(i =>

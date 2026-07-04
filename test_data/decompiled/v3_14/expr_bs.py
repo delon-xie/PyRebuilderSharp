@@ -1,121 +1,33 @@
-# Decompilation failed: OutOfMemoryException: Insufficient memory to continue the execution of the program.
-# Crash report: /Users/admin/.pyrebuilder/crashes/crash_20260703_001941_337.json
-# Stack:    at System.Text.StringBuilder.AppendWithExpansion(Char& value, Int32 valueCount)
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1319
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1170
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitListLiteral(ListLiteral list) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1323
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 161
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitStarred(Starred star) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1339
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitCall(Call call) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1164
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 152
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitAttribute(Attribute attr) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 1194
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 155
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 69
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.VisitModule(Module module) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 317
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Visit(AstNode node) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 39
-#     at PyRebuilderSharp.Core.Generators.PythonCodeGenerator.Generate(AstNode root) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Generators/PythonCodeGenerator.cs:line 30
-#     at PyRebuilderSharp.Core.Decompiler.DecompileWithStats(Byte[] pycData) in /Users/admin/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Core/Decompiler.cs:line 64
+# Decompiled from: <module>
+
+a2 = True
+a3 = False
+a4 = 42
+a5 = 3.14
+a6 = 'hello'
+b1 = x
+b2 = obj.attr
+b3 = items[0]
+b4 = items[1:10]
+b5 = items[1:]
+c1 = not x
+c2 = ~x
+c3 = -x
+d1 = x + y
+d2 = x - y
+d3 = x * y
+d4 = x / y
+d5 = x // y
+d6 = x % y
+d7 = x ** y
+e1 = x & y
+e2 = x | y
+e3 = x ^ y
+e4 = x << y
+e5 = x >> y
+f1 = x < y
+f2 = x > y
+f3 = x <= y
+f4 = x >= y
+f5 = x == y
+f6 = x != y

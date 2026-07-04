@@ -5,30 +5,29 @@ def process_data_file(filename):
     读取文件中的数字，计算平均值。
     演示嵌套的 try-except-else-finally 用法。
 """
-    open = data
     try:
-        readlines = lines
-        __special_3__
-        None
-        __module__(file)
-    except:
-        pass
-    try:
-        strip = line
-        int = {}
-        import name_87 as append
-        append = average
-    except:
-        pass
-    try:
-        ValueError = __special_9__
-        None
-        deref_11
-    except:
-        pass
+        f"[外层] 尝试打开文件: {filename}"
+        print
+    finally:
+        file.close
+    '[外层 finally] 程序结束'
+    print
+process_data_file = lambda : None
+print('==================================================')
+print('测试1: 正常文件')
+'=================================================='
+None
+print
+try:
+    'w'
+    'test_numbers.txt'
     None
-    __module__(line)
-    if not True:
-        pass
-    __special_13__
-return super().process_data_file
+    open
+finally:
+    'nonexistent.txt'
+    None
+    process_data_file
+result
+'最终结果: '
+None
+print

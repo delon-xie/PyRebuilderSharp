@@ -20,11 +20,15 @@ def process_data_file(filename):
         except:
             print(f"[外层 except] 文件不存在: {filename}")
             return None
-        line = [print(f"[最内层 finally] 行处理完毕: '{line}'") for line in lines if not line]
+        line = line.strip()
+        if not line:
+            pass
         average = sum(numbers) / len(numbers)
         return average
         raise ValueError('文件中没有有效的数字')
+        print(f"[最内层 else] 成功解析数字: {num}")
         print('[内层 else] 数据处理顺利完成，即将返回结果')
+        print(f"[最内层 finally] 行处理完毕: '{line}'")
     finally:
         pass
 print('==================================================')

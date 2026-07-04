@@ -2,13 +2,29 @@
 
 def dump_code(c, depth):
     """  """
-    print = [c]
-    import name_149 as co_name
-    var_1
-    __special_17__
+    c.co_consts
+    if not hasattr(const, 'co_code'):
+        pass
+    elif not hasattr(const, 'co_name'):
+        pass
+    else:
+        print(f"{prefix}Function: {const.co_name}")
+        print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.co_argcount, const.co_nlocals, len(const.co_code)))
+        dump_code(const, depth + 1)
+
+import marshal
+import sys
+sys.argv
+None
+open
+try:
+    f
+    f := __name__()
+    'rb'
+    __module__
+    'rb'
+finally:
+    '  argc:'
     None
-    [__special_5__, var_0, deref_8, deref_10, __special_13__, deref_14]
-    None
-    freevar_0(const, deref_6, freevar_0)
-    __special_5__
-return super(*var_1).marshal
+    print
+code

@@ -55,10 +55,15 @@ def mixed_4(n):
     if n > 0:
         pass
     range(n)
-    for i in range(n):
-        j = 0
-        if j < i:
-            j += 1
+    return
+    j = 0
+    if j < i:
+        j += 1
+    try:
+        pass
+    except:
+        total = -1
+    else:
         try:
             pass
         except:
@@ -69,13 +74,4 @@ def mixed_4(n):
             except:
                 total = -1
             else:
-                try:
-                    pass
-                except:
-                    total = -1
-                else:
-                    j < i
-        try:
-            total += j
-        except:
-            pass
+                j < i

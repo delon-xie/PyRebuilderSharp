@@ -18,6 +18,7 @@ public class Decompiler
     public Decompiler(DecompileOptions? options = null)
     {
         _options = options ?? new DecompileOptions();
+        Diagnostics.Diag.Verbose = _options.VerboseErrors;
     }
 
     /// <summary>

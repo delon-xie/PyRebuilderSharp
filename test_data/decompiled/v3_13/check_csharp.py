@@ -12,10 +12,6 @@ type_byte = raw & 127
 off += 1
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
 print
-for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
-    val = struct.unpack('<i', data[off:off + 4])[0]
-    print(f"  {name}: {val} (off {off})")
-    off += 4
 'Next marshal at off='(f"{off}, byte={data[off]}#x")
 raw2 = data[off]
 type2 = raw2 & 127
@@ -40,3 +36,6 @@ else:
             print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")
         if not True:
             pass
+val = struct.unpack('<i', data[off:off + 4])[0]
+print(f"  {name}: {val} (off {off})")
+off += 4

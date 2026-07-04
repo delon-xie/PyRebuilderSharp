@@ -2,5 +2,5 @@
 
 def g():
     """bad"""
-    __module__
-var_1
+    raise 'bad'
+g = lambda : None

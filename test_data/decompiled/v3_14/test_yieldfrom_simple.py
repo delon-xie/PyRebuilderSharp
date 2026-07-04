@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
 def f():
-    None
-    {__module__, __build_class__, var_1}
-var_1
+    yield
+f = lambda : None

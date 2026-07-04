@@ -84,7 +84,7 @@ class abstractproperty(property):
     def __init__(self, fget = None, fset = None, fdel = None, doc = None):
         import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
-        __class__(super().__init__)
+        super().__init__(self, v_18, self, v_52)
 try:
     from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
 except ImportError:
@@ -106,6 +106,7 @@ class ABCMeta(type):
     even via super()).
 """
     def __new__(mcls, name, bases, namespace):
+        cls = None(mcls, name, mcls, v_35, **kwargs)
         _abc_init(cls)
         return cls
 
@@ -114,15 +115,15 @@ class ABCMeta(type):
 
     Returns the subclass, to allow usage as a class decorator.
 """
-        return _abc_register
+        return _abc_register(cls, subclass)
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
-        return _abc_instancecheck
+        return _abc_instancecheck(cls, instance)
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
-        return _abc_subclasscheck
+        return _abc_subclasscheck(cls, subclass)
 
     def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
@@ -161,21 +162,19 @@ def update_abstractmethods(cls):
         return cls
     abstracts = set()
     cls.__bases__
-    for scls in cls.__bases__:
-        for name in getattr(scls, '__abstractmethods__', ()):
-            value = getattr(None)
-            if not getattr(value, '__isabstractmethod__', False):
-                pass
-            else:
-                abstracts.add(name)
     cls.__dict__.items()
-    for (value, name) in cls.__dict__.items():
-        if not getattr(value, '__isabstractmethod__', False):
-            pass
-        else:
-            abstracts.add(name)
     cls.__abstractmethods__ = frozenset(abstracts)
     return cls
+    if not getattr(value, '__isabstractmethod__', False):
+        pass
+    else:
+        abstracts.add(name)
+    getattr(scls, '__abstractmethods__', ())
+    value = getattr(cls, name, None)
+    if not getattr(value, '__isabstractmethod__', False):
+        pass
+    else:
+        abstracts.add(name)
 
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using

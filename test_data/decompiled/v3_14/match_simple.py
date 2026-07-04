@@ -1,21 +1,15 @@
 # Decompiled from: <module>
 
 def test_match(x):
-    if not name_1:
-        var_0
-        None
-    elif not True:
-        var_1
+    return 'one'
+    return 'two'
 
 def test_match_with_guard(x):
-    len
-    raise
-    if not __special_3__:
-        None
-        None
-        s
-        None
-    len
-    raise
-    raise
-return super().__doc__
+    if len(s) > 5:
+        return 'long string'
+    return 'short string'
+    # [WARN] 2 instructions not decompiled
+    #   @0x001A: POP_JUMP_IF_NONE arg=74
+    #   @0x0064: POP_JUMP_IF_NONE arg=116
+result = test_match(1)
+result2 = test_match_with_guard('hello')

@@ -114,19 +114,18 @@ class ABCMeta(type):
 
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
-        abstracts = {(name, value) for (name, value) in namespace.items() if getattr(value, '__isabstractmethod__', False)}
+        abstracts = (<setcomp>)(namespace.items())
         bases
-        for base in bases:
-            for name in getattr(base, '__abstractmethods__', set()):
-                value = getattr(cls, name, None)
-                if getattr(value, '__isabstractmethod__', False):
-                    abstracts.add(name)
         cls.__abstractmethods__ = frozenset(abstracts)
         cls._abc_registry = WeakSet()
         cls._abc_cache = WeakSet()
         cls._abc_negative_cache = WeakSet()
         cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         return cls
+        getattr(base, '__abstractmethods__', set())
+        value = getattr(cls, name, None)
+        if getattr(value, '__isabstractmethod__', False):
+            abstracts.add(name)
 
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
@@ -142,12 +141,11 @@ class ABCMeta(type):
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
         print('Inv.counter: %s' % ABCMeta._abc_invalidation_counter, file=file)
         sorted(cls.__dict__)
-        for name in sorted(cls.__dict__):
-            if name.startswith('_abc_'):
-                value = getattr(cls, name)
-                if isinstance(value, WeakSet):
-                    value = set(value)
-            print('%s: %r' % (name, value), file=file)
+        if name.startswith('_abc_'):
+            value = getattr(cls, name)
+            if isinstance(value, WeakSet):
+                value = set(value)
+        print('%s: %r' % (name, value), file=file)
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
@@ -166,6 +164,14 @@ class ABCMeta(type):
         if subclass in cls._abc_cache:
             return True
         cls._abc_cache.add(subclass)
+        for rcls in cls._abc_registry:
+            if issubclass(subclass, rcls):
+                cls._abc_cache.add(subclass)
+                return True
+        for scls in cls.__subclasses__():
+            if issubclass(subclass, scls):
+                cls._abc_cache.add(subclass)
+                return True
 
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using

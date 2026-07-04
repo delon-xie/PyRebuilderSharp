@@ -1,5 +1,6 @@
 using System.Text;
 using PyRebuilderSharp.Core.Versioning;
+using PyRebuilderSharp.Core.Diagnostics;
 using PyRebuilderSharp.Core.Models.Bytecode;
 
 namespace PyRebuilderSharp.Core.Readers;
@@ -754,6 +755,8 @@ public class PycReader
     {
         if (_strategy.Version == PythonVersion.Py27)
             return ParseInstructionsPre36(bytecode);
+        if (_strategy.Version == PythonVersion.Py314)
+            return ParseInstructions314(bytecode);
         if (_strategy.HasCaches)
             return ParseInstructions311Plus(bytecode);
         // Python 3.5: pre-wordcode format
@@ -858,7 +861,17 @@ public class PycReader
             // Instructions with arguments
             int? arg = null;
             if (_strategy.RequiresArgument(rawOp))
+            {
                 arg = (extArg << 8) | rawArg;
+                // Debug: show raw bytes for all instructions
+                if (op == Models.Bytecode.Opcode.BUILD_LIST || op == Models.Bytecode.Opcode.LIST_APPEND_313)
+                {
+                    if (Diag.Verbose)
+                    {
+                    Console.Error.WriteLine($"[PARSER_DEBUG] offset=0x{offset:X4}, rawOp={rawOp}, rawArg={rawArg}, arg={arg}, mappedOp={op}");
+                    }
+                }
+            }
             extArg = 0;
 
             // Python 3.10+ 使用 word 偏移
@@ -907,6 +920,110 @@ public class PycReader
             // Advance past this instruction (2 bytes) and any cache entries
             // NOTE: don't trust the cache table — only skip actual CACHE markers (opcode=0)
             offset += 2;
+            while (offset + 1 < bytecode.Length && bytecode[offset] == 0)
+                offset += 2;
+        }
+
+        return instructions;
+    }
+
+    /// <summary>
+    /// 解析 Python 3.14 字节码（可变长度格式）。
+    /// 3.14 使用 HAVE_ARGUMENT=41：
+    ///   - opcode 0-40: 1 字节，无参数
+    ///   - opcode 41+: 2 字节（1 字节 opcode + 1 字节 arg）
+    ///   - CACHE 条目 (opcode=0): 2 字节
+    ///   - 跳转参数是 codeunit 偏移量
+    /// 参考: CPython main/Include/opcode_ids.h (2026-07)
+    /// </summary>
+    private List<Instruction> ParseInstructions314(byte[] bytecode)
+    {
+        var instructions = new List<Instruction>();
+        int offset = 0;
+        int extArg = 0;
+        int safety = 0;
+
+        while (offset < bytecode.Length)
+        {
+            if (++safety > 1000000)
+                throw new InvalidOperationException(
+                    $"Infinite loop in ParseInstructions314 at offset {offset}/{bytecode.Length}");
+
+            byte rawOp = bytecode[offset];
+
+            if (rawOp == 0)
+            {
+                offset += 2;
+                continue;
+            }
+
+            var op = _strategy.MapOpcode(rawOp);
+
+            if (op == Models.Bytecode.Opcode.EXTENDED_ARG)
+            {
+                byte rawArg = bytecode[offset + 1];
+                extArg = (extArg << 8) | rawArg;
+                offset += 2;
+                continue;
+            }
+
+            int? arg = null;
+            // Python 3.14 所有指令都是 2 字节（wordcode）
+            // 无参数指令（opcode 0-40）的 arg 字节被忽略
+            if (_strategy.RequiresArgument(rawOp))
+            {
+                if (offset + 1 < bytecode.Length)
+                {
+                    byte rawArg = bytecode[offset + 1];
+                    arg = (extArg << 8) | rawArg;
+                }
+            }
+            if (Diag.Verbose)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=PARSE offset=0x{offset:X4} rawOp={rawOp:000} -> mappedOp={op} arg={arg?.ToString() ?? "null"}");
+            }
+            
+            int cacheCount = _strategy.GetCacheCount(rawOp);
+            
+            if (_strategy.Version >= PythonVersion.Py314 && arg.HasValue && _strategy.IsJumpInstruction(op))
+            {
+                int targetOffset = offset + 2 + cacheCount * 2;
+                if (op == Models.Bytecode.Opcode.JUMP_BACKWARD || op == Models.Bytecode.Opcode.JUMP_BACKWARD_NO_INTERRUPT)
+                    targetOffset -= arg.Value * 2;
+                else
+                    targetOffset += arg.Value * 2;
+                arg = targetOffset;
+                if (Diag.Verbose)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=PARSE jump_target=0x{targetOffset:X4}");
+                }
+            }
+            
+            offset += 2;
+            
+            if (cacheCount > 0)
+            {
+                offset += cacheCount * 2;
+                if (Diag.Verbose)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=PARSE offset=0x{offset:X4} skipped={cacheCount} cache entries");
+                }
+            }
+            
+            extArg = 0;
+
+            if (arg.HasValue && op == Models.Bytecode.Opcode.LOAD_GLOBAL)
+            {
+                arg = arg.Value >> 1;
+            }
+
+            if (arg.HasValue && op == Models.Bytecode.Opcode.LOAD_ATTR)
+            {
+                arg = arg.Value >> 1;
+            }
+
+            instructions.Add(new Instruction(offset - (arg.HasValue ? 2 : 1), op, arg));
+
             while (offset + 1 < bytecode.Length && bytecode[offset] == 0)
                 offset += 2;
         }
@@ -1663,6 +1780,9 @@ public class PycReader
     {
         // 3.11+ 异常表：统一使用变长 base-64 varint 编码（bit6=延续标记）
         // 适用于 3.11, 3.12, 3.13, 3.14
+        // 3.14 使用可变长度指令，偏移量格式与 3.11-3.13 不同
+        if (_strategy.Version == PythonVersion.Py314)
+            return ParseExceptionTableVarint314(data);
         return ParseExceptionTableVarint(data);
     }
 
@@ -1699,6 +1819,40 @@ public class PycReader
                 StartOffset = start * 2,
                 EndOffset = end * 2,
                 TargetOffset = target * 2,
+                Depth = depth,
+                Lasti = lasti
+            });
+        }
+        return entries;
+    }
+
+    /// <summary>
+    /// 3.14 异常表：变长 6-bit/字节编码（base-64 varint）。
+    /// 与 3.11-3.13 的区别：3.14 偏移量是字节偏移，不是 word 偏移。
+    /// 参考：CPython main/Lib/dis.py _parse_varint (2026-07)
+    /// </summary>
+    private List<ExceptionTableEntry> ParseExceptionTableVarint314(byte[] data)
+    {
+        var entries = new List<ExceptionTableEntry>();
+        int i = 0;
+        while (i < data.Length)
+        {
+            int start = ReadExceptionTableVarint(data, ref i);
+            int size = ReadExceptionTableVarint(data, ref i);
+            int target = ReadExceptionTableVarint(data, ref i);
+            int depthLasti = ReadExceptionTableVarint(data, ref i);
+
+            if (i > data.Length) break;
+
+            int end = start + size;
+            int depth = depthLasti >> 1;
+            bool lasti = (depthLasti & 1) != 0;
+
+            entries.Add(new ExceptionTableEntry
+            {
+                StartOffset = start,
+                EndOffset = end,
+                TargetOffset = target,
                 Depth = depth,
                 Lasti = lasti
             });

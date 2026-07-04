@@ -5,6 +5,8 @@ def process_data_file(filename):
     读取文件中的数字，计算平均值。
     演示嵌套的 try-except-else-finally 用法。
     """
+    num = int(line)
+    numbers.append(num)
     data = None
     try:
         try:
@@ -19,12 +21,16 @@ def process_data_file(filename):
                 print('[外层 finally] 程序结束')
         except:
             print(f"[外层 except] 文件不存在: {filename}")
-        line = [print(f"[最内层 finally] 行处理完毕: '{line}'") for line in lines if not line]
+        line = line.strip()
+        if not line:
+            pass
         if numbers:
             average = sum(numbers) / len(numbers)
             return
         raise ValueError('文件中没有有效的数字')
+        print(f"[最内层 else] 成功解析数字: {num}")
         print('[内层 else] 数据处理顺利完成，即将返回结果')
+        print(f"[最内层 finally] 行处理完毕: '{line}'")
     finally:
         pass
 print('==================================================')

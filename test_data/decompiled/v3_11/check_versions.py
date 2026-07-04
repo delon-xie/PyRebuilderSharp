@@ -11,13 +11,10 @@ for filename in os.listdir(pyc_dir):
         open(filepath, 'rb')
     print('各版本 pyc 文件分布:')
     sorted(version_files.items())
-    for (version, files) in sorted(version_files.items()):
-        print(f"  Python {version}: {len(files)} 个文件")
-        if version == '3.10':
-            for f in sorted(files):
-                print(f"      {f}")
-        None
     return
+    print(f"  Python {version}: {len(files)} 个文件")
+    if version == '3.10':
+        filename = [print(f"      {f}") for f in sorted(files)]
     magic = f.read(4)
     version = magic_numbers.get(magic, 'unknown')
     if version not in version_files:
@@ -26,5 +23,6 @@ for filename in os.listdir(pyc_dir):
     None(None)
     if not True:
         pass
+    raise
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())

@@ -65,10 +65,11 @@ public class PythonCodeGenerator : ICodeGenerator
             case ExprStmt e:
                 WriteIndent();
                 // 独立 Starred（*expr 或 **expr）是反编译错误，只输出内部值
-                if (e.Value is Starred starredExpr)
-                    Visit(starredExpr.Value);
-                else
-                    Visit(e.Value);
+                // 也处理嵌套的 Starred（如 AstAttribute 的 Value 是 Starred）
+                Expr value = e.Value;
+                while (value is Starred starred)
+                    value = starred.Value;
+                Visit(value);
                 _output.AppendLine();
                 break;
             case Pass:
@@ -200,14 +201,17 @@ public class PythonCodeGenerator : ICodeGenerator
             case ListComp lc:
                 _output.Append("[");
                 Visit(lc.Elt);
-                _output.Append(" for ");
-                Visit(lc.Generators[0].Target);
-                _output.Append(" in ");
-                Visit(lc.Generators[0].Iter);
-                foreach (var ifExpr in lc.Generators[0].Ifs)
+                foreach (var gen in lc.Generators)
                 {
-                    _output.Append(" if ");
-                    Visit(ifExpr);
+                    _output.Append(" for ");
+                    Visit(gen.Target);
+                    _output.Append(" in ");
+                    Visit(gen.Iter);
+                    foreach (var ifExpr in gen.Ifs)
+                    {
+                        _output.Append(" if ");
+                        Visit(ifExpr);
+                    }
                 }
                 _output.Append("]");
                 break;
@@ -1161,13 +1165,21 @@ public class PythonCodeGenerator : ICodeGenerator
             return;
         }
         
-        Visit(call.Func);
+        // 展开嵌套的 Starred（函数位置不应该有 * 前缀）
+        Expr func = call.Func;
+        while (func is Starred starred)
+            func = starred.Value;
+        Visit(func);
         _output.Append("(");
 
         for (int i = 0; i < call.Args.Count; i++)
         {
             if (i > 0) _output.Append(", ");
-            Visit(call.Args[i]);
+            // 展开嵌套的 Starred（参数位置不应该有 * 前缀）
+            Expr arg = call.Args[i];
+            while (arg is Starred starred && starred.Ctx == ExpressionContext.Load)
+                arg = starred.Value;
+            Visit(arg);
         }
 
         foreach (var kw in call.Keywords)
@@ -1183,7 +1195,11 @@ public class PythonCodeGenerator : ICodeGenerator
             {
                 _output.Append(kw.IsStarArg ? "*" : "**");
             }
-            Visit(kw.Value);
+            // 展开嵌套的 Starred（关键字参数的值不应该有 * 前缀）
+            Expr kwValue = kw.Value;
+            while (kwValue is Starred starred && starred.Ctx == ExpressionContext.Load)
+                kwValue = starred.Value;
+            Visit(kwValue);
         }
 
         _output.Append(")");
@@ -1191,7 +1207,11 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitAttribute(AstAttribute attr)
     {
-        Visit(attr.Value);
+        // 展开嵌套的 Starred（属性访问的 receiver 不应该有 * 前缀）
+        Expr value = attr.Value;
+        while (value is Starred starred)
+            value = starred.Value;
+        Visit(value);
         _output.Append(".");
         _output.Append(attr.Attr);
     }
@@ -1199,7 +1219,11 @@ public class PythonCodeGenerator : ICodeGenerator
     private void VisitSubscript(Subscript sub)
     {
         _inSubscript++;
-        Visit(sub.Value);
+        // 展开嵌套的 Starred（下标访问的 receiver 不应该有 * 前缀）
+        Expr value = sub.Value;
+        while (value is Starred starred && starred.Ctx == ExpressionContext.Load)
+            value = starred.Value;
+        Visit(value);
         _output.Append("[");
         if (sub.Slice is Slice slice)
         {
@@ -1247,12 +1271,24 @@ public class PythonCodeGenerator : ICodeGenerator
         // 优化: None 下限表示起始不指定 → 输出空（[:2] 而非 [None:2]）
         bool lowerIsNone = slice.Lower == null || slice.Lower is Constant { Value: null };
         if (!lowerIsNone)
-            Visit(slice.Lower);
+        {
+            // 展开嵌套的 Starred（切片边界不应该有 * 前缀）
+            Expr lower = slice.Lower;
+            while (lower is Starred starred && starred.Ctx == ExpressionContext.Load)
+                lower = starred.Value;
+            Visit(lower);
+        }
         _output.Append(":");
         bool hasUpper = !(slice.Upper is Constant { Value: null }); // None
         bool hasStep = slice.Step != null && !(slice.Step is Constant { Value: null });
         if (hasUpper)
-            Visit(slice.Upper);
+        {
+            // 展开嵌套的 Starred（切片边界不应该有 * 前缀）
+            Expr upper = slice.Upper;
+            while (upper is Starred starred && starred.Ctx == ExpressionContext.Load)
+                upper = starred.Value;
+            Visit(upper);
+        }
         if (hasStep || hasUpper)
         {
             // Still need an empty upper if step is present but upper is None
@@ -1263,7 +1299,11 @@ public class PythonCodeGenerator : ICodeGenerator
             if (hasStep)
             {
                 _output.Append(":");
-                Visit(slice.Step);
+                // 展开嵌套的 Starred（切片步长不应该有 * 前缀）
+                Expr step = slice.Step;
+                while (step is Starred starred && starred.Ctx == ExpressionContext.Load)
+                    step = starred.Value;
+                Visit(step);
             }
         }
     }

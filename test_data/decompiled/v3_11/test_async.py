@@ -3,8 +3,10 @@
 import asyncio
 
 async def test_async():
-    yield asyncio.sleep(1)()
+    asyncio
+    yield 1()
     return 'done'
 
 async def worker():
-    yield test_async()()
+    test_async
+    yield

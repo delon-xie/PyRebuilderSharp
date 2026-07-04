@@ -1,3 +1,7 @@
 # Decompiled from: <module>
 
-return super().range
+3()
+if i == 1:
+    pass
+else:
+    a = i

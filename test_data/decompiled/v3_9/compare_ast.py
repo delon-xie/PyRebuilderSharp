@@ -20,3 +20,16 @@ except Exception:
     sys.exit(1)
 if expected_ast == actual_ast:
     print('✅ AST MATCH - test_expr_basic 3.10')
+for i in range(max(len(exp_lines), len(act_lines))):
+    if i < len(exp_lines):
+        pass
+    '(missing)'
+    if i < len(act_lines):
+        pass
+    '(missing)'
+    if e != a:
+        print(f"Line {i}:")
+        print(f"  expected: {e}")
+        print
+    if i > 5:
+        pass

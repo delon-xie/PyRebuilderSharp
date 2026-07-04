@@ -1,3 +1,4 @@
 # Decompiled from: <module>
 
-return super().total
+range(3)
+total += 1

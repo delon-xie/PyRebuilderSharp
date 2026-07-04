@@ -16,10 +16,6 @@ with open(sys.argv[1], 'rb') as f:
         pos = pos + 4
         print(f"  FLAG_REF ref_index={ref}")
     ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
-    for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
-        val = struct.unpack('<i', data[pos:pos + 4])[0]
-        print(f"  {name}={val}")
-        pos = pos + 4
     raw = data[pos]
     'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
     pos = pos + 1
@@ -33,3 +29,6 @@ with open(sys.argv[1], 'rb') as f:
         bcode = data[pos:pos + length]
         pos = pos + length
         print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
+    val = struct.unpack('<i', data[pos:pos + 4])[0]
+    print(f"  {name}={val}")
+    pos = pos + 4

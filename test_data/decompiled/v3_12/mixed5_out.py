@@ -17,23 +17,21 @@ def mixed_1(n):
 def mixed_2(n):
     total = 0
     range(n)
-    for i in range(n):
-        j = 0
-        if not j < n:
-            pass
-        while i == j:
-            if j < n:
-                pass
-        range(i)
+    return total
+    j = 0
+    if not j < n:
+        pass
+    j += 1
+    if i == j:
         for k in range(i):
             total += k
-    return total
+    elif j < n:
+        pass
 
 def mixed_3(n):
-    i += 1
     total = 0
     i = 0
-    while i < n:
+    if i < n:
         i += 1
         if i % 2 == 0:
             for j in range(i):
@@ -42,27 +40,26 @@ def mixed_3(n):
                     pass
                 while k > 0:
                     pass
-        else:
-            if i < n:
-                pass
-            return total
+        elif i < n:
+            pass
+    return total
 
 def mixed_4(n):
     total = 0
     if n > 0:
         pass
     range(n)
-    for i in range(n):
-        j = 0
-        if not j < i:
-            pass
-        try:
-            j += 1
-        except:
-            total = -1
-        try:
-            total += j
-        except:
-            pass
-        if j < i:
-            pass
+    try:
+        total = -1
+        return None
+        raise
+    except:
+        total = -1
+    if j < i:
+        pass
+    raise
+    j = 0
+    if not j < i:
+        pass
+    j += 1
+    total += j

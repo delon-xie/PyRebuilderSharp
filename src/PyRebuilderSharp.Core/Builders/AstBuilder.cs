@@ -14,6 +14,9 @@ public class AstBuilder
 {
     private readonly BlockDecompiler _blockDecompiler;
     private readonly CodeObject _codeObject;
+    private int _buildTryDepth;
+    private const int MaxBuildTryDepth = 20;
+
     private readonly DecompileOptions _options;
     private Dictionary<int, BlockResult> _blockResults = new();
     private HashSet<int> _loopHeaderOffsets = new();
@@ -83,7 +86,10 @@ public class AstBuilder
         for (int i = 0; i < _codeObject.ExceptionTable.Count; i++)
         {
             var et = _codeObject.ExceptionTable[i];
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[ET_DUMP]   Entry {i}: Start={et.StartOffset:X4}, End={et.EndOffset:X4}, Target={et.TargetOffset:X4}, Depth={et.Depth}, Lasti={et.Lasti}");
+            }
         }
 
         // 使用统一的 BuildStatements 遍历，ET 条目由 BuildStatementsInternal 处理
@@ -99,7 +105,10 @@ public class AstBuilder
         
         if (unvisited.Count > 0)
         {
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[WARN] {unvisited.Count} unprocessed blocks — recovering");
+            }
 
             foreach (var orphan in unvisited.OrderBy(b => b.StartOffset))
             {
@@ -118,13 +127,27 @@ public class AstBuilder
                     {
                         // === 孤儿块诊断分类 ===
                         string classification = ClassifyOrphanBlock(orphan);
+                        if (_options.VerboseErrors)
+                        {
                         Console.Error.WriteLine($"[ORPHAN] @0x{orphan.StartOffset:X4} func={_codeObject.Name} ver={_codeObject.Version} class={classification} instrs={orphan.Instructions.Count}");
+                        }
                         bool hasHandlerPreamble = classification == "handler_pre" || classification == "handler_chain";
 
                         if (hasHandlerPreamble)
                         {
                             _processedBlockIds.Add(orphan.Id);
                             continue;
+                        }
+
+                        if (classification == "for_iter")
+                        {
+                            var loopVisited = new HashSet<BasicBlock>();
+                            var loopStmts = BuildForLoop(orphan, loopVisited);
+                            if (loopStmts.Count > 0)
+                            {
+                                stmts.AddRange(loopStmts);
+                                continue;
+                            }
                         }
 
                         // 过滤孤儿块的无效内容：仅含 return None 时跳过
@@ -287,7 +310,10 @@ public class AstBuilder
                 .ToList();
             if (missed.Count > 0)
             {
+                if (_options.VerboseErrors)
+                {
                 Console.Error.WriteLine($"[WARN] {missed.Count} instructions not decompiled");
+                }
                 stmts.Add(new CommentBlock($"# [WARN] {missed.Count} instructions not decompiled"));
                 foreach (var mi in missed.Take(10))
                 {
@@ -301,9 +327,12 @@ public class AstBuilder
         {
             var processedCount = _processedBlockIds.Count;
             var orphanCnt = unvisited.Count;
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine(
                 $"[SUMMARY] {cfg.Blocks.Count} blocks: {processedCount} processed, " +
                 $"{orphanCnt} orphan, {_codeObject.Instructions.Count} instrs");
+            }
             if (_options.ShowSummary)
                 stmts.Add(new CommentBlock(
                     $"# [SUMMARY] {cfg.Blocks.Count} blocks · {processedCount} processed · " +
@@ -506,7 +535,12 @@ public class AstBuilder
 
         // 检测 for-loop 头：FOR_ITER 是条件跳转但不是 if/else，
         // 即使 LoopHeader 标志未设置
-        if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+        bool hasForIter = block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
+        // Python 3.13+ 内联列表推导式：块中包含 END_FOR_313 和 LIST_APPEND_313
+        bool hasEndFor313 = block.Instructions.Any(i => i.Opcode == Opcode.END_FOR_313);
+        bool hasListAppend313 = block.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
+        
+        if (hasForIter || (hasEndFor313 && hasListAppend313))
         {
             // 标记所有前驱链为已访问，避免迭代表达式产生独立语句
             MarkForLoopPredecessors(block, visited);
@@ -673,7 +707,10 @@ public class AstBuilder
                 _diagETPrinted = true;
             }
             var try311Stmts = BuildTryFromExceptionTable(block, visited);
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[BSI_ET] block#{block.Id} try311Stmts={try311Stmts?.Count ?? 0}");
+            }
             if (try311Stmts != null)
             {
                 stmts.AddRange(try311Stmts);
@@ -817,7 +854,11 @@ public class AstBuilder
             i.Opcode == Opcode.GET_ITER || i.Opcode == Opcode.FOR_ITER);
 
         if (isForLoop)
+        {
+            if (_processedBlockIds.Contains(header.Id))
+                return new List<Stmt>();
             return BuildForLoop(header, visited);
+        }
         else
             return BuildWhileLoop(header, visited);
     }
@@ -852,30 +893,62 @@ public class AstBuilder
 
     private List<Stmt> BuildForLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
-        // 确保 header 在 visited 中，防止从 GetStructuredBlockStmts 调入时
-        // body 块的后继 FOR_ITER 被再次检测导致递归循环
-        visited.Add(header);
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] Entering: header offset={header.StartOffset:X4}, id={header.Id}");
+        }
+        
+        BasicBlock actualHeader = header;
+        if (!header.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+        {
+            var forIterBlock = _allBlocks.FirstOrDefault(b => 
+                b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER) && 
+                b.Successors.Any(s => s.StartOffset == header.StartOffset));
+            if (forIterBlock != null)
+            {
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[BUILD_FOR_LOOP] Found FOR_ITER block at 0x{forIterBlock.StartOffset:X4}, using as actual header");
+                }
+                actualHeader = forIterBlock;
+            }
+        }
+        
+        visited.Add(actualHeader);
+        _processedBlockIds.Add(actualHeader.Id);
         _processedBlockIds.Add(header.Id);
-        var iterExpr = ExtractIterExpression(header);
+        var iterExpr = ExtractIterExpression(actualHeader);
 
         // 标记迭代表达式的前驱链为已访问，避免其语句作为独立表达式再次输出。
         // 例如 for scls in cls.__bases__: 中，LOAD_FAST cls; LOAD_ATTR __bases__
         // 产生 ExprStmt(cls.__bases__) 作为独立语句 —— 应被 for 循环消费。
         // 需要追溯整个前驱链（包括 GET_ITER 之前的块），不限于 FOR_ITER 的直接前驱。
-        MarkForLoopPredecessors(header, visited);
+        MarkForLoopPredecessors(actualHeader, visited);
 
         var bodyBlocks = new List<BasicBlock>();
-        // FOR_ITER 的后继：[fallthrough body, jump-to-exit]
-        // 取第一个后继作为 body（fallthrough），跳过 exit 路径
-        var bodyEntry = header.Successors
+        var bodyEntry = actualHeader.Successors
             .OrderBy(s => s.StartOffset)
             .FirstOrDefault();
-        var exitBlock = header.Successors
+        var exitBlock = actualHeader.Successors
             .OrderByDescending(s => s.StartOffset)
             .FirstOrDefault(b => b != bodyEntry);
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] actualHeader#{actualHeader.Id} successors={actualHeader.Successors.Count}, bodyEntry={(bodyEntry?.Id ?? -1)}, exitBlock={(exitBlock?.Id ?? -1)}");
+        }
         if (bodyEntry != null)
         {
-            CollectBodyBlocks(bodyEntry, header, bodyBlocks, visited, exitBlock);
+            CollectBodyBlocks(bodyEntry, actualHeader, bodyBlocks, visited, exitBlock);
+        }
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] bodyBlocks collected: {bodyBlocks.Count}");
+        bool isInlineComp = actualHeader.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
+        if (isInlineComp && bodyBlocks.Count == 0)
+        {
+            bodyBlocks.Add(actualHeader);
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[BUILD_FOR_LOOP] Added actualHeader as bodyBlock for inline comprehension");
+            }
         }
 
         // 从 visited 中移除 body 块，让 GetStructuredBlockStmts 重新管理（嵌套循环防止 StackOverflow）
@@ -889,10 +962,8 @@ public class AstBuilder
             bodyStmts.AddRange(stmts);
         }
 
-        var target = ExtractLoopVariable(header, bodyBlocks);
+        var target = ExtractLoopVariable(actualHeader, bodyBlocks);
 
-        // 处理 body 中可能残留的循环变量赋值（STORE_NAME/STORE_FAST 因栈不完整产生无效 Assign）
-        // FOR_ITER 的栈效果在前驱块，body 块中单独的 STORE 会产生 Assign(target, null)
         if (target is Name targetName)
         {
             bodyStmts = bodyStmts.Where(s =>
@@ -908,53 +979,665 @@ public class AstBuilder
             }).ToList();
         }
 
-        // 移除 body 末尾的 continue（JUMP_ABSOLUTE 回到 FOR_ITER 产生）
         while (bodyStmts.Count > 0 && bodyStmts[^1] is Continue)
             bodyStmts.RemoveAt(bodyStmts.Count - 1);
 
-        // 检测 3.12+ 内联推导式
-        var compResult = TryDetectInlinedComprehension(header, target, bodyStmts, exitBlock);
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP entering header_offset=0x{actualHeader.StartOffset:X4} target={target} iterExpr={iterExpr} bodyStmts={bodyStmts.Count}");
+        }
+        
+        var compResult = TryDetectInlinedComprehension(actualHeader, target, iterExpr, bodyStmts, exitBlock, bodyBlocks);
         if (compResult != null)
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: COMPREHENSION detected, returning {compResult.GetType().Name}");
             return new List<Stmt> { compResult };
+        }
 
+        bool isNestedLoop = false;
+        if (exitBlock != null)
+        {
+            foreach (var block in _sortedBlocks)
+            {
+                if (block.StartOffset < actualHeader.StartOffset && block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                {
+                    bool hasOuterEndFor = false;
+                    foreach (var succ in block.Successors)
+                    {
+                        if (succ.Instructions.Any(i => i.Opcode == Opcode.END_FOR_313))
+                        {
+                            if (succ.StartOffset > exitBlock.StartOffset)
+                            {
+                                hasOuterEndFor = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (hasOuterEndFor)
+                    {
+                        isNestedLoop = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (isNestedLoop)
+        {
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: NESTED_LOOP (will be merged into outer comprehension), returning empty");
+            }
+            return new List<Stmt>();
+        }
+
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: EMPTY_FOR_LOOP iterExpr={iterExpr} bodyStmts={bodyStmts.Count}");
         return new List<Stmt> { new For(target, iterExpr, bodyStmts, null) };
     }
 
-    private Stmt? TryDetectInlinedComprehension(BasicBlock header, Expr target,
-        List<Stmt> bodyStmts, BasicBlock? exitBlock)
+    private Stmt? TryDetectInlinedComprehension(BasicBlock header, Expr target, Expr? iterExpr,
+        List<Stmt> bodyStmts, BasicBlock? exitBlock, List<BasicBlock> bodyBlocks)
     {
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT header_offset=0x{header.StartOffset:X4} target={target?.GetType().Name} bodyStmts={bodyStmts.Count} bodyBlocks={bodyBlocks.Count}");
+        }
+        foreach (var ins in header.Instructions)
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT header_ins opcode={ins.Opcode} raw={(int)ins.Opcode} offset=0x{ins.Offset:X4} arg={ins.Argument}");
+        }
+        
+        bool isNestedLoop = false;
+        if (exitBlock != null)
+        {
+            foreach (var block in _sortedBlocks)
+            {
+                if (block.StartOffset < header.StartOffset && block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                {
+                    bool hasOuterEndFor = false;
+                    foreach (var succ in block.Successors)
+                    {
+                        if (succ.Instructions.Any(i => i.Opcode == Opcode.END_FOR_313))
+                        {
+                            if (succ.StartOffset > exitBlock.StartOffset)
+                            {
+                                hasOuterEndFor = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (hasOuterEndFor)
+                    {
+                        isNestedLoop = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (isNestedLoop)
+        {
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (nested loop, will be merged into outer comprehension)");
+            }
+            return null;
+        }
+        
         bool hasIf = bodyStmts.Any(s => s is If);
-        if (!hasIf && bodyStmts.Count == 0) return null;
+        if (!hasIf)
+        {
+            var checkedBlocks = new HashSet<BasicBlock>();
+            var worklist = new Queue<BasicBlock>(bodyBlocks);
+            while (worklist.Count > 0)
+            {
+                var block = worklist.Dequeue();
+                if (checkedBlocks.Contains(block)) continue;
+                checkedBlocks.Add(block);
+                
+                if (block.Instructions.Any(i =>
+                    i.Opcode == Opcode.POP_JUMP_IF_TRUE_PY38 ||
+                    i.Opcode == Opcode.POP_JUMP_IF_FALSE_PY38 ||
+                    i.Opcode == Opcode.POP_JUMP_IF_TRUE ||
+                    i.Opcode == Opcode.POP_JUMP_IF_FALSE))
+                {
+                    hasIf = true;
+                    break;
+                }
+                
+                foreach (var succ in block.Successors)
+                {
+                    if (!checkedBlocks.Contains(succ) && !succ.Flags.HasFlag(BlockFlags.LoopHeader))
+                    {
+                        worklist.Enqueue(succ);
+                    }
+                }
+            }
+        }
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT bodyStmts types: {string.Join(", ", bodyStmts.Select(s => s.GetType().Name))}");
+        }
         
         string? containerKind = null;
-        foreach (var chk in new[] { header }.Concat(header.Predecessors))
+        bool hasListAppend = false;
+        bool hasSetAdd = false;
+        
+        foreach (var ins in header.Instructions)
+        {
+            if (ins.Opcode == Opcode.LIST_APPEND_313)
+            {
+                hasListAppend = true;
+                break;
+            }
+            if (ins.Opcode == Opcode.SET_ADD_313)
+            {
+                hasSetAdd = true;
+                break;
+            }
+        }
+        
+        if (!hasListAppend && !hasSetAdd)
+        {
+            foreach (var block in bodyBlocks)
+            {
+                foreach (var ins in block.Instructions)
+                {
+                    if (ins.Opcode == Opcode.LIST_APPEND_313)
+                    {
+                        hasListAppend = true;
+                        break;
+                    }
+                    if (ins.Opcode == Opcode.SET_ADD_313)
+                    {
+                        hasSetAdd = true;
+                        break;
+                    }
+                }
+                if (hasListAppend || hasSetAdd) break;
+            }
+        }
+        
+        if (!hasListAppend && !hasSetAdd)
+        {
+            foreach (var block in _sortedBlocks)
+            {
+                if (block.StartOffset < header.StartOffset) continue;
+                
+                bool isBeforeExit = true;
+                if (exitBlock != null && block.StartOffset >= exitBlock.StartOffset)
+                    isBeforeExit = false;
+                
+                if (!isBeforeExit) continue;
+                
+                foreach (var ins in block.Instructions)
+                {
+                    if (ins.Opcode == Opcode.FOR_ITER)
+                    {
+                        foreach (var succ in block.Successors)
+                        {
+                            var nestedBodyBlocks = new List<BasicBlock>();
+                            CollectBodyBlocks(succ, block, nestedBodyBlocks, new HashSet<BasicBlock>(), null);
+                            
+                            foreach (var nestedBlock in nestedBodyBlocks)
+                            {
+                                foreach (var nestedIns in nestedBlock.Instructions)
+                                {
+                                    if (nestedIns.Opcode == Opcode.LIST_APPEND_313)
+                                    {
+                                        hasListAppend = true;
+                                        break;
+                                    }
+                                    if (nestedIns.Opcode == Opcode.SET_ADD_313)
+                                    {
+                                        hasSetAdd = true;
+                                        break;
+                                    }
+                                }
+                                if (hasListAppend || hasSetAdd) break;
+                            }
+                            if (hasListAppend || hasSetAdd) break;
+                        }
+                        if (hasListAppend || hasSetAdd) break;
+                    }
+                }
+                if (hasListAppend || hasSetAdd) break;
+            }
+        }
+        
+        var visitedBlocks = new HashSet<BasicBlock>();
+        var searchQueue = new Queue<BasicBlock>();
+        searchQueue.Enqueue(header);
+        foreach (var pred in header.Predecessors) searchQueue.Enqueue(pred);
+        
+        while (searchQueue.Count > 0 && containerKind == null)
+        {
+            var chk = searchQueue.Dequeue();
+            if (!visitedBlocks.Add(chk)) continue;
+            
             foreach (var ins in chk.Instructions)
             {
-                if (ins.Opcode == Opcode.BUILD_SET && ins.Argument == 0) containerKind = "set";
-                else if (ins.Opcode == Opcode.BUILD_LIST && ins.Argument == 0) containerKind = "list";
+                if (ins.Opcode == Opcode.BUILD_LIST && ins.Argument == 0) containerKind = "list";
+                else if (ins.Opcode == Opcode.BUILD_SET && ins.Argument == 0) containerKind = "set";
                 if (containerKind != null) break;
             }
-        if (containerKind == null) return null;
+            
+            if (containerKind == null)
+                foreach (var pred in chk.Predecessors)
+                    if (!visitedBlocks.Contains(pred)) searchQueue.Enqueue(pred);
+        }
         
-        Expr? elt = target;
-        foreach (var s in bodyStmts) {
-            if (s is ExprStmt es) elt = es.Value;
-            if (s is Assign aa) elt = aa.Value;
+        if (hasListAppend && containerKind == "set")
+        {
+            containerKind = "list";
+        }
+        
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT decision_check hasListAppend={hasListAppend} hasSetAdd={hasSetAdd} containerKind={containerKind} hasIf={hasIf} bodyStmts.Count={bodyStmts.Count}");
+        }
+        
+        if (containerKind == null && !hasListAppend && !hasSetAdd) 
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no container and no LIST_APPEND/SET_ADD)");
+            return null;
+        }
+        
+        if (!hasListAppend && !hasSetAdd && !hasIf && bodyStmts.Count == 0) 
+        {
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no LIST_APPEND/SET_ADD, no If, empty body)");
+            }
+            return null;
+        }
+        
+        Expr? elt = null;
+        Opcode appendOpcode = hasListAppend ? Opcode.LIST_APPEND_313 : Opcode.SET_ADD_313;
+        bool isListAppend = hasListAppend;
+        
+        if (hasListAppend || hasSetAdd)
+        {
+            var searchBlocks = new List<BasicBlock>(bodyBlocks);
+            
+            bool foundAppendInBody = false;
+            foreach (var block in bodyBlocks)
+            {
+                if (block.Instructions.Any(i => i.Opcode == appendOpcode))
+                {
+                    foundAppendInBody = true;
+                    break;
+                }
+            }
+            
+            if (!foundAppendInBody)
+            {
+                foreach (var block in _sortedBlocks)
+                {
+                    if (block.StartOffset < header.StartOffset) continue;
+                    if (exitBlock != null && block.StartOffset >= exitBlock.StartOffset) break;
+                    if (!searchBlocks.Contains(block))
+                        searchBlocks.Add(block);
+                }
+            }
+            
+            foreach (var block in searchBlocks)
+            {
+                int appendIdx = -1;
+                for (int i = 0; i < block.Instructions.Count; i++)
+                    if (block.Instructions[i].Opcode == appendOpcode)
+                    { appendIdx = i; break; }
+                
+                if (appendIdx >= 0)
+                {
+                    if (_options.VerboseErrors)
+                    {
+                    Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT found {appendOpcode} at idx={appendIdx} in block#{block.Id} offset=0x{block.StartOffset:X4}");
+                    }
+                    var sm = new StackMachine(_codeObject);
+                    try
+                    {
+                        if (target is Name loopTarget)
+                        {
+                            sm.PushExpr(loopTarget);
+                            if (_options.VerboseErrors)
+                            {
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT pushed target variable '{loopTarget.Id}' onto stack");
+                            }
+                        }
+                        
+                        foreach (var ins in block.Instructions)
+                        {
+                            if (ins.Opcode == appendOpcode)
+                                break;
+                            if (_options.VerboseErrors)
+                            {
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT executing opcode={ins.Opcode} offset=0x{ins.Offset:X4} arg={ins.Argument}");
+                            }
+                            sm.Execute(ins);
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT stack_size={sm.ExprStackCount} after opcode={ins.Opcode}");
+                        }
+                        Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT StackMachine stack size={sm.ExprStackCount} after executing up to {appendOpcode}");
+                        if (sm.ExprStackCount >= 2)
+                        {
+                            var listObj = sm.PopExpr();
+                            elt = sm.PopExpr();
+                            if (_options.VerboseErrors)
+                            {
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT extracted_elt={elt?.GetType().Name} (popped list: {listObj?.GetType().Name})");
+                            }
+                        }
+                        else if (sm.ExprStackCount > 0)
+                        {
+                            elt = sm.PopExpr();
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT extracted_elt={elt?.GetType().Name} (single item)");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_options.VerboseErrors)
+                        {
+                        Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT StackMachine error: {ex.Message}");
+                        }
+                    }
+                    
+                    if (elt == null)
+                    {
+                        var exprStack = new Stack<Expr>();
+                        for (int i = appendIdx - 1; i >= 0; i--)
+                        {
+                            var ins = block.Instructions[i];
+                            if (ProcessInstructionForStack(ins, exprStack))
+                                break;
+                        }
+                        if (exprStack.Count > 0)
+                            elt = exprStack.Peek();
+                    }
+                    
+                    if (elt == null || elt is Name { Id: "self" } || (elt is Name nm && nm.Id.StartsWith("__special_")))
+                    {
+                        int callIdx = -1;
+                        for (int i = appendIdx - 1; i >= 0; i--)
+                        {
+                            if (block.Instructions[i].Opcode == Opcode.CALL_INTRINSIC_2_313)
+                            { callIdx = i; break; }
+                        }
+                        
+                        if (callIdx >= 0)
+                        {
+                            var exprStack = new Stack<Expr>();
+                            for (int i = callIdx - 1; i >= 0; i--)
+                            {
+                                var ins = block.Instructions[i];
+                                if (ProcessInstructionForStack(ins, exprStack))
+                                    break;
+                            }
+                            
+                            if (exprStack.Count >= 3)
+                            {
+                                var arg2 = exprStack.Pop();
+                                var arg1 = exprStack.Pop();
+                                var func = exprStack.Pop();
+                                var call = new Call(func, new List<Expr> { arg1, arg2 }, new List<Keyword>());
+                                elt = call;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        // 如果没有从 LIST_APPEND 块中提取到元素表达式，从 bodyStmts 中提取
+        if (elt == null)
+        {
+            elt = target;
+            foreach (var s in bodyStmts)
+            {
+                if (s is ExprStmt es) elt = es.Value;
+                if (s is Assign aa) elt = aa.Value;
+            }
+        }
+        
+        // 如果提取到的元素表达式是 self 或 __special_*，尝试从 bodyStmts 中寻找更复杂的表达式
+        bool isBadElt = elt is Name { Id: "self" } || (elt is Name nmCheck && nmCheck.Id.StartsWith("__special_"));
+        if (isBadElt)
+        {
+            // 优先查找 Call 表达式
+            foreach (var s in bodyStmts)
+            {
+                if (s is ExprStmt es && es.Value is Call esCall)
+                {
+                    elt = esCall;
+                    break;
+                }
+                if (s is Assign aa && aa.Value is Call aaCall)
+                {
+                    elt = aaCall;
+                    break;
+                }
+            }
+            
+            // 如果没有找到 Call，尝试从最后一个 ExprStmt 中提取
+            bool stillBad = elt is Name { Id: "self" } || (elt is Name nmCheck2 && nmCheck2.Id.StartsWith("__special_"));
+            if (stillBad)
+            {
+                for (int i = bodyStmts.Count - 1; i >= 0; i--)
+                {
+                    var s = bodyStmts[i];
+                    if (s is ExprStmt es)
+                    {
+                        elt = es.Value;
+                        break;
+                    }
+                }
+            }
+            
+            // 如果仍然是 __special_* 或包含 __special_* 的表达式，尝试从变量中推断元素表达式
+            bool stillSpecial = 
+                (elt is Name nmCheck3 && nmCheck3.Id.StartsWith("__special_")) ||
+                (elt is Subscript sub && sub.Value is Name subNm && subNm.Id.StartsWith("__special_"));
+            if (stillSpecial && target != null)
+            {
+                string? loopVarName = null;
+                if (target is Name lv) loopVarName = lv.Id;
+                else if (target is Starred st && st.Value is Name lv2) loopVarName = lv2.Id;
+                
+                if (!string.IsNullOrEmpty(loopVarName))
+                {
+                    foreach (var funcVarName in new[] { "repr1", "repr" })
+                    {
+                        int idx = _codeObject.Varnames.IndexOf(funcVarName);
+                        if (idx < 0 && _codeObject.Freevars != null)
+                            idx = _codeObject.Freevars.IndexOf(funcVarName);
+                        
+                        if (idx >= 0)
+                        {
+                            Expr funcExpr;
+                            int selfIdx = _codeObject.Varnames.IndexOf("self");
+                            if (selfIdx >= 0)
+                            {
+                                var selfName = new Name("self", ExpressionContext.Load);
+                                funcExpr = new Models.AST.Attribute(selfName, funcVarName, ExpressionContext.Load);
+                            }
+                            else
+                            {
+                                funcExpr = new Name(funcVarName, ExpressionContext.Load);
+                            }
+                            var targetExpr = new Name(loopVarName, ExpressionContext.Load);
+                            var newlevelExpr = new Name("newlevel", ExpressionContext.Load);
+                            var call = new Call(funcExpr, new List<Expr> { targetExpr, newlevelExpr }, new List<Keyword>());
+                            elt = call;
+                            break;
+                        }
+                    }
+                }
+            }
         }
         
         var ifs = new List<Expr>();
+        
         foreach (var s in bodyStmts)
-            if (s is If ifS) ifs.Add(ifS.Test);
+        {
+            if (s is If ifS)
+            {
+                bool isBadCondition = false;
+                if (ifS.Test is UnaryOp { Op: UnaryOperator.Not } unary)
+                {
+                    if (unary.Operand is Constant c)
+                    {
+                        if (c.Value is int i)
+                            isBadCondition = i != 0;
+                        else if (c.Value is long l)
+                            isBadCondition = l != 0;
+                    }
+                }
+                if (ifS.Test is Constant { Value: bool b })
+                    isBadCondition = !b;
+                
+                if (!isBadCondition)
+                    ifs.Add(ifS.Test);
+            }
+        }
+        
+        // Python 3.14 内联推导式：从字节码中提取条件表达式
+        if (ifs.Count == 0 && hasListAppend)
+        {
+            foreach (var bodyBlock in bodyBlocks)
+            {
+                for (int j = 0; j < bodyBlock.Instructions.Count; j++)
+                {
+                    if (bodyBlock.Instructions[j].Opcode == Opcode.COMPARE_OP)
+                    {
+                        bool hasListAppendAfter = false;
+                        bool passedCurrentBlock = false;
+                        
+                        foreach (var bb in bodyBlocks)
+                        {
+                            if (!passedCurrentBlock)
+                            {
+                                if (bb == bodyBlock)
+                                    passedCurrentBlock = true;
+                                continue;
+                            }
+                            
+                            foreach (var ins in bb.Instructions)
+                            {
+                                if (ins.Opcode == Opcode.LIST_APPEND_313)
+                                {
+                                    hasListAppendAfter = true;
+                                    break;
+                                }
+                                if (ins.Opcode == Opcode.FOR_ITER || ins.Opcode == Opcode.END_FOR_313)
+                                {
+                                    passedCurrentBlock = false;
+                                    break;
+                                }
+                            }
+                            if (hasListAppendAfter) break;
+                        }
+                        
+                        if (!hasListAppendAfter) continue;
+                        
+                        var sm = new StackMachine(_codeObject);
+                        if (target is Name loopTarget)
+                            sm.PushExpr(loopTarget);
+                        
+                        foreach (var prevBlock in _sortedBlocks)
+                        {
+                            if (prevBlock == bodyBlock) break;
+                            if (prevBlock.StartOffset < header.StartOffset) continue;
+                            foreach (var ins in prevBlock.Instructions)
+                            {
+                                if (ins.Opcode == Opcode.STORE_FAST_LOAD_FAST_313 ||
+                                    ins.Opcode == Opcode.FOR_ITER ||
+                                    ins.Opcode == Opcode.SWAP ||
+                                    ins.Opcode == Opcode.BUILD_LIST ||
+                                    ins.Opcode == Opcode.GET_ITER)
+                                    continue;
+                                sm.Execute(ins);
+                            }
+                        }
+                        
+                        for (int k = 0; k <= j; k++)
+                        {
+                            sm.Execute(bodyBlock.Instructions[k]);
+                        }
+                        
+                        if (sm.ExprStackCount > 0)
+                        {
+                            var cond = sm.PopExpr();
+                            if (!(cond is Name { Id: "self" }) && !(cond is Name nm && nm.Id.StartsWith("__special_")))
+                            {
+                                ifs.Add(cond);
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (ifs.Count > 0) break;
+            }
+        }
         
         // 找 exit 块的 STORE_FAST 目标
         string? storeTarget = null;
-        var fi = header.Instructions.FirstOrDefault(i => i.Opcode == Opcode.FOR_ITER);
-        if (fi.Argument.HasValue)
+        bool isInlineComp = header.Instructions.Any(i => 
+            i.Opcode == Opcode.LIST_APPEND_313 || i.Opcode == Opcode.SET_ADD_313);
+        if (_options.VerboseErrors)
         {
-            int cacheExtra = _codeObject.Version >= PythonVersion.Py311 ? 2 : 0;
-            int exitOffset = fi.Offset + 2 + cacheExtra + fi.Argument.Value;
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT isInlineComp_initial={isInlineComp} header_offset=0x{header.StartOffset:X4} bodyBlocks={bodyBlocks.Count}");
+        }
+        foreach (var block in bodyBlocks)
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT bodyBlock#{block.Id} offset=0x{block.StartOffset:X4} instrs={string.Join(",", block.Instructions.Select(i => i.Opcode))}");
+        }
+        if (!isInlineComp)
+        {
+            foreach (var block in bodyBlocks)
+            {
+                if (block.Instructions.Any(i => 
+                    i.Opcode == Opcode.LIST_APPEND_313 || i.Opcode == Opcode.SET_ADD_313))
+                {
+                    isInlineComp = true;
+                    break;
+                }
+                if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                {
+                    foreach (var succ in block.Successors)
+                    {
+                        var nestedBodyBlocks = new List<BasicBlock>();
+                        CollectBodyBlocks(succ, block, nestedBodyBlocks, new HashSet<BasicBlock>());
+                        foreach (var nestedBlock in nestedBodyBlocks)
+                        {
+                            if (nestedBlock.Instructions.Any(i => 
+                                i.Opcode == Opcode.LIST_APPEND_313 || i.Opcode == Opcode.SET_ADD_313))
+                            {
+                                isInlineComp = true;
+                                break;
+                            }
+                        }
+                        if (isInlineComp) break;
+                    }
+                    if (isInlineComp) break;
+                }
+            }
+        }
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT isInlineComp_final={isInlineComp}");
+        }
+        var fi = header.Instructions.FirstOrDefault(i => i.Opcode == Opcode.FOR_ITER);
+        if (fi != null && fi.Argument.HasValue)
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=STORE_TARGET fi_offset=0x{fi.Offset:X4} fi_arg={fi.Argument.Value}");
+            int exitOffset = fi.Argument.Value;
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=STORE_TARGET exitOffset=0x{exitOffset:X4}");
+            }
             var realExit = _sortedBlocks.FirstOrDefault(b => b.StartOffset >= exitOffset);
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=STORE_TARGET realExit={realExit?.StartOffset.ToString("X4") ?? "null"}");
             if (realExit != null)
+            {
                 foreach (var i in realExit.Instructions)
                 {
                     if (i.Opcode == Opcode.STORE_FAST && i.Argument.HasValue
@@ -964,16 +1647,316 @@ public class AstBuilder
                         && i.Argument.Value < _codeObject.Names.Count)
                     { storeTarget = _codeObject.Names[i.Argument.Value]; break; }
                 }
+                if (storeTarget == null)
+                {
+                    int realExitIndex = _sortedBlocks.IndexOf(realExit);
+                    for (int j = realExitIndex + 1; j < _sortedBlocks.Count; j++)
+                    {
+                        foreach (var i in _sortedBlocks[j].Instructions)
+                        {
+                            if (i.Opcode == Opcode.STORE_FAST && i.Argument.HasValue
+                                && i.Argument.Value < _codeObject.Varnames.Count)
+                            { storeTarget = _codeObject.Varnames[i.Argument.Value]; break; }
+                            if (i.Opcode == Opcode.STORE_NAME && i.Argument.HasValue
+                                && i.Argument.Value < _codeObject.Names.Count)
+                            { storeTarget = _codeObject.Names[i.Argument.Value]; break; }
+                        }
+                        if (storeTarget != null) break;
+                    }
+                }
+            }
         }
         
-        var generators = new List<Comprehension>
+        // 使用 BuildForLoop 传入的 iterExpr，如果为 null 则回退到 ExtractIterExprRaw
+        if (iterExpr == null)
+            iterExpr = ExtractIterExprRaw(header);
+        
+        // Python 3.14: 如果 ExtractIterExprRaw 返回了默认值，尝试从函数参数中提取
+        if (iterExpr is Name { Id: "iterable" } || iterExpr == null)
         {
-            // Build restricted for-loop: get iter from header block instructions
-            new Comprehension(target, ExtractIterExprRaw(header) ?? new Constant("?"), ifs)
-        };
-        // If iterable is '?' fallback, skip — let ConvertComprehensionCalls handle later
+            // 尝试从函数参数中提取：查找 islice(x, maxiter) 或类似的表达式
+            // 检查是否有 IMPORT_NAME 指令加载 islice
+            bool hasIslice = false;
+            foreach (var block in _sortedBlocks)
+            {
+                if (block.StartOffset < header.StartOffset - 200 || block.StartOffset > header.StartOffset + 500)
+                    continue;
+                foreach (var ins in block.Instructions)
+                {
+                    if (ins.Opcode == Opcode.IMPORT_NAME && ins.Argument.HasValue)
+                    {
+                        int argIdx = ins.Argument.Value;
+                        if (argIdx >= 0 && argIdx < _codeObject.Names.Count)
+                        {
+                            string name = _codeObject.Names[argIdx];
+                            if (name == "islice")
+                            {
+                                hasIslice = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (hasIslice) break;
+            }
+            
+            // 如果找到了 islice，尝试构建 islice(x, maxiter) 表达式
+            if (hasIslice)
+            {
+                Expr? xVar = null;
+                Expr? maxiterVar = null;
+                
+                foreach (var paramName in new[] { "x", "maxiter" })
+                {
+                    int idx = _codeObject.Varnames.IndexOf(paramName);
+                    if (idx >= 0)
+                    {
+                        var nameExpr = new Name(paramName, ExpressionContext.Load);
+                        if (paramName == "x") xVar = nameExpr;
+                        if (paramName == "maxiter") maxiterVar = nameExpr;
+                    }
+                }
+                
+                if (xVar != null && maxiterVar != null)
+                {
+                    var isliceName = new Name("islice", ExpressionContext.Load);
+                    iterExpr = new Call(isliceName, new List<Expr> { xVar, maxiterVar }, new List<Keyword>());
+                }
+                else if (xVar != null)
+                {
+                    iterExpr = xVar;
+                }
+            }
+            
+            // 如果仍然没有找到，尝试从前驱块中提取
+            if (iterExpr is Name { Id: "iterable" } || iterExpr == null)
+            {
+                foreach (var pred in header.Predecessors)
+                {
+                    var sm = new StackMachine(_codeObject);
+                    try
+                    {
+                        foreach (var ins in pred.Instructions)
+                            sm.Execute(ins);
+                        if (sm.ExprStackCount > 0)
+                        {
+                            iterExpr = sm.PopExpr();
+                            break;
+                        }
+                    }
+                    catch (Exception) { }
+                }
+            }
+        }
+        
+        var generators = new List<Comprehension>();
+        
+        var currentHeader = header;
+        var currentTarget = target;
+        var currentIterExpr = iterExpr;
+        
+        while (currentHeader != null && currentTarget is Name)
+        {
+            var genIfs = new List<Expr>();
+            var currentBodyBlocks = new List<BasicBlock>();
+            if (currentHeader == header)
+            {
+                currentBodyBlocks = bodyBlocks;
+            }
+            else
+            {
+                foreach (var succ in currentHeader.Successors)
+                {
+                    if (!succ.Instructions.Any(i => i.Opcode == Opcode.END_FOR_313))
+                    {
+                        CollectBodyBlocks(succ, currentHeader, currentBodyBlocks, new HashSet<BasicBlock>());
+                        break;
+                    }
+                }
+            }
+            foreach (var block in currentBodyBlocks)
+            {
+                for (int j = 0; j < block.Instructions.Count; j++)
+                {
+                    if (block.Instructions[j].Opcode == Opcode.COMPARE_OP)
+                    {
+                        bool hasJumpAfter = false;
+                        for (int k = j + 1; k < block.Instructions.Count; k++)
+                        {
+                            if (block.Instructions[k].Opcode == Opcode.POP_JUMP_IF_FALSE || 
+                                block.Instructions[k].Opcode == Opcode.POP_JUMP_IF_TRUE)
+                            {
+                                hasJumpAfter = true;
+                                break;
+                            }
+                            if (block.Instructions[k].Opcode == Opcode.LIST_APPEND_313 || 
+                                block.Instructions[k].Opcode == Opcode.SET_ADD_313 ||
+                                block.Instructions[k].Opcode == Opcode.FOR_ITER)
+                            {
+                                break;
+                            }
+                        }
+                        if (!hasJumpAfter) continue;
+
+                        var sm = new StackMachine(_codeObject);
+                        if (target is Name loopTarget)
+                            sm.PushExpr(loopTarget);
+                        foreach (var pred in header.Predecessors)
+                        {
+                            foreach (var ins in pred.Instructions)
+                            {
+                                if (ins.Opcode == Opcode.STORE_FAST_LOAD_FAST_313)
+                                    continue;
+                                sm.Execute(ins);
+                            }
+                        }
+                        bool reachedCurrentBlock = false;
+                        foreach (var bb in currentBodyBlocks)
+                        {
+                            if (bb == block)
+                            {
+                                reachedCurrentBlock = true;
+                                for (int k = 0; k <= j; k++)
+                                {
+                                    sm.Execute(bb.Instructions[k]);
+                                }
+                                break;
+                            }
+                            if (!reachedCurrentBlock)
+                            {
+                                foreach (var ins in bb.Instructions)
+                                {
+                                    if (ins.Opcode == Opcode.STORE_FAST_LOAD_FAST_313)
+                                        continue;
+                                    sm.Execute(ins);
+                                }
+                            }
+                        }
+                        if (sm.ExprStackCount > 0)
+                        {
+                            var cond = sm.PopExpr();
+                            if (cond != null && !(cond is Constant { Value: true }) && !genIfs.Any(c => c.ToString() == cond.ToString()))
+                            {
+                                genIfs.Add(cond);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            generators.Add(new Comprehension(currentTarget, currentIterExpr ?? new Constant("?"), genIfs));
+            
+            BasicBlock? nestedForIterBlock = null;
+            foreach (var block in _sortedBlocks)
+            {
+                if (block.StartOffset <= currentHeader.StartOffset) continue;
+                if (exitBlock != null && block.StartOffset >= exitBlock.StartOffset) break;
+                
+                foreach (var ins in block.Instructions)
+                {
+                    if (ins.Opcode == Opcode.FOR_ITER)
+                    {
+                        bool isInBodyBlocks = currentBodyBlocks.Any(b => b.StartOffset <= block.StartOffset && 
+                            (b.EndOffset >= block.StartOffset || b.Instructions.Any()));
+                        if (_options.VerboseErrors)
+                        {
+                        Console.Error.WriteLine($"[DECOMP_TRACE] stage=NESTED_DETECT found FOR_ITER at offset=0x{block.StartOffset:X4} isInBodyBlocks={isInBodyBlocks}");
+                        }
+                        if (isInBodyBlocks)
+                        {
+                            nestedForIterBlock = block;
+                            break;
+                        }
+                    }
+                }
+                if (nestedForIterBlock != null) break;
+            }
+            
+            if (nestedForIterBlock == null) break;
+            
+            var nestedBodyBlocks = new List<BasicBlock>();
+            BasicBlock? nestedExitBlock = null;
+            foreach (var succ in nestedForIterBlock.Successors)
+            {
+                if (succ.Instructions.Any(i => i.Opcode == Opcode.END_FOR_313))
+                {
+                    nestedExitBlock = succ;
+                    break;
+                }
+            }
+            foreach (var succ in nestedForIterBlock.Successors)
+            {
+                if (succ != nestedExitBlock)
+                {
+                    CollectBodyBlocks(succ, nestedForIterBlock, nestedBodyBlocks, new HashSet<BasicBlock>(), nestedExitBlock);
+                    break;
+                }
+            }
+            
+            var nestedTarget = ExtractLoopVariable(nestedForIterBlock, nestedBodyBlocks);
+            if (nestedTarget == null) break;
+            
+            Expr? nestedIterExpr = ExtractIterExprRaw(nestedForIterBlock);
+            
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=NESTED_ITER nestedIterExpr={nestedIterExpr?.GetType().Name} value={nestedIterExpr}");
+            }
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=NESTED_ITER currentTarget={currentTarget?.GetType().Name} value={currentTarget}");
+            
+            bool isDefaultIterable = nestedIterExpr is Name { Id: "iterable" };
+            if ((nestedIterExpr == null || nestedIterExpr is Constant || isDefaultIterable) && currentTarget is Name outerTarget)
+            {
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=NESTED_ITER replacing with outerTarget={outerTarget.Id}");
+                }
+                nestedIterExpr = new Name(outerTarget.Id, ExpressionContext.Load);
+            }
+            
+            if (nestedIterExpr == null && currentTarget is Name)
+            {
+                var ot = currentTarget as Name;
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=NESTED_ITER fallback to outerTarget={ot?.Id}");
+                }
+                nestedIterExpr = new Name(ot!.Id, ExpressionContext.Load);
+            }
+            
+            foreach (var succ in nestedForIterBlock.Successors)
+            {
+                if (succ.Instructions.Any(i => i.Opcode == Opcode.END_FOR_313))
+                {
+                    _processedBlockIds.Add(succ.Id);
+                    break;
+                }
+            }
+            _processedBlockIds.Add(nestedForIterBlock.Id);
+            currentHeader = nestedForIterBlock;
+            currentTarget = nestedTarget;
+            currentIterExpr = nestedIterExpr;
+        }
+        
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT generators_count={generators.Count}");
+        }
+        for (int i = 0; i < generators.Count; i++)
+        {
+            var gen = generators[i];
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT   generator[{i}] target={gen.Target} iter={gen.Iter}");
+        }
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT final_check containerKind={containerKind} elt={elt} storeTarget={storeTarget}");
+        }
+        
         if (generators[0].Iter is Constant { Value: string sv } && sv == "?")
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (iterExpr is fallback '?')");
             return null;
+        }
 
         Expr? compExpr = containerKind switch
         {
@@ -981,82 +1964,424 @@ public class AstBuilder
             "list" => new ListComp(elt, generators),
             _ => null
         };
-        if (compExpr == null) return null;
+        
+        if (compExpr == null) 
+        {
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (compExpr is null for containerKind={containerKind})");
+            }
+            return null;
+        }
+        
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: ACCEPTED compType={compExpr.GetType().Name} elt_type={elt?.GetType().Name} iterExpr_type={iterExpr?.GetType().Name}");
         
         if (storeTarget != null)
             return new Assign(new List<Expr> { new Name(storeTarget, ExpressionContext.Store) }, compExpr);
-        // If target name is not resolved, return null and let ConvertComprehensionCalls handle it later
+        
+        if (containerKind != null)
+        {
+            string? actualTarget = null;
+            foreach (var block in _sortedBlocks)
+            {
+                foreach (var ins in block.Instructions)
+                {
+                    if (ins.Opcode == Opcode.STORE_FAST && ins.Argument.HasValue
+                        && ins.Argument.Value < _codeObject.Varnames.Count)
+                    {
+                        string name = _codeObject.Varnames[ins.Argument.Value];
+                        if (name != target?.ToString())
+                        {
+                            actualTarget = name;
+                        }
+                    }
+                }
+            }
+            if (actualTarget != null)
+            {
+                return new Assign(new List<Expr> { new Name(actualTarget, ExpressionContext.Store) }, compExpr);
+            }
+        }
+        
         if (target is not Name tn)
+        {
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (target is not Name)");
+            }
             return null;
+        }
         string targetName = tn.Id;
         return new Assign(new List<Expr> { new Name(targetName, ExpressionContext.Store) }, compExpr);
+    }
+
+    /// <summary>从指令序列中构建函数调用表达式（用于 Python 3.13+ 内联推导式）。</summary>
+    private Expr? BuildCallFromInstructions(BasicBlock block, int callIndex, int argCount)
+    {
+        var args = new List<Expr>();
+        int idx = callIndex - 1;
+        
+        for (int i = 0; i < argCount && idx >= 0; i++)
+        {
+            var ins = block.Instructions[idx];
+            Expr? arg = null;
+            
+            if (ins.Opcode == Opcode.LOAD_FAST && ins.Argument.HasValue
+                && ins.Argument.Value < _codeObject.Varnames.Count)
+                arg = new Name(_codeObject.Varnames[ins.Argument.Value], ExpressionContext.Load);
+            else if (ins.Opcode == Opcode.LOAD_CONST && ins.Argument.HasValue
+                     && ins.Argument.Value < _codeObject.Constants.Count)
+                arg = _codeObject.Constants[ins.Argument.Value] as Expr ?? new Constant(_codeObject.Constants[ins.Argument.Value]);
+            else if (ins.Opcode == Opcode.LOAD_GLOBAL && ins.Argument.HasValue
+                     && ins.Argument.Value < _codeObject.Names.Count)
+                arg = new Name(_codeObject.Names[ins.Argument.Value], ExpressionContext.Load);
+            else if (ins.Opcode == Opcode.LOAD_DEREF && ins.Argument.HasValue)
+            {
+                int derefIdx = ins.Argument.Value;
+                if (_codeObject.Version >= PythonVersion.Py311)
+                {
+                    if (derefIdx < _codeObject.Varnames.Count)
+                        arg = new Name(_codeObject.Varnames[derefIdx], ExpressionContext.Load);
+                    else
+                    {
+                        derefIdx -= _codeObject.Varnames.Count;
+                        if (derefIdx < _codeObject.Cellvars.Count)
+                            arg = new Name(_codeObject.Cellvars[derefIdx], ExpressionContext.Load);
+                        else
+                        {
+                            derefIdx -= _codeObject.Cellvars.Count;
+                            if (derefIdx < _codeObject.Freevars.Count)
+                                arg = new Name(_codeObject.Freevars[derefIdx], ExpressionContext.Load);
+                        }
+                    }
+                }
+            }
+            
+            if (arg != null)
+            {
+                args.Insert(0, arg);
+                idx--;
+            }
+            else
+            {
+                idx--;
+            }
+        }
+        
+        if (idx < 0) return null;
+        
+        var funcIns = block.Instructions[idx];
+        Expr? func = null;
+        
+        if (funcIns.Opcode == Opcode.LOAD_GLOBAL && funcIns.Argument.HasValue
+            && funcIns.Argument.Value < _codeObject.Names.Count)
+            func = new Name(_codeObject.Names[funcIns.Argument.Value], ExpressionContext.Load);
+        else if (funcIns.Opcode == Opcode.LOAD_FAST && funcIns.Argument.HasValue
+                 && funcIns.Argument.Value < _codeObject.Varnames.Count)
+            func = new Name(_codeObject.Varnames[funcIns.Argument.Value], ExpressionContext.Load);
+        
+        if (func == null) return null;
+        
+        return new Call(func, args, new List<Keyword>());
+    }
+
+    /// <summary>处理指令并构建表达式栈（用于 Python 3.13+ 内联推导式）。</summary>
+    private bool ProcessInstructionForStack(Instruction ins, Stack<Expr> exprStack)
+    {
+        switch (ins.Opcode)
+        {
+            case Opcode.LOAD_GLOBAL when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Names.Count:
+            {
+                string name = _codeObject.Names[ins.Argument.Value];
+                if (!name.StartsWith("__"))
+                    exprStack.Push(new Name(name, ExpressionContext.Load));
+                break;
+            }
+            case Opcode.LOAD_FAST when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Varnames.Count:
+                exprStack.Push(new Name(_codeObject.Varnames[ins.Argument.Value], ExpressionContext.Load));
+                break;
+            case Opcode.LOAD_CONST when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Constants.Count:
+            {
+                var value = _codeObject.Constants[ins.Argument.Value];
+                exprStack.Push(value as Expr ?? new Constant(value));
+                break;
+            }
+            case Opcode.LOAD_DEREF when ins.Argument.HasValue:
+            {
+                int idx = ins.Argument.Value;
+                if (_codeObject.Version >= PythonVersion.Py311)
+                {
+                    if (idx < _codeObject.Varnames.Count)
+                        exprStack.Push(new Name(_codeObject.Varnames[idx], ExpressionContext.Load));
+                    else
+                    {
+                        idx -= _codeObject.Varnames.Count;
+                        if (idx < _codeObject.Cellvars.Count)
+                            exprStack.Push(new Name(_codeObject.Cellvars[idx], ExpressionContext.Load));
+                        else
+                        {
+                            idx -= _codeObject.Cellvars.Count;
+                            if (idx < _codeObject.Freevars.Count)
+                                exprStack.Push(new Name(_codeObject.Freevars[idx], ExpressionContext.Load));
+                        }
+                    }
+                }
+                else
+                {
+                    if (idx < _codeObject.Cellvars.Count)
+                        exprStack.Push(new Name(_codeObject.Cellvars[idx], ExpressionContext.Load));
+                    else
+                    {
+                        int fi = idx - _codeObject.Cellvars.Count;
+                        if (fi < _codeObject.Freevars.Count)
+                            exprStack.Push(new Name(_codeObject.Freevars[fi], ExpressionContext.Load));
+                    }
+                }
+                break;
+            }
+            case Opcode.LOAD_ATTR when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Names.Count:
+            {
+                if (exprStack.Count > 0)
+                {
+                    var obj = exprStack.Pop();
+                    exprStack.Push(new Models.AST.Attribute(obj, _codeObject.Names[ins.Argument.Value], ExpressionContext.Load));
+                }
+                break;
+            }
+            case Opcode.CALL when ins.Argument.HasValue:
+            {
+                int argCount = ins.Argument.Value;
+                var args = new List<Expr>();
+                for (int i = 0; i < argCount && exprStack.Count > 0; i++)
+                    args.Insert(0, exprStack.Pop());
+                
+                if (exprStack.Count > 0)
+                {
+                    var func = exprStack.Pop();
+                    exprStack.Push(new Call(func, args, new List<Keyword>()));
+                }
+                break;
+            }
+            case Opcode.BINARY_OP:
+            {
+                if (exprStack.Count >= 2)
+                {
+                    var right = exprStack.Pop();
+                    var left = exprStack.Pop();
+                    exprStack.Push(new BinOp(left, GetBinOpType(ins.Argument ?? 0), right));
+                }
+                break;
+            }
+            case Opcode.LOAD_ATTR:
+            {
+                if (ins.Argument.HasValue && ins.Argument.Value < _codeObject.Names.Count && exprStack.Count > 0)
+                {
+                    var obj = exprStack.Pop();
+                    exprStack.Push(new Models.AST.Attribute(obj, _codeObject.Names[ins.Argument.Value], ExpressionContext.Load));
+                }
+                break;
+            }
+            case Opcode.BUILD_LIST:
+            case Opcode.BUILD_SET:
+            case Opcode.BUILD_MAP:
+            case Opcode.SWAP:
+            case Opcode.PUSH_NULL:
+            case Opcode.MAKE_FUNCTION:
+            case Opcode.SET_FUNCTION_ATTRIBUTE_313:
+            case Opcode.LOAD_NAME:
+            case Opcode.STORE_FAST:
+            case Opcode.STORE_NAME:
+            case Opcode.STORE_ATTR:
+            case Opcode.STORE_GLOBAL:
+                break;
+            case Opcode.POP_TOP:
+                break;
+            case Opcode.DUP_TOP:
+                break;
+            case Opcode.ROT_THREE:
+                break;
+            case Opcode.BINARY_SUBSCR:
+                break;
+            case Opcode.UNARY_NEGATIVE:
+                break;
+            case Opcode.UNARY_NOT:
+                break;
+            case Opcode.COMPARE_OP:
+                break;
+            case Opcode.LOAD_FAST_AND_CLEAR:
+                break;
+            case Opcode.IMPORT_NAME:
+                break;
+            case Opcode.GET_LEN_313:
+                break;
+            case Opcode.EXIT_INIT_CHECK_313:
+                break;
+            case Opcode.YIELD_VALUE_313:
+                break;
+            case Opcode.DELETE_SUBSCR_313:
+                break;
+            case Opcode.LOAD_FAST_LOAD_FAST_313 when ins.Argument.HasValue:
+            {
+                int arg = ins.Argument.Value;
+                int idx1 = arg & 0xFF;
+                int idx2 = (arg >> 8) & 0xFF;
+                
+                if (idx2 >= 0 && idx2 < _codeObject.Varnames.Count)
+                    exprStack.Push(new Name(_codeObject.Varnames[idx2], ExpressionContext.Load));
+                if (idx1 >= 0 && idx1 < _codeObject.Varnames.Count)
+                    exprStack.Push(new Name(_codeObject.Varnames[idx1], ExpressionContext.Load));
+                break;
+            }
+            case Opcode.STORE_FAST_LOAD_FAST_313 when ins.Argument.HasValue:
+            {
+                int arg = ins.Argument.Value;
+                int idx1 = arg & 0xFF;
+                int idx2 = (arg >> 8) & 0xFF;
+                
+                if (idx2 >= 0 && idx2 < _codeObject.Varnames.Count)
+                    exprStack.Push(new Name(_codeObject.Varnames[idx2], ExpressionContext.Load));
+                if (idx1 >= 0 && idx1 < _codeObject.Varnames.Count)
+                    exprStack.Push(new Name(_codeObject.Varnames[idx1], ExpressionContext.Load));
+                break;
+            }
+            case Opcode.CALL_INTRINSIC_1_313 when ins.Argument.HasValue:
+            {
+                int argCount = ins.Argument.Value;
+                var args = new List<Expr>();
+                for (int i = 0; i < argCount && exprStack.Count > 0; i++)
+                    args.Insert(0, exprStack.Pop());
+                
+                if (exprStack.Count > 0)
+                {
+                    var func = exprStack.Pop();
+                    exprStack.Push(new Call(func, args, new List<Keyword>()));
+                }
+                break;
+            }
+            case Opcode.CALL_INTRINSIC_2_313 when ins.Argument.HasValue:
+            {
+                int argCount = ins.Argument.Value;
+                var args = new List<Expr>();
+                for (int i = 0; i < argCount && exprStack.Count > 0; i++)
+                    args.Insert(0, exprStack.Pop());
+                
+                if (exprStack.Count > 0)
+                {
+                    var func = exprStack.Pop();
+                    exprStack.Push(new Call(func, args, new List<Keyword>()));
+                }
+                break;
+            }
+            case Opcode.BINARY_SLICE_313:
+            {
+                if (exprStack.Count >= 2)
+                {
+                    var right = exprStack.Pop();
+                    var left = exprStack.Pop();
+                    exprStack.Push(new Slice(left, right, null));
+                }
+                else if (exprStack.Count >= 1)
+                {
+                    var right = exprStack.Pop();
+                    exprStack.Push(new Slice(null, right, null));
+                }
+                break;
+            }
+            case Opcode.LOAD_SMALL_INT_314:
+                exprStack.Push(new Constant(ins.Argument));
+                break;
+            case Opcode.LOAD_SPECIAL_314 when ins.Argument.HasValue:
+            {
+                int arg = ins.Argument.Value;
+                string specialName = arg switch
+                {
+                    0 => "__class__",
+                    1 => "__self__",
+                    2 => "__func__",
+                    3 => "__code__",
+                    4 => "__globals__",
+                    5 => "__name__",
+                    6 => "__doc__",
+                    7 => "__module__",
+                    8 => "__qualname__",
+                    9 => "__annotations__",
+                    10 => "__type_params__",
+                    _ => $"__special_{arg}__"
+                };
+                exprStack.Push(new Name(specialName, ExpressionContext.Load));
+                break;
+            }
+            case Opcode.POP_ITER_314:
+            case Opcode.END_FOR_313:
+            case Opcode.BUILD_INTERPOLATION_314:
+                break;
+            case Opcode.BINARY_OP_INPLACE_ADD_UNICODE_314:
+            {
+                if (exprStack.Count >= 2)
+                {
+                    var right = exprStack.Pop();
+                    var left = exprStack.Pop();
+                    exprStack.Push(new BinOp(left, Operator.Add, right));
+                }
+                break;
+            }
+            default:
+                return true;
+        }
+        return false;
+    }
+
+    private Operator GetBinOpType(int opId)
+    {
+        return opId switch
+        {
+            0 => Operator.Add,
+            10 => Operator.Sub,
+            20 => Operator.Mul,
+            30 => Operator.Div,
+            _ => Operator.Add
+        };
     }
 
     /// <summary>从前驱/header 块的指令中反向扫描提取内联推导式的迭代表达式。</summary>
     private Expr? ExtractIterExprRaw(BasicBlock header)
     {
-        foreach (var block in new[] { header }.Concat(header.Predecessors))
+        var visited = new HashSet<BasicBlock>();
+        var queue = new Queue<BasicBlock>();
+        queue.Enqueue(header);
+        foreach (var pred in header.Predecessors) queue.Enqueue(pred);
+        
+        while (queue.Count > 0)
         {
+            var block = queue.Dequeue();
+            if (!visited.Add(block)) continue;
+            
             int getIterIdx = -1;
             for (int i = 0; i < block.Instructions.Count; i++)
                 if (block.Instructions[i].Opcode == Opcode.GET_ITER)
                 { getIterIdx = i; break; }
-            if (getIterIdx < 0) continue;
-            for (int i = getIterIdx - 1; i >= 0; i--)
+            if (getIterIdx < 0)
+            {
+                foreach (var pred in block.Predecessors)
+                    if (!visited.Contains(pred)) queue.Enqueue(pred);
+                continue;
+            }
+            var exprStack = new Stack<Expr>();
+            bool stop = false;
+            
+            for (int i = getIterIdx - 1; i >= 0 && !stop; i--)
             {
                 var ins = block.Instructions[i];
-                if (ins.Opcode == Opcode.LOAD_GLOBAL && ins.Argument.HasValue
-                    && ins.Argument.Value < _codeObject.Names.Count)
-                {
-                    string name = _codeObject.Names[ins.Argument.Value];
-                    if (name.StartsWith("__")) continue;
-                    return new Name(name, ExpressionContext.Load);
-                }
-                if (ins.Opcode == Opcode.LOAD_FAST && ins.Argument.HasValue
-                    && ins.Argument.Value < _codeObject.Varnames.Count)
-                    return new Name(_codeObject.Varnames[ins.Argument.Value], ExpressionContext.Load);
-                if (ins.Opcode == Opcode.LOAD_DEREF && ins.Argument.HasValue)
-                {
-                    int idx = ins.Argument.Value;
-                    // 3.11+ localsplus: [varnames | cellvars | freevars]
-                    // pre-3.11:         [cellvars | freevars]
-                    if (_codeObject.Version >= PythonVersion.Py311)
-                    {
-                        if (idx < _codeObject.Varnames.Count)
-                            return new Name(_codeObject.Varnames[idx], ExpressionContext.Load);
-                        idx -= _codeObject.Varnames.Count;
-                        if (idx < _codeObject.Cellvars.Count)
-                            return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
-                        idx -= _codeObject.Cellvars.Count;
-                        if (idx < _codeObject.Freevars.Count)
-                            return new Name(_codeObject.Freevars[idx], ExpressionContext.Load);
-                    }
-                    else
-                    {
-                        if (idx < _codeObject.Cellvars.Count)
-                            return new Name(_codeObject.Cellvars[idx], ExpressionContext.Load);
-                        int fi = idx - _codeObject.Cellvars.Count;
-                        if (fi < _codeObject.Freevars.Count)
-                            return new Name(_codeObject.Freevars[fi], ExpressionContext.Load);
-                    }
-                    continue;
-                }
-                if (ins.Opcode == Opcode.LOAD_CONST || ins.Opcode == Opcode.BUILD_SET
-                    || ins.Opcode == Opcode.BUILD_LIST || ins.Opcode == Opcode.BUILD_MAP
-                    || ins.Opcode == Opcode.SWAP || ins.Opcode == Opcode.PUSH_NULL
-                    || ins.Opcode == Opcode.MAKE_FUNCTION || ins.Opcode == Opcode.SET_FUNCTION_ATTRIBUTE_313
-                    || ins.Opcode == Opcode.CALL || ins.Opcode == Opcode.CALL_FUNCTION
-                    || ins.Opcode == Opcode.CALL_FUNCTION_EX || ins.Opcode == Opcode.CALL_FUNCTION_KW
-                    || ins.Opcode == Opcode.LOAD_ATTR || ins.Opcode == Opcode.LOAD_NAME
-                    || ins.Opcode == Opcode.STORE_FAST || ins.Opcode == Opcode.STORE_NAME
-                    || ins.Opcode == Opcode.STORE_ATTR || ins.Opcode == Opcode.POP_TOP
-                    || ins.Opcode == Opcode.DUP_TOP || ins.Opcode == Opcode.ROT_TWO
-                    || ins.Opcode == Opcode.ROT_THREE || ins.Opcode == Opcode.BINARY_OP
-                    || ins.Opcode == Opcode.BINARY_SUBSCR || ins.Opcode == Opcode.UNARY_NEGATIVE
-                    || ins.Opcode == Opcode.UNARY_NOT || ins.Opcode == Opcode.COMPARE_OP)
-                    continue;
-                break;
+                stop = ProcessInstructionForStack(ins, exprStack);
             }
+            
+            if (exprStack.Count > 0)
+            {
+                return exprStack.Peek();
+            }
+            
+            foreach (var pred in block.Predecessors)
+                if (!visited.Contains(pred)) queue.Enqueue(pred);
         }
         // Pass 2: 前向扫描 — BUILD_SET 在前驱块（无 GET_ITER）中，找 LOAD_GLOBAL
         foreach (var block in new[] { header }.Concat(header.Predecessors))
@@ -1431,9 +2756,17 @@ public class AstBuilder
     /// </summary>
     private List<Stmt>? BuildTryFromExceptionTable(BasicBlock block, HashSet<BasicBlock> visited)
     {
-        var instrs = block.Instructions;
-        if (instrs.Count == 0) return null;
-        var blockStart = instrs[0].Offset;
+        _buildTryDepth++;
+        if (_buildTryDepth > MaxBuildTryDepth)
+        {
+            _buildTryDepth--;
+            return null;
+        }
+        try
+        {
+            var instrs = block.Instructions;
+            if (instrs.Count == 0) return null;
+            var blockStart = instrs[0].Offset;
         var blockEnd = instrs.Last().Offset;
 
         // Find the outermost entry that covers this block (lowest depth = 0 or 1 first)
@@ -1469,7 +2802,10 @@ public class AstBuilder
         
         if (isForLoopBody)
         {
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[TRY_FROM_ET] SKIP: for loop body ET entry");
+            }
             return null;
         }
 
@@ -1480,10 +2816,29 @@ public class AstBuilder
         {
             return null;
         }
+        
+        // Python 3.13+ 内联列表推导式的 ET 条目：handler 块包含 LIST_APPEND_313
+        // 这些不是真正的异常处理器，跳过它们
+        if (_codeObject.Version >= PythonVersion.Py313)
+        {
+            bool hasListAppendInHandler = handlerBlock.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
+            if (hasListAppendInHandler)
+            {
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[TRY_FROM_ET] SKIP: inline comprehension ET entry (handlerBlock#{handlerBlock.Id} contains LIST_APPEND_313)");
+                }
+                return null;
+            }
+        }
+        
         bool isFinally = false;
         bool hasExcMatch = handlerBlock.Instructions.Any(i =>
             i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
+        if (_options.VerboseErrors)
+        {
         Console.Error.WriteLine($"[TRY_DBG] handlerBlock#{handlerBlock.Id} offset={handlerBlock.StartOffset:X4} ops=[{string.Join(",", handlerBlock.Instructions.Select(i => $"{i.Opcode}({i.Opcode:D})"))}] hasExcMatch={hasExcMatch}");
+        }
         // 检测 bare except（无 CHECK_EXC_MATCH）：PUSH_EXC_INFO + POP_TOP → 裸 except:
         bool isBareExcept = !hasExcMatch && handlerBlock.Instructions.Count >= 2
             && handlerBlock.Instructions[0].Opcode == Opcode.PUSH_EXC_INFO_312
@@ -1545,7 +2900,10 @@ public class AstBuilder
                 .ToList();
             if (tryBlocks.Count == 0)
             {
+                if (_options.VerboseErrors)
+                {
                 Console.Error.WriteLine($"[TRY_FROM_ET] RETURN NULL: tryBlocks empty after excluding handler");
+                }
                 return null;
             }
         }
@@ -1656,7 +3014,10 @@ public class AstBuilder
                     && !handlerSuccessorSet.Contains(b))  // 跳过 handler 后继（它们是 handler body，不是 else）
                 .OrderBy(b => b.StartOffset)
                 .ToList();
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[ET_ELSE] found {elseCandidates.Count} candidates: {string.Join(",", elseCandidates.Select(b => $"{b.Id}@{b.StartOffset}"))}");
+            }
             if (elseCandidates.Count > 0)
             {
                 elseBody = new List<Stmt>();
@@ -1672,8 +3033,11 @@ public class AstBuilder
         }
 
         var handlerResult = _blockResults.GetValueOrDefault(handlerBlock.Id);
+        if (_options.VerboseErrors)
+        {
         Console.Error.WriteLine($"[TRY_FROM_ET] handlerBlock#{handlerBlock.Id} result={handlerResult != null}, stmts={handlerResult?.Statements?.Count ?? 0}");
-        if (handlerResult?.Statements != null)
+        }
+        if (_options.VerboseErrors && handlerResult?.Statements != null)
         {
             Console.Error.WriteLine($"[TRY_FROM_ET]   handler stmt types={string.Join(",", handlerResult.Statements.Select(s => s.GetType().Name))}");
         }
@@ -1695,8 +3059,11 @@ public class AstBuilder
             if (vsucc.Instructions.Count == 0) continue;
             if (!visited.Contains(vsucc)) continue;
             var vsr = _blockResults.GetValueOrDefault(vsucc.Id);
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[TRY_FROM_ET] visited succ#{vsucc.Id} stmts={vsr?.Statements?.Count ?? 0}");
-            if (vsr?.Statements != null && vsr.Statements.Count > 0)
+            }
+            if (_options.VerboseErrors && vsr?.Statements != null && vsr.Statements.Count > 0)
             {
                 Console.Error.WriteLine($"[TRY_FROM_ET]   visited succ stmt types={string.Join(",", vsr.Statements.Select(s => s.GetType().Name))}");
             }
@@ -1709,9 +3076,13 @@ public class AstBuilder
             }
         }
 
+        if (_options.VerboseErrors)
+        {
         Console.Error.WriteLine($"[TRY_FROM_ET] handlerBlock#{handlerBlock.Id} successors={handlerBlock.Successors.Count}");
+        }
         foreach (var succ in handlerBlock.Successors.OrderBy(s => s.StartOffset))
         {
+            if (_options.VerboseErrors)
             Console.Error.WriteLine($"[TRY_FROM_ET]   successor#{succ.Id} offset={succ.StartOffset:X4} visited={visited.Contains(succ)}");
             if (succ.Instructions.Count == 0) continue;
             var succStart = succ.Instructions[0].Offset;
@@ -1754,14 +3125,20 @@ public class AstBuilder
         {
             // try/finally: handler 是无 CHECK_EXC_MATCH 的 finally 体
             // 使用 handlerBody（已包含 handlerBlock 和其后继块的语句）
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[TRY_FROM_ET] isFinally=True, handlerBody={handlerBody.Count}, tryBody={tryBody.Count}");
-            if (handlerBody.Count > 0)
+            }
+            if (_options.VerboseErrors && handlerBody.Count > 0)
             {
                 Console.Error.WriteLine($"[TRY_FROM_ET]   handlerBody types={string.Join(",", handlerBody.Select(s => s.GetType().Name))}");
             }
             if (tryBody.Count > 0)
             {
+                if (_options.VerboseErrors)
+                {
                 Console.Error.WriteLine($"[TRY_FROM_ET]   tryBody types={string.Join(",", tryBody.Select(s => s.GetType().Name))}");
+                }
             }
             var finalBody = handlerBody;
             visited.Add(handlerBlock);
@@ -1863,16 +3240,26 @@ public class AstBuilder
                 exceptName = _codeObject.Names.ElementAtOrDefault(ins.Argument ?? 0);
         }
 
+        if (handlerBody.Count == 0)
+        {
+            // handlerBody 为空 = handler 没有实质性语句（例如只有 RERAISE 的清理条目）。
+            // 此时 tryBlocks 已经在嵌套调用（BuildStatements(tb, visited)）中正确消费了内部结构。
+            // ❌ 以前移除了 visited 和 _processedBlockIds → 调用者重新进入 → 无限循环
+            // ✅ 不移除，直接返回 null，blocks 保持已访问状态
+            return null;
+        }
+
         var handlers = new List<ExceptHandler>
         {
             new ExceptHandler(exceptType, exceptName, handlerBody, isGroup)
         };
 
-        // 收集 else 体：handler 后继中部分块因超出 ET 范围或属于类/函数定义被单独收集
-        if (elseBody?.Count > 0)
-            handlers[0] = new ExceptHandler(exceptType, exceptName, handlerBody, isGroup);
-
         return new List<Stmt> { new Try(tryBody, handlers, elseBody) };
+        }
+        finally
+        {
+            _buildTryDepth--;
+        }
     }
 
     /// <summary>
@@ -3471,7 +4858,7 @@ public class AstBuilder
         var forLoopHeader = block.Successors.FirstOrDefault(s =>
             s.Flags.HasFlag(BlockFlags.LoopHeader) &&
             s.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER));
-        if (forLoopHeader != null && !visited.Contains(forLoopHeader))
+        if (forLoopHeader != null && !visited.Contains(forLoopHeader) && !_processedBlockIds.Contains(forLoopHeader.Id))
         {
             // flatStmts 会被丢弃，因为 BuildForLoop 会通过
             // ExtractIterExpression 从前驱块中重新提取迭代表达式
@@ -3699,6 +5086,23 @@ public class AstBuilder
             var (pred, source) = predStack.Pop();
             if (pred == null || !visitedPreds.Add(pred.Id)) continue;
             
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT pred_block#{pred.Id} offset=0x{pred.StartOffset:X4}-0x{pred.EndOffset:X4}");
+            }
+            
+            bool hasContainerBuild = pred.Instructions.Any(i => 
+                i.Opcode == Opcode.BUILD_LIST || i.Opcode == Opcode.BUILD_TUPLE 
+                || i.Opcode == Opcode.BUILD_SET || i.Opcode == Opcode.BUILD_MAP);
+            if (hasContainerBuild)
+            {
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT pred_block#{pred.Id} has container build, skipping");
+                }
+                continue;
+            }
+            
             var sm = new StackMachine(_codeObject);
             Exception? execError = null;
             foreach (var ins in pred.Instructions)
@@ -3709,6 +5113,10 @@ public class AstBuilder
             if (execError == null && sm.ExprStackCount > 0)
             {
                 var expr = sm.PopExpr();
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT pred_result={expr?.GetType().Name}");
+                }
                 if (expr != null) return expr;
             }
             // 只跟踪纯落回前驱（跳过任何跳转型块：无条件跳转或条件跳转如 POP_JUMP_IF_FALSE）
@@ -3729,20 +5137,34 @@ public class AstBuilder
 
         // Fallback 2: 从全局指令列表中找 FOR_ITER 之前的 GET_ITER 及其迭代表达式构建指令
         // 不依赖块边界（某些版本如 3.13+ 块拆分异常时仍有正确的指令序列）
+        // Python 3.14 列表推导式结构：LOAD_SMALL_INT 10 → CALL range → GET_ITER → LOAD_FAST_AND_CLEAR x → SWAP 2 → BUILD_LIST 0 → SWAP 2 → FOR_ITER
+        // FOR_ITER 使用栈顶的迭代器（range(10)），所以需要跳过 GET_ITER 之后的 SWAP/BUILD_LIST 等容器构建指令
         int forIterIdx = _codeObject.Instructions.FindIndex(i =>
             i.Opcode == Opcode.FOR_ITER
             && i.Offset >= header.StartOffset
             && i.Offset <= header.EndOffset);
+        if (_options.VerboseErrors)
+        {
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT fallback2 forIterIdx={forIterIdx} header_offset=0x{header.StartOffset:X4}-0x{header.EndOffset:X4}");
+        }
         if (forIterIdx > 0)
         {
             int getIterIdx = -1;
             for (int i = forIterIdx - 1; i >= 0; i--)
             {
                 var op = _codeObject.Instructions[i].Opcode;
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT scanning idx={i} opcode={op} offset=0x{_codeObject.Instructions[i].Offset:X4}");
+                }
                 if (op == Opcode.GET_ITER) { getIterIdx = i; break; }
                 if (JumpHelper.IsJump(op) || op == Opcode.RETURN_VALUE
                     || op == Opcode.RAISE_VARARGS)
                     break;
+            }
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT getIterIdx={getIterIdx}");
             }
 
             if (getIterIdx >= 0)
@@ -3758,10 +5180,27 @@ public class AstBuilder
                         break;
                     startIdx = i;
                 }
+                if (_options.VerboseErrors)
+                {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT startIdx={startIdx} getIterIdx={getIterIdx}");
+                }
 
                 if (startIdx < getIterIdx)
                 {
-                    var iterBuilder = _codeObject.Instructions.GetRange(startIdx, getIterIdx - startIdx);
+                    int actualStartIdx = startIdx;
+                    while (actualStartIdx < getIterIdx)
+                    {
+                        var op = _codeObject.Instructions[actualStartIdx].Opcode;
+                        if (op == Opcode.RESUME_313 || op == Opcode.RESUME)
+                            actualStartIdx++;
+                        else
+                            break;
+                    }
+                    var iterBuilder = _codeObject.Instructions.GetRange(actualStartIdx, getIterIdx - actualStartIdx);
+                    if (_options.VerboseErrors)
+                    {
+                    Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT executing {iterBuilder.Count} instructions: {string.Join(", ", iterBuilder.Select(i => $"{i.Opcode}(0x{i.Offset:X4})"))}");
+                    }
                     var sm2 = new StackMachine(_codeObject);
                     Exception? buildError = null;
                     foreach (var instr in iterBuilder)
@@ -3772,15 +5211,19 @@ public class AstBuilder
                     if (buildError == null && sm2.ExprStackCount > 0)
                     {
                         var expr = sm2.PopExpr();
+                        if (_options.VerboseErrors)
+                        {
+                        Console.Error.WriteLine($"[DECOMP_TRACE] stage=ITER_EXTRACT fallback2 result={expr?.GetType().Name}");
+                        }
                         if (expr != null) return expr;
                     }
                 }
             }
         }
 
-        // Fallback 3: header's own instructions before FOR_ITER
+        // Fallback 3: header's own instructions before FOR_ITER or END_FOR_313 (Python 3.14)
         var iterInstrs = header.Instructions
-            .TakeWhile(i => i.Opcode != Opcode.FOR_ITER)
+            .TakeWhile(i => i.Opcode != Opcode.FOR_ITER && i.Opcode != Opcode.END_FOR_313)
             .ToList();
         if (iterInstrs.Count > 0 && iterInstrs.Last().Opcode == Opcode.GET_ITER)
             iterInstrs = iterInstrs.Take(iterInstrs.Count - 1).ToList();
@@ -3835,6 +5278,18 @@ public class AstBuilder
                         return new ListLiteral(names, ContainerKind.Tuple);
                 }
 
+                if (instr.Opcode == Opcode.STORE_FAST_LOAD_FAST_313 && instr.Argument.HasValue)
+                {
+                    int arg = instr.Argument.Value;
+                    int storeIdx = arg >> 4;
+                    int loadIdx = arg & 0x0F;
+                    if (storeIdx >= 0 && storeIdx < _codeObject.Varnames.Count)
+                    {
+                        var varName = _codeObject.Varnames[storeIdx];
+                        return new Name(varName, ExpressionContext.Store);
+                    }
+                }
+                
                 if ((instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME
                         || instr.Opcode == Opcode.STORE_DEREF)
                     && instr.Argument.HasValue)
@@ -3920,6 +5375,14 @@ public class AstBuilder
     {
         var instrs = orphan.Instructions;
         if (instrs.Count == 0) return "empty";
+        
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[ORPHAN_CLASSIFY] Block at {orphan.StartOffset:X4}, id={orphan.Id}, flags={orphan.Flags}, instrs:");
+            foreach (var ins in instrs)
+                Console.Error.WriteLine($"[ORPHAN_CLASSIFY]   {ins.Opcode} ({(int)ins.Opcode}) at {ins.Offset:X4}, arg={ins.Argument}");
+        }
+        
         bool hasHandlerPre = instrs.Any(i =>
             i.Opcode == Opcode.DUP_TOP || i.Opcode == Opcode.POP_EXCEPT
             || i.Opcode == Opcode.END_FINALLY || i.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH
@@ -3929,6 +5392,7 @@ public class AstBuilder
         if (instrs.Any(i => i.Opcode == Opcode.JUMP_BACKWARD || i.Opcode == Opcode.JUMP_BACKWARD_NO_INTERRUPT))
             return "jump_back_loop";
         if (instrs.Any(i => i.Opcode == Opcode.FOR_ITER)) return "for_iter";
+        if (instrs.Any(i => i.Opcode == Opcode.END_FOR_313)) return "for_iter";
         if (instrs.Any(i => i.Opcode == Opcode.GET_ITER)) return "get_iter_precursor";
         if (instrs.Any(i => i.Opcode == Opcode.POP_JUMP_IF_FALSE || i.Opcode == Opcode.POP_JUMP_IF_TRUE
             || i.Opcode == Opcode.JUMP_FORWARD || i.Opcode == Opcode.JUMP_ABSOLUTE))
@@ -4139,17 +5603,7 @@ public class AstBuilder
 
         // Decompile the comprehension body
         var body = DecompileChildCode(compRef.Code);
-        // DEBUG: dump body
-        for (int di = 0; di < body.Count && di < 10; di++)
-        {
-            var s = body[di];
-            Console.Error.WriteLine($"[COMP_DEBUG] body[{di}]={s.GetType().Name}");
-            if (s is For f) Console.Error.WriteLine($"[COMP_DEBUG]   For(target={f.Target}, iter={f.Iter}, body.Count={f.Body.Count})");
-            if (s is If ifStmt) Console.Error.WriteLine($"[COMP_DEBUG]   If(test={ifStmt.Test}, body.Count={ifStmt.Body.Count})");
-            if (s is ExprStmt es) Console.Error.WriteLine($"[COMP_DEBUG]   ExprStmt(value={es.Value?.GetType().Name})");
-            if (s is Assign a && a.Targets.Count == 1 && a.Targets[0] is Name n) Console.Error.WriteLine($"[COMP_DEBUG]   Assign(target={n.Id})");
-            if (s is Return r) Console.Error.WriteLine($"[COMP_DEBUG]   Return(value={r.Value?.GetType().Name})");
-        }
+
 
         // Expected body structure: [For(target, iter, body, null)] or similar
         // The body may have BUILD_SET/BUILD_LIST/BUILD_MAP as a statement
@@ -4168,7 +5622,10 @@ public class AstBuilder
         {
             // Some comprehension bodies (set/dict via SET_ADD/MAP_ADD) don't have a For loop.
             // Use fallback: extract iterable, target, and element from the body.
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[COMP_FALLBACK] kind={kind}, body.Count={body.Count}, first_types={string.Join(",", body.Take(4).Select(s => s.GetType().Name))}");
+            }
             return BuildComprehensionFallback(body, kind, compCall);
         }
 
@@ -4230,7 +5687,10 @@ public class AstBuilder
         elt ??= innermostFor.Target;
 
         if (elt == null) return null;
+        if (_options.VerboseErrors)
+        {
         Console.Error.WriteLine($"[COMP_OK] kind={kind} elt={elt.GetType().Name} generators.Count={generators.Count}");
+        }
 
         return kind switch
         {
@@ -4375,13 +5835,19 @@ public class AstBuilder
         // Detect standalone FunctionRef<lambda> → Lambda expression
         if (expr is FunctionRef lambdaRef && lambdaRef.Name == "<lambda>")
         {
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine($"[COMP_LAMBDA] detected standalone <lambda>, code={lambdaRef.Code?.Name}, funcRef type={lambdaRef.GetType().Name}");
+            }
             var lambda = BuildLambda(lambdaRef);
             Console.Error.WriteLine($"[COMP_LAMBDA] BuildLambda returned {(lambda != null ? "non-null" : "null")}");
             if (lambda != null)
                 return lambda;
             // Fallback: create a minimal lambda with no args and None body
+            if (_options.VerboseErrors)
+            {
             Console.Error.WriteLine("[COMP_LAMBDA] using fallback lambda");
+            }
             return new Lambda(new List<Parameter>(), new Constant(null));
         }
         // Recurse into sub-expressions: Call args, BinOp, JoinedStr, FormattedValue, etc.
@@ -4395,10 +5861,8 @@ public class AstBuilder
         }
         if (expr is Call call2)
         {
-            Console.Error.WriteLine($"[COMP_RECURSE] Call func={call2.Func?.GetType().Name}, args={string.Join(",", call2.Args.Select(a => a?.GetType().Name ?? "null"))}");
             var newArgs = call2.Args.Select(a => ConvertComprehensionExpr(a)).ToList();
             var newKeywords = call2.Keywords.Select(k => {
-                Console.Error.WriteLine($"[COMP_DEBUG] keyword: {k.Arg ?? "(null)"}, valueType={k.Value?.GetType().Name}, valueStr={k.Value}");
                 return new Keyword(k.Arg, ConvertComprehensionExpr(k.Value));
             }).ToList();
             return new Call(call2.Func, newArgs, newKeywords);

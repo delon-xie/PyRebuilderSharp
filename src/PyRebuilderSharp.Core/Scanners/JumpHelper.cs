@@ -10,7 +10,9 @@ public static class JumpHelper
 {
     public static bool IsTerminal(Opcode op) => op switch
     {
-        Opcode.RETURN_VALUE or Opcode.RAISE_VARARGS => true,
+        Opcode.RETURN_VALUE or Opcode.RAISE_VARARGS
+            or Opcode.RETURN_GENERATOR_313 or Opcode.END_FOR_313
+            or Opcode.INTERPRETER_EXIT => true,
         _ => false
     };
 
@@ -19,13 +21,14 @@ public static class JumpHelper
         Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
             or Opcode.POP_JUMP_IF_TRUE_PY38 or Opcode.POP_JUMP_IF_FALSE_PY38
             or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-            or Opcode.FOR_ITER => true,
+            or Opcode.FOR_ITER or Opcode.POP_JUMP_IF_NONE or Opcode.POP_JUMP_IF_NOT_NONE => true,
         _ => false
     };
 
     public static bool IsUnconditionalJump(Opcode op) => op switch
     {
-        Opcode.JUMP_ABSOLUTE or Opcode.JUMP_FORWARD or Opcode.JUMP_BACKWARD => true,
+        Opcode.JUMP_ABSOLUTE or Opcode.JUMP_FORWARD or Opcode.JUMP_BACKWARD
+            or Opcode.JUMP_BACKWARD_NO_INTERRUPT => true,
         _ => false
     };
 

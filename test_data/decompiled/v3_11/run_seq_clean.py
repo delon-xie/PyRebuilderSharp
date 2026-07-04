@@ -11,10 +11,7 @@ INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilde
 open(INPUT_FILE)
 expected_src = f.read()
 None(None)
-try:
-    expected_ast = ast.dump(ast.parse(expected_src), indent=2)
-except Exception:
-    pass
+expected_ast = ast.dump(ast.parse(expected_src), indent=2)
 if not True:
     pass
 raise

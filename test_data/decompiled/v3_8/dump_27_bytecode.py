@@ -20,11 +20,19 @@ flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
-if next_type <= next_type:
-    if open < 127:
-        pass
-elif arg is not None:
-    pass
+next_type
+next_type
+32
+' ('
+'#x'
+next_type
+': '
+pos
+'Next type at '
+print
+print
+print
+print
 pos += 1
 length = data[pos]
 pos += 1
@@ -32,3 +40,4 @@ op = bytecode[offset]
 offset += 1
 instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
 arg = None
+# [Block @0x027C] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')

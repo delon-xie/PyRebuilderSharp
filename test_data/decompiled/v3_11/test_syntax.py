@@ -3077,11 +3077,14 @@ while 1:
         text of the exception raised.  If subclass is specified it
         is the expected subclass of SyntaxError (e.g. IndentationError).
         """
-        try:
-            compile(code, filename, mode)
-        except SyntaxError:
-            pass
+        compile(code, filename, mode)
         self.fail('compile() did not raise SyntaxError')
+        # [WARN] 5 instructions not decompiled
+        #   @0x010E: POP_JUMP_IF_NOT_NONE arg=48
+        #   @0x0178: POP_JUMP_IF_NONE arg=54
+        #   @0x01B2: POP_JUMP_IF_NONE arg=54
+        #   @0x01EC: POP_JUMP_IF_NONE arg=54
+        #   @0x0226: POP_JUMP_IF_NONE arg=66
 
     def test_expression_with_assignment(self):
         self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
@@ -3263,10 +3266,7 @@ pass
 
 pass
 """
-        try:
-            compile(s, '<string>', 'exec')
-        except SyntaxError:
-            pass
+        compile(s, '<string>', 'exec')
 
     def test_continuation_bad_indentation(self):
         code = """\\
