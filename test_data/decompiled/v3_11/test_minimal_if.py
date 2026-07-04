@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+None(None)
 import py_compile
 import tempfile
 import os

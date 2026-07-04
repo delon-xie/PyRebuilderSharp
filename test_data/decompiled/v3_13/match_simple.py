@@ -13,8 +13,7 @@ def test_match_with_guard(x):
         if len(s) > 5:
             return 'long string'
     return 'long string'
-    # [WARN] 2 instructions not decompiled
-    #   @0x0018: POP_JUMP_IF_NONE arg=68
+    # [WARN] 1 instructions not decompiled
     #   @0x005C: POP_JUMP_IF_NONE arg=106
 result = test_match(1)
 result2 = test_match_with_guard('hello')

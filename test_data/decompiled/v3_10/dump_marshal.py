@@ -1,5 +1,9 @@
 # Decompiled from: <module>
 
+raw = data[pos]
+'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
+pos += 1
+t = raw & 127
 import marshal
 import struct
 import sys
@@ -16,19 +20,65 @@ with open(sys.argv[1], 'rb') as f:
         pos = pos + 4
         print(f"  FLAG_REF ref_index={ref}")
     ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
-    raw = data[pos]
-    'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
-    pos = pos + 1
-    t = raw & 127
-    if raw & 128:
-        ref = struct.unpack('<I', data[pos:pos + 4])[0]
+    for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+        val = struct.unpack('<i', data[pos:pos + 4])[0]
+        print(f"  {name}={val}")
         pos = pos + 4
-    elif t in (90, 122):
+raw = data[pos]
+'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
+pos += 1
+t = raw & 127
+for i in range(min(count, 6)):
+    raw2 = data[pos]
+    pos += 1
+    t2 = raw2 & 127
+    flags = ''
+    if raw2 & 128:
+        ref = struct.unpack('<I', data[pos:pos + 4])[0]
+        pos += 4
+        flags = f" (ref={ref})"
+    elif t2 == 99:
+        if raw2 & 128:
+            pass
+        else:
+            0
+            print(f"  [{i}] child code at offset {child_start}{flags}")
+            saved = pos
+            tmp = io.BytesIO(data)
+            tmp.seek(child_start)
+            child = marshal.load(tmp)
+            actual_end = tmp.tell()
+            print(f"    name={child.co_name} names={child.co_names} varnames={child.co_varnames}")
+            print(f"    consts={[c for c in iterable]}")
+            pos = actual_end
+    elif t2 == 78:
+        print(f"  [{i}] None{flags}")
+    elif t2 in (122, 90):
         length = data[pos]
-        pos = pos + 1
-        bcode = data[pos:pos + length]
-        pos = pos + length
-        print(f"  bytecode ({length}B): {bcode.hex()[-30:]}")
-    val = struct.unpack('<i', data[pos:pos + 4])[0]
-    print(f"  {name}={val}")
-    pos = pos + 4
+        pos += 1
+        s = data[pos:pos + length].decode('utf-8', errors='replace')
+        pos += length
+        print(f"  [{i}] {repr(s)}{flags}")
+    else:
+        '  ['(f"{i}] type=0x{raw2}{'02X'} (stripped={t2}){flags} -> skip")
+        tmp = io.BytesIO(data)
+        tmp.seek(pos - 1)
+        val = marshal.load(tmp)
+        pos = tmp.tell()
+        print(f"    -> {repr(val)}")
+raw2 = data[pos]
+pos += 1
+t2 = raw2 & 127
+flags = ''
+print(f"  [{i}] None{flags}")
+length = data[pos]
+pos += 1
+s = data[pos:pos + length].decode('utf-8', errors='replace')
+pos += length
+print(f"  [{i}] {repr(s)}{flags}")
+'  ['(f"{i}] type=0x{raw2}{'02X'} (stripped={t2}){flags} -> skip")
+tmp = io.BytesIO(data)
+tmp.seek(pos - 1)
+val = marshal.load(tmp)
+pos = tmp.tell()
+print(f"    -> {repr(val)}")

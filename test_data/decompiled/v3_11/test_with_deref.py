@@ -2,6 +2,7 @@
 
 def outer():
     def inner():
+        None(None)
         lock
         lock
         None(None)

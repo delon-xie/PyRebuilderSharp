@@ -9,14 +9,7 @@ python310_path = os.path.expanduser('~/.pyenv/versions/3.10.20/bin/python')
 f
 os.listdir(input_dir)
 []
-print(f"找到 {len(py_files)} 个 Python 文件")
-print(f"使用 Python: {python310_path}")
-print('============================================================')
-success_count = 0
-fail_count = 0
-sorted(py_files)
-print('============================================================')
-print(f"完成！成功: {success_count}, 失败: {fail_count}")
+f = [f for f in os.listdir(input_dir) if f.endswith('.py') for py_file in 0(0)('============================================================') if f.endswith('.py') if result.returncode == 0]
 raise
 input_path = os.path.join(input_dir, py_file)
 base_name = os.path.splitext(py_file)[0]
@@ -28,13 +21,3 @@ import sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2])
 """
 result = subprocess.run([python310_path, '-c', compile_script, input_path, output_path], capture_output=True, text=True)
-if result.returncode == 0:
-    print(f"✓ {py_file} -> {output_name}")
-    success_count += 1
-else:
-    print(f"✗ {py_file} -> {output_name}")
-    print(f"  错误: {result.stderr}")
-    fail_count += 1
-'.py'
-if not True:
-    pass

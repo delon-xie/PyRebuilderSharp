@@ -27,15 +27,14 @@ print(f"  magic: {raw[0:4].hex()}")
 print(f"  hdr:   {raw[4:16].hex()}")
 range(17, 40)
 print
-print("""
-Bytes 16-50:""")
-range(16, 50, 2)
+for off in range(17, 40):
+    if not raw[off:off + 4] == b'AAAAAA==':
+        pass
+    else:
+        print(f"  4 zero bytes at offset {off}")
 if not f:
     pass
 raise
-pair = raw[i:i + 2]
-'  '(f"{i}3d: {pair.hex()}")
-if not raw[off:off + 4] == b'AAAAAA==':
-    pass
-else:
-    print(f"  4 zero bytes at offset {off}")
+for i in range(16, 50, 2):
+    pair = raw[i:i + 2]
+    '  '(f"{i}3d: {pair.hex()}")

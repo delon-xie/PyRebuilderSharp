@@ -1,5 +1,8 @@
 # Decompiled from: <module>
 
+i = 0
+x = 1
+y = 2
 x = 1
 y = 2
 if x < y:

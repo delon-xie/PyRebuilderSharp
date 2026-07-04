@@ -40,22 +40,22 @@ r = obj.attr
 s = x if cond else y
 """}
 tests.items()
-py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
-pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
-out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
-f = open(py_path, 'w')
-f.write(code)
-r = subprocess.run([PY27, '-c', """import py_compile, sys
-py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], capture_output=True, text=True, timeout=10)
-r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], capture_output=True, text=True, timeout=30)
-print(f"\n{'=================================================='}")
-print(f"Test: {name}")
-with open(py_path, 'w') as f:
+for (name, code) in tests.items():
+    py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
+    pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
+    out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
+    f = open(py_path, 'w')
     f.write(code)
-print(f"Decompile: {r2.stdout.strip()[:100]}")
-if os.path.exists(out_path):
-    f = open(out_path)
-    content = f.read().strip()
-    print(f"Output ({len(content)} bytes):\n{content[:300]}")
-r.stderr.strip()
-print(f"Error: {r2.stderr[:200]}")
+    r = subprocess.run([PY27, '-c', """import py_compile, sys
+py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], capture_output=True, text=True, timeout=10)
+    r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], capture_output=True, text=True, timeout=30)
+    print(f"\n{'=================================================='}")
+    print(f"Test: {name}")
+    if r.stdout.strip():
+        r.stderr.strip()
+    print(f"Decompile: {r2.stdout.strip()[:100]}")
+    if os.path.exists(out_path):
+        f = open(out_path)
+        content = f.read().strip()
+        print(f"Output ({len(content)} bytes):\n{content[:300]}")
+    print(f"Error: {r2.stderr[:200]}")

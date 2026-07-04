@@ -13,4 +13,3 @@ open(INPUT_PY)
 __module__
 open(INPUT_PY)
 content = f.read()
-raise

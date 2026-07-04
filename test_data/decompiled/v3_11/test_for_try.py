@@ -2,5 +2,5 @@
 
 total = 0
 range(3)
-return
-total += 1
+for i in range(3):
+    total += 1

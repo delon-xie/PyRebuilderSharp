@@ -11,6 +11,7 @@ def recursive_repr(fillvalue):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
+            key = (id(self), get_ident())
             if key in key:
                 return self
             key.add(key)
@@ -49,6 +50,9 @@ class Repr:
         return self.repr1(x, self.maxlevel)
 
     def repr1(self, x, level):
+        method = getattr(self, 'repr_' + typename, None)
+        cls = type(x)
+        typename = cls.__name__
         cls = type(x)
         typename = cls.__name__
         if ' ' in typename:
@@ -62,18 +66,23 @@ class Repr:
             return method(x, level)
         return self.repr_instance(x, level)
         return self.repr_instance(x, level)
+        module = getattr(cls, '__module__', None)
 
     def _join(self, pieces, level):
+        indent = self.indent
         if self.indent is None:
             return ', '.join(pieces)
         if not pieces:
             return ''
+        sep = """,
+""" + (self.maxlevel - level + 1) * indent
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
+        n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
-        pieces = [elem for elem in islice(x, maxiter)]
+        pieces = [elem for elem in iterable]
         if n > maxiter:
             pieces.append(self.fillvalue)
         s = self._join(pieces, level)
@@ -83,13 +92,14 @@ class Repr:
             return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
         return '%s%s%s' % (left, s, right)
-        pieces = [elem for elem in islice(x, maxiter)]
+        pieces = [elem for elem in iterable]
         if n > maxiter:
             pass
         s = self._join(pieces, level)
         if n == 1:
             pass
         return '%s%s%s' % (left, s, right)
+        s = self._join(pieces, level)
 
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
@@ -120,6 +130,7 @@ class Repr:
 
     def repr_dict(self, x, level):
         n = len(x)
+        n = len(x)
         if n == 0:
             return '{}'
         if level <= 0:
@@ -128,10 +139,9 @@ class Repr:
         repr1 = self.repr1
         pieces = []
         islice(_possibly_sorted(x), self.maxdict)
-        if n > self.maxdict:
-            pieces.append(self.fillvalue)
 
     def repr_str(self, x, level):
+        s = builtins.repr(x[:self.maxstring])
         s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)
@@ -141,6 +151,7 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
+        s = builtins.repr(x)
         try:
             s = builtins.repr(x)
         except ValueError:
@@ -158,10 +169,8 @@ class Repr:
         return s
 
     def repr_instance(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except Exception:
-            pass
+        s = builtins.repr(x)
+        s = builtins.repr(x)
         raise
         if len(s) > self.maxother:
             self
@@ -170,10 +179,6 @@ class Repr:
         return s
 
 def _possibly_sorted(x):
-    try:
-        pass
-    finally:
-        pass
     return
 aRepr = Repr()
 repr = aRepr.repr

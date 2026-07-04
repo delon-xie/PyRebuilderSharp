@@ -137,6 +137,8 @@ public class ControlFlowScanner : IControlFlowScanner
                     if (processedHeaders.Contains(block)) continue;
                     processedHeaders.Add(block);
 
+                    Console.Error.WriteLine($"[CFG_DEBUG] Found backedge: block=0x{block.StartOffset:X4}, pred=0x{pred.StartOffset:X4}, pred dominates block={predDom.Contains(block)}");
+
                     var loopBody = CollectLoopBody(block, pred);
                     
                     if (Diag.Verbose)

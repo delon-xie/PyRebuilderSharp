@@ -14,9 +14,7 @@ def test_match_with_guard(x):
             return 'long string'
         return 'integer'
         return 'short string'
-    # [WARN] 3 instructions not decompiled
-    #   @0x0018: POP_JUMP_IF_NONE arg=38
+    # [WARN] 1 instructions not decompiled
     #   @0x0058: POP_JUMP_IF_NONE arg=10
-    #   @0x0078: POP_JUMP_IF_NONE arg=6
 result = test_match(1)
 result2 = test_match_with_guard('hello')

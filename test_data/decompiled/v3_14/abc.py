@@ -158,23 +158,12 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
 """
-    value = getattr(cls, name, None)
     if not hasattr(cls, '__abstractmethods__'):
         return cls
+    abstracts = set()
+    cls.__bases__
     for scls in cls.__bases__:
         pass
-    for scls in cls.__bases__:
-        getattr(scls, '__abstractmethods__', ())
-        value = getattr(cls, name, None)
-        if not getattr(value, '__isabstractmethod__', False):
-            pass
-        else:
-            abstracts.add(name)
-    for (value, name) in cls.__dict__.items():
-        if not getattr(value, '__isabstractmethod__', False):
-            pass
-        else:
-            abstracts.add(name)
     for (value, name) in cls.__dict__.items():
         if not getattr(value, '__isabstractmethod__', False):
             pass
@@ -186,4 +175,3 @@ class ABC(metaclass=ABCMeta):
     inheritance.
 """
     __slots__ = ()
-raise

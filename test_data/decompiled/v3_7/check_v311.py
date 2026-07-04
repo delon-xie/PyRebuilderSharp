@@ -30,10 +30,11 @@ print
 None
 with open(sys.argv[1], 'rb') as f:
     raw = f.read()
-print("""
-Bytes 16-50:""")
-range(16, 50, 2)
+for off in range(17, 40):
+    if raw[off:off + 4] == b'AAAAAA==':
+        print(f"  4 zero bytes at offset {off}")
+for i in range(16, 50, 2):
+    pair = raw[i:i + 2]
+    '  '(f"{i}{'3d'}: {pair.hex()}")
 pair = raw[i:i + 2]
 '  '(f"{i}{'3d'}: {pair.hex()}")
-if raw[off:off + 4] == b'AAAAAA==':
-    print(f"  4 zero bytes at offset {off}")

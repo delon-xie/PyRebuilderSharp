@@ -11,6 +11,7 @@ def recursive_repr(fillvalue):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
+            key = (id(self), get_ident())
             if key in key:
                 return self
         wrapper.__module__ = getattr(user_function, '__module__')
@@ -48,6 +49,8 @@ class Repr:
         method = getattr(self, 'repr_' + typename, None)
         cls = type(x)
         typename = cls.__name__
+        cls = type(x)
+        typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
@@ -61,6 +64,7 @@ class Repr:
 """ + (self.maxlevel - level + 1) * indent
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
+        n = len(x)
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
@@ -89,6 +93,7 @@ class Repr:
 
     def repr_dict(self, x, level):
         n = len(x)
+        n = len(x)
         if n == 0:
             return '{}'
         key = [pieces.append('%s: %s' % (keyrepr, valrepr)) for key in islice(_possibly_sorted(x), self.maxdict)]
@@ -98,6 +103,7 @@ class Repr:
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])
+        s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)
             j = max(0, self.maxstring - 3 - i)
@@ -105,6 +111,7 @@ class Repr:
             s = s[:i] + self.fillvalue + s[len(s) - j:]
 
     def repr_int(self, x, level):
+        s = builtins.repr(x)
         try:
             s = builtins.repr(x)
         except ValueError:
@@ -115,10 +122,8 @@ class Repr:
             s = s[:i] + self.fillvalue + s[len(s) - j:]
 
     def repr_instance(self, x, level):
-        try:
-            s = builtins.repr(x)
-        except Exception:
-            pass
+        s = builtins.repr(x)
+        s = builtins.repr(x)
         if len(s) > self.maxother:
             i = max(0, (self.maxother - 3) // 2)
             j = max(0, self.maxother - 3 - i)

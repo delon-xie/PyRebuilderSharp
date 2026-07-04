@@ -618,11 +618,20 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitTry(Try tryStmt)
     {
+        bool hasHandlers = tryStmt.Handlers != null && tryStmt.Handlers.Count > 0;
+        bool hasFinally = tryStmt.Finalbody != null && tryStmt.Finalbody.Count > 0;
+        
+        if (!hasHandlers && !hasFinally)
+        {
+            foreach (var stmt in tryStmt.Body)
+                Visit(stmt);
+            return;
+        }
+
         WriteIndent();
         _output.AppendLine("try:");
 
         _indentLevel++;
-        // 合并连续的相同模块 import 语句
         var mergedBody = MergeConsecutiveImports(tryStmt.Body);
         foreach (var stmt in mergedBody)
             Visit(stmt);
@@ -647,9 +656,14 @@ public class PythonCodeGenerator : ICodeGenerator
             _output.AppendLine(":");
 
             _indentLevel++;
-            foreach (var stmt in handler.Body)
-                Visit(stmt);
-            if (handler.Body.Count == 0)
+            if (handler.Body != null)
+            {
+                foreach (var stmt in handler.Body)
+                    Visit(stmt);
+                if (handler.Body.Count == 0)
+                    EmitEmptyBodyPass();
+            }
+            else
                 EmitEmptyBodyPass();
             _indentLevel--;
         }

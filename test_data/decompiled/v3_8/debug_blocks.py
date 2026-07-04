@@ -26,7 +26,7 @@ for (i, start) in enumerate(sorted_leaders):
     if i + 1 < len(sorted_leaders):
         pass
     instrs[-1].offset + 2
-    block_instrs = [start for ins in instrs]
+    block_instrs = [ins for ins in instrs]
     if len(block_instrs) > 3:
         pass
     f"{'3d'}-{end - 1}{'3d'}]: {', '.join((ins for ins in block_instrs))}"
@@ -39,7 +39,4 @@ for (i, start) in enumerate(sorted_leaders):
         for ins in block_instrs:
             if ins.opname == 'JUMP_ABSOLUTE':
                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
-for ins in block_instrs:
-    if ins.opname == 'JUMP_ABSOLUTE':
-        print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

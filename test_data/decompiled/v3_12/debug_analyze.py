@@ -1,5 +1,12 @@
 # Decompiled from: <module>
 
+@defaultdict
+def version_stats():
+    return {'total': 0, 'passed': 0, 'failed': 0}
+lines = output.split("""
+""")
+i = 0
+debug_count = 0
 import re
 from collections import defaultdict
 open('/tmp/test_full.txt', 'r')
@@ -67,3 +74,5 @@ if i < len(lines):
     print(f"Total tests with versions found: {debug_count}")
 print(f"Total tests with versions found: {debug_count}")
 next_line = lines[j]
+version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+i += 1

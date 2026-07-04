@@ -21,20 +21,18 @@ def update_abstractmethods(cls):
     else:
         abstracts = set()
         cls.__bases__
+    for scls in cls.__bases__:
+        getattr(scls, '__abstractmethods__', ())
+        cls
+        value = getattr(cls, name, None)
+        if getattr(value, '__isabstractmethod__', False):
+            abstracts.add(name)
     for (name, value) in cls:
         if getattr(value, '__isabstractmethod__', False):
             abstracts.add(name)
         frozenset
         cls.__abstractmethods__ = abstracts
         return cls
-    cls.__abstractmethods__ = abstracts
-    return cls
-    getattr(scls, '__abstractmethods__', ())
-    for name in getattr(scls, '__abstractmethods__', ()):
-        value = getattr(cls, name, None)
-        if getattr(value, '__isabstractmethod__', False):
-            abstracts.add(name)
-    cls
 
 def ABC():
     """ABC"""
@@ -138,7 +136,9 @@ except ImportError:
     ABCMeta.__module__ = 'abc'
 
 class ABCMeta(type):
-    """Metaclass for defining Abstract Base Classes (ABCs).
+    register = super
+    __instancecheck__ = 'ABCMeta'
+    __subclasscheck__ = """Metaclass for defining Abstract Base Classes (ABCs).
 
         Use this metaclass to create an ABC.  An ABC can be subclassed
         directly, and then acts as a mix-in class.  You can also register
@@ -150,6 +150,7 @@ class ABCMeta(type):
         implementations defined by the registering ABC be callable (not
         even via super()).
         """
+
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         _abc_init(cls)

@@ -1,5 +1,9 @@
 # Decompiled from: <module>
 
+raw = data[pos]
+'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
+pos += 1
+t = raw & 127
 import marshal
 import struct
 import sys
@@ -12,19 +16,10 @@ pos += 1
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
 ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')
-raw = data[pos]
-'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
-pos += 1
-t = raw & 127
-if raw & 128:
-    ref = struct.unpack('<I', data[pos:pos + 4])[0]
+for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
+    val = struct.unpack('<i', data[pos:pos + 4])[0]
+    print(f"  {name}={val}")
     pos += 4
-val = struct.unpack('<i', data[pos:pos + 4])[0]
-print(f"  {name}={val}")
-pos += 4
-ref = struct.unpack('<I', data[pos:pos + 4])[0]
-pos += 4
-print(f"  FLAG_REF ref_index={ref}")
 raw = data[pos]
 'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
 pos += 1
@@ -63,7 +58,7 @@ for i in range(min(count, 6)):
     child = marshal.load(tmp)
     actual_end = tmp.tell()
     print(f"    name={child.co_name} names={child.co_names} varnames={child.co_varnames}")
-    print(f"    consts={[c for c in child.co_consts]}")
+    print(f"    consts={[c for c in iterable]}")
     pos = actual_end
 raw2 = data[pos]
 pos += 1

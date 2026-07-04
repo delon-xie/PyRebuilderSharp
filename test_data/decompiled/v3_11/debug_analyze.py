@@ -1,5 +1,13 @@
 # Decompiled from: <module>
 
+@defaultdict
+def version_stats():
+    return {'total': 0, 'passed': 0, 'failed': 0}
+lines = output.split("""
+""")
+i = 0
+debug_count = 0
+None(None)
 import re
 from collections import defaultdict
 open('/tmp/test_full.txt', 'r')
@@ -63,4 +71,5 @@ print(f"Total tests with versions found: {debug_count}")
 if not True:
     pass
 raise
+version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 # [Block @0x0358] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')

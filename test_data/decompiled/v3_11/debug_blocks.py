@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+None(None)
 import dis
 import marshal
 import types
@@ -16,6 +17,11 @@ for const in code.co_consts:
                 pass
             elif instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
                 pass
+            leaders.add(instr.arg)
+            if i + 1 < len(instrs):
+                pass
+            leaders.add(instr.arg)
+    None
 return
 if not True:
     pass

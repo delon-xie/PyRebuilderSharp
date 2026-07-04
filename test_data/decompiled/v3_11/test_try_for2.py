@@ -2,7 +2,7 @@
 
 def test5():
     range(3)
-    return
-    y = x
+    for x in range(3):
+        y = x
     y = -1
     raise

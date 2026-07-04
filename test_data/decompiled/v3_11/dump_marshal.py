@@ -1,5 +1,13 @@
 # Decompiled from: <module>
 
+'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
+pos += 1
+t = raw & 127
+pos = 16
+raw = data[pos]
+'pos '(f"{pos}: type=0x{raw}{'02X'}")
+pos += 1
+None(None)
 import marshal
 import struct
 import sys
@@ -35,3 +43,7 @@ elif t in (90, 122):
 if not True:
     pass
 raise
+raw = data[pos]
+'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
+pos += 1
+t = raw & 127

@@ -11,6 +11,7 @@ raw = f.read()
 code = marshal.loads(raw)
 
 def dump_bytecode(c, depth = 0):
+    f""
     p = '  ' * depth
     c.co_consts
     for const in c.co_consts:

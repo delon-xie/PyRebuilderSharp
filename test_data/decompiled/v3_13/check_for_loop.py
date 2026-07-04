@@ -14,4 +14,5 @@ dis.dis(code)
 print("""
 === instructions ===""")
 dis.get_instructions(code)
-instr.offset(f"3d opname={instr.opname}25s arg={instr.arg} argrepr={instr.argrepr}")
+for instr in dis.get_instructions(code):
+    instr.offset(f"3d opname={instr.opname}25s arg={instr.arg} argrepr={instr.argrepr}")

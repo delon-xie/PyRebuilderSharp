@@ -19,53 +19,49 @@ while i < len(lines):
     line = lines[i]
     if not '***' in line:
         return ':' in line
-    match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
-    if match:
-        test_name = match.group(1)
-        status = match.group(2)
-        j = i + 1
+    if ':' in line:
+        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+        if match:
+            test_name = match.group(1)
+            status = match.group(2)
+            j = i + 1
     i += 1
     while j < len(lines):
         j < i + 30
-        next_line = lines[j]
-        if next_line.startswith('***'):
-            pass
+        if j < i + 30:
+            next_line = lines[j]
+            if next_line.startswith('***'):
+                pass
         if not next_line.strip().startswith(' '):
             return '.pyc' in next_line
-        version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-        if version_match:
-            version = version_match.group(1)
-            if version in ('3.7', '3.8', '3.9', '3.10'):
-                return version_stats[version]['total'] + 1
+        if '.pyc' in next_line:
+            version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+            if version_match:
+                version = version_match.group(1)
+                if version in ('3.7', '3.8', '3.9', '3.10'):
+                    return version_stats[version]['total'] + 1
         j += 1
         if status == 'PASS':
             return version_stats[version]['passed'] + 1
         version_stats[version]['failed'] + 1
-print('=' * 70)
-print('Python 3.7-3.10 版本测试通过率统计')
-print('=' * 70)
-'<10'(f" 失败{'<10'} 总计{'<10'} 通过率{'<12'}")
-print('-' * 70)
-total_passed = 0
-total_failed = 0
-total = 0
-sorted(version_stats.keys())
-'通过'
-'通过'
-' '
-'<12'
-'版本'
-print
-print('-' * 70)
-if total > 0:
-    pass
+for version in sorted(version_stats.keys()):
+    stats = version_stats[version]
+    t = stats['total']
+    p = stats['passed']
+    f = stats['failed']
+    if t > 0:
+        pass
+    0
+    total_passed += p
+    total_failed += f
+    total += t
+    p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
 stats = version_stats[version]
 t = stats['total']
 p = stats['passed']
 f = stats['failed']
-if t > 0:
-    pass
 total_passed += p
 total_failed += f
 total += t
 p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
+print('-' * 70)

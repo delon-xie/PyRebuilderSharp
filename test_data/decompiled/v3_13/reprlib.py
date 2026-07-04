@@ -12,6 +12,7 @@ def recursive_repr(fillvalue = '...'):
         repr_running = set()
         def wrapper(self):
             key = (id(self), get_ident())
+            key = (id(self), get_ident())
             if key in repr_running:
                 return fillvalue
             repr_running.add(key)
@@ -55,6 +56,8 @@ class Repr:
     def repr1(self, x, level):
         cls = type(x)
         typename = cls.__name__
+        cls = type(x)
+        typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
@@ -66,6 +69,8 @@ class Repr:
             return method(self, v_18)
         return self.repr_instance(self, v_18)
         return self.repr_instance(self, v_18)
+        method = getattr(self, 'repr_' + typename, None)
+        module = getattr(cls, '__module__', None)
 
     def _join(self, pieces, level):
         if self.indent:
@@ -74,16 +79,18 @@ class Repr:
         if isinstance(indent, int) and (indent < 0):
             raise ValueError(f"Repr.indent cannot be negative int (was {indent})")
         indent *= ' '
-        sep = """,
-""" + (self.maxlevel - level + 1) * indent
-        if not -len(indent):
-            return None
-        return
+        for _ in iterable:
+            if not -len(indent):
+                return None
+            return
+        if self:
+            pass
+        raise
+        raise
         return ''
-        # [WARN] 1 instructions not decompiled
-        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=62
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
+        n = len(x)
         n = len(x)
         if level <= 0:
             if n:
@@ -93,22 +100,13 @@ class Repr:
             elem
             islice(self, v_21)
             []
-            if self > v_117:
-                pieces.append(self.fillvalue)
-            s = self._join(self, v_194)
-            if (n == 1) and trail:
-                if self.indent:
-                    right = self + v_100
-                return f"{left}{s}{right}"
-            return f"{left}{s}{right}"
-            return f"{left}{s}{right}"
+            pieces = [repr1(self, v_185) for elem in islice(self, v_21)]
             raise
         newlevel = level - 1
         repr1 = self.repr1
         elem
         islice(self, v_21)
-        # [WARN] 1 instructions not decompiled
-        #   @0x0140: POP_JUMP_IF_NOT_NONE arg=332
+        s = self._join(self, v_194)
 
     def repr_tuple(self, x, level):
         return self._repr_iterable(self, v_18, '(', ')', self.maxtuple, ',')
@@ -139,6 +137,7 @@ class Repr:
 
     def repr_dict(self, x, level):
         n = len(x)
+        n = len(x)
         if n == 0:
             return '{}'
         if level <= 0:
@@ -147,10 +146,9 @@ class Repr:
         repr1 = self.repr1
         pieces = []
         islice(_possibly_sorted(x), self.maxdict)
-        if self > v_48.maxdict:
-            pieces.append(self.fillvalue)
 
     def repr_str(self, x, level):
+        s = builtins.repr(x[:self.maxstring])
         s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)

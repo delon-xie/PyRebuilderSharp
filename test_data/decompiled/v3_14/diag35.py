@@ -36,4 +36,3 @@ open('/tmp/diag35.cs', 'w')
 __module__
 open('/tmp/diag35.cs', 'w')
 f.write(test_code)
-raise

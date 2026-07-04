@@ -1,5 +1,12 @@
 # Decompiled from: <module>
 
+@defaultdict
+def version_stats():
+    return {'total': 0, 'passed': 0, 'failed': 0}
+lines = output.split("""
+""")
+i = 0
+None(None)
 import re
 from collections import defaultdict
 open('/tmp/test_full.txt', 'r')
@@ -117,3 +124,5 @@ print
 if not True:
     pass
 raise
+j += 1
+print('----------------------------------------------------------------------')

@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+None(None)
 import marshal
 import struct
 import sys

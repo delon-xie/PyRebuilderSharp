@@ -2,8 +2,5 @@
 
 total = 0
 range(3)
-try:
+for i in range(3):
     total += 1
-except:
-    pass
-continue

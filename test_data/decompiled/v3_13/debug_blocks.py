@@ -9,32 +9,4 @@ f.read(16)
 code = marshal.load(f)
 None(None)
 code.co_consts
-if not f:
-    pass
-raise
-raise
-if not isinstance(const, types.CodeType):
-    pass
-elif not const.co_name == 'depth_5_while':
-    pass
-else:
-    print('=== Block structure ===')
-    instrs = list(dis.Bytecode(const))
-    leaders = {0}
-    enumerate(instrs)
-    sorted_leaders = sorted(leaders)
-    enumerate(sorted_leaders)
-    if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
-        if instr.arg:
-            leaders.add(instr.arg)
-    elif not instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
-        pass
-    elif instr.arg:
-        leaders.add(instr.arg)
-        if not i + 1 < len(instrs):
-            pass
-        else:
-            leaders.add(instrs[i + 1].offset)
-# [WARN] 2 instructions not decompiled
-#   @0x019C: POP_JUMP_IF_NONE arg=474
-#   @0x0218: POP_JUMP_IF_NONE arg=594
+ins = [const for const in code.co_consts if not isinstance(const, types.CodeType) if const.co_name == 'depth_5_while' if i + 1 < len(sorted_leaders) if (<genexpr>)(block_instrs()) <= [] if ins.opname == 'JUMP_ABSOLUTE' if len(block_instrs) > 3]

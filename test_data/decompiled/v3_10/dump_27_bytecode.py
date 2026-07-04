@@ -1,5 +1,13 @@
 # Decompiled from: <module>
 
+bytecode = data[pos:pos + length]
+pos += length
+print(f"Bytecode length={length}")
+print(f"Bytecode hex: {bytecode.hex()}")
+HAVE_ARGUMENT = 90
+offset = 0
+instructions = []
+pos += 1
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
 data = open(path, 'rb').read()

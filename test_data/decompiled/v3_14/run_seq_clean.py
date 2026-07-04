@@ -13,12 +13,3 @@ open(INPUT_FILE)
 __module__
 open(INPUT_FILE)
 expected_src = f.read()
-raise
-if ast:
-    pass
-raise
-raise
-if ast:
-    pass
-raise
-raise

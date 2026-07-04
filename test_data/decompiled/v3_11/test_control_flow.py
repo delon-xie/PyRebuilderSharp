@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 i = 0
+i = 0
 if i < 5:
     j = i * 2
     i += 1

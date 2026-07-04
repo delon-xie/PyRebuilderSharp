@@ -7,4 +7,3 @@ open('/tmp/test_full.txt', 'r')
 __module__
 open('/tmp/test_full.txt', 'r')
 output = f.read()
-raise

@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 def test():
+    None(None)
     lock = object()
     lock
     None(None)

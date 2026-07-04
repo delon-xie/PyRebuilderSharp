@@ -11,6 +11,7 @@ def recursive_repr(fillvalue = '...'):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
+            key = (id(self), get_ident())
             if key in repr_running:
                 return fillvalue
             repr_running.add(key)
@@ -54,6 +55,8 @@ class Repr:
     def repr1(self, x, level):
         cls = type(x)
         typename = cls.__name__
+        cls = type(x)
+        typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
@@ -65,15 +68,16 @@ class Repr:
             return method(x, level)
         return self.repr_instance(x, level)
         return self.repr_instance(x, level)
+        method = getattr(self, 'repr_' + typename, None)
+        module = getattr(cls, '__module__', None)
 
     def _join(self, pieces, level):
         indent = self.indent
         if self.indent:
             return ', '.join(pieces)
-        # [WARN] 1 instructions not decompiled
-        #   @0x0018: POP_JUMP_IF_NOT_NONE arg=34
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
+        n = len(x)
         n = len(x)
         if level <= 0:
             if n:
@@ -83,21 +87,14 @@ class Repr:
             elem
             islice(x, maxiter)
             []
-            if n > maxiter:
-                pieces.append(self.fillvalue)
-            s = self._join(pieces, level)
-            if n == 1:
-                if trail:
-                    pass
-                return f"{left!s}{s!s}{right!s}"
-            return f"{left!s}{s!s}{right!s}"
+            for elem in islice(x, maxiter):
+                pass
             raise
         newlevel = level - 1
         repr1 = self.repr1
         elem
         islice(x, maxiter)
-        # [WARN] 1 instructions not decompiled
-        #   @0x012A: POP_JUMP_IF_NOT_NONE arg=10
+        s = self._join(pieces, level)
 
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
@@ -128,6 +125,7 @@ class Repr:
 
     def repr_dict(self, x, level):
         n = len(x)
+        n = len(x)
         if n == 0:
             return '{}'
         if level <= 0:
@@ -136,10 +134,9 @@ class Repr:
         repr1 = self.repr1
         pieces = []
         islice(_possibly_sorted(x), self.maxdict)
-        if n > self.maxdict:
-            pieces.append(self.fillvalue)
 
     def repr_str(self, x, level):
+        s = builtins.repr(x[:self.maxstring])
         s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)

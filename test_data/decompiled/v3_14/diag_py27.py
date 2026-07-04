@@ -40,15 +40,16 @@ r = obj.attr
 s = x if cond else y
 """}
 tests.items()
-py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
-pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
-out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
-__name__()
-open(py_path, 'w')
-__module__
-open(py_path, 'w')
-f.write(code)
-raise
-if not f:
-    pass
-raise
+for (name, code) in tests.items():
+    py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
+    pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
+    out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
+    __name__()
+    open(py_path, 'w')
+    __module__
+    open(py_path, 'w')
+    f.write(code)
+    return None
+    if not f:
+        pass
+    raise

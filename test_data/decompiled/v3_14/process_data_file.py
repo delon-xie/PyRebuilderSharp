@@ -12,14 +12,7 @@ def process_data_file(filename):
     lines = file.readlines()
     numbers = []
     lines
-    line = line.strip()
-    if not line:
-        pass
-    else:
-        num = int(line)
-        numbers.append(num)
-        print(f"[最内层 else] 成功解析数字: {num}")
-        raise
+    average = [line.strip() for line in lines if not line]
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')
@@ -33,7 +26,3 @@ abc
 30
 40
 """)
-raise
-if not f:
-    pass
-raise

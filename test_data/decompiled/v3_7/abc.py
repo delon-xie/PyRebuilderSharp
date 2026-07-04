@@ -90,10 +90,8 @@ class abstractproperty(property):
     instead.
     """
     __isabstractmethod__ = True
-try:
-    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
-except ImportError:
-    pass
+
+from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
 
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).

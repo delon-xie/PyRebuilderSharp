@@ -64,7 +64,7 @@ for i in range(min(count, 6)):
     child = marshal.load(tmp)
     actual_end = tmp.tell()
     print(f"    name={child.co_name} names={child.co_names} varnames={child.co_varnames}")
-    print(f"    consts={[c for c in child.co_consts]}")
+    print(f"    consts={[c for c in iterable]}")
     pos = actual_end
 raw2 = data[pos]
 pos += 1

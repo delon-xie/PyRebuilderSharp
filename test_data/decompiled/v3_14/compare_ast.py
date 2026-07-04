@@ -15,22 +15,23 @@ else:
     act_lines = actual_ast.split("""
 """)
     range(max(len(exp_lines), len(act_lines)))
-if i < len(exp_lines):
-    pass
-else:
-    '(missing)'
-    if i < len(act_lines):
+for i in range(max(len(exp_lines), len(act_lines))):
+    if i < len(exp_lines):
         pass
     else:
         '(missing)'
-        if not e != a:
+        if i < len(act_lines):
             pass
         else:
-            print(f"Line {i}:")
-            print(f"  expected: {e}")
-            print(f"  actual:   {a}")
-            if not i > 5:
+            '(missing)'
+            if not e != a:
                 pass
-raise
-for _ in iterable:
-    return None
+            else:
+                print(f"Line {i}:")
+                print(f"  expected: {e}")
+                print(f"  actual:   {a}")
+                if not i > 5:
+                    pass
+print(f"Line {i}:")
+print(f"  expected: {e}")
+print(f"  actual:   {a}")

@@ -1,10 +1,13 @@
 # Decompiled from: <module>
 
+None(None)
+
 def process_data_file(filename):
     """
     读取文件中的数字，计算平均值。
     演示嵌套的 try-except-else-finally 用法。
     """
+    print(f"[最内层 else] 成功解析数字: {num}")
     data = None
     print(f"[外层] 尝试打开文件: {filename}")
     file = open(filename, 'r')
@@ -12,13 +15,7 @@ def process_data_file(filename):
     lines = file.readlines()
     numbers = []
     lines
-    line = line.strip()
-    if not line:
-        pass
-    else:
-        num = int(line)
-        numbers.append(num)
-        print(f"[最内层 else] 成功解析数字: {num}")
+    average = [line.strip() for line in lines if not line]
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')
@@ -53,3 +50,4 @@ raise
 if not True:
     pass
 raise
+None(None)

@@ -109,16 +109,10 @@ class ABCMeta(type):
         cls = super().__new__(mcls, name, bases, namespace)
         abstracts = (<setcomp>)(namespace.items())
         bases
-        cls.__abstractmethods__ = frozenset(abstracts)
-        cls._abc_registry = WeakSet()
-        cls._abc_cache = WeakSet()
-        cls._abc_negative_cache = WeakSet()
-        cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
-        return cls
-        getattr(base, '__abstractmethods__', set())
-        value = getattr(cls, name, None)
-        if getattr(value, '__isabstractmethod__', False):
-            abstracts.add(name)
+        for base in bases:
+            for name in getattr(base, '__abstractmethods__', set()):
+                value = getattr(cls, name, None)
+                abstracts.add(name)
     __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
 
     Use this metaclass to create an ABC.  An ABC can be subclassed
@@ -153,11 +147,13 @@ class ABCMeta(type):
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         sorted(cls.__dict__.keys())
-        if name.startswith('_abc_'):
+        for name in sorted(cls.__dict__.keys()):
             value = getattr(cls, name)
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
+        subtype = type(instance)
+        subclass = instance.__class__
         subclass = instance.__class__
         if subclass in cls._abc_cache:
             return True
@@ -171,6 +167,7 @@ class ABCMeta(type):
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
+        ok = cls.__subclasshook__(subclass)
         if subclass in cls._abc_cache:
             return True
         if cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
@@ -193,6 +190,9 @@ class ABCMeta(type):
                     cls._abc_cache.add(subclass)
                     return True
                 cls._abc_registry
+        for scls in cls.__subclasses__():
+            cls._abc_cache.add(subclass)
+            return True
 
 def get_cache_token():
     """Returns the current ABC cache token.

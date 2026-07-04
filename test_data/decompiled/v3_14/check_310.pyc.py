@@ -12,22 +12,26 @@ code = marshal.loads(raw)
 
 def dump_bytecode(c, depth = 0):
     """  """
+    print(f"{p}--- {const.co_name} ---")
+    et = getattr(const, 'co_exceptiontable', None)
     p = '  ' * depth
     c.co_consts
-    if not hasattr(const, 'co_code'):
-        pass
-    elif not isinstance(const, types.CodeType):
-        pass
-    else:
-        print(f"{p}--- {const.co_name} ---")
-        et = getattr(const, 'co_exceptiontable', None)
-        if et:
+    for const in c.co_consts:
+        if not hasattr(const, 'co_code'):
+            pass
+        elif not isinstance(const, types.CodeType):
             pass
         else:
-            '(none)'
-            f""
+            print(f"{p}--- {const.co_name} ---")
+            et = getattr(const, 'co_exceptiontable', None)
             if et:
                 pass
-            dis.dis(const)
-            dump_bytecode(const, depth + 1)
+            else:
+                '(none)'
+                f""
+                if et:
+                    pass
+                dis.dis(const)
+                dump_bytecode(const, depth + 1)
+    f""
 dump_bytecode(code)

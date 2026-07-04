@@ -26,7 +26,7 @@ KNOWN_PATTERNS = {
     "orphan_raise": re.compile(r"(?<!\n)^\s*raise(?!\s+)", re.MULTILINE),
     "bare_elem": re.compile(r"(?<!\w)\belem\b(?!\s*=)", re.MULTILINE),
     "bare_list": re.compile(r"^\s*\[\]\s*$", re.MULTILINE),
-    "empty_try": re.compile(r"try:\s*\n\s*(?!except|finally)", re.MULTILINE),
+    "empty_try": re.compile(r"try:\s*\n\s*(?:pass\s*\n)?\s*(?=\n|$)", re.MULTILINE),
     "try_no_except_finally": re.compile(r"try:\s*\n(?:(?!except|finally).)*?(?=\n\s*return|\n\s*def|\Z)", re.DOTALL),
     "for_empty": re.compile(r"for\s+\w+\s+in\s+\[\]:", re.MULTILINE),
     "stray_pass": re.compile(r"(?<!\n)\s*pass\s*(?=\n\s*(?:if|for|while|return|def))", re.MULTILINE),
@@ -179,6 +179,11 @@ def main():
             runtime_ok, runtime_err = check_import(dest) if syntax_ok else (False, "Syntax error")
             patterns = scan_patterns(source)
             error_category = classify_error(syntax_ok, runtime_ok, patterns)
+            for p in patterns:
+                if p["type"] == "try_no_except_finally":
+                    print(f"  ⚠ try_no_except_finally in {source_file} (Py {ver})")
+                    for ex in p["examples"]:
+                        print(f"    Example: {repr(ex[:100])}")
         else:
             orphans = 0
             syntax_ok = False

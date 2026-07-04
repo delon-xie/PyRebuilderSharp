@@ -50,6 +50,7 @@ public class AstBuilder
     /// </summary>
     public AstNode Build(StructuredCFG structuredCFG)
     {
+        Console.Error.WriteLine($"[BUILD] AstBuilder.Build called for {_codeObject.Name}");
         var cfg = structuredCFG.RawCFG;
         _blockResults = _blockDecompiler.DecompileBlocks(cfg.Blocks, _codeObject);
         _allBlocks = cfg.Blocks;
@@ -75,7 +76,22 @@ public class AstBuilder
         foreach (var b in cfg.Blocks)
         {
             if (b.Flags.HasFlag(BlockFlags.LoopHeader))
+            {
                 _loopHeaderOffsets.Add(b.StartOffset);
+                if (_options.VerboseErrors)
+                {
+                    Console.Error.WriteLine($"[BUILD] Found LoopHeader block at 0x{b.StartOffset:X4}");
+                }
+            }
+        }
+        
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[BUILD] Code object: {_codeObject.Name}, {cfg.Blocks.Count} blocks");
+            foreach (var b in cfg.Blocks)
+            {
+                Console.Error.WriteLine($"[BUILD]   Block 0x{b.StartOffset:X4}-0x{b.EndOffset:X4}");
+            }
         }
 
         var stmts = new List<Stmt>();
@@ -487,7 +503,6 @@ public class AstBuilder
 
         try
         {
-            _processedBlockIds.Add(block.Id);
             return BuildStatementsInternal(block, visited);
         }
         catch (Exception ex)
@@ -524,28 +539,78 @@ public class AstBuilder
         // 检查是否在循环结构中
         if (block.Flags.HasFlag(BlockFlags.LoopHeader))
         {
-            stmts.AddRange(BuildLoop(block, visited));
-            foreach (var succ in block.Successors)
+            if (_options.VerboseErrors)
             {
-                if (!visited.Contains(succ))
-                    stmts.AddRange(BuildStatements(succ, visited));
+                Console.Error.WriteLine($"[BUILD_STMT_INTERNAL] block=0x{block.StartOffset:X4} is LoopHeader, calling BuildLoop");
             }
+            stmts.AddRange(BuildLoop(block, visited));
             return stmts;
         }
 
         // 检测 for-loop 头：FOR_ITER 是条件跳转但不是 if/else，
         // 即使 LoopHeader 标志未设置
         bool hasForIter = block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
-        // Python 3.13+ 内联列表推导式：块中包含 END_FOR_313 和 LIST_APPEND_313
-        bool hasEndFor313 = block.Instructions.Any(i => i.Opcode == Opcode.END_FOR_313);
+        // Python 3.13+ 内联列表推导式：检查是否存在 LIST_APPEND_313（可能在 body 块中）
         bool hasListAppend313 = block.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
-        
-        if (hasForIter || (hasEndFor313 && hasListAppend313))
+        if (!hasListAppend313)
         {
-            // 标记所有前驱链为已访问，避免迭代表达式产生独立语句
-            MarkForLoopPredecessors(block, visited);
+            hasListAppend313 = block.Successors.Any(s => s.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313));
+        }
+        
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL] block=0x{block.StartOffset:X4} hasForIter={hasForIter} hasListAppend313={hasListAppend313}");
+            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   instructions: {string.Join(", ", block.Instructions.Select(i => i.Opcode))}");
+            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   flags: {block.Flags}");
+        }
+        
+        if ((hasForIter || hasListAppend313) && !block.Flags.HasFlag(BlockFlags.LoopHeader))
+        {
+            BasicBlock loopBlock = block;
+            if (!hasForIter && hasListAppend313)
+            {
+                var forIterBlock = _allBlocks.FirstOrDefault(b => 
+                    b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER) && 
+                    b.Successors.Any(s => s.StartOffset == block.StartOffset));
+                if (forIterBlock == null)
+                {
+                    var checkedBlocks = new HashSet<BasicBlock>();
+                    var worklist = new Queue<BasicBlock>(block.Predecessors);
+                    while (worklist.Count > 0)
+                    {
+                        var pred = worklist.Dequeue();
+                        if (checkedBlocks.Contains(pred)) continue;
+                        checkedBlocks.Add(pred);
+                        if (pred.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                        {
+                            forIterBlock = pred;
+                            break;
+                        }
+                        foreach (var pp in pred.Predecessors)
+                        {
+                            if (!checkedBlocks.Contains(pp))
+                                worklist.Enqueue(pp);
+                        }
+                    }
+                }
+                if (forIterBlock == null)
+                {
+                    forIterBlock = _sortedBlocks.Where(b => 
+                        b.StartOffset < block.StartOffset && 
+                        b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER)).LastOrDefault();
+                }
+                if (forIterBlock != null)
+                {
+                    loopBlock = forIterBlock;
+                }
+            }
+            
+            if (_processedBlockIds.Contains(loopBlock.Id))
+                return stmts;
+            
+            MarkForLoopPredecessors(loopBlock, visited);
 
-            var loopAst = BuildForLoop(block, visited);
+            var loopAst = BuildForLoop(loopBlock, visited);
             stmts.AddRange(loopAst);
             // 处理循环出口块的后继（如循环后的顺序代码）
             // exit = 偏移较大的 successor（跳转目标），body = 偏移较小的 successor（fallthrough）
@@ -839,10 +904,22 @@ public class AstBuilder
         }
 
         // 递归处理后继块
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL] block=0x{block.StartOffset:X4} has {block.Successors.Count} successors");
+            foreach (var succ in block.Successors)
+            {
+                Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   successor=0x{succ.StartOffset:X4} visited={visited.Contains(succ)}");
+            }
+        }
         foreach (var succ in block.Successors.OrderBy(s => s.StartOffset))
         {
             if (!visited.Contains(succ))
                 stmts.AddRange(BuildStatements(succ, visited));
+            else if (_options.VerboseErrors)
+            {
+                Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   SKIPPED successor=0x{succ.StartOffset:X4} (already visited)");
+            }
         }
 
         return stmts;
@@ -855,8 +932,12 @@ public class AstBuilder
 
         if (isForLoop)
         {
+            Console.Error.WriteLine($"[BUILD_LOOP] header=0x{header.StartOffset:X4} id={header.Id} _processedBlockIds.Contains={_processedBlockIds.Contains(header.Id)}");
             if (_processedBlockIds.Contains(header.Id))
+            {
+                Console.Error.WriteLine($"[BUILD_LOOP] skipping because already processed");
                 return new List<Stmt>();
+            }
             return BuildForLoop(header, visited);
         }
         else
@@ -904,6 +985,36 @@ public class AstBuilder
             var forIterBlock = _allBlocks.FirstOrDefault(b => 
                 b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER) && 
                 b.Successors.Any(s => s.StartOffset == header.StartOffset));
+            
+            if (forIterBlock == null)
+            {
+                var checkedBlocks = new HashSet<BasicBlock>();
+                var worklist = new Queue<BasicBlock>(header.Predecessors);
+                while (worklist.Count > 0)
+                {
+                    var pred = worklist.Dequeue();
+                    if (checkedBlocks.Contains(pred)) continue;
+                    checkedBlocks.Add(pred);
+                    if (pred.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                    {
+                        forIterBlock = pred;
+                        break;
+                    }
+                    foreach (var pp in pred.Predecessors)
+                    {
+                        if (!checkedBlocks.Contains(pp))
+                            worklist.Enqueue(pp);
+                    }
+                }
+            }
+            
+            if (forIterBlock == null)
+            {
+                forIterBlock = _sortedBlocks.Where(b => 
+                    b.StartOffset < header.StartOffset && 
+                    b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER)).LastOrDefault();
+            }
+            
             if (forIterBlock != null)
             {
                 if (_options.VerboseErrors)
@@ -914,9 +1025,19 @@ public class AstBuilder
             }
         }
         
+        if (_processedBlockIds.Contains(actualHeader.Id))
+        {
+            if (_options.VerboseErrors)
+            {
+                Console.Error.WriteLine($"[BUILD_FOR_LOOP] Skipping because actualHeader id={actualHeader.Id} is already processed");
+            }
+            return new List<Stmt>();
+        }
+        
         visited.Add(actualHeader);
         _processedBlockIds.Add(actualHeader.Id);
-        _processedBlockIds.Add(header.Id);
+        if (actualHeader.Id != header.Id)
+            _processedBlockIds.Add(header.Id);
         var iterExpr = ExtractIterExpression(actualHeader);
 
         // 标记迭代表达式的前驱链为已访问，避免其语句作为独立表达式再次输出。
@@ -938,10 +1059,28 @@ public class AstBuilder
         }
         if (bodyEntry != null)
         {
-            CollectBodyBlocks(bodyEntry, actualHeader, bodyBlocks, visited, exitBlock);
+            var bodyVisited = new HashSet<BasicBlock>();
+            bodyVisited.Add(actualHeader);
+            if (exitBlock != null)
+                bodyVisited.Add(exitBlock);
+            CollectBodyBlocks(bodyEntry, actualHeader, bodyBlocks, bodyVisited, exitBlock);
         }
-        Console.Error.WriteLine($"[BUILD_FOR_LOOP] bodyBlocks collected: {bodyBlocks.Count}");
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] bodyBlocks collected: {bodyBlocks.Count}, bodyEntry={(bodyEntry?.Id ?? -1)}, exitBlock={(exitBlock?.Id ?? -1)}");
+        foreach (var bb in bodyBlocks)
+        {
+            Console.Error.WriteLine($"[BUILD_FOR_LOOP]   bodyBlock#{bb.Id} offset=0x{bb.StartOffset:X4}-0x{bb.EndOffset:X4} opcodes={string.Join(",", bb.Instructions.Select(i => i.Opcode))}");
+        }
         bool isInlineComp = actualHeader.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
+        if (!isInlineComp)
+        {
+            isInlineComp = bodyBlocks.Any(b => b.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313));
+            Console.Error.WriteLine($"[BUILD_FOR_LOOP] checking bodyBlocks for LIST_APPEND_313: {bodyBlocks.Count} blocks");
+            foreach (var b in bodyBlocks)
+            {
+                bool hasAppend = b.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
+                Console.Error.WriteLine($"[BUILD_FOR_LOOP]   block#{b.Id} offset=0x{b.StartOffset:X4} hasAppend={hasAppend}");
+            }
+        }
         if (isInlineComp && bodyBlocks.Count == 0)
         {
             bodyBlocks.Add(actualHeader);
@@ -961,6 +1100,9 @@ public class AstBuilder
             var stmts = GetStructuredBlockStmts(bodyBlock, visited);
             bodyStmts.AddRange(stmts);
         }
+
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] bodyStmts collected: {bodyStmts.Count} types: {string.Join(", ", bodyStmts.Select(s => s.GetType().Name))}");
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] isInlineComp={isInlineComp}");
 
         var target = ExtractLoopVariable(actualHeader, bodyBlocks);
 
@@ -993,6 +1135,8 @@ public class AstBuilder
             Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: COMPREHENSION detected, returning {compResult.GetType().Name}");
             return new List<Stmt> { compResult };
         }
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: TryDetectInlinedComprehension returned NULL");
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: isInlineComp={isInlineComp}, target={target?.GetType().Name}, iterExpr={iterExpr?.GetType().Name}, bodyStmts.Count={bodyStmts.Count}");
 
         bool isNestedLoop = false;
         if (exitBlock != null)
@@ -1479,6 +1623,7 @@ public class AstBuilder
         {
             if (s is If ifS)
             {
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=IF_EXTRACT found If stmt, test={ifS.Test?.GetType().Name} value={ifS.Test}");
                 bool isBadCondition = false;
                 if (ifS.Test is UnaryOp { Op: UnaryOperator.Not } unary)
                 {
@@ -1494,28 +1639,32 @@ public class AstBuilder
                     isBadCondition = !b;
                 
                 if (!isBadCondition)
+                {
+                    Console.Error.WriteLine($"[DECOMP_TRACE] stage=IF_EXTRACT adding condition: {ifS.Test}");
                     ifs.Add(ifS.Test);
+                }
             }
         }
         
         // Python 3.14 内联推导式：从字节码中提取条件表达式
         if (ifs.Count == 0 && hasListAppend)
         {
-            foreach (var bodyBlock in bodyBlocks)
+            var sortedBodyBlocks = bodyBlocks.OrderBy(b => b.StartOffset).ToList();
+            foreach (var bodyBlock in sortedBodyBlocks)
             {
                 for (int j = 0; j < bodyBlock.Instructions.Count; j++)
                 {
                     if (bodyBlock.Instructions[j].Opcode == Opcode.COMPARE_OP)
                     {
                         bool hasListAppendAfter = false;
-                        bool passedCurrentBlock = false;
+                        bool foundCurrent = false;
                         
-                        foreach (var bb in bodyBlocks)
+                        foreach (var bb in sortedBodyBlocks)
                         {
-                            if (!passedCurrentBlock)
+                            if (!foundCurrent)
                             {
                                 if (bb == bodyBlock)
-                                    passedCurrentBlock = true;
+                                    foundCurrent = true;
                                 continue;
                             }
                             
@@ -1524,11 +1673,6 @@ public class AstBuilder
                                 if (ins.Opcode == Opcode.LIST_APPEND_313)
                                 {
                                     hasListAppendAfter = true;
-                                    break;
-                                }
-                                if (ins.Opcode == Opcode.FOR_ITER || ins.Opcode == Opcode.END_FOR_313)
-                                {
-                                    passedCurrentBlock = false;
                                     break;
                                 }
                             }
@@ -1547,8 +1691,7 @@ public class AstBuilder
                             if (prevBlock.StartOffset < header.StartOffset) continue;
                             foreach (var ins in prevBlock.Instructions)
                             {
-                                if (ins.Opcode == Opcode.STORE_FAST_LOAD_FAST_313 ||
-                                    ins.Opcode == Opcode.FOR_ITER ||
+                                if (ins.Opcode == Opcode.FOR_ITER ||
                                     ins.Opcode == Opcode.SWAP ||
                                     ins.Opcode == Opcode.BUILD_LIST ||
                                     ins.Opcode == Opcode.GET_ITER)
@@ -1757,7 +1900,7 @@ public class AstBuilder
         
         while (currentHeader != null && currentTarget is Name)
         {
-            var genIfs = new List<Expr>();
+            var genIfs = new List<Expr>(ifs);
             var currentBodyBlocks = new List<BasicBlock>();
             if (currentHeader == header)
             {
@@ -1805,8 +1948,6 @@ public class AstBuilder
                         {
                             foreach (var ins in pred.Instructions)
                             {
-                                if (ins.Opcode == Opcode.STORE_FAST_LOAD_FAST_313)
-                                    continue;
                                 sm.Execute(ins);
                             }
                         }
@@ -1826,8 +1967,6 @@ public class AstBuilder
                             {
                                 foreach (var ins in bb.Instructions)
                                 {
-                                    if (ins.Opcode == Opcode.STORE_FAST_LOAD_FAST_313)
-                                        continue;
                                     sm.Execute(ins);
                                 }
                             }
@@ -2098,6 +2237,8 @@ public class AstBuilder
                 break;
             }
             case Opcode.LOAD_FAST when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Varnames.Count:
+            case Opcode.LOAD_FAST_BORROW_314 when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Varnames.Count:
+            case Opcode.STORE_FAST_LOAD_FAST_313 when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Varnames.Count:
                 exprStack.Push(new Name(_codeObject.Varnames[ins.Argument.Value], ExpressionContext.Load));
                 break;
             case Opcode.LOAD_CONST when ins.Argument.HasValue && ins.Argument.Value < _codeObject.Constants.Count:
@@ -2870,10 +3011,8 @@ public class AstBuilder
             if (!tryHasStatements)
             {
                 // 清理条目：标记 handler 为已访问，但实际语句仍需保留
+                // 注意：不要标记 handler 的后继为已访问，因为这些后继可能包含循环头块等重要结构
                 visited.Add(handlerBlock);
-                foreach (var hsucc in handlerBlock.Successors)
-                    if (!visited.Contains(hsucc))
-                        visited.Add(hsucc);
                 return null;
             }
             isFinally = true;
@@ -3210,7 +3349,10 @@ public class AstBuilder
             
             // 跳过空的 finally 体（生成器 cleanup 条目：无实际语义）
             var resultList = new List<Stmt>();
-            if ((finalBody == null || finalBody.Count == 0) && (elseBody == null || elseBody.Count == 0))
+            bool finalBodyIsEmpty = finalBody == null || finalBody.Count == 0 || 
+                (finalBody.Count == 1 && finalBody[0] is Pass);
+            bool elseBodyIsEmpty = elseBody == null || elseBody.Count == 0;
+            if (finalBodyIsEmpty && elseBodyIsEmpty)
                 resultList.AddRange(tryBody);
             else
                 resultList.Add(new Try(tryBody, new List<ExceptHandler>(), elseBody, finalBody));
@@ -3250,9 +3392,9 @@ public class AstBuilder
                 exceptName = _codeObject.Names.ElementAtOrDefault(ins.Argument ?? 0);
         }
 
-        if (handlerBody.Count == 0)
+        if (handlerBody.Count == 0 || (handlerBody.Count == 1 && handlerBody[0] is Pass))
         {
-            // handlerBody 为空 = handler 没有实质性语句（例如只有 RERAISE 的清理条目）。
+            // handlerBody 为空或只有 Pass = handler 没有实质性语句（例如只有 RERAISE 的清理条目）。
             // 此时 tryBlocks 已经在嵌套调用（BuildStatements(tb, visited)）中正确消费了内部结构。
             // ❌ 以前移除了 visited 和 _processedBlockIds → 调用者重新进入 → 无限循环
             // ✅ 不移除，直接返回 null，blocks 保持已访问状态
@@ -3660,9 +3802,6 @@ public class AstBuilder
                     handlerBody.Add(stmt);
             }
         }
-        if (handlerBody.Count == 0)
-            handlerBody.Add(new Pass());
-
         // 检测 handler 类型：except（以 DUP_TOP 或 POP_TOP×3 开头）还是 finally（无两者）
         bool isExceptHandler = false;
         int topCount = 0;
@@ -3769,6 +3908,19 @@ public class AstBuilder
         {
             // === finally handler ===
             finalBody = handlerBody;
+        }
+
+        bool hasValidHandlers = handlers.Count > 0 && handlers.Any(h => 
+            h.Body != null && h.Body.Count > 0 && 
+            !(h.Body.Count == 1 && h.Body[0] is Pass));
+        bool hasValidFinally = finalBody != null && finalBody.Count > 0 && 
+            !(finalBody.Count == 1 && finalBody[0] is Pass);
+        
+        if (!hasValidHandlers && !hasValidFinally)
+        {
+            var resultWithoutTry = new List<Stmt>(beforeTry);
+            resultWithoutTry.AddRange(tryStmts);
+            return resultWithoutTry;
         }
 
         var tryNode = new Try(tryStmts, handlers, elseBody, finalBody);
@@ -4426,7 +4578,12 @@ public class AstBuilder
         // 检测 OR 短接链: POP_JUMP_IF_TRUE + fallthrough 为条件分支
         // if a or b: bytecode = "POP_JUMP_IF_TRUE → body ; POP_JUMP_IF_FALSE → after"
         bool isOrChain = isJumpIfTrue && bodyBranch != null && IsConditionBranch(bodyBranch);
-        if (!isOrChain && isJumpIfTrue && testExpr != null)
+        
+        // 检测列表推导式模式：POP_JUMP_IF_TRUE 的跳转目标包含 LIST_APPEND
+        bool isComprehensionPattern = isJumpIfTrue && afterBranch != null && 
+            afterBranch.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313 || i.Opcode == Opcode.SET_ADD_313);
+        
+        if (!isOrChain && !isComprehensionPattern && isJumpIfTrue && testExpr != null)
             testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
 
         // OR 短接: POP_JUMP_IF_TRUE + fallthrough 为条件分支
@@ -4749,8 +4906,16 @@ public class AstBuilder
         // 跳过 for-loop 前导块：有 GET_ITER 但无 FOR_ITER → 不是真正的循环头
         if (block.Flags.HasFlag(BlockFlags.LoopHeader))
         {
+            if (_options.VerboseErrors)
+            {
+                Console.Error.WriteLine($"[BUILD_STMT] Found LoopHeader block at 0x{block.StartOffset:X4}");
+            }
             bool hasForIter = block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
             bool hasGetIter = block.Instructions.Any(i => i.Opcode == Opcode.GET_ITER);
+            if (_options.VerboseErrors)
+            {
+                Console.Error.WriteLine($"[BUILD_STMT] hasForIter={hasForIter}, hasGetIter={hasGetIter}");
+            }
             if (!(hasGetIter && !hasForIter))
                 return BuildLoop(block, visited);
         }
@@ -4759,6 +4924,8 @@ public class AstBuilder
         // 即使 LoopHeader 标志未设置（当 for-loop 的 GET_ITER 在另一个块中时）
         if (block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
         {
+            if (_processedBlockIds.Contains(block.Id))
+                return new List<Stmt>();
             return BuildForLoop(block, visited);
         }
 
@@ -5004,12 +5171,49 @@ public class AstBuilder
             .Take(block.Instructions.Count - 1)
             .ToList();
 
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND block=0x{block.StartOffset:X4} conditionInstrs.Count={conditionInstrs.Count}");
+        foreach (var ins in conditionInstrs)
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND   instr={ins.Opcode} offset=0x{ins.Offset:X4}");
+
+        // 如果当前块只有跳转指令，没有条件表达式，从前驱块中获取
+        if (conditionInstrs.Count == 0)
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND conditionInstrs is empty, checking predecessors");
+            foreach (var pred in block.Predecessors)
+            {
+                var predInstrs = pred.Instructions.ToList();
+                Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND   pred=0x{pred.StartOffset:X4} predInstrs.Count={predInstrs.Count}");
+                if (predInstrs.Count > 0 && !JumpHelper.IsConditionalJump(pred.Instructions.Last().Opcode))
+                {
+                    conditionInstrs = predInstrs;
+                    Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND   using pred instructions");
+                    break;
+                }
+            }
+        }
+
         var stackMachine = new StackMachine(_codeObject);
+        
+        // 如果条件表达式以 STORE_FAST_LOAD_FAST_313 开头，需要先压入循环变量
+        if (conditionInstrs.Count > 0 && conditionInstrs[0].Opcode == Opcode.STORE_FAST_LOAD_FAST_313)
+        {
+            var sflfArg = conditionInstrs[0].Argument ?? 0;
+            int storeIdx = sflfArg >> 4;
+            var loopVarName = storeIdx < _codeObject.Varnames.Count ? _codeObject.Varnames[storeIdx] : $"v_{storeIdx}";
+            stackMachine.PushExpr(new Name(loopVarName, ExpressionContext.Load));
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND pushed loop variable '{loopVarName}'");
+        }
+        
         foreach (var instr in conditionInstrs)
             stackMachine.Execute(instr);
 
+        Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND stackMachine.ExprStackCount={stackMachine.ExprStackCount}");
         if (stackMachine.ExprStackCount > 0)
-            return stackMachine.PopExpr();
+        {
+            var result = stackMachine.PopExpr();
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND returning {result?.GetType().Name} value={result}");
+            return result;
+        }
             
         // elif 模式：COMPARE_OP 因缺少 subject（已在之前块中 COPY）而返回 null。
         // 从前驱块中复制 subject，用扩展指令列表重新构造比较表达式。
@@ -5431,45 +5635,16 @@ public class AstBuilder
             var current = worklist.Dequeue();
             if (current == header || visited.Contains(current))
                 continue;
-            // 排除循环出口块（FOR_ITER 的跳转目标），防止收集到循环后代码
             if (exitBlock != null && current == exitBlock)
                 continue;
 
             bodyBlocks.Add(current);
             visited.Add(current);
 
-            // v3.10: 回边条件块（POP_JUMP_IF_TRUE 目标 < 自身偏移）的后继是循环出口，不是 body 的一部分
-            // 3.12+ wordcode: 使用解析后的目标偏移，否则 wordcode arg（已 *2）总是 < 块偏移
-            var lastInstr = current.Instructions.LastOrDefault();
-            // 3.12+ wordcode: 使用解析后的目标偏移，否则 wordcode arg（已 *2）总是 < 块偏移
-            int resolvedBackEdge = int.MaxValue;
-            if (lastInstr != default && lastInstr.Argument.HasValue)
-            {
-                var iwc = _codeObject.Instructions.Count > 1
-                       && _codeObject.Instructions.All(i => i.Offset % 2 == 0);
-                resolvedBackEdge = lastInstr.Opcode switch
-                {
-                    Opcode.JUMP_ABSOLUTE => lastInstr.Argument.Value,
-                    Opcode.JUMP_FORWARD or Opcode.FOR_ITER => lastInstr.Offset + 2 + lastInstr.Argument.Value,
-                    Opcode.JUMP_BACKWARD => lastInstr.Offset + 2 - lastInstr.Argument.Value,
-                    Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
-                        or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-                        when iwc => lastInstr.Offset + 2 + lastInstr.Argument.Value,
-                    _ => lastInstr.Argument.Value
-                };
-            }
-            bool isBackEdgeBlock = lastInstr != default
-                && JumpHelper.IsJump(lastInstr.Opcode)
-                && lastInstr.Argument.HasValue
-                && resolvedBackEdge < current.StartOffset;
-
             foreach (var succ in current.Successors)
             {
                 if (succ != header && !visited.Contains(succ))
                 {
-                    // 回边块的 fallthrough 是循环出口
-                    if (isBackEdgeBlock)
-                        continue;
                     worklist.Enqueue(succ);
                 }
             }
@@ -6585,7 +6760,7 @@ public class AstBuilder
             var cfg = cfScanner.Analyze(blocks);
 
             // 用递归的 AstBuilder 处理子代码
-            var childBuilder = new AstBuilder(childCode);
+            var childBuilder = new AstBuilder(childCode, _options);
             var ast = childBuilder.Build(cfg);
             if (ast is Module m)
                 return m.Body;

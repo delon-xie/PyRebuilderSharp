@@ -11,6 +11,7 @@ def recursive_repr(fillvalue = '...'):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
+            key = (id(self), get_ident())
             if key in repr_running:
                 return fillvalue
             repr_running.add(key)
@@ -20,6 +21,7 @@ def recursive_repr(fillvalue = '...'):
             repr_running.discard(key)
             raise
             raise
+            repr_running.discard(key)
         wrapper.__module__ = getattr(user_function, '__module__')
         wrapper.__doc__ = getattr(user_function, '__doc__')
         wrapper.__name__ = getattr(user_function, '__name__')
@@ -54,6 +56,8 @@ class Repr:
     def repr1(self, x, level):
         cls = type(x)
         typename = cls.__name__
+        cls = type(x)
+        typename = cls.__name__
         if ' ' in typename:
             parts = typename.split()
             typename = '_'.join(parts)
@@ -65,15 +69,16 @@ class Repr:
             return method(x, level)
         return self.repr_instance(x, level)
         return self.repr_instance(x, level)
+        method = getattr(self, 'repr_' + typename, None)
+        module = getattr(cls, '__module__', None)
 
     def _join(self, pieces, level):
         indent = self.indent
         if self.indent:
             return ', '.join(pieces)
-        # [WARN] 1 instructions not decompiled
-        #   @0x000E: POP_JUMP_IF_NOT_NONE arg=42
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
+        n = len(x)
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
@@ -93,6 +98,7 @@ class Repr:
         if n == 1:
             pass
         return f"{left!s}{s!s}{right!s}"
+        s = self._join(pieces, level)
         # [WARN] 1 instructions not decompiled
         #   @0x011E: POP_JUMP_IF_NOT_NONE arg=10
 
@@ -125,6 +131,7 @@ class Repr:
 
     def repr_dict(self, x, level):
         n = len(x)
+        n = len(x)
         if n == 0:
             return '{}'
         if level <= 0:
@@ -135,6 +142,7 @@ class Repr:
         islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
+        s = builtins.repr(x[:self.maxstring])
         s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)

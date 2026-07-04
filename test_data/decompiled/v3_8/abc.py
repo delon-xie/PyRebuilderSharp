@@ -1,6 +1,9 @@
 # Decompiled from: <module>
 
 """Abstract Base Classes (ABCs) according to PEP 3119."""
+from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
+"""Abstract Base Classes (ABCs) according to PEP 3119."""
+
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 
@@ -85,10 +88,8 @@ class abstractproperty(property):
         import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(fget, fset, fdel, doc)
-try:
-    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
-except ImportError:
-    pass
+
+from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
 
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).
@@ -165,10 +166,6 @@ def update_abstractmethods(cls):
             value = getattr(cls, name, None)
             if getattr(value, '__isabstractmethod__', False):
                 abstracts.add(name)
-    for name in getattr(scls, '__abstractmethods__', []):
-        value = getattr(cls, name, None)
-        if getattr(value, '__isabstractmethod__', False):
-            abstracts.add(name)
     abstracts.add(name)
     for (name, value) in cls.__dict__.items():
         if getattr(value, '__isabstractmethod__', False):

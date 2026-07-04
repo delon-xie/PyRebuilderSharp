@@ -162,19 +162,13 @@ def update_abstractmethods(cls):
         return cls
     abstracts = set()
     cls.__bases__
-    cls.__dict__.items()
-    cls.__abstractmethods__ = frozenset(abstracts)
-    return cls
-    if not getattr(value, '__isabstractmethod__', False):
+    for scls in cls.__bases__:
         pass
-    else:
-        abstracts.add(name)
-    getattr(scls, '__abstractmethods__', ())
-    value = getattr(cls, name, None)
-    if not getattr(value, '__isabstractmethod__', False):
-        pass
-    else:
-        abstracts.add(name)
+    for (value, name) in cls.__dict__.items():
+        if not getattr(value, '__isabstractmethod__', False):
+            pass
+        else:
+            abstracts.add(name)
 
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using

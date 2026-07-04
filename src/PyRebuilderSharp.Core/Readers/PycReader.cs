@@ -978,12 +978,11 @@ public class PycReader
                     arg = (extArg << 8) | rawArg;
                 }
             }
+            int cacheCount = _strategy.GetCacheCount(rawOp);
             if (Diag.Verbose)
             {
             Console.Error.WriteLine($"[DECOMP_TRACE] stage=PARSE offset=0x{offset:X4} rawOp={rawOp:000} -> mappedOp={op} arg={arg?.ToString() ?? "null"}");
             }
-            
-            int cacheCount = _strategy.GetCacheCount(rawOp);
             
             if (_strategy.Version >= PythonVersion.Py314 && arg.HasValue && _strategy.IsJumpInstruction(op))
             {
@@ -1022,7 +1021,8 @@ public class PycReader
                 arg = arg.Value >> 1;
             }
 
-            instructions.Add(new Instruction(offset - (arg.HasValue ? 2 : 1), op, arg));
+            int instrStartOffset = offset - 2 - cacheCount * 2;
+            instructions.Add(new Instruction(instrStartOffset, op, arg));
 
             while (offset + 1 < bytecode.Length && bytecode[offset] == 0)
                 offset += 2;

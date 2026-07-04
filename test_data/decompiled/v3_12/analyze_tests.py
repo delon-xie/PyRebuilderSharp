@@ -2,6 +2,13 @@
 
 next_line = lines[j]
 line = lines[i]
+
+@defaultdict
+def version_stats():
+    return {'total': 0, 'passed': 0, 'failed': 0}
+lines = output.split("""
+""")
+i = 0
 import re
 from collections import defaultdict
 open('/tmp/test_full.txt', 'r')
@@ -57,28 +64,19 @@ while i < len(lines):
                                         '版本'
                                         print
                                         None
-                                        print('----------------------------------------------------------------------')
-                                        if total > 0:
-                                            pass
-                                        else:
-                                            0
-                                            '<10'(f" {total_failed}{'<10'} {total}{'<10'} {overall_rate}{'>8.1f'}%")
-                                            print('======================================================================')
-                                            if not print:
+                                        for version in sorted(version_stats.keys()):
+                                            stats = version_stats[version]
+                                            t = stats['total']
+                                            p = stats['passed']
+                                            f = stats['failed']
+                                            if t > 0:
                                                 pass
-                                            raise
-                                        stats = version_stats[version]
-                                        t = stats['total']
-                                        p = stats['passed']
-                                        f = stats['failed']
-                                        if t > 0:
-                                            pass
-                                        else:
-                                            0
-                                            total_passed += p
-                                            total_failed += f
-                                            total += t
-                                            p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
+                                            else:
+                                                0
+                                                total_passed += p
+                                                total_failed += f
+                                                total += t
+                                                p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
                                         i += 1
                                         if i < len(lines):
                                             pass
@@ -235,3 +233,8 @@ while i < len(lines):
         '版本'
         print
         None
+if not print:
+    pass
+raise
+j += 1
+i += 1

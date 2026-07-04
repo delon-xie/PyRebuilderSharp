@@ -19,4 +19,3 @@ __module__
 tempfile.NamedTemporaryFile(suffix='.py', delete=False, mode='w')
 f.write(src)
 py_path = f.name
-raise

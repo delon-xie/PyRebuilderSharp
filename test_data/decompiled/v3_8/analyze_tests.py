@@ -37,30 +37,24 @@ while i < len(lines):
         if status == 'PASS':
             return version_stats[version]['passed'] + 1
         version_stats[version]['failed'] + 1
-print('======================================================================')
-print('Python 3.7-3.10 版本测试通过率统计')
-print('======================================================================')
-'<10'(f" 失败{'<10'} 总计{'<10'} 通过率{'<12'}")
-print('----------------------------------------------------------------------')
-total_passed = 0
-total_failed = 0
-total = 0
-sorted(version_stats.keys())
-'通过'
-' '
-'<12'
-'版本'
-print
-print('----------------------------------------------------------------------')
-if total > 0:
-    pass
+for version in sorted(version_stats.keys()):
+    stats = version_stats[version]
+    t = stats['total']
+    p = stats['passed']
+    f = stats['failed']
+    if t > 0:
+        pass
+    0
+    total_passed += p
+    total_failed += f
+    total += t
+    p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
 stats = version_stats[version]
 t = stats['total']
 p = stats['passed']
 f = stats['failed']
-if t > 0:
-    pass
 total_passed += p
 total_failed += f
 total += t
 p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
+print('----------------------------------------------------------------------')

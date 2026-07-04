@@ -10,11 +10,8 @@ r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_o
 lines = r.stdout.split("""
 """)
 enumerate(lines)
-print("""
---- ACTUAL AST ---""")
-actual_ast = ast.dump(ast.parse(r.stdout), indent=2)
-print(actual_ast)
-if not 'items[' in line:
-    pass
-else:
-    print(f"Line {i}: {line}")
+for (i, line) in enumerate(lines):
+    if not 'items[' in line:
+        pass
+    else:
+        print(f"Line {i}: {line}")

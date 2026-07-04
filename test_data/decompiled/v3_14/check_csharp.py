@@ -7,4 +7,3 @@ open(sys.argv[1], 'rb')
 __module__
 open(sys.argv[1], 'rb')
 data = f.read()
-raise

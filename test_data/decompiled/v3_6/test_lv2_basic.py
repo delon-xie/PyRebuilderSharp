@@ -3,6 +3,8 @@
 z = y
 x = 1
 y = 2
+x = 1
+y = 2
 if x < y:
     z = x
 j = i * 2

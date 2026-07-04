@@ -81,6 +81,7 @@ public class BlockScanner : IBlockScanner
             }
         }
 
+        Console.Error.WriteLine($"[BLOCK_DEBUG] Final leaders: {string.Join(", ", leaders)}");
         return leaders;
     }
 
@@ -124,7 +125,7 @@ public class BlockScanner : IBlockScanner
 
         return instr.Opcode switch
         {
-            // 3.13+ 在 ParseInstructions311Plus 中已解析为绝对字节偏移，不复算
+            // 3.13+ 和 3.14 在解析阶段已将跳转参数转为绝对字节偏移，不复算
             Opcode.JUMP_BACKWARD or Opcode.JUMP_BACKWARD_NO_INTERRUPT
                 or Opcode.FOR_ITER or Opcode.JUMP_FORWARD
                 or Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
@@ -192,11 +193,20 @@ public class BlockScanner : IBlockScanner
 
             if (lastInstr == default) continue;
 
+            if (block.StartOffset == 0)
+            {
+                Console.Error.WriteLine($"[BLOCK_LINK] Entry block 0x{block.StartOffset:X4} last instruction: {lastInstr.Opcode}");
+            }
+
             switch (lastInstr.Opcode)
             {
                 case Opcode.RETURN_VALUE:
                     block.Flags |= BlockFlags.Exit;
                     ResolveIntermediateJumps(block, blocks, codeObj);
+                    if (block.StartOffset == 0)
+                    {
+                        Console.Error.WriteLine($"[BLOCK_LINK] Entry block 0x{block.StartOffset:X4} has RETURN_VALUE as last instruction, no fallthrough");
+                    }
                     // 注意：RETURN_VALUE 是函数终止指令，不产生顺序后继。
                     // RAISE_VARARGS 的 fallthrough 由下一条 case 处理。
                     break;
@@ -251,14 +261,32 @@ public class BlockScanner : IBlockScanner
                 case Opcode.FOR_ITER:
                 case Opcode.POP_JUMP_IF_NONE:
                 case Opcode.POP_JUMP_IF_NOT_NONE:
-                    AddSuccessor(block, FindBlockByOffset(blocks, ResolveJumpTarget(lastInstr, codeObj)!.Value));
+                    var jumpTarget = ResolveJumpTarget(lastInstr, codeObj);
+                    if (jumpTarget.HasValue)
+                    {
+                        var jumpBlock = FindBlockByOffset(blocks, jumpTarget.Value);
+                        if (jumpBlock != null)
+                            AddSuccessor(block, jumpBlock);
+                        else
+                            Console.Error.WriteLine($"[BLOCK_LINK] Warning: jump target block not found for {lastInstr.Opcode} at 0x{lastInstr.Offset:X4}");
+                    }
                     if (i + 1 < blocks.Count)
-                        AddSuccessor(block, blocks[i + 1]);
+                    {
+                        var fallthroughBlock = blocks[i + 1];
+                        AddSuccessor(block, fallthroughBlock);
+                        Console.Error.WriteLine($"[BLOCK_LINK] {lastInstr.Opcode} at 0x{lastInstr.Offset:X4} added fallthrough successor 0x{fallthroughBlock.StartOffset:X4}");
+                    }
                     break;
 
                 default:
                     if (i + 1 < blocks.Count)
+                    {
                         AddSuccessor(block, blocks[i + 1]);
+                        if (block.StartOffset == 0)
+                        {
+                            Console.Error.WriteLine($"[BLOCK_LINK] Entry block 0x{block.StartOffset:X4} has {block.Instructions.Count} instructions, last opcode={block.Instructions.Last().Opcode}, added successor 0x{blocks[i + 1].StartOffset:X4}");
+                        }
+                    }
                     break;
             }
         }

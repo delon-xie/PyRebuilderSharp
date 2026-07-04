@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+None(None)
 import struct
 import sys
 open(sys.argv[1], 'rb')
@@ -39,3 +40,7 @@ else:
         print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")
 if not True:
     pass
+'Next marshal at off='(f"{off}, byte={data[off]}{'#x'}")
+raw2 = data[off]
+type2 = raw2 & 127
+'  type_byte='(f"{raw2}{'#x'}, clean={type2}")

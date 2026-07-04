@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 next_line = lines[j]
+line = lines[i]
 import re
 from collections import defaultdict
 f = open('/tmp/test_full.txt', 'r')
@@ -99,4 +100,10 @@ with open('/tmp/test_full.txt', 'r') as f:
                 pass
             while '***' in line:
                 pass
+j += 1
+i += 1
+total_passed += p
+total_failed += f
+total += t
+p(f"{'<10'} {f}{'<10'} {t}{'<10'} {rate}{'>8.1f'}%")
 print('----------------------------------------------------------------------')

@@ -116,16 +116,11 @@ class ABCMeta(type):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         abstracts = (<setcomp>)(namespace.items())
         bases
-        cls.__abstractmethods__ = frozenset(abstracts)
-        cls._abc_registry = WeakSet()
-        cls._abc_cache = WeakSet()
-        cls._abc_negative_cache = WeakSet()
-        cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
-        return cls
-        getattr(base, '__abstractmethods__', set())
-        value = getattr(cls, name, None)
-        if getattr(value, '__isabstractmethod__', False):
-            abstracts.add(name)
+        for base in bases:
+            for name in getattr(base, '__abstractmethods__', set()):
+                value = getattr(cls, name, None)
+                if getattr(value, '__isabstractmethod__', False):
+                    abstracts.add(name)
 
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
@@ -141,15 +136,17 @@ class ABCMeta(type):
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
         print('Inv.counter: %s' % ABCMeta._abc_invalidation_counter, file=file)
         sorted(cls.__dict__)
-        if name.startswith('_abc_'):
-            value = getattr(cls, name)
-            if isinstance(value, WeakSet):
-                value = set(value)
-        print('%s: %r' % (name, value), file=file)
+        for name in sorted(cls.__dict__):
+            if name.startswith('_abc_'):
+                value = getattr(cls, name)
+                if isinstance(value, WeakSet):
+                    value = set(value)
+            print('%s: %r' % (name, value), file=file)
 
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         subtype = type(instance)
+        subclass = instance.__class__
         subclass = instance.__class__
         if subclass in cls._abc_cache:
             return True

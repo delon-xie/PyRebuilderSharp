@@ -8,4 +8,3 @@ open(sys.argv[1], 'rb')
 __module__
 open(sys.argv[1], 'rb')
 raw = f.read()
-raise

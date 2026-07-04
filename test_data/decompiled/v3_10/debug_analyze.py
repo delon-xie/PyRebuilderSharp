@@ -4549,3 +4549,5 @@ with open('/tmp/test_full.txt', 'r') as f:
         # [Recursion limit]
     print(f"Total tests with versions found: {debug_count}")
 next_line = lines[j]
+version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
+i += 1

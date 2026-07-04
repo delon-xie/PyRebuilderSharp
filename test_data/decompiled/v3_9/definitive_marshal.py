@@ -12,16 +12,18 @@ print('Bytes:', ' '.join((b for b in m[:60])))
 print()
 'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
 known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
-print('Known values:', (<dictcomp>)(known.items()))
+print('Known values:', {v: v for (k, v) in iterable if k == 'flags'})
 range(0, 8)
 print
-code2 = marshal.loads(m)
-print(f"\nRe-loaded: argcount={code2.co_argcount} nlocals={code2.co_nlocals} stacksize={code2.co_stacksize} flags={hex(code2.co_flags)}")
-print(f"Match: {code2.co_argcount == code.co_argcount}")
-if start + 16 > len(m):
-    pass
-vals = struct.unpack_from('<IIII', m, start)
-a0 = *vals
-nl = *vals
-ss = *vals
-fl = *vals
+for start in range(0, 8):
+    if start + 16 > len(m):
+        pass
+    vals = struct.unpack_from('<IIII', m, start)
+    a0 = *vals
+    nl = *vals
+    ss = *vals
+    fl = *vals
+    if (a0 == known['argcount']) and (nl == known['nlocals']):
+        print(f"\nMATCH at offset {start}:")
+        print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+        print(f"  Bytes: {' '.join((b for b in m[start:start + 16]))}")

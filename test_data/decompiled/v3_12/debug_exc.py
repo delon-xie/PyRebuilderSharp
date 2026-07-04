@@ -15,6 +15,21 @@ raw = f.read()
 code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
+import sys
+import dis
+import marshal
+import types
+f = open(sys.argv[1], 'rb')
+magic = f.read(4)
+print(f"Magic: {magic.hex()}")
+flags = int.from_bytes(f.read(4), 'little')
+ts = int.from_bytes(f.read(4), 'little')
+size = int.from_bytes(f.read(4), 'little')
+print(f"Header: flags={flags} ts={ts} size={size}")
+raw = f.read()
+code = marshal.loads(raw)
+print(f"Code name: {code.co_name}")
+print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
     for i in range(0, len(et), 8):
         if i + 7 >= len(et):
@@ -40,3 +55,5 @@ if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
         return None
 code.co_consts
 code.co_consts
+print(f"\n--- Nested: {const.co_name} ---")
+print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")

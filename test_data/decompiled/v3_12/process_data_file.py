@@ -12,25 +12,7 @@ def process_data_file(filename):
     lines = file.readlines()
     numbers = []
     lines
-    if numbers:
-        pass
-    else:
-        raise ValueError('文件中没有有效的数字')
-        if line:
-            print(f"[最内层 except] 无法转换为整数: '{line}'，已跳过")
-        else:
-            raise
-            raise
-            print(f"[最内层 finally] 行处理完毕: '{line}'")
-            raise
-            raise
-    line = line.strip()
-    if not line:
-        pass
-    else:
-        num = int(line)
-        numbers.append(num)
-        print(f"[最内层 else] 成功解析数字: {num}")
+    num = [line.strip() for line in lines if not line]
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')

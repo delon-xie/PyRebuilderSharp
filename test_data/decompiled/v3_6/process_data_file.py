@@ -9,28 +9,25 @@ def process_data_file(filename):
     try:
         try:
             try:
-                try:
-                    print('[内层] 开始读取数据...')
-                    lines = file.readlines()
-                    numbers = []
-                except:
-                    ve = None
+                print('[内层] 开始读取数据...')
+                lines = file.readlines()
+                numbers = []
             except:
-                print('[外层 finally] 程序结束')
+                ve = None
         except:
-            print(f"[外层 except] 文件不存在: {filename}")
-            return None
-        line = line.strip()
-        if not line:
-            pass
-        average = sum(numbers) / len(numbers)
-        return average
-        raise ValueError('文件中没有有效的数字')
-        print(f"[最内层 else] 成功解析数字: {num}")
-        print('[内层 else] 数据处理顺利完成，即将返回结果')
-        print(f"[最内层 finally] 行处理完毕: '{line}'")
-    finally:
+            print('[外层 finally] 程序结束')
+    except:
+        print(f"[外层 except] 文件不存在: {filename}")
+        return None
+    line = line.strip()
+    if not line:
         pass
+    average = sum(numbers) / len(numbers)
+    return average
+    raise ValueError('文件中没有有效的数字')
+    print(f"[最内层 else] 成功解析数字: {num}")
+    print('[内层 else] 数据处理顺利完成，即将返回结果')
+    print(f"[最内层 finally] 行处理完毕: '{line}'")
 print('=' * 50)
 print('测试1: 正常文件')
 print('=' * 50)

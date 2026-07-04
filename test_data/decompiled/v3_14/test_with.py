@@ -6,4 +6,3 @@ lock
 __module__
 lock
 print('hello')
-raise

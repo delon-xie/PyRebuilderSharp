@@ -28,10 +28,10 @@ for (i, offset) in enumerate(sorted_leaders):
     if i + 1 < len(sorted_leaders):
         pass
     instrs[-1].end + 2
-    block_instrs = [start for ins in instrs]
+    block_instrs = [ins for ins in instrs]
     if len(block_instrs) > 3:
         pass
-    f"{'3d'}-{.0 - 1}{'3d'}]: {', '.join((ins for test_data/input/debug_blocks.py in block_instrs))}"
+    f"{'3d'}-{.0 - 1}{'3d'}]: {', '.join((test_data/input/debug_blocks.py for test_data/input/debug_blocks.py in ins))}"
     offset
     'Block ['
     if any((<module>)(block_instrs)):
@@ -41,7 +41,4 @@ for (i, offset) in enumerate(sorted_leaders):
         for test_data/input/debug_blocks.py in block_instrs:
             if test_data/input/debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
                 print(f"  → JUMP: offset={test_data/input/debug_blocks.py.end}, target={test_data/input/debug_blocks.py.arg}")
-for test_data/input/debug_blocks.py in block_instrs:
-    if test_data/input/debug_blocks.py.<genexpr> == 'JUMP_ABSOLUTE':
-        print(f"  → JUMP: offset={test_data/input/debug_blocks.py.end}, target={test_data/input/debug_blocks.py.arg}")
 print(f"  → JUMP: offset={test_data/input/debug_blocks.py.end}, target={test_data/input/debug_blocks.py.arg}")
