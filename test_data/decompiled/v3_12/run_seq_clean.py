@@ -8,6 +8,7 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+open(INPUT_FILE)
 expected_src = f.read()
 None(None)
 expected_ast = ast.dump(ast.parse(expected_src), indent=2)
@@ -18,7 +19,7 @@ passed = (<genexpr>)(results.items()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-if not True:
+if not sum:
     pass
 raise
 pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)

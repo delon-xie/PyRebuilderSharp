@@ -19,7 +19,7 @@ passed = (<genexpr>)(results.items()())
 total = len(results)
 print("""
 Passed: %d/%d (%d%%)""" % (passed, total, passed * 100 // total))
-if not True:
+if not sum:
     pass
 raise
 pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)

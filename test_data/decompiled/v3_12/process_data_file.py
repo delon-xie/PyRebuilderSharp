@@ -16,7 +16,14 @@ def process_data_file(filename):
         pass
     else:
         raise ValueError('文件中没有有效的数字')
-        print(f"[最内层 except] 无法转换为整数: '{line}'，已跳过")
+        if line:
+            print(f"[最内层 except] 无法转换为整数: '{line}'，已跳过")
+        else:
+            raise
+            raise
+            print(f"[最内层 finally] 行处理完毕: '{line}'")
+            raise
+            raise
     line = line.strip()
     if not line:
         pass
@@ -27,6 +34,7 @@ def process_data_file(filename):
 print('==================================================')
 print('测试1: 正常文件')
 print('==================================================')
+open('test_numbers.txt', 'w')
 f.write("""10
 20
 abc
@@ -44,15 +52,16 @@ print(f"最终结果: {result}\n")
 print('==================================================')
 print('测试3: 空文件')
 print('==================================================')
+open('empty_file.txt', 'w')
 f.write("""abc
 def
 """)
 None(None)
 result = process_data_file('empty_file.txt')
 print(f"最终结果: {result}\n")
-if not True:
+if not process_data_file:
     pass
 raise
-if not True:
+if not f:
     pass
 raise

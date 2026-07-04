@@ -30,7 +30,7 @@ print
 print("""
 Bytes 16-50:""")
 range(16, 50, 2)
-if not True:
+if not f:
     pass
 raise
 pair = raw[i:i + 2]

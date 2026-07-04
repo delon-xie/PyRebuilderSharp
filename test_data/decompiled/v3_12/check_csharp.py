@@ -2,6 +2,7 @@
 
 import struct
 import sys
+open(sys.argv[1], 'rb')
 data = f.read()
 None(None)
 off = 16
@@ -34,7 +35,7 @@ else:
             print(f"  Raw bytes: len={length} data={data[off2 + 4:off2 + 14].hex()}")
         else:
             print(f"  Unknown type, bytes at {off2}: {data[off2:off2 + 16].hex()}")
-        if not True:
+        if not print:
             pass
 val = struct.unpack('<i', data[off:off + 4])[0]
 print(f"  {name}: {val} (off {off})")

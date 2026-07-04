@@ -92,11 +92,10 @@ def _make_class_unpicklable(obj):
 
 def _iter_bits_lsb(num):
     original = num
-    raise
-    while num:
-        b = num & ~num + 1
-        yield b
-        num ^= b
+    if isinstance(num, Enum):
+        num = num.value
+    elif num < 0:
+        raise ValueError('%r is not a positive integer' % original)
 
 def show_flag_values(value):
     return list(_iter_bits_lsb(value))
@@ -170,7 +169,10 @@ class property(DynamicClassAttribute):
         else:
             if self.fget:
                 return self.fget(instance)
-            self
+            if self._attr_type == 'attr':
+                return getattr(self._cls_type, self.name)
+            if self._attr_type == 'desc':
+                return getattr(instance._value_, self.name)
         # [WARN] 3 instructions not decompiled
         #   @0x0006: POP_JUMP_IF_NOT_NONE arg=118
         #   @0x0022: POP_JUMP_IF_NONE arg=62
@@ -211,69 +213,15 @@ class _proto_member:
             args = value
             if enum_class._member_type_ is tuple:
                 args = (args)
-            enum_class._use_args_
-            enum_class
-            Flag
-            enum_class
-            issubclass
-            enum_class
-            enum_class
-        self(v_37)
-        enum_class._value2member_map_.setdefault(self, v_53)
-        for (canonical_member, name) in enum_class._member_map_.items():
-            if not canonical_member._value_ == value:
-                pass
+            elif not enum_class._use_args_:
+                enum_member = enum_class._new_member_(enum_class)
             else:
-                enum_member = canonical_member
-                try:
-                    try:
-                        try:
-                            enum_member = enum_class._value2member_map_[value]
-                        finally:
-                            self(v_37)
-                            enum_class._value2member_map_.setdefault(self, v_53)
-                        enum_class._hashable_values_.append(value)
-                        return None
-                    finally:
-                        self(v_37)
-                        enum_class._value2member_map_.setdefault(self, v_53)
-                        enum_class._hashable_values_.append(value)
-                    new_exc = TypeError('_value_ not set in __new__, unable to create it')
-                    v_103.__cause__ = self
-                    enum_class
-                finally:
-                    self(v_37)
-                    enum_class._value2member_map_.setdefault(self, v_53)
-                    enum_class._hashable_values_.append(value)
-                exc = None
-        for (canonical_member, name) in enum_class._member_map_.items():
-            if not canonical_member._value_ == value:
-                pass
-            else:
-                enum_member = canonical_member
-                try:
-                    try:
-                        try:
-                            enum_member = enum_class._value2member_map_[value]
-                        finally:
-                            self(v_37)
-                            enum_class._value2member_map_.setdefault(self, v_53)
-                        enum_class._hashable_values_.append(value)
-                        return None
-                    finally:
-                        self(v_37)
-                        enum_class._value2member_map_.setdefault(self, v_53)
-                        enum_class._hashable_values_.append(value)
-                    new_exc = TypeError('_value_ not set in __new__, unable to create it')
-                    v_103.__cause__ = self
-                    enum_class
-                finally:
-                    self(v_37)
-                    enum_class._value2member_map_.setdefault(self, v_53)
-                    enum_class._hashable_values_.append(value)
-                exc = None
-        # [WARN] 1 instructions not decompiled
+                enum_member = None(enum_class, args, **None)
+                enum_class._new_member_
+        # [WARN] 3 instructions not decompiled
         #   @0x021C: POP_JUMP_IF_NONE arg=856
+        #   @0x0546: POP_JUMP_IF_NONE arg=1398
+        #   @0x05BE: POP_JUMP_IF_NONE arg=1650
 
 class EnumDict(dict):
     def member_names(self):
@@ -335,13 +283,16 @@ enumeration member names.
                 if key in self._ignore:
                     pass
                 elif isinstance(value, nonmember):
-                    value
+                    value = value.value
                 elif _is_descriptor(value):
                     pass
                 elif self._cls_name:
-                    pass
+                    if _is_internal_class(self._cls_name, value):
+                        pass
+                    elif key in self:
+                        raise TypeError(f"{key} already defined as {self[key]}")
                 elif key in self:
-                    raise TypeError(f"{key} already defined as {self[key]}")
+                    pass
         elif _is_sunder(key):
             pass
         elif _is_dunder(key):
@@ -368,7 +319,11 @@ enumeration member names.
             if single:
                 value = auto_valued[0]
             else:
-                value = t(auto_valued)
+                try:
+                    value = t(auto_valued)
+                except TypeError:
+                    value = None(**auto_valued, **None)
+                raise
         for auto_valued in value():
             if not True:
                 pass
@@ -388,7 +343,11 @@ enumeration member names.
             if single:
                 value = auto_valued[0]
             else:
-                value = t(auto_valued)
+                try:
+                    value = t(auto_valued)
+                except TypeError:
+                    value = None(**auto_valued, **None)
+                raise
         value = [auto_valued.append(v) for v in value if v.value == _auto_null]
         non_auto_store = False
         value = [auto_valued.append(v) for v in value if v.value == _auto_null]
@@ -400,10 +359,8 @@ enumeration member names.
 
     def update(self, members):
         members.keys()
-        for (value, name) in more_members.items:
-            pass
-        for (value, name) in more_members.items:
-            pass
+        more_members.items()
+        raise
         for (value, name) in members:
             pass
         for (value, name) in members:
@@ -555,7 +512,7 @@ Metaclass for Enum
         member_names = classdict._member_names
         invalid_names = set(member_names) & {'mro', ''}
         if invalid_names:
-            raise 'invalid enum member name(s) %s'(','.join % (repr for n in invalid_names()))
+            raise 'invalid enum member name(s) %s'(','.join % (n for n in invalid_names()))
         _order_ = classdict.pop('_order_', None)
         _gnv = classdict.get('_generate_next_value_')
         classdict = dict(classdict.items())
@@ -567,20 +524,63 @@ Metaclass for Enum
         metacls._get_mixins_(cls, bases)
         if not boundary:
             getattr(first_enum, '_boundary_', None)
-        try:
-            try:
-                bases[-1]
-                issubclass
-                super
-            finally:
-                super
-            metacls
-            __class__
-            classdict
-            True
-        finally:
-            super
-        super().__new__
+        elif Flag:
+            if bases and issubclass(bases[-1], Flag):
+                p = [classdict[n] for n in member_names if p.value < 0 if p.value[0] < 0]
+            enum_class = None(metacls, cls, bases, classdict, **kwds)
+            delattr(enum_class, '_%s__in_progress' % cls)
+            super(__class__, metacls).__new__
+            classdict.update(enum_class.__dict__)
+            if ReprEnum:
+                if (ReprEnum in bases) and (member_type is object):
+                    raise TypeError('ReprEnum subclasses must be mixed with a data type (i.e. int, str, float, etc.)')
+                if '__format__' not in classdict:
+                    enum_class.__format__ = member_type.__format__
+                elif '__str__' not in classdict:
+                    method = member_type.__str__
+                    if method is object.__str__:
+                        method = member_type.__repr__
+                    enum_class.__str__ = method
+                    ('__repr__', '__str__', '__format__', '__reduce_ex__')
+                    if Flag:
+                        if issubclass(enum_class, Flag):
+                            _order_ = [name for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__')]
+                        elif Enum:
+                            if save_new:
+                                enum_class.__new_member__ = __new__
+                            enum_class.__new__ = Enum.__new__
+                            if _order_:
+                                if isinstance(_order_, str):
+                                    _order_ = _order_.replace(',', ' ').split()
+                                elif Flag:
+                                    if not cls != 'Flag':
+                                        pass
+                            elif Flag:
+                                pass
+                        elif _order_:
+                            pass
+                        elif Flag:
+                            pass
+                    elif Enum:
+                        pass
+                    elif _order_:
+                        pass
+                    elif Flag:
+                        pass
+                    if not name not in classdict:
+                        pass
+                    else:
+                        enum_method = getattr(first_enum, name)
+                        found_method = getattr(enum_class, name)
+                        object_method = getattr(object, name)
+                        data_type_method = getattr(member_type, name)
+                        if not found_method in (data_type_method, object_method):
+                            pass
+                        else:
+                            setattr(enum_class, name, enum_method)
+                ('__repr__', '__str__', '__format__', '__reduce_ex__')
+            ('__repr__', '__str__', '__format__', '__reduce_ex__')
+            raise
         value = classdict[name]
         if type(_gnv) is not staticmethod:
             _gnv = staticmethod(_gnv)
@@ -592,32 +592,30 @@ Metaclass for Enum
         metacls._get_mixins_(cls, bases)
         metacls._get_mixins_(cls, bases)
         classdict.pop(key, None)
-        enum_class = [('__repr__', '__str__', '__format__', '__reduce_ex__') for p in inverted if cls != 'Flag']
-        method = member_type.__str__
-        name = [name for name in ('__repr__', '__str__', '__format__', '__reduce_ex__')]
-        enum_method = getattr(first_enum, name)
-        found_method = getattr(enum_class, name)
-        object_method = getattr(object, name)
-        data_type_method = getattr(member_type, name)
-        name = [name for name in ('__repr__', '__str__', '__format__', '__reduce_ex__')]
-        _order_ = [name for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__')]
+        p = [classdict[n] for n in member_names if p.value < 0 if p.value[0] < 0]
+        enum_class = [p for p in inverted]
+        enum_class = [p for p in inverted]
         _order_ = [name for name in ('__or__', '__and__', '__xor__', '__ror__', '__rand__', '__rxor__', '__invert__')]
         delattr(enum_class, '_boundary_')
         delattr(enum_class, '_flag_mask_')
         delattr(enum_class, '_singles_mask_')
         delattr(enum_class, '_all_bits_')
         delattr(enum_class, '_inverted_')
-        member_list = [m._value_ for m in enum_class]
-        member_list = [m._value_ for m in enum_class]
+        member_list = [m._value_ for m in enum_class for o in _order_ for o in _order_]
+        member_list = [m._value_ for m in enum_class for o in _order_ for o in _order_]
+        _order_ = [o for o in _order_ for o in _order_]
+        _order_ = [o for o in _order_ for o in _order_]
         _order_ = [o for o in _order_]
         _order_ = [o for o in _order_]
-        _order_ = [o for o in _order_]
-        _order_ = [o for o in _order_]
-        # [WARN] 4 instructions not decompiled
+        # [WARN] 8 instructions not decompiled
         #   @0x01AC: POP_JUMP_IF_NONE arg=492
         #   @0x0222: POP_JUMP_IF_NONE arg=558
         #   @0x03A8: POP_JUMP_IF_NONE arg=1852
-        #   @0x04EA: POP_JUMP_IF_NOT_NONE arg=1266
+        #   @0x07FA: POP_JUMP_IF_NONE arg=2334
+        #   @0x09E6: POP_JUMP_IF_NONE arg=2686
+        #   @0x0A8A: POP_JUMP_IF_NONE arg=2774
+        #   @0x0ADA: POP_JUMP_IF_NONE arg=2890
+        #   @0x0B56: POP_JUMP_IF_NOT_NONE arg=2920
 
     def __bool__(cls):
         """
@@ -768,38 +766,46 @@ Metaclass for Enum
             classdict = metacls.__prepare__(class_name, bases)
             if isinstance(names, str):
                 names = names.replace(',', ' ').split()
-            elif isinstance(names, (tuple, list)):
-                if names:
-                    names[0]
-                    isinstance
-                elif names:
-                    names = []
-            elif names:
-                pass
-        # [Block @0x0184] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+            # [Block @0x00E2] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         # [Block @0x0210] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
-        # [WARN] 5 instructions not decompiled
+        module = [item for item in names]
+        member_value = names[item]
+        member_name = item
+        module = [item for item in names]
+        _make_class_unpicklable(classdict)
+        # [WARN] 1 instructions not decompiled
         #   @0x001E: POP_JUMP_IF_NOT_NONE arg=40
-        #   @0x0218: POP_JUMP_IF_NOT_NONE arg=544
-        #   @0x028E: POP_JUMP_IF_NOT_NONE arg=704
-        #   @0x02C4: POP_JUMP_IF_NOT_NONE arg=736
-        #   @0x02EC: POP_JUMP_IF_NONE arg=760
 
     def _convert_(cls, name, module, filter, source = None, *, boundary = None, as_global = False):
         """
     Create a new Enum subclass that replaces a collection of global constants
 """
         module_globals = sys.modules[module].__dict__
-        source
-        source
-        name
-        type
-        object
-        for t in members:
-            pass
-        tmp_cls = ()(body)
-        cls = tmp_cls()
-        global_enum(cls)
+        if source:
+            source = source.__dict__
+        else:
+            source = module_globals
+            value
+            name
+            source.items()
+            []
+            members.sort(key=lambda t: (t[1], t[0]))
+            t
+            members
+            {}
+            tmp_cls = type(name, (object), body)
+            if not boundary:
+                KEEP
+            cls = tmp_cls()
+            if as_global:
+                global_enum(cls)
+            else:
+                sys.modules[cls.__module__].__dict__.update(cls.__members__)
+                return cls
+            raise
+            filter(name)
+            if not True:
+                pass
     _check_for_existing_members_ = _check_for_existing_members_()
     _get_mixins_ = _get_mixins_()
     _find_data_repr_ = _find_data_repr_()
@@ -863,11 +869,8 @@ class Enum(metaclass=EnumType):
     count: the number of existing members
     last_values: the list of values assigned
 """
-        last_values
-        return start
-        last_values
-        sorted
-        return last_value + 1
+        if not last_values:
+            return start
 
     def _missing_(cls, value):
         pass
@@ -920,90 +923,47 @@ attributes -- see the documentation for details.
 
     def __new__(cls, value):
         """_%s__in_progress"""
-        value
-        type
-        try:
-            try:
-                return value
-            finally:
-                cls
-            return
-        finally:
-            cls
-        TypeError
-        for _ in cls._unhashable_values_map_.items():
-            pass
-        for (member, name) in iterable:
-            cls._member_map_
-            for (member, name) in cls._member_map_:
-                v_20
-                cls
-                name
-                cls
-                exc = None
-                result = cls._missing_(value)
-                exc = e
-                result = None
-                e = None
-                e = None
-        for (member, name) in cls._member_map_:
-            v_20
-            cls
-            name
-            cls
-            exc = None
-            result = cls._missing_(value)
-            exc = e
-            result = None
-            e = None
-            e = None
-        for _ in iterable:
-            try:
-                return
+        if type(value) is cls:
+            return value
+        for (unhashable_values, name) in cls._unhashable_values_map_.items():
+            cls in v_19
+            if not True:
+                pass
             else:
-                try:
+                cls[name]
+                return
+                raise
+        for (member, name) in iterable:
+            for (member, name) in cls._member_map_.items():
+                cls == v_20._value_
+                if not True:
                     pass
                 else:
-                    try:
-                        pass
-                    else:
-                        try:
-                            pass
-                        else:
-                            cls
-                            getattr
-                        exc = None
-                        result = cls._missing_(value)
-                    exc = e
-                    result = None
-                    e = None
-                    e = None
-                exc = None
-                ve_exc = None
-                return result
-            exc = None
-            ve_exc = None
-            return result
-            ve_exc = ValueError(f"{value} is not a valid {cls.__qualname__}")
+                    cls[name]
+                    return
+                    raise
+        for (member, name) in cls._member_map_.items():
+            cls == v_20._value_
+            if not True:
+                pass
+            else:
+                cls[name]
+                return
+                raise
+        for _ in iterable:
+            pass
 
     def _add_alias_(self, name):
         self.__class__._add_member_(name, self)
 
     def _add_value_alias_(self, value):
         """ is already bound: """
-        self
-        value
-        cls._value2member_map_
-        self(v_16)
-        cls
-        value
-        for m in cls._member_map_:
-            if not m._value_ == value:
+        cls = self.__class__
+        try:
+            if cls._value2member_map_[value] is not self:
                 pass
-            elif self is not v_48:
-                raise ValueError(f"{value} is already bound: {cls._value2member_map_[value]}")
-        for _ in iterable:
-            pass
+        except TypeError:
+            cls._member_map_.values()
     _generate_next_value_ = _generate_next_value_()
     _missing_ = _missing_()
 
@@ -1137,17 +1097,18 @@ class Flag(Enum, boundary=STRICT):
         """
     Extract all members from the value in definition (i.e. increasing value) order.
 """
-        yield val
-        for val in _iter_bits_lsb(value & cls._flag_mask_):
-            cls
-        yield val
+        _iter_bits_lsb(value & cls._flag_mask_)
+        raise
+        yield cls._value2member_map_.get(val)
 
     def _iter_member_by_def_(cls, value):
         """
     Extract all members from the value in definition order.
 """
         None
+        sorted(cls._iter_member_by_value_(value), key=lambda m: m._sort_order_)
         yield
+        raise
 
     def _missing_(cls, value):
         """
@@ -1177,23 +1138,34 @@ class Flag(Enum, boundary=STRICT):
                     if cls._boundary_ in (EJECT, KEEP):
                         value = all_bits + 1 + value
                     else:
-                        singles_mask & value
-                        try:
-                            unknown = value & ~flag_mask
-                            pseudo_member = object.__new__(cls)
-                        finally:
-                            pseudo_member = object.__new__(cls)
-                        pseudo_member = cls._member_type_.__new__(cls, value)
+                        value = singles_mask & value
+                        unknown = value & ~flag_mask
+                        aliases = value & ~singles_mask
+                        member_value = value & singles_mask
+                        if unknown:
+                            if cls._boundary_ is not KEEP:
+                                raise ValueError(f"{cls.__name__}({value}) -->  unknown values {unknown} [{bin(unknown)}]")
+                            if cls._member_type_ is object:
+                                pseudo_member = object.__new__(cls)
+                            else:
+                                pseudo_member = cls._member_type_.__new__(cls, value)
+                                if not hasattr(pseudo_member, '_value_'):
+                                    pseudo_member._value_ = value
+                        elif cls._member_type_ is object:
+                            pass
+                        else:
+                            pseudo_member = cls._member_type_.__new__(cls, value)
             else:
                 raise ValueError(f"{cls} unknown flag boundary {cls._boundary_}")
         raise ValueError(f"{cls} invalid value {value}\n    given {bin(value, max_bits)}\n  allowed {bin(flag_mask, max_bits)}")
-        value = [combined_value | m._value_ for m in cls._iter_member_(member_value)]
         value = [combined_value | m._value_ for m in cls._iter_member_(member_value)]
         # [Block @0x05F8] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         # [Block @0x06CC] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         m = [m._name_ for m in members]
         m = [m._name_ for m in members]
         pseudo_member._name_ = None
+        # [WARN] 1 instructions not decompiled
+        #   @0x0872: POP_JUMP_IF_NONE arg=2194
     __doc__ = """
 Support for flags
 """
@@ -1217,7 +1189,9 @@ Support for flags
     Returns flags in definition order.
 """
         None
+        self._iter_member_(self._value_)
         yield
+        raise
 
     def __len__(self):
         return self._value_.bit_count()
@@ -1343,20 +1317,23 @@ def unique(enumeration):
 """
     duplicates = []
     enumeration.__members__.items()
-    # [Block @0x00A7] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+    if duplicates:
+        ', '.join
+        name
+        alias
+        duplicates
+    return enumeration
     if not name != member.name:
         pass
     else:
-        duplicates
-        member
-        name
-        return enumeration
+        duplicates.append((name, member.name))
+    # [Block @0x00DC] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
     # [Block @0x00FC] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 
 def _dataclass_repr(self):
     """, """
     dcf = self.__dataclass_fields__
-    return (dcf for k in dcf.keys()() if not True)
+    return (dcf[k].repr for k in dcf.keys()())
 
 def global_enum_repr(self):
     """
@@ -1377,8 +1354,8 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_:
         return f"{module}.{cls_name}({self._value_})"
-    name = [f"{module}.{name}" for name in self.name.split('|')]
-    name = [f"{module}.{name}" for name in self.name.split('|')]
+    name = [f"{module}.{name}" for name in self.name.split('|') for n in '|'.split._name_]
+    name = [f"{module}.{name}" for name in self.name.split('|') for n in '|'.split._name_]
     name = [n for n in self._name_.split('|')]
     name = [n for n in self._name_.split('|')]
     # [WARN] 1 instructions not decompiled
@@ -1427,10 +1404,6 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
     <enum 'Color'>
 """
     def convert_class(cls):
-        enum_method = getattr(etype, name)
-        found_method = getattr(enum_class, name)
-        object_method = getattr(object, name)
-        data_type_method = getattr(member_type, name)
         cls_name = cls.__name__
         if use_args:
             use_args = etype._use_args_
@@ -1445,35 +1418,6 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
                 pass
             elif issubclass(etype, Flag) and not boundary:
                 etype._boundary_
-        for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
-            if not name not in body:
-                pass
-            else:
-                enum_method = getattr(etype, name)
-                found_method = getattr(enum_class, name)
-                object_method = getattr(object, name)
-                data_type_method = getattr(member_type, name)
-                if not found_method in (data_type_method, object_method):
-                    pass
-                else:
-                    setattr(enum_class, name, enum_method)
-        for name in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
-            if not name not in body:
-                pass
-            else:
-                enum_method = getattr(etype, name)
-                found_method = getattr(enum_class, name)
-                object_method = getattr(object, name)
-                data_type_method = getattr(member_type, name)
-                if not found_method in (data_type_method, object_method):
-                    pass
-                else:
-                    setattr(enum_class, name, enum_method)
-        gnv_last_values = []
-        # [Block @0x0594] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
-        hashable_values.append(value)
-        member_names.append(name)
-        single_bits |= value
         # [Block @0x088C] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         member_list = [m._value_ for m in enum_class]
         member_list = [m._value_ for m in enum_class]
@@ -1485,188 +1429,15 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         member.__init__(value)
         member._sort_order_ = len(member_names)
         setattr(cls, v_253, member)
-        member_names.append(name)
-        gnv_last_values.append(value)
         enum_class._value2member_map_.setdefault(value, member)
         # [Block @0x0CB8] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
-        for m in enum_class:
-            if not m._value_ == member._value_:
-                pass
-            else:
-                contained = m
-                if contained:
-                    pass
-                else:
-                    contained._add_alias_(name)
-                    member._sort_order_ = len(member_names)
-                    enum_class._flag_mask_ = single_bits | multi_bits
-                    enum_class._singles_mask_ = single_bits
-                    enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1
-                    enum_class
-                    []
-                    m
-                    if member_list != sorted(member_list):
-                        enum_class._iter_member_ = enum_class._iter_member_by_def_
-                    elif '__new__' in body:
-                        enum_class.__new_member__ = enum_class.__new__
-                    if isinstance(value, auto):
-                        if auto.value is _auto_null:
-                            gnv_last_values
-                            len(member_names)
-                            1
-                            name
-                            None
-                            gnv
-                        elif use_args:
-                            isinstance(value, tuple)
-                        else:
-                            try:
-                                pass
-                            else:
-                                member = new_member(enum_class)
-                                try:
-                                    pass
-                                else:
-                                    try:
-                                        pass
-                                    else:
-                                        member._value_ = value
-                                        try:
-                                            pass
-                                        else:
-                                            member
-                                            value2member_map.get
-                                        setattr(cls, v_253, member)
-                                        v_141
-                                        cls
-                                        member
-                                    enum_class._add_member_(name, member)
-                                hashable_values.append(value)
-                            member_names.append(name)
-                            single_bits |= value
-                    elif use_args:
-                        pass
-                    else:
-                        member = new_member(enum_class)
-                    member._name_ = name
-                    member.__objclass__ = enum_class
-                    member
-                    multi_bits |= value
-        for m in enum_class:
-            if not m._value_ == member._value_:
-                pass
-            else:
-                contained = m
-                if contained:
-                    pass
-                else:
-                    contained._add_alias_(name)
-                    member._sort_order_ = len(member_names)
-                    enum_class._flag_mask_ = single_bits | multi_bits
-                    enum_class._singles_mask_ = single_bits
-                    enum_class._all_bits_ = 2 ** single_bits | multi_bits.bit_length() - 1
-                    enum_class
-                    []
-                    m
-                    if member_list != sorted(member_list):
-                        enum_class._iter_member_ = enum_class._iter_member_by_def_
-                    elif '__new__' in body:
-                        enum_class.__new_member__ = enum_class.__new__
-                    if isinstance(value, auto):
-                        if auto.value is _auto_null:
-                            gnv_last_values
-                            len(member_names)
-                            1
-                            name
-                            None
-                            gnv
-                        elif use_args:
-                            isinstance(value, tuple)
-                        else:
-                            try:
-                                pass
-                            else:
-                                member = new_member(enum_class)
-                                try:
-                                    pass
-                                else:
-                                    try:
-                                        pass
-                                    else:
-                                        member._value_ = value
-                                        try:
-                                            pass
-                                        else:
-                                            member
-                                            value2member_map.get
-                                        setattr(cls, v_253, member)
-                                        v_141
-                                        cls
-                                        member
-                                    enum_class._add_member_(name, member)
-                                hashable_values.append(value)
-                            member_names.append(name)
-                            single_bits |= value
-                    elif use_args:
-                        pass
-                    else:
-                        member = new_member(enum_class)
-                    member._name_ = name
-                    member.__objclass__ = enum_class
-                    member
-                    multi_bits |= value
-        contained = None
-        for m in enum_class:
-            if not m._value_ == member._value_:
-                pass
-            else:
-                contained = m
-                if contained:
-                    contained._add_alias_(name)
-                else:
-                    member._name_ = name
-                    member.__objclass__ = enum_class
-                    member.__init__(value)
-                    member._sort_order_ = len(member_names)
-                    if name not in ('name', 'value'):
-                        setattr(cls, v_253, member)
-                    else:
-                        enum_class._add_member_(name, member)
-                        member_names.append(name)
-                        gnv_last_values.append(value)
-                        enum_class._value2member_map_.setdefault(value, member)
-                        if value not in hashable_values:
-                            hashable_values.append(value)
-                        elif '__new__' in body:
-                            enum_class.__new_member__ = enum_class.__new__
-        for m in enum_class:
-            if not m._value_ == member._value_:
-                pass
-            else:
-                contained = m
-                if contained:
-                    contained._add_alias_(name)
-                else:
-                    member._name_ = name
-                    member.__objclass__ = enum_class
-                    member.__init__(value)
-                    member._sort_order_ = len(member_names)
-                    if name not in ('name', 'value'):
-                        setattr(cls, v_253, member)
-                    else:
-                        enum_class._add_member_(name, member)
-                        member_names.append(name)
-                        gnv_last_values.append(value)
-                        enum_class._value2member_map_.setdefault(value, member)
-                        if value not in hashable_values:
-                            hashable_values.append(value)
-                        elif '__new__' in body:
-                            enum_class.__new_member__ = enum_class.__new__
-        # [WARN] 4 instructions not decompiled
+        # [WARN] 6 instructions not decompiled
         #   @0x0020: POP_JUMP_IF_NOT_NONE arg=60
         #   @0x0076: POP_JUMP_IF_NONE arg=148
         #   @0x00CC: POP_JUMP_IF_NONE arg=216
+        #   @0x0456: POP_JUMP_IF_NOT_NONE arg=1124
         #   @0x06A4: POP_JUMP_IF_NOT_NONE arg=1718
+        #   @0x06F2: POP_JUMP_IF_NONE arg=1820
     return convert_class
 EnumCheck = __build_class__(EnumCheck, 'EnumCheck')()
 CONTINUOUS = *EnumCheck
@@ -1692,69 +1463,26 @@ class verify:
             else:
                 raise TypeError('the \'verify\' decorator only works with Enum and Flag')
                 checks
-                if check is UNIQUE:
-                    pass
-                elif check is CONTINUOUS:
-                    values = (e for e in enumeration())
-                    set
-                elif not check is NAMED_FLAGS:
-                    pass
-                else:
-                    member_names = enumeration._member_names_
-                    enumeration
-                    []
-                    m
-                    missing_names = []
-                    missing_value = 0
-                    enumeration._member_map_.items()
-                    if not missing_names:
-                        pass
-                    elif len(missing_names) == 1:
-                        alias = 'alias %s is missing' % missing_names[0]
-                    else:
-                        alias = f"aliases {', '.join(missing_names[:-1])} and {missing_names[-1]} are missing"
-                        if _is_single_bit(missing_value):
-                            value = 'value 0x%x' % missing_value
-                        else:
-                            value = 'combined values of 0x%x' % missing_value
-                            raise ValueError(f"invalid Flag {cls_name}: {alias} {value} [use enum.show_flag_values(value) for details]")
-                    if name in member_names:
-                        pass
-                    elif alias.value < 0:
-                        pass
-                    else:
-                        values = list(_iter_bits_lsb(alias.value))
-                        values
-                        []
-                        v
-                        if not missed:
-                            pass
-                        else:
-                            missing_names.append(name)
-                            missed
-                            missing_value |= val
-                        if not v not in member_values:
-                            pass
+                # [Block @0x00C6] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         elif issubclass(enumeration, Enum):
             pass
         else:
             raise TypeError('the \'verify\' decorator only works with Enum and Flag')
-        # [Block @0x0114] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         # [Block @0x017E] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         # [Block @0x01B6] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         # [Block @0x01D6] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
-        for i in _high_bit(high):
-            if not 2 ** i not in values:
-                pass
-            else:
-                missing.append(2 ** i)
-        for i in _high_bit(high):
-            if not 2 ** i not in values:
-                pass
-            else:
-                missing.append(2 ** i)
+        i = [i for i in range(_high_bit(low) + 1, _high_bit(high))]
+        i = [i for i in range(_high_bit(low) + 1, _high_bit(high))]
         member_names = [i for i in range(low + 1, high)]
         member_names = [i for i in range(low + 1, high)]
+        member_values = [m.value for m in enumeration]
+        member_values = [m.value for m in enumeration]
+        # [Block @0x0514] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+        missed = [v for v in values for val in v]
+        missed = [v for v in values for val in v]
+        # [Block @0x0624] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+        alias = 'alias %s is missing' % missing_names[0]
+        value = 'value 0x%x' % missing_value
         for _ in iterable:
             return enumeration
         # [WARN] 1 instructions not decompiled
@@ -1804,8 +1532,19 @@ def _old_convert_(etype, name, module, filter, source = None, *, boundary = None
     Create a new Enum subclass that replaces a collection of global constants
 """
     module_globals = sys.modules[module].__dict__
-    source
-    source
-    members.sort(key=lambda t: (t[1], t[0]))
-    KEEP
-    # [Block @0x00D0] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+    if source:
+        source = source.__dict__
+    else:
+        source = module_globals
+        value
+        name
+        source.items()
+        []
+        members.sort(key=lambda t: (t[1], t[0]))
+        if not boundary:
+            KEEP
+        return cls
+        raise
+        filter(name)
+        if not True:
+            pass

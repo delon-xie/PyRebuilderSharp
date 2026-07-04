@@ -1828,7 +1828,7 @@ public class PycReader
 
     /// <summary>
     /// 3.14 异常表：变长 6-bit/字节编码（base-64 varint）。
-    /// 与 3.11-3.13 的区别：3.14 偏移量是字节偏移，不是 word 偏移。
+    /// 与 3.11-3.13 相同：偏移量是 WORD 偏移（字节偏移/2），读取后 *2 转换为字节偏移。\n    /// CPython 3.14 的异常表使用 code unit 偏移（1 unit = 2 字节），与 3.11-3.13 一致。
     /// 参考：CPython main/Lib/dis.py _parse_varint (2026-07)
     /// </summary>
     private List<ExceptionTableEntry> ParseExceptionTableVarint314(byte[] data)
@@ -1850,9 +1850,9 @@ public class PycReader
 
             entries.Add(new ExceptionTableEntry
             {
-                StartOffset = start,
-                EndOffset = end,
-                TargetOffset = target,
+                StartOffset = start * 2,
+                EndOffset = end * 2,
+                TargetOffset = target * 2,
                 Depth = depth,
                 Lasti = lasti
             });

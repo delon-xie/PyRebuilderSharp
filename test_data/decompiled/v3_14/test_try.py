@@ -1,3 +1,6 @@
 # Decompiled from: <module>
 
-1
+try:
+    a = 1
+except:
+    a = 0

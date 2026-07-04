@@ -40,10 +40,10 @@ r = obj.attr
 s = x if cond else y
 """}
 tests.items()
-if not True:
+if not f:
     pass
 raise
-if not True:
+if not f:
     pass
 raise
 py_path = os.path.join(OUTPUT_DIR, f"{name}.py")

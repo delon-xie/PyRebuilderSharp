@@ -7,7 +7,7 @@ version_files = {}
 os.listdir(pyc_dir)
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())
-if not True:
+if not f:
     pass
 raise
 print(f"  Python {version}: {len(files)} 个文件")
@@ -21,6 +21,7 @@ if not filename.endswith('.pyc'):
     pass
 else:
     filepath = os.path.join(pyc_dir, filename)
+    open(filepath, 'rb')
     magic = f.read(4)
     version = magic_numbers.get(magic, 'unknown')
     if version not in version_files:

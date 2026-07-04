@@ -260,7 +260,11 @@ class EnumDict(dict):
                             value
                             setattr(self, '_generate_next_value', _gnv)
                             super().__setitem__(key, value)
-                            value = None(**t, **auto_valued)
+                            if self:
+                                value = None(**t, **auto_valued)
+                            else:
+                                raise
+                                raise
                     elif (key == '_ignore_') and isinstance(value, str):
                         value = value.replace(',', ' ').split()
                     else:
@@ -304,8 +308,12 @@ class EnumDict(dict):
     def update(self, members):
         members.keys()
         more_members.items()
-        for (name, value) in members:
-            pass
+        if members:
+            for (name, value) in members:
+                pass
+        else:
+            raise
+            raise
 _EnumDict = EnumDict
 
 class EnumType(type):
@@ -789,11 +797,14 @@ class Enum(metaclass=EnumType):
                 return None
                 cls._value2member_map_.setdefault(value, self)
                 cls._hashable_values_.append(value)
-                for m in cls._member_map_.values():
-                    if not m._value_ == value:
-                        pass
-                    elif m is not self:
-                        raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
+                if value:
+                    for m in cls._member_map_.values():
+                        if not m._value_ == value:
+                            pass
+                        elif m is not self:
+                            raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
+                else:
+                    raise
             except TypeError:
                 cls._member_map_.values()
         except TypeError:

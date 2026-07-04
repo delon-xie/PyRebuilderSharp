@@ -40,22 +40,15 @@ r = obj.attr
 s = x if cond else y
 """}
 tests.items()
-py_path = OUTPUT_DIR(f"{name}.py")
+py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
 pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
 out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
-f.write(code)
-f := __name__()(None, None, None)
+__name__()
 open(py_path, 'w')
 __module__
 open(py_path, 'w')
-'-c'
-PY27
-None
-subprocess.run
-r = ["""import py_compile, sys
-py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path]
-print
-f"\n=================================================="()
-print(f"Test: {name}")
-f""
-print(f"Decompile: {r2.stdout.strip()[:100]}")
+f.write(code)
+raise
+if not f:
+    pass
+raise

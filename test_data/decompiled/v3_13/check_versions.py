@@ -7,7 +7,7 @@ version_files = {}
 os.listdir(pyc_dir)
 print('各版本 pyc 文件分布:')
 sorted(version_files.items())
-if not True:
+if not f:
     pass
 raise
 print(f"  Python {version}: {len(files)} 个文件")

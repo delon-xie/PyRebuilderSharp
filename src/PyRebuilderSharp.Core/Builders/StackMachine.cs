@@ -1471,10 +1471,12 @@ public class StackMachine
             case Opcode.PUSH_EXC_HANDLER_312:
             case Opcode.PULL_EXC_FROM_INFO_312:
             case Opcode.PUSH_EXC_INFO_312:
+                // handler 块：for 循环上下文结束，防止 POP_TOP 误判为 break
+                _isForLoop = false;
+                return null;
             case Opcode.CHECK_EXC_MATCH:
             case Opcode.CHECK_EG_MATCH:
-                // handler 块：for 循环上下文结束，防止 POP_TOP 误判为 break
-                // Fallthrough to MATCH_MAPPING_312: pop consumed item, no visible output
+                // handler 块：for 循环上下文结束
                 _isForLoop = false;
                 goto case Opcode.MATCH_MAPPING_312;
             case Opcode.MATCH_MAPPING_312:

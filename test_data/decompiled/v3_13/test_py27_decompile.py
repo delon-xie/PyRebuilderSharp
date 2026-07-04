@@ -30,6 +30,6 @@ else:
         result2.stderr[-500:]
     else:
         result2.stderr
-    if not True:
+    if not result2:
         pass
     raise

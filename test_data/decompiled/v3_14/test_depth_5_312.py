@@ -53,3 +53,8 @@ def depth_5_while():
 
 def depth_5_try():
     result = 0
+    try:
+        result = 42
+    except:
+        result = -1
+    raise

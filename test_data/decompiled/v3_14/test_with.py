@@ -1,11 +1,9 @@
 # Decompiled from: <module>
 
 lock = object()
+__name__()
 lock
-try:
-    __name__
-    __module__
-finally:
-    'hello'
-    None
-    print
+__module__
+lock
+print('hello')
+raise

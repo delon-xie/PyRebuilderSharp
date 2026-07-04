@@ -13,6 +13,7 @@ def test_until_broken(exprs):
 """.join(exprs)
     pyf = '/tmp/expr_bs.py'
     pycf = '/tmp/expr_bs.3.10.pyc'
+    open(pyf, 'w')
     f.write(code)
     None(None)
     r = subprocess.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], capture_output=True, text=True, timeout=30)
@@ -26,7 +27,7 @@ def test_until_broken(exprs):
     if 'if ' in out:
         return f"CONDITIONAL: {out[:80]}"
     return 'OK'
-    if not True:
+    if not f:
         pass
 
 def find_breaking_point(exprs, lo, hi):

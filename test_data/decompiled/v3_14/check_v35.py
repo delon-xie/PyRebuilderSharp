@@ -15,17 +15,11 @@ def dump_code(c, depth):
 
 import marshal
 import sys
-sys.argv
-None
-open
-try:
-    f
-    f := __name__()
-    'rb'
-    __module__
-    'rb'
-finally:
-    '  argc:'
-    None
-    print
-code
+__name__()
+open(sys.argv[1], 'rb')
+__module__
+open(sys.argv[1], 'rb')
+magic = f.read(4)
+f.read(8)
+code = marshal.load(f)
+raise

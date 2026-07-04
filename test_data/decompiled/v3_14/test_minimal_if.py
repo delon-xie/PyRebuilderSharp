@@ -13,9 +13,10 @@ def test_simple():
         x = 2
     return x
 """
+__name__()
+tempfile.NamedTemporaryFile(suffix='.py', delete=False, mode='w')
+__module__
+tempfile.NamedTemporaryFile(suffix='.py', delete=False, mode='w')
 f.write(src)
 py_path = f.name
-f := __name__()(None, None, None)
-__module__
-py_compile.compile(py_path, cfile=py_path + 'c', doraise=True)
-print('Compiled OK')
+raise

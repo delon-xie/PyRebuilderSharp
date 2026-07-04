@@ -14,12 +14,15 @@ else:
     print('    文件列表:')
     sorted(files)
     print(f"      {f}")
-filename.endswith
-try:
-    pyc_dir
-    os.path.join
-    version_files
-    []
+if not filename.endswith('.pyc'):
+    pass
+else:
+    filepath = os.path.join(pyc_dir, filename)
+    __name__()
+    open(filepath, 'rb')
+    __module__
+    open(filepath, 'rb')
+    magic = f.read(4)
+    version = magic_numbers.get(magic, 'unknown')
     version_files[version].append(filename)
-finally:
-    version_files[version].append(filename)
+    raise

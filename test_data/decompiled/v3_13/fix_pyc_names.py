@@ -9,7 +9,7 @@ def get_python_version(filepath):
     magic = fp.read(4)
     None(None)
     return MAGIC_NUMBERS.get(magic, 'unknown')
-    if not True:
+    if not fp:
         pass
     raise
 

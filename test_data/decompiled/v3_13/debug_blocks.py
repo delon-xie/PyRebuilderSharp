@@ -9,7 +9,7 @@ f.read(16)
 code = marshal.load(f)
 None(None)
 code.co_consts
-if not True:
+if not f:
     pass
 raise
 raise

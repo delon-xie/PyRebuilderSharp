@@ -8,6 +8,7 @@ INPUT_PY = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/P
 OUTPUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 BASENAME = 'test_expressions_comprehensive'
 PY27 = os.path.expanduser('~/.pyenv/versions/2.7.18/bin/python')
+open(INPUT_PY)
 content = f.read()
 None(None)
 outc = os.path.join(OUTPUT_DIR, '{}.2.7.pyc'.format(BASENAME))
@@ -29,6 +30,6 @@ else:
         result2.stderr[-500:]
     else:
         result2.stderr
-    if not True:
+    if not result2:
         pass
     raise

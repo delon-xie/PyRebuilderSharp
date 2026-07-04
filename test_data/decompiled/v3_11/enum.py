@@ -307,8 +307,16 @@ class EnumDict(dict):
 
     def update(self, members):
         members.keys()
-        for (name, value) in members:
-            pass
+        if members:
+            for (name, value) in members:
+                pass
+        else:
+            raise
+            raise
+            more_members.items()
+            for (name, value) in more_members.items():
+                None
+            return
 _EnumDict = EnumDict
 
 class EnumType(type):
@@ -777,13 +785,16 @@ class Enum(metaclass=EnumType):
         try:
             try:
                 raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
-                for m in cls._member_map_.values():
-                    if (m._value_ == value) and (m is not self):
-                        raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
-                    return None
+                if value:
+                    for m in cls._member_map_.values():
+                        if (m._value_ == value) and (m is not self):
+                            raise ValueError(f"{value!r} is already bound: {cls._value2member_map_[value]!r}")
+                        return None
+                        raise
+                        cls._value2member_map_.setdefault(value, self)
+                        cls._hashable_values_.append(value)
+                else:
                     raise
-                    cls._value2member_map_.setdefault(value, self)
-                    cls._hashable_values_.append(value)
             except TypeError:
                 cls._member_map_.values()
         except TypeError:

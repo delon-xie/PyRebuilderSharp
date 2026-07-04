@@ -599,11 +599,11 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
                 full = cache_len() >= maxsize
                 None(None)
                 return result
-                if not True:
+                if not key:
                     pass
                 return result
                 raise
-            if not True:
+            if not key:
                 pass
             raise
             # [WARN] 1 instructions not decompiled

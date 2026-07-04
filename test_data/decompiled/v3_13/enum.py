@@ -275,7 +275,8 @@ enumeration member names.
                             value
                             setattr(self, '_generate_next_value', _gnv)
                             super().__setitem__(self, v_18)
-                            value = t(**None, **auto_valued)
+                            if self:
+                                value = t(**None, **auto_valued)
                             raise
                             raise
                     elif (key == '_ignore_') and isinstance(value, str):
@@ -301,8 +302,9 @@ enumeration member names.
     def update(self, members):
         members.keys()
         more_members.items()
-        for (value, name) in members:
-            pass
+        if members:
+            for (value, name) in members:
+                pass
         raise
         raise
         for (value, name) in members:
@@ -860,12 +862,13 @@ attributes -- see the documentation for details.
                 cls._value2member_map_.setdefault(self, v_16)
                 cls._hashable_values_.append(value)
                 return None
-                for m in cls._member_map_.values():
-                    m._value_ == value
-                    if not True:
-                        pass
-                    elif self is not v_48:
-                        raise ValueError(f"{value} is already bound: {cls._value2member_map_[value]}")
+                if cls:
+                    for m in cls._member_map_.values():
+                        m._value_ == value
+                        if not True:
+                            pass
+                        elif self is not v_48:
+                            raise ValueError(f"{value} is already bound: {cls._value2member_map_[value]}")
                 raise
             except TypeError:
                 cls._member_map_.values()

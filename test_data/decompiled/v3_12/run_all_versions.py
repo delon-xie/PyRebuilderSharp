@@ -7,6 +7,7 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
+open(INPUT_FILE)
 expected_src = f.read()
 None(None)
 try:
@@ -22,7 +23,7 @@ print(f"\n{'========================================'}")
 passed = (<genexpr>)(results.items()())
 total = len(results)
 'Passed: '(f"{passed}/{total} ({passed / total * 100}{'.0f'}%)")
-if not True:
+if not print:
     pass
 raise
 pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")

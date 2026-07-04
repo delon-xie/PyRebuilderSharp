@@ -14,16 +14,14 @@ def test_until_broken(exprs):
     code = """
 """.join(exprs)
     pyf = '/tmp/expr_bs.py'
-    '/tmp/expr_bs.3.10.pyc'
-    try:
-        'w'
-        pyf
-        open
-    finally:
-        pyc
-    return 'NO_COMPILE'
-    r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
-    out = r2.stdout + r2.stderr.strip()
+    pycf = '/tmp/expr_bs.3.10.pyc'
+    __name__()
+    open(pyf, 'w')
+    __module__
+    open(pyf, 'w')
+    f.write(code)
+    return 'OK'
+    raise
 
 def find_breaking_point(exprs, lo, hi):
     while lo < hi:

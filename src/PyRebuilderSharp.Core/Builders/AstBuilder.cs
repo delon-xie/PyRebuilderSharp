@@ -2816,6 +2816,16 @@ public class AstBuilder
         {
             return null;
         }
+        // 3.14 中 ET 目标偏移可能指向空指令块（BlockScanner 创建的占位块）。
+        // 向后搜索最近的有指令的块作为真正的 handler。
+        if (handlerBlock.Instructions.Count == 0)
+        {
+            handlerBlock = _sortedBlocks
+                .FirstOrDefault(b => b.StartOffset >= matchingEntry.TargetOffset
+                    && b.Instructions.Count > 0);
+            if (handlerBlock == null || visited.Contains(handlerBlock))
+                return null;
+        }
         
         // Python 3.13+ 内联列表推导式的 ET 条目：handler 块包含 LIST_APPEND_313
         // 这些不是真正的异常处理器，跳过它们

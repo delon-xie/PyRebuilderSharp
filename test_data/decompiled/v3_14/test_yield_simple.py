@@ -1,4 +1,5 @@
 # Decompiled from: <module>
 
 def f():
-    pass
+    yield 1
+    raise

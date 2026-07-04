@@ -13,6 +13,7 @@ def test_simple():
         x = 2
     return x
 """
+tempfile.NamedTemporaryFile(suffix='.py', delete=False, mode='w')
 f.write(src)
 py_path = f.name
 None(None)
@@ -23,6 +24,6 @@ print('=== Decompiled ===')
 print(r.stdout.strip())
 os.unlink(py_path)
 os.unlink(py_path + 'c')
-if not True:
+if not py_compile:
     pass
 raise

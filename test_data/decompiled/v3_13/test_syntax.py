@@ -2872,7 +2872,7 @@ class SyntaxWarningTest(unittest.TestCase):
         self.assertWarnsRegex(SyntaxWarning, errtext)
         compile(self, v_19, mode)
         None(None)
-        if not True:
+        if not mode:
             pass
         raise
 
@@ -2949,10 +2949,10 @@ class SyntaxErrorTestCase(unittest.TestCase):
         MAX_MANAGERS = CO_MAXBLOCKS - 1
         range(MAX_MANAGERS)
         range(self, v_51 + 5)
-        if not True:
+        if not get_code:
             pass
         raise
-        if not True:
+        if not self:
             pass
         raise
         self.subTest(f"out of range: n={n}")
@@ -2977,10 +2977,10 @@ class SyntaxErrorTestCase(unittest.TestCase):
         MAX_MANAGERS = CO_MAXBLOCKS - 1
         range(MAX_MANAGERS)
         range(self, v_51 + 5)
-        if not True:
+        if not get_code:
             pass
         raise
-        if not True:
+        if not self:
             pass
         raise
         self.subTest(f"out of range: n={n}")
@@ -3021,7 +3021,7 @@ while 1:
     def test_error_on_parser_stack_overflow(self):
         source = '-' * 100000 + '4'
         ('exec', 'eval', 'single')
-        if not True:
+        if not source:
             pass
         raise
         self.subTest(mode=mode)
@@ -3035,7 +3035,7 @@ while 1:
         self.assertRaises(SyntaxError)
         compile(source, '<string>', 'exec')
         None(None)
-        if not True:
+        if not source:
             pass
         raise
 

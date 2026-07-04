@@ -64,7 +64,7 @@ while i < len(lines):
                                             0
                                             '<10'(f" {total_failed}<10 {total}<10 {overall_rate}>8.1f%")
                                             print('======================================================================')
-                                            if not True:
+                                            if not print:
                                                 pass
                                             raise
                                         stats = version_stats[version]

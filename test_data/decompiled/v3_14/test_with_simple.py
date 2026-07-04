@@ -2,6 +2,12 @@
 
 def test():
     lock = object()
-    __name__
+    __name__()
+    lock
     __module__
-    print
+    lock
+    __name__()
+    lock
+    __module__
+    lock
+    print(lk)

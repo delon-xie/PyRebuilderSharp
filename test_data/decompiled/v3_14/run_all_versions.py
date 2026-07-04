@@ -5,11 +5,18 @@ import os
 import subprocess
 import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-os.path
-'~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled'
-None
-f""
-print(f"  Line {i}: expected={e}")
-print(f"           actual=  {a}")
-passed = [range(max(len(exp_lines), len(act_lines))) for ver in versions if i < len(exp_lines) if e != a for i in """
-""".split if i < len(exp_lines) if e != a]
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_expr_basic.py')
+__name__()
+open(INPUT_FILE)
+__module__
+open(INPUT_FILE)
+expected_src = f.read()
+raise
+print('Failed to parse expected source')
+sys.exit(1)
+raise
+if ast:
+    pass
+raise
+raise

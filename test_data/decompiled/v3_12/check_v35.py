@@ -2,6 +2,7 @@
 
 import marshal
 import sys
+open(sys.argv[1], 'rb')
 magic = f.read(4)
 f.read(8)
 code = marshal.load(f)
@@ -24,6 +25,6 @@ def dump_code(c, depth = 0):
         print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.co_argcount, const.co_nlocals, len(const.co_code)))
         dump_code(const, depth + 1)
 dump_code(code)
-if not True:
+if not print:
     pass
 raise

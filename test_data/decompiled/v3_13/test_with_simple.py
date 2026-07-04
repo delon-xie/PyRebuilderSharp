@@ -7,6 +7,6 @@ def test():
     lock
     print(lk)
     None(None)
-    if not True:
+    if not lk:
         pass
     raise

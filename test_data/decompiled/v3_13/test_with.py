@@ -4,6 +4,6 @@ lock = object()
 lock
 print('hello')
 None(None)
-if not True:
+if not print:
     pass
 raise

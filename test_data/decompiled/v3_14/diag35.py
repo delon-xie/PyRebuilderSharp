@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 import os
 SRC = os.path.expanduser('~/codes/Tools/PyRebuilderSharp')
-PROJECT = SRC('src/PyRebuilderSharp.Cli')
+PROJECT = os.path.join(SRC, 'src/PyRebuilderSharp.Cli')
 test_code = """
 using PyRebuilderSharp.Core;
 using PyRebuilderSharp.Core.Readers;
@@ -31,8 +31,9 @@ try {
     Console.Error.WriteLine("ERROR: " + ex.GetType().Name + ": " + ex.Message);
 }
 """
-f
-f := __name__()
+__name__()
 open('/tmp/diag35.cs', 'w')
 __module__
 open('/tmp/diag35.cs', 'w')
+f.write(test_code)
+raise

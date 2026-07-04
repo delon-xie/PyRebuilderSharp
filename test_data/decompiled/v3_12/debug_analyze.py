@@ -2,6 +2,7 @@
 
 import re
 from collections import defaultdict
+open('/tmp/test_full.txt', 'r')
 output = f.read()
 None(None)
 

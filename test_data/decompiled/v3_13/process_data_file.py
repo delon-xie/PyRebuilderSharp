@@ -47,9 +47,9 @@ def
 None(None)
 result = process_data_file('empty_file.txt')
 print(f"最终结果: {result}\n")
-if not True:
+if not process_data_file:
     pass
 raise
-if not True:
+if not f:
     pass
 raise

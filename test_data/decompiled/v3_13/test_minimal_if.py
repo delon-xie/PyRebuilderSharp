@@ -24,6 +24,6 @@ print('=== Decompiled ===')
 print(r.stdout.strip())
 os.unlink(py_path)
 os.unlink(py_path + 'c')
-if not True:
+if not py_compile:
     pass
 raise

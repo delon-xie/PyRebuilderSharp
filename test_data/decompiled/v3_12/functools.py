@@ -474,6 +474,7 @@ def lru_cache(maxsize = 128, typed = False):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     def cache_info():
         """Report cache statistics"""
+        lock
         misses
         maxsize
         lock
@@ -488,6 +489,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
         raise
     def cache_clear():
         """Clear the cache and cache statistics"""
+        lock
         root
         misses
         lock

@@ -40,7 +40,7 @@ r = obj.attr
 s = x if cond else y
 """}
 tests.items()
-if not True:
+if not f:
     pass
 r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], capture_output=True, text=True, timeout=10)
@@ -52,16 +52,17 @@ if not r.stdout.strip():
 f""
 print(f"Decompile: {r2.stdout.strip()[:100]}")
 if os.path.exists(out_path):
-    pass
+    open(out_path)
 else:
     print(f"Error: {r2.stderr[:200]}")
 raise
-if not True:
+if not f:
     pass
 print(f"Output ({len(content)} bytes):\n{content[:300]}")
 raise
 py_path = os.path.join(OUTPUT_DIR, f"{name}.py")
 pyc_path = os.path.join(OUTPUT_DIR, f"{name}.27.pyc")
 out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
+open(py_path, 'w')
 f.write(code)
 None(None)

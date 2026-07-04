@@ -2,11 +2,9 @@
 
 import struct
 import sys
-sys.argv
-None
-open
-'rb'
-128
-raw2
-print('  (FLAG_REF set, _refList.Count used)')
-off2 = off + 1
+__name__()
+open(sys.argv[1], 'rb')
+__module__
+open(sys.argv[1], 'rb')
+data = f.read()
+raise

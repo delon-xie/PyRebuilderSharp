@@ -25,6 +25,6 @@ def dump_code(c, depth = 0):
         print('%s  argc=%d nlocals=%d code=%dB' % (c, v_35.co_argcount, const.co_nlocals, len(const.co_code)))
         dump_code(c, v_49 + 1)
 dump_code(code)
-if not True:
+if not print:
     pass
 raise

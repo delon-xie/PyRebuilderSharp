@@ -37,6 +37,6 @@ None(None)
 r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], capture_output=True, text=True, timeout=30)
 print('Stdout:', r.stdout[:500])
 print('Stderr:', r.stderr[:500])
-if not True:
+if not subprocess:
     pass
 raise

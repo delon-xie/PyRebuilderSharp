@@ -6,14 +6,19 @@ import subprocess
 import ast
 import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
-os.path
-'~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled'
-os.path
-('indent',)
-2
-actual_src()
-f""
-print('  Line %d: expected=%s' % (i, e))
-print('           actual=  %s' % a)
-passed = [f"" for ver in versions if i < len(exp_lines) if e != a for i in """
-""".split if i < len(exp_lines) if e != a]
+COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
+INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+__name__()
+open(INPUT_FILE)
+__module__
+open(INPUT_FILE)
+expected_src = f.read()
+raise
+if ast:
+    pass
+raise
+raise
+if ast:
+    pass
+raise
+raise

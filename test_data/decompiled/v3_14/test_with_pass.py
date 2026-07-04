@@ -2,5 +2,7 @@
 
 def test():
     lock = object()
-    None
-    None
+    __name__()
+    lock
+    __module__
+    lock

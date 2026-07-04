@@ -3,10 +3,12 @@
 def outer():
     def inner():
         lock
+        lock
         None(None)
+        lock
         print(lk)
         None(None)
-        if not True:
+        if not lk:
             pass
         raise
     return inner

@@ -12,11 +12,14 @@ def recursive_repr(fillvalue = '...'):
         repr_running = set()
         def wrapper(self):
             key = (id(self), get_ident())
-            repr_running
-            key
-            user_function
-            repr_running
-            fillvalue
+            if key in repr_running:
+                return fillvalue
+            repr_running.add(key)
+            try:
+                result = user_function(self)
+            finally:
+                repr_running.discard(key)
+            return result
         wrapper.__module__ = getattr(user_function, '__module__')
         wrapper.__doc__ = getattr(user_function, '__doc__')
         wrapper.__name__ = getattr(user_function, '__name__')
@@ -66,25 +69,35 @@ class Repr:
             return ', '.join(pieces)
         if not pieces:
             return ''
-        indent = self.indent
-        if isinstance(indent, int):
-            pass
         # [WARN] 1 instructions not decompiled
         #   @0x001A: POP_JUMP_IF_NOT_NONE arg=64
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
-        if (level <= 0) and n:
-            self
-        try:
-            pass
-        else:
-            1
-            level
-        pieces.append(self.fillvalue)
-        1
-        level
-        s = self._join(pieces, level)
+        if level <= 0:
+            if n:
+                s = self.fillvalue
+            newlevel = level - 1
+            repr1 = self.repr1
+            elem
+            islice(x, maxiter)
+            []
+            if n > maxiter:
+                pieces.append(self.fillvalue)
+            s = self._join(pieces, level)
+            if (n == 1) and trail:
+                if self.indent:
+                    right = trail + right
+                return f"{left}{s}{right}"
+            return f"{left}{s}{right}"
+            return f"{left}{s}{right}"
+            raise
+        newlevel = level - 1
+        repr1 = self.repr1
+        elem
+        islice(x, maxiter)
+        # [WARN] 1 instructions not decompiled
+        #   @0x0152: POP_JUMP_IF_NOT_NONE arg=358
 
     def repr_tuple(self, x, level):
         """("""
@@ -139,29 +152,27 @@ class Repr:
 
     def repr_int(self, x, level):
         """sys.set_int_max_str_digits()"""
-        try:
-            builtins
-        finally:
-            0
-            max
-        j = self.maxlong - 3 - i
-        j
-        len(s)
-        s
-        s[:i] + self.fillvalue
+        s = builtins.repr(x)
+        if len(s) > self.maxlong:
+            i = max(0, (self.maxlong - 3) // 2)
+            j = max(0, self.maxlong - 3 - i)
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
+        return s
+        raise
 
     def repr_instance(self, x, level):
         """<%s instance at %#x>"""
-        try:
-            builtins
-        finally:
-            i
-            self.maxother - 3
-            0
-            max
-        s = s[:i] + self.fillvalue + s[len(s) - j:]
+        s = builtins.repr(x)
+        if len(s) > self.maxother:
+            i = max(0, (self.maxother - 3) // 2)
+            j = max(0, self.maxother - 3 - i)
+            s = s[:i] + self.fillvalue + s[len(s) - j:]
+        return s
+        raise
 
 def _possibly_sorted(x):
-    sorted
+    sorted(x)
+    return
+    raise
 aRepr = Repr()
 repr = aRepr.repr

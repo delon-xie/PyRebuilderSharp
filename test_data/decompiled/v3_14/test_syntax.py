@@ -2869,9 +2869,12 @@ class SyntaxWarningTest(unittest.TestCase):
     errtest is a regular expression that must be present in the
     text of the warning raised.
 """
-        self.assertWarnsRegex
-        SyntaxWarning(errtext)
+        __name__()
+        self.assertWarnsRegex(SyntaxWarning, errtext)
+        __module__
+        self.assertWarnsRegex(SyntaxWarning, errtext)
         compile(code, filename, mode)
+        raise
 
     def test_return_in_finally(self):
         """
@@ -2960,31 +2963,17 @@ class SyntaxErrorTestCase(unittest.TestCase):
         CO_MAXBLOCKS = 21
         MAX_MANAGERS = CO_MAXBLOCKS - 1
         range(MAX_MANAGERS)
-        range
+        range(MAX_MANAGERS, MAX_MANAGERS + 5)
         __name__()
-        self._check_error(get_code(n), 'too many statically nested blocks')
-        self.subTest(f"out of range: n={n}")(None, None, None)
-        self
-        __name__()
-        n
-        None
-        get_code
-        compile
-        f"within range: n={n}"
+        self.subTest(f"out of range: n={n}")
         __module__
-        f"within range: n={n}"
-        '<string>'('exec')
-        None
-        None
-        None
-        for n in None:
-            __name__()
-            self._check_error(get_code(n), 'too many statically nested blocks')
-            self.subTest(f"out of range: n={n}")(None, None, None)
-        for n in None:
-            __name__()
-            self._check_error(get_code(n), 'too many statically nested blocks')
-            self.subTest(f"out of range: n={n}")(None, None, None)
+        self.subTest(f"out of range: n={n}")
+        self._check_error(get_code(n), 'too many statically nested blocks')
+        __name__()
+        self.subTest(f"within range: n={n}")
+        __module__
+        self.subTest(f"within range: n={n}")
+        compile(get_code(n), '<string>', 'exec')
 
     def test_async_with_statement_many_context_managers(self):
         def get_code(n):
@@ -3005,31 +2994,17 @@ class SyntaxErrorTestCase(unittest.TestCase):
         CO_MAXBLOCKS = 21
         MAX_MANAGERS = CO_MAXBLOCKS - 1
         range(MAX_MANAGERS)
-        range
+        range(MAX_MANAGERS, MAX_MANAGERS + 5)
         __name__()
-        self._check_error(get_code(n), 'too many statically nested blocks')
-        self.subTest(f"out of range: n={n}")(None, None, None)
-        self
-        __name__()
-        n
-        None
-        get_code
-        compile
-        f"within range: n={n}"
+        self.subTest(f"out of range: n={n}")
         __module__
-        f"within range: n={n}"
-        '<string>'('exec')
-        None
-        None
-        None
-        for n in None:
-            __name__()
-            self._check_error(get_code(n), 'too many statically nested blocks')
-            self.subTest(f"out of range: n={n}")(None, None, None)
-        for n in None:
-            __name__()
-            self._check_error(get_code(n), 'too many statically nested blocks')
-            self.subTest(f"out of range: n={n}")(None, None, None)
+        self.subTest(f"out of range: n={n}")
+        self._check_error(get_code(n), 'too many statically nested blocks')
+        __name__()
+        self.subTest(f"within range: n={n}")
+        __module__
+        self.subTest(f"within range: n={n}")
+        compile(get_code(n), '<string>', 'exec')
 
     def test_syntax_error_on_deeply_nested_blocks(self):
         """
@@ -3088,18 +3063,24 @@ while 1:
         """-"""
         source = '-' * 100000 + '4'
         ('exec', 'eval', 'single')
-        self
-        __name__
+        __name__()
+        self.subTest(mode=mode)
         __module__
-        'too complex'
-        MemoryError
+        self.subTest(mode=mode)
+        __name__()
+        self.assertRaisesRegex(MemoryError, 'too complex')
+        __module__
+        self.assertRaisesRegex(MemoryError, 'too complex')
 
     def test_deep_invalid_rule(self):
         """d{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y"""
         source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
-        self.assertRaises
-        SyntaxError
+        __name__()
+        self.assertRaises(SyntaxError)
+        __module__
+        self.assertRaises(SyntaxError)
         compile(source, '<string>', 'exec')
+        raise
 
     def _check_error(self, code, errtext, filename = '<testcase>', mode = 'exec', subclass = None, lineno = None, offset = None, end_lineno = None, end_offset = None):
         """Check that compiling code raises SyntaxError with errtext.
@@ -3108,8 +3089,15 @@ while 1:
     text of the exception raised.  If subclass is specified it
     is the expected subclass of SyntaxError (e.g. IndentationError).
 """
-        compile
-        'compile() did not raise SyntaxError'
+        compile(code, filename, mode)
+        self.fail('compile() did not raise SyntaxError')
+        raise
+        # [WARN] 5 instructions not decompiled
+        #   @0x0114: POP_JUMP_IF_NOT_NONE arg=322
+        #   @0x017E: POP_JUMP_IF_NONE arg=442
+        #   @0x01BE: POP_JUMP_IF_NONE arg=506
+        #   @0x01FE: POP_JUMP_IF_NONE arg=570
+        #   @0x023E: POP_JUMP_IF_NONE arg=646
 
     def test_expression_with_assignment(self):
         """print(end1 + end2 = ' ')"""
@@ -3335,11 +3323,28 @@ except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the
 
     pass
 """
-        try:
-            compile
-        finally:
-            compile(s1, '<string>', 'exec')
-        compile
+        s = """\\
+pass
+        \\
+
+pass
+"""
+        compile(s, '<string>', 'exec')
+        s1 = """\\
+def fib(n):
+    \\
+'''Print a Fibonacci series up to n.'''
+    \\
+a, b = 0, 1
+"""
+        s2 = """\\
+def fib(n):
+    '''Print a Fibonacci series up to n.'''
+    a, b = 0, 1
+"""
+        compile(s1, '<string>', 'exec')
+        compile(s2, '<string>', 'exec')
+        raise
 
     def test_continuation_bad_indentation(self):
         """\
