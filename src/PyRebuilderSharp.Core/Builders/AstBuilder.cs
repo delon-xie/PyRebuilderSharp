@@ -7470,10 +7470,10 @@ public class AstBuilder
         // 4. 检测是否是类体：无参数函数且函数体只有赋值语句
         // 但如果函数有显式返回值，或者有 RETURN_VALUE 指令，则不应识别为类
         bool hasReturnValue = childCode.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE);
-        // 类体的 return __class__ 是 CPython 内部实现，不算显式函数返回
-        // 如果最后一个 RETURN_VALUE 对应的是 return __class__，则排除
-        bool hasRealReturn = hasReturnValue && !(body.Count > 0 && body[^1] is Return rv
-            && rv.Value is Name rvn && rvn.Id == "__class__");
+        // 类体的 return __class__ 和 return None 都是 CPython 内部实现，不算显式函数返回
+        // 经过 StripTrailingReturnNone 后，body 中还有非-implicit return 才算 real return
+        bool hasRealReturn = body.Any(s => s is Return r2 && r2.Value != null
+            && !(r2.Value is Name rn && rn.Id == "__class__"));
         
         // 只有当函数体确实像类体（只有赋值语句）且没有显式返回值时，才识别为类
         // 对于普通函数，即使没有参数，如果有 return 语句或 RETURN_VALUE 指令，也应该识别为函数
@@ -7870,6 +7870,9 @@ public class AstBuilder
                 {
                     // 从模块级指令中提取基类名
                     // 模式: LOAD_BUILD_CLASS ... LOAD_CONST(name) LOAD_NAME(base) CALL N STORE_NAME(className)
+                    // 对 keyword-args 类定义，从 Call.Keywords 提取 keyword bases
+                    // 在 PostProcessFunctionDefs 中，CALL_KW 路径会产生 Keyword 列表
+                    // 此处从字节码回溯 CALL_KW + KW_NAMES 模式
                     var bases = new List<Expr>();
                     if (_codeObject?.Instructions != null)
                     {
