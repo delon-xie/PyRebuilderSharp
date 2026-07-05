@@ -2,7 +2,7 @@
 
 print(f"⏭ {ver}: .pyc not found")
 pyc = os.path.join(COMPILED_DIR, f"test_expr_basic.{ver}.pyc")
-"""Run AST comparison for test_expr_basic across all versions"""
+'Run AST comparison for test_expr_basic across all versions'
 import os
 import subprocess
 import sys
@@ -13,6 +13,7 @@ f = open(INPUT_FILE)
 expected_src = f.read()
 with open(INPUT_FILE) as f:
     expected_src = f.read()
+    pass
     try:
         ast = ast
         expected_ast = ast.dump(ast.parse(expected_src), indent=2)

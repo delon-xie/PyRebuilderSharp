@@ -8,5 +8,13 @@ for (name, code) in tests.items():
     open(py_path, 'w')
     __module__
     open(py_path, 'w')
+    try:
+        pass
+    finally:
+        pass
+        pass
+    pass
+    pass
+    pass
     if not f:
         pass

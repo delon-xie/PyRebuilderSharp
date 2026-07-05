@@ -36,6 +36,7 @@ def mixed_3(n):
                     k -= 1
                     total += 1
                     continue
+        pass
 
 def mixed_4(n):
     total = 0

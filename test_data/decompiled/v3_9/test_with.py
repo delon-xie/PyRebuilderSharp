@@ -5,3 +5,6 @@ lock
 print('hello')
 with lock:
     print('hello')
+    pass
+    pass
+    pass

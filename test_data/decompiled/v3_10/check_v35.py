@@ -4,10 +4,15 @@ def dump_code(c, depth):
     prefix = '  ' * depth
     c.co_consts
     for const in c.co_consts:
-        if hasattr(const, 'co_code') and hasattr(const, 'co_name'):
-            print('%sFunction: %s' % (prefix, const.co_name))
-            print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.co_argcount, const.co_nlocals, len(const.co_code)))
-            dump_code(const, depth + 1)
+        pass
+        if hasattr(const, 'co_code'):
+            pass
+            if hasattr(const, 'co_name'):
+                print('%sFunction: %s' % (prefix, const.co_name))
+                print('%s  argc=%d nlocals=%d code=%dB' % (prefix, const.co_argcount, const.co_nlocals, len(const.co_code)))
+                dump_code(const, depth + 1)
+            pass
+        pass
 
 import marshal
 import sys
@@ -19,6 +24,7 @@ with open(sys.argv[1], 'rb') as f:
     magic = f.read(4)
     f.read(8)
     code = marshal.load(f)
+    pass
     print('Module:', code.co_name)
     print('  argc:', code.co_argcount)
     print('  nlocals:', code.co_nlocals)
@@ -26,3 +32,4 @@ with open(sys.argv[1], 'rb') as f:
     print('  code hex:', code.co_code.hex()[:60])
     dump_code = dump_code
     dump_code(code)
+    pass

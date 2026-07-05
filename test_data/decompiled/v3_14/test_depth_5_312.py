@@ -4,9 +4,13 @@ def depth_5_if(x0, x1, x2, x3, x4):
     result = 0
     result = 0
     if x0 > 0:
+        pass
         if x1 > 1:
+            pass
             if x2 > 2:
+                pass
                 if x3 > 3:
+                    pass
                     if x4 > 4:
                         result = 42
                     else:

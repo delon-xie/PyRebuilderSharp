@@ -1,4 +1,7 @@
 # Decompiled from: <module>
 
-def test():
+class test:
     (None, None)
+
+    class test:
+        lock = object()

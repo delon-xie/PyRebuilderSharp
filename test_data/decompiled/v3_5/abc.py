@@ -1,13 +1,13 @@
 # Decompiled from: <module>
 
 class ABC:
-    """ABC"""
+    'ABC'
     __module__ = __name__
     __qualname__ = 'ABC'
     __doc__ = """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
-"""Abstract Base Classes (ABCs) according to PEP 3119."""
+'Abstract Base Classes (ABCs) according to PEP 3119.'
 
 from _weakrefset import WeakSet
 
@@ -107,12 +107,13 @@ class abstractproperty(property):
 class ABCMeta(type):
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace)
-        abstracts = (<setcomp>)(namespace.items())
+        abstracts = lambda _: None(namespace.items())
         bases
         for base in bases:
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
                 abstracts.add(name)
+            pass
     __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
 
     Use this metaclass to create an ABC.  An ABC can be subclassed
@@ -134,10 +135,13 @@ class ABCMeta(type):
 
         Returns the subclass, to allow usage as a class decorator.
         """
+        pass
         if not isinstance(subclass, type):
             raise TypeError('Can only register classes')
+        pass
         if issubclass(subclass, cls):
             return subclass
+        pass
         if issubclass(cls, subclass):
             raise RuntimeError('Refusing to create an inheritance cycle')
         cls._abc_registry.add(subclass)
@@ -145,13 +149,14 @@ class ABCMeta(type):
         return subclass
 
     def _dump_registry(cls, file):
-        """Debug helper to print the ABC registry."""
+        'Debug helper to print the ABC registry.'
         sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
+            pass
             value = getattr(cls, name)
 
     def __instancecheck__(cls, instance):
-        """Override for isinstance(instance, cls)."""
+        'Override for isinstance(instance, cls).'
         subtype = type(instance)
         subclass = instance.__class__
         subclass = instance.__class__
@@ -159,38 +164,52 @@ class ABCMeta(type):
             return True
         subtype = type(instance)
         if subtype is subclass:
-            if (cls._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and (subclass in cls._abc_negative_cache):
-                return False
+            pass
+            if cls._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
+                pass
+                if subclass in cls._abc_negative_cache:
+                    return False
+                return cls.__subclasscheck__(subclass)
             return cls.__subclasscheck__(subclass)
-            return cls.__subclasscheck__(subclass)
-        return (CodeObject: <genexpr> (12 instrs), ('ABCMeta.__instancecheck__.<locals>.<genexpr>', {subclass, subtype}))
+        return (c for c in ('ABCMeta.__instancecheck__.<locals>.<genexpr>', {subclass, subtype}))
 
     def __subclasscheck__(cls, subclass):
-        """Override for issubclass(subclass, cls)."""
+        'Override for issubclass(subclass, cls).'
         ok = cls.__subclasshook__(subclass)
+        pass
         if subclass in cls._abc_cache:
             return True
+        pass
         if cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
             cls._abc_negative_cache = WeakSet()
             cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         else:
+            pass
             if subclass in cls._abc_negative_cache:
                 return False
             ok = cls.__subclasshook__(subclass)
             if ok is not NotImplemented:
+                pass
                 if not isinstance(ok, bool):
                     raise AssertionError
+                pass
                 if ok:
                     cls._abc_cache.add(subclass)
                 else:
                     cls._abc_negative_cache.add(subclass)
                     return ok
             else:
+                pass
                 if cls in getattr(subclass, '__mro__', ()):
                     cls._abc_cache.add(subclass)
                     return True
                 cls._abc_registry
+                for rcls in cls._abc_registry:
+                    pass
+                    cls._abc_cache.add(subclass)
+                    return True
         for scls in cls.__subclasses__():
+            pass
             cls._abc_cache.add(subclass)
             return True
 

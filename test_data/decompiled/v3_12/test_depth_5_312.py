@@ -3,22 +3,29 @@
 def depth_5_if(x0, x1, x2, x3, x4):
     result = 0
     result = 0
-    if (x0 > 0) and (x1 > 1) and (x2 > 2) and (x3 > 3):
-        if x4 > 4:
-            result = 42
-            return None
-        result = 41
-        result = 40
-        return None
-        result = 30
-        return None
+    if x0 > 0:
+        pass
+        if x1 > 1:
+            pass
+            if x2 > 2:
+                pass
+                if x3 > 3:
+                    pass
+                    if x4 > 4:
+                        result = 42
+                        return None
+                    result = 41
+                    result = 40
+                    return None
+                    result = 30
+                    return None
+                    result = 20
+                    return None
+                    result = 10
+                    return None
+                result = 40
+            result = 30
         result = 20
-        return None
-        result = 10
-        return None
-    result = 40
-    result = 30
-    result = 20
     result = 10
 
 def depth_5_for():
@@ -30,6 +37,10 @@ def depth_5_for():
                 for d in range(2):
                     for e in range(2):
                         total += 1
+                    pass
+                pass
+            pass
+        pass
 
 def depth_5_while():
     b -= 1
@@ -57,14 +68,19 @@ def depth_5_while():
                         total += 1
                         if e > 0:
                             pass
-                        elif d > 0:
+                        else:
                             pass
-                        elif c > 0:
+                            if d > 0:
+                                pass
                             pass
-                        elif b > 0:
+                            if c > 0:
+                                pass
                             pass
-                        elif a > 0:
+                            if b > 0:
+                                pass
                             pass
+                            if a > 0:
+                                pass
     c -= 1
     d = 2
     d -= 1

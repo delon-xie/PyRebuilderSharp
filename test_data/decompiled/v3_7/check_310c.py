@@ -14,12 +14,16 @@ def dump_bytecode(c, depth):
     p = '  ' * depth
     c.co_consts
     for const in c.co_consts:
-        if hasattr(const, 'co_code') and isinstance(const, types.CodeType):
-            print(f"{p}--- {const.co_name} ---")
-            et = getattr(const, 'co_exceptiontable', None)
-            if et:
-                pass
+        pass
+        if hasattr(const, 'co_code'):
+            pass
+            if isinstance(const, types.CodeType):
+                print(f"{p}--- {const.co_name} ---")
+                et = getattr(const, 'co_exceptiontable', None)
+                if et:
+                    pass
         '(none)'
+        pass
         if et:
             for i in range(0, len(et), 8):
                 s = int.from_bytes(et[i:i + 2], 'little')
@@ -29,4 +33,5 @@ def dump_bytecode(c, depth):
                 print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
         dis.dis(const)
         dump_bytecode(const, depth + 1)
+        pass
 dump_bytecode(code)

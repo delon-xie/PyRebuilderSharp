@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
 pyc = os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver)
-"""Run AST comparison for test_seq_clean across all versions"""
+'Run AST comparison for test_seq_clean across all versions'
 import os
 import subprocess
 import ast
@@ -13,6 +13,8 @@ f = open(INPUT_FILE)
 expected_src = f.read()
 with open(INPUT_FILE) as f:
     expected_src = f.read()
+    pass
+    pass
     try:
         expected_ast = ast.dump(ast.parse(expected_src), indent=2)
     except Exception:

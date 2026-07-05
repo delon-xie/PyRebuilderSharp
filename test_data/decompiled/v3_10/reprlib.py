@@ -1,13 +1,13 @@
 # Decompiled from: <module>
 
-"""Redo the builtin repr() (representation) but with limits on most sizes."""
+'Redo the builtin repr() (representation) but with limits on most sizes.'
 __all__ = ['Repr', 'repr', 'recursive_repr']
 import builtins
 from itertools import islice
 from _thread import get_ident
 
 def recursive_repr(fillvalue):
-    """Decorator to make a repr function return fillvalue for a recursive call"""
+    'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
@@ -59,40 +59,77 @@ class Repr:
             parts = typename.split()
             typename = '_'.join(parts)
         method = getattr(self, 'repr_' + typename, None)
-        if method and (typename not in self._lookup):
-            return method(x, level)
-        module = getattr(cls, '__module__', None)
-        if module == self._lookup[typename]:
-            return method(x, level)
-        return self.repr_instance(x, level)
+        if method:
+            pass
+            if typename not in self._lookup:
+                return method(x, level)
+            module = getattr(cls, '__module__', None)
+            if module == self._lookup[typename]:
+                return method(x, level)
+            return self.repr_instance(x, level)
         return self.repr_instance(x, level)
         module = getattr(cls, '__module__', None)
 
     def _join(self, pieces, level):
         indent = self.indent
+        pass
         if self.indent is None:
             return ', '.join(pieces)
+        pass
         if not pieces:
             return ''
+        indent = self.indent
+        if isinstance(indent, int):
+            pass
+            if indent < 0:
+                raise ValueError(f"Repr.indent cannot be negative int (was {indent!r})")
+            indent *= ' '
+            try:
+                sep = """,
+""" + (self.maxlevel - level + 1) * indent
+            except TypeError:
+                raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}")
+                error = None
+                raise
+                raise
+                return ['', pieces]('')[1:-len(indent)]
+            pass
+            if -len(indent):
+                return
+            return None
+        try:
+            sep = """,
+""" + (self.maxlevel - level + 1) * indent
+        except TypeError:
+            raise TypeError(f"Repr.indent must be a str, int or None, not {type(indent)}")
+            error = None
+            raise
+            raise
+            return ['', pieces]('')[1:-len(indent)]
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
         n = len(x)
         n = len(x)
-        if (level <= 0) and n:
-            s = self.fillvalue
-        pieces = [elem for elem in iterable]
-        if n > maxiter:
-            pieces.append(self.fillvalue)
-        s = self._join(pieces, level)
-        if (n == 1) and trail:
-            if self.indent is None:
-                right = trail + right
+        if level <= 0:
+            pass
+            if n:
+                s = self.fillvalue
+            pieces = [elem for elem in islice(x, maxiter)]
+            if n > maxiter:
+                pieces.append(self.fillvalue)
+            s = self._join(pieces, level)
+            if n == 1:
+                pass
+                if trail:
+                    pass
+                    if self.indent is None:
+                        right = trail + right
+                    return '%s%s%s' % (left, s, right)
+                return '%s%s%s' % (left, s, right)
             return '%s%s%s' % (left, s, right)
-        return '%s%s%s' % (left, s, right)
-        return '%s%s%s' % (left, s, right)
-        pieces = [elem for elem in iterable]
+        pieces = [elem for elem in islice(x, maxiter)]
         if n > maxiter:
             pass
         s = self._join(pieces, level)
@@ -108,18 +145,21 @@ class Repr:
         return self._repr_iterable(x, level, '[', ']', self.maxlist)
 
     def repr_array(self, x, level):
+        pass
         if not x:
             return 'array(\'%s\')' % x.typecode
         header = 'array(\'%s\', [' % x.typecode
         return self._repr_iterable(x, level, header, '])', self.maxarray)
 
     def repr_set(self, x, level):
+        pass
         if not x:
             return 'set()'
         x = _possibly_sorted(x)
         return self._repr_iterable(x, level, '{', '}', self.maxset)
 
     def repr_frozenset(self, x, level):
+        pass
         if not x:
             return 'frozenset()'
         x = _possibly_sorted(x)
@@ -133,12 +173,14 @@ class Repr:
         n = len(x)
         if n == 0:
             return '{}'
+        pass
         if level <= 0:
             return '{' + self.fillvalue + '}'
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
         islice(_possibly_sorted(x), self.maxdict)
+        key = [pieces.append('%s: %s' % (keyrepr, valrepr)) for key in islice(_possibly_sorted(x), self.maxdict)]
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])

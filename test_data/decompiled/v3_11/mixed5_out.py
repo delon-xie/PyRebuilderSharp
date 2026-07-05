@@ -13,6 +13,8 @@ def mixed_1(n):
                 else:
                     result += 1
                     j < i
+                    pass
+            pass
     else:
         result
         return
@@ -29,6 +31,7 @@ def mixed_2(n):
                     total += k
             else:
                 j
+                pass
                 total
                 return
         total
@@ -47,8 +50,10 @@ def mixed_3(n):
                     k -= 1
                     total += 1
                     k > 0
+                pass
         else:
             i
+            pass
             return total
     return total
 
@@ -63,4 +68,11 @@ def mixed_4(n):
             total = -1
         else:
             j < i
-        total += j
+        pass
+        try:
+            pass
+        except:
+            pass
+            pass
+        else:
+            pass

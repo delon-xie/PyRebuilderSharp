@@ -4,4 +4,9 @@ class outer:
     lock = object()
 
     def inner():
-        pass
+        try:
+            pass
+        finally:
+            pass
+            pass
+    pass

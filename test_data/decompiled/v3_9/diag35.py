@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Diagnose 3.5 crash"""
+'Diagnose 3.5 crash'
 import subprocess
 import tempfile
 import os
@@ -35,6 +35,9 @@ f = open('/tmp/diag35.cs', 'w')
 f.write(test_code)
 with open('/tmp/diag35.cs', 'w') as f:
     f.write(test_code)
+    pass
+    pass
     r = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', '/tmp/t1.35.pyc'], capture_output=True, text=True, timeout=30)
     print('Stdout:', r.stdout[:500])
     print('Stderr:', r.stderr[:500])
+    pass

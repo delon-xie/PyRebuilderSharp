@@ -7,3 +7,4 @@ class outer:
         print(lk)
         with lk:
             pass
+    pass

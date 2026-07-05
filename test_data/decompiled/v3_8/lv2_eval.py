@@ -7,9 +7,11 @@ for i in range(10):
 for x in items:
     y = x
 for n in range(5):
+    pass
     if n == 3:
         pass
+    pass
     if n == 1:
-        continue
+        pass
 x = 1 / 0
 f = open('test.txt')

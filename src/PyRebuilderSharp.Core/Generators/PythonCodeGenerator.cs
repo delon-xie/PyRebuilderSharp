@@ -351,7 +351,8 @@ public class PythonCodeGenerator : ICodeGenerator
         {
             var docStr = (string)((Constant)((ExprStmt)module.Body[0]).Value).Value!;
             WriteIndent();
-            _output.AppendLine($"\"\"\"{docStr}\"\"\"");
+            // 使用 EscapeString 确保正确处理内部引号（如 `"""<Recursion on "` → `'<Recursion on "'`)
+            _output.AppendLine(EscapeString(docStr));
             module.Body.RemoveAt(0);
         }
 
@@ -364,7 +365,7 @@ public class PythonCodeGenerator : ICodeGenerator
                 && n.Id == "__doc__" && assign.Value is Constant { Value: string docStr })
             {
                 WriteIndent();
-                _output.AppendLine($"\"\"\"{docStr}\"\"\"");
+                _output.AppendLine(EscapeString(docStr));
                 continue;
             }
             EmitBlankLineIfNeeded(stmt, prevStmt);
@@ -437,7 +438,7 @@ public class PythonCodeGenerator : ICodeGenerator
                 }
                 docStr = string.Join("\n", lines);
             }
-            _output.AppendLine($"\"\"\"{docStr}\"\"\"");
+            _output.AppendLine(EscapeString(docStr));
             body.RemoveAt(0);  // 移除已被发出的 docstring，避免后续 Visit 重复输出
         }
     }
@@ -899,7 +900,13 @@ public class PythonCodeGenerator : ICodeGenerator
     private void VisitReturn(Return ret)
     {
         if (_functionDepth == 0)
+        {
+            // 模块级的 return 无效（Python 语法错误），但 if/else 体需要至少一条语句。
+            // 使用 pass 占位以防止空体语法错误。
+            WriteIndent();
+            _output.AppendLine("pass");
             return;
+        }
         
         WriteIndent();
         _output.Append("return");
@@ -1655,7 +1662,10 @@ public class PythonCodeGenerator : ICodeGenerator
     {
         var sb = new StringBuilder();
         bool isMultiLine = s.Contains('\n');
-        if (isMultiLine)
+        bool containsTripleQuotes = s.Contains("\"\"\"");
+        // 如果字符串包含 """, 不能用 """ 包裹（会产生未闭合的字符串）
+        // 用单引号包裹替代
+        if (isMultiLine && !containsTripleQuotes)
             sb.Append("\"\"\"");
         else
             sb.Append('\'');
@@ -1690,8 +1700,8 @@ public class PythonCodeGenerator : ICodeGenerator
                     case '\n': sb.Append("\\n"); break;
                     case '\r': sb.Append("\\r"); break;
                     case '\t': sb.Append("\\t"); break;
-                    case '\'':
-                    case '"': sb.Append("\\'"); break;
+                    case '\'': sb.Append("\\'"); break;
+                    case '"': sb.Append("\""); break;
                     default:
                         if (c < 0x20 || c == 0x7F)
                             sb.Append($"\\x{(int)c:x2}");

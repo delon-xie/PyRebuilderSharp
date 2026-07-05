@@ -11,8 +11,10 @@ lines = r.stdout.split("""
 """)
 enumerate(lines)
 for (i, line) in enumerate(lines):
+    pass
     if 'items[' in line:
         print(f"Line {i}: {line}")
+    pass
     print("""
 --- ACTUAL AST ---""")
     actual_ast = ast.dump(ast.parse(r.stdout), indent=2)

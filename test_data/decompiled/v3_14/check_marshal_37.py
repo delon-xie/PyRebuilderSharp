@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Check marshal fields for 3.7 code object"""
+'Check marshal fields for 3.7 code object'
 import struct
 import marshal
 code = compile('a1 = None', '<test>', 'exec')
@@ -18,11 +18,15 @@ for offset in range(0, 8):
     vals = struct.unpack_from('<IIII', m, offset)
     if not vals[0] == code.co_argcount:
         pass
-    elif not vals[2] == code.co_stacksize:
-        pass
-    elif not vals[3] == code.co_flags:
-        pass
     else:
-        print(f"\nFields found at offset {offset}:")
-        print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
-        ('  Bytes: ', f"{' '.join}{(b for b in m[offset:offset + 16]())}")
+        pass
+        if not vals[2] == code.co_stacksize:
+            pass
+        else:
+            pass
+            if not vals[3] == code.co_flags:
+                pass
+            else:
+                print(f"\nFields found at offset {offset}:")
+                print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")
+                ('  Bytes: ', f"{' '.join}{(b for b in m[offset:offset + 16]())}")

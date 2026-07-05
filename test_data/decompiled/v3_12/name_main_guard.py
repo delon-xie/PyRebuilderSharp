@@ -1,8 +1,8 @@
 # Decompiled from: <module>
 
-"""Test file for __name__ == '__main__' guard"""
+'Test file for __name__ == \'__main__\' guard'
 import sys
-"""Test file for __name__ == '__main__' guard"""
+'Test file for __name__ == \'__main__\' guard'
 import sys
 
 def main():

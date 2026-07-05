@@ -16,9 +16,11 @@ None
 None
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
+pass
 if i < len(lines):
     line = lines[i]
     if not '***' in line:
+        pass
 next_line = lines[j]
 version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 j += 1

@@ -19,30 +19,48 @@ for line in lines:
     clean_line = remove_ansi(line)
     line_stripped = clean_line.strip()
     if line_stripped.startswith('*** '):
-        if current_test and current_test_fail:
-            print(f"✗ {current_test}")
-            failed += 1
-        else:
-            print(f"✓ {current_test}")
-            passed += 1
-            current_test = line_stripped[4:].split(':')[0]
-            current_test_fail = False
-            if not 'FAIL' in line_stripped:
-                pass
+        pass
+        if current_test:
+            pass
+            if current_test_fail:
+                print(f"✗ {current_test}")
+                failed += 1
             else:
-                current_test_fail = True
+                print(f"✓ {current_test}")
+                passed += 1
+                current_test = line_stripped[4:].split(':')[0]
+                current_test_fail = False
+                if not 'FAIL' in line_stripped:
+                    pass
+                else:
+                    current_test_fail = True
         current_test = line_stripped[4:].split(':')[0]
         current_test_fail = False
         if not 'FAIL' in line_stripped:
             pass
         else:
             current_test_fail = True
-    elif not current_test:
+    else:
         pass
-    elif not '3.10.pyc' in clean_line:
-        pass
-    elif 'FAIL' in clean_line:
-        current_test_fail = True
+        if not current_test:
+            pass
+        else:
+            pass
+            if not '3.10.pyc' in clean_line:
+                pass
+            else:
+                pass
+                if 'FAIL' in clean_line:
+                    current_test_fail = True
+                else:
+                    pass
+                    if 'Unsupported' in clean_line:
+                        pass
+                    else:
+                        pass
+                        if not 'Bad MAGIC' in clean_line:
+                            pass
+                        current_test_fail = True
 current_test = line_stripped[4:].split(':')[0]
 current_test_fail = False
 print(f"✗ {current_test}")

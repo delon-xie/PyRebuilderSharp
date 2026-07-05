@@ -7,8 +7,13 @@ for i in range(10):
 for x in items:
     y = x
 for n in range(5):
+    pass
     if n == 3:
         pass
-    elif n == 1:
+    else:
         pass
+        if n == 1:
+            pass
+        else:
+            pass
 x = 1 / 0

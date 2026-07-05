@@ -7,6 +7,7 @@ for (name, code) in tests.items():
     open(py_path, 'w')
     f.write(code)
     (None, None)
+    pass
     if not True:
         pass
 f""

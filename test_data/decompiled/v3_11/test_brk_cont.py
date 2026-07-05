@@ -2,9 +2,13 @@
 
 range(10)
 for i in range(10):
+    pass
     if i == 5:
-    elif i == 1:
+        pass
+    pass
+    if i == 1:
         pass
     else:
         a = i
         None
+        pass

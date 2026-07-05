@@ -8,6 +8,7 @@ def add(a, b):
     return result
 
 def factorial(n):
+    pass
     if n <= 1:
         return 1
 print(greet('World'))

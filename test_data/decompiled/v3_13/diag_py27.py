@@ -7,6 +7,7 @@ for (name, code) in tests.items():
     open(py_path, 'w')
     f.write(code)
     (None, None)
+    pass
     if not f:
         pass
     r = subprocess.run([PY27, '-c', """import py_compile, sys

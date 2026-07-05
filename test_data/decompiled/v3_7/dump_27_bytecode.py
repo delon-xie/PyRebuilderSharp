@@ -33,6 +33,9 @@ print
 print
 print
 print
+pass
+pass
+pass
 pos += 1
 length = data[pos]
 pos += 1

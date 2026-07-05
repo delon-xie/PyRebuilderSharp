@@ -18,6 +18,8 @@ with open('/tmp/test_full.txt', 'r') as f:
 while i < len(lines):
     line = lines[i]
     if not '***' in line:
+        pass
+    pass
     if ':' in line:
         match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
         if match:
@@ -27,19 +29,29 @@ while i < len(lines):
     i += 1
     while j < len(lines):
         j < i + 30
+        pass
         if j < i + 30:
             next_line = lines[j]
             if next_line.startswith('***'):
                 pass
+        pass
+        pass
         if not next_line.strip().startswith(' '):
+            pass
+        pass
         if '.pyc' in next_line:
             version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
             if version_match:
                 version = version_match.group(1)
                 if version in ('3.7', '3.8', '3.9', '3.10'):
+                    pass
         j += 1
+        pass
         if status == 'PASS':
+            pass
         version_stats[version]['failed'] + 1
+        pass
+        pass
 for version in sorted(version_stats.keys()):
     stats = version_stats[version]
     t = stats['total']

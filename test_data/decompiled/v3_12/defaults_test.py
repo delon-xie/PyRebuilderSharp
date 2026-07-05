@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Test default parameter values"""
+'Test default parameter values'
 def has_defaults(a, b = 1, c = 'hello'):
     return a + b
 

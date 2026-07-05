@@ -1,4 +1,5 @@
 # Decompiled from: <module>
 
-def test():
-    pass
+class test:
+    class test:
+        lock = object()

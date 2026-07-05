@@ -9,7 +9,7 @@ current_group = None
 output.split("""
 """)
 passed_groups = [line for line in output.split("""
-""") if line.startswith('***') if current_group and line.strip().endswith('.3.10.pyc') if len(parts) >= 2]
+""") if line.startswith('***') if current_group if len(parts) >= 2]
 # [Block @0x00F6] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 passed_groups.append(group)
 failed_groups.append(group)

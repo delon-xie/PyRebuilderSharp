@@ -11,18 +11,32 @@ code.co_consts
 with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.8.pyc', 'rb') as f:
     f.read(16)
     code = marshal.load(f)
-    if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
-        for (i, instr) in enumerate(instrs):
-            if (instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD')) and (instr.arg is not None):
-                leaders.add(instr.arg)
-            elif any((<genexpr>)(block_instrs)):
-                last = block_instrs[-1]
-                print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-            if (instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER')) and (instr.arg is not None):
-                leaders.add(instr.arg)
-            if i + 1 < len(instrs):
-                leaders.add(instrs[i + 1].offset)
+    pass
+    if isinstance(const, types.CodeType):
+        pass
+        if const.co_name == 'depth_5_while':
+            for (i, instr) in enumerate(instrs):
+                pass
+                if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
+                    pass
+                    if instr.arg is not None:
+                        leaders.add(instr.arg)
+                    pass
+                    pass
+                    if any(lambda x: x(block_instrs)):
+                        last = block_instrs[-1]
+                        print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
+                pass
+                if instr.opname in ('POP_JUMP_IF_FALSE', 'POP_JUMP_IF_TRUE', 'POP_JUMP_IF_FALSE_OR_POP', 'POP_JUMP_IF_TRUE_OR_POP', 'FOR_ITER'):
+                    pass
+                    if instr.arg is not None:
+                        leaders.add(instr.arg)
+                pass
+                pass
+                if i + 1 < len(instrs):
+                    leaders.add(instrs[i + 1].offset)
 for (i, start) in enumerate(sorted_leaders):
+    pass
     if i + 1 < len(sorted_leaders):
         pass
     instrs[-1].offset + 2
@@ -32,11 +46,15 @@ for (i, start) in enumerate(sorted_leaders):
     f"{'3d'}-{end - 1}{'3d'}]: {', '.join((ins for ins in block_instrs))}"
     start
     'Block ['
-    if any((<genexpr>)(block_instrs)):
+    pass
+    if any(lambda x: x(block_instrs)):
         last = block_instrs[-1]
         print(f"  → COND: jump_target={last.arg}, fallthrough_offset={block_instrs[-1].offset + 2}")
-    if any((<genexpr>)(block_instrs)):
+    pass
+    if any(lambda x: x(block_instrs)):
         for ins in block_instrs:
+            pass
             if ins.opname == 'JUMP_ABSOLUTE':
                 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+    pass
 print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")

@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Diagnose 3.5 crash"""
+'Diagnose 3.5 crash'
 import subprocess
 import tempfile
 import os
@@ -33,5 +33,6 @@ try {
 """
 f = open('/tmp/diag35.cs', 'w')
 f.write(test_code)
+pass
 with open('/tmp/diag35.cs', 'w') as f:
     f.write(test_code)

@@ -12,6 +12,8 @@ def mixed_1(n):
                     result += j
                 else:
                     result += 1
+            pass
+            pass
             if not j < i:
                 pass
             while j > 5:
@@ -29,15 +31,3000 @@ def mixed_2(n):
             if i == j:
                 for k in range(i):
                     total += k
-            elif not j < n:
+            pass
+            if not j < n:
                 pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            pass
+            if not j < n:
+                pass
+            j += 1
+            if i == j:
+                pass
+            # [Recursion limit]
+        pass
+        pass
         if not j < n:
             pass
         j += 1
         if i == j:
             pass
-        elif not j < n:
+        pass
+        if not j < n:
             pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        j += 1
+        if i == j:
+            pass
+        pass
+        if not j < n:
+            pass
+        # [Recursion limit]
 
 def mixed_3(n):
     total = 0
@@ -51,8 +3038,1505 @@ def mixed_3(n):
                 while k > 0:
                     k -= 1
                     total += 1
-        elif not i < n:
+                pass
+        pass
+        if not i < n:
             return total
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        i += 1
+        if i % 2 == 0:
+            pass
+        pass
+        if not i < n:
+            pass
+        # [Recursion limit]
     return total
     k -= 1
     total += 1
@@ -69,6 +4553,8 @@ def mixed_4(n):
                 while j < i:
                     j += 1
                     total += j
+                pass
+                pass
                 if not j < i:
                     pass
                 while j < i:

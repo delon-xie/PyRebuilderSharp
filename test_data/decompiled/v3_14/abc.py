@@ -21,7 +21,7 @@ def abstractmethod(funcobj):
     return funcobj
 
 class abstractclassmethod:
-    """abstractclassmethod"""
+    'abstractclassmethod'
     __module__ = __name__
     __qualname__ = 'abstractclassmethod'
     __firstlineno__ = 28
@@ -48,9 +48,10 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
     __classcell__ = __class__
+    pass
 
 class abstractstaticmethod:
-    """abstractstaticmethod"""
+    'abstractstaticmethod'
     __module__ = __name__
     __qualname__ = 'abstractstaticmethod'
     __firstlineno__ = 52
@@ -77,9 +78,10 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
     __classcell__ = __class__
+    pass
 
 class abstractproperty:
-    """abstractproperty"""
+    'abstractproperty'
     __module__ = __name__
     __qualname__ = 'abstractproperty'
     __firstlineno__ = 76
@@ -105,9 +107,10 @@ Deprecated, use 'property' with 'abstractmethod' instead:
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
     __classcell__ = __class__
+    pass
 
 class ABCMeta:
-    """ABCMeta"""
+    'ABCMeta'
     __module__ = __name__
     __qualname__ = 'ABCMeta'
     __firstlineno__ = 113
@@ -137,15 +140,15 @@ even via super()).
         return _abc_register(cls, subclass)
 
     def __instancecheck__(cls, instance):
-        """Override for isinstance(instance, cls)."""
+        'Override for isinstance(instance, cls).'
         return _abc_instancecheck(cls, instance)
 
     def __subclasscheck__(cls, subclass):
-        """Override for issubclass(subclass, cls)."""
+        'Override for issubclass(subclass, cls).'
         return _abc_subclasscheck(cls, subclass)
 
     def _dump_registry(cls, file = None):
-        """Debug helper to print the ABC registry."""
+        'Debug helper to print the ABC registry.'
         print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
         print(f"Inv. counter: {get_cache_token()}", file=file)
         print(f"_abc_registry: {_abc_registry}", file=file)
@@ -154,15 +157,16 @@ even via super()).
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version}", file=file)
 
     def _abc_registry_clear(cls):
-        """Clear the registry (for debugging or testing)."""
+        'Clear the registry (for debugging or testing).'
         _reset_registry(cls)
 
     def _abc_caches_clear(cls):
-        """Clear the caches (for debugging or testing)."""
+        'Clear the caches (for debugging or testing).'
         _reset_caches(cls)
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
     __classcell__ = __class__
+    pass
 
 def update_abstractmethods(cls):
     """Recalculate the set of abstract methods of an abstract class.
@@ -180,6 +184,7 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
 """
+    pass
     if not hasattr(cls, '__abstractmethods__'):
         return cls
     else:
@@ -188,13 +193,14 @@ def update_abstractmethods(cls):
     for scls in cls.__bases__:
         pass
     for (value, name) in cls.__dict__.items():
+        pass
         if not getattr(value, '__isabstractmethod__', False):
             pass
         else:
             abstracts.add(name)
 
 class ABC:
-    """ABC"""
+    'ABC'
     __module__ = __name__
     __qualname__ = 'ABC'
     __firstlineno__ = 205
@@ -205,6 +211,7 @@ inheritance.
 try:
     pass
 except ImportError:
+    pass
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     ABCMeta.__module__ = 'abc'

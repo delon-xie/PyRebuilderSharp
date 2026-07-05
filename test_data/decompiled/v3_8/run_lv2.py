@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Run AST comparison for test_control_flow across all versions"""
+'Run AST comparison for test_control_flow across all versions'
 import os
 import subprocess
 import ast
@@ -25,21 +25,28 @@ for ver in versions:
         pass
     else:
         '❌'
+    pass
     if ok:
         pass
     'MISMATCH'
+    pass
     if not ok:
         for i in enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
 """))):
+            pass
             if e != a:
                 print(f"  Line {i}: expected={e}\n           actual=  {a}")
+    pass
     if ok:
         pass
     'MISMATCH'
+    pass
     if not ok:
         enumerate(zip(expected_ast.split("""
 """), actual_ast.split("""
 """)))
+    pass
+    pass
     if e != a:
         print(f"  Line {i}: expected={e}\n           actual=  {a}")

@@ -33,6 +33,7 @@ print
 print
 print
 print
+pass
 if not True:
     pass
 instructions

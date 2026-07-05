@@ -1614,8 +1614,11 @@ public class StackMachine
             case Opcode.CHECK_EXC_MATCH:
             case Opcode.CHECK_EG_MATCH:
                 // handler 块：for 循环上下文结束
+                // CHECK_EXC_MATCH 在 try/except 中比较异常类型并返回 bool。
+                // 不弹栈 — 结果由后续 POP_JUMP_IF_FALSE 处理（块级 AstBuilder 负责）。
+                // ❌ 不应 goto MATCH_MAPPING_312（那个 SafePop 是为 match 语句设计的）
                 _isForLoop = false;
-                goto case Opcode.MATCH_MAPPING_312;
+                return null;
             case Opcode.MATCH_MAPPING_312:
             case Opcode.MATCH_MAPPING_313:
                 // MATCH_MAPPING: pop subject

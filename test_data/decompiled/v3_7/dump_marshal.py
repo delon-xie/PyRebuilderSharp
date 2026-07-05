@@ -33,10 +33,15 @@ for i in range(min(count, 6)):
         ref = struct.unpack('<I', data[pos:pos + 4])[0]
         pos += 4
         flags = f" (ref={ref})"
-    if (t2 == 99) and (raw2 & 128):
+    pass
+    if t2 == 99:
         pass
+        if raw2 & 128:
+            pass
+    pass
     if t2 == 78:
         print(f"  [{i}] None{flags}")
+    pass
     if t2 in (122, 90):
         length = data[pos]
         pos += 1
@@ -51,6 +56,7 @@ for i in range(min(count, 6)):
     pos = tmp.tell()
     print(f"    -> {val:.0}")
     print
+    pass
     print(f"  [{i}] child code at offset {child_start}{flags}")
     saved = pos
     tmp = io.BytesIO(data)
@@ -58,7 +64,7 @@ for i in range(min(count, 6)):
     child = marshal.load(tmp)
     actual_end = tmp.tell()
     print(f"    name={child.co_name} names={child.co_names} varnames={child.co_varnames}")
-    print(f"    consts={[c for c in iterable]}")
+    print(f"    consts={[c for c in child.co_consts]}")
     pos = actual_end
 raw2 = data[pos]
 pos += 1

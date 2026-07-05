@@ -12,6 +12,8 @@ def dump_code(c, depth):
     c.co_consts
     for const in c.co_consts:
         pass
+        pass
+        pass
 dump_code(code)
 with open(sys.argv[1], 'rb') as f:
     magic = f.read(4)

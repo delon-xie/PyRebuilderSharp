@@ -59,6 +59,7 @@ abc
 30
 40
 """)
+    pass
     result = process_data_file('test_numbers.txt')
     print(f"最终结果: {result}\n")
     print('==================================================')
@@ -75,5 +76,6 @@ def
 """)
     if not True:
         pass
+    pass
     result = process_data_file('empty_file.txt')
     print(f"最终结果: {result}\n")

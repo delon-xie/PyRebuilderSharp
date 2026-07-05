@@ -1,8 +1,8 @@
 # Decompiled from: <module>
 
-"""Test if __name__ == '__main__' with else"""
+'Test if __name__ == \'__main__\' with else'
 import sys
-"""Test if __name__ == '__main__' with else"""
+'Test if __name__ == \'__main__\' with else'
 import sys
 
 def main():

@@ -1,4 +1,8 @@
 # Decompiled from: <module>
 
 def test():
-    pass
+    try:
+        pass
+    finally:
+        pass
+        pass

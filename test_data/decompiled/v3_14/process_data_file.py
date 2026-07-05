@@ -6,3 +6,8 @@ def process_data_file(filename):
     演示嵌套的 try-except-else-finally 用法。
 """
     average = [line.strip() for line in lines if not line]
+try:
+    pass
+finally:
+    pass
+    pass

@@ -5734,7 +5734,8 @@ class SyntaxWarningTest(unittest.TestCase):
     errtest is a regular expression that must be present in the
     text of the warning raised.
 """
-        pass
+        # orphan @0x0000
+        self.assertWarnsRegex(SyntaxWarning, errtext)
 
     def test_return_in_finally(self):
         source = textwrap.dedent("""
@@ -5810,12 +5811,14 @@ class SyntaxErrorTestCase(unittest.TestCase):
             self.subTest(f"within range: n={n}")
             compile(get_code(n), '<string>', 'exec')
             (None, None)
+            pass
             if not get_code:
                 pass
             for n in range(self, v_51 + 5):
                 self.subTest(f"out of range: n={n}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
                 (None, None)
+                pass
                 if not self:
                     pass
 
@@ -5833,12 +5836,14 @@ class SyntaxErrorTestCase(unittest.TestCase):
             self.subTest(f"within range: n={n}")
             compile(get_code(n), '<string>', 'exec')
             (None, None)
+            pass
             if not get_code:
                 pass
             for n in range(self, v_51 + 5):
                 self.subTest(f"out of range: n={n}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
                 (None, None)
+                pass
                 if not self:
                     pass
 
@@ -5875,15 +5880,18 @@ while 1:
             self.subTest(mode=mode)
             self.assertRaisesRegex(MemoryError, 'too complex')
             compile(source, '<string>', mode)
+            pass
             if not self:
                 pass
             (None, None)
+            pass
             if not source:
                 pass
             (None, None)
 
     def test_deep_invalid_rule(self):
-        pass
+        class test_deep_invalid_rule:
+            source = 'd{{{{{{{{{{{{{{{{{{{{{{{{{```{{{{{{{ef f():y'
     test_expression_with_assignment = compile
     test_curly_brace_after_primary_raises_immediately = 'SyntaxErrorTestCase'
     test_assign_call = 2946
@@ -5895,6 +5903,11 @@ while 1:
     text of the exception raised.  If subclass is specified it
     is the expected subclass of SyntaxError (e.g. IndentationError).
 """
+        try:
+            pass
+        except SyntaxError:
+            pass
+            pass
         # [WARN] 5 instructions not decompiled
         #   @0x0102: POP_JUMP_IF_NOT_NONE arg=304
         #   @0x016A: POP_JUMP_IF_NONE arg=422
@@ -5903,7 +5916,7 @@ while 1:
         #   @0x0224: POP_JUMP_IF_NONE arg=618
 
     def test_expression_with_assignment(self):
-        self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant \'==\'?', offset=7)
+        self._check_error('print(end1 + end2 = \' \')', 'expression cannot contain assignment, perhaps you meant "=="?', offset=7)
 
     def test_curly_brace_after_primary_raises_immediately(self):
         self._check_error('f{}', 'invalid syntax', mode='single')
@@ -6076,7 +6089,13 @@ except* ValueError: pass
 except TypeError: pass""", 'cannot have both \'except\' and \'except\\*\' on the same \'try\'', lineno=3, end_lineno=3, offset=1, end_offset=7)
 
     def test_empty_line_after_linecont(self):
-        pass
+        class test_empty_line_after_linecont:
+            s = """\\
+pass
+        \\
+
+pass
+"""
 
     def test_continuation_bad_indentation(self):
         code = """\\
@@ -6121,7 +6140,7 @@ fgdfgf
 """, 'unexpected EOF while parsing')
 
     def test_error_parenthesis(self):
-        """([{"""
+        '([{'
         for paren in '([{':
             self._check_error(paren + '1 + 2', f"\\{paren}' was never closed")
         for paren in '([{':
@@ -6131,14 +6150,14 @@ fgdfgf
 
     def test_error_string_literal(self):
         self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
-        self._check_error('\'blech', 'unterminated string literal \\(.*\\)$')
-        self._check_error('\'blech\\\'', 'unterminated string literal \\(.*\\); perhaps you escaped the end quote')
-        self._check_error('r\'blech\\\'', 'unterminated string literal \\(.*\\); perhaps you escaped the end quote')
+        self._check_error('"blech', 'unterminated string literal \\(.*\\)$')
+        self._check_error('"blech\\"', 'unterminated string literal \\(.*\\); perhaps you escaped the end quote')
+        self._check_error('r"blech\\"', 'unterminated string literal \\(.*\\); perhaps you escaped the end quote')
         self._check_error('\'\'\'blech', 'unterminated triple-quoted string literal')
-        self._check_error('\'\'\'blech', 'unterminated triple-quoted string literal')
+        self._check_error('"""blech', 'unterminated triple-quoted string literal')
 
     def test_invisible_characters(self):
-        self._check_error('print\x17(\'Hello\')', 'invalid non-printable character')
+        self._check_error('print\x17("Hello")', 'invalid non-printable character')
         self._check_error(b'd2l0aCgwLCwpOgoB', 'invalid non-printable character')
 
     def test_match_call_does_not_raise_syntax_error(self):
@@ -6217,7 +6236,7 @@ class LazyImportRestrictionTestCase(SyntaxErrorTestCase):
     test_lazy_import_in_async_function = 'Test syntax restrictions for lazy imports.'
 
     def test_lazy_import_in_try_block(self):
-        """Test that lazy imports are not allowed inside try blocks."""
+        'Test that lazy imports are not allowed inside try blocks.'
         self._check_error("""try:
     lazy import os
 except:
@@ -6230,7 +6249,7 @@ except ImportError:
 """, 'lazy from ... import not allowed inside try/except blocks')
 
     def test_lazy_import_in_trystar_block(self):
-        """Test that lazy imports are not allowed inside try* blocks."""
+        'Test that lazy imports are not allowed inside try* blocks.'
         self._check_error("""try:
     lazy import json
 except* Exception:
@@ -6243,7 +6262,7 @@ except* ImportError:
 """, 'lazy from ... import not allowed inside try/except blocks')
 
     def test_lazy_import_in_except_block(self):
-        """Test that lazy imports are not allowed inside except blocks."""
+        'Test that lazy imports are not allowed inside except blocks.'
         self._check_error("""try:
     sys.modules # trigger the except block
 except* Exception:
@@ -6251,7 +6270,7 @@ except* Exception:
 """, 'lazy import not allowed inside try/except blocks')
 
     def test_lazy_import_in_function(self):
-        """Test that lazy imports are not allowed inside functions."""
+        'Test that lazy imports are not allowed inside functions.'
         self._check_error("""def func():
     lazy import math
 """, 'lazy import not allowed inside functions')
@@ -6260,7 +6279,7 @@ except* Exception:
 """, 'lazy from ... import not allowed inside functions')
 
     def test_lazy_import_in_async_function(self):
-        """Test that lazy imports are not allowed inside async functions."""
+        'Test that lazy imports are not allowed inside async functions.'
         self._check_error("""async def async_func():
     lazy import asyncio
 """, 'lazy import not allowed inside functions')
@@ -6269,7 +6288,7 @@ except* Exception:
 """, 'lazy from ... import not allowed inside functions')
 
     def test_lazy_import_in_class(self):
-        """Test that lazy imports are not allowed inside classes."""
+        'Test that lazy imports are not allowed inside classes.'
         self._check_error("""class MyClass:
     lazy import typing
 """, 'lazy import not allowed inside classes')
@@ -6278,14 +6297,14 @@ except* Exception:
 """, 'lazy from ... import not allowed inside classes')
 
     def test_lazy_import_star_forbidden(self):
-        """Test that 'lazy from ... import *' is forbidden everywhere."""
+        'Test that \'lazy from ... import *\' is forbidden everywhere.'
         self._check_error('lazy from os import *', 'lazy from ... import \\* is not allowed')
         self._check_error("""def func():
     lazy from sys import *
 """, 'lazy from ... import not allowed inside functions')
 
     def test_lazy_import_nested_scopes(self):
-        """Test lazy imports in nested scopes."""
+        'Test lazy imports in nested scopes.'
         self._check_error("""class Outer:
     def method(self):
         lazy import sys
@@ -6300,7 +6319,7 @@ except* Exception:
 """, 'lazy from ... import not allowed inside functions')
 
     def test_lazy_import_valid_cases(self):
-        """Test that lazy imports work at module level."""
+        'Test that lazy imports work at module level.'
         compile('lazy import os', '<test>', 'exec')
         compile('lazy from sys import path', '<test>', 'exec')
         compile('lazy import json as j', '<test>', 'exec')

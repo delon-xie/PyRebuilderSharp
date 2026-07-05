@@ -23,6 +23,7 @@ def process_data_file(filename):
     line = line.strip()
     if not line:
         pass
+    pass
     if numbers:
         average = sum(numbers) / len(numbers)
         return

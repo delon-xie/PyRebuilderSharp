@@ -5,3 +5,4 @@ def test():
     lock
     with lock:
         pass
+        pass

@@ -31,8 +31,10 @@ code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
 if hasattr(code, 'co_exceptiontable'):
+    pass
     if code.co_exceptiontable:
         for i in range(0, len(et), 8):
+            pass
             if i + 7 >= len(et):
                 pass
             else:
@@ -43,15 +45,20 @@ if hasattr(code, 'co_exceptiontable'):
                 print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
             code
     code
+    pass
     for const in code:
+        pass
         if isinstance(const, types.CodeType):
             print(f"\n--- Nested: {const.co_name} ---")
             print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
             if hasattr(const, 'co_exceptiontable'):
+                pass
                 if const.co_exceptiontable:
                     print(f"  bytes: {const.co_exceptiontable.hex()}")
                 None
+                pass
             else:
+                pass
         None
 else:
     code

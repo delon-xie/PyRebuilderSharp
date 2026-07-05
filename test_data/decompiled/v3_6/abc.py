@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Abstract Base Classes (ABCs) according to PEP 3119."""
+'Abstract Base Classes (ABCs) according to PEP 3119.'
 from _weakrefset import WeakSet
 
 def abstractmethod(funcobj):
@@ -114,29 +114,32 @@ class ABCMeta(type):
 
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
-        abstracts = (<setcomp>)(namespace.items())
+        abstracts = lambda _: None(namespace.items())
         bases
         for base in bases:
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
                 if getattr(value, '__isabstractmethod__', False):
                     abstracts.add(name)
+            pass
 
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
 
         Returns the subclass, to allow usage as a class decorator.
         """
+        pass
         if not isinstance(subclass, type):
             raise TypeError('Can only register classes')
         return subclass
 
     def _dump_registry(cls, file):
-        """Debug helper to print the ABC registry."""
+        'Debug helper to print the ABC registry.'
         print('Class: %s.%s' % (cls.__module__, cls.__qualname__), file=file)
         print('Inv.counter: %s' % ABCMeta._abc_invalidation_counter, file=file)
         sorted(cls.__dict__)
         for name in sorted(cls.__dict__):
+            pass
             if name.startswith('_abc_'):
                 value = getattr(cls, name)
                 if isinstance(value, WeakSet):
@@ -144,28 +147,34 @@ class ABCMeta(type):
             print('%s: %r' % (name, value), file=file)
 
     def __instancecheck__(cls, instance):
-        """Override for isinstance(instance, cls)."""
+        'Override for isinstance(instance, cls).'
         subtype = type(instance)
         subclass = instance.__class__
         subclass = instance.__class__
         if subclass in cls._abc_cache:
             return True
-        if (cls._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and (subclass in cls._abc_negative_cache):
-            return False
+        pass
+        if cls._abc_negative_cache_version == ABCMeta._abc_invalidation_counter:
+            pass
+            if subclass in cls._abc_negative_cache:
+                return False
 
     def __subclasscheck__(cls, subclass):
-        """Override for issubclass(subclass, cls)."""
+        'Override for issubclass(subclass, cls).'
         ok = cls.__subclasshook__(subclass)
         cls._abc_negative_cache = WeakSet()
         cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
+        pass
         if subclass in cls._abc_cache:
             return True
         cls._abc_cache.add(subclass)
         for rcls in cls._abc_registry:
+            pass
             if issubclass(subclass, rcls):
                 cls._abc_cache.add(subclass)
                 return True
         for scls in cls.__subclasses__():
+            pass
             if issubclass(subclass, scls):
                 cls._abc_cache.add(subclass)
                 return True

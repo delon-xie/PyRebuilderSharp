@@ -9,8 +9,11 @@ i = 0
 while i < 5:
     for n in range(10):
         m = n + 1
+    pass
     try:
         pass
     except:
         a = 0
     else:
+        pass
+    pass

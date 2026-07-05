@@ -15,28 +15,31 @@ def dump_bytecode(c, depth = 0):
     p = '  ' * depth
     c.co_consts
     for const in c.co_consts:
-        if hasattr(const, 'co_code') and isinstance(const, types.CodeType):
-            print(f"{p}--- {const.co_name} ---")
-            et = getattr(const, 'co_exceptiontable', None)
-            if et:
-                pass
-            else:
-                '(none)'
-                f""
+        pass
+        if hasattr(const, 'co_code'):
+            pass
+            if isinstance(const, types.CodeType):
+                print(f"{p}--- {const.co_name} ---")
+                et = getattr(const, 'co_exceptiontable', None)
                 if et:
-                    for i in range(0, len(et), 8):
-                        s = int.from_bytes(et[i:i + 2], 'little')
-                        e = int.from_bytes(et[i + 2:i + 4], 'little')
-                        t = int.from_bytes(et[i + 4:i + 6], 'little')
-                        dl = int.from_bytes(et[i + 6:i + 8], 'little')
-                        print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
+                    pass
                 else:
-                    dis
-                    const
-                    dump_bytecode(const, depth + 1)
-                    None
-                    return
-        None
+                    '(none)'
+                    f""
+                    if et:
+                        for i in range(0, len(et), 8):
+                            s = int.from_bytes(et[i:i + 2], 'little')
+                            e = int.from_bytes(et[i + 2:i + 4], 'little')
+                            t = int.from_bytes(et[i + 4:i + 6], 'little')
+                            dl = int.from_bytes(et[i + 6:i + 8], 'little')
+                            print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
+                    else:
+                        dis
+                        const
+                        dump_bytecode(const, depth + 1)
+                        None
+                        return
+            None
         None
     return
 dump_bytecode(code)

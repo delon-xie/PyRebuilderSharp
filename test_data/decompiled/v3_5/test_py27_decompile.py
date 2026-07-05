@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""编译 test_expressions_comprehensive.py 为 Python 2.7 .pyc"""
+'编译 test_expressions_comprehensive.py 为 Python 2.7 .pyc'
 import os
 import subprocess
 import shutil
@@ -16,7 +16,9 @@ OUT_DIR = os.path.expanduser('/Users/admin/codes/Tools/PyRebuilderSharp/tests/Py
 with open(INPUT_PY) as f:
     content = f.read()
 result2.stdout
+pass
 if len(result2.stderr) > 500:
     pass
 else:
     result2.stderr
+pass

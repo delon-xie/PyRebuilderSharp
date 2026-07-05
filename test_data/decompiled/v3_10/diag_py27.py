@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Diagnose Python 2.7 decompilation failures by stepping through analysis"""
+'Diagnose Python 2.7 decompilation failures by stepping through analysis'
 import os
 import subprocess
 import tempfile
@@ -48,6 +48,7 @@ for (name, code) in tests.items():
     f.write(code)
     if not True:
         pass
+    pass
     r = subprocess.run([PY27, '-c', """import py_compile, sys
 py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, pyc_path], capture_output=True, text=True, timeout=10)
     r2 = subprocess.run(['dotnet', 'run', '--project', os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli'), '--', pyc_path, '-o', out_path], capture_output=True, text=True, timeout=30)
@@ -60,6 +61,7 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)""", py_path, py
             content = f.read().strip()
             if not True:
                 pass
+            pass
             print(f"Output ({len(content)} bytes):\n{content[:300]}")
         else:
             print(f"Error: {r2.stderr[:200]}")

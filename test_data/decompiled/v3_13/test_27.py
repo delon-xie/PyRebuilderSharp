@@ -11,6 +11,7 @@ lines = r.stdout.split("""
 """)
 enumerate(lines)
 for (i, line) in enumerate(lines):
+    pass
     if not 'items[' in line:
         pass
     else:

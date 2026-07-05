@@ -1,5 +1,5 @@
 # Decompiled from: <module>
 
 def g():
-    """bad"""
+    'bad'
     raise ValueError('bad')

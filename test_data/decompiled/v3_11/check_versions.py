@@ -1,6 +1,7 @@
 # Decompiled from: <module>
 
 for filename in os.listdir(pyc_dir):
+    pass
     if filename.endswith('.pyc'):
         filepath = os.path.join(pyc_dir, filename)
         open(filepath, 'rb')

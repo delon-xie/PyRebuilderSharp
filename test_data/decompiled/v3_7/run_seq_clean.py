@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Run AST comparison for test_seq_clean across all versions"""
+'Run AST comparison for test_seq_clean across all versions'
 import os
 import subprocess
 import ast
@@ -28,23 +28,30 @@ for ver in versions:
         pass
     else:
         '❌'
+    pass
     if match:
         pass
     'MISMATCH'
+    pass
     if not match:
         for i in range(max(len(exp_lines), len(act_lines))):
+            pass
             if i < len(exp_lines):
                 pass
             '(missing)'
+            pass
             if i < len(act_lines):
                 pass
             '(missing)'
+            pass
             if e != a:
                 print('  Line %d: expected=%s' % (i, e))
                 print('           actual=  %s' % a)
+    pass
     if match:
         pass
     'MISMATCH'
+    pass
     if not match:
         exp_lines = expected_ast.split("""
 """)
@@ -52,12 +59,16 @@ for ver in versions:
 """)
         range(max(len(exp_lines), len(act_lines)))
     
+    pass
+    pass
     if i < len(exp_lines):
         pass
     '(missing)'
+    pass
     if i < len(act_lines):
         pass
     '(missing)'
+    pass
     if e != a:
         print('  Line %d: expected=%s' % (i, e))
         print('           actual=  %s' % a)

@@ -5,3 +5,5 @@ class outer:
         lk
         with lk:
             pass
+            pass
+    pass

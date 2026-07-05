@@ -13,15 +13,18 @@ lines = output.split("""
 i = debug_count = 0
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
+pass
 if i < len(lines):
     line = lines[i]
-    if ('***' in line) and (':' in line):
-        match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
-        if match:
-            test_name = match.group(1)
-            status = match.group(2)
-            j = i + 1
-            found_versions = []
+    if '***' in line:
+        pass
+        if ':' in line:
+            match = re.search('\\*\\*\\*\\s+([^:]+):\\s+(PASS|FAIL)', line)
+            if match:
+                test_name = match.group(1)
+                status = match.group(2)
+                j = i + 1
+                found_versions = []
 next_line = lines[j]
 version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 j += 1

@@ -15,11 +15,16 @@ lines = output.split("""
 i = 0
 debug_count = 0
 while next_line.startswith('***'):
-    if ('.pyc' in next_line) and next_line.startswith('***'):
-        j += 1
-        if (j < len(lines)) and (j < i + 30):
-            pass
-        # [Block @0x02C0] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+    pass
+    if '.pyc' in next_line:
+        pass
+        if next_line.startswith('***'):
+            j += 1
+            if j < len(lines):
+                pass
+                if j < i + 30:
+                    pass
+                # [Block @0x02C0] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
     print()
 next_line = lines[j]
 version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)

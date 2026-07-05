@@ -10,7 +10,10 @@ def mixed_1(n):
                 pass
             while j > 5:
                 result = n + v_19
+                pass
                 if n < v_50:
+                    pass
+                else:
                     pass
             result += 1
     return result
@@ -26,8 +29,12 @@ def mixed_2(n):
         j += 1
         if n == v_35:
             pass
-        elif n < v_48:
+        pass
+        if n < v_48:
             pass
+        else:
+            pass
+        pass
     j += 1
 
 def mixed_3(n):
@@ -43,8 +50,11 @@ def mixed_3(n):
                     pass
                 while k > 0:
                     pass
-        elif n < v_32:
+                pass
+        pass
+        if n < v_32:
             pass
+        return total
     return total
     k -= 1
     total += 1
@@ -53,6 +63,7 @@ def mixed_4(n):
     for i in range(n):
         j = 0
         n < v_50
+        pass
         if not n < v_50:
             pass
         while j + 1:
@@ -62,5 +73,7 @@ def mixed_4(n):
                 total = -1
             else:
                 total = n + v_19
+            pass
             if n < v_50:
                 pass
+            pass

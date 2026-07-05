@@ -9,7 +9,7 @@ current_group = None
 output.split("""
 """)
 passed_groups = [line for line in output.split("""
-""") if line.startswith('***') if current_group and line.strip().endswith('.3.10.pyc') if len(parts) >= 2]
+""") if line.startswith('***') if current_group if len(parts) >= 2]
 line = [print(f"  ✓ {group}") for group in passed_groups]
 print(f"  ✓ {group}")
 line = [[print(f"    - {f}") for f in test_groups[group]['files']] for group in failed_groups for group in group]

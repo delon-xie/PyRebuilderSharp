@@ -3,9 +3,15 @@
 def test_until_broken(exprs):
     """
 """
+    try:
+        pass
+    finally:
+        pass
+        pass
     return 'OK'
 
 def find_breaking_point(exprs, lo, hi):
+    pass
     while lo < hi:
         mid = (lo + hi) // 2
         result = test_until_broken(exprs[:mid + 1])

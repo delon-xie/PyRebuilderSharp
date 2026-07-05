@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Definitive test: field alignment in marshal data"""
+'Definitive test: field alignment in marshal data'
 import struct
 import marshal
 import sys
@@ -12,27 +12,27 @@ print('Length:', len(m))
 print()
 ('Byte[0] = 0x', f"{m[0]}{'02x'} ({m[0]})")
 known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
-('Known values:', (<dictcomp>), known.items()())
+('Known values:', lambda x: x, known.items()())
 range(0, 8)
 print
 print
 print
 for start in range(0, 8):
+    pass
     if start + 16 > len(m):
         pass
     else:
         vals = struct.unpack_from('<IIII', m, start)
-        a0 = *vals
-        nl = *vals
-        ss = *vals
-        fl = *vals
-        if (a0 == known['argcount']) and (nl == known['nlocals']):
-            print(f"\nMATCH at offset {start}:")
-            print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-            ('  Bytes: ', f"{' '.join}{(None for b in m[start:start + 16]())}")
-            print
+        a0, nl, ss, fl = vals
+        if a0 == known['argcount']:
+            pass
+            if nl == known['nlocals']:
+                print(f"\nMATCH at offset {start}:")
+                print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+                ('  Bytes: ', f"{' '.join}{(None for b in m[start:start + 16]())}")
+                print
+            pass
+        pass
+    pass
 vals = struct.unpack_from('<IIII', m, start)
-a0 = *vals
-nl = *vals
-ss = *vals
-fl = *vals
+a0, nl, ss, fl = vals

@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Run AST comparison for test_expr_basic across all versions"""
+'Run AST comparison for test_expr_basic across all versions'
 import os
 import subprocess
 import sys
@@ -28,26 +28,34 @@ for ver in versions:
         pass
     else:
         '❌'
+    pass
     if match:
         pass
     'MISMATCH'
+    pass
     if not match:
         for i in range(max(len(exp_lines), len(act_lines))):
+            pass
             if i < len(exp_lines):
                 pass
             '(missing)'
+            pass
             if i < len(act_lines):
                 pass
             '(missing)'
+            pass
             if e != a:
                 print(f"  Line {i}: expected={e}")
                 print(f"           actual=  {a}")
     ver
     results
     True
+    pass
+    pass
     if match:
         pass
     'MISMATCH'
+    pass
     if not match:
         exp_lines = expected_ast.split("""
 """)
@@ -57,12 +65,17 @@ for ver in versions:
     ver
     results
     True
+    pass
+    pass
+    pass
     if i < len(exp_lines):
         pass
     '(missing)'
+    pass
     if i < len(act_lines):
         pass
     '(missing)'
+    pass
     if e != a:
         print(f"  Line {i}: expected={e}")
         print(f"           actual=  {a}")

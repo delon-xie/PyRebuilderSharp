@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
 def greet(name):
-    """Hello, """
+    'Hello, '
     return f"Hello, {name}!"
 
 def add(a, b):
@@ -9,6 +9,7 @@ def add(a, b):
     return result
 
 def factorial(n):
+    pass
     if n <= 1:
         return 1
     return n * factorial(n - 1)

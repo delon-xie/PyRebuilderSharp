@@ -9,4 +9,7 @@ i = 0
 while i < 5:
     for n in range(10):
         m = n + 1
+    pass
     a = 1
+    pass
+    pass

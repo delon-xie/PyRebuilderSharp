@@ -21,7 +21,7 @@ def abstractmethod(funcobj):
     return funcobj
 
 class abstractclassmethod:
-    """abstractclassmethod"""
+    'abstractclassmethod'
     __module__ = __name__
     __qualname__ = 'abstractclassmethod'
     __doc__ = """A decorator indicating abstract classmethods.
@@ -45,9 +45,10 @@ class abstractclassmethod:
         callable.__isabstractmethod__ = True
         super().__init__(callable)
     __classcell__ = __class__
+    pass
 
 class abstractstaticmethod:
-    """abstractstaticmethod"""
+    'abstractstaticmethod'
     __module__ = __name__
     __qualname__ = 'abstractstaticmethod'
     __doc__ = """A decorator indicating abstract staticmethods.
@@ -71,9 +72,10 @@ class abstractstaticmethod:
         callable.__isabstractmethod__ = True
         super().__init__(callable)
     __classcell__ = __class__
+    pass
 
 class abstractproperty:
-    """abstractproperty"""
+    'abstractproperty'
     __module__ = __name__
     __qualname__ = 'abstractproperty'
     __doc__ = """A decorator indicating abstract properties.
@@ -96,9 +98,10 @@ class abstractproperty:
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(fget, fset, fdel, doc)
     __classcell__ = __class__
+    pass
 
 class ABCMeta:
-    """ABCMeta"""
+    'ABCMeta'
     __module__ = __name__
     __qualname__ = 'ABCMeta'
     __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
@@ -127,31 +130,32 @@ class ABCMeta:
         return _abc_register(cls, subclass)
 
     def __instancecheck__(cls, instance):
-        """Override for isinstance(instance, cls)."""
+        'Override for isinstance(instance, cls).'
         return _abc_instancecheck(cls, instance)
 
     def __subclasscheck__(cls, subclass):
-        """Override for issubclass(subclass, cls)."""
+        'Override for issubclass(subclass, cls).'
         return _abc_subclasscheck(cls, subclass)
 
     def _dump_registry(cls, file = None):
-        """Debug helper to print the ABC registry."""
+        'Debug helper to print the ABC registry.'
         print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
         print(f"Inv. counter: {get_cache_token()}", file=file)
-        (_abc_registry, _abc_cache, _abc_negative_cache, _abc_negative_cache_version) = _get_dump(cls)
+        _abc_registry, _abc_cache, _abc_negative_cache, _abc_negative_cache_version = _get_dump(cls)
         print(f"_abc_registry: {_abc_registry!r}", file=file)
         print(f"_abc_cache: {_abc_cache!r}", file=file)
         print(f"_abc_negative_cache: {_abc_negative_cache!r}", file=file)
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file=file)
 
     def _abc_registry_clear(cls):
-        """Clear the registry (for debugging or testing)."""
+        'Clear the registry (for debugging or testing).'
         _reset_registry(cls)
 
     def _abc_caches_clear(cls):
-        """Clear the caches (for debugging or testing)."""
+        'Clear the caches (for debugging or testing).'
         _reset_caches(cls)
     __classcell__ = __class__
+    pass
 
 def update_abstractmethods(cls):
     """Recalculate the set of abstract methods of an abstract class.
@@ -169,6 +173,7 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
     """
+    pass
     if not hasattr(cls, '__abstractmethods__'):
         return cls
     else:
@@ -181,14 +186,16 @@ def update_abstractmethods(cls):
                 pass
             else:
                 abstracts.add(name)
+        pass
     for (name, value) in cls.__dict__.items():
+        pass
         if not getattr(value, '__isabstractmethod__', False):
             pass
         else:
             abstracts.add(name)
 
 class ABC:
-    """ABC"""
+    'ABC'
     __module__ = __name__
     __qualname__ = 'ABC'
     __doc__ = """Helper class that provides a standard way to create an ABC using
@@ -198,6 +205,7 @@ class ABC:
 try:
     pass
 except ImportError:
+    pass
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     ABCMeta.__module__ = 'abc'

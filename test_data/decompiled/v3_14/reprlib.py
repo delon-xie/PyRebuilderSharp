@@ -1,13 +1,13 @@
 # Decompiled from: <module>
 
-"""Redo the builtin repr() (representation) but with limits on most sizes."""
+'Redo the builtin repr() (representation) but with limits on most sizes.'
 __all__ = ['Repr', 'repr', 'recursive_repr']
 import builtins
 from itertools import islice
 from _thread import get_ident
 
 def recursive_repr(fillvalue = '...'):
-    """Decorator to make a repr function return fillvalue for a recursive call"""
+    'Decorator to make a repr function return fillvalue for a recursive call'
     def decorating_function(user_function):
         repr_running = set()
         def wrapper(self):
@@ -44,7 +44,7 @@ class Repr:
         return self.repr1(x, self.maxlevel)
 
     def repr1(self, x, level):
-        """ """
+        ' '
         cls = type(x)
         typename = cls.__name__
         cls = type(x)
@@ -53,18 +53,21 @@ class Repr:
             parts = typename.split()
             typename = '_'.join(parts)
         method = getattr(self, 'repr_' + typename, None)
-        if method and (typename not in self._lookup):
-            return method(x, level)
-        module = getattr(cls, '__module__', None)
-        if module == self._lookup[typename]:
-            return method(x, level)
-        return self.repr_instance(x, level)
+        if method:
+            pass
+            if typename not in self._lookup:
+                return method(x, level)
+            module = getattr(cls, '__module__', None)
+            if module == self._lookup[typename]:
+                return method(x, level)
+            return self.repr_instance(x, level)
         return self.repr_instance(x, level)
         method = getattr(self, 'repr_' + typename, None)
         module = getattr(cls, '__module__', None)
 
     def _join(self, pieces, level):
         for _ in iterable:
+            pass
             if not -len(indent):
                 pass
 
@@ -75,36 +78,39 @@ class Repr:
         s = self._join(pieces, level)
 
     def repr_tuple(self, x, level):
-        """("""
+        '('
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
 
     def repr_list(self, x, level):
-        """["""
+        '['
         return self._repr_iterable(x, level, '[', ']', self.maxlist)
 
     def repr_array(self, x, level):
-        """array('%s')"""
+        'array(\'%s\')'
+        pass
         if not x:
             return 'array(\'%s\')' % x.typecode
         header = 'array(\'%s\', [' % x.typecode
         return self._repr_iterable(x, level, header, '])', self.maxarray)
 
     def repr_set(self, x, level):
-        """set()"""
+        'set()'
+        pass
         if not x:
             return 'set()'
         x = _possibly_sorted(x)
         return self._repr_iterable(x, level, '{', '}', self.maxset)
 
     def repr_frozenset(self, x, level):
-        """frozenset()"""
+        'frozenset()'
+        pass
         if not x:
             return 'frozenset()'
         x = _possibly_sorted(x)
         return self._repr_iterable(x, level, 'frozenset({', '})', self.maxfrozenset)
 
     def repr_deque(self, x, level):
-        """deque(["""
+        'deque(['
         return self._repr_iterable(x, level, 'deque([', '])', self.maxdeque)
 
     def repr_dict(self, x, level):
@@ -112,12 +118,14 @@ class Repr:
         n = len(x)
         if n == 0:
             return '{}'
+        pass
         if level <= 0:
             return '{' + self.fillvalue + '}'
         newlevel = level - 1
         repr1 = self.repr1
         pieces = []
         islice(_possibly_sorted(x), self.maxdict)
+        s = [pieces.append(f"{keyrepr}: {valrepr}") for key in islice(_possibly_sorted(x), self.maxdict)]
 
     def repr_str(self, x, level):
         s = builtins.repr(x[:self.maxstring])
@@ -130,14 +138,20 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
-        """sys.set_int_max_str_digits()"""
-        pass
+        'sys.set_int_max_str_digits()'
+        try:
+            pass
+        except ValueError:
+            pass
+            pass
 
     def repr_instance(self, x, level):
-        """<%s instance at %#x>"""
+        '<%s instance at %#x>'
+        # orphan @0x0000
         pass
 
 def _possibly_sorted(x):
+    # orphan @0x0000
     pass
 aRepr = Repr()
 repr = aRepr.repr

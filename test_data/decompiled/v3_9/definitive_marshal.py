@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Definitive test: field alignment in marshal data"""
+'Definitive test: field alignment in marshal data'
 import struct
 import marshal
 import sys
@@ -16,14 +16,14 @@ print('Known values:', {v: v for (k, v) in iterable if k == 'flags'})
 range(0, 8)
 print
 for start in range(0, 8):
+    pass
     if start + 16 > len(m):
         pass
     vals = struct.unpack_from('<IIII', m, start)
-    a0 = *vals
-    nl = *vals
-    ss = *vals
-    fl = *vals
-    if (a0 == known['argcount']) and (nl == known['nlocals']):
-        print(f"\nMATCH at offset {start}:")
-        print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
-        print(f"  Bytes: {' '.join((b for b in m[start:start + 16]))}")
+    a0, nl, ss, fl = vals
+    if a0 == known['argcount']:
+        pass
+        if nl == known['nlocals']:
+            print(f"\nMATCH at offset {start}:")
+            print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
+            print(f"  Bytes: {' '.join((b for b in m[start:start + 16]))}")

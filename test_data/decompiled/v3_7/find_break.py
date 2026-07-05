@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-"""Binary search to find which expression breaks decompilation"""
+'Binary search to find which expression breaks decompilation'
 import os
 import subprocess
 import sys
@@ -10,7 +10,7 @@ all_exprs = ['a1 = None', 'a2 = True', 'a3 = False', 'a4 = 42', 'a5 = 3.14', 'a6
 base = all_exprs[:6]
 r = test_until_broken(base)
 print(f"Base (6 exprs): {r}")
-"""Binary search to find which expression breaks decompilation"""
+'Binary search to find which expression breaks decompilation'
 import os
 import subprocess
 import sys
@@ -38,6 +38,7 @@ def test_until_broken(exprs):
     out = r2.stdout + r2.stderr.strip()
 
 def find_breaking_point(exprs, lo, hi):
+    pass
     while lo < hi:
         mid = (lo + hi) // 2
         result = test_until_broken(exprs[:mid + 1])

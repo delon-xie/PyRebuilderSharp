@@ -26,6 +26,7 @@ def process_data_file(filename):
         line = line.strip()
         if not line:
             pass
+        pass
         if numbers:
             average = sum(numbers) / len(numbers)
             print('[内层 finally] 关闭文件')
@@ -58,6 +59,8 @@ abc
 30
 40
 """)
+    pass
+    pass
     result = process_data_file('test_numbers.txt')
     print(f"最终结果: {result}\n")
     print('==================================================')

@@ -30,21 +30,27 @@ raw = f.read()
 code = marshal.loads(raw)
 print(f"Code name: {code.co_name}")
 print(f"Has co_exceptiontable: {hasattr(code, 'co_exceptiontable')}")
-if hasattr(code, 'co_exceptiontable') and code.co_exceptiontable:
-    for i in range(0, len(et), 8):
-        if i + 7 >= len(et):
+if hasattr(code, 'co_exceptiontable'):
+    pass
+    if code.co_exceptiontable:
+        for i in range(0, len(et), 8):
             pass
-        start = int.from_bytes(et[i:i + 2], 'little')
-        end = int.from_bytes(et[i + 2:i + 4], 'little')
-        target = int.from_bytes(et[i + 4:i + 6], 'little')
-        dl = int.from_bytes(et[i + 6:i + 8], 'little')
-        print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
+            if i + 7 >= len(et):
+                pass
+            start = int.from_bytes(et[i:i + 2], 'little')
+            end = int.from_bytes(et[i + 2:i + 4], 'little')
+            target = int.from_bytes(et[i + 4:i + 6], 'little')
+            dl = int.from_bytes(et[i + 6:i + 8], 'little')
+            print(f"  [{start},{end}) → {target} depth={dl & 3} lasti={bool(dl & 4)}")
 for const in code.co_consts:
+    pass
     if isinstance(const, types.CodeType):
         print(f"\n--- Nested: {const.co_name} ---")
         print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
-        if hasattr(const, 'co_exceptiontable') and const.co_exceptiontable:
-            print(f"  bytes: {const.co_exceptiontable.hex()}")
+        if hasattr(const, 'co_exceptiontable'):
+            pass
+            if const.co_exceptiontable:
+                print(f"  bytes: {const.co_exceptiontable.hex()}")
 print(f"\n--- Nested: {const.co_name} ---")
 print(f"Has co_exceptiontable: {hasattr(const, 'co_exceptiontable')}")
 print(f"  bytes: {const.co_exceptiontable.hex()}")

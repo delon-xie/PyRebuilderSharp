@@ -1,6 +1,11 @@
 # Decompiled from: <module>
 
-passed = [os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver) for ver in versions if not os.path.exists(pyc) if expected_ast == actual_ast if i < len(exp_lines) for i in """
+try:
+    pass
+except Exception:
+    pass
+    pass
+passed = [None for ver in versions if not os.path.exists(pyc) if expected_ast == actual_ast if i < len(exp_lines) for i in """
 """.split if not os.path.exists(pyc) if i < len(exp_lines) if expected_ast == actual_ast]
 actual_ast = ast.dump(ast.parse(actual_src), indent=2)
 match = expected_ast == actual_ast

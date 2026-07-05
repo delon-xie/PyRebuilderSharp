@@ -9,6 +9,8 @@ f = open('/tmp/test_full.txt', 'r')
 output = f.read()
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
+    pass
+    pass
     version_stats = defaultdict(lambda: None)
     lines = output.split("""
 """)
