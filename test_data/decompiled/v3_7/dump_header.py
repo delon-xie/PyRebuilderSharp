@@ -12,9 +12,9 @@ ts = struct.unpack('<I', data[4:8])[0]
 size = struct.unpack('<I', data[8:12])[0]
 print(f"Timestamp={ts}, Size={size}")
 pos = 12
-'Marshal at offset '(f"{pos}: byte={data[pos]}{'#x'}")
+('Marshal at offset ', f"{pos}: byte={data[pos]}{'#x'}")
 type_byte = data[pos]
-'  TYPE_CODE = '(f"{type_byte & 127}{'#x'} (expected 0x63)")
+('  TYPE_CODE = ', f"{type_byte & 127}{'#x'} (expected 0x63)")
 print(f"  has_ref = {type_byte & 128 != 0}")
 pos += 1
 import struct
@@ -29,9 +29,9 @@ ts = struct.unpack('<I', data[4:8])[0]
 size = struct.unpack('<I', data[8:12])[0]
 print(f"Timestamp={ts}, Size={size}")
 pos = 12
-'Marshal at offset '(f"{pos}: byte={data[pos]}{'#x'}")
+('Marshal at offset ', f"{pos}: byte={data[pos]}{'#x'}")
 type_byte = data[pos]
-'  TYPE_CODE = '(f"{type_byte & 127}{'#x'} (expected 0x63)")
+('  TYPE_CODE = ', f"{type_byte & 127}{'#x'} (expected 0x63)")
 print(f"  has_ref = {type_byte & 128 != 0}")
 pos += 1
 if type_byte & 128:

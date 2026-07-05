@@ -1,13 +1,13 @@
 # Decompiled from: <module>
 
-'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
+('pos ', f"{pos}: bytecode type=0x{raw}{'02X'}")
 pos += 1
 t = raw & 127
 pos = 16
 raw = data[pos]
-'pos '(f"{pos}: type=0x{raw}{'02X'}")
+('pos ', f"{pos}: type=0x{raw}{'02X'}")
 pos += 1
-None(None)
+(None, None)
 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     val = struct.unpack('<i', data[pos:pos + 4])[0]
     print(f"  {name}={val}")
@@ -23,6 +23,6 @@ for i in range(min(count, 6)):
         pos += 4
         flags = f" (ref={ref})"
 raw = data[pos]
-'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
+('pos ', f"{pos}: consts type=0x{raw}{'02X'}")
 pos += 1
 t = raw & 127

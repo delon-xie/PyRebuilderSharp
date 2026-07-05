@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-f = [f for f in os.listdir(input_dir) if not f.endswith('.py') for f in 0(0)('============================================================') if not f.endswith('.py')]
+f = [f for f in os.listdir(input_dir) if not f.endswith('.py') for f in (0, 0)('============================================================') if not f.endswith('.py')]
 input_path = os.path.join(input_dir, py_file)
 base_name = os.path.splitext(py_file)[0]
 output_name = f"{base_name}.3.10.pyc"

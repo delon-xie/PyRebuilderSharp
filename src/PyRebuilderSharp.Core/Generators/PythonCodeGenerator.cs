@@ -270,6 +270,55 @@ public class PythonCodeGenerator : ICodeGenerator
                 {
                     if (part is Constant c && c.Value is string s)
                         _output.Append(EscapeStringContent(s));
+                    else if (part is Call call && call.Args.Count == 1)
+                    {
+                        // 调试信息：输出 func 的类型和值
+                        if (call.Func is Constant funcConst)
+                        {
+                            var val = funcConst.Value;
+                            _output.Append($"/*DEBUG: type={val?.GetType().Name}, value={val}*/");
+                        }
+                        // 在 f-string 内部，如果遇到 .0(s) 这样的调用，
+                        // 这实际上是格式说明符，应该生成 {s:.0}
+                        bool isFormatSpec = false;
+                        string formatSpec = "";
+                        
+                        if (call.Func is Constant { Value: double d })
+                        {
+                            isFormatSpec = true;
+                            formatSpec = d.ToString();
+                        }
+                        else if (call.Func is Constant { Value: float f })
+                        {
+                            isFormatSpec = true;
+                            formatSpec = f.ToString();
+                        }
+                        else if (call.Func is Constant { Value: decimal dec })
+                        {
+                            isFormatSpec = true;
+                            formatSpec = dec.ToString();
+                        }
+                        else if (call.Func is Constant { Value: string strVal } && 
+                                (strVal.StartsWith(".") || strVal.StartsWith("0.") || strVal.StartsWith("#")))
+                        {
+                            isFormatSpec = true;
+                            formatSpec = strVal;
+                        }
+                        
+                        if (isFormatSpec)
+                        {
+                            _output.Append('{');
+                            Visit(call.Args[0]);
+                            _output.Append(":");
+                            _output.Append(formatSpec);
+                            _output.Append('}');
+                            continue;
+                        }
+                        
+                        _output.Append('{');
+                        Visit(part);
+                        _output.Append('}');
+                    }
                     else
                     {
                         _output.Append('{');
@@ -1183,6 +1232,68 @@ public class PythonCodeGenerator : ICodeGenerator
         Expr func = call.Func;
         while (func is Starred starred)
             func = starred.Value;
+        
+        // 检查 func 是否是常量（字符串、None、整数、浮点数等）
+        // 如果是，生成元组而不是函数调用，避免语法错误
+        bool funcIsConstant = func is Constant;
+        
+        if (funcIsConstant)
+        {
+            // 如果 func 是一个浮点数（如 0.0），并且只有一个参数，
+            // 这可能是一个格式说明符被错误解析，如 .0(s) 应该是 s:.0
+            if (call.Args.Count == 1)
+            {
+                if (func is Constant { Value: double d })
+                {
+                    Visit(call.Args[0]);
+                    _output.Append(":");
+                    _output.Append(d.ToString());
+                    return;
+                }
+                else if (func is Constant { Value: float f })
+                {
+                    Visit(call.Args[0]);
+                    _output.Append(":");
+                    _output.Append(f.ToString());
+                    return;
+                }
+            }
+            
+            // 如果 func 是一个字符串（如 ".0"），并且看起来像格式说明符，
+            // 这可能是一个格式说明符被错误解析，如 ".0"(s) 应该是 s:.0
+            if (func is Constant { Value: string formatStr } && 
+                call.Args.Count == 1 && 
+                (formatStr.StartsWith(".") || formatStr.StartsWith("0.") || formatStr.StartsWith("#")))
+            {
+                Visit(call.Args[0]);
+                _output.Append(":");
+                _output.Append(formatStr);
+                return;
+            }
+            
+            _output.Append("(");
+            Visit(func);
+            foreach (var arg in call.Args)
+            {
+                _output.Append(", ");
+                Visit(arg);
+            }
+            _output.Append(")");
+            return;
+        }
+        
+        // 如果 func 是一个 Name 节点，并且其 Id 看起来像格式说明符（如 ".0"），
+        // 这可能是一个格式说明符被错误解析，如 .0(s) 应该是 s:.0
+        if (func is Name nameFunc && 
+            call.Args.Count == 1 && 
+            (nameFunc.Id.StartsWith(".") || nameFunc.Id.StartsWith("0.") || nameFunc.Id.StartsWith("#")))
+        {
+            Visit(call.Args[0]);
+            _output.Append(":");
+            _output.Append(nameFunc.Id);
+            return;
+        }
+        
         Visit(func);
         _output.Append("(");
 

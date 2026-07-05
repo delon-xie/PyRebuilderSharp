@@ -2,5 +2,5 @@
 
 def outer():
     def inner():
-        None(None)
+        (None, None)
     return inner

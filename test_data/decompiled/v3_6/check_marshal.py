@@ -14,7 +14,7 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
     type_byte = data[pos]
     actual_type = type_byte & 127
     has_ref = type_byte & 128 != 0
-    ': header='(f"{hdr}, marshal_at={pos}, type={type_byte}{'#x'} (type={actual_type}{'#x'}, has_ref={has_ref})")
+    (': header=', f"{hdr}, marshal_at={pos}, type={type_byte}{'#x'} (type={actual_type}{'#x'}, has_ref={has_ref})")
     if has_ref:
         ref_idx = struct.unpack('<I', data[pos + 1:pos + 5])[0]
         fields_start = pos + 5

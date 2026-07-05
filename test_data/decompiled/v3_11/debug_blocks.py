@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-None(None)
+(None, None)
 for const in code.co_consts:
     if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
         for (i, instr) in enumerate(instrs):

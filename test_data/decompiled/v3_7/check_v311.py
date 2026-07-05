@@ -16,7 +16,7 @@ print(f"  posonly={code.co_posonlyargcount}")
 print(f"  kwonly={code.co_kwonlyargcount}")
 print(f"  nlocals={code.co_nlocals}")
 print(f"  stacksize={code.co_stacksize}")
-'  flags='(f"{code.co_flags}{'#x'}")
+('  flags=', f"{code.co_flags}{'#x'}")
 print(f"  bytecode len={len(code.co_code)}")
 print(f"  consts count={len(code.co_consts)}")
 print(f"  names={list(code.co_names)}")
@@ -35,6 +35,6 @@ for off in range(17, 40):
         print(f"  4 zero bytes at offset {off}")
 for i in range(16, 50, 2):
     pair = raw[i:i + 2]
-    '  '(f"{i}{'3d'}: {pair.hex()}")
+    ('  ', f"{i}{'3d'}: {pair.hex()}")
 pair = raw[i:i + 2]
-'  '(f"{i}{'3d'}: {pair.hex()}")
+('  ', f"{i}{'3d'}: {pair.hex()}")

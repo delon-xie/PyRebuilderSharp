@@ -484,11 +484,25 @@ public class StackMachine
             // ---- f-string: FORMAT_VALUE + BUILD_STRING ----
             case Opcode.FORMAT_VALUE:
             {
-                var conversion = (instr.Argument ?? 0) & 0x03;
+                var arg = instr.Argument ?? 0;
+                var conversion = arg & 0x03;
                 int conv = conversion switch { 1 => 's', 2 => 'r', 3 => 'a', _ => -1 };
+                var formatSpecIndex = arg >> 2;
+                
                 var fval = SafePop();
                 if (fval == null) return null;
-                _exprStack.Push(new FormattedValue(fval, conv));
+                
+                Expr? formatSpec = null;
+                if (formatSpecIndex > 0 && _code.Constants.TryGetValue(formatSpecIndex, out var formatSpecValue))
+                {
+                    // 只在格式说明符是字符串且不为空时才添加
+                    if (formatSpecValue is string formatStr && !string.IsNullOrEmpty(formatStr))
+                    {
+                        formatSpec = new Constant(formatStr);
+                    }
+                }
+                
+                _exprStack.Push(new FormattedValue(fval, conv, formatSpec));
                 return null;
             }
 

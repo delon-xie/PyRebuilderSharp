@@ -15,7 +15,7 @@ DECOMPILED_DIR = PROJECT_DIR / "test_data/decompiled"
 REPORTS_DIR = PROJECT_DIR / "docs"
 REPORTS_DIR.mkdir(exist_ok=True)
 
-REPORT_DATE = "20260704"
+REPORT_DATE = "20260705"
 REPORT_PATH = str(REPORTS_DIR / f"baseline_evaluate_report_{REPORT_DATE}.md")
 RESULTS_PATH = str(REPORTS_DIR / "baseline_results.json")
 

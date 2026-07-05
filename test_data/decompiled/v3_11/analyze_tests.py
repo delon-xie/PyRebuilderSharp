@@ -13,7 +13,7 @@ def version_stats():
 lines = output.split("""
 """)
 i = 0
-None(None)
+(None, None)
 for version in sorted(version_stats.keys()):
     stats = version_stats[version]
     t = stats['total']

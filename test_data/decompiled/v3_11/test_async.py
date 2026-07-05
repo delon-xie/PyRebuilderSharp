@@ -4,7 +4,7 @@ import asyncio
 
 async def test_async():
     asyncio
-    yield 1()
+    yield (1)
     return 'done'
 
 async def worker():

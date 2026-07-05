@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-None(None)
+(None, None)
 try:
     pass
 except:

@@ -118,7 +118,7 @@ implementations defined by the registering ABC be callable (not
 even via super()).
 """
     def __new__(mcls, name, bases, namespace):
-        cls = None(mcls, name, mcls, v_35, **kwargs)
+        cls = (None, mcls, name, mcls, v_35)
         _abc_init(cls)
         return cls
     def register(cls, subclass):

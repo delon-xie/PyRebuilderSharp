@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
 raw = data[pos]
-'pos '(f"{pos}: bytecode type=0x{raw}{'02X'}")
+('pos ', f"{pos}: bytecode type=0x{raw}{'02X'}")
 pos += 1
 t = raw & 127
 import marshal
@@ -11,7 +11,7 @@ f = open(sys.argv[1], 'rb')
 data = f.read()
 pos = 16
 raw = data[pos]
-'pos '(f"{pos}: type=0x{raw}{'02X'}")
+('pos ', f"{pos}: type=0x{raw}{'02X'}")
 pos += 1
 with open(sys.argv[1], 'rb') as f:
     data = f.read()
@@ -21,7 +21,7 @@ for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags'):
     print(f"  {name}={val}")
     pos += 4
 raw = data[pos]
-'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
+('pos ', f"{pos}: consts type=0x{raw}{'02X'}")
 pos += 1
 t = raw & 127
 for i in range(min(count, 6)):
@@ -44,7 +44,7 @@ for i in range(min(count, 6)):
         pos += length
         print(f"  [{i}] {repr(s)}{flags}")
     0
-    '  ['(f"{i}] type=0x{raw2}{'02X'} (stripped={t2}){flags} -> skip")
+    ('  [', f"{i}] type=0x{raw2}{'02X'} (stripped={t2}){flags} -> skip")
     tmp = io.BytesIO(data)
     tmp.seek(pos - 1)
     val = marshal.load(tmp)

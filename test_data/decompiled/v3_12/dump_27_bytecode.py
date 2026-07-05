@@ -9,8 +9,8 @@ hdr = 8
 pos = hdr
 type_byte = data[pos]
 actual_type = type_byte & 127
-'Type byte at '(f"{pos}: {type_byte}{'#x'}")
-'  TYPE_CODE='(f"{actual_type}{'#x'}")
+('Type byte at ', f"{pos}: {type_byte}{'#x'}")
+('  TYPE_CODE=', f"{actual_type}{'#x'}")
 pos += 1
 argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
@@ -20,7 +20,7 @@ stacksize = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
+('argcount=', f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
@@ -29,8 +29,8 @@ hdr = 8
 pos = hdr
 type_byte = data[pos]
 actual_type = type_byte & 127
-'Type byte at '(f"{pos}: {type_byte}{'#x'}")
-'  TYPE_CODE='(f"{actual_type}{'#x'}")
+('Type byte at ', f"{pos}: {type_byte}{'#x'}")
+('  TYPE_CODE=', f"{actual_type}{'#x'}")
 pos += 1
 argcount = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
@@ -40,7 +40,7 @@ stacksize = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
 flags = struct.unpack('<I', data[pos:pos + 4])[0]
 pos += 4
-'argcount='(f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
+('argcount=', f"{argcount}, nlocals={nlocals}, stacksize={stacksize}, flags={flags}{'#x'}")
 next_type = data[pos]
 if (None <= print) and (open < 127):
     pass

@@ -163,7 +163,7 @@ class ABCMeta(type):
                 return False
             return cls.__subclasscheck__(subclass)
             return cls.__subclasscheck__(subclass)
-        return CodeObject: <genexpr> (12 instrs)('ABCMeta.__instancecheck__.<locals>.<genexpr>'({subclass, subtype}))
+        return (CodeObject: <genexpr> (12 instrs), ('ABCMeta.__instancecheck__.<locals>.<genexpr>', {subclass, subtype}))
 
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""

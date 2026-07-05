@@ -1038,7 +1038,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         # [Block @0x0340] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         attrs = [name for name in ('__repr__', '__str__', '__format__', '__reduce_ex__') if not name not in body]
         # [Block @0x0522] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
-        member = None(**new_member, **[enum_class, value])
+        member = (None)
         value = value[0]
         member._name_ = name
         member.__objclass__ = enum_class
@@ -1050,7 +1050,7 @@ def _simple_enum(etype = Enum, *, boundary = None, use_args = None):
         single_bits |= value
         __new__ = [m for m in enum_class for _ in attrs for m in enum_class if m._value_ == member._value_ if member_list != sorted(member_list)]
         enum_class._iter_member_ = enum_class._iter_member_by_def_
-        member = None(**new_member, **[enum_class, value])
+        member = (None)
         value = value[0]
         member._name_ = name
         member.__objclass__ = enum_class

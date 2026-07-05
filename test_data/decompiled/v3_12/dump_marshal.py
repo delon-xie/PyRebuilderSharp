@@ -2,11 +2,11 @@
 
 pos = 16
 raw = data[pos]
-'pos '(f"{pos}: type=0x{raw}{'02X'}")
+('pos ', f"{pos}: type=0x{raw}{'02X'}")
 pos += 1
 pos = [pos + 4 for name in ('argcount', 'posonly', 'kwonly', 'nlocals', 'stacksize', 'flags')]
 raw = data[pos]
-'pos '(f"{pos}: consts type=0x{raw}{'02X'}")
+('pos ', f"{pos}: consts type=0x{raw}{'02X'}")
 pos += 1
 t = raw & 127
 child_start = [actual_end for i in range(min(count, 6)) if raw2 & 128 if t2 == 99 for c in i if raw2 & 128 if t2 == 99 if t == 41]

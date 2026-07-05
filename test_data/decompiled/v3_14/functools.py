@@ -468,7 +468,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     if maxsize == 0:
         def wrapper():
             misses += 1
-            result = None(**args, **kwds)
+            result = (None)
             return result
     elif maxsize:
         def wrapper():
@@ -644,7 +644,7 @@ def singledispatch(func):
         """ requires at least 1 positional argument"""
         if not args:
             raise TypeError(f"{funcname} requires at least 1 positional argument")
-        return None(**args, **kw)
+        return (None)
     funcname = getattr(func, '__name__', 'singledispatch function')
     wrapper.register = register
     wrapper.dispatch = dispatch
@@ -714,9 +714,9 @@ def _singledispatchmethod_get():
                 skip_bound_arg = self._dispatch_arg_index == 1
             else:
                 if skip_bound_arg:
-                    return None(**args[1:], **kwargs)
-                return None(**args, **kwargs)
-        return None(**args, **kwargs)
+                    return (None)
+                return (None)
+        return (None)
         method = method.__get__(self._obj, self._cls)
     def __getattr__(self, name):
         """__name__"""

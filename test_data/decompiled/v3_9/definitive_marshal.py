@@ -10,7 +10,7 @@ print('Type of marshal bytes:', type(m))
 print('Length:', len(m))
 print('Bytes:', ' '.join((b for b in m[:60])))
 print()
-'Byte[0] = 0x'(f"{m[0]}{'02x'} ({m[0]})")
+('Byte[0] = 0x', f"{m[0]}{'02x'} ({m[0]})")
 known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
 print('Known values:', {v: v for (k, v) in iterable if k == 'flags'})
 range(0, 8)

@@ -7,5 +7,5 @@ def process_data_file(filename):
     """
     print(f"[最内层 else] 成功解析数字: {num}")
     average = [line.strip() for line in lines if not line]
-None(None)
-None(None)
+(None, None)
+(None, None)

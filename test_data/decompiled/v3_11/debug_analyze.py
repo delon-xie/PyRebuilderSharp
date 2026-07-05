@@ -14,7 +14,7 @@ lines = output.split("""
 """)
 i = 0
 debug_count = 0
-None(None)
+(None, None)
 # [Block @0x0358] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 next_line = lines[j]
 version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)

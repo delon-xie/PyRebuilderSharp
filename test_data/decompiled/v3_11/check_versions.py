@@ -9,4 +9,4 @@ for filename in os.listdir(pyc_dir):
     version = magic_numbers.get(magic, 'unknown')
     if version not in version_files:
         pass
-None(None)
+(None, None)

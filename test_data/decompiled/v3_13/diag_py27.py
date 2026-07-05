@@ -6,7 +6,7 @@ for (name, code) in tests.items():
     out_path = os.path.join(OUTPUT_DIR, f"{name}.out.py")
     open(py_path, 'w')
     f.write(code)
-    None(None)
+    (None, None)
     if not f:
         pass
     r = subprocess.run([PY27, '-c', """import py_compile, sys

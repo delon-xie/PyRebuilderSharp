@@ -5809,13 +5809,13 @@ class SyntaxErrorTestCase(unittest.TestCase):
         for n in range(MAX_MANAGERS):
             self.subTest(f"within range: n={n}")
             compile(get_code(n), '<string>', 'exec')
-            None(None)
+            (None, None)
             if not get_code:
                 pass
             for n in range(self, v_51 + 5):
                 self.subTest(f"out of range: n={n}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
-                None(None)
+                (None, None)
                 if not self:
                     pass
 
@@ -5832,13 +5832,13 @@ class SyntaxErrorTestCase(unittest.TestCase):
         for n in range(MAX_MANAGERS):
             self.subTest(f"within range: n={n}")
             compile(get_code(n), '<string>', 'exec')
-            None(None)
+            (None, None)
             if not get_code:
                 pass
             for n in range(self, v_51 + 5):
                 self.subTest(f"out of range: n={n}")
                 self._check_error(get_code(n), 'too many statically nested blocks')
-                None(None)
+                (None, None)
                 if not self:
                     pass
 
@@ -5877,10 +5877,10 @@ while 1:
             compile(source, '<string>', mode)
             if not self:
                 pass
-            None(None)
+            (None, None)
             if not source:
                 pass
-            None(None)
+            (None, None)
 
     def test_deep_invalid_rule(self):
         pass

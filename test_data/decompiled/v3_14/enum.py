@@ -274,7 +274,7 @@ enumeration member names.
                 try:
                     pass
                 except TypeError:
-                    value = None(**auto_valued, **None)
+                    value = (None)
         value = value.value
         non_auto_store = True
         single = False
@@ -1051,14 +1051,14 @@ def _simple_enum(etype, *, boundary, use_args):
         # [Block @0x0360] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         gnv_last_values = [name for name in ('__repr__', '__str__', '__format__', '__reduce_ex__') if not name not in body]
         # [Block @0x0594] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
-        member = None(enum_class, value, **None)
+        member = (None, enum_class, value)
         value = value[0]
         setattr(cls, v_253, member)
         hashable_values.append(value)
         member_names.append(name)
         single_bits |= value
         member_list = [m._value_ for m in enum_class]
-        member = None(enum_class, value, **None)
+        member = (None, enum_class, value)
         value = value[0]
         setattr(cls, v_253, member)
         enum_class._value2member_map_.setdefault(value, member)

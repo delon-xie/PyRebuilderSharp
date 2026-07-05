@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-None(None)
+(None, None)
 outc = os.path.join(OUTPUT_DIR, '{}.2.7.pyc'.format(BASENAME))
 result = subprocess.run([PY27, '-c', """import py_compile, sys
 src, dst = sys.argv[1], sys.argv[2]
