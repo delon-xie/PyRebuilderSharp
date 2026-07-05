@@ -81,7 +81,7 @@ public class BlockDecompiler
                     break;
                 }
             }
-            if (!hasNonComment)
+            if (!hasNonComment && !isConditionBlock)
             {
                 stmts.Add(new Pass());
             }

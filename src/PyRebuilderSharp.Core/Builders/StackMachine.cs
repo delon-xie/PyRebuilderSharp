@@ -314,7 +314,10 @@ public class StackMachine
                 // walrus := detected: COPY followed by STORE_NAME
                 // Only generate NamedExpr if we're actually building a larger expression context
                 // In chained assignments like a = b = c = None, COPY is used to duplicate values, not for walrus
-                if (_pendingCopyDepth >= 0 && _exprStack.Count > 1)
+                // 排除类创建相关的特殊变量（__classcell__, __class__ 等）
+                if (_pendingCopyDepth >= 0 && _exprStack.Count > 1
+                    && storeName != "__classcell__" && storeName != "__class__"
+                    && !storeName.StartsWith("__classdict"))
                 {
                     _pendingCopyDepth = -1;
                     _pendingInplaceOp = null;
@@ -391,7 +394,10 @@ public class StackMachine
                 var val = SafePop();
                 if (val == null) return null;
                 // walrus := detected: COPY followed by STORE_FAST
-                if (_pendingCopyDepth >= 0)
+                // 排除类创建相关的特殊变量（__classcell__, __class__ 等）
+                if (_pendingCopyDepth >= 0
+                    && storeLocal != "__classcell__" && storeLocal != "__class__"
+                    && !storeLocal.StartsWith("__classdict"))
                 {
                     _pendingCopyDepth = -1;
                     _exprStack.Push(new NamedExpr(new Name(storeLocal, ExpressionContext.Store), val));

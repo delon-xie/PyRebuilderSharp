@@ -425,7 +425,7 @@ public class AstBuilder
         }
         
         // Remove trailing module-level return None (always implicit at module level)
-        stmts = stmts.Where(s => !(s is Return ret && ret.Value is Constant { Value: null })).ToList();
+        stmts = stmts.Where(s => !(s is Return ret && (ret.Value is Constant { Value: null } || ret.Value == null))).ToList();
         
         // Convert __doc__ = '...' to bare docstring (ExprStmt with string constant)
         stmts = ConvertDocstring(stmts);
@@ -4823,6 +4823,9 @@ public class AstBuilder
                 // ExprStmt(Compare) 是条件表达式本身，前面的语句是初始化代码
                 if (s is ExprStmt { Value: Compare })
                     break;
+                // Pass 是 BlockDecompiler 为空语句列表添加的占位符，不是真正的初始化语句
+                if (s is Pass)
+                    continue;
                 headerInitStmts.Add(s);
             }
         }
@@ -4863,12 +4866,37 @@ public class AstBuilder
         // 检测 OR 短接链: POP_JUMP_IF_TRUE + fallthrough 为条件分支
         // if a or b: bytecode = "POP_JUMP_IF_TRUE → body ; POP_JUMP_IF_FALSE → after"
         bool isOrChain = isJumpIfTrue && bodyBranch != null && IsConditionBranch(bodyBranch);
-        
+
         // 检测列表推导式模式：POP_JUMP_IF_TRUE 的跳转目标包含 LIST_APPEND
         bool isComprehensionPattern = isJumpIfTrue && afterBranch != null && 
             afterBranch.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313 || i.Opcode == Opcode.SET_ADD_313);
-        
-        if (!isOrChain && !isComprehensionPattern && isJumpIfTrue && testExpr != null)
+
+        // 检测简单 OR 表达式: return x or y
+        // 字节码: LOAD x, COPY, TO_BOOL, POP_JUMP_IF_TRUE → RETURN_VALUE; POP_TOP, LOAD y, RETURN_VALUE
+        // afterBranch (跳转目标) 包含 RETURN_VALUE，bodyBranch (fallthrough) 最终也到达 RETURN_VALUE
+        // 注意：只在 bodyBranch 不是条件分支时才触发（否则由 OR 链终端检测处理）
+        bool isSimpleOrExpr = isJumpIfTrue && !isOrChain
+            && afterBranch != null && bodyBranch != null
+            && !IsConditionBranch(bodyBranch)
+            && afterBranch.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE)
+            && (bodyBranch.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE)
+                || bodyBranch.Successors.Contains(afterBranch))
+            && !isComprehensionPattern;
+
+        // 检测简单 AND 表达式: return x and y
+        // 字节码: LOAD x, COPY, TO_BOOL, POP_JUMP_IF_FALSE → RETURN_VALUE; POP_TOP, LOAD y, RETURN_VALUE
+        // afterBranch (跳转目标) 包含 RETURN_VALUE，bodyBranch (fallthrough) 最终也到达 RETURN_VALUE
+        // 注意：只在 bodyBranch 不是条件分支时才触发（否则由 AND 链终端检测处理）
+        bool isSimpleAndExpr = !isJumpIfTrue && !isOrChain
+            && lastInstr.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_FALSE_PY38
+            && afterBranch != null && bodyBranch != null
+            && !IsConditionBranch(bodyBranch)
+            && afterBranch.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE)
+            && (bodyBranch.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE)
+                || bodyBranch.Successors.Contains(afterBranch))
+            && !isComprehensionPattern;
+
+        if (!isOrChain && !isComprehensionPattern && !isSimpleOrExpr && !isSimpleAndExpr && isJumpIfTrue && testExpr != null)
             testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
 
         // OR 短接: POP_JUMP_IF_TRUE + fallthrough 为条件分支
@@ -4878,6 +4906,83 @@ public class AstBuilder
             var savedBody = bodyBranch;
             bodyBranch = afterBranch;   // body = print
             afterBranch = savedBody;    // else = 第二条件检查
+        }
+
+        // 简单 OR 表达式: return x or y
+        // 字节码: POP_JUMP_IF_TRUE → RETURN_VALUE(x); POP_TOP, LOAD y, RETURN_VALUE
+        // afterBranch 是 RETURN_VALUE 块（跳转目标），bodyBranch 是 fallthrough 块
+        if (isSimpleOrExpr)
+        {
+            // 从 bodyBranch (fallthrough) 中提取 y 表达式
+            // bodyBranch 可能直接包含 RETURN_VALUE，也可能通过后继到达 afterBranch
+            var bodyResult = _blockResults.GetValueOrDefault(bodyBranch.Id);
+            Expr? orRight = null;
+            if (bodyResult?.Statements != null)
+            {
+                foreach (var s in bodyResult.Statements)
+                {
+                    if (s is Return ret && ret.Value != null)
+                    {
+                        orRight = ret.Value;
+                        break;
+                    }
+                    // bodyBranch 可能只有表达式语句（LOAD_FAST 等），没有 Return
+                    if (s is ExprStmt es && es.Value != null)
+                    {
+                        orRight = es.Value;
+                    }
+                }
+            }
+            if (orRight != null)
+            {
+                // 生成 return x or y
+                var orExpr = new BoolOp(BoolOperator.Or, new List<Expr> { testExpr!, orRight });
+                var orResult = new List<Stmt>();
+                orResult.AddRange(headerInitStmts);
+                orResult.Add(new Return(orExpr));
+                // 标记两个块为已访问
+                visited.Add(afterBranch);
+                visited.Add(bodyBranch);
+                Console.Error.WriteLine($"[BUILD_IF_ELSE] Simple OR expr detected: return {testExpr} or {orRight}");
+                return orResult;
+            }
+        }
+
+        // 简单 AND 表达式: return x and y
+        // 字节码: POP_JUMP_IF_FALSE → RETURN_VALUE; POP_TOP, LOAD y, RETURN_VALUE
+        if (isSimpleAndExpr)
+        {
+            // 从 bodyBranch (fallthrough) 中提取 y 表达式
+            var bodyResult = _blockResults.GetValueOrDefault(bodyBranch.Id);
+            Expr? andRight = null;
+            if (bodyResult?.Statements != null)
+            {
+                foreach (var s in bodyResult.Statements)
+                {
+                    if (s is Return ret && ret.Value != null)
+                    {
+                        andRight = ret.Value;
+                        break;
+                    }
+                    if (s is ExprStmt es && es.Value != null)
+                    {
+                        andRight = es.Value;
+                    }
+                }
+            }
+            if (andRight != null)
+            {
+                // 生成 return x and y
+                var andExpr = new BoolOp(BoolOperator.And, new List<Expr> { testExpr!, andRight });
+                var andResult = new List<Stmt>();
+                andResult.AddRange(headerInitStmts);
+                andResult.Add(new Return(andExpr));
+                // 标记两个块为已访问
+                visited.Add(afterBranch);
+                visited.Add(bodyBranch);
+                Console.Error.WriteLine($"[BUILD_IF_ELSE] Simple AND expr detected: return {testExpr} and {andRight}");
+                return andResult;
+            }
         }
 
         // 检测 while 循环模式：bodyBranch 是循环头（LoopHeader）
@@ -4963,7 +5068,7 @@ public class AstBuilder
                 // 用 BuildBlockOnly 只取 else 块本身的语句（不追踪后继）
                 var elseBody = BuildBlockOnly(afterBranch, visited);
                 orelse = elseBody
-                    .Where(s => !(s is Return ret && ret.Value is Constant { Value: null }))
+                    .Where(s => !(s is Return ret && (ret.Value is Constant { Value: null } || ret.Value == null)))
                     .ToList();
                 if (orelse.Count == 0) orelse = null;
                 // else 块的后继块作为 tailCode（模块级顺序代码）
@@ -4994,7 +5099,7 @@ public class AstBuilder
 
         if (afterStmts != null && afterStmts.Count > 0)
         {
-            var ifChain = afterStmts.TakeWhile(s => s is If).ToList();
+            var ifChain = afterStmts.SkipWhile(s => s is Pass or CommentBlock).TakeWhile(s => s is If).ToList();
             if (ifChain.Count > 0)
             {
                 orelse = ifChain; // elif 链
@@ -5016,7 +5121,7 @@ public class AstBuilder
                 {
                     // 过滤 orelse 中的 module-level return None
                     orelse = afterStmts
-                        .Where(s => !(s is Return ret && ret.Value is Constant { Value: null }))
+                        .Where(s => !(s is Return ret && (ret.Value is Constant { Value: null } || ret.Value == null)))
                         .ToList();
                     if (orelse.Count == 0) orelse = null;
                 }
@@ -5024,7 +5129,7 @@ public class AstBuilder
                 {
                     // 非 If 的尾部，过滤 return None
                     foreach (var s in afterStmts)
-                        if (!(s is Return ret && ret.Value is Constant { Value: null }))
+                        if (!(s is Return ret && (ret.Value is Constant { Value: null } || ret.Value == null)))
                             tailCode.Add(s);
                 }
             }
@@ -5124,6 +5229,21 @@ public class AstBuilder
                         result.AddRange(orelse.Skip(1));
                 }
             }
+        }
+        // OR 链 + afterStmts 首条为 Return(Or(...)) → 合并为更长的 OR 链
+        // 例如: return a or b or c 被拆成 if(a) return + return b or c
+        else if (isOrChain && afterStmts != null && afterStmts.Count > 0
+                 && afterStmts[0] is Return orRet
+                 && orRet.Value is BoolOp orBool && orBool.Op == BoolOperator.Or
+                 && bodyStmts.Count == 1 && bodyStmts[0] is Return bodyRet2
+                 && bodyRet2.Value == null)
+        {
+            // 将 a 合并到 (b or c) 前面，生成 return a or b or c
+            var conditions = new List<Expr> { testExpr };
+            conditions.AddRange(orBool.Values);
+            result.Add(new Return(MergeBoolOpValues(BoolOperator.Or, conditions)));
+            if (afterStmts.Count > 1)
+                result.AddRange(afterStmts.Skip(1));
         }
         else
         {
@@ -5420,7 +5540,7 @@ public class AstBuilder
             
             // afterBranch 的语句就是 else 体
             // 检查是否形成 elif 链
-            var ifChain = afterStmts.TakeWhile(s => s is If).ToList();
+            var ifChain = afterStmts.SkipWhile(s => s is Pass or CommentBlock).TakeWhile(s => s is If).ToList();
             if (ifChain.Count > 0 && afterStmts.Count == ifChain.Count)
             {
                 // 整个 afterBranch 是 elif
@@ -7378,7 +7498,7 @@ public class AstBuilder
         for (int i = stmts.Count - 1; i >= 0; i--)
         {
             var s = stmts[i];
-            if (s is Return ret && ret.Value is Constant { Value: null })
+            if (s is Return ret && ((ret.Value is Constant { Value: null } || ret.Value == null)))
             {
                 stmts.RemoveAt(i);
             }
