@@ -1,19 +1,6 @@
 # Decompiled from: <module>
 
-import marshal
-import sys
-open(sys.argv[1], 'rb')
-magic = f.read(4)
-f.read(8)
-code = marshal.load(f)
-None(None)
-print('Module:', code.co_name)
-print('  argc:', code.co_argcount)
-print('  nlocals:', code.co_nlocals)
-print('  code len:', len(code.co_code))
-print('  code hex:', code.co_code.hex()[:60])
-
-def dump_code(c, depth = 0):
+def dump_code(c, depth):
     prefix = '  ' * depth
     c.co_consts
     for const in c.co_consts:
@@ -24,10 +11,7 @@ def dump_code(c, depth = 0):
                 dump_code(const, depth + 1)
             None
             return
-        return None
+        else:
+            return None
     return
-dump_code(code)
-if not True:
-    pass
-raise
 None(None)

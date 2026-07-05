@@ -69,8 +69,7 @@ def depth_5_while():
     total += 1
 
 def depth_5_try():
-    result = 0
     try:
-        result = 42
+        pass
     except:
         result = -1

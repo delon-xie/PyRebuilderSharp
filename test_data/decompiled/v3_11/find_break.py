@@ -20,27 +20,6 @@ all_exprs = ['a1 = None', 'a2 = True', 'a3 = False', 'a4 = 42', 'a5 = 3.14', 'a6
 
 def test_until_broken(exprs):
     None(None)
-    code = """
-""".join(exprs)
-    pyf = '/tmp/expr_bs.py'
-    pycf = '/tmp/expr_bs.3.10.pyc'
-    open(pyf, 'w')
-    f.write(code)
-    None(None)
-    r = subprocess.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], capture_output=True, text=True, timeout=30)
-    pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
-    if not os.path.exists(pyc):
-        return 'NO_COMPILE'
-    r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)
-    out = r2.stdout + r2.stderr.strip()
-    if 'Decompilation failed' in out:
-        return 'CRASH'
-    if 'if ' in out:
-        return f"CONDITIONAL: {out[:80]}"
-    return 'OK'
-    if not True:
-        pass
-    raise
     r = subprocess.run(['python3', '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py', pyf, '/tmp/expr_compiled2'], capture_output=True, text=True, timeout=30)
     pyc = '/tmp/expr_compiled2/expr_bs.3.10.pyc'
     r2 = subprocess.run(['dotnet', 'run', '--project', PROJECT, '--', pyc], capture_output=True, text=True, timeout=30)

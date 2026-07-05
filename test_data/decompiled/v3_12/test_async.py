@@ -3,11 +3,7 @@
 import asyncio
 
 async def test_async():
-    asyncio
-    1()
-    return 'done'
-    raise
+    pass
 
 async def worker():
-    test_async
-    raise
+    pass

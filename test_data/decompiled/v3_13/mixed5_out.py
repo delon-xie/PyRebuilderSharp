@@ -51,10 +51,6 @@ def mixed_3(n):
     total += 1
 
 def mixed_4(n):
-    total = 0
-    if n > 0:
-        pass
-    range(n)
     for i in range(n):
         j = 0
         n < v_50

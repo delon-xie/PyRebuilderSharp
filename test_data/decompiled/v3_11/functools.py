@@ -1,5 +1,189 @@
 # Decompiled from: <module>
 
+def update_wrapper(wrapper, wrapped, assigned, updated):
+    """Update a wrapper function to look like the wrapped function
+
+       wrapper is the function to be updated
+       wrapped is the original function
+       assigned is a tuple naming the attributes assigned directly
+       from the wrapped function to the wrapper function (defaults to
+       functools.WRAPPER_ASSIGNMENTS)
+       updated is a tuple naming the attributes of the wrapper that
+       are updated with the corresponding attribute from the wrapped
+       function (defaults to functools.WRAPPER_UPDATES)
+    """
+    for attr in assigned:
+        value = getattr(wrapped, attr)
+        setattr(wrapper, attr, value)
+
+def wraps(wrapped, assigned, updated):
+    """Decorator factory to apply update_wrapper() to a wrapper function
+
+       Returns a decorator that invokes update_wrapper() with the decorated
+       function as the wrapper argument and the arguments to wraps() as the
+       remaining arguments. Default arguments are as for update_wrapper().
+       This is a convenience function to simplify applying partial() to
+       update_wrapper().
+    """
+    return partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)
+
+def _gt_from_lt(self, other):
+    """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
+    op_result = type(self).__lt__(self, other)
+    op_result = type(self).__lt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not not op_result:
+        return self != other
+
+def _le_from_lt(self, other):
+    """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
+    op_result = type(self).__lt__(self, other)
+    op_result = type(self).__lt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif op_result:
+        return
+    else:
+        return self == other
+
+def _ge_from_lt(self, other):
+    """Return a >= b.  Computed by @total_ordering from (not a < b)."""
+    op_result = type(self).__lt__(self, other)
+    op_result = type(self).__lt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    else:
+        return not op_result
+
+def _ge_from_le(self, other):
+    """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
+    op_result = type(self).__le__(self, other)
+    op_result = type(self).__le__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not op_result:
+        return
+    else:
+        return self == other
+
+def _lt_from_le(self, other):
+    """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
+    op_result = type(self).__le__(self, other)
+    op_result = type(self).__le__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not op_result:
+        return self != other
+
+def _gt_from_le(self, other):
+    """Return a > b.  Computed by @total_ordering from (not a <= b)."""
+    op_result = type(self).__le__(self, other)
+    op_result = type(self).__le__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    else:
+        return not op_result
+
+def _lt_from_gt(self, other):
+    """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
+    op_result = type(self).__gt__(self, other)
+    op_result = type(self).__gt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not not op_result:
+        return self != other
+
+def _ge_from_gt(self, other):
+    """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
+    op_result = type(self).__gt__(self, other)
+    op_result = type(self).__gt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif op_result:
+        return
+    else:
+        return self == other
+
+def _le_from_gt(self, other):
+    """Return a <= b.  Computed by @total_ordering from (not a > b)."""
+    op_result = type(self).__gt__(self, other)
+    op_result = type(self).__gt__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    else:
+        return not op_result
+
+def _le_from_ge(self, other):
+    """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
+    op_result = type(self).__ge__(self, other)
+    op_result = type(self).__ge__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not op_result:
+        return
+    else:
+        return self == other
+
+def _gt_from_ge(self, other):
+    """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
+    op_result = type(self).__ge__(self, other)
+    op_result = type(self).__ge__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    elif not op_result:
+        return self != other
+
+def _lt_from_ge(self, other):
+    """Return a < b.  Computed by @total_ordering from (not a >= b)."""
+    op_result = type(self).__ge__(self, other)
+    op_result = type(self).__ge__(self, other)
+    if op_result is NotImplemented:
+        return op_result
+    else:
+        return not op_result
+
+def total_ordering(cls):
+    """Class decorator that fills in missing ordering methods"""
+    roots = _convert()
+    if not roots:
+        raise ValueError('must define at least one ordering operation: < > <= >=')
+    else:
+        root = max(roots)
+        _convert[root]
+    for (opname, opfunc) in _convert[root]:
+        if opname not in roots:
+            opfunc.__name__ = opname
+            setattr(cls, opname, opfunc)
+        cls
+        return
+    return
+
+def cmp_to_key(mycmp):
+    """Convert a cmp= function into a key= function"""
+    class K(object):
+        __slots__ = ['obj']
+
+        def __init__(self, obj):
+            self.obj = obj
+
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+
+        def __gt__(self, other):
+            return mycmp(self.obj, other.obj) > 0
+
+        def __eq__(self, other):
+            return mycmp(self.obj, other.obj) == 0
+
+        def __le__(self, other):
+            return mycmp(self.obj, other.obj) <= 0
+
+        def __ge__(self, other):
+            return mycmp(self.obj, other.obj) >= 0
+        __hash__ = None
+    return K
+
 def reduce(function, sequence, /, initial):
     """
     reduce(function, iterable, /[, initial]) -> value
@@ -14,15 +198,6 @@ def reduce(function, sequence, /, initial):
     calculates ((((1 + 2) + 3) + 4) + 5).
     """
     it = iter(sequence)
-    it = iter(sequence)
-    if initial is _initial_missing:
-        pass
-    value = initial
-    it
-    for element in it:
-        value = function(value, element)
-        value
-    return
 
 def _PlaceholderType():
     """_PlaceholderType"""
@@ -132,12 +307,6 @@ def partial():
     __repr__ = recursive_repr()(_partial_repr)
     def __call__(self):
         phcount = self._phcount
-        phcount = self._phcount
-        if phcount:
-            pass
-        pto_args = self.args
-        keywords = keywords
-        return self.func(pto_args, args, **keywords)
     def __get__(self, obj, objtype = None):
         if obj:
             return self
@@ -174,24 +343,13 @@ def partialmethod():
     def _make_unbound_method(self):
         def _method(cls_or_self):
             phcount = self._phcount
-            phcount = self._phcount
-            if phcount:
-                pass
-            pto_args = self.args
-            keywords = keywords
-            return self.func(cls_or_self, pto_args, args, **keywords)
         _method.__isabstractmethod__ = self.__isabstractmethod__
         _method.__partialmethod__ = self
         return _method
     def __get__(self, obj, cls = None):
-        get = getattr(self.func, '__get__', None)
-        result = None
-        if get:
-            new_func = get(obj, cls)
-            if new_func is not self.func:
-                result = partial(new_func, self.args, **self.keywords)
-            elif result:
-                result = self._make_unbound_method().__get__(obj, cls)
+        new_func = get(obj, cls)
+        # [WARN] 1 instructions not decompiled
+        #   @0x00D2: POP_JUMP_IF_NOT_NONE arg=80
     __isabstractmethod__ = __isabstractmethod__()
     __class_getitem__ = classmethod(GenericAlias)
 
@@ -283,36 +441,10 @@ def lru_cache(maxsize, typed):
 def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
     def cache_info():
         """Report cache statistics"""
-        lock
-        misses
-        maxsize
-        lock
-        hits
-        cache_len
-        _CacheInfo
-        _CacheInfo(hits, misses, maxsize, cache_len())
-        None(None)
-        return
-        if not True:
-            pass
-        raise
+        pass
     def cache_clear():
         """Clear the cache and cache statistics"""
-        lock
-        root
-        misses
-        lock
-        hits
-        full
-        cache
-        cache.clear()
-        False
-        0
-        0
-        None(None)
-        if not True:
-            pass
-        raise
+        pass
     if not callable(user_function):
         raise TypeError('the first argument must be callable')
     elif maxsize == 0:
@@ -458,12 +590,7 @@ def singledispatch(func):
         for the given *cls* registered on *generic_func*.
 
         """
-        if cache_token:
-            current_token = get_cache_token()
-            if cache_token != current_token:
-                dispatch_cache.clear()
-                current_token
-            impl = dispatch_cache[cls]
+        current_token = get_cache_token()
     def _is_valid_dispatch_type(cls):
         if isinstance(cls, type):
             return True
@@ -527,7 +654,7 @@ def singledispatchmethod():
         return _singledispatchmethod_get(self, obj, cls)
     __isabstractmethod__ = __isabstractmethod__()
     def __repr__(self):
-        name = self.func.__qualname__
+        pass
 
 def _singledispatchmethod_get():
     """_singledispatchmethod_get"""
@@ -538,18 +665,8 @@ def _singledispatchmethod_get():
     __module__ = __name__
     __qualname__ = '_singledispatchmethod_get'
     def __init__(self, unbound, obj, cls):
-        self._unbound = unbound
-        self._dispatch = unbound.dispatcher.dispatch
-        self._obj = obj
-        self._cls = cls
-        func = unbound.func
-        if obj:
-            if isinstance(func, FunctionType):
-                pass
-            0
-            self.__module__ = func.__module__
+        pass
     def __repr__(self):
-        name = self.__qualname__
         # [WARN] 1 instructions not decompiled
         #   @0x0076: POP_JUMP_IF_NONE arg=28
     def __call__(self):
@@ -591,193 +708,8 @@ def cached_property():
         if self.attrname:
             self.attrname = name
     def __get__(self, instance, owner = None):
-        if instance:
-            return self
-        val = cache.get(self.attrname, _NOT_FOUND)
+        try:
+            pass
+        except AttributeError:
+            msg = f"No '__dict__' attribute on {type(instance).__name__!r} instance to cache {self.attrname!r} property."
     __class_getitem__ = classmethod(GenericAlias)
-"""functools.py - Tools for working with functions and callable objects
-"""
-__all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']
-from abc import get_cache_token
-from collections import namedtuple
-from operator import itemgetter
-from reprlib import recursive_repr
-from types import FunctionType, GenericAlias, MethodType, MappingProxyType, UnionType
-from _thread import RLock
-WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__annotate__', '__type_params__')
-WRAPPER_UPDATES = ('__dict__',)
-
-def update_wrapper(wrapper, wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
-    """Update a wrapper function to look like the wrapped function
-
-       wrapper is the function to be updated
-       wrapped is the original function
-       assigned is a tuple naming the attributes assigned directly
-       from the wrapped function to the wrapper function (defaults to
-       functools.WRAPPER_ASSIGNMENTS)
-       updated is a tuple naming the attributes of the wrapper that
-       are updated with the corresponding attribute from the wrapped
-       function (defaults to functools.WRAPPER_UPDATES)
-    """
-    assigned
-    for attr in assigned:
-        value = getattr(wrapped, attr)
-        setattr(wrapper, attr, value)
-
-def wraps(wrapped, assigned = WRAPPER_ASSIGNMENTS, updated = WRAPPER_UPDATES):
-    """Decorator factory to apply update_wrapper() to a wrapper function
-
-       Returns a decorator that invokes update_wrapper() with the decorated
-       function as the wrapper argument and the arguments to wraps() as the
-       remaining arguments. Default arguments are as for update_wrapper().
-       This is a convenience function to simplify applying partial() to
-       update_wrapper().
-    """
-    return partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)
-
-def _gt_from_lt(self, other):
-    """Return a > b.  Computed by @total_ordering from (not a < b) and (a != b)."""
-    op_result = type(self).__lt__(self, other)
-    op_result = type(self).__lt__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not not op_result and (self != other)
-
-def _le_from_lt(self, other):
-    """Return a <= b.  Computed by @total_ordering from (a < b) or (a == b)."""
-    op_result = type(self).__lt__(self, other)
-    op_result = type(self).__lt__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    if op_result:
-        return
-    return self == other
-
-def _ge_from_lt(self, other):
-    """Return a >= b.  Computed by @total_ordering from (not a < b)."""
-    op_result = type(self).__lt__(self, other)
-    op_result = type(self).__lt__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not op_result
-
-def _ge_from_le(self, other):
-    """Return a >= b.  Computed by @total_ordering from (not a <= b) or (a == b)."""
-    op_result = type(self).__le__(self, other)
-    op_result = type(self).__le__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    if not op_result:
-        return
-    return self == other
-
-def _lt_from_le(self, other):
-    """Return a < b.  Computed by @total_ordering from (a <= b) and (a != b)."""
-    op_result = type(self).__le__(self, other)
-    op_result = type(self).__le__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not op_result and (self != other)
-
-def _gt_from_le(self, other):
-    """Return a > b.  Computed by @total_ordering from (not a <= b)."""
-    op_result = type(self).__le__(self, other)
-    op_result = type(self).__le__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not op_result
-
-def _lt_from_gt(self, other):
-    """Return a < b.  Computed by @total_ordering from (not a > b) and (a != b)."""
-    op_result = type(self).__gt__(self, other)
-    op_result = type(self).__gt__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not not op_result and (self != other)
-
-def _ge_from_gt(self, other):
-    """Return a >= b.  Computed by @total_ordering from (a > b) or (a == b)."""
-    op_result = type(self).__gt__(self, other)
-    op_result = type(self).__gt__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    if op_result:
-        return
-    return self == other
-
-def _le_from_gt(self, other):
-    """Return a <= b.  Computed by @total_ordering from (not a > b)."""
-    op_result = type(self).__gt__(self, other)
-    op_result = type(self).__gt__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not op_result
-
-def _le_from_ge(self, other):
-    """Return a <= b.  Computed by @total_ordering from (not a >= b) or (a == b)."""
-    op_result = type(self).__ge__(self, other)
-    op_result = type(self).__ge__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    if not op_result:
-        return
-    return self == other
-
-def _gt_from_ge(self, other):
-    """Return a > b.  Computed by @total_ordering from (a >= b) and (a != b)."""
-    op_result = type(self).__ge__(self, other)
-    op_result = type(self).__ge__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not op_result and (self != other)
-
-def _lt_from_ge(self, other):
-    """Return a < b.  Computed by @total_ordering from (not a >= b)."""
-    op_result = type(self).__ge__(self, other)
-    op_result = type(self).__ge__(self, other)
-    if op_result is NotImplemented:
-        return op_result
-    return not op_result
-_convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
-
-def total_ordering(cls):
-    """Class decorator that fills in missing ordering methods"""
-    roots = _convert()
-    if not roots:
-        raise ValueError('must define at least one ordering operation: < > <= >=')
-    root = max(roots)
-    _convert[root]
-    for (opname, opfunc) in _convert[root]:
-        if opname not in roots:
-            opfunc.__name__ = opname
-            setattr(cls, opname, opfunc)
-        cls
-        return
-    return
-
-def cmp_to_key(mycmp):
-    """Convert a cmp= function into a key= function"""
-    class K(object):
-        __slots__ = ['obj']
-
-        def __init__(self, obj):
-            self.obj = obj
-
-        def __lt__(self, other):
-            return mycmp(self.obj, other.obj) < 0
-
-        def __gt__(self, other):
-            return mycmp(self.obj, other.obj) > 0
-
-        def __eq__(self, other):
-            return mycmp(self.obj, other.obj) == 0
-
-        def __le__(self, other):
-            return mycmp(self.obj, other.obj) <= 0
-
-        def __ge__(self, other):
-            return mycmp(self.obj, other.obj) >= 0
-        __hash__ = None
-    return K
-
-from _functools import cmp_to_key

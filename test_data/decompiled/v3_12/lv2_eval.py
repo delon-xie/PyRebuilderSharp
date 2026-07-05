@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
-range(10)
 for i in range(10):
     a = i
 for x in items:
@@ -8,10 +7,8 @@ for x in items:
 for n in range(5):
     if n == 3:
         pass
-    elif not n == 1:
-        pass
     try:
-        x = 1 / 0
+        pass
     except:
         x = 0
     f = open('test.txt')

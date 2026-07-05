@@ -773,6 +773,73 @@ public class AstBuilder
             {
                 _diagETPrinted = true;
             }
+            
+            // 检查是否有多个连续的异常表条目（如 _add_value_alias_ 方法有两个独立的 try/except 块）
+            var matchingEntry = _codeObject.ExceptionTable
+                .FirstOrDefault(e => block.Instructions.Count > 0
+                    && block.Instructions[0].Offset >= e.StartOffset
+                    && block.Instructions[0].Offset < e.EndOffset);
+            if (matchingEntry != null)
+            {
+                var nextEntry = _codeObject.ExceptionTable
+                    .FirstOrDefault(e => e.StartOffset == matchingEntry.EndOffset);
+                if (nextEntry != null)
+                {
+                    // 有连续的异常表条目，创建临时 visited 集合
+                    var tempVisited = new HashSet<BasicBlock>(visited);
+                    
+                    // 处理第一个条目
+                    var firstTry = BuildTryFromExceptionTable(block, tempVisited);
+                    if (firstTry != null)
+                    {
+                        stmts.AddRange(firstTry);
+                        
+                        // 将临时 visited 集合中的块添加到主 visited 集合中
+                        foreach (var visitedBlock in tempVisited)
+                        {
+                            if (!visited.Contains(visitedBlock))
+                                visited.Add(visitedBlock);
+                        }
+                        
+                        // 处理第二个条目
+                        var secondBlock = FindBlockByOffset(nextEntry.StartOffset);
+                        if (secondBlock != null && !visited.Contains(secondBlock))
+                        {
+                            var secondTry = BuildStatements(secondBlock, visited);
+                            if (secondTry != null)
+                                stmts.AddRange(secondTry);
+                        }
+                        
+                        // 继续处理 try/except 后面的块（else 分支、类定义等）
+                        var firstTryStmt = firstTry.FirstOrDefault() as Try;
+                        if (firstTryStmt != null)
+                        {
+                            // 处理 handler 块的后缀块（类定义等在 try/except 之后的代码）
+                            if (firstTryStmt.Finalbody?.Count > 0)
+                            {
+                                // try/finally：无需构建 elseBody，但继续处理 try/finally 之后的代码
+                            }
+                            
+                            var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
+                            if (handlerBlock != null)
+                            {
+                                // 处理 handler 块的后继块
+                                foreach (var succ in handlerBlock.Successors)
+                                {
+                                    if (!visited.Contains(succ))
+                                    {
+                                        var succStmts = BuildStatements(succ, visited);
+                                        stmts.AddRange(succStmts);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        return stmts;
+                    }
+                }
+            }
+            
             var try311Stmts = BuildTryFromExceptionTable(block, visited);
             if (_options.VerboseErrors)
             {
@@ -781,6 +848,7 @@ public class AstBuilder
             if (try311Stmts != null)
             {
                 stmts.AddRange(try311Stmts);
+                
                 // 继续处理 try/except 后面的块（else 分支、类定义等）
                 var firstTry = try311Stmts.FirstOrDefault() as Try;
                 if (firstTry != null && firstTry.Orelse != null)
@@ -796,13 +864,13 @@ public class AstBuilder
                         // try/finally：无需构建 elseBody，但继续处理 try/finally 之后的代码
                     }
 
-                    var matchingEntry = _codeObject.ExceptionTable
+                    var entry = _codeObject.ExceptionTable
                         .FirstOrDefault(e => block.Instructions.Count > 0
                             && block.Instructions[0].Offset >= e.StartOffset
                             && block.Instructions[0].Offset < e.EndOffset);
-                    if (matchingEntry != null)
+                    if (entry != null)
                     {
-                        var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
+                        var handlerBlock = FindBlockByOffset(entry.TargetOffset);
                         if (handlerBlock != null)
                         {
                             // 统一检测 else 体：handler 末尾的 JUMP_FORWARD 跳过 else 体到 after_else。
@@ -867,6 +935,19 @@ public class AstBuilder
             if (matchStmts != null)
             {
                 stmts.AddRange(matchStmts);
+                return stmts;
+            }
+            
+            // 如果 BuildTryFromExceptionTable 返回 null 但已经标记了当前块为 visited，
+            // 说明它已经处理了当前块的语句，不需要再处理
+            if (visited.Contains(block))
+            {
+                // 处理当前块的后继
+                foreach (var succ in block.Successors.OrderBy(s => s.StartOffset))
+                {
+                    if (!visited.Contains(succ))
+                        stmts.AddRange(BuildStatements(succ, visited));
+                }
                 return stmts;
             }
         }
@@ -3068,6 +3149,12 @@ public class AstBuilder
         var tryVisited = new HashSet<BasicBlock>();
         foreach (var tb in tryBlocks)
         {
+            // 检查这个块是否真正属于当前 try/except 块
+            // 如果块的最后一个指令的偏移超过了当前异常表条目的 EndOffset，
+            // 说明这个块跨越了两个异常表条目，不应该被处理
+            if (tb.Instructions.Count > 0 && tb.Instructions.Last().Offset >= matchingEntry.EndOffset)
+                continue;
+            
             // 检测 POP_BLOCK 或 JUMP_FORWARD（3.12+）分界
             if (!afterTryBody
                 && (tb.Instructions.Any(i => i.Opcode == Opcode.POP_BLOCK)
@@ -3089,29 +3176,40 @@ public class AstBuilder
             }
             if (tb == block)
             {
-                var result = _blockResults.GetValueOrDefault(block.Id);
-                if (result?.Statements != null)
-                {
-                    var filtered = result.Statements.Where(s => s is not Raise).ToList();
-                    if (filtered.Count > 0)
-                        (afterTryBody ? elseBody : tryBody).AddRange(filtered);
-                }
-            }
-            else if (!visited.Contains(tb) && !tryVisited.Contains(tb))
-            {
+                // 对于当前块，使用 BuildStatements 方法，这样可以正确处理嵌套结构
                 var stmts = BuildStatements(tb, visited);
                 if (afterTryBody)
                     elseBody.AddRange(stmts);
                 else
                     tryBody.AddRange(stmts);
             }
+            else if (!visited.Contains(tb) && !tryVisited.Contains(tb))
+            {
+                // 对于其他块，只使用 _blockResults 中已有的语句，不递归调用 BuildStatements
+                // 这样可以避免递归处理后继块，从而避免错误地包含第二个异常表条目的代码
+                var tbResult = _blockResults.GetValueOrDefault(tb.Id);
+                if (tbResult?.Statements != null)
+                {
+                    var filtered = tbResult.Statements.Where(s => s is not Raise).ToList();
+                    if (filtered.Count > 0)
+                        (afterTryBody ? elseBody : tryBody).AddRange(filtered);
+                }
+            }
         }
         if (elseBody.Count == 0) elseBody = null;
 
+        // 只标记当前 try/except 块的代码为 visited，而不是整个范围的所有块
+        // 如果标记了太多的块，会导致第二个 try/except 块无法被正确处理
         foreach (var tb in tryBlocks)
         {
-            visited.Add(tb);
-            _processedBlockIds.Add(tb.Id);
+            // 检查这个块是否真正属于当前 try/except 块
+            // 如果块的最后一个指令的偏移超过了当前异常表条目的 EndOffset，
+            // 说明这个块跨越了两个异常表条目，不应该被标记为 visited
+            if (tb.Instructions.Count > 0 && tb.Instructions.Last().Offset < matchingEntry.EndOffset)
+            {
+                visited.Add(tb);
+                _processedBlockIds.Add(tb.Id);
+            }
         }
 
         // 跳过仅有基础设施指令（Raise/异常处理）的 try 体

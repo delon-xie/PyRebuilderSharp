@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
-"""Abstract Base Classes (ABCs) according to PEP 3119."""
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 
@@ -21,10 +20,14 @@ def abstractmethod(funcobj):
     funcobj.__isabstractmethod__ = True
     return funcobj
 
-class abstractclassmethod(classmethod):
-    """A decorator indicating abstract classmethods.
+def abstractclassmethod():
+    """abstractclassmethod"""
+    __module__ = __name__
+    __qualname__ = 'abstractclassmethod'
+    __firstlineno__ = 28
+    __doc__ = """A decorator indicating abstract classmethods.
 
-    Deprecated, use 'classmethod' with 'abstractmethod' instead:
+Deprecated, use 'classmethod' with 'abstractmethod' instead:
 
     class C(ABC):
         @classmethod
@@ -32,21 +35,26 @@ class abstractclassmethod(classmethod):
         def my_abstract_classmethod(cls, ...):
             ...
 
-    .. deprecated-removed: 3.3 3.21
+.. deprecated-removed: 3.3 3.21
 
 """
     __isabstractmethod__ = True
-
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
+    __static_attributes__ = ()
+    return __classcell__ := __class__
 
-class abstractstaticmethod(staticmethod):
-    """A decorator indicating abstract staticmethods.
+def abstractstaticmethod():
+    """abstractstaticmethod"""
+    __module__ = __name__
+    __qualname__ = 'abstractstaticmethod'
+    __firstlineno__ = 52
+    __doc__ = """A decorator indicating abstract staticmethods.
 
-    Deprecated, use 'staticmethod' with 'abstractmethod' instead:
+Deprecated, use 'staticmethod' with 'abstractmethod' instead:
 
     class C(ABC):
         @staticmethod
@@ -54,21 +62,26 @@ class abstractstaticmethod(staticmethod):
         def my_abstract_staticmethod(...):
             ...
 
-    .. deprecated-removed: 3.3 3.21
+.. deprecated-removed: 3.3 3.21
 
 """
     __isabstractmethod__ = True
-
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
+    __static_attributes__ = ()
+    return __classcell__ := __class__
 
-class abstractproperty(property):
-    """A decorator indicating abstract properties.
+def abstractproperty():
+    """abstractproperty"""
+    __module__ = __name__
+    __qualname__ = 'abstractproperty'
+    __firstlineno__ = 76
+    __doc__ = """A decorator indicating abstract properties.
 
-    Deprecated, use 'property' with 'abstractmethod' instead:
+Deprecated, use 'property' with 'abstractmethod' instead:
 
     class C(ABC):
         @property
@@ -76,55 +89,50 @@ class abstractproperty(property):
         def my_abstract_property(self):
             ...
 
-    .. deprecated-removed: 3.3 3.21
+.. deprecated-removed: 3.3 3.21
 
 """
     __isabstractmethod__ = True
-
     def __init__(self, fget = None, fset = None, fdel = None, doc = None):
         import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(self, v_18, self, v_52)
-try:
-    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
-except ImportError:
-    from _py_abc import ABCMeta
-    from _py_abc import get_cache_token
-    ABCMeta.__module__ = 'abc'
+    __static_attributes__ = ()
+    return __classcell__ := __class__
 
-class ABCMeta(type):
-    """Metaclass for defining Abstract Base Classes (ABCs).
+def ABCMeta():
+    """ABCMeta"""
+    __module__ = __name__
+    __qualname__ = 'ABCMeta'
+    __firstlineno__ = 113
+    __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
 
-    Use this metaclass to create an ABC.  An ABC can be subclassed
-    directly, and then acts as a mix-in class.  You can also register
-    unrelated concrete classes (even built-in classes) and unrelated
-    ABCs as 'virtual subclasses' -- these and their descendants will
-    be considered subclasses of the registering ABC by the built-in
-    issubclass() function, but the registering ABC won't show up in
-    their MRO (Method Resolution Order) nor will method
-    implementations defined by the registering ABC be callable (not
-    even via super()).
+Use this metaclass to create an ABC.  An ABC can be subclassed
+directly, and then acts as a mix-in class.  You can also register
+unrelated concrete classes (even built-in classes) and unrelated
+ABCs as 'virtual subclasses' -- these and their descendants will
+be considered subclasses of the registering ABC by the built-in
+issubclass() function, but the registering ABC won't show up in
+their MRO (Method Resolution Order) nor will method
+implementations defined by the registering ABC be callable (not
+even via super()).
 """
     def __new__(mcls, name, bases, namespace):
         cls = None(mcls, name, mcls, v_35, **kwargs)
         _abc_init(cls)
         return cls
-
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
 
     Returns the subclass, to allow usage as a class decorator.
 """
         return _abc_register(cls, subclass)
-
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         return _abc_instancecheck(cls, instance)
-
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         return _abc_subclasscheck(cls, subclass)
-
     def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
         print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
@@ -133,14 +141,14 @@ class ABCMeta(type):
         print(f"_abc_cache: {_abc_cache}", file=file)
         print(f"_abc_negative_cache: {_abc_negative_cache}", file=file)
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version}", file=file)
-
     def _abc_registry_clear(cls):
         """Clear the registry (for debugging or testing)."""
         _reset_registry(cls)
-
     def _abc_caches_clear(cls):
         """Clear the caches (for debugging or testing)."""
         _reset_caches(cls)
+    __static_attributes__ = ()
+    return __classcell__ := __class__
 
 def update_abstractmethods(cls):
     """Recalculate the set of abstract methods of an abstract class.
@@ -160,8 +168,9 @@ def update_abstractmethods(cls):
 """
     if not hasattr(cls, '__abstractmethods__'):
         return cls
-    abstracts = set()
-    cls.__bases__
+    else:
+        abstracts = set()
+        cls.__bases__
     for scls in cls.__bases__:
         pass
     for (value, name) in cls.__dict__.items():
@@ -170,8 +179,19 @@ def update_abstractmethods(cls):
         else:
             abstracts.add(name)
 
-class ABC(metaclass=ABCMeta):
-    """Helper class that provides a standard way to create an ABC using
-    inheritance.
+def ABC():
+    """ABC"""
+    __module__ = __name__
+    __qualname__ = 'ABC'
+    __firstlineno__ = 205
+    __doc__ = """Helper class that provides a standard way to create an ABC using
+inheritance.
 """
     __slots__ = ()
+    __static_attributes__ = ()
+try:
+    pass
+except ImportError:
+    from _py_abc import ABCMeta
+    from _py_abc import get_cache_token
+    ABCMeta.__module__ = 'abc'

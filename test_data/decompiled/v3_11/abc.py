@@ -1,5 +1,99 @@
 # Decompiled from: <module>
 
+def abstractmethod(funcobj):
+    """A decorator indicating abstract methods.
+
+    Requires that the metaclass is ABCMeta or derived from it.  A
+    class that has a metaclass derived from ABCMeta cannot be
+    instantiated unless all of its abstract methods are overridden.
+    The abstract methods can be called using any of the normal
+    'super' call mechanisms.  abstractmethod() may be used to declare
+    abstract methods for properties and descriptors.
+
+    Usage:
+
+        class C(metaclass=ABCMeta):
+            @abstractmethod
+            def my_abstract_method(self, arg1, arg2, argN):
+                ...
+    """
+    funcobj.__isabstractmethod__ = True
+    return funcobj
+
+def abstractclassmethod():
+    """abstractclassmethod"""
+    __module__ = __name__
+    __qualname__ = 'abstractclassmethod'
+    __doc__ = """A decorator indicating abstract classmethods.
+
+    Deprecated, use 'classmethod' with 'abstractmethod' instead:
+
+        class C(ABC):
+            @classmethod
+            @abstractmethod
+            def my_abstract_classmethod(cls, ...):
+                ...
+
+    .. deprecated-removed: 3.3 3.21
+
+    """
+    __isabstractmethod__ = True
+    def __init__(self, callable):
+        import warnings
+        warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
+        callable.__isabstractmethod__ = True
+        super().__init__(callable)
+    return __classcell__ := __class__
+
+def abstractstaticmethod():
+    """abstractstaticmethod"""
+    __module__ = __name__
+    __qualname__ = 'abstractstaticmethod'
+    __doc__ = """A decorator indicating abstract staticmethods.
+
+    Deprecated, use 'staticmethod' with 'abstractmethod' instead:
+
+        class C(ABC):
+            @staticmethod
+            @abstractmethod
+            def my_abstract_staticmethod(...):
+                ...
+
+    .. deprecated-removed: 3.3 3.21
+
+    """
+    __isabstractmethod__ = True
+    def __init__(self, callable):
+        import warnings
+        warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
+        callable.__isabstractmethod__ = True
+        super().__init__(callable)
+    return __classcell__ := __class__
+
+def abstractproperty():
+    """abstractproperty"""
+    __module__ = __name__
+    __qualname__ = 'abstractproperty'
+    __doc__ = """A decorator indicating abstract properties.
+
+    Deprecated, use 'property' with 'abstractmethod' instead:
+
+        class C(ABC):
+            @property
+            @abstractmethod
+            def my_abstract_property(self):
+                ...
+
+    .. deprecated-removed: 3.3 3.21
+
+    """
+    __isabstractmethod__ = True
+    def __init__(self, fget = None, fset = None, fdel = None, doc = None):
+        import warnings
+        warnings._deprecated('abc.abstractproperty', remove=(3, 21))
+        super().__init__(fget, fset, fdel, doc)
+    return __classcell__ := __class__
+
 def update_abstractmethods(cls):
     """Recalculate the set of abstract methods of an abstract class.
 
@@ -42,103 +136,15 @@ def ABC():
     inheritance.
     """
     __slots__ = ()
-"""Abstract Base Classes (ABCs) according to PEP 3119."""
-
-def abstractmethod(funcobj):
-    """A decorator indicating abstract methods.
-
-    Requires that the metaclass is ABCMeta or derived from it.  A
-    class that has a metaclass derived from ABCMeta cannot be
-    instantiated unless all of its abstract methods are overridden.
-    The abstract methods can be called using any of the normal
-    'super' call mechanisms.  abstractmethod() may be used to declare
-    abstract methods for properties and descriptors.
-
-    Usage:
-
-        class C(metaclass=ABCMeta):
-            @abstractmethod
-            def my_abstract_method(self, arg1, arg2, argN):
-                ...
-    """
-    funcobj.__isabstractmethod__ = True
-    return funcobj
-
-class abstractclassmethod(classmethod):
-    """A decorator indicating abstract classmethods.
-
-    Deprecated, use 'classmethod' with 'abstractmethod' instead:
-
-        class C(ABC):
-            @classmethod
-            @abstractmethod
-            def my_abstract_classmethod(cls, ...):
-                ...
-
-    .. deprecated-removed: 3.3 3.21
-
-    """
-    __isabstractmethod__ = True
-
-    def __init__(self, callable):
-        import warnings
-        warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
-        callable.__isabstractmethod__ = True
-        super().__init__(callable)
-
-class abstractstaticmethod(staticmethod):
-    """A decorator indicating abstract staticmethods.
-
-    Deprecated, use 'staticmethod' with 'abstractmethod' instead:
-
-        class C(ABC):
-            @staticmethod
-            @abstractmethod
-            def my_abstract_staticmethod(...):
-                ...
-
-    .. deprecated-removed: 3.3 3.21
-
-    """
-    __isabstractmethod__ = True
-
-    def __init__(self, callable):
-        import warnings
-        warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
-        callable.__isabstractmethod__ = True
-        super().__init__(callable)
-
-class abstractproperty(property):
-    """A decorator indicating abstract properties.
-
-    Deprecated, use 'property' with 'abstractmethod' instead:
-
-        class C(ABC):
-            @property
-            @abstractmethod
-            def my_abstract_property(self):
-                ...
-
-    .. deprecated-removed: 3.3 3.21
-
-    """
-    __isabstractmethod__ = True
-
-    def __init__(self, fget = None, fset = None, fdel = None, doc = None):
-        import warnings
-        warnings._deprecated('abc.abstractproperty', remove=(3, 21))
-        super().__init__(fget, fset, fdel, doc)
 try:
-    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
+    pass
 except ImportError:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     ABCMeta.__module__ = 'abc'
 
 class ABCMeta(type):
-    register = super
-    __instancecheck__ = 'ABCMeta'
-    __subclasscheck__ = """Metaclass for defining Abstract Base Classes (ABCs).
+    """Metaclass for defining Abstract Base Classes (ABCs).
 
         Use this metaclass to create an ABC.  An ABC can be subclassed
         directly, and then acts as a mix-in class.  You can also register
@@ -150,7 +156,6 @@ class ABCMeta(type):
         implementations defined by the registering ABC be callable (not
         even via super()).
         """
-
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         _abc_init(cls)

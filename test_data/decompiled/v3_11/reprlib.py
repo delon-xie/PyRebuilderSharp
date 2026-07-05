@@ -11,16 +11,6 @@ def recursive_repr(fillvalue = '...'):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
-            key = (id(self), get_ident())
-            if key in repr_running:
-                return fillvalue
-            repr_running.add(key)
-            result = user_function(self)
-            repr_running.discard(key)
-            return result
-            repr_running.discard(key)
-            raise
-            raise
             repr_running.discard(key)
         wrapper.__module__ = getattr(user_function, '__module__')
         wrapper.__doc__ = getattr(user_function, '__doc__')
@@ -74,8 +64,6 @@ class Repr:
 
     def _join(self, pieces, level):
         indent = self.indent
-        if self.indent:
-            return ', '.join(pieces)
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail = ''):
         n = len(x)
@@ -152,13 +140,12 @@ class Repr:
         return s
 
     def repr_int(self, x, level):
-        s = builtins.repr(x)
+        pass
 
     def repr_instance(self, x, level):
-        s = builtins.repr(x)
+        pass
 
 def _possibly_sorted(x):
-    sorted(x)
-    return
+    pass
 aRepr = Repr()
 repr = aRepr.repr
