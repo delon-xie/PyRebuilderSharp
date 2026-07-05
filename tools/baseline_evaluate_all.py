@@ -84,14 +84,13 @@ def main():
     os.makedirs(batch_out)
     t0 = time.time()
     r = subprocess.run(
-        ["dotnet", "run", "--project", CLI_PROJECT, "-c", "Release", "--",
+        ["dotnet", "exec", os.path.join(PROJECT_DIR, "bin/release/PyRebuilderSharp.Cli.dll"),
          "-d", COMPILED_DIR, "-o", batch_out],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         timeout=300, cwd=PROJECT_DIR
     )
     elapsed = time.time() - t0
-    success_count = len([f for f in os.listdir(batch_out) if f.endswith('.py')]) if os.path.exists(batch_out) else 0
-    # Recurse into subdirs
+    # Batch creates subdirectory matching input dir name
     import glob as _glob
     success_count = len(_glob.glob(os.path.join(batch_out, "**/*.py"), recursive=True))
     print(f"  {elapsed:.1f}s — {success_count} files decompiled")
@@ -113,7 +112,7 @@ def main():
             continue
         source_file = base + '.py'
         rel = os.path.relpath(os.path.join(COMPILED_DIR, fname), PROJECT_DIR)
-        batch_py = os.path.join(batch_out, os.path.splitext(rel)[0] + '.py')
+        batch_py = os.path.join(batch_out, os.path.basename(COMPILED_DIR), os.path.splitext(fname)[0] + '.py')
         dest = os.path.join(DECOMPILED_DIR, ver_tag(ver), source_file)
         success = os.path.exists(batch_py)
         if success:

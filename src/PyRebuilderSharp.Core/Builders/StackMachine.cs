@@ -1945,12 +1945,9 @@ public class StackMachine
                     }
 
                     case PythonVersion.Py313:
-                    case PythonVersion.Py314:
-                        // Python 3.12+: MAKE_FUNCTION 只弹出 code object。
-                        // 3.12 移除了 3.11 的 flags 机制；qualname 来自 co_qualname。
-                        // defaults/kwdefaults/annotations/closure 由 3.13+ 的
-                        // SET_FUNCTION_ATTRIBUTE 处理，3.12 用 PRECALL+CALL 协议。
-                        // 参考 CPython 3.12: Python/ceval.c TARGET(MAKE_FUNCTION)
+                        // Python 3.13: MAKE_FUNCTION 只弹出 code object + qualname。
+                        // defaults/kwdefaults/annotations/closure 由 SET_FUNCTION_ATTRIBUTE 处理。
+                        // 参考 CPython 3.13: Python/ceval.c TARGET(MAKE_FUNCTION)
                     {
                         var codeExpr = SafePop();
                         if (codeExpr is Constant c2 && c2.Value is CodeObject co)
@@ -1959,6 +1956,61 @@ public class StackMachine
                             funcName = co.Name ?? "<lambda>";
                         }
                         _exprStack.Push(new FunctionRef(childCode, funcName));
+                        return null;
+                    }
+
+                    case PythonVersion.Py314:
+                        // Python 3.14: MAKE_FUNCTION 的 oparg 是 flags 位掩码（同 3.11）。
+                        // 但 3.14 的 qualname 在栈上（code 之后）。
+                        // 栈布局: [..., defaults?, kwdefaults?, annotations?, closure?, code, qualname]
+                        // 参考 CPython 3.14: Python/ceval.c MAKE_FUNCTION
+                    {
+                        int flags = instr.Argument ?? 0;
+                        var codeExpr = SafePop();                     // qualname (TOS)
+                        // 检查弹出的值：可能是 qualname 或 code object
+                        Expr? maybeQualname = codeExpr;
+                        codeExpr = null;
+                        // 若 TOS 是 code object，则无 qualname 在栈上
+                        if (maybeQualname is Constant { Value: CodeObject qcoVal })
+                        {
+                            childCode = qcoVal;
+                        }
+                        else
+                        {
+                            // 否则弹出下一个值作为 code
+                            codeExpr = SafePop();
+                            if (codeExpr is Constant { Value: CodeObject co2Val })
+                                childCode = co2Val;
+                        }
+                        funcName = childCode?.Name ?? "<lambda>";
+
+                        Expr? closureExpr = (flags & 0x08) != 0 ? SafePop() : null;
+                        Expr? annotations = (flags & 0x04) != 0 ? SafePop() : null;
+                        Expr? kwDefaults = (flags & 0x02) != 0 ? SafePop() : null;
+                        Expr? defaultsTuple = (flags & 0x01) != 0 ? SafePop() : null;
+
+                        var funcRef = new FunctionRef(childCode, funcName);
+                        if (defaultsTuple != null)
+                        {
+                            if (defaultsTuple is ListLiteral dl && dl.Kind == ContainerKind.Tuple)
+                                funcRef.DefaultExprs = dl.Elts;
+                            else if (defaultsTuple is Constant dc && dc.Value is System.Collections.IList list)
+                                funcRef.DefaultExprs = list.Cast<object>()
+                                    .Select(v => new Constant(v) as Expr).ToList();
+                        }
+                        if (kwDefaults != null)
+                        {
+                            if (kwDefaults is DictLiteral dictLit)
+                            {
+                                funcRef.KwDefaultExprs = new Dictionary<string, Expr?>();
+                                foreach (var entry in dictLit.Entries)
+                                {
+                                    if (entry.Key is Constant keyConst && keyConst.Value is string keyStr)
+                                        funcRef.KwDefaultExprs[keyStr] = entry.Value;
+                                }
+                            }
+                        }
+                        _exprStack.Push(funcRef);
                         return null;
                     }
 

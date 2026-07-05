@@ -1713,7 +1713,7 @@ public class PythonCodeGenerator : ICodeGenerator
         }
         if (param.Default != null)
         {
-            _output.Append(" = ");
+            _output.Append("=");
             Visit(param.Default);
         }
     }
