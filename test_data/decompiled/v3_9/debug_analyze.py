@@ -11,8 +11,7 @@ with open('/tmp/test_full.txt', 'r') as f:
     version_stats = defaultdict(lambda: None)
     lines = output.split("""
 """)
-    i = 0
-    debug_count = 0
+    i = debug_count = 0
 next_line = lines[j]
 version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 j += 1

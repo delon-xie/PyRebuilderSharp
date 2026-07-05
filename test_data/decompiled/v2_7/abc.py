@@ -59,7 +59,7 @@ def abstractproperty():
     __isabstractmethod__ = True
     return
 
-def ABCMeta():
+class ABCMeta:
     """Metaclass for defining Abstract Base Classes (ABCs).
 
     Use this metaclass to create an ABC.  An ABC can be subclassed
@@ -88,6 +88,7 @@ def ABCMeta():
 
     """
     _abc_invalidation_counter = 0
+
     def __new__(mcls, name, bases, namespace):
         cls = super(ABCMeta, mcls).__new__(mcls, name, bases, namespace)
         abstracts = set(((name, value) for (name, value) in namespace.items()))
@@ -96,6 +97,7 @@ def ABCMeta():
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
                 abstracts.add(name)
+
     def register(cls, subclass):
         """Register a virtual subclass of an ABC."""
         if not isinstance(subclass, (type, types.ClassType)):
@@ -106,13 +108,15 @@ def ABCMeta():
             if issubclass(cls, subclass):
                 raise RuntimeError('Refusing to create an inheritance cycle')
             cls._abc_registry.add(subclass)
-            ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
+            ABCMeta._abc_invalidation_counter = ABCMeta._abc_invalidation_counter + 1
+
     def _dump_registry(cls, file):
         """Debug helper to print the ABC registry."""
         file
         sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
             value = getattr(cls, name)
+
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         subtype = type(instance)
@@ -126,6 +130,7 @@ def ABCMeta():
         subtype = type(instance)
         if subtype is _InstanceType:
             pass
+
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         ok = cls.__subclasshook__(subclass)

@@ -1,4 +1,4 @@
 # Decompiled from: <module>
 
-def f():
+class f:
     x = 1

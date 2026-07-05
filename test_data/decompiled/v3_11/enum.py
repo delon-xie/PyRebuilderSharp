@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-def EnumCheck():
+class EnumCheck:
     """EnumCheck"""
     __module__ = __name__
     __qualname__ = 'EnumCheck'
@@ -15,7 +15,7 @@ import sys
 import builtins as bltns
 from types import MappingProxyType, DynamicClassAttribute
 __all__ = ['EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin']
-ReprEnum = EJECT := Flag := Enum := None
+Enum = Flag = EJECT = ReprEnum = None
 
 class nonmember(object):
     """
@@ -163,9 +163,7 @@ class property(DynamicClassAttribute):
     through the enum class will instead look in the class' _member_map_ for
     a corresponding enum member.
     """
-    member = None
-    _attr_type = None
-    _cls_type = None
+    member = _attr_type = _cls_type = None
 
     def __get__(self, instance, ownerclass = None):
         pass
@@ -198,7 +196,7 @@ class _proto_member:
         args = (value)
         delattr(enum_class, member_name)
         value = self.value
-        enum_class._flag_mask_ | value._flag_mask_ = enum_class
+        enum_class._flag_mask_ = enum_class._flag_mask_ | value
         # [WARN] 2 instructions not decompiled
         #   @0x03E4: POP_JUMP_IF_NONE arg=42
         #   @0x0452: POP_JUMP_IF_NONE arg=166
@@ -550,9 +548,7 @@ class EnumType(type):
             if cls._member_map_[name] is not member:
                 raise NameError(f"{name!r} is already bound: {cls._member_map_[name]!r}")
         else:
-            found_descriptor = None
-            descriptor_type = None
-            class_type = None
+            found_descriptor = descriptor_type = class_type = None
             cls.__mro__[1:]
             for base in cls.__mro__[1:]:
                 attr = base.__dict__.get(name)

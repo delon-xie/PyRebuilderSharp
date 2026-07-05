@@ -1,10 +1,9 @@
 # Decompiled from: <module>
 
-def outer():
+class outer:
     def inner():
         lk
         lk = lk
         print(lk)
         with lk:
             pass
-    return inner

@@ -10,8 +10,7 @@ def version_stats():
     return {'total': 0, 'passed': 0, 'failed': 0}
 lines = output.split("""
 """)
-i = 0
-debug_count = 0
+i = debug_count = 0
 with open('/tmp/test_full.txt', 'r') as f:
     output = f.read()
 if i < len(lines):

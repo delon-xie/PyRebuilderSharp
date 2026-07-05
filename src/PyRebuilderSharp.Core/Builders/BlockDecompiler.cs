@@ -67,6 +67,24 @@ public class BlockDecompiler
 
             // 死代码消除：移除 Continue/Break/Return 之后的语句
             stmts = EliminateDeadCode(stmts);
+            
+            // 合并连续的赋值语句（链式赋值）
+            stmts = MergeChainedAssignments(stmts);
+
+            // 如果语句列表为空或者只有注释，添加 pass 语句
+            bool hasNonComment = false;
+            foreach (var stmt in stmts)
+            {
+                if (stmt is not CommentBlock)
+                {
+                    hasNonComment = true;
+                    break;
+                }
+            }
+            if (!hasNonComment)
+            {
+                stmts.Add(new Pass());
+            }
 
             return BlockResult.Success(stmts);
         }
@@ -164,6 +182,66 @@ public class BlockDecompiler
             }
         }
         return stmts;
+    }
+    
+    private List<Stmt> MergeChainedAssignments(List<Stmt> stmts)
+    {
+        if (stmts.Count < 2)
+            return stmts;
+        
+        var result = new List<Stmt>();
+        int i = 0;
+        
+        while (i < stmts.Count)
+        {
+            if (stmts[i] is Assign assign && assign.Targets.Count == 1)
+            {
+                var currentValue = assign.Value;
+                var targets = new List<Expr>(assign.Targets);
+                
+                int j = i + 1;
+                while (j < stmts.Count && stmts[j] is Assign nextAssign 
+                       && nextAssign.Targets.Count == 1)
+                {
+                    bool match = false;
+                    
+                    if (nextAssign.Value is Constant c1 && currentValue is Constant c2)
+                    {
+                        if (c1.Value == null && c2.Value == null)
+                            match = true;
+                        else if (c1.Value != null && c1.Value.Equals(c2.Value))
+                            match = true;
+                    }
+                    else if (nextAssign.Value is Name n1 && currentValue is Name n2
+                             && n1.Id == n2.Id)
+                    {
+                        match = true;
+                    }
+                    
+                    if (match)
+                    {
+                        targets.Add(nextAssign.Targets[0]);
+                        j++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                if (targets.Count > 1)
+                {
+                    result.Add(new Assign(targets, currentValue));
+                    i = j;
+                    continue;
+                }
+            }
+            
+            result.Add(stmts[i]);
+            i++;
+        }
+        
+        return result;
     }
 
     /// <summary>

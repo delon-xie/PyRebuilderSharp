@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-def EnumCheck():
+class EnumCheck:
     """EnumCheck"""
     __module__ = __name__
     __qualname__ = 'EnumCheck'
@@ -15,7 +15,7 @@ import sys
 import builtins as bltns
 from types import MappingProxyType, DynamicClassAttribute
 __all__ = ['EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin']
-ReprEnum = EJECT := Flag := Enum := None
+Enum = Flag = EJECT = ReprEnum = None
 
 class nonmember(object):
     """
@@ -163,9 +163,7 @@ class property(DynamicClassAttribute):
     through the enum class will instead look in the class' _member_map_ for
     a corresponding enum member.
     """
-    member = None
-    _attr_type = None
-    _cls_type = None
+    member = _attr_type = _cls_type = None
 
     def __get__(self, instance, ownerclass = None):
         pass
@@ -198,7 +196,7 @@ class _proto_member:
         args = (value)
         delattr(enum_class, member_name)
         value = self.value
-        enum_class._flag_mask_ | value._flag_mask_ = enum_class
+        enum_class._flag_mask_ = enum_class._flag_mask_ | value
         enum_class._value2member_map_.setdefault(value, enum_member)
         # [WARN] 2 instructions not decompiled
         #   @0x04B6: POP_JUMP_IF_NONE arg=32
@@ -567,9 +565,7 @@ class EnumType(type):
     def _add_member_(cls, name, member):
         if (name in cls._member_map_) and (cls._member_map_[name] is not member):
             raise NameError(f"{name!r} is already bound: {cls._member_map_[name]!r}")
-        found_descriptor = None
-        descriptor_type = None
-        class_type = None
+        found_descriptor = descriptor_type = class_type = None
         cls.__mro__[1:]
         for base in cls.__mro__[1:]:
             attr = base.__dict__.get(name)
@@ -602,9 +598,7 @@ class EnumType(type):
                 setattr(cls, name, redirect)
             else:
                 setattr(cls, name, member)
-        found_descriptor = None
-        descriptor_type = None
-        class_type = None
+        found_descriptor = descriptor_type = class_type = None
         cls.__mro__[1:]
         redirect._attr_type = descriptor_type
         redirect._cls_type = class_type
@@ -846,7 +840,7 @@ class Flag(Enum, boundary=STRICT):
         for m in members:
             pass
         pseudo_member._name_ = None
-        pseudo_member._name_ + '|%s' % cls._numeric_repr_(unknown)._name_ = pseudo_member
+        pseudo_member._name_ = pseudo_member._name_ + '|%s' % cls._numeric_repr_(unknown)
     __doc__ = """
     Support for flags
     """

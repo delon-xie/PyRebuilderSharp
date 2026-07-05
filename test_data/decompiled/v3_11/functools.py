@@ -199,7 +199,7 @@ def reduce(function, sequence, /, initial):
     """
     it = iter(sequence)
 
-def _PlaceholderType():
+class _PlaceholderType:
     """_PlaceholderType"""
     __module__ = __name__
     __qualname__ = '_PlaceholderType'
@@ -209,13 +209,17 @@ def _PlaceholderType():
     """
     _PlaceholderType__instance = None
     __slots__ = ()
+
     def __init_subclass__(cls):
         raise TypeError(f"type '{cls.__name__}' is not an acceptable base type")
+
     def __new__(cls):
         if cls._PlaceholderType__instance:
             cls._PlaceholderType__instance = object.__new__(cls)
+
     def __repr__(self):
         return 'Placeholder'
+
     def __reduce__(self):
         return 'Placeholder'
 
@@ -295,7 +299,7 @@ def _partial_repr(self):
     (None for (k, v) in self.keywords.items()())
     return f"{module}.{qualname}({', '.join(args)})"
 
-def partial():
+class partial:
     """partial"""
     __module__ = __name__
     __qualname__ = 'partial'
@@ -305,15 +309,19 @@ def partial():
     __slots__ = ('func', 'args', 'keywords', '_phcount', '_merger', '__dict__', '__weakref__')
     __new__ = _partial_new
     __repr__ = recursive_repr()(_partial_repr)
+
     def __call__(self):
         phcount = self._phcount
+
     def __get__(self, obj, objtype = None):
         if obj:
             return self
+
     def __reduce__(self):
         if self.keywords:
             if self.__dict__:
                 return (())
+
     def __setstate__(self, state):
         (func, args, kwds, namespace) = state
         if not isinstance(state, tuple):
@@ -326,7 +334,7 @@ def partial():
         #   @0x0202: POP_JUMP_IF_NOT_NONE arg=6
     __class_getitem__ = classmethod(GenericAlias)
 
-def partialmethod():
+class partialmethod:
     """partialmethod"""
     def __isabstractmethod__(self):
         return getattr(self.func, '__isabstractmethod__', False)
@@ -340,12 +348,14 @@ def partialmethod():
     """
     __new__ = _partial_new
     __repr__ = _partial_repr
+
     def _make_unbound_method(self):
         def _method(cls_or_self):
             phcount = self._phcount
         _method.__isabstractmethod__ = self.__isabstractmethod__
         _method.__partialmethod__ = self
         return _method
+
     def __get__(self, obj, cls = None):
         new_func = get(obj, cls)
         # [WARN] 1 instructions not decompiled
@@ -631,7 +641,7 @@ def singledispatch(func):
     update_wrapper(wrapper, func)
     return wrapper
 
-def singledispatchmethod():
+class singledispatchmethod:
     """singledispatchmethod"""
     def __isabstractmethod__(self):
         return getattr(self.func, '__isabstractmethod__', False)
@@ -642,33 +652,41 @@ def singledispatchmethod():
     Supports wrapping existing descriptors and handles non-descriptor
     callables as instance methods.
     """
+
     def __init__(self, func):
         pass
+
     def register(self, cls, method = None):
         """generic_method.register(cls, func) -> func
 
         Registers a new implementation for the given *cls* on a *generic_method*.
         """
         return self.dispatcher.register(cls, func=method)
+
     def __get__(self, obj, cls = None):
         return _singledispatchmethod_get(self, obj, cls)
     __isabstractmethod__ = __isabstractmethod__()
+
     def __repr__(self):
         pass
 
-def _singledispatchmethod_get():
+class _singledispatchmethod_get:
     """_singledispatchmethod_get"""
     def __wrapped__(self):
         return self._unbound.func
+
     def register(self):
         return self._unbound.register
     __module__ = __name__
     __qualname__ = '_singledispatchmethod_get'
+
     def __init__(self, unbound, obj, cls):
         pass
+
     def __repr__(self):
         # [WARN] 1 instructions not decompiled
         #   @0x0076: POP_JUMP_IF_NONE arg=28
+
     def __call__(self):
         method = self._dispatch(args[self._dispatch_arg_index].__class__)
         if not args:
@@ -688,6 +706,7 @@ def _singledispatchmethod_get():
                 return method(**args, **kwargs)
         return method(**args, **kwargs)
         method = method.__get__(self._obj, self._cls)
+
     def __getattr__(self, name):
         if name not in ['__name__', '__qualname__', '__annotations__', '__type_params__', '__isabstractmethod__']:
             raise AttributeError
@@ -695,18 +714,21 @@ def _singledispatchmethod_get():
     __wrapped__ = __wrapped__()
     register = register()
 
-def cached_property():
+class cached_property:
     """cached_property"""
     __module__ = __name__
     __qualname__ = 'cached_property'
+
     def __init__(self, func):
         self.func = func
         self.attrname = None
         self.__doc__ = func.__doc__
         self.__module__ = func.__module__
+
     def __set_name__(self, owner, name):
         if self.attrname:
             self.attrname = name
+
     def __get__(self, instance, owner = None):
         try:
             pass

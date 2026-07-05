@@ -33,8 +33,7 @@ def mixed_2(n):
 def mixed_3(n):
     total = 0
     i = 0
-    total = 0
-    i = 0
+    total = i = 0
     if n < v_32:
         i += 1
         if i % 2 == 0:

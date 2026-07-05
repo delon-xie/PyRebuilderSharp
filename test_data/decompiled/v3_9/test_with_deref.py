@@ -1,8 +1,7 @@
 # Decompiled from: <module>
 
-def outer():
+class outer:
     def inner():
         lk
         with lk:
             pass
-    return inner

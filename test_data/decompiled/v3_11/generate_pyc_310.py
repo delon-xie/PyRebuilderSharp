@@ -10,8 +10,7 @@ py_files = os.listdir(input_dir)()
 print(f"找到 {len(py_files)} 个 Python 文件")
 print(f"使用 Python: {python310_path}")
 print('============================================================')
-success_count = 0
-fail_count = 0
+success_count = fail_count = 0
 sorted(py_files)
 (<listcomp>)
 for py_file in sorted(py_files):

@@ -181,6 +181,7 @@ public class AstBuilder
                                     or Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE
                                     or Opcode.FOR_ITER or Opcode.GET_ITER
                                     or Opcode.JUMP_IF_FALSE_OR_POP or Opcode.JUMP_IF_TRUE_OR_POP
+                                    or Opcode.POP_JUMP_IF_NONE or Opcode.POP_JUMP_IF_NOT_NONE
                                     => true,
                                 _ => false
                             };
@@ -212,11 +213,17 @@ public class AstBuilder
                                 }
                             }
                             if (!recoveredPrefix)
+                            {
                                 _processedBlockIds.Add(orphan.Id);
+                                if (stmts.Count == 0)
+                                {
+                                    stmts.Add(new CommentBlock($"# [Block @0x{orphan.StartOffset:X4}] unreachable jump"));
+                                }
+                            }
                             continue;
                         }
 
-                        if (!isEmptyReturn && _options.ShowOrphanBlocks)
+                        if (!isEmptyReturn && (_options.ShowOrphanBlocks || stmts.Count == 0))
                         {
                             // flat_expr_store/flat_expr_loads: reprocess through StackMachine to recover statements
                             if (classification is "flat_expr_store" or "flat_expr_loads" or "other")
@@ -237,8 +244,37 @@ public class AstBuilder
                                     _processedBlockIds.Add(orphan.Id);
                                     var lo = _allBlocks.Count > 0 ? _allBlocks[^1].EndOffset : 0;
                                     bool early = lo > 0 && orphan.StartOffset < lo / 3;
-                                    if (early) stmts.InsertRange(0, recovered);
-                                    else stmts.AddRange(recovered);
+                                    
+                                    // Debug: log recovered statements
+                                    if (_codeObject.Name == "EnumCheck")
+                                    {
+                                        System.IO.File.AppendAllText("/tmp/enum_debug2.txt", 
+                                            $"EnumCheck recovered stmts:\n");
+                                        foreach (var stmt in recovered)
+                                        {
+                                            System.IO.File.AppendAllText("/tmp/enum_debug2.txt", 
+                                                $"  {stmt.GetType().Name}: {stmt}\n");
+                                        }
+                                        System.IO.File.AppendAllText("/tmp/enum_debug2.txt", 
+                                            $"LooksLikeClassBody: {LooksLikeClassBody(recovered)}\n");
+                                    }
+                                    
+                                    // Check if this looks like a class body
+                                    if (LooksLikeClassBody(recovered))
+                                    {
+                                        var className = _codeObject.Name;
+                                        if (string.IsNullOrEmpty(className) || className == "<module>" || className.StartsWith("name_"))
+                                            className = $"Class_{orphan.StartOffset:X4}";
+                                        stmts.Add(new ClassDef(className, new List<Expr>(), recovered));
+                                    }
+                                    else if (early)
+                                    {
+                                        stmts.InsertRange(0, recovered);
+                                    }
+                                    else
+                                    {
+                                        stmts.AddRange(recovered);
+                                    }
                                     continue;
                                 }
                             }
@@ -397,6 +433,24 @@ public class AstBuilder
         // Convert i = i + 1 to i += 1 (augmented assignment)
         stmts = ConvertAugAssign(stmts);
         
+        // 全局修复：遍历所有语句，修复空函数体
+        FixEmptyFunctionBodies(stmts);
+        
+        // 修复顶层空函数体：如果模块体为空或只有注释，添加 pass 语句
+        bool hasNonComment = false;
+        foreach (var stmt in stmts)
+        {
+            if (stmt is not CommentBlock)
+            {
+                hasNonComment = true;
+                break;
+            }
+        }
+        if (!hasNonComment)
+        {
+            stmts.Add(new Pass());
+        }
+        
         return new Module(stmts, _codeObject.Name);
     }
 
@@ -444,9 +498,37 @@ public class AstBuilder
             }
             else if (stmt is FunctionDef funcDef)
             {
+                var newBody = ConvertAugAssign(funcDef.Body);
+                
+                // DEBUG: 查看 __new__ 方法的 Body
+                if (funcDef.Name == "__new__")
+                {
+                    Console.WriteLine($"[DEBUG] __new__ Body count: {newBody.Count}");
+                    foreach (var s in newBody)
+                    {
+                        Console.WriteLine($"[DEBUG]   type: {s.GetType().FullName}");
+                    }
+                }
+                
+                // 修复空函数体：如果函数体只有注释，添加 pass 语句
+                bool hasNonComment = false;
+                foreach (var s in newBody)
+                {
+                    if (s is not CommentBlock)
+                    {
+                        hasNonComment = true;
+                        break;
+                    }
+                }
+                if (!hasNonComment)
+                {
+                    Console.WriteLine($"[DEBUG] Adding Pass to {funcDef.Name}");
+                    newBody.Add(new Pass());
+                }
+                
                 result.Add(new FunctionDef(
                     funcDef.Name, funcDef.Args,
-                    ConvertAugAssign(funcDef.Body),
+                    newBody,
                     funcDef.Decorators,
                     funcDef.Returns,
                     funcDef.IsGenerator, funcDef.IsAsync,
@@ -463,6 +545,61 @@ public class AstBuilder
             }
         }
         return result;
+    }
+
+    /// <summary>
+    /// 修复空函数体：遍历所有语句，将只有注释的函数体添加 pass 语句。
+    /// </summary>
+    private void FixEmptyFunctionBodies(List<Stmt> stmts)
+    {
+        foreach (var stmt in stmts)
+        {
+            if (stmt is FunctionDef fd)
+            {
+                bool hasNonComment = false;
+                foreach (var s in fd.Body)
+                {
+                    if (s is not CommentBlock)
+                    {
+                        hasNonComment = true;
+                        break;
+                    }
+                }
+                if (!hasNonComment)
+                {
+                    fd.Body.Add(new Pass());
+                }
+            }
+            else if (stmt is ClassDef cd)
+            {
+                FixEmptyFunctionBodies(cd.Body);
+            }
+            else if (stmt is If ifStmt)
+            {
+                FixEmptyFunctionBodies(ifStmt.Body);
+                if (ifStmt.Orelse != null) FixEmptyFunctionBodies(ifStmt.Orelse);
+            }
+            else if (stmt is While whileStmt)
+            {
+                FixEmptyFunctionBodies(whileStmt.Body);
+                if (whileStmt.Orelse != null) FixEmptyFunctionBodies(whileStmt.Orelse);
+            }
+            else if (stmt is For forStmt)
+            {
+                FixEmptyFunctionBodies(forStmt.Body);
+                if (forStmt.Orelse != null) FixEmptyFunctionBodies(forStmt.Orelse);
+            }
+            else if (stmt is Try tryStmt)
+            {
+                FixEmptyFunctionBodies(tryStmt.Body);
+                foreach (var h in tryStmt.Handlers)
+                {
+                    FixEmptyFunctionBodies(h.Body);
+                }
+                if (tryStmt.Orelse != null) FixEmptyFunctionBodies(tryStmt.Orelse);
+                if (tryStmt.Finalbody != null) FixEmptyFunctionBodies(tryStmt.Finalbody);
+            }
+        }
     }
 
     /// <summary>
@@ -6274,6 +6411,26 @@ public class AstBuilder
                 }
                 if (stmt is ClassDef cd)
                 {
+                    foreach (var bodyStmt in cd.Body)
+                    {
+                        if (bodyStmt is FunctionDef innerFd)
+                        {
+                            bool hasNonComment = false;
+                            foreach (var s in innerFd.Body)
+                            {
+                                if (s is not CommentBlock)
+                                {
+                                    hasNonComment = true;
+                                    break;
+                                }
+                            }
+                            if (!hasNonComment)
+                            {
+                                innerFd.Body.Add(new Pass());
+                            }
+                        }
+                    }
+                    
                     if (!seenNames.Add(cd.Name))
                     {
                         // 替换已有的重复定义（保留最后一个，通常更完整）
@@ -6338,13 +6495,61 @@ public class AstBuilder
                         continue;
                     }
                     // ClassDef
-                    if (assign.Value is Call call && call.Func is Name callFuncName && callFuncName.Id == "__build_class__")
+                    // 两种情况：
+                    // 1. 直接调用: __build_class__(func, name, ...)
+                    // 2. 装饰器调用: decorator(__build_class__(func, name, ...)) 或 decorator(__build_class__(...))()
+                    Call? buildClassCall = null;
+                    var decorators = new List<Expr>();
+                    
+                    if (assign.Value is Call call)
+                    {
+                        // 调试信息
+                        if (targetName.Id == "EnumCheck")
+                        {
+                            System.IO.File.AppendAllText("/tmp/enum_debug.txt", 
+                                $"EnumCheck: assign.Value type={call.GetType().Name}, " +
+                                $"Func type={call.Func.GetType().Name}, " +
+                                $"Func value={call.Func}, " +
+                                $"Args count={call.Args.Count}\n");
+                            if (call.Args.Count > 0)
+                            {
+                                for (int i = 0; i < call.Args.Count; i++)
+                                {
+                                    var arg = call.Args[i];
+                                    System.IO.File.AppendAllText("/tmp/enum_debug.txt", 
+                                        $"  Arg[{i}]: type={arg.GetType().Name}, value={arg}\n");
+                                }
+                            }
+                        }
+                        
+                        // 情况 2b: decorator(__build_class__(...))() — 装饰器结果被调用
+                        if (call.Args.Count == 0 && call.Func is Call outerDecoratorCall)
+                        {
+                            decorators.Add(outerDecoratorCall.Func);
+                            if (outerDecoratorCall.Args.Count == 1 && outerDecoratorCall.Args[0] is Call bcCall1
+                                && bcCall1.Func is Name bcName1 && bcName1.Id == "__build_class__")
+                            {
+                                buildClassCall = bcCall1;
+                            }
+                        }
+                        // 情况 2a: decorator(__build_class__(...)) — 装饰器直接应用
+                        else if (call.Args.Count == 1 && call.Args[0] is Call bcCall2
+                                 && bcCall2.Func is Name bcName2 && bcName2.Id == "__build_class__")
+                        {
+                            decorators.Add(call.Func);
+                            buildClassCall = bcCall2;
+                        }
+                        // 情况 1: 直接调用 __build_class__
+                        else if (call.Func is Name bcName3 && bcName3.Id == "__build_class__")
+                        {
+                            buildClassCall = call;
+                        }
+                    }
+                    
+                    if (buildClassCall != null)
                     {
                         if (!seenNames.Add(targetName.Id))
                         {
-                            // 替换已存在的重复定义（保留最后一个，通常是正确的版本）
-                            // dedup log removed
-                            // 搜索 FunctionDef 或 ClassDef
                             for (int si = currentResult.Count - 1; si >= 0; si--)
                             {
                                 if (currentResult[si] is ClassDef prevClass && prevClass.Name == targetName.Id
@@ -6355,7 +6560,11 @@ public class AstBuilder
                                 }
                             }
                         }
-                        var classDef = ExtractClassDef(call, targetName.Id);
+                        var classDef = ExtractClassDef(buildClassCall, targetName.Id);
+                        if (classDef != null && decorators.Count > 0)
+                        {
+                            classDef = classDef with { Decorators = decorators };
+                        }
                         currentResult.Add(classDef ?? stmt);
                         continue;
                     }
@@ -6384,18 +6593,74 @@ public class AstBuilder
                         continue;
                     }
                     // decorator
-                    if (assign.Value is Call decoratorCall && decoratorCall.Args.Count == 1
-                        && decoratorCall.Args[0] is FunctionRef)
+                    if (assign.Value is Call decoratorCall && decoratorCall.Args.Count == 1)
                     {
-                        BuildFunctionDefWithDecorators(targetName, decoratorCall, currentResult);
-                        continue;
+                        // Class decorator: decorator(__build_class__(func, name, ...))
+                        if (decoratorCall.Args[0] is Call classBuildCall
+                            && classBuildCall.Func is Name classFuncName 
+                            && classFuncName.Id == "__build_class__")
+                        {
+                            if (!seenNames.Add(targetName.Id))
+                            {
+                                for (int si = currentResult.Count - 1; si >= 0; si--)
+                                {
+                                    if (currentResult[si] is ClassDef prevClass && prevClass.Name == targetName.Id
+                                        || currentResult[si] is FunctionDef prevFn && prevFn.Name == targetName.Id)
+                                    {
+                                        currentResult.RemoveAt(si);
+                                        break;
+                                    }
+                                }
+                            }
+                            var classDef = ExtractClassDef(classBuildCall, targetName.Id);
+                            if (classDef != null)
+                            {
+                                classDef = classDef with { Decorators = new List<Expr> { decoratorCall.Func } };
+                            }
+                            currentResult.Add(classDef ?? stmt);
+                            continue;
+                        }
+                        // Function decorator: decorator(func)
+                        if (decoratorCall.Args[0] is FunctionRef)
+                        {
+                            BuildFunctionDefWithDecorators(targetName, decoratorCall, currentResult);
+                            continue;
+                        }
                     }
                     if (assign.Value is Call outerCall && outerCall.Args.Count == 1
-                        && outerCall.Args[0] is Call innerCall && innerCall.Args.Count == 1
-                        && innerCall.Args[0] is FunctionRef)
+                        && outerCall.Args[0] is Call innerCall && innerCall.Args.Count == 1)
                     {
-                        BuildFunctionDefWithDecorators(targetName, outerCall, currentResult);
-                        continue;
+                        // Nested class decorator: outer(inner(__build_class__(func, name, ...)))
+                        if (innerCall.Args[0] is Call classBuildCall
+                            && classBuildCall.Func is Name classFuncName 
+                            && classFuncName.Id == "__build_class__")
+                        {
+                            if (!seenNames.Add(targetName.Id))
+                            {
+                                for (int si = currentResult.Count - 1; si >= 0; si--)
+                                {
+                                    if (currentResult[si] is ClassDef prevClass && prevClass.Name == targetName.Id
+                                        || currentResult[si] is FunctionDef prevFn && prevFn.Name == targetName.Id)
+                                    {
+                                        currentResult.RemoveAt(si);
+                                        break;
+                                    }
+                                }
+                            }
+                            var classDef = ExtractClassDef(classBuildCall, targetName.Id);
+                            if (classDef != null)
+                            {
+                                classDef = classDef with { Decorators = new List<Expr> { innerCall.Func, outerCall.Func } };
+                            }
+                            currentResult.Add(classDef ?? stmt);
+                            continue;
+                        }
+                        // Nested function decorator: outer(inner(func))
+                        if (innerCall.Args[0] is FunctionRef)
+                        {
+                            BuildFunctionDefWithDecorators(targetName, outerCall, currentResult);
+                            continue;
+                        }
                     }
                     // from ... import
                     if (assign.Value is Models.AST.Attribute attr && attr.Value is Name modName
@@ -6622,11 +6887,17 @@ public class AstBuilder
             var lastDot = fnName.LastIndexOf('.');
             if (lastDot >= 0) cleanName = fnName[(lastDot + 1)..];
             
-            var funcDef = BuildFunctionDef(cleanName, funcRef);
-            if (funcDef != null)
+            var stmt = BuildFunctionDef(cleanName, funcRef);
+            if (stmt != null)
             {
-                // Recreate FunctionDef with decorators
-                result.Add(funcDef with { Decorators = decorators });
+                if (stmt is FunctionDef funcDef)
+                {
+                    result.Add(funcDef with { Decorators = decorators });
+                }
+                else
+                {
+                    result.Add(stmt);
+                }
             }
         }
     }
@@ -6677,6 +6948,27 @@ public class AstBuilder
 
         // Decompile class body from the child code object
         var body = DecompileChildCode(funcRef.Code);
+        
+        // 修复类体中的空函数体：如果函数体只有注释，添加 pass 语句
+        foreach (var stmt in body)
+        {
+            if (stmt is FunctionDef fd)
+            {
+                bool hasNonComment = false;
+                foreach (var s in fd.Body)
+                {
+                    if (s is not CommentBlock)
+                    {
+                        hasNonComment = true;
+                        break;
+                    }
+                }
+                if (!hasNonComment)
+                {
+                    fd.Body.Add(new Pass());
+                }
+            }
+        }
 
         // 过滤 class body 中的 __module__ / __qualname__ 元数据赋值
         body = body.Where(s => s is not Assign a
@@ -6704,7 +6996,7 @@ public class AstBuilder
     /// 从 FunctionRef 构建一个完整的 FunctionDef AST。
     /// 递归反编译子代码对象以获取函数体。
     /// </summary>
-    private FunctionDef? BuildFunctionDef(string name, FunctionRef funcRef)
+    private Stmt? BuildFunctionDef(string name, FunctionRef funcRef)
     {
         if (funcRef.Code == null) return null;
 
@@ -6765,6 +7057,32 @@ public class AstBuilder
 
         // 2. 递归反编译函数体
         var body = DecompileChildCode(childCode);
+        
+        // DEBUG: 输出 __new__ 方法的 body 内容
+        if (name.Contains("__new__"))
+        {
+            System.IO.File.WriteAllText("/tmp/debug_body.txt", 
+                $"name: {name}\n" +
+                $"body count: {body.Count}\n");
+            foreach (var stmt in body)
+            {
+                System.IO.File.AppendAllText("/tmp/debug_body.txt", 
+                    $"  type: {stmt.GetType().Name}\n");
+            }
+            
+            // DEBUG: 检查是否只有注释
+            bool hasNonCommentBefore = false;
+            foreach (var stmt in body)
+            {
+                if (stmt is not CommentBlock)
+                {
+                    hasNonCommentBefore = true;
+                    break;
+                }
+            }
+            System.IO.File.AppendAllText("/tmp/debug_body.txt", 
+                $"hasNonComment before fix: {hasNonCommentBefore}\n");
+        }
 
         // 2.5 隐式 docstring: Python 3.10+ 将 docstring 放在 co_consts[0]
         //    但不生成 LOAD_CONST 0 指令。需检测并插入。
@@ -6784,6 +7102,28 @@ public class AstBuilder
         var cleanName = name;
         var lastDot = name.LastIndexOf('.');
         if (lastDot >= 0) cleanName = name[(lastDot + 1)..];
+        
+        // 4.5 如果函数体为空或只有注释，添加 pass 语句
+        bool hasNonComment = false;
+        foreach (var stmt in body)
+        {
+            if (stmt is not CommentBlock)
+            {
+                hasNonComment = true;
+                break;
+            }
+        }
+        if (!hasNonComment)
+        {
+            body.Add(new Pass());
+        }
+
+        // 4. 检测是否是类体：无参数函数且函数体只有赋值语句
+        if (args.Count == 0 && !childCode.IsGenerator && !childCode.IsCoroutine && !childCode.IsAsyncGenerator
+            && (HasNestedFunctions(body) || LooksLikeClassBody(body)))
+        {
+            return new ClassDef(cleanName, new List<Expr>(), body);
+        }
 
         // 4. 生成 FunctionDef
         return new FunctionDef(
@@ -6854,6 +7194,9 @@ public class AstBuilder
         {
             if (childCode.Instructions.Count == 0)
                 return new List<Stmt> { new Pass() };
+            
+            // DEBUG: 输出所有子代码的 body 内容
+            Console.WriteLine($"[DEBUG] childCode.Name: {childCode.Name}, Instructions.Count: {childCode.Instructions.Count}");
 
             var scanner = new BlockScanner();
             var blocks = scanner.Scan(childCode);
@@ -6864,7 +7207,45 @@ public class AstBuilder
             var childBuilder = new AstBuilder(childCode, _options);
             var ast = childBuilder.Build(cfg);
             if (ast is Module m)
+            {
+                // 修复空函数体：如果函数体只有注释，添加 pass 语句
+                foreach (var stmt in m.Body)
+                {
+                    if (stmt is FunctionDef fd)
+                    {
+                        bool hasNonComment = false;
+                        foreach (var s in fd.Body)
+                        {
+                            if (s is not CommentBlock)
+                            {
+                                hasNonComment = true;
+                                break;
+                            }
+                        }
+                        if (!hasNonComment)
+                        {
+                            fd.Body.Add(new Pass());
+                        }
+                    }
+                }
+                
+                // 修复顶层空函数体：如果模块体只有注释，添加 pass 语句
+                bool topLevelHasNonComment = false;
+                foreach (var stmt in m.Body)
+                {
+                    if (stmt is not CommentBlock)
+                    {
+                        topLevelHasNonComment = true;
+                        break;
+                    }
+                }
+                if (!topLevelHasNonComment)
+                {
+                    m.Body.Add(new Pass());
+                }
+                
                 return m.Body;
+            }
             return new List<Stmt>();
         }
         catch (Exception ex)
@@ -6946,22 +7327,16 @@ public class AstBuilder
                 && !fnRef.Name.StartsWith("<"))  // 跳过推导式（已在 PostProcessFunctionDefs 中处理）
             {
                 childIdx++;
-                var funcDef = BuildFunctionDef(fnRef.Name ?? targetNameFn.Id, fnRef);
-                if (funcDef != null)
+                var defStmt = BuildFunctionDef(fnRef.Name ?? targetNameFn.Id, fnRef);
+                if (defStmt != null)
                 {
-                    if (funcDef.Args.Count == 0 && HasNestedFunctions(funcDef.Body))
-                    {
-                        var className = targetNameFn.Id;
-                        if (!string.IsNullOrEmpty(fnRef.Name) && fnRef.Name != "<module>" && !fnRef.Name.StartsWith("name_"))
-                            className = fnRef.Name;
-                        if (!localSeen.Add(className))
-                        { result.Add(stmt); continue; }
-                        result.Add(new ClassDef(className, new List<Expr>(), funcDef.Body));
-                    }
-                    else
-                    {
-                        result.Add(funcDef);
-                    }
+                    string defName = "";
+                    if (defStmt is FunctionDef fd) defName = fd.Name;
+                    else if (defStmt is ClassDef cd) defName = cd.Name;
+                    
+                    if (!localSeen.Add(defName))
+                    { result.Add(stmt); continue; }
+                    result.Add(defStmt);
                 }
                 else { result.Add(stmt); }
                 continue;
@@ -6975,38 +7350,19 @@ public class AstBuilder
             {
                 var cc = childCodes[childIdx];
                 childIdx++;
-                var funcDef = BuildFunctionDef(cc.Name ?? targetName.Id, new FunctionRef(cc, cc.Name ?? targetName.Id));
-                if (funcDef != null)
+                var defStmt = BuildFunctionDef(cc.Name ?? targetName.Id, new FunctionRef(cc, cc.Name ?? targetName.Id));
+                if (defStmt != null)
                 {
-                    // Detect class body: FunctionDef with no args and contains methods
-                    if (funcDef.Args.Count == 0 && HasNestedFunctions(funcDef.Body))
-                    {
-                        // Use the STORE_NAME target as class name (more reliable than code object's name)
-                        var className = targetName.Id;
-                        // Try to get a better name from the code object if available
-                        if (!string.IsNullOrEmpty(cc.Name) && cc.Name != "<module>" && !cc.Name.StartsWith("name_"))
-                            className = cc.Name;
-                        // 跳过已在 PostProcessFunctionDefs 中正确定义的类（有 bases 的版本更完整）
-                        if (existingDefNames.Contains(className) || !localSeen.Add(className))
-                        {
-                            result.Add(stmt);
-                            continue;
-                        }
-                        var classDef = new ClassDef(
-                            className,
-                            new List<Expr>(),
-                            funcDef.Body
-                        );
-                        result.Add(classDef);
-                        continue;
-                    }
-                    // 跳过已在 PostProcessFunctionDefs 中正确定义或本方法已创建的函数
-                    if (existingDefNames.Contains(funcDef.Name) || !localSeen.Add(funcDef.Name))
+                    string defName = "";
+                    if (defStmt is FunctionDef fd) defName = fd.Name;
+                    else if (defStmt is ClassDef cd) defName = cd.Name;
+                    
+                    if (existingDefNames.Contains(defName) || !localSeen.Add(defName))
                     {
                         result.Add(stmt);
                         continue;
                     }
-                    result.Add(funcDef);
+                    result.Add(defStmt);
                     continue;
                 }
             }
@@ -7031,11 +7387,12 @@ public class AstBuilder
             var newResult = new List<Stmt>();
             foreach (var cc in remainingChildCodes)
             {
-                var funcDef = BuildFunctionDef(cc.Name ?? "<lambda>", new FunctionRef(cc, cc.Name ?? "<lambda>"));
-                if (funcDef != null)
+                var defStmt = BuildFunctionDef(cc.Name ?? "<lambda>", new FunctionRef(cc, cc.Name ?? "<lambda>"));
+                if (defStmt != null)
                 {
-                    newResult.Add(funcDef);
-                    localSeen.Add(funcDef.Name);
+                    newResult.Add(defStmt);
+                    if (defStmt is FunctionDef fd) localSeen.Add(fd.Name);
+                    else if (defStmt is ClassDef cd) localSeen.Add(cd.Name);
                 }
             }
             newResult.AddRange(result);
@@ -7054,5 +7411,27 @@ public class AstBuilder
             if (stmt is ClassDef) return true;
         }
         return false;
+    }
+    
+    private static bool LooksLikeClassBody(List<Stmt> body)
+    {
+        if (body == null || body.Count == 0) return false;
+        
+        int assignCount = 0;
+        int otherCount = 0;
+        
+        foreach (var stmt in body)
+        {
+            if (stmt is Assign)
+                assignCount++;
+            else if (stmt is ExprStmt { Value: Constant { Value: string } })
+                continue;  // docstring
+            else if (stmt is CommentBlock)
+                continue;  // comment
+            else
+                otherCount++;
+        }
+        
+        return otherCount == 0 && assignCount > 0;
     }
 }

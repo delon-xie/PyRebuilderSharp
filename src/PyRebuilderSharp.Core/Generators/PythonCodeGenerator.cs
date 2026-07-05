@@ -40,9 +40,12 @@ public class PythonCodeGenerator : ICodeGenerator
                 VisitModule(m);
                 break;
             case FunctionDef f:
+                // DEBUG: 查看所有函数定义
+                Console.WriteLine($"[GENERATOR DEBUG] FunctionDef: {f.Name}, Body count: {f.Body.Count}");
                 VisitFunctionDef(f);
                 break;
             case ClassDef c:
+                Console.WriteLine($"[GENERATOR DEBUG] ClassDef: {c.Name}, Body count: {c.Body.Count}");
                 VisitClassDef(c);
                 break;
             case If i:
@@ -444,6 +447,16 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitFunctionDef(FunctionDef func)
     {
+        // DEBUG: 查看函数定义
+        if (func.Name == "__new__")
+        {
+            Console.WriteLine($"[GENERATOR DEBUG] VisitFunctionDef: {func.Name}, Body count: {func.Body.Count}");
+            foreach (var s in func.Body)
+            {
+                Console.WriteLine($"[GENERATOR DEBUG]   type: {s.GetType().Name}");
+            }
+        }
+        
         if (func.Decorators?.Count > 0)
         {
             foreach (var decorator in func.Decorators)
@@ -500,9 +513,21 @@ public class PythonCodeGenerator : ICodeGenerator
         _functionDepth++;
         // 函数体 docstring: 首个语句若为字符串常量，用 """...""" 格式
         EmitDocstringPrefix(func.Body);
+        
+        // 检查函数体是否只有注释
+        bool hasNonComment = false;
+        foreach (var stmt in func.Body)
+        {
+            if (stmt is not CommentBlock)
+            {
+                hasNonComment = true;
+                break;
+            }
+        }
+        
         foreach (var stmt in func.Body)
             Visit(stmt);
-        if (func.Body.Count == 0)
+        if (func.Body.Count == 0 || !hasNonComment)
             EmitEmptyBodyPass();
         _indentLevel--;
         _functionDepth--;

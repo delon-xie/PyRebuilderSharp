@@ -26,19 +26,7 @@ class Repr:
     _lookup = {'tuple': 'builtins', 'list': 'builtins', 'array': 'array', 'set': 'builtins', 'frozenset': 'builtins', 'deque': 'collections', 'dict': 'builtins', 'str': 'builtins', 'int': 'builtins'}
 
     def __init__(self, *, maxlevel = 6, maxtuple = 6, maxlist = 6, maxarray = 5, maxdict = 4, maxset = 6, maxfrozenset = 6, maxdeque = 6, maxstring = 30, maxlong = 40, maxother = 30, fillvalue = '...', indent = None):
-        v_16.maxlevel = self
-        v_32.maxtuple = self
-        v_48.maxlist = self
-        v_64.maxarray = self
-        v_80.maxdict = self
-        v_96.maxset = self
-        v_112.maxfrozenset = self
-        v_128.maxdeque = self
-        v_144.maxstring = self
-        v_160.maxlong = self
-        v_176.maxother = self
-        v_192.fillvalue = self
-        v_208.indent = self
+        v_16.maxlevel = v_32.maxtuple = v_48.maxlist = v_64.maxarray = v_80.maxdict = v_96.maxset = v_112.maxfrozenset = v_128.maxdeque = v_144.maxstring = v_160.maxlong = v_176.maxother = v_192.fillvalue = v_208.indent = self
 
     def repr(self, x):
         return self.repr1(self, v_16.maxlevel)

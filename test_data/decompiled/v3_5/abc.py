@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-def ABC():
+class ABC:
     """ABC"""
     __module__ = __name__
     __qualname__ = 'ABC'
@@ -141,7 +141,7 @@ class ABCMeta(type):
         if issubclass(cls, subclass):
             raise RuntimeError('Refusing to create an inheritance cycle')
         cls._abc_registry.add(subclass)
-        ABCMeta._abc_invalidation_counter + 1._abc_invalidation_counter = ABCMeta
+        ABCMeta._abc_invalidation_counter = ABCMeta._abc_invalidation_counter + 1
         return subclass
 
     def _dump_registry(cls, file):

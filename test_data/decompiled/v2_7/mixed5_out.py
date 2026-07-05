@@ -28,8 +28,7 @@ def mixed_2(n):
             continue
 
 def mixed_3(n):
-    total = 0
-    i = 0
+    total = i = 0
     while i < n:
         i += 1
         for j in range(i):

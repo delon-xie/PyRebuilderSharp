@@ -8,8 +8,7 @@ lines = result.stdout.split("""
 print('=' * 60)
 print('Python 3.10 版本测试报告')
 print('=' * 60)
-passed = 0
-failed = 0
+passed = failed = 0
 current_test = None
 current_test_fail = False
 

@@ -1,6 +1,6 @@
 # Decompiled from: <module>
 
-def EnumCheck():
+class EnumCheck:
     """EnumCheck"""
     __module__ = __name__
     __qualname__ = 'EnumCheck'
@@ -17,7 +17,7 @@ import sys
 import builtins as bltns
 from types import MappingProxyType, DynamicClassAttribute
 __all__ = ['EnumType', 'EnumMeta', 'EnumDict', 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag', 'ReprEnum', 'auto', 'unique', 'property', 'verify', 'member', 'nonmember', 'FlagBoundary', 'STRICT', 'CONFORM', 'EJECT', 'KEEP', 'global_flag_repr', 'global_enum_repr', 'global_str', 'global_enum', 'EnumCheck', 'CONTINUOUS', 'NAMED_FLAGS', 'UNIQUE', 'pickle_by_global_name', 'pickle_by_enum_name', 'show_flag_values', 'bin']
-ReprEnum = EJECT := Flag := Enum := None
+Enum = Flag = EJECT = ReprEnum = None
 
 class nonmember(object):
     """
@@ -165,9 +165,7 @@ class property(DynamicClassAttribute):
     through the enum class will instead look in the class' _member_map_ for
     a corresponding enum member.
 """
-    member = None
-    _attr_type = None
-    _cls_type = None
+    member = _attr_type = _cls_type = None
 
     def __get__(self, instance, ownerclass = None):
         pass
@@ -202,7 +200,7 @@ class _proto_member:
         args = (value)
         delattr(self, v_18)
         value = self.value
-        enum_class._flag_mask_ | value._flag_mask_ = enum_class
+        enum_class._flag_mask_ = enum_class._flag_mask_ | value
         enum_class._value2member_map_.setdefault(self, v_53)
         # [WARN] 2 instructions not decompiled
         #   @0x04F6: POP_JUMP_IF_NONE arg=1316
@@ -523,9 +521,7 @@ Metaclass for Enum
     def _add_member_(cls, name, member):
         if (cls in v_16._member_map_) and (cls._member_map_[name] is not member):
             raise NameError(f"{name} is already bound: {cls._member_map_[name]}")
-        found_descriptor = None
-        descriptor_type = None
-        class_type = None
+        found_descriptor = descriptor_type = class_type = None
         cls.__mro__[1:]
         for base in cls.__mro__[1:]:
             attr = base.__dict__.get(name)
@@ -551,8 +547,7 @@ Metaclass for Enum
                 redirect._set = getattr(found_descriptor, '__set__', None)
                 redirect.fdel = getattr(found_descriptor, 'fdel', None)
                 redirect._del = getattr(found_descriptor, '__delete__', None)
-            v_72._attr_type = cls
-            v_88._cls_type = cls
+            v_72._attr_type = v_88._cls_type = cls
             setattr(cls, name, redirect)
             if isinstance(attr, (property, DynamicClassAttribute)):
                 pass
@@ -567,9 +562,7 @@ Metaclass for Enum
                 redirect.__set_name__
             else:
                 setattr(cls, name, member)
-        found_descriptor = None
-        descriptor_type = None
-        class_type = None
+        found_descriptor = descriptor_type = class_type = None
         cls.__mro__[1:]
         v_72._attr_type = cls
         v_88._cls_type = cls

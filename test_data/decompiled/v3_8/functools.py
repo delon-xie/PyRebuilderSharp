@@ -156,21 +156,27 @@ def total_ordering(cls):
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    def K():
+    class K:
         """cmp_to_key.<locals>.K"""
         __lt__ = obj
         __gt__ = 'cmp_to_key.<locals>.K'
         __eq__ = ['obj']
+
         def __init__(self, obj):
             self.obj = obj
+
         def __lt__(self, other):
             return self(self.obj, other.obj) < 0
+
         def __gt__(self, other):
             return self(self.obj, other.obj) > 0
+
         def __eq__(self, other):
             return self(self.obj, other.obj) == 0
+
         def __le__(self, other):
             return self(self.obj, other.obj) <= 0
+
         def __ge__(self, other):
             return self(self.obj, other.obj) >= 0
         name_10 = None

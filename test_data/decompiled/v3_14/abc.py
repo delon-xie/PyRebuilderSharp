@@ -20,7 +20,7 @@ def abstractmethod(funcobj):
     funcobj.__isabstractmethod__ = True
     return funcobj
 
-def abstractclassmethod():
+class abstractclassmethod:
     """abstractclassmethod"""
     __module__ = __name__
     __qualname__ = 'abstractclassmethod'
@@ -39,6 +39,7 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
 
 """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
@@ -46,9 +47,9 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
         super().__init__(callable)
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
-    return __classcell__ := __class__
+    __classcell__ = __class__
 
-def abstractstaticmethod():
+class abstractstaticmethod:
     """abstractstaticmethod"""
     __module__ = __name__
     __qualname__ = 'abstractstaticmethod'
@@ -67,6 +68,7 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
 
 """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
@@ -74,9 +76,9 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
         super().__init__(callable)
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
-    return __classcell__ := __class__
+    __classcell__ = __class__
 
-def abstractproperty():
+class abstractproperty:
     """abstractproperty"""
     __module__ = __name__
     __qualname__ = 'abstractproperty'
@@ -95,15 +97,16 @@ Deprecated, use 'property' with 'abstractmethod' instead:
 
 """
     __isabstractmethod__ = True
+
     def __init__(self, fget = None, fset = None, fdel = None, doc = None):
         import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(fget, fset, fdel, doc)
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
-    return __classcell__ := __class__
+    __classcell__ = __class__
 
-def ABCMeta():
+class ABCMeta:
     """ABCMeta"""
     __module__ = __name__
     __qualname__ = 'ABCMeta'
@@ -120,22 +123,27 @@ their MRO (Method Resolution Order) nor will method
 implementations defined by the registering ABC be callable (not
 even via super()).
 """
+
     def __new__(mcls, name, bases, namespace):
         cls = (None, mcls, name, bases, namespace)
         _abc_init(cls)
         return cls
+
     def register(cls, subclass):
         """Register a virtual subclass of an ABC.
 
     Returns the subclass, to allow usage as a class decorator.
 """
         return _abc_register(cls, subclass)
+
     def __instancecheck__(cls, instance):
         """Override for isinstance(instance, cls)."""
         return _abc_instancecheck(cls, instance)
+
     def __subclasscheck__(cls, subclass):
         """Override for issubclass(subclass, cls)."""
         return _abc_subclasscheck(cls, subclass)
+
     def _dump_registry(cls, file = None):
         """Debug helper to print the ABC registry."""
         print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
@@ -144,15 +152,17 @@ even via super()).
         print(f"_abc_cache: {_abc_cache}", file=file)
         print(f"_abc_negative_cache: {_abc_negative_cache}", file=file)
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version}", file=file)
+
     def _abc_registry_clear(cls):
         """Clear the registry (for debugging or testing)."""
         _reset_registry(cls)
+
     def _abc_caches_clear(cls):
         """Clear the caches (for debugging or testing)."""
         _reset_caches(cls)
     __static_attributes__ = ()
     __classdictcell__ = __classdict__
-    return __classcell__ := __class__
+    __classcell__ = __class__
 
 def update_abstractmethods(cls):
     """Recalculate the set of abstract methods of an abstract class.
@@ -183,7 +193,7 @@ def update_abstractmethods(cls):
         else:
             abstracts.add(name)
 
-def ABC():
+class ABC:
     """ABC"""
     __module__ = __name__
     __qualname__ = 'ABC'
@@ -191,8 +201,7 @@ def ABC():
     __doc__ = """Helper class that provides a standard way to create an ABC using
 inheritance.
 """
-    __slots__ = ()
-    __static_attributes__ = ()
+    __slots__ = __static_attributes__ = ()
 try:
     pass
 except ImportError:

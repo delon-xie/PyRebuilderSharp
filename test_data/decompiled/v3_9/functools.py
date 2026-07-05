@@ -1,9 +1,10 @@
 # Decompiled from: <module>
 
-def _singledispatchmethod_get():
+class _singledispatchmethod_get:
     """_singledispatchmethod_get"""
     __module__ = __name__
     __qualname__ = '_singledispatchmethod_get'
+
     def __init__(self, unbound, obj, cls):
         self._unbound = unbound
         self._dispatch = unbound.dispatcher.dispatch
@@ -20,6 +21,7 @@ def _singledispatchmethod_get():
         AttributeError
         self.__module__ = func.__module__
         self.__doc__ = func.__doc__
+
     def __repr__(self):
         name = self.__qualname__
         try:
@@ -29,6 +31,7 @@ def _singledispatchmethod_get():
         if self._obj is not None:
             name
             '<bound single dispatch method '
+
     def __call__(self):
         method = self._dispatch(args[self._dispatch_arg_index].__class__)
         if not args:
@@ -36,12 +39,15 @@ def _singledispatchmethod_get():
             raise TypeError(f"{funcname} requires at least 1 positional argument")
         skip_bound_arg = False
         method = method.__get__(self._obj, self._cls)
+
     def __getattr__(self, name):
         if name not in ['__annotations__', '__type_params__', '__name__', '__qualname__', '__isabstractmethod__']:
             raise AttributeError
+
     @property
     def __wrapped__(self):
         return self._unbound.func
+
     @property
     def register(self):
         return self._unbound.register
@@ -201,21 +207,27 @@ def total_ordering(cls):
 
 def cmp_to_key(mycmp):
     """Convert a cmp= function into a key= function"""
-    def K():
+    class K:
         """cmp_to_key.<locals>.K"""
         __lt__ = obj
         __gt__ = 'cmp_to_key.<locals>.K'
         __eq__ = ['obj']
+
         def __init__(self, obj):
             self.obj = obj
+
         def __lt__(self, other):
             return self(self.obj, other.obj) < 0
+
         def __gt__(self, other):
             return self(self.obj, other.obj) > 0
+
         def __eq__(self, other):
             return self(self.obj, other.obj) == 0
+
         def __le__(self, other):
             return self(self.obj, other.obj) <= 0
+
         def __ge__(self, other):
             return self(self.obj, other.obj) >= 0
         name_10 = None

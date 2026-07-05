@@ -25,6 +25,7 @@ public class StackMachine
     private Expr? _pendingUnpackContainer; // 待处理的元组解包容器
     private List<Expr>? _pendingUnpackTargets; // 待处理的元组解包目标列表
     private object? _kwNames; // 3.11+ KW_NAMES 存储的关键词名元组，由 CALL 消费
+    private Operator? _pendingInplaceOp; // 待处理的原地操作（用于增强赋值）
 
     public StackMachine(CodeObject code)
     {
@@ -94,7 +95,7 @@ public class StackMachine
         _results.RemoveAt(_results.Count - 1);
         return result;
     }
-
+    
     /// <summary>
     /// 执行单条指令。
     /// </summary>
@@ -286,13 +287,78 @@ public class StackMachine
                 var storeName = GetName(instr);
                 var val = SafePop();
                 if (val == null) return null;
+                
+                // Handle augmented assignment: a += b, a |= b, etc.
+                if (_pendingInplaceOp.HasValue && val is BinOp binOp)
+                {
+                    var op = _pendingInplaceOp.Value;
+                    _pendingInplaceOp = null;
+                    _pendingCopyDepth = -1;
+                    return new Assign(new List<Expr> { new Name(storeName, ExpressionContext.Store) }, new BinOp(new Name(storeName, ExpressionContext.Load), op, binOp.Right));
+                }
+                
                 // walrus := detected: COPY followed by STORE_NAME
-                if (_pendingCopyDepth >= 0)
+                // Only generate NamedExpr if we're actually building a larger expression context
+                // In chained assignments like a = b = c = None, COPY is used to duplicate values, not for walrus
+                if (_pendingCopyDepth >= 0 && _exprStack.Count > 1)
                 {
                     _pendingCopyDepth = -1;
+                    _pendingInplaceOp = null;
                     _exprStack.Push(new NamedExpr(new Name(storeName, ExpressionContext.Store), val));
                     return null;
                 }
+                
+                // If there's a pending unpack, accumulate this STORE_NAME as a target
+                if (_pendingUnpackContainer != null)
+                {
+                    _pendingUnpackTargets!.Add(new Name(storeName, ExpressionContext.Store));
+                    
+                    // Check if more Starred items remain
+                    bool hasMoreStarred = false;
+                    foreach (var e in _exprStack)
+                    {
+                        if (e is Starred s && s.Value == _pendingUnpackContainer && s.Ctx == ExpressionContext.Load)
+                        { hasMoreStarred = true; break; }
+                    }
+                    if (!hasMoreStarred)
+                    {
+                        var container = _pendingUnpackContainer;
+                        var allTargets = _pendingUnpackTargets;
+                        _pendingUnpackContainer = null;
+                        _pendingUnpackTargets = null;
+                        return new Assign(
+                            new List<Expr> { new ListLiteral(allTargets!, ContainerKind.Tuple) }, container);
+                    }
+                    return null; // Still waiting
+                }
+                
+                // UNPACK_SEQUENCE with Starred: start collecting tuple targets
+                if (val is Starred starred && starred.Ctx == ExpressionContext.Load)
+                {
+                    var targets = new List<Expr> { new Name(storeName, ExpressionContext.Store) };
+                    _pendingUnpackContainer = starred.Value;
+                    _pendingUnpackTargets = targets;
+                    
+                    // Check if more Starred items remain
+                    bool hasMoreStarred = false;
+                    foreach (var e in _exprStack)
+                    {
+                        if (e is Starred s && s.Value == starred.Value && s.Ctx == ExpressionContext.Load)
+                        { hasMoreStarred = true; break; }
+                    }
+                    if (!hasMoreStarred)
+                    {
+                        // Single-item unpack — emit immediately
+                        _pendingUnpackContainer = null;
+                        _pendingUnpackTargets = null;
+                        return new Assign(
+                            new List<Expr> { new ListLiteral(targets, ContainerKind.Tuple) }, starred.Value);
+                    }
+                    return null; // Wait for more STORE_NAME instructions
+                }
+                
+                _pendingCopyDepth = -1;
+                _pendingInplaceOp = null;
                 return new Assign(new List<Expr> { new Name(storeName, ExpressionContext.Store) }, val);
             }
 
@@ -401,6 +467,48 @@ public class StackMachine
                     attrValue = SafePop();  // TOS1 = value
                 }
                 if (attrValue == null || obj == null) return null;
+                
+                // Handle augmented assignment: obj.attr |= value
+                // For augmented assignment like a.attr |= b, the bytecode is:
+                // LOAD_FAST a, COPY 1, LOAD_ATTR attr, LOAD_FAST b, LOAD_ATTR attr2, BINARY_OP OR (in-place), SWAP 2, STORE_ATTR attr
+                // After SWAP, stack is [result, obj], so attrValue may be obj and obj may be result (BinOp)
+                if (_pendingInplaceOp.HasValue)
+                {
+                    var op = _pendingInplaceOp.Value;
+                    _pendingInplaceOp = null;
+                    
+                    // Check if stack order was swapped by SWAP instruction
+                    if (attrValue is BinOp binOp)
+                    {
+                        // Normal order: attrValue is the BinOp result
+                        // The BinOp's left should be obj.attr
+                        if (binOp.Left is AstAttribute leftAttr && leftAttr.Attr == attrName)
+                        {
+                            // Correct: obj.attr |= right
+                            return new Assign(
+                                new List<Expr> { new AstAttribute(obj, attrName, ExpressionContext.Store) },
+                                new BinOp(new AstAttribute(obj, attrName, ExpressionContext.Load), op, binOp.Right)
+                            );
+                        }
+                        else
+                        {
+                            // The BinOp contains both operands, use it directly
+                            return new Assign(
+                                new List<Expr> { new AstAttribute(obj, attrName, ExpressionContext.Store) },
+                                binOp
+                            );
+                        }
+                    }
+                    else if (obj is BinOp swappedBinOp)
+                    {
+                        // Swapped order: obj is the BinOp result, attrValue is the object
+                        return new Assign(
+                            new List<Expr> { new AstAttribute(attrValue, attrName, ExpressionContext.Store) },
+                            swappedBinOp
+                        );
+                    }
+                }
+                
                 return new Assign(new List<Expr> { new AstAttribute(obj, attrName, ExpressionContext.Store) }, attrValue);
             }
 
@@ -533,19 +641,27 @@ public class StackMachine
             case Opcode.BINARY_AND: return HandleBinaryOp(Operator.BitAnd);
             case Opcode.BINARY_OR: return HandleBinaryOp(Operator.BitOr);
             case Opcode.BINARY_XOR: return HandleBinaryOp(Operator.BitXor);
-            case Opcode.INPLACE_ADD: return HandleBinaryOp(Operator.Add);
-            case Opcode.INPLACE_SUBTRACT: return HandleBinaryOp(Operator.Sub);
-            case Opcode.INPLACE_MULTIPLY: return HandleBinaryOp(Operator.Mul);
-            case Opcode.INPLACE_MODULO: return HandleBinaryOp(Operator.Mod);
-            case Opcode.INPLACE_POWER: return HandleBinaryOp(Operator.Pow);
-            case Opcode.INPLACE_FLOOR_DIVIDE: return HandleBinaryOp(Operator.FloorDiv);
-            case Opcode.INPLACE_TRUE_DIVIDE: return HandleBinaryOp(Operator.Div);
-            case Opcode.INPLACE_AND: return HandleBinaryOp(Operator.BitAnd);
-            case Opcode.INPLACE_OR: return HandleBinaryOp(Operator.BitOr);
-            case Opcode.INPLACE_XOR: return HandleBinaryOp(Operator.BitXor);
-            case Opcode.INPLACE_LSHIFT: return HandleBinaryOp(Operator.LShift);
-            case Opcode.INPLACE_RSHIFT: return HandleBinaryOp(Operator.RShift);
-            case Opcode.INPLACE_MATRIX_MULTIPLY: return HandleBinaryOp(Operator.MatMul);
+            case Opcode.INPLACE_ADD: return HandleInplaceOp(Operator.Add);
+            case Opcode.INPLACE_SUBTRACT: return HandleInplaceOp(Operator.Sub);
+            case Opcode.INPLACE_MULTIPLY: return HandleInplaceOp(Operator.Mul);
+            case Opcode.INPLACE_MODULO: return HandleInplaceOp(Operator.Mod);
+            case Opcode.INPLACE_POWER: return HandleInplaceOp(Operator.Pow);
+            case Opcode.INPLACE_FLOOR_DIVIDE: return HandleInplaceOp(Operator.FloorDiv);
+            case Opcode.INPLACE_TRUE_DIVIDE: return HandleInplaceOp(Operator.Div);
+            case Opcode.INPLACE_AND: return HandleInplaceOp(Operator.BitAnd);
+            case Opcode.INPLACE_OR: 
+            {
+                var result = HandleInplaceOp(Operator.BitOr);
+                if (_code.Name == "_make_class_unpicklable")
+                {
+                    System.IO.File.AppendAllText("/tmp/inplace_debug.txt", "INPLACE_OR called\n");
+                }
+                return result;
+            }
+            case Opcode.INPLACE_XOR: return HandleInplaceOp(Operator.BitXor);
+            case Opcode.INPLACE_LSHIFT: return HandleInplaceOp(Operator.LShift);
+            case Opcode.INPLACE_RSHIFT: return HandleInplaceOp(Operator.RShift);
+            case Opcode.INPLACE_MATRIX_MULTIPLY: return HandleInplaceOp(Operator.MatMul);
 
             // ---- BINARY_SUBSCR (a[b]) and Python 2 SLICE opcodes ----
             case Opcode.BINARY_SUBSCR:
@@ -1014,8 +1130,16 @@ public class StackMachine
                 var right = SafePop();
                 var left = SafePop();
                 if (left == null || right == null) return null;
+                
+                // Check if this is an in-place operation (arg >= 13)
+                bool isInplace = opType >= 13 && opType <= 25;
                 var binOp = MapBinaryOpArg(opType);
                 _exprStack.Push(new BinOp(left, binOp, right));
+                
+                // Mark as pending in-place operation for augmented assignment
+                if (isInplace)
+                    _pendingInplaceOp = binOp;
+                
                 return null;
             }
 
@@ -2027,6 +2151,16 @@ public class StackMachine
         var right = _exprStack.Pop();
         var left = _exprStack.Pop();
         _exprStack.Push(new BinOp(left, op, right));
+        return null;
+    }
+    
+    private Stmt? HandleInplaceOp(Operator op)
+    {
+        if (_exprStack.Count < 2) return null;
+        var right = _exprStack.Pop();
+        var left = _exprStack.Pop();
+        _exprStack.Push(new BinOp(left, op, right));
+        _pendingInplaceOp = op;
         return null;
     }
 

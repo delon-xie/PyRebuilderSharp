@@ -1,7 +1,7 @@
 # Decompiled from: <module>
 
-def outer():
+class outer:
     lock = object()
+
     def inner():
         pass
-    return inner

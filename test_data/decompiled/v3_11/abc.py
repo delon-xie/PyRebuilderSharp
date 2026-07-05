@@ -20,7 +20,7 @@ def abstractmethod(funcobj):
     funcobj.__isabstractmethod__ = True
     return funcobj
 
-def abstractclassmethod():
+class abstractclassmethod:
     """abstractclassmethod"""
     __module__ = __name__
     __qualname__ = 'abstractclassmethod'
@@ -38,14 +38,15 @@ def abstractclassmethod():
 
     """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
-    return __classcell__ := __class__
+    __classcell__ = __class__
 
-def abstractstaticmethod():
+class abstractstaticmethod:
     """abstractstaticmethod"""
     __module__ = __name__
     __qualname__ = 'abstractstaticmethod'
@@ -63,14 +64,15 @@ def abstractstaticmethod():
 
     """
     __isabstractmethod__ = True
+
     def __init__(self, callable):
         import warnings
         warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
-    return __classcell__ := __class__
+    __classcell__ = __class__
 
-def abstractproperty():
+class abstractproperty:
     """abstractproperty"""
     __module__ = __name__
     __qualname__ = 'abstractproperty'
@@ -88,11 +90,12 @@ def abstractproperty():
 
     """
     __isabstractmethod__ = True
+
     def __init__(self, fget = None, fset = None, fdel = None, doc = None):
         import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(fget, fset, fdel, doc)
-    return __classcell__ := __class__
+    __classcell__ = __class__
 
 def update_abstractmethods(cls):
     """Recalculate the set of abstract methods of an abstract class.
@@ -128,7 +131,7 @@ def update_abstractmethods(cls):
         cls.__abstractmethods__ = abstracts
         return cls
 
-def ABC():
+class ABC:
     """ABC"""
     __module__ = __name__
     __qualname__ = 'ABC'

@@ -9,8 +9,7 @@ with open('/tmp/test_full.txt', 'r') as f:
     version_stats = defaultdict(lambda: None)
     lines = output.split("""
 """)
-    i = 0
-    debug_count = 0
+    i = debug_count = 0
     if i < len(lines):
         line = lines[i]
         if ('***' in line) and (':' in line):
