@@ -1472,6 +1472,7 @@ public class AstBuilder
         string? containerKind = null;
         bool hasListAppend = false;
         bool hasSetAdd = false;
+        bool hasMapAdd = false;
         
         foreach (var ins in header.Instructions)
         {
@@ -1485,9 +1486,14 @@ public class AstBuilder
                 hasSetAdd = true;
                 break;
             }
+            if (ins.Opcode == Opcode.MAP_ADD_313)
+            {
+                hasMapAdd = true;
+                break;
+            }
         }
         
-        if (!hasListAppend && !hasSetAdd)
+        if (!hasListAppend && !hasSetAdd && !hasMapAdd)
         {
             foreach (var block in bodyBlocks)
             {
@@ -1503,12 +1509,17 @@ public class AstBuilder
                         hasSetAdd = true;
                         break;
                     }
+                    if (ins.Opcode == Opcode.MAP_ADD_313)
+                    {
+                        hasMapAdd = true;
+                        break;
+                    }
                 }
-                if (hasListAppend || hasSetAdd) break;
+                if (hasListAppend || hasSetAdd || hasMapAdd) break;
             }
         }
         
-        if (!hasListAppend && !hasSetAdd)
+        if (!hasListAppend && !hasSetAdd && !hasMapAdd)
         {
             foreach (var block in _sortedBlocks)
             {
@@ -1543,15 +1554,20 @@ public class AstBuilder
                                         hasSetAdd = true;
                                         break;
                                     }
+                                    if (nestedIns.Opcode == Opcode.MAP_ADD_313)
+                                    {
+                                        hasMapAdd = true;
+                                        break;
+                                    }
                                 }
-                                if (hasListAppend || hasSetAdd) break;
+                                if (hasListAppend || hasSetAdd || hasMapAdd) break;
                             }
-                            if (hasListAppend || hasSetAdd) break;
+                            if (hasListAppend || hasSetAdd || hasMapAdd) break;
                         }
-                        if (hasListAppend || hasSetAdd) break;
+                        if (hasListAppend || hasSetAdd || hasMapAdd) break;
                     }
                 }
-                if (hasListAppend || hasSetAdd) break;
+                if (hasListAppend || hasSetAdd || hasMapAdd) break;
             }
         }
         
@@ -1569,6 +1585,7 @@ public class AstBuilder
             {
                 if (ins.Opcode == Opcode.BUILD_LIST && ins.Argument == 0) containerKind = "list";
                 else if (ins.Opcode == Opcode.BUILD_SET && ins.Argument == 0) containerKind = "set";
+                else if (ins.Opcode == Opcode.BUILD_MAP && ins.Argument == 0) containerKind = "dict";
                 if (containerKind != null) break;
             }
             
@@ -1581,32 +1598,38 @@ public class AstBuilder
         {
             containerKind = "list";
         }
+        if (hasMapAdd && containerKind != "dict")
+        {
+            containerKind = "dict";
+        }
         
         if (_options.VerboseErrors)
         {
         Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT decision_check hasListAppend={hasListAppend} hasSetAdd={hasSetAdd} containerKind={containerKind} hasIf={hasIf} bodyStmts.Count={bodyStmts.Count}");
         }
         
-        if (containerKind == null && !hasListAppend && !hasSetAdd) 
+        if (containerKind == null && !hasListAppend && !hasSetAdd && !hasMapAdd) 
         {
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no container and no LIST_APPEND/SET_ADD)");
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no container and no LIST_APPEND/SET_ADD/MAP_ADD)");
             return null;
         }
         
-        if (!hasListAppend && !hasSetAdd && !hasIf && bodyStmts.Count == 0) 
+        if (!hasListAppend && !hasSetAdd && !hasMapAdd && !hasIf && bodyStmts.Count == 0) 
         {
             if (_options.VerboseErrors)
             {
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no LIST_APPEND/SET_ADD, no If, empty body)");
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no LIST_APPEND/SET_ADD/MAP_ADD, no If, empty body)");
             }
             return null;
         }
         
         Expr? elt = null;
-        Opcode appendOpcode = hasListAppend ? Opcode.LIST_APPEND_313 : Opcode.SET_ADD_313;
+        Expr? keyElt = null;
+        Opcode appendOpcode = hasListAppend ? Opcode.LIST_APPEND_313 : (hasSetAdd ? Opcode.SET_ADD_313 : Opcode.MAP_ADD_313);
         bool isListAppend = hasListAppend;
+        bool isMap = hasMapAdd;
         
-        if (hasListAppend || hasSetAdd)
+        if (hasListAppend || hasSetAdd || hasMapAdd)
         {
             var searchBlocks = new List<BasicBlock>(bodyBlocks);
             
@@ -1647,6 +1670,30 @@ public class AstBuilder
                     var sm = new StackMachine(_codeObject);
                     try
                     {
+                        // For dict comprehensions, push an empty dict onto the stack first
+                        // because BUILD_MAP is executed before the loop body
+                        // Stack before loop body: [dict, iterator, target]
+                        // But we only need to simulate up to MAP_ADD_313
+                        if (isMap)
+                        {
+                            sm.PushExpr(new DictLiteral(new List<(Expr, Expr)>()));
+                            if (_options.VerboseErrors)
+                            {
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT pushed empty DictLiteral for dict comprehension");
+                            }
+                        }
+                        
+                        // For comprehensions, push iterator onto stack (before target)
+                        // because GET_ITER is executed before the loop body
+                        if (iterExpr != null)
+                        {
+                            sm.PushExpr(iterExpr);
+                            if (_options.VerboseErrors)
+                            {
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT pushed iterExpr '{iterExpr.GetType().Name}' onto stack");
+                            }
+                        }
+                        
                         if (target is Name loopTarget)
                         {
                             sm.PushExpr(loopTarget);
@@ -1668,7 +1715,19 @@ public class AstBuilder
                             Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT stack_size={sm.ExprStackCount} after opcode={ins.Opcode}");
                         }
                         Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT StackMachine stack size={sm.ExprStackCount} after executing up to {appendOpcode}");
-                        if (sm.ExprStackCount >= 2)
+                        if (isMap && sm.ExprStackCount >= 3)
+                        {
+                            var dictObj = sm.PopExpr();
+                            var val = sm.PopExpr();
+                            var key = sm.PopExpr();
+                            elt = val;
+                            keyElt = key;
+                            if (_options.VerboseErrors)
+                            {
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT extracted dict key={key?.GetType().Name} value={val?.GetType().Name}");
+                            }
+                        }
+                        else if (sm.ExprStackCount >= 2)
                         {
                             var listObj = sm.PopExpr();
                             elt = sm.PopExpr();
@@ -2309,6 +2368,7 @@ public class AstBuilder
         {
             "set" => new SetComp(elt, generators),
             "list" => new ListComp(elt, generators),
+            "dict" => new DictComp(keyElt ?? elt, elt, generators),
             _ => null
         };
         
@@ -6088,11 +6148,53 @@ public class AstBuilder
         // Element expression: the last non-for, non-continue statement in innermost body
         Expr? elt = null;
         Expr? keyElt = null;
-        for (int i = innermostFor.Body.Count - 1; i >= 0; i--)
+        
+        // For dict comprehensions, we need to find both key and value
+        // The order in bytecode is: push key, push value, MAP_ADD
+        // So in the decompiled body, we typically see: key expression, value expression
+        if (kind == CompKind.Dict)
         {
-            var s = innermostFor.Body[i];
-            if (s is ExprStmt es) { elt = es.Value; break; }
-            if (s is Assign aa) { elt = aa.Value; break; }
+            // Look for two consecutive ExprStmt: first is key, second is value
+            for (int i = innermostFor.Body.Count - 1; i >= 0; i--)
+            {
+                var s = innermostFor.Body[i];
+                if (s is ExprStmt es && !(es.Value is Name n0 && n0.Id.StartsWith(".")))
+                {
+                    if (elt == null)
+                    {
+                        // First ExprStmt from the end is value
+                        elt = es.Value;
+                    }
+                    else
+                    {
+                        // Second ExprStmt from the end is key
+                        keyElt = es.Value;
+                        break;
+                    }
+                }
+                else if (s is Assign aa)
+                {
+                    if (elt == null)
+                    {
+                        elt = aa.Value;
+                    }
+                    else
+                    {
+                        keyElt = aa.Value;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            // For other comprehensions, just find the last element
+            for (int i = innermostFor.Body.Count - 1; i >= 0; i--)
+            {
+                var s = innermostFor.Body[i];
+                if (s is ExprStmt es) { elt = es.Value; break; }
+                if (s is Assign aa) { elt = aa.Value; break; }
+            }
         }
 
         // Fallback: use for-loop target as element when SET_ADD consumed it
@@ -6192,7 +6294,15 @@ public class AstBuilder
             if (stmt is ExprStmt es && !(es.Value is Name n0 && n0.Id.StartsWith("."))
                 && es.Value is not ListLiteral and not SetLiteral and not DictLiteral)
             {
-                elt = es.Value;
+                // 对于字典推导式，第一个 ExprStmt 是 key，第二个是 value
+                if (kind == CompKind.Dict && keyElt == null)
+                {
+                    keyElt = es.Value;
+                }
+                else
+                {
+                    elt = es.Value;
+                }
             }
             else if (stmt is Assign a && a.Targets.Count == 1 && a.Targets[0] is Name n && n.Id != "?")
             {
@@ -7202,6 +7312,9 @@ public class AstBuilder
                 body.Insert(0, new ExprStmt(new Constant(docstr)));
         }
 
+        // 在 StripTrailingReturnNone 之前检查是否有显式返回值
+        bool hasNonImplicitReturn = body.Any(stmt => stmt is Return ret && ret.Value != null);
+
         // 3. 去掉函数体末尾的隐式 return None（由 LOAD_CONST None + RETURN_VALUE 产生）
         StripTrailingReturnNone(body);
 
@@ -7226,11 +7339,24 @@ public class AstBuilder
         }
 
         // 4. 检测是否是类体：无参数函数且函数体只有赋值语句
+        // 但如果函数有显式返回值，或者有 RETURN_VALUE 指令，则不应识别为类
+        bool hasReturnValue = childCode.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE);
+        
+        // 只有当函数体确实像类体（只有赋值语句）且没有显式返回值时，才识别为类
+        // 对于普通函数，即使没有参数，如果有 return 语句或 RETURN_VALUE 指令，也应该识别为函数
+        bool isLikelyClassBody = !hasNonImplicitReturn && (HasNestedFunctions(body) || LooksLikeClassBody(body));
+        
+        // 如果函数有 RETURN_VALUE 指令，且函数体看起来像类体，但实际上应该是函数
+        // 这种情况通常发生在反编译器没有正确识别出 return 语句时
+        bool shouldBeFunction = hasReturnValue && body.Count > 0 && 
+            !(body.Count == 1 && body[0] is ExprStmt es2 && es2.Value is Constant { Value: string });
+        
         if (args.Count == 0 && !childCode.IsGenerator && !childCode.IsCoroutine && !childCode.IsAsyncGenerator
-            && (HasNestedFunctions(body) || LooksLikeClassBody(body)))
+            && isLikelyClassBody && !shouldBeFunction)
         {
             return new ClassDef(cleanName, new List<Expr>(), body);
         }
+
 
         // 4. 生成 FunctionDef
         return new FunctionDef(

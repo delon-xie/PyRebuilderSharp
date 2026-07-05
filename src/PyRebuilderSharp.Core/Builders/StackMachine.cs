@@ -201,6 +201,20 @@ public class StackMachine
                 _exprStack.Push(new Name(nameTos, ExpressionContext.Load));   // 后推 → 栈顶
                 return null;
 
+            case Opcode.STORE_FAST_STORE_FAST_313:
+                // 双 store-fast: 连续存储两个局部变量
+                // CPython 3.13+ wordcode: 1-byte arg packs two 4-bit indices
+                //   arg & 0x0F = var1 index (low 4 bits)
+                //   arg >> 4   = var2 index (high 4 bits)
+                // 弹出两个值：TOS 存入 var2，TOS1 存入 var1
+                var sfsfPackedArg = instr.Argument ?? 0;
+                int sfsfIdx2 = sfsfPackedArg >> 4;           // 高位 = 第二个变量（存入 TOS）
+                int sfsfIdx1 = sfsfPackedArg & 0x0F;         // 低位 = 第一个变量（存入 TOS1）
+                var val2 = SafePop();                       // TOS → var2
+                var val1 = SafePop();                       // TOS1 → var1
+                // 对于反编译器，我们不需要实际存储值，只需要消耗栈上的值
+                return null;
+
             case Opcode.POP_ITER_314:
                 // POP_ITER: 弹出 for 循环迭代器的栈条目
                 SafePop();
@@ -567,11 +581,16 @@ public class StackMachine
             {
                 var count = instr.Argument ?? 0;
                 var entries = new List<(Expr Key, Expr Value)>();
-                for (int i = 0; i < count && _exprStack.Count >= 2; i++)
+                // BUILD_MAP 0 表示创建空字典（用于字典推导式）
+                // BUILD_MAP n (n>0) 表示从栈上弹出 n 个键值对
+                if (count > 0)
                 {
-                    var val = SafePop();
-                    var key = SafePop();
-                    if (key != null && val != null) entries.Insert(0, (key, val));
+                    for (int i = 0; i < count && _exprStack.Count >= 2; i++)
+                    {
+                        var val = SafePop();
+                        var key = SafePop();
+                        if (key != null && val != null) entries.Insert(0, (key, val));
+                    }
                 }
                 _exprStack.Push(new DictLiteral(entries));
                 return null;
@@ -1677,8 +1696,11 @@ public class StackMachine
                         _exprStack.Push(new Constant(ilist[i]));
                 }
                 else
-                    for (int i = count - 1; i >= 0; i--)
-                        _exprStack.Push(new Starred(container, ExpressionContext.Load));
+                {
+                    // 对于无法静态确定内容的容器，创建一个 Starred 表达式表示解包
+                    // 反编译器无法知道具体元素，只能表示解包操作
+                    _exprStack.Push(new Starred(container, ExpressionContext.Load));
+                }
                 return null;
             }
 
@@ -2124,6 +2146,28 @@ public class StackMachine
                 var mapVal = SafePop();
                 var mapKey = SafePop();
                 if (mapKey == null || mapVal == null) return null;
+                // Find the DictLiteral at stack[-mapDepth] (BUILD_MAP pushed it)
+                // Stack doesn't support indexing, so we need to convert to array
+                var stackArray = _exprStack.ToArray();
+                // After popping value and key, the dict is at stack[-mapDepth] in the original stack
+                // which corresponds to index Length - mapDepth + 2 in the current stack
+                var mapIndex = stackArray.Length - mapDepth + 2;
+                bool foundDict = false;
+                if (mapIndex >= 0 && mapIndex < stackArray.Length)
+                {
+                    var dictLit = stackArray[mapIndex] as DictLiteral;
+                    if (dictLit != null)
+                    {
+                        dictLit.Entries.Add((mapKey, mapVal));
+                        foundDict = true;
+                    }
+                }
+                // If dict not found (e.g., in comprehension detection), push a synthetic dict entry
+                // This allows TryDetectInlinedComprehension to extract key/value expressions
+                if (!foundDict)
+                {
+                    _exprStack.Push(new DictLiteral(new List<(Expr, Expr)> { (mapKey, mapVal) }));
+                }
                 return null;
             }
 

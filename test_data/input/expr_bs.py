@@ -30,3 +30,17 @@ f3 = x <= y
 f4 = x >= y
 f5 = x == y
 f6 = x != y
+f7 = x is y
+f8 = x is not y
+f9 = x in y
+f10 = x not in y
+i1 = func()
+i2 = func(x)
+i3 = func(x, y)
+o1 = obj.attr.sub
+o2 = obj.method()
+n1 = (a + b) * (c - d)
+n2 = -x ** 2 + y / 3
+n3 = x + y * z
+n4 = x * y + z
+n5 = a + b + c
