@@ -7325,6 +7325,11 @@ public class AstBuilder
 
         // 过滤 class body 中的 return 语句（class body 无 return）
         body = body.Where(s => s is not Return).ToList();
+        // 过滤编译器内部伪影
+        body = body.Where(s => s is not Assign a || a.Targets.Count != 1
+            || a.Targets[0] is not Name an
+            || (an.Id != "__static_attributes__" && an.Id != "__classdictcell__"
+                && an.Id != "__classcell__" && an.Id != "__firstlineno__")).ToList();
 
         return new ClassDef(className, bases, body, null, keywords);
     }
@@ -7482,6 +7487,7 @@ public class AstBuilder
         if (args.Count == 0 && !childCode.IsGenerator && !childCode.IsCoroutine && !childCode.IsAsyncGenerator
             && isLikelyClassBody && !shouldBeFunction)
         {
+            CleanClassBody(body);
             return new ClassDef(cleanName, new List<Expr>(), body);
         }
 
@@ -7543,6 +7549,33 @@ public class AstBuilder
                 StripTrailingReturnNone(fd.Body);
             }
             else break;  // non-return statement → stop
+        }
+    }
+
+    /// <summary>
+    /// 清理类体中 CPython 编译器产生的内部伪影（__isabstractmethod__ 等用户定义除外）。
+    /// 移除：__static_attributes__, __classdictcell__, __classcell__, return __class__。
+    /// </summary>
+    private static void CleanClassBody(List<Stmt> body)
+    {
+        for (int i = body.Count - 1; i >= 0; i--)
+        {
+            if (body[i] is Return r)
+            {
+                if (r.Value is Name rn && rn.Id == "__class__")
+                { body.RemoveAt(i); continue; }
+                if (r.Value == null || r.Value is Constant { Value: null })
+                { body.RemoveAt(i); continue; }
+            }
+            if (body[i] is Assign a && a.Targets.Count == 1
+                && a.Targets[0] is Name an)
+            {
+                if (an.Id == "__static_attributes__" || an.Id == "__classdictcell__"
+                    || an.Id == "__classcell__" || an.Id == "__firstlineno__")
+                { body.RemoveAt(i); continue; }
+            }
+            if (i == body.Count - 1 && body[i] is Pass)
+            { body.RemoveAt(i); continue; }
         }
     }
 
