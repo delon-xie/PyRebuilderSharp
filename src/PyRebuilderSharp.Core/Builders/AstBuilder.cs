@@ -7433,7 +7433,11 @@ public class AstBuilder
         }
 
         // 在 StripTrailingReturnNone 之前检查是否有显式返回值
-        bool hasNonImplicitReturn = body.Any(stmt => stmt is Return ret && ret.Value != null);
+        // 类体的 return __class__ 是 CPython 内部实现，不算显式函数返回
+        bool implicitClassReturn = body.Count > 0 && body[^1] is Return rVal1
+            && rVal1.Value is Name rn1 && rn1.Id == "__class__";
+        bool hasNonImplicitReturn = body.Any(stmt => stmt is Return ret && ret.Value != null
+            && !(ret.Value is Name rn2 && rn2.Id == "__class__"));
 
         // 3. 去掉函数体末尾的隐式 return None（由 LOAD_CONST None + RETURN_VALUE 产生）
         StripTrailingReturnNone(body);
@@ -7461,6 +7465,10 @@ public class AstBuilder
         // 4. 检测是否是类体：无参数函数且函数体只有赋值语句
         // 但如果函数有显式返回值，或者有 RETURN_VALUE 指令，则不应识别为类
         bool hasReturnValue = childCode.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE);
+        // 类体的 return __class__ 是 CPython 内部实现，不算显式函数返回
+        // 如果最后一个 RETURN_VALUE 对应的是 return __class__，则排除
+        bool hasRealReturn = hasReturnValue && !(body.Count > 0 && body[^1] is Return rv
+            && rv.Value is Name rvn && rvn.Id == "__class__");
         
         // 只有当函数体确实像类体（只有赋值语句）且没有显式返回值时，才识别为类
         // 对于普通函数，即使没有参数，如果有 return 语句或 RETURN_VALUE 指令，也应该识别为函数
@@ -7468,8 +7476,8 @@ public class AstBuilder
         
         // 如果函数有 RETURN_VALUE 指令，且函数体看起来像类体，但实际上应该是函数
         // 这种情况通常发生在反编译器没有正确识别出 return 语句时
-        bool shouldBeFunction = hasReturnValue && body.Count > 0 && 
-            !(body.Count == 1 && body[0] is ExprStmt es2 && es2.Value is Constant { Value: string });
+        bool shouldBeFunction = hasRealReturn && body.Count > 0 
+            && !(body.Count == 1 && body[0] is ExprStmt es2 && es2.Value is Constant { Value: string });
         
         if (args.Count == 0 && !childCode.IsGenerator && !childCode.IsCoroutine && !childCode.IsAsyncGenerator
             && isLikelyClassBody && !shouldBeFunction)
