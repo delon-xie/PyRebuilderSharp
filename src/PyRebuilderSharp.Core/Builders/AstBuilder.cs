@@ -500,17 +500,6 @@ public class AstBuilder
             {
                 var newBody = ConvertAugAssign(funcDef.Body);
                 
-                // DEBUG: 查看 __new__ 方法的 Body
-                if (funcDef.Name == "__new__")
-                {
-                    Console.WriteLine($"[DEBUG] __new__ Body count: {newBody.Count}");
-                    foreach (var s in newBody)
-                    {
-                        Console.WriteLine($"[DEBUG]   type: {s.GetType().FullName}");
-                    }
-                }
-                
-                // 修复空函数体：如果函数体只有注释，添加 pass 语句
                 bool hasNonComment = false;
                 foreach (var s in newBody)
                 {
@@ -522,7 +511,6 @@ public class AstBuilder
                 }
                 if (!hasNonComment)
                 {
-                    Console.WriteLine($"[DEBUG] Adding Pass to {funcDef.Name}");
                     newBody.Add(new Pass());
                 }
                 
@@ -7195,9 +7183,6 @@ public class AstBuilder
             if (childCode.Instructions.Count == 0)
                 return new List<Stmt> { new Pass() };
             
-            // DEBUG: 输出所有子代码的 body 内容
-            Console.WriteLine($"[DEBUG] childCode.Name: {childCode.Name}, Instructions.Count: {childCode.Instructions.Count}");
-
             var scanner = new BlockScanner();
             var blocks = scanner.Scan(childCode);
             var cfScanner = new ControlFlowScanner();

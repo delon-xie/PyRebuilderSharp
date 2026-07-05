@@ -40,12 +40,9 @@ public class PythonCodeGenerator : ICodeGenerator
                 VisitModule(m);
                 break;
             case FunctionDef f:
-                // DEBUG: 查看所有函数定义
-                Console.WriteLine($"[GENERATOR DEBUG] FunctionDef: {f.Name}, Body count: {f.Body.Count}");
                 VisitFunctionDef(f);
                 break;
             case ClassDef c:
-                Console.WriteLine($"[GENERATOR DEBUG] ClassDef: {c.Name}, Body count: {c.Body.Count}");
                 VisitClassDef(c);
                 break;
             case If i:
@@ -447,16 +444,6 @@ public class PythonCodeGenerator : ICodeGenerator
 
     private void VisitFunctionDef(FunctionDef func)
     {
-        // DEBUG: 查看函数定义
-        if (func.Name == "__new__")
-        {
-            Console.WriteLine($"[GENERATOR DEBUG] VisitFunctionDef: {func.Name}, Body count: {func.Body.Count}");
-            foreach (var s in func.Body)
-            {
-                Console.WriteLine($"[GENERATOR DEBUG]   type: {s.GetType().Name}");
-            }
-        }
-        
         if (func.Decorators?.Count > 0)
         {
             foreach (var decorator in func.Decorators)
@@ -927,10 +914,42 @@ public class PythonCodeGenerator : ICodeGenerator
     private void VisitAssign(Assign assign)
     {
         WriteIndent();
-        for (int i = 0; i < assign.Targets.Count; i++)
+        if (assign.Targets.Count == 1 && assign.Targets[0] is ListLiteral listLiteral)
         {
-            if (i > 0) _output.Append(" = ");
-            Visit(assign.Targets[i]);
+            // Unpack assignment: a, b, c = value or [a, b, c] = value
+            // For tuple unpack with 2+ elements, don't emit parentheses
+            // For tuple unpack with 1 element, emit parentheses to avoid ambiguity
+            // For list unpack, always emit brackets
+            if (listLiteral.Kind == ContainerKind.Tuple && listLiteral.Elts.Count >= 2)
+            {
+                for (int i = 0; i < listLiteral.Elts.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    Visit(listLiteral.Elts[i]);
+                }
+            }
+            else
+            {
+                string open = listLiteral.Kind == ContainerKind.Tuple ? "(" : "[";
+                string close = listLiteral.Kind == ContainerKind.Tuple ? ")" : "]";
+                
+                _output.Append(open);
+                for (int i = 0; i < listLiteral.Elts.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    Visit(listLiteral.Elts[i]);
+                }
+                _output.Append(close);
+            }
+        }
+        else
+        {
+            // Chained assignment: a = b = c = value
+            for (int i = 0; i < assign.Targets.Count; i++)
+            {
+                if (i > 0) _output.Append(" = ");
+                Visit(assign.Targets[i]);
+            }
         }
         _output.Append(" = ");
         Visit(assign.Value);
