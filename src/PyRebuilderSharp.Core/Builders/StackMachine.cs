@@ -332,14 +332,12 @@ public class StackMachine
                     return null; // Still waiting
                 }
                 
-                // UNPACK_SEQUENCE with Starred: start collecting tuple targets
                 if (val is Starred starred && starred.Ctx == ExpressionContext.Load)
                 {
                     var targets = new List<Expr> { new Name(storeName, ExpressionContext.Store) };
                     _pendingUnpackContainer = starred.Value;
                     _pendingUnpackTargets = targets;
                     
-                    // Check if more Starred items remain
                     bool hasMoreStarred = false;
                     foreach (var e in _exprStack)
                     {
@@ -348,13 +346,16 @@ public class StackMachine
                     }
                     if (!hasMoreStarred)
                     {
-                        // Single-item unpack — emit immediately
                         _pendingUnpackContainer = null;
                         _pendingUnpackTargets = null;
+                        if (targets.Count == 1)
+                        {
+                            return new Assign(new List<Expr> { new Name(storeName, ExpressionContext.Store) }, starred.Value);
+                        }
                         return new Assign(
                             new List<Expr> { new ListLiteral(targets, ContainerKind.Tuple) }, starred.Value);
                     }
-                    return null; // Wait for more STORE_NAME instructions
+                    return null;
                 }
                 
                 _pendingCopyDepth = -1;
@@ -1097,10 +1098,8 @@ public class StackMachine
             // 将消费 __build_class__ 等不相关栈项。
             case Opcode.LOAD_CLOSURE:
             {
-                // 推一个 Name 表达式表示 cell 引用变量
                 int cellIdx = instr.Argument ?? 0;
-                string cellName = ".cell";
-                // 尝试从 cellvars 或 varnames 获取名称
+                string cellName = "_cell";
                 if (_code.Cellvars != null && cellIdx < _code.Cellvars.Count)
                     cellName = _code.Cellvars[cellIdx];
                 else if (_code.Varnames != null && cellIdx < _code.Varnames.Count)
@@ -1659,6 +1658,21 @@ public class StackMachine
 
                 if (count == 1)
                     _exprStack.Push(container);
+                else if (container is ListLiteral list && list.Kind == ContainerKind.Tuple)
+                {
+                    for (int i = list.Elts.Count - 1; i >= 0; i--)
+                        _exprStack.Push(list.Elts[i]);
+                }
+                else if (container is ListLiteral list2 && list2.Kind == ContainerKind.List)
+                {
+                    for (int i = list2.Elts.Count - 1; i >= 0; i--)
+                        _exprStack.Push(list2.Elts[i]);
+                }
+                else if (container is Constant c && c.Value is System.Collections.IList ilist)
+                {
+                    for (int i = ilist.Count - 1; i >= 0; i--)
+                        _exprStack.Push(new Constant(ilist[i]));
+                }
                 else
                     for (int i = count - 1; i >= 0; i--)
                         _exprStack.Push(new Starred(container, ExpressionContext.Load));
@@ -1952,8 +1966,12 @@ public class StackMachine
                             }
                             else if (tos is Constant cStr && cStr.Value is string s)
                             {
-                                // 普通函数：使用 qualname 作为函数名
                                 funcName = s;
+                                if (funcName.Contains("<locals>"))
+                                {
+                                    var parts = funcName.Split('.');
+                                    funcName = parts[parts.Length - 1];
+                                }
                             }
                             else
                             {

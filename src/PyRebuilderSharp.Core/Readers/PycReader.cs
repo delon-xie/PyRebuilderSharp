@@ -284,7 +284,11 @@ public class PycReader
             // qualname (3.11+ 的所有代码对象都有)
             if (_strategy.HasQualname)
             {
-                try { var qualObj = ReadMarshalObject(br); }
+                try 
+                { 
+                    var qualObj = ReadMarshalObject(br); 
+                    code.QualifiedName = qualObj?.ToString() ?? "";
+                }
                 catch (Exception ex) { LogCatch(br, "ReadMarshalCodeObject.qualname", ex); }
             }
 

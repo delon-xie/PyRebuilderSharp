@@ -173,9 +173,9 @@ public class PythonCodeGenerator : ICodeGenerator
                 break;
             case FunctionRef fr:
                 if (fr.Name == "<lambda>")
-                    _output.Append("lambda: None");  // fallback for unlinked lambda
+                    _output.Append("lambda: None");
                 else if (fr.Name.StartsWith("<"))
-                    _output.Append($"({fr.Name})");  // other <name> become comments
+                    _output.Append("lambda x: x");  // fallback for <genexpr>, <setcomp>, etc.
                 else
                     _output.Append(fr.Name);
                 break;

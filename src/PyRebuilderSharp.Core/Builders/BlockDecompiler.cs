@@ -162,7 +162,8 @@ public class BlockDecompiler
                 }
             }
 
-            var result = DecompileBlock(instrs, codeObject, block.Id, loopHeaders, isForLoop, isConditionBlock);
+            bool isInLoop = block.Flags.HasFlag(BlockFlags.LoopBody) || block.Flags.HasFlag(BlockFlags.LoopBackEdge);
+            var result = DecompileBlock(instrs, codeObject, block.Id, isInLoop ? loopHeaders : null, isForLoop, isConditionBlock);
             results[block.Id] = result;
         }
 
@@ -217,6 +218,10 @@ public class BlockDecompiler
                     {
                         match = true;
                     }
+                    else if (nextAssign.Value is Starred s1 && currentValue is Starred s2)
+                    {
+                        match = ValuesMatch(s1.Value, s2.Value);
+                    }
                     
                     if (match)
                     {
@@ -244,6 +249,32 @@ public class BlockDecompiler
         return result;
     }
 
+    private bool ValuesMatch(Expr? e1, Expr? e2)
+    {
+        if (e1 == null && e2 == null) return true;
+        if (e1 == null || e2 == null) return false;
+        
+        if (e1 is Constant c1 && e2 is Constant c2)
+        {
+            if (c1.Value == null && c2.Value == null) return true;
+            if (c1.Value != null && c1.Value.Equals(c2.Value)) return true;
+        }
+        else if (e1 is Name n1 && e2 is Name n2 && n1.Id == n2.Id)
+        {
+            return true;
+        }
+        else if (e1 is ListLiteral l1 && e2 is ListLiteral l2 && l1.Kind == l2.Kind)
+        {
+            if (l1.Elts.Count != l2.Elts.Count) return false;
+            for (int i = 0; i < l1.Elts.Count; i++)
+            {
+                if (!ValuesMatch(l1.Elts[i], l2.Elts[i])) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    
     /// <summary>
     /// 递归标记 for 循环体块（遍历后继，直到回到 header 或已访问）。
     /// </summary>

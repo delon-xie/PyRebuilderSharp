@@ -5325,7 +5325,9 @@ public class AstBuilder
         
         // 检测 continue：body 为空且块末尾有向后跳转到循环头
         // 3.10+: JUMP_ABSOLUTE（非 wordcode）, 3.12+: JUMP_BACKWARD（wordcode）
-        if (bodyStmts.Count == 0 && bodyBranch != null)
+        // 注意：必须确保 bodyBranch 在循环内部（有 LoopBody 或 LoopBackEdge 标志）
+        if (bodyStmts.Count == 0 && bodyBranch != null 
+            && (bodyBranch.Flags.HasFlag(BlockFlags.LoopBody) || bodyBranch.Flags.HasFlag(BlockFlags.LoopBackEdge)))
         {
             var lastInBody = bodyBranch.Instructions.LastOrDefault();
             if (lastInBody != default)
@@ -5340,7 +5342,6 @@ public class AstBuilder
                 else if (lastInBody.Opcode == Opcode.JUMP_BACKWARD
                          && lastInBody.Argument.HasValue)
                 {
-                    // JUMP_BACKWARD 总是向后跳转（相对于自身偏移）
                     isBackToLoop = true;
                 }
                 if (isBackToLoop)
@@ -5374,12 +5375,13 @@ public class AstBuilder
 
         // 当 body 仅为 continue（向后跳转）且 else 有有效代码时，
         // 交换 body/else 并移除否定，产生 if X: Y 而非 if not X: continue else: Y
+        // 注意：只有当 continue 在循环内部时才进行这个优化
         bool bodyIsJustContinue = bodyStmts.Count == 1 && bodyStmts[0] is Continue;
-        if (bodyIsJustContinue && orelse != null && orelse.Count > 0)
+        bool isInLoop = bodyBranch != null && (bodyBranch.Flags.HasFlag(BlockFlags.LoopBody) || bodyBranch.Flags.HasFlag(BlockFlags.LoopBackEdge));
+        if (bodyIsJustContinue && orelse != null && orelse.Count > 0 && isInLoop)
         {
             bodyStmts = orelse;
             orelse = null;
-            // 移除否定：重新提取原始条件（不经过 isJumpIfTrue 的 Not 包装）
             testExpr = ExtractCondition(header);
         }
 
@@ -6073,7 +6075,9 @@ public class AstBuilder
             var actualIter = cur.Iter;
             if (actualIter is Name dotName && dotName.Id.StartsWith(".") && int.TryParse(dotName.Id.AsSpan(1), out int di) && di < compCall.Args.Count)
                 actualIter = compCall.Args[di];
-            generators.Add(new Comprehension(cur.Target, actualIter, genIfs));
+            // Replace .0/.1/.2 in filters with actual call args
+            var replacedIfs = genIfs.Select(ifExpr => ReplaceDotParamInExpr(ifExpr, compCall)).ToList();
+            generators.Add(new Comprehension(cur.Target, actualIter, replacedIfs));
 
             For? next = null;
             foreach (var s in cur.Body)
@@ -6095,9 +6099,14 @@ public class AstBuilder
         elt ??= innermostFor.Target;
 
         if (elt == null) return null;
+
+        elt = ReplaceDotParams(elt, generators);
+        if (keyElt != null)
+            keyElt = ReplaceDotParams(keyElt, generators);
+
         if (_options.VerboseErrors)
         {
-        Console.Error.WriteLine($"[COMP_OK] kind={kind} elt={elt.GetType().Name} generators.Count={generators.Count}");
+            Console.Error.WriteLine($"[COMP_OK] kind={kind} elt={elt.GetType().Name} generators.Count={generators.Count}");
         }
 
         return kind switch
@@ -6108,6 +6117,58 @@ public class AstBuilder
             CompKind.Generator => new GeneratorExp(elt, generators),
             _ => null
         };
+    }
+
+    private Expr ReplaceDotParamInExpr(Expr expr, Call compCall)
+    {
+        if (expr is Name name && name.Id.StartsWith(".") && int.TryParse(name.Id.AsSpan(1), out int di))
+        {
+            if (di < compCall.Args.Count)
+                return compCall.Args[di];
+            return name;
+        }
+        if (expr is BinOp binOp)
+            return new BinOp(ReplaceDotParamInExpr(binOp.Left, compCall), binOp.Op, ReplaceDotParamInExpr(binOp.Right, compCall));
+        if (expr is UnaryOp unaryOp)
+            return new UnaryOp(unaryOp.Op, ReplaceDotParamInExpr(unaryOp.Operand, compCall));
+        if (expr is PyRebuilderSharp.Core.Models.AST.Attribute attr)
+            return new PyRebuilderSharp.Core.Models.AST.Attribute(ReplaceDotParamInExpr(attr.Value, compCall), attr.Attr, ExpressionContext.Load);
+        if (expr is Subscript sub)
+            return new Subscript(ReplaceDotParamInExpr(sub.Value, compCall), ReplaceDotParamInExpr(sub.Slice, compCall), ExpressionContext.Load);
+        if (expr is Call call)
+            return new Call(ReplaceDotParamInExpr(call.Func, compCall), call.Args.Select(a => ReplaceDotParamInExpr(a, compCall)).ToList(), call.Keywords.Select(k => new Keyword(k.Arg, ReplaceDotParamInExpr(k.Value, compCall))).ToList());
+        if (expr is Compare compare)
+            return new Compare(ReplaceDotParamInExpr(compare.Left, compCall), compare.Ops, compare.Comparators.Select(c => ReplaceDotParamInExpr(c, compCall)).ToList());
+        if (expr is BoolOp boolOp)
+            return new BoolOp(boolOp.Op, boolOp.Values.Select(v => ReplaceDotParamInExpr(v, compCall)).ToList());
+        return expr;
+    }
+
+    private Expr ReplaceDotParams(Expr expr, List<Comprehension> generators)
+    {
+        if (expr is Name name && name.Id.StartsWith(".") && int.TryParse(name.Id.AsSpan(1), out int di))
+        {
+            if (di < generators.Count)
+                return generators[di].Target;
+            return name;
+        }
+        if (expr is BinOp binOp)
+            return new BinOp(ReplaceDotParams(binOp.Left, generators), binOp.Op, ReplaceDotParams(binOp.Right, generators));
+        if (expr is UnaryOp unaryOp)
+            return new UnaryOp(unaryOp.Op, ReplaceDotParams(unaryOp.Operand, generators));
+        if (expr is PyRebuilderSharp.Core.Models.AST.Attribute attr)
+            return new PyRebuilderSharp.Core.Models.AST.Attribute(ReplaceDotParams(attr.Value, generators), attr.Attr, ExpressionContext.Load);
+        if (expr is Subscript sub)
+            return new Subscript(ReplaceDotParams(sub.Value, generators), ReplaceDotParams(sub.Slice, generators), ExpressionContext.Load);
+        if (expr is Call call)
+            return new Call(ReplaceDotParams(call.Func, generators), call.Args.Select(a => ReplaceDotParams(a, generators)).ToList(), call.Keywords.Select(k => new Keyword(k.Arg, ReplaceDotParams(k.Value, generators))).ToList());
+        if (expr is Compare compare)
+            return new Compare(ReplaceDotParams(compare.Left, generators), compare.Ops, compare.Comparators.Select(c => ReplaceDotParams(c, generators)).ToList());
+        if (expr is BoolOp boolOp)
+            return new BoolOp(boolOp.Op, boolOp.Values.Select(v => ReplaceDotParams(v, generators)).ToList());
+        if (expr is Lambda lambda)
+            return new Lambda(lambda.Args, ReplaceDotParams(lambda.Body, generators));
+        return expr;
     }
 
     /// <summary>
@@ -6189,6 +6250,10 @@ public class AstBuilder
             new Comprehension(target, iter, ifs)
         };
 
+        elt = ReplaceDotParams(elt, generators);
+        if (keyElt != null)
+            keyElt = ReplaceDotParams(keyElt, generators);
+
         return kind switch
         {
             CompKind.Set => new SetComp(elt, generators),
@@ -6248,22 +6313,38 @@ public class AstBuilder
         if (expr == null) return null;
         // Detect Call(FunctionRef<...>, ...) → comprehension expression
         // Must check BEFORE the general Call recursion to intercept generation/comp expressions
-        if (expr is Call call && call.Func is FunctionRef compRef
-            && compRef.Name.StartsWith("<") && compRef.Name != "<lambda>")
+        if (expr is Call call)
         {
-            var compExpr = BuildComprehension(compRef, call);
-            if (compExpr != null)
-                return compExpr;
-            // If comprehensions fails, try lambda
-            if (compRef.Name == "<lambda>")
+            FunctionRef? compRef = null;
+            if (call.Func is FunctionRef fr)
+                compRef = fr;
+            else if (call.Func is Constant c && c.Value is Models.Bytecode.CodeObject co)
+                compRef = new FunctionRef(co, co.Name ?? "");
+            
+            if (compRef != null && compRef.Name.StartsWith("<") && compRef.Name != "<lambda>")
             {
-                var lambda = BuildLambda(compRef);
-                if (lambda != null)
+                var compExpr = BuildComprehension(compRef, call);
+                if (compExpr != null)
+                    return compExpr;
+                // If comprehensions fails, try lambda
+                if (compRef.Name == "<lambda>")
                 {
-                    // Create new Call with lambda as function
+                    var lambda = BuildLambda(compRef);
+                    if (lambda != null)
+                    {
+                        var newArgs = call.Args.Select(a => ConvertComprehensionExpr(a)).ToList();
+                        var newKeywords = call.Keywords.Select(k => new Keyword(k.Arg, ConvertComprehensionExpr(k.Value))).ToList();
+                        return new Call(lambda, newArgs, newKeywords);
+                    }
+                }
+                // If comprehension and lambda both fail, try to decompile as lambda function
+                // This handles cases like <genexpr>, <setcomp>, etc. that couldn't be converted
+                var fallbackLambda = BuildLambda(compRef);
+                if (fallbackLambda != null)
+                {
                     var newArgs = call.Args.Select(a => ConvertComprehensionExpr(a)).ToList();
                     var newKeywords = call.Keywords.Select(k => new Keyword(k.Arg, ConvertComprehensionExpr(k.Value))).ToList();
-                    return new Call(lambda, newArgs, newKeywords);
+                    return new Call(fallbackLambda, newArgs, newKeywords);
                 }
             }
         }
@@ -7249,26 +7330,39 @@ public class AstBuilder
     private Lambda? BuildLambda(FunctionRef funcRef)
     {
         if (funcRef.Code == null) return null;
-        // Note: if the code is null (unlinked), we return null and the caller renders <lambda> as-is.
-        // This can happen for test/utility code objects where the lambda is used before definition.
         var childCode = funcRef.Code;
 
         // 1. 提取参数
         var args = new List<Parameter>();
         for (int i = 0; i < childCode.ArgCount && i < childCode.Varnames.Count; i++)
-            args.Add(new Parameter(childCode.Varnames[i]));
+        {
+            string name = childCode.Varnames[i];
+            if (!name.StartsWith("."))
+                args.Add(new Parameter(name));
+        }
 
         // 2. 反编译函数体，提取返回表达式
         var body = DecompileChildCode(childCode);
-        if (body.Count == 0) return new Lambda(args, new Constant(null));
+        if (body.Count == 0)
+        {
+            if (args.Count == 0)
+                args.Add(new Parameter("_"));
+            return new Lambda(args, new Constant(null));
+        }
 
         // 找到最后一个 Return 语句，提取其表达式
         for (int i = body.Count - 1; i >= 0; i--)
         {
             if (body[i] is Return ret && ret.Value != null)
+            {
+                if (args.Count == 0)
+                    args.Add(new Parameter("_"));
                 return new Lambda(args, ret.Value);
+            }
         }
 
+        if (args.Count == 0)
+            args.Add(new Parameter("_"));
         return new Lambda(args, new Constant(null));
     }
 
