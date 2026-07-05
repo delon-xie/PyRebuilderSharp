@@ -7831,12 +7831,88 @@ public class AstBuilder
             var newResult = new List<Stmt>();
             foreach (var cc in remainingChildCodes)
             {
-                var defStmt = BuildFunctionDef(cc.Name ?? "<lambda>", new FunctionRef(cc, cc.Name ?? "<lambda>"));
+                var funcRef = new FunctionRef(cc, cc.Name ?? "<lambda>");
+                var defStmt = BuildFunctionDef(cc.Name ?? "<lambda>", funcRef);
+                if (defStmt is ClassDef cd && cc != null)
+                {
+                    // 从模块级指令中提取基类名
+                    // 模式: LOAD_BUILD_CLASS ... LOAD_CONST(name) LOAD_NAME(base) CALL N STORE_NAME(className)
+                    var bases = new List<Expr>();
+                    if (_codeObject?.Instructions != null)
+                    {
+                        // 模式: LOAD_BUILD_CLASS ... LOAD_CONST(code) MAKE_FUNCTION LOAD_CONST(name) LOAD_NAME(base) CALL N STORE_NAME
+                        bool foundLoadBuild = false;
+                        bool foundClassCode = false;
+                        for (int ii = 0; ii < _codeObject.Instructions.Count - 2; ii++)
+                        {
+                            var instr = _codeObject.Instructions[ii];
+                            if (instr.Opcode == Opcode.LOAD_BUILD_CLASS)
+                            {
+                                foundLoadBuild = true;
+                                foundClassCode = false;
+                                continue;
+                            }
+                            if (!foundLoadBuild) continue;
+                            // Skip PUSH_NULL
+                            if (instr.Opcode == Opcode.PUSH_NULL) continue;
+                            // First LOAD_CONST after BUILD_CLASS is the code object
+                            if (!foundClassCode && instr.Opcode == Opcode.LOAD_CONST)
+                            {
+                                foundClassCode = true;
+                                continue;
+                            }
+                            // Second LOAD_CONST after BUILD_CLASS: check if it's our class name
+                            if (foundLoadBuild && foundClassCode && instr.Opcode == Opcode.LOAD_CONST
+                                && instr.Argument.HasValue
+                                && _codeObject.Constants.TryGetValue(instr.Argument.Value, out var cv)
+                                && cv is string className && className == cd.Name)
+                            {
+                                // After the class name, collect LOAD_NAME instructions (bases)
+                                for (int jj = ii + 1; jj < _codeObject.Instructions.Count; jj++)
+                                {
+                                    var next = _codeObject.Instructions[jj];
+                                    if (next.Opcode == Opcode.LOAD_NAME && next.Argument.HasValue)
+                                    {
+                                        var baseName = _codeObject.Names.Count > next.Argument.Value
+                                            ? _codeObject.Names[next.Argument.Value] : null;
+                                        if (baseName != null && baseName != cd.Name && baseName != "__build_class__")
+                                            bases.Add(new Name(baseName, ExpressionContext.Load));
+                                    }
+                                    else if (next.Opcode == Opcode.BUILD_TUPLE || next.Opcode == Opcode.BUILD_LIST)
+                                    {
+                                        // Multiple base classes in tuple
+                                        for (int kk = jj + 1; kk < _codeObject.Instructions.Count; kk++)
+                                        {
+                                            var tupNext = _codeObject.Instructions[kk];
+                                            if (tupNext.Opcode == Opcode.LOAD_NAME && tupNext.Argument.HasValue)
+                                            {
+                                                var bn = _codeObject.Names.Count > tupNext.Argument.Value
+                                                    ? _codeObject.Names[tupNext.Argument.Value] : null;
+                                                if (bn != null && bn != cd.Name && bn != "__build_class__")
+                                                    bases.Add(new Name(bn, ExpressionContext.Load));
+                                            }
+                                            if (tupNext.Opcode == Opcode.CALL || tupNext.Opcode == Opcode.CALL_311)
+                                                break;
+                                        }
+                                        break;
+                                    }
+                                    if (next.Opcode == Opcode.CALL || next.Opcode == Opcode.CALL_311
+                                        || next.Opcode == Opcode.CALL_KW_313
+                                        || next.Opcode == Opcode.STORE_NAME)
+                                        break;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (bases.Count > 0)
+                        defStmt = cd with { Bases = bases };
+                }
                 if (defStmt != null)
                 {
                     newResult.Add(defStmt);
-                    if (defStmt is FunctionDef fd) localSeen.Add(fd.Name);
-                    else if (defStmt is ClassDef cd) localSeen.Add(cd.Name);
+                    if (defStmt is FunctionDef fd2) localSeen.Add(fd2.Name);
+                    else if (defStmt is ClassDef cd2) localSeen.Add(cd2.Name);
                 }
             }
             newResult.AddRange(result);
