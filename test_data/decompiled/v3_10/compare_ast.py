@@ -48,4 +48,3 @@ for i in range(max(len(exp_lines), len(act_lines))):
                 '  actual:   '
                 print
     if i > 5:
-        return None

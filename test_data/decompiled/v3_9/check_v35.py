@@ -26,4 +26,3 @@ with open(sys.argv[1], 'rb') as f:
     print('  code hex:', code.co_code.hex()[:60])
     dump_code = dump_code
     dump_code(code)
-    return None

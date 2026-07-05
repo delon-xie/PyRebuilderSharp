@@ -43,7 +43,7 @@ for ver in versions:
                             if e != a:
                                 continue
             else:
-                yield from results
+                
     if match:
         pass
     else:
@@ -55,7 +55,7 @@ for ver in versions:
 """)
             range(max(len(exp_lines), len(act_lines)))
         else:
-            yield from results
+            
     if i < len(exp_lines):
         pass
     else:
@@ -66,4 +66,4 @@ for ver in versions:
             '(missing)'
             if e != a:
                 continue
-yield from results
+

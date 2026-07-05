@@ -13,7 +13,5 @@ while i < 5:
     except:
         a = 0
     else:
-        return None
-    return None
 j = i * 2
 i += 1

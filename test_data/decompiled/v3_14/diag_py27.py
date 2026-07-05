@@ -8,6 +8,5 @@ for (name, code) in tests.items():
     open(py_path, 'w')
     __module__
     open(py_path, 'w')
-    return None
     if not f:
         pass

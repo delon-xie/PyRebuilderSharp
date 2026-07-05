@@ -77,7 +77,7 @@ WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__doc__', '__a
 WRAPPER_UPDATES = ('__dict__',)
 _convert = frozendict({'__lt__': [('__gt__', _gt_from_lt), ('__le__', _le_from_lt), ('__ge__', _ge_from_lt)], '__le__': [('__ge__', _ge_from_le), ('__lt__', _lt_from_le), ('__gt__', _gt_from_le)], '__gt__': [('__lt__', _lt_from_gt), ('__ge__', _ge_from_gt), ('__le__', _le_from_gt)], '__ge__': [('__le__', _le_from_ge), ('__gt__', _gt_from_ge), ('__lt__', _lt_from_ge)]})
 from _functools import cmp_to_key
-yield from (WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES)
+
 """functools.py - Tools for working with functions and callable objects
 """
 __all__ = ['update_wrapper', 'wraps', 'WRAPPER_ASSIGNMENTS', 'WRAPPER_UPDATES', 'total_ordering', 'cache', 'cmp_to_key', 'lru_cache', 'reduce', 'partial', 'partialmethod', 'singledispatch', 'singledispatchmethod', 'cached_property', 'Placeholder']

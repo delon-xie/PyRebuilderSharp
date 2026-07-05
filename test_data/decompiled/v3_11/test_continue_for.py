@@ -7,4 +7,3 @@ for i in range(3):
     else:
         a = i
         None
-        return

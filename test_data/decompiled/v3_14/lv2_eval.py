@@ -12,4 +12,3 @@ for n in range(5):
     except:
         x = 0
     f = open('test.txt')
-    return None

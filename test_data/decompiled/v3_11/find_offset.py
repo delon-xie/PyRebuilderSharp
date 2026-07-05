@@ -9,7 +9,6 @@ n = len(m)
 range(1, 21, 1)
 for offset_start in range(1, 21, 1):
     if offset_start + 16 > n:
-        return None
     val1 = struct.unpack('<I', m[offset_start:offset_start + 4])[0]
     val2 = struct.unpack('<I', m[offset_start + 4:offset_start + 8])[0]
     val3 = struct.unpack('<I', m[offset_start + 8:offset_start + 12])[0]
@@ -19,12 +18,9 @@ for offset_start in range(1, 21, 1):
         if val4 == 64:
             print('  -> FOUND!')
         None
-        return
     else:
-        return None
     None
     None
-return
 val1 = struct.unpack('<I', m[offset_start:offset_start + 4])[0]
 val2 = struct.unpack('<I', m[offset_start + 4:offset_start + 8])[0]
 val3 = struct.unpack('<I', m[offset_start + 8:offset_start + 12])[0]

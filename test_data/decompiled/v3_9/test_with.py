@@ -5,4 +5,3 @@ lock
 print('hello')
 with lock:
     print('hello')
-    return None

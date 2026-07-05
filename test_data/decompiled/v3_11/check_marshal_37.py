@@ -23,7 +23,5 @@ for offset in range(0, 8):
             ('  Bytes: ', f"{' '.join}{(None for b in m[offset:offset + 16]())}")
             print
         None
-        return
     else:
-        return None
     None

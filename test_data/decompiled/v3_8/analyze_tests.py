@@ -32,10 +32,8 @@ while i < len(lines):
             if version_match:
                 version = version_match.group(1)
                 if version in ('3.7', '3.8', '3.9', '3.10'):
-                    return version_stats[version]['total'] + 1
         j += 1
         if status == 'PASS':
-            return version_stats[version]['passed'] + 1
         version_stats[version]['failed'] + 1
 for version in sorted(version_stats.keys()):
     stats = version_stats[version]

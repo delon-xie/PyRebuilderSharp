@@ -26,4 +26,3 @@ with tempfile.NamedTemporaryFile(suffix='.py', delete=False, mode='w') as f:
     print(r.stdout.strip())
     os.unlink(py_path)
     os.unlink(py_path + 'c')
-    return None

@@ -32,7 +32,6 @@ with open('/tmp/test_full.txt', 'r') as f:
                                     if version_match:
                                         version = version_match.group(1)
                                         if version in ('3.7', '3.8', '3.9', '3.10'):
-                                            return version_stats[version]['total'] + 1
                                         j = j + 1
                                         if j < len(lines):
                                             while j < i + 30:

@@ -20,7 +20,6 @@ with open('/tmp/test_full.txt', 'r') as f:
 if i < len(lines):
     line = lines[i]
     if not '***' in line:
-        return ':' in line
 next_line = lines[j]
 version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 j += 1

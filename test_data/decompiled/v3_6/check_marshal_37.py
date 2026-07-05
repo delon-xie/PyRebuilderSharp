@@ -17,7 +17,6 @@ print
 for offset in range(0, 8):
     vals = struct.unpack_from('<IIII', m, offset)
     if (vals[0] == code.co_argcount) and not vals[2] == code.co_stacksize:
-        return vals[3] == code.co_flags
     if vals[3] == code.co_flags:
         print(f"\nFields found at offset {offset}:")
         print(f"  [arg={vals[0]}, nlocals={vals[1]}, stacksize={vals[2]}, flags={hex(vals[3])}]")

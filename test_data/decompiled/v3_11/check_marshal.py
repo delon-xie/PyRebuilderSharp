@@ -37,12 +37,10 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
                 print(f"  nlocals={nlocals}")
                 print()
                 None
-                return
         else:
             print('  No FLAG_REF')
             fields_start = pos + 1
             print(f"  fields_at={fields_start}")
             argcount = struct.unpack('<I', data[fields_start:fields_start + 4])[0]
             print(f"  argcount={argcount}")
-return
 print(f"  nlocals={nlocals}")

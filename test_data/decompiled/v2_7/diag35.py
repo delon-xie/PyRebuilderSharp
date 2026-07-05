@@ -33,6 +33,5 @@ try {
 """
 f = open('/tmp/diag35.cs', 'w')
 f.write(test_code)
-return
 with open('/tmp/diag35.cs', 'w') as f:
     f.write(test_code)

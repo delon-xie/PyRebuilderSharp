@@ -51,7 +51,7 @@ for ver in versions:
         act_lines = actual_ast.split("""
 """)
         range(max(len(exp_lines), len(act_lines)))
-    yield from results
+    
     if i < len(exp_lines):
         pass
     '(missing)'

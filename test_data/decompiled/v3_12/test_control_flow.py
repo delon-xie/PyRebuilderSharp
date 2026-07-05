@@ -11,5 +11,3 @@ while i < 5:
     except:
         a = 0
     else:
-        return None
-    return None

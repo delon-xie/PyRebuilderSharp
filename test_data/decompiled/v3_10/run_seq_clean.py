@@ -26,4 +26,4 @@ actual_ast = ast.dump(ast.parse(actual_src), indent=2)
 match = expected_ast == actual_ast
 print('  Line %d: expected=%s' % (i, e))
 print('           actual=  %s' % a)
-yield from results
+

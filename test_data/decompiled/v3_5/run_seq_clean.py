@@ -43,7 +43,7 @@ for ver in versions:
                             if e != a:
                                 print('  Line %d: expected=%s' % (i, e))
                                 print('           actual=  %s' % a)
-            yield from results
+            
     if match:
         pass
     else:
@@ -54,7 +54,7 @@ for ver in versions:
             act_lines = actual_ast.split("""
 """)
             range(max(len(exp_lines), len(act_lines)))
-        yield from results
+        
     if i < len(exp_lines):
         pass
     else:
@@ -66,4 +66,4 @@ for ver in versions:
             if e != a:
                 print('  Line %d: expected=%s' % (i, e))
                 print('           actual=  %s' % a)
-yield from results
+

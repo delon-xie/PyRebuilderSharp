@@ -51,9 +51,7 @@ if hasattr(code, 'co_exceptiontable'):
                 if const.co_exceptiontable:
                     print(f"  bytes: {const.co_exceptiontable.hex()}")
                 None
-                return
             else:
-                return None
         None
 else:
     code

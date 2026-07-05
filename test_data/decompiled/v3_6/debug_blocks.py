@@ -14,7 +14,6 @@ with open('tests/PyRebuilderSharp.Tests/TestData/compiled/test_nested_depth_5.3.
     f.read(16)
     code = marshal.load(f)
     if not isinstance(const, types.CodeType):
-        return const.co_name == 'depth_5_while'
     leaders.add(instr.arg)
     if i + 1 < len(instrs):
         for (i, instr) in enumerate(instrs):

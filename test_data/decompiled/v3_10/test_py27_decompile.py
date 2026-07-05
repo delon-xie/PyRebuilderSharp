@@ -28,4 +28,3 @@ except Exception as e:
     else:
         result2.stdout
         if len(result2.stderr) > 500:
-            return None
