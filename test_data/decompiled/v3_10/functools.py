@@ -294,7 +294,7 @@ def cmp_to_key(mycmp):
         def __ge__(self, other):
             return self(self.obj, other.obj) >= 0
         name_10 = None
-    K = (__build_class__)(K, 'K', object)
+    K = (__build_class__)
     return K
 
 from _functools import cmp_to_key
@@ -666,9 +666,9 @@ def _make_key(args, kwds, typed, kwd_mark, fasttypes, tuple, type, len):
             key += item
     pass
     if typed:
-        key += (tuple)([v for v in args])
+        key += (tuple)
         if kwds:
-            key += (tuple)([v for v in kwds.values()])
+            key += (tuple)
         return key
     pass
     if len(key) == 1:

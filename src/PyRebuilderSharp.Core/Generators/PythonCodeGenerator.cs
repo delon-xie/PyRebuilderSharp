@@ -1342,6 +1342,53 @@ public class PythonCodeGenerator : ICodeGenerator
                 return;
             }
             
+            // 如果 func 是一个常量且值为 None，这可能是列表推导式重构失败，
+            // 应该直接输出 None 而不是尝试调用它
+            if (func is Constant { Value: null })
+            {
+                _output.Append("None");
+                return;
+            }
+            
+            // 如果 func 是 SetLiteral、ListLiteral 或 DictLiteral，这可能是列表推导式重构失败，
+            // 应该将其转换为对应的构造函数调用
+            if (func is SetLiteral)
+            {
+                _output.Append("set");
+                _output.Append("(");
+                for (int i = 0; i < call.Args.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    Visit(call.Args[i]);
+                }
+                _output.Append(")");
+                return;
+            }
+            if (func is ListLiteral)
+            {
+                _output.Append("list");
+                _output.Append("(");
+                for (int i = 0; i < call.Args.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    Visit(call.Args[i]);
+                }
+                _output.Append(")");
+                return;
+            }
+            if (func is DictLiteral)
+            {
+                _output.Append("dict");
+                _output.Append("(");
+                for (int i = 0; i < call.Args.Count; i++)
+                {
+                    if (i > 0) _output.Append(", ");
+                    Visit(call.Args[i]);
+                }
+                _output.Append(")");
+                return;
+            }
+            
             // 如果 func 是一个常量且值为 0 或 0.0，这可能是列表推导式重构失败，
             // 应该跳过这个错误的调用，直接返回参数
             if (func is Constant constFunc)
@@ -1364,6 +1411,26 @@ public class PythonCodeGenerator : ICodeGenerator
                 Visit(arg);
             }
             _output.Append(")");
+            return;
+        }
+        
+        // 如果 func 是一个 ListLiteral（元组或列表），这可能是列表推导式重构失败，
+        // 应该生成元组/列表语法而不是函数调用
+        if (func is ListLiteral listFunc)
+        {
+            if (listFunc.Kind == ContainerKind.Tuple)
+                _output.Append("(");
+            else
+                _output.Append("[");
+            for (int i = 0; i < listFunc.Elts.Count; i++)
+            {
+                if (i > 0) _output.Append(", ");
+                Visit(listFunc.Elts[i]);
+            }
+            if (listFunc.Kind == ContainerKind.Tuple)
+                _output.Append(")");
+            else
+                _output.Append("]");
             return;
         }
         

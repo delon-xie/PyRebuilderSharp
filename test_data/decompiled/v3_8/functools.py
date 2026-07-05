@@ -181,7 +181,7 @@ def cmp_to_key(mycmp):
         def __ge__(self, other):
             return self(self.obj, other.obj) >= 0
         name_10 = None
-    K = (__build_class__)(K, 'K', object)
+    K = (__build_class__)
     return K
 
 from _functools import cmp_to_key
@@ -652,7 +652,7 @@ class partialmethod:
         if get is not None:
             new_func = get(obj, cls)
             if new_func is not self.func:
-                result = (new_func)(**self.args, **self.keywords)
+                result = (new_func)
                 result.__self__ = new_func.__self__
 
     @name_10

@@ -1023,7 +1023,7 @@ def unique(enumeration):
     # [Block @0x000E] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 
 def _dataclass_repr(self):
-    return (self, ', '.join)((k for k in dcf.keys() if dcf.keys()[k].repr))
+    return (self, ', '.join)
 
 def global_enum_repr(self):
     """
@@ -1044,7 +1044,7 @@ def global_flag_repr(self):
     cls_name = self.__class__.__name__
     if self._name_ is None:
         return '%s.%s(%r)' % (module, cls_name, self._value_)
-    return ('|'.join)([name for name in self.name.split('|')])
+    return ('|'.join)
     name = [name.append('%s.%s' % (module, n)) for n in self._name_.split('|') if n[0].isdigit()]
     name.append(n)
     name.append('%s.%s' % (module, n))

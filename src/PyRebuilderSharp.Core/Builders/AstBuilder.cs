@@ -6254,6 +6254,11 @@ public class AstBuilder
         if (keyElt != null)
             keyElt = ReplaceDotParams(keyElt, generators);
 
+        // 检查元素表达式是否包含无效的 Call（如 Constant(None) 作为函数）
+        // 如果包含，返回 null 让调用者处理
+        if (ContainsInvalidCall(elt))
+            return null;
+
         return kind switch
         {
             CompKind.Set => new SetComp(elt, generators),
@@ -6262,6 +6267,28 @@ public class AstBuilder
             CompKind.Generator => new GeneratorExp(elt, generators),
             _ => null
         };
+    }
+
+    private bool ContainsInvalidCall(Expr? expr)
+    {
+        if (expr == null) return false;
+        if (expr is Call call && call.Func is Constant)
+            return true;
+        if (expr is BinOp binOp)
+            return ContainsInvalidCall(binOp.Left) || ContainsInvalidCall(binOp.Right);
+        if (expr is UnaryOp unaryOp)
+            return ContainsInvalidCall(unaryOp.Operand);
+        if (expr is PyRebuilderSharp.Core.Models.AST.Attribute attr)
+            return ContainsInvalidCall(attr.Value);
+        if (expr is Subscript sub)
+            return ContainsInvalidCall(sub.Value) || ContainsInvalidCall(sub.Slice);
+        if (expr is Call call2)
+        {
+            if (ContainsInvalidCall(call2.Func)) return true;
+            foreach (var arg in call2.Args)
+                if (ContainsInvalidCall(arg)) return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -6342,6 +6369,17 @@ public class AstBuilder
                 var fallbackLambda = BuildLambda(compRef);
                 if (fallbackLambda != null)
                 {
+                    // 如果 BuildLambda 返回的 Lambda body 是字面量或常量，直接返回这个 body
+                    // 这处理了列表推导式重构失败的情况
+                    if (fallbackLambda.Body is Constant || 
+                        fallbackLambda.Body is SetLiteral || 
+                        fallbackLambda.Body is ListLiteral || 
+                        fallbackLambda.Body is DictLiteral)
+                    {
+                        return fallbackLambda.Body;
+                    }
+                    
+                    // 否则将 Lambda 包装在 Call 中
                     var newArgs = call.Args.Select(a => ConvertComprehensionExpr(a)).ToList();
                     var newKeywords = call.Keywords.Select(k => new Keyword(k.Arg, ConvertComprehensionExpr(k.Value))).ToList();
                     return new Call(fallbackLambda, newArgs, newKeywords);
@@ -7350,6 +7388,8 @@ public class AstBuilder
             return new Lambda(args, new Constant(null));
         }
 
+
+
         // 找到最后一个 Return 语句，提取其表达式
         for (int i = body.Count - 1; i >= 0; i--)
         {
@@ -7357,7 +7397,56 @@ public class AstBuilder
             {
                 if (args.Count == 0)
                     args.Add(new Parameter("_"));
+                
+                // 如果返回表达式是 Call(Constant(None), ...)，说明列表推导式重构失败
+                // 应该直接返回 Constant(None) 而不是错误的调用
+                if (ret.Value is Call callRet)
+                {
+                    if (callRet.Func is Constant { Value: null })
+                    {
+                        return new Lambda(args, new Constant(null));
+                    }
+                    // 如果 func 是一个常量（如整数、字符串等），也说明重构失败
+                    if (callRet.Func is Constant)
+                    {
+                        return new Lambda(args, new Constant(null));
+                    }
+                }
+                
                 return new Lambda(args, ret.Value);
+            }
+        }
+
+        // 如果没有 Return 语句，检查 body 中是否有 ExprStmt，提取其值作为返回表达式
+        for (int i = body.Count - 1; i >= 0; i--)
+        {
+            if (body[i] is ExprStmt es && es.Value != null)
+            {
+                if (args.Count == 0)
+                    args.Add(new Parameter("_"));
+                
+                // 如果表达式是 Call(Constant(None), ...)，说明列表推导式重构失败
+                // 应该直接返回 Constant(None) 而不是错误的调用
+                if (es.Value is Call callExpr)
+                {
+                    if (callExpr.Func is Constant { Value: null })
+                    {
+                        return new Lambda(args, new Constant(null));
+                    }
+                    // 如果 func 是一个常量（如整数、字符串等），也说明重构失败
+                    if (callExpr.Func is Constant)
+                    {
+                        return new Lambda(args, new Constant(null));
+                    }
+                    // 如果 func 是 DictLiteral、ListLiteral 或 SetLiteral，这也是重构失败
+                    // 空字典/列表/集合不应该被当作函数调用
+                    if (callExpr.Func is DictLiteral || callExpr.Func is ListLiteral || callExpr.Func is SetLiteral)
+                    {
+                        return new Lambda(args, new Constant(null));
+                    }
+                }
+                
+                return new Lambda(args, es.Value);
             }
         }
 
@@ -7402,10 +7491,32 @@ public class AstBuilder
             if (stmt is Assign assignFn && assignFn.Targets.Count == 1
                 && assignFn.Targets[0] is Name targetNameFn
                 && assignFn.Value is FunctionRef fnRef
-                && fnRef.Code != null
-                && !fnRef.Name.StartsWith("<"))  // 跳过推导式（已在 PostProcessFunctionDefs 中处理）
+                && fnRef.Code != null)
             {
                 childIdx++;
+                
+                // Lambda 函数
+                if (fnRef.Name == "<lambda>" || fnRef.Code.Name == "<lambda>")
+                {
+                    var lambda = BuildLambda(fnRef);
+                    if (lambda != null)
+                    {
+                        result.Add(new Assign(new List<Expr> { new Name(targetNameFn.Id, ExpressionContext.Store) }, lambda));
+                    }
+                    else
+                    {
+                        result.Add(stmt);
+                    }
+                    continue;
+                }
+                
+                // 跳过推导式（已在 PostProcessFunctionDefs 中处理）
+                if (fnRef.Name.StartsWith("<"))
+                {
+                    result.Add(stmt);
+                    continue;
+                }
+                
                 var defStmt = BuildFunctionDef(fnRef.Name ?? targetNameFn.Id, fnRef);
                 if (defStmt != null)
                 {

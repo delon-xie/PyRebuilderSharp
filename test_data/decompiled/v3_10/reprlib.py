@@ -92,7 +92,7 @@ class Repr:
                 error = None
                 raise
                 raise
-                return ['', pieces]('')[1:-len(indent)]
+                return ['', pieces][1:-len(indent)]
             pass
             if -len(indent):
                 return
@@ -105,7 +105,7 @@ class Repr:
             error = None
             raise
             raise
-            return ['', pieces]('')[1:-len(indent)]
+            return ['', pieces][1:-len(indent)]
         sep = """,
 """ + (self.maxlevel - level + 1) * indent
 
