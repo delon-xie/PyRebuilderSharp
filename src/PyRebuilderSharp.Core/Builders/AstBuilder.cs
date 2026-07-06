@@ -7376,10 +7376,15 @@ public class AstBuilder
         // 过滤 class body 中的 return 语句（class body 无 return）
         body = body.Where(s => s is not Return).ToList();
         // 过滤编译器内部伪影
+        Console.Error.WriteLine($"[CLS_EXTRACT] body.Count={body.Count} before filtering");
         body = body.Where(s => s is not Assign a || a.Targets.Count != 1
             || a.Targets[0] is not Name an
             || (an.Id != "__static_attributes__" && an.Id != "__classdictcell__"
-                && an.Id != "__classcell__" && an.Id != "__firstlineno__")).ToList();
+                && an.Id != "__classcell__" && an.Id != "__firstlineno__"))
+            .Where(s => s is not Assign a2 || a2.Value is not Name classN || classN.Id != "__class__")
+            .Where(s => s is not Assign a3 || a3.Value is not Constant ic || ic.Value is not int)
+            .ToList();
+        Console.Error.WriteLine($"[CLS_EXTRACT] body.Count={body.Count} after filtering");
 
         return new ClassDef(className, bases, body, null, keywords);
     }
@@ -7642,6 +7647,12 @@ public class AstBuilder
                 if (an.Id == "__doc__" && a.Value is Constant c && c.Value is string s
                     && i > 0 && body[0] is ExprStmt { Value: Constant { Value: string } })
                 { body.RemoveAt(i); continue; }
+                // Remove assignments where value is __class__ cell (compiler metadata)
+                if (a.Value is Name classCell && classCell.Id == "__class__")
+                { body.RemoveAt(i); continue; }
+                // Remove assignments with integer constant value (firstlineno)
+                if (a.Value is Constant ic && ic.Value is int)
+                { body.RemoveAt(i); continue; }
             }
             // Remove standalone 'ClassName' string literal (docstring alias when no docstring)
             if (body[i] is ExprStmt e && e.Value is Constant c2 && c2.Value is string
@@ -7649,6 +7660,34 @@ public class AstBuilder
                 && a2.Targets.Count == 1 && a2.Targets[0] is Name n2
                 && (n2.Id == "__module__" || n2.Id == "__qualname__"))
             { body.RemoveAt(i); continue; }
+            // Remove standalone string or integer constants (compiler metadata)
+            if (body[i] is ExprStmt e2 && e2.Value is Constant c3)
+            {
+                if (c3.Value is string sn && sn.All(ch => char.IsLetterOrDigit(ch) || ch == '_'))
+                { body.RemoveAt(i); continue; }
+                if (c3.Value is int)
+                { body.RemoveAt(i); continue; }
+            }
+                if (a.Value is Name classCell && classCell.Id == "__class__")
+                { body.RemoveAt(i); continue; }
+                // Remove assignments with integer constant value (firstlineno metadata)
+                if (a.Value is Constant ic && ic.Value is int)
+                { body.RemoveAt(i); continue; }
+            }
+            // Remove standalone 'ClassName' string literal (docstring alias when no docstring)
+            if (body[i] is ExprStmt e && e.Value is Constant c2 && c2.Value is string
+                && i == 0 && body.Count > 1 && body[1] is Assign a2
+                && a2.Targets.Count == 1 && a2.Targets[0] is Name n2
+                && (n2.Id == "__module__" || n2.Id == "__qualname__"))
+            { body.RemoveAt(i); continue; }
+            // Remove standalone string or integer constants (compiler metadata)
+            if (body[i] is ExprStmt e2 && e2.Value is Constant c3)
+            {
+                if (c3.Value is string sn && sn.All(ch => char.IsLetterOrDigit(ch) || ch == '_'))
+                { body.RemoveAt(i); continue; }
+                if (c3.Value is int)
+                { body.RemoveAt(i); continue; }
+            }
             if (i == body.Count - 1 && body[i] is Pass)
             { body.RemoveAt(i); continue; }
         }
@@ -8021,6 +8060,13 @@ public class AstBuilder
                 }
                 if (defStmt is FunctionDef fd2 && _codeObject?.Instructions != null)
                     AttachDefaultsFromBytecode(fd2, ref defStmt);
+                // 清理 ClassDef 类体中的编译器伪影（独立字符串、__class__ 赋值等）
+                if (defStmt is ClassDef cd)
+                {
+                    var cleanBody = new List<Stmt>(cd.Body);
+                    CleanClassBody(cleanBody);
+                    defStmt = cd with { Body = cleanBody };
+                }
                 if (defStmt != null)
                 {
                     newResult.Add(defStmt);
