@@ -145,6 +145,8 @@ public class PycReader
                 code.IsGenerator = (flags & 0x20) != 0;
                 code.IsCoroutine = (flags & 0x80) != 0;
                 code.IsAsyncGenerator = (flags & 0xC0) == 0xC0;
+                code.HasVarargs = (flags & 0x04) != 0;
+                code.HasVarkw = (flags & 0x08) != 0;
             }
             else if (_strategy.HasPosOnlyArgCount && !isSimple)
             {
@@ -157,6 +159,8 @@ public class PycReader
                 code.IsGenerator = (flags & 0x20) != 0;
                 code.IsCoroutine = (flags & 0x80) != 0;
                 code.IsAsyncGenerator = (flags & 0xC0) == 0xC0;
+                code.HasVarargs = (flags & 0x04) != 0;
+                code.HasVarkw = (flags & 0x08) != 0;
             }
             else if (isSimple)
             {

@@ -7400,6 +7400,14 @@ public class AstBuilder
             args.Add(param);
         }
 
+        // 1e. *args (var-positional) parameter — 在 varnames 中位于 kwonly 之后
+        string? varargName = childCode.HasVarargs && varnames.Count > totalPosArgs + kwOnlyCount
+            ? varnames[totalPosArgs + kwOnlyCount] : null;
+
+        // 1f. **kwargs (var-keyword) parameter — 在 varnames 中位于 vararg 之后
+        string? varkwName = childCode.HasVarkw && varnames.Count > totalPosArgs + kwOnlyCount + (childCode.HasVarargs ? 1 : 0)
+            ? varnames[totalPosArgs + kwOnlyCount + (childCode.HasVarargs ? 1 : 0)] : null;
+
         // 1d. Set default values for trailing positional args (from DefaultExprs)
         // 注意：DefaultExprs 只应用于 POSITIONAL 参数（posonly + positional-or-keyword），
         // 不可污染 keyword-only 参数。args.Count 可能包含 kwonly 参数。
@@ -7516,7 +7524,13 @@ public class AstBuilder
         }
 
 
-        // 4. 生成 FunctionDef
+        // 4. 添加 *args / **kwargs 参数
+        if (varargName != null)
+            args.Insert(totalPosArgs, new Parameter($"*{varargName}"));
+        if (varkwName != null)
+            args.Add(new Parameter($"**{varkwName}"));
+
+        // 5. 生成 FunctionDef
         return new FunctionDef(
             cleanName,
             args,
