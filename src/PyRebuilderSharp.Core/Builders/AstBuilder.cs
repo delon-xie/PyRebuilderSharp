@@ -8015,10 +8015,11 @@ public class AstBuilder
     private void AttachDefaultsFromBytecode(FunctionDef fd, ref Stmt defStmt)
     {
         if (_codeObject == null) return;
-        // Search current code object, then recursively search child code objects
+        // Search current code object, then search child codes that reference this name
         if (ScanCodeObjectForDefaults(_codeObject, fd, ref defStmt)) return;
         foreach (var childCode in _codeObject.ChildCodes)
-            if (ScanCodeObjectForDefaults(childCode, fd, ref defStmt)) return;
+            if (childCode.Names != null && childCode.Names.Contains(fd.Name))
+                if (ScanCodeObjectForDefaults(childCode, fd, ref defStmt)) return;
     }
 
     private bool ScanCodeObjectForDefaults(CodeObject codeObj, FunctionDef fd, ref Stmt defStmt)
@@ -8026,60 +8027,111 @@ public class AstBuilder
         var insList = codeObj.Instructions;
         for (int ii = 0; ii < insList.Count; ii++)
         {
-            if (insList[ii].Opcode == Opcode.STORE_NAME && insList[ii].Argument.HasValue
-                && codeObj.Names.Count > insList[ii].Argument.Value
-                && codeObj.Names[insList[ii].Argument.Value] == fd.Name)
+            if (insList[ii].Opcode != Opcode.STORE_NAME || !insList[ii].Argument.HasValue
+                || codeObj.Names.Count <= insList[ii].Argument.Value
+                || codeObj.Names[insList[ii].Argument.Value] != fd.Name)
+                continue;
+
+            // Found STORE_NAME <funcName>. Scan backward for SFA instructions for THIS function.
+            bool processedDefaults = false, processedKwDefaults = false;
+            for (int jj = ii - 1; jj >= 0 && jj >= ii - 8; jj--)
             {
-                for (int jj = ii - 1; jj >= 0 && jj >= ii - 8; jj--)
+                if (insList[jj].Opcode != Opcode.SET_FUNCTION_ATTRIBUTE_313 || !insList[jj].Argument.HasValue)
+                    continue;
+
+                var sfaFlags = insList[jj].Argument.Value;
+                if ((sfaFlags & 0x01) != 0 && !processedDefaults) // positional defaults
                 {
-                    if (insList[jj].Opcode == Opcode.SET_FUNCTION_ATTRIBUTE_313 && insList[jj].Argument.HasValue
-                        && (insList[jj].Argument.Value & 0x01) != 0)
+                    var defaults = new List<Expr>();
+                    for (int kk = jj - 1; kk >= 0 && kk >= jj - 20; kk--)
                     {
-                        var defaults = new List<Expr>();
-                        for (int kk = jj - 1; kk >= 0 && kk >= jj - 20; kk--)
+                        var kIns = insList[kk];
+                        if (kIns.Opcode == Opcode.BUILD_TUPLE && kIns.Argument.HasValue && kIns.Argument.Value > 0)
                         {
-                            var kIns = insList[kk];
-                            if (kIns.Opcode == Opcode.BUILD_TUPLE && kIns.Argument.HasValue && kIns.Argument.Value > 0)
+                            for (int mm = kk - 1, need = kIns.Argument.Value; mm >= 0 && need > 0; mm--)
                             {
-                                for (int mm = kk - 1, need = kIns.Argument.Value; mm >= 0 && need > 0; mm--)
+                                var it = insList[mm];
+                                if (it.Opcode == Opcode.LOAD_NAME && it.Argument.HasValue && codeObj.Names.Count > it.Argument.Value)
+                                { defaults.Insert(0, new Name(codeObj.Names[it.Argument.Value], ExpressionContext.Load)); need--; }
+                                else if (it.Opcode == Opcode.LOAD_CONST && it.Argument.HasValue && codeObj.Constants.TryGetValue(it.Argument.Value, out var cv))
+                                { defaults.Insert(0, new Constant(cv)); need--; }
+                            }
+                            break;
+                        }
+                        if (kIns.Opcode == Opcode.LOAD_CONST && kIns.Argument.HasValue
+                            && codeObj.Constants.TryGetValue(kIns.Argument.Value, out var cv2)
+                            && cv2 is System.Collections.IList tupleList && tupleList.Count > 0)
+                        {
+                            foreach (var item in tupleList)
+                                defaults.Add(new Constant(item));
+                            break;
+                        }
+                    }
+                    if (defaults.Count > 0)
+                    {
+                        int posC = fd.Args.Count - fd.KwOnlyCount;
+                        int sIdx = posC - defaults.Count;
+                        if (sIdx < 0) sIdx = 0;
+                        var newArgs = new List<Parameter>(fd.Args.Count);
+                        for (int ai = 0; ai < fd.Args.Count; ai++)
+                        {
+                            int di = ai - sIdx;
+                            newArgs.Add(di >= 0 && di < defaults.Count
+                                ? new Parameter(fd.Args[ai].Name, fd.Args[ai].Annotation, defaults[di])
+                                : fd.Args[ai]);
+                        }
+                        defStmt = fd with { Args = newArgs };
+                        processedDefaults = true;
+                        if (processedKwDefaults) break;
+                    }
+                }
+                if ((sfaFlags & 0x02) != 0 && !processedKwDefaults) // kwdefaults
+                {
+                    var kwDefaults = new Dictionary<string, Expr?>();
+                    for (int kk = jj - 1; kk >= 0 && kk >= jj - 16; kk--)
+                    {
+                        var kIns = insList[kk];
+                        if (kIns.Opcode == Opcode.BUILD_MAP && kIns.Argument.HasValue && kIns.Argument.Value > 0)
+                        {
+                            int need = kIns.Argument.Value;
+                            for (int mm = kk - 1; mm >= 0 && need > 0; mm -= 2)
+                            {
+                                var valIns = insList[mm];
+                                var keyIns = insList[mm - 1];
+                                if (keyIns.Opcode == Opcode.LOAD_CONST && keyIns.Argument.HasValue
+                                    && codeObj.Constants.TryGetValue(keyIns.Argument.Value, out var keyVal)
+                                    && keyVal is string keyStr)
                                 {
-                                    var it = insList[mm];
-                                    if (it.Opcode == Opcode.LOAD_NAME && it.Argument.HasValue && codeObj.Names.Count > it.Argument.Value)
-                                    { defaults.Insert(0, new Name(codeObj.Names[it.Argument.Value], ExpressionContext.Load)); need--; }
-                                    else if (it.Opcode == Opcode.LOAD_CONST && it.Argument.HasValue && codeObj.Constants.TryGetValue(it.Argument.Value, out var cv))
-                                    { defaults.Insert(0, new Constant(cv)); need--; }
+                                    Expr? val = null;
+                                    if (valIns.Opcode == Opcode.LOAD_NAME && valIns.Argument.HasValue && codeObj.Names.Count > valIns.Argument.Value)
+                                        val = new Name(codeObj.Names[valIns.Argument.Value], ExpressionContext.Load);
+                                    else if (valIns.Opcode == Opcode.LOAD_CONST && valIns.Argument.HasValue && codeObj.Constants.TryGetValue(valIns.Argument.Value, out var constVal))
+                                        val = new Constant(constVal);
+                                    kwDefaults[keyStr] = val;
+                                    need--;
                                 }
-                                break;
                             }
-                            if (kIns.Opcode == Opcode.LOAD_CONST && kIns.Argument.HasValue
-                                && codeObj.Constants.TryGetValue(kIns.Argument.Value, out var cv2)
-                                && cv2 is System.Collections.IList tupleList && tupleList.Count > 0)
-                            {
-                                foreach (var item in tupleList)
-                                    defaults.Add(new Constant(item));
-                                break;
-                            }
+                            break;
                         }
-                        if (defaults.Count > 0)
+                    }
+                    if (kwDefaults.Count > 0)
+                    {
+                        var curArgs = (defStmt is FunctionDef fd3) ? fd3.Args : fd.Args;
+                        var newArgs = new List<Parameter>(curArgs.Count);
+                        foreach (var arg in curArgs)
                         {
-                            int posC = fd.Args.Count - fd.KwOnlyCount;
-                            int sIdx = posC - defaults.Count;
-                            if (sIdx < 0) sIdx = 0;
-                            var newArgs = new List<Parameter>(fd.Args.Count);
-                            for (int ai = 0; ai < fd.Args.Count; ai++)
-                            {
-                                int di = ai - sIdx;
-                                newArgs.Add(di >= 0 && di < defaults.Count
-                                    ? new Parameter(fd.Args[ai].Name, fd.Args[ai].Annotation, defaults[di])
-                                    : fd.Args[ai]);
-                            }
-                            defStmt = fd with { Args = newArgs };
-                            return true;
+                            if (kwDefaults.TryGetValue(arg.Name, out var d) && arg.Default == null)
+                                newArgs.Add(new Parameter(arg.Name, arg.Annotation, d));
+                            else
+                                newArgs.Add(arg);
                         }
-                        break;
+                        defStmt = fd with { Args = newArgs };
+                        processedKwDefaults = true;
+                        if (processedDefaults) break;
                     }
                 }
             }
+            return true;
         }
         return false;
     }
