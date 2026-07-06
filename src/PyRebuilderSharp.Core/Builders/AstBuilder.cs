@@ -1092,6 +1092,8 @@ public class AstBuilder
         if (IsConditionBranch(block))
         {
             // 条件分支块由 BuildIfElse 处理，不重复添加平坦语句
+            // 同时标记为已处理，防止孤儿块恢复重复添加
+            _processedBlockIds.Add(block.Id);
             stmts.AddRange(BuildIfElse(block, visited));
             return stmts;
         }
@@ -1122,6 +1124,8 @@ public class AstBuilder
         {
             stmts.AddRange(result.Statements);
         }
+        // 标记当前块为已处理，防止孤儿块恢复重复处理
+        _processedBlockIds.Add(block.Id);
 
         // 递归处理后继块
         if (_options.VerboseErrors)
@@ -3234,7 +3238,10 @@ public class AstBuilder
         var forLoopHandlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
         if (!isForLoopBody && forLoopHandlerBlock != null)
         {
-            isForLoopBody = forLoopHandlerBlock.Instructions.Any(i => i.Opcode == Opcode.RERAISE);
+            var hasReraise = forLoopHandlerBlock.Instructions.Any(i => i.Opcode == Opcode.RERAISE);
+            // Only mark as for-loop body if BOTH: the handler has RERAISE AND the try body has FOR_ITER.
+            // A finally handler also has RERAISE but its try body has NO FOR_ITER.
+            isForLoopBody = hasReraise && forIterInRange.Any();
         }
         
         if (isForLoopBody)
@@ -3390,7 +3397,15 @@ public class AstBuilder
             if (tb == block)
             {
                 // 对于当前块，使用 BuildStatements 方法，这样可以正确处理嵌套结构
-                var stmts = BuildStatements(tb, visited);
+                // 但如果块已在 visited 中（被主遍历预先处理过），使用缓存结果
+                List<Stmt> stmts;
+                if (visited.Contains(tb))
+                {
+                    var tbResult = _blockResults.GetValueOrDefault(tb.Id);
+                    stmts = tbResult?.Statements?.Where(s => s is not Raise).ToList() ?? new List<Stmt>();
+                }
+                else
+                    stmts = BuildStatements(tb, visited);
                 if (afterTryBody)
                     elseBody.AddRange(stmts);
                 else
