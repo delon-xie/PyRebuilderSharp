@@ -128,9 +128,10 @@ public class PythonCodeGenerator : ICodeGenerator
 
             // ❗ 核心：CommentBlock 兜底输出
             case CommentBlock cb:
-                // 跳过反编译器伪影注释（孤儿块、Block @0x 等）
-                if (cb.Comment.Contains("orphan @0x") || cb.Comment.Contains("Block @0x") || cb.Comment.Contains("[WARN]"))
-                    break;
+                // 跳过反编译器伪影注释（孤儿块、Block @0x、调试偏移量等）
+                if (cb.Comment.Contains("orphan @0x") || cb.Comment.Contains("Block @0x") || cb.Comment.Contains("[WARN")
+                    || System.Text.RegularExpressions.Regex.IsMatch(cb.Comment, @"@0x[0-9A-Fa-f]{4}"))
+                { break; }
                 VisitCommentBlock(cb);
                 break;
 

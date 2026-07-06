@@ -7400,7 +7400,9 @@ public class AstBuilder
             .Where(s => s is not Assign a2 || a2.Value is not Name classN || classN.Id != "__class__")
             .Where(s => s is not Assign a3 || a3.Value is not Constant ic || ic.Value is not int)
             .ToList();
-        Console.Error.WriteLine($"[CLS_EXTRACT] body.Count={body.Count} after filtering");
+        // 如果类体为空（所有伪影被清空后），添加 pass
+        if (body.Count == 0 || body.All(s => s is CommentBlock))
+            body.Add(new Pass());
 
         return new ClassDef(className, bases, body, null, keywords);
     }
@@ -7687,6 +7689,9 @@ public class AstBuilder
             if (i == body.Count - 1 && body[i] is Pass)
             { body.RemoveAt(i); continue; }
         }
+        // 如果类体为空（所有伪影被清空后），添加 pass
+        if (body.Count == 0 || body.All(s => s is CommentBlock))
+            body.Add(new Pass());
     }
 
     /// <summary>

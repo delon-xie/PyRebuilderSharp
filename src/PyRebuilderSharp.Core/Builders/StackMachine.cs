@@ -101,7 +101,17 @@ public class StackMachine
     /// </summary>
     public Stmt? Execute(Instruction instr)
     {
-        _code.DecompiledInstructionOffsets.Add(instr.Offset);
+        // Reset pending copy depth at the start of each instruction
+        // Only COPY and the subsequent STORE will interact with this field
+        if (instr.Opcode != Opcode.COPY && _pendingCopyDepth >= 0)
+        {
+            // Don't reset if the next instruction is STORE_FAST or STORE_NAME
+            // (walrus pattern: COPY → ... → STORE)
+            bool isStore = instr.Opcode is Opcode.STORE_FAST or Opcode.STORE_NAME;
+            if (!isStore)
+                _pendingCopyDepth = -1;
+        }
+            
         switch (instr.Opcode)
         {
             // ---- 常量加载 ----
