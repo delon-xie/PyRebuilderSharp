@@ -1091,6 +1091,7 @@ public class AstBuilder
         // 检查是否为条件分支（在 ExceptionTable 之后）
         if (IsConditionBranch(block))
         {
+            // 条件分支块由 BuildIfElse 处理，不重复添加平坦语句
             stmts.AddRange(BuildIfElse(block, visited));
             return stmts;
         }
@@ -7944,10 +7945,24 @@ public class AstBuilder
         // 而是直接通过 LOAD_FAST_AND_CLEAR 访问。这种情况下，需要在函数体开头添加
         // 函数定义，因为 wrapper 的 code object 存在于 co_consts 中。
         var remainingChildCodes = new List<CodeObject>();
+        // 收集 result 中所有已定义的函数名（包括嵌套函数体中的引用）
+        var nestedNames = new HashSet<string>();
+        void CollectNestedNames(List<Stmt> stmts)
+        {
+            foreach (var s in stmts)
+            {
+                if (s is FunctionDef fd)
+                { nestedNames.Add(fd.Name); CollectNestedNames(fd.Body); }
+                else if (s is ClassDef cd)
+                { nestedNames.Add(cd.Name); CollectNestedNames(cd.Body); }
+            }
+        }
+        CollectNestedNames(result);
         for (int i = childIdx; i < childCodes.Count; i++)
         {
             var cc = childCodes[i];
-            if (!existingDefNames.Contains(cc.Name ?? "") && !localSeen.Contains(cc.Name ?? ""))
+            if (!existingDefNames.Contains(cc.Name ?? "") && !localSeen.Contains(cc.Name ?? "")
+                && !nestedNames.Contains(cc.Name ?? ""))
             {
                 remainingChildCodes.Add(cc);
             }
