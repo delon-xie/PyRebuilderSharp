@@ -7973,7 +7973,7 @@ public class AstBuilder
                 if (defStmt != null)
                 {
                     newResult.Add(defStmt);
-                    if (defStmt is FunctionDef fd2) localSeen.Add(fd2.Name);
+                    if (defStmt is FunctionDef fd3) localSeen.Add(fd3.Name);
                     else if (defStmt is ClassDef cd2) localSeen.Add(cd2.Name);
                 }
             }

@@ -211,6 +211,11 @@ public class BlockScanner : IBlockScanner
                     // RAISE_VARARGS 的 fallthrough 由下一条 case 处理。
                     break;
 
+                case Opcode.RETURN_GENERATOR_313:
+                    block.Flags |= BlockFlags.Exit;
+                    ResolveIntermediateJumps(block, blocks, codeObj);
+                    break;
+
                 case Opcode.RAISE_VARARGS:
                     block.Flags |= BlockFlags.Exit;
                     ResolveIntermediateJumps(block, blocks, codeObj);
@@ -370,8 +375,8 @@ public class BlockScanner : IBlockScanner
             var lastInstr = block.Instructions.LastOrDefault();
             if (lastInstr == default) continue;
 
-            // RETURN_VALUE 后紧跟的块且无其他前驱 → 合并指令到后继可达块
-            if (lastInstr.Opcode == Opcode.RETURN_VALUE
+            // RETURN_VALUE/RETURN_GENERATOR_313 后紧跟的块且无其他前驱 → 合并指令到后继可达块
+            if ((lastInstr.Opcode == Opcode.RETURN_VALUE || lastInstr.Opcode == Opcode.RETURN_GENERATOR_313)
                 && i + 1 < blocks.Count
                 && blocks[i + 1].Predecessors.Count == 0)
             {

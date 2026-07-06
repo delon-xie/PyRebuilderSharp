@@ -1,0 +1,33 @@
+# Decompiled from: <module>
+
+None
+for (i, instr) in enumerate(instrs):
+    if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
+        pass
+    else:
+        for (i, start) in enumerate(sorted_leaders):
+            if i + 1 < len(sorted_leaders):
+                pass
+            else:
+                for ins in block_instrs:
+                    if ins.opname == 'JUMP_ABSOLUTE':
+                        print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+    leaders.add(instr.arg)
+for const in code.co_consts:
+    if isinstance(const, types.CodeType) and (const.co_name == 'depth_5_while'):
+        print('=== Block structure ===')
+        instrs = list(dis.Bytecode(const))
+        leaders = {0}
+        enumerate(instrs)
+    sorted_leaders = sorted(leaders)
+    enumerate(sorted_leaders)
+    if instr.opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE', 'JUMP_BACKWARD'):
+        pass
+    None
+    if i + 1 < len(sorted_leaders):
+        pass
+    leaders.add(instr.arg)
+    if ins.opname == 'JUMP_ABSOLUTE':
+        print(f"  → JUMP: offset={ins.offset}, target={ins.arg}")
+# [WARN] 1 instructions not decompiled
+#   @0x0190: POP_JUMP_IF_NONE arg=52

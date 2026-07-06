@@ -85,6 +85,8 @@ public record FunctionRef(Bytecode.CodeObject? Code, string Name) : Expr
     public List<Expr>? DefaultExprs { get; set; }
     /// <summary>关键字参数默认值，对应 kwonly 参数</summary>
     public Dictionary<string, Expr?>? KwDefaultExprs { get; set; }
+    /// <summary>闭包变量元组（用于生成器表达式等）</summary>
+    public Expr? Closure { get; set; }
 }
 
 // --- Walrus (NamedExpr) ---

@@ -796,6 +796,13 @@ public class StackMachine
                     retValue = starred.Value;
                 return new Return(retValue);
             }
+            case Opcode.RETURN_GENERATOR_313:
+            {
+                var retValue = SafePop();
+                if (retValue is Starred starred && starred.Ctx == ExpressionContext.Load)
+                    retValue = starred.Value;
+                return new Return(retValue);
+            }
 
             // ---- 栈操作 ----
             case Opcode.POP_TOP:
@@ -1096,14 +1103,53 @@ public class StackMachine
             case Opcode.COPY_FREE_VARS:
             {
                 int nfree = instr.Argument ?? 0;
+                
+                // Debug: show freevars info
+                if (_code.Name == "__iter__")
+                {
+                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] nfree={nfree}\n");
+                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] _code.Name={_code.Name}\n");
+                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] _code.Freevars.Count={_code.Freevars?.Count ?? 0}\n");
+                    if (_code.Freevars != null)
+                    {
+                        for (int i = 0; i < _code.Freevars.Count; i++)
+                            System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS]   freevar[{i}]={_code.Freevars[i]}\n");
+                    }
+                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] _code.Varnames.Count={_code.Varnames.Count}\n");
+                    if (_code.Varnames != null)
+                    {
+                        for (int i = 0; i < _code.Varnames.Count; i++)
+                            System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS]   varname[{i}]={_code.Varnames[i]}\n");
+                    }
+                    // Look ahead for the CodeObject on stack (the genexpr code)
+                    if (_exprStack.Count > 0 && _exprStack.Peek() is Constant c2 && c2.Value is CodeObject co2)
+                    {
+                        System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] Peek CodeObject.Name={co2.Name}\n");
+                        System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] Peek CodeObject.Freevars.Count={co2.Freevars?.Count ?? 0}\n");
+                        if (co2.Freevars != null)
+                        {
+                            for (int i = 0; i < co2.Freevars.Count; i++)
+                                System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS]   peek_freevar[{i}]={co2.Freevars[i]}\n");
+                        }
+                    }
+                }
+                
                 // COPY_FREE_VARS n 从当前作用域复制 n 个自由变量的 cell 引用到栈上。
                 // 即使名字不精确，也必须推 n 个占位符，否则 BUILD_TUPLE 将消费
                 // 不相关的 stack 项（如 __build_class__），破坏后续 CALL 协议。
-                if (_code.Freevars != null)
+                
+                // Try to get freevars from the code object that will be used by MAKE_FUNCTION
+                List<string>? targetFreevars = _code.Freevars;
+                if (_exprStack.Count > 0 && _exprStack.Peek() is Constant c3 && c3.Value is CodeObject co3)
                 {
-                    int count = Math.Min(nfree, _code.Freevars.Count);
+                    targetFreevars = co3.Freevars;
+                }
+                
+                if (targetFreevars != null)
+                {
+                    int count = Math.Min(nfree, targetFreevars.Count);
                     for (int i = 0; i < count; i++)
-                        _exprStack.Push(new Name(_code.Freevars[i], ExpressionContext.Load));
+                        _exprStack.Push(new Name(targetFreevars[i], ExpressionContext.Load));
                     for (int i = count; i < nfree; i++)
                         _exprStack.Push(new Name($"freevar_{i}", ExpressionContext.Load));
                 }
@@ -1238,11 +1284,80 @@ public class StackMachine
             case Opcode.COPY_FREE_VARS_313:
             {
                 int nfree = instr.Argument ?? 0;
-                if (_code.Freevars != null)
+                
+                // Try to get freevars from the code object that will be used by MAKE_FUNCTION
+                // For generator expressions (<genexpr>), the freevars come from the parent scope,
+                // not from the genexpr's own freevars list
+                List<string>? targetFreevars = _code.Freevars;
+                
+                // For comprehension code objects (<genexpr>, <listcomp>, etc.),
+                // look for the parent code object's freevars instead
+                if (_code.Name.StartsWith("<"))
                 {
-                    int count = Math.Min(nfree, _code.Freevars.Count);
+                    // Check if there's a closure tuple on the stack (from parent scope)
+                    // This is pushed before the comprehension code object
+                    for (int i = _exprStack.Count - 1; i >= 0; i--)
+                    {
+                        var item = _exprStack.ElementAt(i);
+                        if (item is ListLiteral ll)
+                        {
+                            // This might be a closure tuple - check if it contains Names
+                            bool looksLikeClosure = true;
+                            foreach (var elt in ll.Elts)
+                            {
+                                if (!(elt is Name || elt is Models.AST.Attribute || elt is Constant))
+                                {
+                                    looksLikeClosure = false;
+                                    break;
+                                }
+                            }
+                            if (looksLikeClosure && ll.Elts.Count > 0)
+                            {
+                                // The variable names in the closure should come from
+                                // the parent code object's freevars list
+                                // Look for a CodeObject on the stack and use its freevars
+                                for (int j = i - 1; j >= 0; j--)
+                                {
+                                    var earlierItem = _exprStack.ElementAt(j);
+                                    if (earlierItem is Constant c4 && c4.Value is CodeObject co4)
+                                    {
+                                        if (co4.Freevars != null && co4.Freevars.Count > 0)
+                                        {
+                                            targetFreevars = co4.Freevars;
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    // If still not found, check for CodeObject on stack directly
+                    if (targetFreevars == null || targetFreevars.Count == 0)
+                    {
+                        foreach (var item in _exprStack)
+                        {
+                            if (item is Constant c4 && c4.Value is CodeObject co4)
+                            {
+                                if (co4.Freevars != null && co4.Freevars.Count > 0)
+                                {
+                                    targetFreevars = co4.Freevars;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (_exprStack.Count > 0 && _exprStack.Peek() is Constant c5 && c5.Value is CodeObject co5)
+                {
+                    targetFreevars = co5.Freevars;
+                }
+                
+                if (targetFreevars != null)
+                {
+                    int count = Math.Min(nfree, targetFreevars.Count);
                     for (int i = 0; i < count; i++)
-                        _exprStack.Push(new Name(_code.Freevars[i], ExpressionContext.Load));
+                        _exprStack.Push(new Name(targetFreevars[i], ExpressionContext.Load));
                     for (int i = count; i < nfree; i++)
                         _exprStack.Push(new Name($"freevar_{i}", ExpressionContext.Load));
                 }
@@ -1966,6 +2081,29 @@ public class StackMachine
                         // 参考 CPython 3.14: Python/ceval.c MAKE_FUNCTION
                     {
                         int flags = instr.Argument ?? 0;
+                        
+                        // Debug: trace MAKE_FUNCTION for <genexpr>
+                        if (_code.Name == "__iter__")
+                        {
+                            System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC] flags=0x{flags:X2} ({flags})\n");
+                            System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC] HasClosure={(flags & 0x08) != 0}\n");
+                            System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC] Stack before: {_exprStack.Count} items\n");
+                            var stackCopy = new List<Expr>(_exprStack);
+                            for (int i = stackCopy.Count - 1; i >= 0; i--)
+                            {
+                                var item = stackCopy[i];
+                                System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]   Stack[{i}] type={item.GetType().Name}\n");
+                                if (item is Constant c && c.Value is CodeObject co)
+                                    System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     CodeObject.Name={co.Name}\n");
+                                else if (item is ListLiteral ll)
+                                    System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     ListLiteral.Count={ll.Elts.Count}\n");
+                                else if (item is Models.AST.Attribute attr)
+                                    System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     Attribute: {attr.Value?.GetType().Name}.{attr.Attr}\n");
+                                else if (item is Name n)
+                                    System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     Name: {n.Id}\n");
+                            }
+                        }
+                        
                         var codeExpr = SafePop();                     // qualname (TOS)
                         // 检查弹出的值：可能是 qualname 或 code object
                         Expr? maybeQualname = codeExpr;
@@ -1988,8 +2126,50 @@ public class StackMachine
                         Expr? annotations = (flags & 0x04) != 0 ? SafePop() : null;
                         Expr? kwDefaults = (flags & 0x02) != 0 ? SafePop() : null;
                         Expr? defaultsTuple = (flags & 0x01) != 0 ? SafePop() : null;
+                        
+                        // Python 3.14 fix: sometimes closure is on stack but flags don't indicate it
+                        // This happens with generator expressions that capture closure variables
+                        if (closureExpr == null && _exprStack.Count > 0 && _exprStack.Peek() is ListLiteral closureList)
+                        {
+                            bool looksLikeClosure = closureList.Elts.Count > 0;
+                            if (looksLikeClosure)
+                            {
+                                foreach (var elt in closureList.Elts)
+                                {
+                                    if (!(elt is Name || elt is Models.AST.Attribute || elt is Constant))
+                                    {
+                                        looksLikeClosure = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (looksLikeClosure)
+                            {
+                                closureExpr = SafePop();
+                            }
+                        }
+
+                        // Debug: show what was popped
+                        if (_code.Name == "__iter__")
+                        {
+                            System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC] funcName={funcName}\n");
+                            System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC] closureExpr={closureExpr?.GetType().Name ?? "null"}\n");
+                            if (closureExpr is ListLiteral closureList2)
+                            {
+                                for (int i = 0; i < closureList2.Elts.Count; i++)
+                                {
+                                    var elt = closureList2.Elts[i];
+                                    System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]   closure[{i}] type={elt.GetType().Name}\n");
+                                    if (elt is Models.AST.Attribute attr)
+                                        System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     attr: {attr.Value?.GetType().Name}.{attr.Attr}\n");
+                                    else if (elt is Name n)
+                                        System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     name: {n.Id}\n");
+                                }
+                            }
+                        }
 
                         var funcRef = new FunctionRef(childCode, funcName);
+                        funcRef.Closure = closureExpr;
                         if (defaultsTuple != null)
                         {
                             if (defaultsTuple is ListLiteral dl && dl.Kind == ContainerKind.Tuple)
@@ -2115,7 +2295,25 @@ public class StackMachine
                 
                 if (funcRef == null) return null;
 
-                if ((sfaFlags & 0x08) != 0) _ = SafePop(); // closure — skip
+                if ((sfaFlags & 0x08) != 0)
+                {
+                    // closure — store on FunctionRef
+                    var closureExpr = SafePop();
+                    // Debug: check closureExpr
+                    System.IO.File.AppendAllText("/tmp/sfa_debug.txt", $"[SFA] sfaFlags=0x{sfaFlags:X2}, funcRef.Name={funcRef.Name}\n");
+                    System.IO.File.AppendAllText("/tmp/sfa_debug.txt", $"[SFA] closureExpr type={closureExpr?.GetType().Name ?? "null"}\n");
+                    if (closureExpr is ListLiteral ll)
+                    {
+                        for (int i = 0; i < ll.Elts.Count; i++)
+                        {
+                            var elt = ll.Elts[i];
+                            System.IO.File.AppendAllText("/tmp/sfa_debug.txt", $"[SFA]   closure[{i}] type={elt.GetType().Name}\n");
+                            if (elt is Name n)
+                                System.IO.File.AppendAllText("/tmp/sfa_debug.txt", $"[SFA]     name: {n.Id}\n");
+                        }
+                    }
+                    funcRef.Closure = closureExpr;
+                }
                 if ((sfaFlags & 0x04) != 0) _ = SafePop(); // annotations — skip
                 if ((sfaFlags & 0x02) != 0) // kwdefaults
                 {

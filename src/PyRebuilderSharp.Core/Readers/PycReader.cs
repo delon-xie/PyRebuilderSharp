@@ -238,6 +238,10 @@ public class PycReader
                 var varnames = new List<string>();
                 var cellvars = new List<string>();
                 var freevars = new List<string>();
+                if (localsplusnames.Count > 0 && (code.Name == "<genexpr>" || code.Name == "<listcomp>" || code.Name == "<setcomp>" || code.Name == "<dictcomp>"))
+                {
+                    Console.Error.WriteLine($"[DEBUG] comp {code.Name} localsplusnames.Count={localsplusnames.Count}, kinds.Length={localspluskinds?.Length ?? 0}, names={string.Join(", ", localsplusnames)}");
+                }
                 for (int i = 0; i < localsplusnames.Count; i++)
                 {
                     var kind = (localspluskinds != null && i < localspluskinds.Length) ? localspluskinds[i] : (byte)0;
@@ -280,6 +284,11 @@ public class PycReader
             code.Filename = filenameObj?.ToString() ?? "<unknown>";
             var nameObj = ReadMarshalObject(br);
             code.Name = nameObj?.ToString() ?? "<module>";
+            
+            if (code.Name == "<genexpr>" || code.Name == "<listcomp>" || code.Name == "<setcomp>" || code.Name == "<dictcomp>")
+            {
+                Console.Error.WriteLine($"[DEBUG] comp {code.Name} freevars={string.Join(", ", code.Freevars)}, cellvars={string.Join(", ", code.Cellvars)}, varnames={string.Join(", ", code.Varnames)}, names={string.Join(", ", code.Names)}");
+            }
 
             // qualname (3.11+ 的所有代码对象都有)
             if (_strategy.HasQualname)
