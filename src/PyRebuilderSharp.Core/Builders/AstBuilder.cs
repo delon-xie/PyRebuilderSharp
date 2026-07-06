@@ -260,7 +260,10 @@ public class AstBuilder
                                     }
                                     
                                     // Check if this looks like a class body
-                                    if (LooksLikeClassBody(recovered))
+                                    // 如果包含 import 语句，则是模块级代码，不是类体
+                                    bool hasImport = recovered.Any(s => s is Assign a
+                                        && a.Value is Name n && n.IsImport);
+                                    if (LooksLikeClassBody(recovered) && !hasImport)
                                     {
                                         var className = _codeObject.Name;
                                         if (string.IsNullOrEmpty(className) || className == "<module>" || className.StartsWith("name_"))
