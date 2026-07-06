@@ -7384,7 +7384,8 @@ public class AstBuilder
         }
         // 如果同时存在独立的 'ClassName' 字符串（编译器产生）和 __doc__ 赋值，
         // 移除独立字符串（以 __doc__ 为准）
-        if (hadDocString && body.Count > 0 && body[0] is ExprStmt { Value: Constant { Value: string } })
+        if (hadDocString && body.Count > 0 && body[0] is ExprStmt { Value: Constant { Value: string sv } }
+            && sv == className)
         {
             body.RemoveAt(0);
         }
