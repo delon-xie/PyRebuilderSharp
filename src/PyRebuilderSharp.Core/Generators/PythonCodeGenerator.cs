@@ -1452,11 +1452,15 @@ public class PythonCodeGenerator : ICodeGenerator
         for (int i = 0; i < call.Args.Count; i++)
         {
             if (i > 0) _output.Append(", ");
-            // 展开嵌套的 Starred（参数位置不应该有 * 前缀）
+            // *args 展开：arg 是 Starred → 输出 *expr
             Expr arg = call.Args[i];
-            while (arg is Starred starred && starred.Ctx == ExpressionContext.Load)
-                arg = starred.Value;
-            Visit(arg);
+            if (arg is Starred s && s.Ctx == ExpressionContext.Load)
+            {
+                _output.Append("*");
+                Visit(s.Value);
+            }
+            else
+                Visit(arg);
         }
 
         foreach (var kw in call.Keywords)

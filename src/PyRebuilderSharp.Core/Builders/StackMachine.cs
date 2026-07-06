@@ -577,6 +577,8 @@ public class StackMachine
                         foreach (var item in ilist)
                             listLit.Elts.Add(new Constant(item));
                     }
+                    else if (iterable is Name iterableName)
+                        listLit.Elts.Add(new Starred(new Name(iterableName.Id, ExpressionContext.Load), ExpressionContext.Load));
                     else
                         listLit.Elts.Add(iterable);
                 }
@@ -1005,7 +1007,15 @@ public class StackMachine
                     hasKwargs = false;
                 
                 if (argsExpr is ListLiteral listLit)
-                    args.AddRange(listLit.Elts);
+                {
+                    foreach (var elt in listLit.Elts)
+                    {
+                        if (elt is Starred starredArg)
+                            args.Add(new Starred(starredArg.Value, ExpressionContext.Load));
+                        else
+                            args.Add(elt);
+                    }
+                }
                 else if (hasArgs && argsExpr != null)
                 {
                     keywords.Add(new Keyword(null, argsExpr, IsStarArg: true));
@@ -1022,15 +1032,8 @@ public class StackMachine
                 while (func is Starred starredFunc && starredFunc.Ctx == ExpressionContext.Load)
                     func = starredFunc.Value;
                 
-                // 处理参数中的 Starred
-                var processedArgs = new List<Expr>();
-                foreach (var arg in args)
-                {
-                    var unwrapped = arg;
-                    while (unwrapped is Starred starred && starred.Ctx == ExpressionContext.Load)
-                        unwrapped = starred.Value;
-                    processedArgs.Add(unwrapped);
-                }
+                // 保留参数中的 Starred（*args），不展开
+                var processedArgs = new List<Expr>(args);
                 
                 var call = new Call(func, processedArgs, keywords);
                 _exprStack.Push(call);
