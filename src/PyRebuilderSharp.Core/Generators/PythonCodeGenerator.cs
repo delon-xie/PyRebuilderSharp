@@ -486,7 +486,10 @@ public class PythonCodeGenerator : ICodeGenerator
             }
             else if (i == kwOnlyStart && kwOnlyCount > 0)
             {
-                _output.Append("*, ");
+                // Don't add *, if any earlier param has *args (name starts with *)
+                bool hasVarargs = func.Args.Any(a => a.Name.StartsWith("*") && !a.Name.StartsWith("**"));
+                if (!hasVarargs)
+                    _output.Append("*, ");
             }
 
             VisitParameter(func.Args[i]);
