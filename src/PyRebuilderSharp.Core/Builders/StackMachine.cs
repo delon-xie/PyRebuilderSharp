@@ -2174,10 +2174,11 @@ public class StackMachine
                 if (item == null) return null;
                 // LIST_APPEND depth: append TOS to list at stack[-depth-1]
                 // e.g., depth=2: stack[0]=list, stack[1]=iter, stack[2]=current_item
-                int listIndex = _exprStack.Count - depth - 1;
-                if (listIndex >= 0)
+                // SafePop 已经减少了 _exprStack.Count，所以需要 +1 补偿
+                int listIndex = _exprStack.Count - depth;  // +1 to compensate for SafePop
+                if (listIndex >= 0 && listIndex < _exprStack.Count)
                 {
-                    var listLit = _exprStack.Skip(listIndex).FirstOrDefault() as ListLiteral;
+                    var listLit = _exprStack.ElementAt(listIndex) as ListLiteral;
                     if (listLit != null)
                     {
                         listLit.Elts.Add(item);

@@ -692,9 +692,10 @@ public class AstBuilder
         if ((hasForIter || hasListAppend313) && !block.Flags.HasFlag(BlockFlags.LoopHeader))
         {
             BasicBlock loopBlock = block;
+            BasicBlock? forIterBlock = null;
             if (!hasForIter && hasListAppend313)
             {
-                var forIterBlock = _allBlocks.FirstOrDefault(b => 
+                forIterBlock = _allBlocks.FirstOrDefault(b => 
                     b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER) && 
                     b.Successors.Any(s => s.StartOffset == block.StartOffset));
                 if (forIterBlock == null)
@@ -720,38 +721,42 @@ public class AstBuilder
                 }
                 if (forIterBlock == null)
                 {
+                    // 无 FOR_ITER 前驱且当前块无 FOR_ITER → 不是推导式，是列表字面量
+                    if (!hasForIter)
+                    {
+                        ;  // fall through to flat statements below
+                    }
+                    else
+                    {
                     forIterBlock = _sortedBlocks.Where(b => 
                         b.StartOffset < block.StartOffset && 
                         b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER)).LastOrDefault();
-                }
-                if (forIterBlock != null)
-                {
-                    loopBlock = forIterBlock;
-                }
-            }
-            
-            if (_processedBlockIds.Contains(loopBlock.Id))
-                return stmts;
-            
-            MarkForLoopPredecessors(loopBlock, visited);
+                    }
+                    if (forIterBlock != null)
+                    {
+                        if (_processedBlockIds.Contains(loopBlock.Id))
+                            return stmts;
+                
+                        MarkForLoopPredecessors(loopBlock, visited);
 
-            var loopAst = BuildForLoop(loopBlock, visited);
-            stmts.AddRange(loopAst);
-            // 处理循环出口块的后继（如循环后的顺序代码）
-            // exit = 偏移较大的 successor（跳转目标），body = 偏移较小的 successor（fallthrough）
-            var bodySorter = block.Successors.Where(s => s != null).OrderBy(s => s.StartOffset).ToList();
-            var bodyEntry = bodySorter.FirstOrDefault();
-            foreach (var succ in block.Successors)
-            {
-                if (succ == null) continue;
-                // 跳过 body 块（已在 BuildForLoop 中被 GetStructuredBlockStmts 处理）
-                if (succ == bodyEntry) continue;
-                // exit 块可能已被 body 块的后继检测误加入 visited，移除以确保处理
-                if (visited.Contains(succ))
-                    visited.Remove(succ);
-                stmts.AddRange(BuildStatements(succ, visited));
+                        var loopAst = BuildForLoop(loopBlock, visited);
+                        stmts.AddRange(loopAst);
+                        // 处理循环出口块的后继（如循环后的顺序代码）
+                        var bodySorter = block.Successors.Where(s => s != null).OrderBy(s => s.StartOffset).ToList();
+                        var bodyEntry = bodySorter.FirstOrDefault();
+                        foreach (var succ in block.Successors)
+                        {
+                            if (succ == null) continue;
+                            if (succ == bodyEntry) continue;
+                            if (visited.Contains(succ))
+                                visited.Remove(succ);
+                            stmts.AddRange(BuildStatements(succ, visited));
+                        }
+                        if (forIterBlock != null)
+                            return stmts;
+                    }
+                }
             }
-            return stmts;
         }
 
         // 检测 with 语句 (SETUP_WITH / BEFORE_WITH 模式)
@@ -3185,6 +3190,22 @@ public class AstBuilder
             .FirstOrDefault();
         if (matchingEntry == null)
         {
+            return null;
+        }
+
+        // 检查：如果 ET 条目覆盖模块入口块（offset ≈ 0）且无 CHECK_EXC_MATCH，则是模块级清理条目
+        // CPython 3.14 会为整个模块生成一个 ET 清理条目，不应被当作 try/except 处理
+        bool isModuleCleanup = matchingEntry.StartOffset <= 4
+            && !_codeObject.Instructions.Any(i =>
+                (i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH)
+                && i.Offset >= matchingEntry.StartOffset && i.Offset < matchingEntry.EndOffset);
+
+        if (isModuleCleanup)
+        {
+            if (_options.VerboseErrors)
+            {
+            Console.Error.WriteLine($"[TRY_FROM_ET] SKIP: module-level cleanup ET entry (start=0x{matchingEntry.StartOffset:X4}, end=0x{matchingEntry.EndOffset:X4})");
+            }
             return null;
         }
 
