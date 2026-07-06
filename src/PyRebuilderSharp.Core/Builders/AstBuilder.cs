@@ -7968,6 +7968,8 @@ public class AstBuilder
                     if (bases.Count > 0)
                         defStmt = cd with { Bases = bases };
                 }
+                if (defStmt is FunctionDef fd2 && _codeObject?.Instructions != null)
+                    AttachDefaultsFromBytecode(fd2, ref defStmt);
                 if (defStmt != null)
                 {
                     newResult.Add(defStmt);
@@ -7980,6 +7982,69 @@ public class AstBuilder
         }
 
         return result;
+    }
+
+    private void AttachDefaultsFromBytecode(FunctionDef fd, ref Stmt defStmt)
+    {
+        if (_codeObject == null) return;
+        var insList = _codeObject.Instructions;
+        bool foundDefault = false;
+        for (int ii = 0; ii < insList.Count && !foundDefault; ii++)
+        {
+            if (insList[ii].Opcode == Opcode.STORE_NAME && insList[ii].Argument.HasValue
+                && _codeObject.Names.Count > insList[ii].Argument.Value
+                && _codeObject.Names[insList[ii].Argument.Value] == fd.Name)
+            {
+                for (int jj = ii - 1; jj >= 0 && jj >= ii - 8; jj--)
+                {
+                    if (insList[jj].Opcode == Opcode.SET_FUNCTION_ATTRIBUTE_313 && (insList[jj].Argument & 0x01) != 0)
+                    {
+                        var defaults = new List<Expr>();
+                        for (int kk = jj - 1; kk >= 0 && kk >= jj - 6; kk--)
+                        {
+                            var kIns = insList[kk];
+                            if (kIns.Opcode == Opcode.BUILD_TUPLE && kIns.Argument.HasValue && kIns.Argument.Value > 0)
+                            {
+                                for (int mm = kk - 1, need = kIns.Argument.Value; mm >= 0 && need > 0; mm--)
+                                {
+                                    var it = insList[mm];
+                                    if (it.Opcode == Opcode.LOAD_NAME && it.Argument.HasValue && _codeObject.Names.Count > it.Argument.Value)
+                                    { defaults.Insert(0, new Name(_codeObject.Names[it.Argument.Value], ExpressionContext.Load)); need--; }
+                                    else if (it.Opcode == Opcode.LOAD_CONST && it.Argument.HasValue && _codeObject.Constants.TryGetValue(it.Argument.Value, out var cv))
+                                    { defaults.Insert(0, new Constant(cv)); need--; }
+                                }
+                                break;
+                            }
+                            if (kIns.Opcode == Opcode.LOAD_CONST && kIns.Argument.HasValue
+                                && _codeObject.Constants.TryGetValue(kIns.Argument.Value, out var cv2)
+                                && cv2 is System.Collections.IList tupleList && tupleList.Count > 0)
+                            {
+                                foreach (var item in tupleList)
+                                    defaults.Add(new Constant(item));
+                                break;
+                            }
+                        }
+                        if (defaults.Count > 0)
+                        {
+                            int posC = fd.Args.Count - fd.KwOnlyCount;
+                            int sIdx = posC - defaults.Count;
+                            if (sIdx < 0) sIdx = 0;
+                            var newArgs = new List<Parameter>(fd.Args.Count);
+                            for (int ai = 0; ai < fd.Args.Count; ai++)
+                            {
+                                int di = ai - sIdx;
+                                newArgs.Add(di >= 0 && di < defaults.Count
+                                    ? new Parameter(fd.Args[ai].Name, fd.Args[ai].Annotation, defaults[di])
+                                    : fd.Args[ai]);
+                            }
+                            defStmt = fd with { Args = newArgs };
+                            foundDefault = true;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private static bool HasNestedFunctions(List<Stmt> body)
