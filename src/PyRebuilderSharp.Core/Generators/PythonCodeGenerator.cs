@@ -569,6 +569,8 @@ public class PythonCodeGenerator : ICodeGenerator
         _indentLevel++;
         // 类体 docstring: 首个语句若为字符串常量，用 """...""" 格式
         EmitDocstringPrefix(cls.Body);
+        if (cls.Body.Count > 0 && cls.Body[0] is ExprStmt { Value: Constant { Value: string } })
+            Console.Error.WriteLine($"[DBG_CLS] class={cls.Name} has leading string, wasn't removed by EmitDocstringPrefix");
         Stmt? prevClsStmt = null;
         foreach (var stmt in cls.Body)
         {

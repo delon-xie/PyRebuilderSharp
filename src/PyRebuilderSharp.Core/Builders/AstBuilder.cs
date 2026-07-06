@@ -7342,12 +7342,32 @@ public class AstBuilder
                 && n.Id != "__static_attributes__" && n.Id != "__firstlineno__"
                 && n.Id != "__classdictcell__")).ToList();
 
-        // 将第一个 __doc__ = '...' 转换为裸字符串表达式（类体 docstring）
-        if (body.Count > 0 && body[0] is Assign docAssign
-            && docAssign.Targets.Count == 1 && docAssign.Targets[0] is Name docName
-            && docName.Id == "__doc__" && docAssign.Value is Constant docConst)
+        // 移除类体开头的独立字符串常量 'ClassName'（编译器产生的 __doc__ 别名）
+        if (body.Count > 0 && body[0] is ExprStmt { Value: Constant { Value: string s } }
+            && s.All(c => char.IsLetterOrDigit(c) || c == '_'))
         {
-            body[0] = new ExprStmt(docConst);
+            Console.Error.WriteLine($"[CLS_CLEAN] Removing standalone string '{s}' from class body (count={body.Count})");
+            body.RemoveAt(0);
+        }
+
+        // 将类体中第一个 __doc__ = '...' 转换为裸字符串表达式（类体 docstring）
+        bool hadDocString = false;
+        for (int di = 0; di < body.Count; di++)
+        {
+            if (body[di] is Assign docAssign
+                && docAssign.Targets.Count == 1 && docAssign.Targets[0] is Name docName
+                && docName.Id == "__doc__" && docAssign.Value is Constant docConst)
+            {
+                body[di] = new ExprStmt(docConst);
+                hadDocString = true;
+                break;
+            }
+        }
+        // 如果同时存在独立的 'ClassName' 字符串（编译器产生）和 __doc__ 赋值，
+        // 移除独立字符串（以 __doc__ 为准）
+        if (hadDocString && body.Count > 0 && body[0] is ExprStmt { Value: Constant { Value: string } })
+        {
+            body.RemoveAt(0);
         }
 
         // 过滤 class body 中的 return 语句（class body 无 return）
