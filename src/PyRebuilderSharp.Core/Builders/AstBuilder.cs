@@ -242,8 +242,8 @@ public class AstBuilder
                                 if (hasRecovered)
                                 {
                                     _processedBlockIds.Add(orphan.Id);
-                                    var lo = _allBlocks.Count > 0 ? _allBlocks[^1].EndOffset : 0;
-                                    bool early = lo > 0 && orphan.StartOffset < lo / 3;
+                                    // 孤儿块按偏移量决定插入位置：早期偏移（偏移最小的一部分）插到开头
+                                    bool early = orphan.StartOffset < 64;
                                     
                                     // Debug: log recovered statements
                                     if (_codeObject.Name == "EnumCheck")
