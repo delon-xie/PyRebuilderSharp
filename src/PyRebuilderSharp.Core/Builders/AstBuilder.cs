@@ -551,9 +551,9 @@ public class AstBuilder
             if (stmt is FunctionDef fd)
             {
                 bool hasNonComment = false;
-                foreach (var s in fd.Body)
+                foreach (var sb in fd.Body)
                 {
-                    if (s is not CommentBlock)
+                    if (sb is not CommentBlock)
                     {
                         hasNonComment = true;
                         break;
@@ -7323,9 +7323,9 @@ public class AstBuilder
             if (stmt is FunctionDef fd)
             {
                 bool hasNonComment = false;
-                foreach (var s in fd.Body)
+                foreach (var sb in fd.Body)
                 {
-                    if (s is not CommentBlock)
+                    if (sb is not CommentBlock)
                     {
                         hasNonComment = true;
                         break;
@@ -8056,11 +8056,11 @@ public class AstBuilder
                 if (defStmt is FunctionDef fd2 && _codeObject?.Instructions != null)
                     AttachDefaultsFromBytecode(fd2, ref defStmt);
                 // 清理 ClassDef 类体中的编译器伪影（独立字符串、__class__ 赋值等）
-                if (defStmt is ClassDef cd)
+                if (defStmt is ClassDef clsDefVal)
                 {
-                    var cleanBody = new List<Stmt>(cd.Body);
+                    var cleanBody = new List<Stmt>(clsDefVal.Body);
                     CleanClassBody(cleanBody);
-                    defStmt = cd with { Body = cleanBody };
+                    defStmt = clsDefVal with { Body = cleanBody };
                 }
                 if (defStmt != null)
                 {
