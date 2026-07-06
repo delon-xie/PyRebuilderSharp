@@ -5081,13 +5081,16 @@ public class AstBuilder
                 // afterBranch 是 else 子句的条件：
                 // (1) body 以终端指令结尾（不能 fallthrough 到 afterBranch）
                 // (2) afterBranch 不含条件跳转指令（不是 elif 链的一部分）
+                // (3) 跳转方向必须是 POP_JUMP_IF_FALSE（跳转到 else）
+                //     POP_JUMP_IF_TRUE 的跳转目标是 if 体，永不视为 else
                 bool bodyEndsWithTerminal = bodyStmts.Count > 0
                     && bodyStmts[^1] is Return or Raise or Break or Continue;
                 bool isConditionBlock = afterBranch.Instructions.Any(i =>
                     i.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                         or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
                         or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38);
-                isElseClause = bodyEndsWithTerminal && !isConditionBlock;
+                bool isFalseJump = lastInstr.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_FALSE_PY38;
+                isElseClause = bodyEndsWithTerminal && !isConditionBlock && isFalseJump;
             }
 
             if (isElseClause)
