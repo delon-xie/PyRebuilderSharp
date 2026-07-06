@@ -1074,9 +1074,9 @@ public class AstBuilder
                 return stmts;
             }
             
-            // 如果 BuildTryFromExceptionTable 返回 null 但已经标记了当前块为 visited，
+            // 如果 BuildTryFromExceptionTable 返回 null 但已经标记了当前块为 processed，
             // 说明它已经处理了当前块的语句，不需要再处理
-            if (visited.Contains(block))
+            if (_processedBlockIds.Contains(block.Id))
             {
                 // 处理当前块的后继
                 foreach (var succ in block.Successors.OrderBy(s => s.StartOffset))
@@ -7651,26 +7651,6 @@ public class AstBuilder
                 if (a.Value is Name classCell && classCell.Id == "__class__")
                 { body.RemoveAt(i); continue; }
                 // Remove assignments with integer constant value (firstlineno)
-                if (a.Value is Constant ic && ic.Value is int)
-                { body.RemoveAt(i); continue; }
-            }
-            // Remove standalone 'ClassName' string literal (docstring alias when no docstring)
-            if (body[i] is ExprStmt e && e.Value is Constant c2 && c2.Value is string
-                && i == 0 && body.Count > 1 && body[1] is Assign a2
-                && a2.Targets.Count == 1 && a2.Targets[0] is Name n2
-                && (n2.Id == "__module__" || n2.Id == "__qualname__"))
-            { body.RemoveAt(i); continue; }
-            // Remove standalone string or integer constants (compiler metadata)
-            if (body[i] is ExprStmt e2 && e2.Value is Constant c3)
-            {
-                if (c3.Value is string sn && sn.All(ch => char.IsLetterOrDigit(ch) || ch == '_'))
-                { body.RemoveAt(i); continue; }
-                if (c3.Value is int)
-                { body.RemoveAt(i); continue; }
-            }
-                if (a.Value is Name classCell && classCell.Id == "__class__")
-                { body.RemoveAt(i); continue; }
-                // Remove assignments with integer constant value (firstlineno metadata)
                 if (a.Value is Constant ic && ic.Value is int)
                 { body.RemoveAt(i); continue; }
             }
