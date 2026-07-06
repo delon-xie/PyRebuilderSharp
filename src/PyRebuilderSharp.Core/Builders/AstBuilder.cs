@@ -8015,20 +8015,28 @@ public class AstBuilder
     private void AttachDefaultsFromBytecode(FunctionDef fd, ref Stmt defStmt)
     {
         if (_codeObject == null) return;
-        var insList = _codeObject.Instructions;
-        bool foundDefault = false;
-        for (int ii = 0; ii < insList.Count && !foundDefault; ii++)
+        // Search current code object, then recursively search child code objects
+        if (ScanCodeObjectForDefaults(_codeObject, fd, ref defStmt)) return;
+        foreach (var childCode in _codeObject.ChildCodes)
+            if (ScanCodeObjectForDefaults(childCode, fd, ref defStmt)) return;
+    }
+
+    private bool ScanCodeObjectForDefaults(CodeObject codeObj, FunctionDef fd, ref Stmt defStmt)
+    {
+        var insList = codeObj.Instructions;
+        for (int ii = 0; ii < insList.Count; ii++)
         {
             if (insList[ii].Opcode == Opcode.STORE_NAME && insList[ii].Argument.HasValue
-                && _codeObject.Names.Count > insList[ii].Argument.Value
-                && _codeObject.Names[insList[ii].Argument.Value] == fd.Name)
+                && codeObj.Names.Count > insList[ii].Argument.Value
+                && codeObj.Names[insList[ii].Argument.Value] == fd.Name)
             {
                 for (int jj = ii - 1; jj >= 0 && jj >= ii - 8; jj--)
                 {
-                    if (insList[jj].Opcode == Opcode.SET_FUNCTION_ATTRIBUTE_313 && (insList[jj].Argument & 0x01) != 0)
+                    if (insList[jj].Opcode == Opcode.SET_FUNCTION_ATTRIBUTE_313 && insList[jj].Argument.HasValue
+                        && (insList[jj].Argument.Value & 0x01) != 0)
                     {
                         var defaults = new List<Expr>();
-                        for (int kk = jj - 1; kk >= 0 && kk >= jj - 6; kk--)
+                        for (int kk = jj - 1; kk >= 0 && kk >= jj - 20; kk--)
                         {
                             var kIns = insList[kk];
                             if (kIns.Opcode == Opcode.BUILD_TUPLE && kIns.Argument.HasValue && kIns.Argument.Value > 0)
@@ -8036,15 +8044,15 @@ public class AstBuilder
                                 for (int mm = kk - 1, need = kIns.Argument.Value; mm >= 0 && need > 0; mm--)
                                 {
                                     var it = insList[mm];
-                                    if (it.Opcode == Opcode.LOAD_NAME && it.Argument.HasValue && _codeObject.Names.Count > it.Argument.Value)
-                                    { defaults.Insert(0, new Name(_codeObject.Names[it.Argument.Value], ExpressionContext.Load)); need--; }
-                                    else if (it.Opcode == Opcode.LOAD_CONST && it.Argument.HasValue && _codeObject.Constants.TryGetValue(it.Argument.Value, out var cv))
+                                    if (it.Opcode == Opcode.LOAD_NAME && it.Argument.HasValue && codeObj.Names.Count > it.Argument.Value)
+                                    { defaults.Insert(0, new Name(codeObj.Names[it.Argument.Value], ExpressionContext.Load)); need--; }
+                                    else if (it.Opcode == Opcode.LOAD_CONST && it.Argument.HasValue && codeObj.Constants.TryGetValue(it.Argument.Value, out var cv))
                                     { defaults.Insert(0, new Constant(cv)); need--; }
                                 }
                                 break;
                             }
                             if (kIns.Opcode == Opcode.LOAD_CONST && kIns.Argument.HasValue
-                                && _codeObject.Constants.TryGetValue(kIns.Argument.Value, out var cv2)
+                                && codeObj.Constants.TryGetValue(kIns.Argument.Value, out var cv2)
                                 && cv2 is System.Collections.IList tupleList && tupleList.Count > 0)
                             {
                                 foreach (var item in tupleList)
@@ -8066,13 +8074,14 @@ public class AstBuilder
                                     : fd.Args[ai]);
                             }
                             defStmt = fd with { Args = newArgs };
-                            foundDefault = true;
+                            return true;
                         }
                         break;
                     }
                 }
             }
         }
+        return false;
     }
 
     private static bool HasNestedFunctions(List<Stmt> body)
