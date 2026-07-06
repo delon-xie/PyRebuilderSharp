@@ -285,10 +285,10 @@ public class AstBuilder
                             // 根据偏移位置插入孤儿块内容，而非始终追加在末尾。
                             // 早期偏移的孤儿块（如函数体开头的初始化语句 `abstracts = set()`）
                             // 应出现在函数开头而非末尾。
-                            var orphanStmts = new List<Stmt>
-                            {
-                                new CommentBlock($"# orphan @0x{orphan.StartOffset:X4}")
-                            };
+                            var orphanStmts = new List<Stmt>();
+                            // 只有当孤儿块有实际内容时才添加注释
+                            if (blockResult.Statements.Count > 0)
+                                orphanStmts.Add(new CommentBlock($"# orphan @0x{orphan.StartOffset:X4}"));
                             // 过滤孤儿块中的 raise 语句：这些是失去处理器上下文的不可达异常重抛，
                             // 不应出现在反编译输出中。
                             foreach (var s in blockResult.Statements)
@@ -298,9 +298,12 @@ public class AstBuilder
                                 if (s is ExprStmt { Value: Constant { Value: null } }) continue;
                                 // 过滤孤立变量引用（如 solo name / 'string' / classdict = 异常处理残留）
                                 if (s is ExprStmt { Value: Name }) continue;
-                                if (s is ExprStmt { Value: Constant { Value: string } }) continue;
+                                if (s is ExprStmt { Value: Constant cv } && cv.Value is string) continue;
                                 orphanStmts.Add(s);
                             }
+                            // 过滤后如果只有注释没有实际语句，则不输出孤儿块注释
+                            if (orphanStmts.Count == 0 || (orphanStmts.Count == 1 && orphanStmts[0] is CommentBlock))
+                            { continue; }
 
                             // 跳过纯注释的孤儿块（无有效语句，例如已被控制流消费的 jump_cond 块）
                             if (orphanStmts.Count <= 1)
@@ -7609,9 +7612,20 @@ public class AstBuilder
                 && a.Targets[0] is Name an)
             {
                 if (an.Id == "__static_attributes__" || an.Id == "__classdictcell__"
-                    || an.Id == "__classcell__" || an.Id == "__firstlineno__")
+                    || an.Id == "__classcell__" || an.Id == "__firstlineno__"
+                    || an.Id == "__module__" || an.Id == "__qualname__")
+                { body.RemoveAt(i); continue; }
+                // Remove __doc__ = 'ClassName' (no real docstring, just class name alias)
+                if (an.Id == "__doc__" && a.Value is Constant c && c.Value is string s
+                    && i > 0 && body[0] is ExprStmt { Value: Constant { Value: string } })
                 { body.RemoveAt(i); continue; }
             }
+            // Remove standalone 'ClassName' string literal (docstring alias when no docstring)
+            if (body[i] is ExprStmt e && e.Value is Constant c2 && c2.Value is string
+                && i == 0 && body.Count > 1 && body[1] is Assign a2
+                && a2.Targets.Count == 1 && a2.Targets[0] is Name n2
+                && (n2.Id == "__module__" || n2.Id == "__qualname__"))
+            { body.RemoveAt(i); continue; }
             if (i == body.Count - 1 && body[i] is Pass)
             { body.RemoveAt(i); continue; }
         }
