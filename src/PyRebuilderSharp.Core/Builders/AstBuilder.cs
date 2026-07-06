@@ -303,7 +303,7 @@ public class AstBuilder
                             }
                             // 过滤后如果只有注释没有实际语句，则不输出孤儿块注释
                             if (orphanStmts.Count == 0 || (orphanStmts.Count == 1 && orphanStmts[0] is CommentBlock))
-                            { continue; }
+                            { _processedBlockIds.Add(orphan.Id); continue; }
 
                             // 跳过纯注释的孤儿块（无有效语句，例如已被控制流消费的 jump_cond 块）
                             if (orphanStmts.Count <= 1)
