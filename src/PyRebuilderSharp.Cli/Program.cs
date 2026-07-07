@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using PyRebuilderSharp.Core;
@@ -85,7 +85,7 @@ class Program
             ShowHeader = !noHeader,
             ShowSummary = useDebug,
             ShowOrphanBlocks = useDebug,
-            VerboseErrors = inputFiles.Count == 1  // 单文件模式启动诊断输出
+            VerboseErrors = useDebug  // 仅在调试模式下启动诊断输出
         };
         if (inputFiles.Count > 1 || batchMode)
             RunBatch(inputFiles, outputDir, statsOnly, opts);
