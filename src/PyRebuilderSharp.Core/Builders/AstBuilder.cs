@@ -3451,16 +3451,9 @@ public class AstBuilder
             }
             if (tb == block)
             {
-                // 对于当前块，使用 BuildStatements 方法，这样可以正确处理嵌套结构
-                // 但如果块已在 visited 中（被主遍历预先处理过），使用缓存结果
-                List<Stmt> stmts;
-                if (visited.Contains(tb))
-                {
-                    var tbResult = _blockResults.GetValueOrDefault(tb.Id);
-                    stmts = tbResult?.Statements?.Where(s => s is not Raise).ToList() ?? new List<Stmt>();
-                }
-                else
-                    stmts = BuildStatements(tb, visited);
+                // 对于当前块，使用 _blockResults 缓存（避免递归调用 BuildStatements → BuildTryFromExceptionTable）
+                var tbResult = _blockResults.GetValueOrDefault(tb.Id);
+                var stmts = tbResult?.Statements?.Where(s => s is not Raise).ToList() ?? new List<Stmt>();
                 if (afterTryBody)
                     elseBody.AddRange(stmts);
                 else
@@ -3510,6 +3503,13 @@ public class AstBuilder
 
         visited.Add(handlerBlock);
 
+        // 预先计算 handlerEnd（handler 的 ET 条目结束偏移），后续会被 else 扫描使用
+        var handlerET = _codeObject.ExceptionTable
+            .FirstOrDefault(e => e.StartOffset == matchingEntry.TargetOffset);
+        var handlerEnd = handlerET != null
+            ? handlerET.EndOffset
+            : matchingEntry.EndOffset;
+
         // 收集 else 体：扫描 handler 块末尾后的指令流，查找类/函数定义块。
         // 在 abc.py 中，ABCMeta class 定义位于 handler 的末尾与 handler 的
         // JUMP_FORWARD 目标之间，且不是 handler 后继。
@@ -3540,11 +3540,16 @@ public class AstBuilder
             }
 
             var handlerSuccessorSet = new HashSet<BasicBlock>(handlerBlock.Successors);
+            // 对于 orphan handler block，Successors 可能为空，
+            // 需要也排除 handler ET 范围内的块
+            var handlerRangeBlockSet = new HashSet<BasicBlock>(
+                _sortedBlocks.Where(b => b.StartOffset >= handlerBlock.StartOffset && b.StartOffset < handlerEnd));
             var elseCandidates = _sortedBlocks
                 .Where(b => b.StartOffset > scanStart
                     && b.EndOffset < scanEnd
                     && !visited.Contains(b)
-                    && !handlerSuccessorSet.Contains(b))  // 跳过 handler 后继（它们是 handler body，不是 else）
+                    && !handlerSuccessorSet.Contains(b)
+                    && !handlerRangeBlockSet.Contains(b))  // 排除 handler 范围内的块
                 .OrderBy(b => b.StartOffset)
                 .ToList();
             if (_options.VerboseErrors)
@@ -3580,11 +3585,6 @@ public class AstBuilder
 
         // 从 handler 的后继块中收集 handler 体语句（在 POP_EXCEPT/POP_EXCEPT 之前的语句）
         // 同时也需要获取 handlerEnd（handler 的 ET 条目结束偏移）
-        var handlerET = _codeObject.ExceptionTable
-            .FirstOrDefault(e => e.StartOffset == matchingEntry.TargetOffset);
-        var handlerEnd = handlerET != null
-            ? handlerET.EndOffset
-            : matchingEntry.EndOffset;
 
         // 检查已被其他路径 visited 的 handler 后继是否含有未消费的语句
         foreach (var vsucc in handlerBlock.Successors)
@@ -3644,43 +3644,54 @@ public class AstBuilder
                 }
 
                 var succResult = _blockResults.GetValueOrDefault(succ.Id);
-                if (succResult?.Statements != null && succResult.Statements.Any(s => s is not Raise and not CommentBlock))
+                bool hasValidStatements = succResult?.Statements != null && succResult.Statements.Any(s => s is not Raise and not CommentBlock);
+                if (hasValidStatements)
                 {
-                    // Handler successor 中的 Return 语句是 handler 退出路径，不是 handler body
                     handlerBody.AddRange(succResult.Statements
                         .Where(s => s is not Raise and not CommentBlock and not Pass));
                 }
-                else if (handlerBlock.StartOffset < succStart && succStart < handlerEnd)
+                else if (handlerBlock.StartOffset < succStart && succStart < handlerEnd + 2)
                 {
                     try
                     {
+                        // 创建一个新 StackMachine 模拟 handler 前缀 + 后继
                         var tempSM = new StackMachine(_codeObject);
+                        // 执行 handler 前缀，仅执行非条件跳转指令
+                        bool seenPopJump = false;
                         foreach (var hi in handlerBlock.Instructions)
                         {
                             if (hi.Opcode == Opcode.POP_JUMP_IF_FALSE
                                 || hi.Opcode == Opcode.POP_JUMP_IF_TRUE)
                             {
-                                tempSM.PopExpr();
-                                break;
+                                tempSM.PopExpr(); // 消耗条件值
+                                seenPopJump = true;
+                                break; // 停止执行 handler 前缀（条件跳转后是不同路径）
                             }
                             if (hi.Opcode == Opcode.CHECK_EXC_MATCH || hi.Opcode == Opcode.CHECK_EG_MATCH)
                             {
                                 tempSM.PopExpr();
                                 continue;
                             }
+                            if (hi.Opcode == Opcode.PUSH_EXC_INFO || hi.Opcode == Opcode.PUSH_EXC_INFO_312
+                                || hi.Opcode == Opcode.PUSH_EXC_HANDLER_312)
+                            {
+                                // PUSH_EXC_INFO 在 3.11+ 中推向内部异常栈，模拟时不处理
+                                continue;
+                            }
                             tempSM.Execute(hi);
                         }
-                        var succStmts = new List<Stmt>();
+                        // 执行后继指令
+                        var handlerSuccStmts = new List<Stmt>();
                         foreach (var si in succ.Instructions)
                         {
                             var result = tempSM.Execute(si);
                             if (result is Return && si.Opcode == Opcode.JUMP_FORWARD)
                                 break;
                             if (result != null && result is not Raise and not CommentBlock and not Pass)
-                                succStmts.Add(result);
+                                handlerSuccStmts.Add(result);
                         }
-                        if (succStmts.Count > 0)
-                            handlerBody.AddRange(succStmts);
+                        if (handlerSuccStmts.Count > 0)
+                            handlerBody.AddRange(handlerSuccStmts);
                     }
                     catch (Exception exSim)
                     {
@@ -3835,7 +3846,6 @@ public class AstBuilder
         {
             new ExceptHandler(exceptType, exceptName, handlerBody, isGroup)
         };
-
         return new List<Stmt> { new Try(tryBody, handlers, elseBody) };
         }
         finally
