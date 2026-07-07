@@ -3246,7 +3246,7 @@ public class AstBuilder
 
         // Find the outermost entry that covers this block (lowest depth = 0 or 1 first)
         var matchingEntry = _codeObject.ExceptionTable
-            .Where(e => blockStart >= e.StartOffset && blockEnd <= e.EndOffset)
+            .Where(e => blockStart >= e.StartOffset && blockStart < e.EndOffset)
             .OrderBy(e => e.Depth)
             .FirstOrDefault();
         if (matchingEntry == null)
@@ -3254,12 +3254,16 @@ public class AstBuilder
             return null;
         }
 
-        // 检查：如果 ET 条目覆盖模块入口块（offset ≈ 0）且无 CHECK_EXC_MATCH，则是模块级清理条目
-        // CPython 3.14 会为整个模块生成一个 ET 清理条目，不应被当作 try/except 处理
+        // 检查：如果 ET 条目覆盖模块入口块（offset ≈ 0）且 handler 中无 CHECK_EXC_MATCH，则是模块级清理条目
+        // CPython 3.14 会为整个模块生成一个 ET 清理条目，不应被当作 try/except 处理。
+        // 注意：CHECK_EXC_MATCH 可能在 handler 中（TargetOffset 之后），不在 entry 的范围内
+        // 模块级清理条目标志：起始 ≈ 0，覆盖范围覆盖几乎所有代码，无 CHECK_EXC_MATCH
+        bool isLargeRange = (matchingEntry.EndOffset - matchingEntry.StartOffset) > _codeObject.Instructions.Count * 0.6;
         bool isModuleCleanup = matchingEntry.StartOffset <= 4
+            && isLargeRange
             && !_codeObject.Instructions.Any(i =>
                 (i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH)
-                && i.Offset >= matchingEntry.StartOffset && i.Offset < matchingEntry.EndOffset);
+                && i.Offset >= matchingEntry.TargetOffset);
 
         if (isModuleCleanup)
         {
@@ -3420,9 +3424,10 @@ public class AstBuilder
         foreach (var tb in tryBlocks)
         {
             // 检查这个块是否真正属于当前 try/except 块
-            // 如果块的最后一个指令的偏移超过了当前异常表条目的 EndOffset，
+            // 如果块的最后一个指令的偏移显著超过了当前异常表条目的 EndOffset，
             // 说明这个块跨越了两个异常表条目，不应该被处理
-            if (tb.Instructions.Count > 0 && tb.Instructions.Last().Offset >= matchingEntry.EndOffset)
+            // 允许少量偏差（最多 2 字节），因为 block 边界可能略超 ET 边界
+            if (tb.Instructions.Count > 0 && tb.Instructions.Last().Offset > matchingEntry.EndOffset + 2)
                 continue;
             
             // 检测 POP_BLOCK 或 JUMP_FORWARD（3.12+）分界
@@ -3481,9 +3486,10 @@ public class AstBuilder
         foreach (var tb in tryBlocks)
         {
             // 检查这个块是否真正属于当前 try/except 块
-            // 如果块的最后一个指令的偏移超过了当前异常表条目的 EndOffset，
+            // 如果块的最后一个指令的偏移显著超过了当前异常表条目的 EndOffset，
             // 说明这个块跨越了两个异常表条目，不应该被标记为 visited
-            if (tb.Instructions.Count > 0 && tb.Instructions.Last().Offset < matchingEntry.EndOffset)
+            // 允许少量偏差（最多 2 字节）
+            if (tb.Instructions.Count > 0 && tb.Instructions.Last().Offset <= matchingEntry.EndOffset + 2)
             {
                 visited.Add(tb);
                 _processedBlockIds.Add(tb.Id);
@@ -3569,7 +3575,7 @@ public class AstBuilder
             Console.Error.WriteLine($"[TRY_FROM_ET]   handler stmt types={string.Join(",", handlerResult.Statements.Select(s => s.GetType().Name))}");
         }
         var handlerBody = handlerResult?.Statements
-            ?.Where(s => s is not Raise and not CommentBlock and not Return)
+            ?.Where(s => s is not Raise and not CommentBlock and not Pass)
             .ToList() ?? new List<Stmt>();
 
         // 从 handler 的后继块中收集 handler 体语句（在 POP_EXCEPT/POP_EXCEPT 之前的语句）
@@ -3613,7 +3619,8 @@ public class AstBuilder
             Console.Error.WriteLine($"[TRY_FROM_ET]   successor#{succ.Id} offset={succ.StartOffset:X4} visited={visited.Contains(succ)}");
             if (succ.Instructions.Count == 0) continue;
             var succStart = succ.Instructions[0].Offset;
-            if (succStart >= matchingEntry.TargetOffset && succStart < handlerEnd
+            // 后继在 handler 块范围内（从 handler 块开始到 handler ET 结束，容忍 2 字节边界）
+            if (succStart >= handlerBlock.StartOffset && succStart < handlerEnd + 2
                 && !visited.Contains(succ))
             {
                 // 跳过类/函数定义块 — 这些是结构边界，不是 handler 后继体
@@ -3637,11 +3644,49 @@ public class AstBuilder
                 }
 
                 var succResult = _blockResults.GetValueOrDefault(succ.Id);
-                if (succResult?.Statements != null)
+                if (succResult?.Statements != null && succResult.Statements.Any(s => s is not Raise and not CommentBlock))
                 {
                     // Handler successor 中的 Return 语句是 handler 退出路径，不是 handler body
                     handlerBody.AddRange(succResult.Statements
-                        .Where(s => s is not Raise and not CommentBlock and not Return and not ExprStmt));
+                        .Where(s => s is not Raise and not CommentBlock and not Pass));
+                }
+                else if (handlerBlock.StartOffset < succStart && succStart < handlerEnd)
+                {
+                    try
+                    {
+                        var tempSM = new StackMachine(_codeObject);
+                        foreach (var hi in handlerBlock.Instructions)
+                        {
+                            if (hi.Opcode == Opcode.POP_JUMP_IF_FALSE
+                                || hi.Opcode == Opcode.POP_JUMP_IF_TRUE)
+                            {
+                                tempSM.PopExpr();
+                                break;
+                            }
+                            if (hi.Opcode == Opcode.CHECK_EXC_MATCH || hi.Opcode == Opcode.CHECK_EG_MATCH)
+                            {
+                                tempSM.PopExpr();
+                                continue;
+                            }
+                            tempSM.Execute(hi);
+                        }
+                        var succStmts = new List<Stmt>();
+                        foreach (var si in succ.Instructions)
+                        {
+                            var result = tempSM.Execute(si);
+                            if (result is Return && si.Opcode == Opcode.JUMP_FORWARD)
+                                break;
+                            if (result != null && result is not Raise and not CommentBlock and not Pass)
+                                succStmts.Add(result);
+                        }
+                        if (succStmts.Count > 0)
+                            handlerBody.AddRange(succStmts);
+                    }
+                    catch (Exception exSim)
+                    {
+                        if (_options.VerboseErrors)
+                            Console.Error.WriteLine($"[TRY_FROM_ET] succ_sim_error: {exSim.GetType().Name}: {exSim.Message}");
+                    }
                 }
                 visited.Add(succ);
                 _processedBlockIds.Add(succ.Id);
@@ -3750,20 +3795,27 @@ public class AstBuilder
             var ins = handlerBlock.Instructions[i];
             if (ins.Opcode == Opcode.CHECK_EXC_MATCH || ins.Opcode == Opcode.CHECK_EG_MATCH)
             {
-                if (i > 0)
+                // Collect exception types from instructions BEFORE CHECK_EXC_MATCH/CHECK_EG_MATCH
+                // Pattern 1: single type → LOAD_NAME/LOAD_GLOBAL
+                // Pattern 2: multiple types → LOAD_NAME/LOAD_GLOBAL... BUILD_TUPLE
+                var typeExprs = new List<Expr>();
+                for (int j = i - 1; j >= 0; j--)
                 {
-                    var typeLoad = handlerBlock.Instructions[i - 1];
-                    if (typeLoad.Opcode == Opcode.LOAD_NAME)
+                    var prev = handlerBlock.Instructions[j];
+                    if (prev.Opcode == Opcode.BUILD_TUPLE || prev.Opcode == Opcode.BUILD_LIST)
+                        continue; // skip tuple/list builder, collect individual types
+                    if (prev.Opcode == Opcode.LOAD_NAME || prev.Opcode == Opcode.LOAD_GLOBAL)
                     {
-                        var name = _codeObject.Names.ElementAtOrDefault(typeLoad.Argument ?? 0);
-                        if (name != null) exceptType = new Name(name);
+                        var name = _codeObject.Names.ElementAtOrDefault(prev.Argument ?? 0);
+                        if (name != null)
+                            typeExprs.Insert(0, new Name(name));
                     }
-                    else if (typeLoad.Opcode == Opcode.LOAD_GLOBAL)
-                    {
-                        var name = _codeObject.Names.ElementAtOrDefault(typeLoad.Argument ?? 0);
-                        if (name != null) exceptType = new Name(name);
-                    }
+                    else break;
                 }
+                if (typeExprs.Count == 1)
+                    exceptType = typeExprs[0];
+                else if (typeExprs.Count > 1)
+                    exceptType = new ListLiteral(typeExprs, ContainerKind.Tuple);
                 break;
             }
             if (ins.Opcode == Opcode.STORE_NAME)

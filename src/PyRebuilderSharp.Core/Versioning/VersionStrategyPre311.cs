@@ -73,11 +73,22 @@ public class VersionStrategyPre311 : VersionStrategyBase
     public override bool HasPosOnlyArgCount => _is38plus;
 
     /// <summary>
-    /// 3.5-3.10 的操作码编号体系统一，可直接投射。
+    /// 3.5-3.10 的操作码编号：大部分与 Opcode 枚举一致，但 DEREF/CLOSURE 块（135-138）有偏移：
+    ///   CPython 3.5-3.10: 135=LOAD_CLOSURE, 136=LOAD_DEREF, 137=STORE_DEREF, 138=DELETE_DEREF
+    ///   PyRebuilder enum (3.11+): 135=MAKE_CELL, 136=LOAD_CLOSURE, 137=LOAD_DEREF, 138=PUSH_EXC_INFO
+    /// 参考 CPython: Include/opcode.h v3.5.0~v3.10.0
     /// </summary>
     public override Opcode MapOpcode(byte rawOp)
     {
-        return (Opcode)rawOp;
+        // 3.5-3.10 的 DEREF/CLOSURE 块偏移映射
+        return rawOp switch
+        {
+            135 => Opcode.LOAD_CLOSURE,
+            136 => Opcode.LOAD_DEREF,
+            137 => Opcode.STORE_DEREF,
+            138 => Opcode.DELETE_DEREF,
+            _ => (Opcode)rawOp,
+        };
     }
 
     // IsJumpInstruction 继承自基类的默认实现
