@@ -1281,7 +1281,7 @@ public class AstBuilder
                 bodyVisited.Add(exitBlock);
             if (elseBlock != null)
                 bodyVisited.Add(elseBlock);
-            CollectBodyBlocks(bodyEntry, actualHeader, bodyBlocks, bodyVisited, exitBlock);
+            CollectBodyBlocks(bodyEntry, actualHeader, bodyBlocks, bodyVisited, exitBlock, elseOffset);
         }
         Console.Error.WriteLine($"[BUILD_FOR_LOOP] bodyBlocks collected: {bodyBlocks.Count}, bodyEntry={(bodyEntry?.Id ?? -1)}, exitBlock={(exitBlock?.Id ?? -1)}, elseOffset={(elseOffset.HasValue ? $"0x{elseOffset.Value:X4}" : "null")}");
         foreach (var bb in bodyBlocks)
@@ -5017,11 +5017,14 @@ public class AstBuilder
             {
                 int instrLen = 2;
                 var jumpTargetOffset = forIterInstr.Offset + instrLen + forIterInstr.Argument.Value;
-                if (afterBranch.StartOffset != jumpTargetOffset)
+                
+                var targetBlock = _blockByOffset.Values.FirstOrDefault(b => 
+                    b.StartOffset <= jumpTargetOffset && jumpTargetOffset <= b.EndOffset);
+                if (targetBlock == null || targetBlock != afterBranch)
                     return false;
 
                 var allBlocks = _blockByOffset.Values.OrderBy(b => b.StartOffset).ToList();
-                int targetIndex = allBlocks.FindIndex(b => b.StartOffset == jumpTargetOffset);
+                int targetIndex = allBlocks.FindIndex(b => b == afterBranch);
 
                 if (targetIndex >= 0 && targetIndex < allBlocks.Count - 1)
                 {
@@ -6341,7 +6344,8 @@ public class AstBuilder
     private void CollectBodyBlocks(
         BasicBlock entry, BasicBlock header,
         List<BasicBlock> bodyBlocks, HashSet<BasicBlock> visited,
-        BasicBlock? exitBlock = null)
+        BasicBlock? exitBlock = null,
+        int? elseOffset = null)
     {
         var worklist = new Queue<BasicBlock>();
         worklist.Enqueue(entry);
@@ -6359,6 +6363,9 @@ public class AstBuilder
             if (current == header || visited.Contains(current))
                 continue;
             if (exitBlock != null && (current == exitBlock || exitSuccessors.Contains(current)))
+                continue;
+            
+            if (elseOffset.HasValue && current.EndOffset >= elseOffset.Value)
                 continue;
 
             bodyBlocks.Add(current);
