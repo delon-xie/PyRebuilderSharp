@@ -1790,8 +1790,10 @@ public class AstBuilder
                             // 取栈顶作为 elt（真正的元素表达式是栈顶或栈顶-1）
                             var top = sm.PopExpr();
                             var second = sm.PopExpr();
-                            // BinOp 更可能是元素表达式而非列表容器
-                            if (top is BinOp || second is ListLiteral || second is DictLiteral)
+                            // BinOp/Call/Name（非 loop target）更可能是元素表达式而非列表容器
+                            if (top is BinOp or Call or IfExp or Compare or ListComp or UnaryOp)
+                                elt = top;
+                            else if (second is ListLiteral or DictLiteral or SetLiteral)
                                 elt = top;
                             else
                                 elt = second;
@@ -6807,7 +6809,7 @@ public class AstBuilder
                 }
                 
                 if ((instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME
-                        || instr.Opcode == Opcode.STORE_DEREF)
+                        || instr.Opcode == Opcode.STORE_DEREF || instr.Opcode == Opcode.MAKE_CELL)
                     && instr.Argument.HasValue)
                 {
                     var idx = instr.Argument.Value;
@@ -6827,10 +6829,14 @@ public class AstBuilder
                     else // STORE_DEREF
                     {
                         // CPython 3.12+ STORE_DEREF uses varname index for cell variables,
-                        // and len(varnames) + freevar_index for free variables
-                        if (idx < _codeObject.Varnames.Count)
+                        // and len(varnames) + freevar_index for free variables.
+                        // In 3.10, cellvars take priority: idx<len(cellvars) → cellvar.
+                        // Note: in 3.10, raw byte 135 = STORE_DEREF is mapped to MAKE_CELL in enum
+                        if (idx < (_codeObject.Cellvars?.Count ?? 0))
+                            varName = _codeObject.Cellvars[idx];
+                        else if (idx < (_codeObject.Varnames?.Count ?? 0))
                             varName = _codeObject.Varnames[idx];
-                        else if (idx - _codeObject.Varnames.Count < _codeObject.Freevars.Count)
+                        else if (idx - (_codeObject.Varnames?.Count ?? 0) < (_codeObject.Freevars?.Count ?? 0))
                             varName = _codeObject.Freevars[idx - _codeObject.Varnames.Count];
                         else
                             varName = $"cell_{idx}";
@@ -6867,13 +6873,16 @@ public class AstBuilder
             else if (instr.Opcode == Opcode.STORE_NAME && instr.Argument.HasValue
                 && instr.Argument.Value >= 0 && instr.Argument.Value < _codeObject.Names.Count)
                 names.Add(new Name(_codeObject.Names[instr.Argument.Value], ExpressionContext.Store));
-            else if (instr.Opcode == Opcode.STORE_DEREF && instr.Argument.HasValue)
+            else if ((instr.Opcode == Opcode.STORE_DEREF || instr.Opcode == Opcode.MAKE_CELL) && instr.Argument.HasValue)
             {
                 int idx = instr.Argument.Value;
                 string cellName;
                 // CPython 3.12+ STORE_DEREF uses varname index for cell variables,
-                // and len(varnames) + freevar_index for free variables
-                if (idx < _codeObject.Varnames.Count)
+                // and len(varnames) + freevar_index for free variables.
+                // In 3.10, cellvars take priority: idx<len(cellvars) → cellvar.
+                if (idx < _codeObject.Cellvars.Count)
+                    cellName = _codeObject.Cellvars[idx];
+                else if (idx < _codeObject.Varnames.Count)
                     cellName = _codeObject.Varnames[idx];
                 else if (idx - _codeObject.Varnames.Count < _codeObject.Freevars.Count)
                     cellName = _codeObject.Freevars[idx - _codeObject.Varnames.Count];
@@ -7204,7 +7213,7 @@ public class AstBuilder
                     if (hasCellVar)
                     {
                         // Try to simulate element extraction from raw instructions
-                        Expr? simElt = SimulateNestedElt(childInstrs, innermostFor.Target);
+                        Expr? simElt = SimulateNestedElt(childInstrs, innermostFor.Target, compRef.Code);
                         if (simElt != null)
                             elt = simElt;
                     }
@@ -7477,7 +7486,7 @@ public class AstBuilder
     /// 从原始子代码指令中提取元素表达式。
     /// 处理需要 LOAD_DEREF（外部 cell 变量）的嵌套推导式。
     /// </summary>
-    private Expr? SimulateNestedElt(List<Instruction> childInstrs, Expr? loopTarget)
+    private Expr? SimulateNestedElt(List<Instruction> childInstrs, Expr? loopTarget, CodeObject? codeObj)
     {
         int storeIdx = -1;
         for (int i = 0; i < childInstrs.Count; i++)
@@ -7490,7 +7499,7 @@ public class AstBuilder
         }
         if (storeIdx < 0 || storeIdx >= childInstrs.Count - 1) return null;
         
-        var simMachine = new StackMachine(new CodeObject());
+        var simMachine = new StackMachine(codeObj ?? new CodeObject());
         simMachine.PushExpr(loopTarget ?? new Name("?", ExpressionContext.Load));
         
         for (int i = storeIdx + 1; i < childInstrs.Count; i++)
@@ -7573,7 +7582,11 @@ public class AstBuilder
             {
                 var compExpr = BuildComprehension(compRef, call);
                 if (compExpr != null)
+                {
+                    // 递归转换推导式内部的元素（可能包含嵌套推导式或 lambda）
+                    compExpr = ConvertComprehensionExpr(compExpr);
                     return compExpr;
+                }
                 // If comprehensions fails, try lambda
                 if (compRef.Name == "<lambda>")
                 {
@@ -7649,6 +7662,40 @@ public class AstBuilder
         if (expr is UnaryOp unaryOp)
         {
             return new UnaryOp(unaryOp.Op, ConvertComprehensionExpr(unaryOp.Operand));
+        }
+        // 递归转换推导式内部元素（嵌套推导式 / lambda）
+        if (expr is ListComp lc)
+        {
+            return new ListComp(ConvertComprehensionExpr(lc.Elt),
+                lc.Generators.Select(g => new Comprehension(
+                    g.Target,
+                    ConvertComprehensionExpr(g.Iter) ?? g.Iter,
+                    g.Ifs)).ToList());
+        }
+        if (expr is SetComp sc)
+        {
+            return new SetComp(ConvertComprehensionExpr(sc.Elt),
+                sc.Generators.Select(g => new Comprehension(
+                    g.Target,
+                    ConvertComprehensionExpr(g.Iter) ?? g.Iter,
+                    g.Ifs)).ToList());
+        }
+        if (expr is DictComp dc)
+        {
+            return new DictComp(ConvertComprehensionExpr(dc.Key) ?? dc.Key,
+                ConvertComprehensionExpr(dc.Value) ?? dc.Value,
+                dc.Generators.Select(g => new Comprehension(
+                    g.Target,
+                    ConvertComprehensionExpr(g.Iter) ?? g.Iter,
+                    g.Ifs)).ToList());
+        }
+        if (expr is GeneratorExp ge)
+        {
+            return new GeneratorExp(ConvertComprehensionExpr(ge.Elt),
+                ge.Generators.Select(g => new Comprehension(
+                    g.Target,
+                    ConvertComprehensionExpr(g.Iter) ?? g.Iter,
+                    g.Ifs)).ToList());
         }
         return expr;
     }
@@ -8687,6 +8734,18 @@ public class AstBuilder
             string name = childCode.Varnames[i];
             if (!name.StartsWith("."))
                 args.Add(new Parameter(name));
+        }
+
+        // 应用默认参数值（DefaultExprs 对应最后 N 个位置参数）
+        if (funcRef.DefaultExprs != null && funcRef.DefaultExprs.Count > 0)
+        {
+            int defaultsCount = funcRef.DefaultExprs.Count;
+            for (int i = 0; i < defaultsCount && i < args.Count; i++)
+            {
+                int argIdx = args.Count - defaultsCount + i;
+                if (argIdx >= 0 && argIdx < args.Count)
+                    args[argIdx] = args[argIdx] with { Default = funcRef.DefaultExprs[i] };
+            }
         }
 
         // 2. 反编译函数体，提取返回表达式
