@@ -36,7 +36,6 @@ print
 if not True:
     pass
 instructions
-# [Block @0x0282] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 pos += 1
 length = data[pos]
 pos += 1

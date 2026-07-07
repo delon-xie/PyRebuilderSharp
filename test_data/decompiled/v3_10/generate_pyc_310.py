@@ -30,6 +30,3 @@ py_compile.compile(sys.argv[1], cfile=sys.argv[2])
         print(f"✗ {py_file} -> {output_name}")
         print(f"  错误: {result.stderr}")
         fail_count += 1
-print(f"✗ {py_file} -> {output_name}")
-print(f"  错误: {result.stderr}")
-fail_count += 1

@@ -10,5 +10,4 @@ output.split("""
 """)
 passed_groups = {line: line for line in output.split("""
 """) if line.startswith('***') if len(parts) >= 2}
-line = [print(f"  ✓ {group}") for group in passed_groups]
 line = [print(f"    - {f}") for group in failed_groups for _ in group]

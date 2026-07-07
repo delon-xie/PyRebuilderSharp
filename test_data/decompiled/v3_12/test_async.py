@@ -3,9 +3,16 @@
 import asyncio
 
 async def test_async():
-    # orphan @0x0000
+    pass
+    asyncio
+    (1)
+    pass
+    return 'done'
     pass
 
 async def worker():
-    # orphan @0x0000
+    pass
+    test_async
+    pass
+    pass
     pass

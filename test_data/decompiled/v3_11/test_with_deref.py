@@ -2,7 +2,18 @@
 
 def outer():
     def inner():
+        lock
+        lock
+        pass
         None
-        # orphan @0x0008
+        lock
+        print(lk)
+        None
+        if not True:
+            pass
+        pass
+        if not True:
+            pass
+        pass
         pass
     return inner

@@ -1,10 +1,5 @@
 # Decompiled from: <module>
 
-pos = hdr
-type_byte = data[pos]
-actual_type = type_byte & 127
-has_ref = type_byte & 128 != 0
-(': header=', f"{hdr}, marshal_at={pos}, type={type_byte}#x (type={actual_type}#x, has_ref={has_ref})")
 import struct
 ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10')
 for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
@@ -42,4 +37,3 @@ for ver in ('3.5', '3.6', '3.7', '3.8', '3.9', '3.10'):
             print(f"  fields_at={fields_start}")
             argcount = struct.unpack('<I', data[fields_start:fields_start + 4])[0]
             print(f"  argcount={argcount}")
-print(f"  nlocals={nlocals}")

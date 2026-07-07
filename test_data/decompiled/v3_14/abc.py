@@ -1,5 +1,6 @@
 # Decompiled from: <module>
 
+'Abstract Base Classes (ABCs) according to PEP 3119.'
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 
@@ -21,12 +22,9 @@ def abstractmethod(funcobj):
     return funcobj
 
 class abstractclassmethod(classmethod):
-    'abstractclassmethod'
-    __module__ = __name__
-    __qualname__ = 'abstractclassmethod'
-    __doc__ = """A decorator indicating abstract classmethods.
+    """A decorator indicating abstract classmethods.
 
-Deprecated, use 'classmethod' with 'abstractmethod' instead:
+    Deprecated, use 'classmethod' with 'abstractmethod' instead:
 
     class C(ABC):
         @classmethod
@@ -34,7 +32,7 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
         def my_abstract_classmethod(cls, ...):
             ...
 
-.. deprecated-removed: 3.3 3.21
+    .. deprecated-removed: 3.3 3.21
 
 """
     __isabstractmethod__ = True
@@ -46,12 +44,9 @@ Deprecated, use 'classmethod' with 'abstractmethod' instead:
         super().__init__(callable)
 
 class abstractstaticmethod(staticmethod):
-    'abstractstaticmethod'
-    __module__ = __name__
-    __qualname__ = 'abstractstaticmethod'
-    __doc__ = """A decorator indicating abstract staticmethods.
+    """A decorator indicating abstract staticmethods.
 
-Deprecated, use 'staticmethod' with 'abstractmethod' instead:
+    Deprecated, use 'staticmethod' with 'abstractmethod' instead:
 
     class C(ABC):
         @staticmethod
@@ -59,7 +54,7 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
         def my_abstract_staticmethod(...):
             ...
 
-.. deprecated-removed: 3.3 3.21
+    .. deprecated-removed: 3.3 3.21
 
 """
     __isabstractmethod__ = True
@@ -71,12 +66,9 @@ Deprecated, use 'staticmethod' with 'abstractmethod' instead:
         super().__init__(callable)
 
 class abstractproperty(property):
-    'abstractproperty'
-    __module__ = __name__
-    __qualname__ = 'abstractproperty'
-    __doc__ = """A decorator indicating abstract properties.
+    """A decorator indicating abstract properties.
 
-Deprecated, use 'property' with 'abstractmethod' instead:
+    Deprecated, use 'property' with 'abstractmethod' instead:
 
     class C(ABC):
         @property
@@ -84,7 +76,7 @@ Deprecated, use 'property' with 'abstractmethod' instead:
         def my_abstract_property(self):
             ...
 
-.. deprecated-removed: 3.3 3.21
+    .. deprecated-removed: 3.3 3.21
 
 """
     __isabstractmethod__ = True
@@ -93,25 +85,27 @@ Deprecated, use 'property' with 'abstractmethod' instead:
         import warnings
         warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(fget, fset, fdel, doc)
+try:
+    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
+except ImportError:
+    from _py_abc import ABCMeta
+    from _py_abc import get_cache_token
+    ABCMeta.__module__ = 'abc'
 
 class ABCMeta(type):
-    'ABCMeta'
-    __module__ = __name__
-    __qualname__ = 'ABCMeta'
-    __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
+    """Metaclass for defining Abstract Base Classes (ABCs).
 
-Use this metaclass to create an ABC.  An ABC can be subclassed
-directly, and then acts as a mix-in class.  You can also register
-unrelated concrete classes (even built-in classes) and unrelated
-ABCs as 'virtual subclasses' -- these and their descendants will
-be considered subclasses of the registering ABC by the built-in
-issubclass() function, but the registering ABC won't show up in
-their MRO (Method Resolution Order) nor will method
-implementations defined by the registering ABC be callable (not
-even via super()).
+    Use this metaclass to create an ABC.  An ABC can be subclassed
+    directly, and then acts as a mix-in class.  You can also register
+    unrelated concrete classes (even built-in classes) and unrelated
+    ABCs as 'virtual subclasses' -- these and their descendants will
+    be considered subclasses of the registering ABC by the built-in
+    issubclass() function, but the registering ABC won't show up in
+    their MRO (Method Resolution Order) nor will method
+    implementations defined by the registering ABC be callable (not
+    even via super()).
 """
-
-    def __new__(mcls, name, bases, namespace):
+    def __new__(mcls, name, bases, namespace, /, **kwargs):
         cls = None
         _abc_init(cls)
         return cls
@@ -166,9 +160,8 @@ def update_abstractmethods(cls):
 """
     if not hasattr(cls, '__abstractmethods__'):
         return cls
-    else:
-        abstracts = set()
-        cls.__bases__
+    abstracts = set()
+    cls.__bases__
     for scls in cls.__bases__:
         pass
     for (value, name) in cls.__dict__.items():
@@ -177,17 +170,8 @@ def update_abstractmethods(cls):
         else:
             abstracts.add(name)
 
-class ABC(ABCMeta):
-    'ABC'
-    __module__ = __name__
-    __qualname__ = 'ABC'
-    __doc__ = """Helper class that provides a standard way to create an ABC using
-inheritance.
+class ABC(metaclass=ABCMeta):
+    """Helper class that provides a standard way to create an ABC using
+    inheritance.
 """
     __slots__ = __static_attributes__ = ()
-try:
-    pass
-except ImportError:
-    from _py_abc import ABCMeta
-    from _py_abc import get_cache_token
-    ABCMeta.__module__ = 'abc'

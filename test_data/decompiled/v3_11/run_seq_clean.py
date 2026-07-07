@@ -1,6 +1,5 @@
 # Decompiled from: <module>
 
-None
 'Run AST comparison for test_seq_clean across all versions'
 import os
 import subprocess
@@ -9,3 +8,11 @@ import sys
 PROJECT = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/src/PyRebuilderSharp.Cli')
 COMPILED_DIR = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled')
 INPUT_FILE = os.path.expanduser('~/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/input/test_seq_clean.py')
+open(INPUT_FILE)
+expected_src = f.read()
+None
+pass
+if not True:
+    pass
+pass
+pass

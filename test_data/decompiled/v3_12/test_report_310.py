@@ -43,7 +43,5 @@ for line in lines:
         pass
     elif 'FAIL' in clean_line:
         current_test_fail = True
-current_test = line_stripped[4:].split(':')[0]
-current_test_fail = False
 print(f"✗ {current_test}")
 failed += 1

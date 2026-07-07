@@ -245,20 +245,6 @@ public class AstBuilder
                                     // 孤儿块按偏移量决定插入位置：早期偏移（偏移最小的一部分）插到开头
                                     bool early = orphan.StartOffset < 64;
                                     
-                                    // Debug: log recovered statements
-                                    if (_codeObject.Name == "EnumCheck")
-                                    {
-                                        System.IO.File.AppendAllText("/tmp/enum_debug2.txt", 
-                                            $"EnumCheck recovered stmts:\n");
-                                        foreach (var stmt in recovered)
-                                        {
-                                            System.IO.File.AppendAllText("/tmp/enum_debug2.txt", 
-                                                $"  {stmt.GetType().Name}: {stmt}\n");
-                                        }
-                                        System.IO.File.AppendAllText("/tmp/enum_debug2.txt", 
-                                            $"LooksLikeClassBody: {LooksLikeClassBody(recovered)}\n");
-                                    }
-                                    
                                     // Check if this looks like a class body
                                     // 如果包含 import 语句，则是模块级代码，不是类体
                                     bool hasImport = recovered.Any(s => s is Assign a
@@ -835,6 +821,7 @@ public class AstBuilder
         // 检测 try/except (SETUP_FINALLY 模式)
         // 如果已经在构建 try 语句中（_buildTryDepth > 0），则跳过，避免在 try 体中创建另一个 try 语句
         var tryBodyStmts = _buildTryDepth == 0 ? BuildTryFromBlock(block, visited) : null;
+        
         if (tryBodyStmts != null)
         {
             stmts.AddRange(tryBodyStmts);
@@ -1198,10 +1185,8 @@ public class AstBuilder
 
     private List<Stmt> BuildForLoop(BasicBlock header, HashSet<BasicBlock> visited)
     {
-        if (_options.VerboseErrors)
-        {
         Console.Error.WriteLine($"[BUILD_FOR_LOOP] Entering: header offset={header.StartOffset:X4}, id={header.Id}");
-        }
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] header instructions: {string.Join(", ", header.Instructions.Select(i => i.Opcode))}");
         
         BasicBlock actualHeader = header;
         if (!header.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
@@ -1251,10 +1236,7 @@ public class AstBuilder
         
         if (_processedBlockIds.Contains(actualHeader.Id))
         {
-            if (_options.VerboseErrors)
-            {
-                Console.Error.WriteLine($"[BUILD_FOR_LOOP] Skipping because actualHeader id={actualHeader.Id} is already processed");
-            }
+            Console.Error.WriteLine($"[BUILD_FOR_LOOP] Skipping because actualHeader id={actualHeader.Id} is already processed");
             return new List<Stmt>();
         }
         
@@ -1271,15 +1253,25 @@ public class AstBuilder
         MarkForLoopPredecessors(actualHeader, visited);
 
         var bodyBlocks = new List<BasicBlock>();
+        var forIterInstr = actualHeader.Instructions.FirstOrDefault(i => i.Opcode == Opcode.FOR_ITER);
+        int? elseOffset = null;
+        if (forIterInstr != default && forIterInstr.Argument.HasValue)
+        {
+            int instrLen = 2;
+            elseOffset = forIterInstr.Offset + instrLen + forIterInstr.Argument.Value;
+        }
+
         var bodyEntry = actualHeader.Successors
             .OrderBy(s => s.StartOffset)
             .FirstOrDefault();
+        var elseBlock = elseOffset.HasValue ? FindBlockByOffset(elseOffset.Value) : null;
+        
         var exitBlock = actualHeader.Successors
             .OrderByDescending(s => s.StartOffset)
-            .FirstOrDefault(b => b != bodyEntry);
+            .FirstOrDefault(b => b != bodyEntry && b != elseBlock);
         if (_options.VerboseErrors)
         {
-        Console.Error.WriteLine($"[BUILD_FOR_LOOP] actualHeader#{actualHeader.Id} successors={actualHeader.Successors.Count}, bodyEntry={(bodyEntry?.Id ?? -1)}, exitBlock={(exitBlock?.Id ?? -1)}");
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] actualHeader#{actualHeader.Id} successors={actualHeader.Successors.Count}, bodyEntry={(bodyEntry?.Id ?? -1)}, exitBlock={(exitBlock?.Id ?? -1)}, elseOffset={(elseOffset.HasValue ? $"0x{elseOffset.Value:X4}" : "null")}");
         }
         if (bodyEntry != null)
         {
@@ -1287,9 +1279,11 @@ public class AstBuilder
             bodyVisited.Add(actualHeader);
             if (exitBlock != null)
                 bodyVisited.Add(exitBlock);
+            if (elseBlock != null)
+                bodyVisited.Add(elseBlock);
             CollectBodyBlocks(bodyEntry, actualHeader, bodyBlocks, bodyVisited, exitBlock);
         }
-        Console.Error.WriteLine($"[BUILD_FOR_LOOP] bodyBlocks collected: {bodyBlocks.Count}, bodyEntry={(bodyEntry?.Id ?? -1)}, exitBlock={(exitBlock?.Id ?? -1)}");
+        Console.Error.WriteLine($"[BUILD_FOR_LOOP] bodyBlocks collected: {bodyBlocks.Count}, bodyEntry={(bodyEntry?.Id ?? -1)}, exitBlock={(exitBlock?.Id ?? -1)}, elseOffset={(elseOffset.HasValue ? $"0x{elseOffset.Value:X4}" : "null")}");
         foreach (var bb in bodyBlocks)
         {
             Console.Error.WriteLine($"[BUILD_FOR_LOOP]   bodyBlock#{bb.Id} offset=0x{bb.StartOffset:X4}-0x{bb.EndOffset:X4} opcodes={string.Join(",", bb.Instructions.Select(i => i.Opcode))}");
@@ -1391,15 +1385,21 @@ public class AstBuilder
         }
         if (isNestedLoop)
         {
-            if (_options.VerboseErrors)
-            {
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: NESTED_LOOP (will be merged into outer comprehension), returning empty");
-            }
+            
             return new List<Stmt>();
         }
 
         Console.Error.WriteLine($"[DECOMP_TRACE] stage=BUILD_FOR_LOOP DECISION: EMPTY_FOR_LOOP iterExpr={iterExpr} bodyStmts={bodyStmts.Count}");
-        return new List<Stmt> { new For(target, iterExpr, bodyStmts, null) };
+
+        List<Stmt>? orelse = null;
+        if (elseBlock != null && IsLoopElseTarget(elseBlock, actualHeader, bodyEntry))
+        {
+            var elseStmts = BuildBlockOnly(elseBlock, visited);
+            if (elseStmts.Count > 0)
+                orelse = elseStmts.Where(s => !(s is Return ret && (ret.Value is Constant { Value: null } || ret.Value == null))).ToList();
+            if (orelse?.Count == 0) orelse = null;
+        }
+        return new List<Stmt> { new For(target, iterExpr, bodyStmts, orelse) };
     }
 
     private Stmt? TryDetectInlinedComprehension(BasicBlock header, Expr target, Expr? iterExpr,
@@ -3982,29 +3982,47 @@ public class AstBuilder
                 tryStmts.AddRange(bodyResult);
         }
         // 检查 POP_BLOCK 块之后是否有 JUMP_FORWARD → else body
-        // 优先从 tryBodyBlocks 中找，如果为空则从当前 block 中找
-        var popBlockBlock = tryBodyBlocks.Count > 0
-            ? tryBodyBlocks.LastOrDefault(b =>
-                b.Instructions.Any(i => i.Opcode == Opcode.POP_BLOCK))
-            : block;
-        // 当前块也可能包含 POP_BLOCK + JUMP_FORWARD（try body 在单块内）
-        if (popBlockBlock != null)
+        // 优先从当前 block 中找（try-except-else 的 JUMP_FORWARD 通常在 SETUP_FINALLY 块中）
+        var popBlockBlock = block;
+        var jfInstr = popBlockBlock.Instructions.FirstOrDefault(
+            i => i.Opcode == Opcode.JUMP_FORWARD);
+        if (jfInstr.Argument.HasValue)
         {
-            var jfInstr = popBlockBlock.Instructions.FirstOrDefault(
-                i => i.Opcode == Opcode.JUMP_FORWARD);
-            if (jfInstr.Argument.HasValue)
+            var target = jfInstr.Offset + 2 + jfInstr.Argument.Value;
+            // 跳过回边块（v3.10: POP_BLOCK→JUMP_FORWARD 可能跳到 while 回边条件块）
+            if (_blockByOffset.TryGetValue(target, out var targetBlock))
             {
-                var target = jfInstr.Offset + 2 + jfInstr.Argument.Value;
-                // 跳过回边块（v3.10: POP_BLOCK→JUMP_FORWARD 可能跳到 while 回边条件块）
-                if (_blockByOffset.TryGetValue(target, out var targetBlock))
+                var lastInTarget = targetBlock.Instructions.LastOrDefault();
+                bool isBackEdge = lastInTarget != default
+                    && JumpHelper.IsConditionalJump(lastInTarget.Opcode)
+                    && lastInTarget.Argument.HasValue
+                    && lastInTarget.Argument.Value >= targetBlock.StartOffset;
+                if (!isBackEdge)
+                    elseJumpTarget = target;
+            }
+        }
+        // 如果当前块没有找到，再从 tryBodyBlocks 中找
+        if (!elseJumpTarget.HasValue && tryBodyBlocks.Count > 0)
+        {
+            var bodyPopBlock = tryBodyBlocks.LastOrDefault(b =>
+                b.Instructions.Any(i => i.Opcode == Opcode.POP_BLOCK));
+            if (bodyPopBlock != null)
+            {
+                jfInstr = bodyPopBlock.Instructions.FirstOrDefault(
+                    i => i.Opcode == Opcode.JUMP_FORWARD);
+                if (jfInstr.Argument.HasValue)
                 {
-                    var lastInTarget = targetBlock.Instructions.LastOrDefault();
-                    bool isBackEdge = lastInTarget != default
-                        && JumpHelper.IsConditionalJump(lastInTarget.Opcode)
-                        && lastInTarget.Argument.HasValue
-                        && lastInTarget.Argument.Value >= targetBlock.StartOffset;
-                    if (!isBackEdge)
-                        elseJumpTarget = target;
+                    var target = jfInstr.Offset + 2 + jfInstr.Argument.Value;
+                    if (_blockByOffset.TryGetValue(target, out var targetBlock))
+                    {
+                        var lastInTarget = targetBlock.Instructions.LastOrDefault();
+                        bool isBackEdge = lastInTarget != default
+                            && JumpHelper.IsConditionalJump(lastInTarget.Opcode)
+                            && lastInTarget.Argument.HasValue
+                            && lastInTarget.Argument.Value >= targetBlock.StartOffset;
+                        if (!isBackEdge)
+                            elseJumpTarget = target;
+                    }
                 }
             }
         }
@@ -4184,31 +4202,61 @@ public class AstBuilder
             // 检测 else 子句：try body 的 POP_BLOCK 后 JUMP_FORWARD → else body
             if (elseJumpTarget.HasValue)
             {
-                // else body 在 POP_BLOCK 之后、handler 之前。
-                // 收集 from=elseJumpTarget(=after_all) 是错的，它指向 handler 之后。
-                // 正确做法：从 popBlockBlock 的后继中找 offset < handlerAbs 的块
+                // else body 在 handler 之后，由 JUMP_FORWARD 指向
                 var elseBlocks = new List<BasicBlock>();
-                // 从 POP_BLOCK 块的后继开始（不在 handler 区域内）
-                foreach (var succ in (popBlockBlock ?? block).Successors)
+                if (_blockByOffset.TryGetValue(elseJumpTarget.Value, out var elseEntryBlock))
                 {
-                    if (succ == null || succ.StartOffset >= handlerAbs)
-                        continue;
-                    if (succ.StartOffset < (instrs[setupIdx].Offset + 2))
-                        continue;
-                    // 跳过 handler 入口块
-                    if (succ.Id == (handlerEntryBlock?.Id ?? -1))
-                        continue;
-                    elseBlocks.Add(succ);
+                    // 检查 else 候选块之后是否有其他块
+                    // 在 try-except-else 中，else 块之后还有函数末尾的代码块
+                    // 在 try-except-no-else 中，else 候选块是最后一个块（函数末尾）
+                    bool isRealElse = false;
+                    var allBlocks = _blockByOffset.Values.OrderBy(b => b.StartOffset).ToList();
+                    int elseIndex = allBlocks.FindIndex(b => b.StartOffset == elseEntryBlock.StartOffset);
+                    
+                    if (elseIndex >= 0 && elseIndex < allBlocks.Count - 1)
+                    {
+                        bool hasNonEmptyNextBlock = false;
+                        for (int i = elseIndex + 1; i < allBlocks.Count; i++)
+                        {
+                            if (allBlocks[i].Instructions.Count > 0)
+                            {
+                                hasNonEmptyNextBlock = true;
+                                break;
+                            }
+                        }
+                        if (hasNonEmptyNextBlock)
+                        {
+                            isRealElse = true;
+                        }
+                    }
+                    if (isRealElse)
+                    {
+                        elseBlocks.Add(elseEntryBlock);
+                        var visitedIds = new HashSet<int> { elseEntryBlock.Id };
+                        var queue = new Queue<BasicBlock>();
+                        queue.Enqueue(elseEntryBlock);
+                        while (queue.Count > 0)
+                        {
+                            var cur = queue.Dequeue();
+                            foreach (var succ in cur.Successors)
+                            {
+                                if (succ == null || !visitedIds.Add(succ.Id)) continue;
+                                // 跳过 handler 块和回边块
+                                if (succ.StartOffset < handlerAbs) continue;
+                                // 跳过循环头
+                                if (succ.Flags.HasFlag(BlockFlags.LoopHeader)) continue;
+                                elseBlocks.Add(succ);
+                                queue.Enqueue(succ);
+                            }
+                        }
+                    }
                 }
                 if (elseBlocks.Count > 0)
                 {
                     var elseStmts = new List<Stmt>();
                     foreach (var eb in elseBlocks)
                     {
-                        var ebInstrs = eb.Instructions
-                            .Where(i => i.Opcode != Opcode.RETURN_VALUE
-                                && i.Opcode != Opcode.RERAISE)
-                            .ToList();
+                        var ebInstrs = eb.Instructions.ToList();
                         if (ebInstrs.Count > 0)
                         {
                             var ebMachine = new StackMachine(_codeObject);
@@ -4225,7 +4273,6 @@ public class AstBuilder
                     if (elseStmts.Count > 0 && !IsTrivialElse(elseStmts))
                     {
                         elseBody = elseStmts;
-                        // 将 else 块标记为已访问，防止外部重复处理
                         foreach (var eb in elseBlocks)
                             visited.Add(eb);
                     }
@@ -4239,12 +4286,11 @@ public class AstBuilder
         }
 
         bool hasValidHandlers = handlers.Count > 0 && handlers.Any(h => 
-            h.Body != null && h.Body.Count > 0 && 
-            !(h.Body.Count == 1 && h.Body[0] is Pass));
-        bool hasValidFinally = finalBody != null && finalBody.Count > 0 && 
-            !(finalBody.Count == 1 && finalBody[0] is Pass);
+            h.Body != null && h.Body.Count > 0);
+        bool hasValidFinally = finalBody != null && finalBody.Count > 0;
+        bool hasValidElse = elseBody != null && elseBody.Count > 0;
         
-        if (!hasValidHandlers && !hasValidFinally)
+        if (!hasValidHandlers && !hasValidFinally && !hasValidElse)
         {
             var resultWithoutTry = new List<Stmt>(beforeTry);
             resultWithoutTry.AddRange(tryStmts);
@@ -4287,6 +4333,7 @@ public class AstBuilder
         // 标记所有 try body 块为 visited，防止外部重新处理
         foreach (var tb in tryBodyCollector)
             visited.Add(tb);
+        
         return result;
     }
 
@@ -4668,7 +4715,24 @@ public class AstBuilder
             }
         }
 
-        return new List<Stmt> { new While(testExpr, bodyStmts, null) };
+        List<Stmt>? orelse = null;
+        if (lastInstr != default && lastInstr.Argument.HasValue)
+        {
+            var jumpTargetOffset = lastInstr.Argument.Value;
+            var afterLoopBlock = FindBlockByOffset(jumpTargetOffset);
+            if (afterLoopBlock != null && !visited.Contains(afterLoopBlock))
+            {
+                var bodyEntryBlock = bodyBlocks.FirstOrDefault();
+                if (IsLoopElseTarget(afterLoopBlock, header, bodyEntryBlock))
+                {
+                    orelse = BuildBlockOnly(afterLoopBlock, visited);
+                    orelse = orelse.Where(s => !(s is Return ret && (ret.Value is Constant { Value: null } || ret.Value == null))).ToList();
+                    if (orelse.Count == 0) orelse = null;
+                }
+            }
+        }
+
+        return new List<Stmt> { new While(testExpr, bodyStmts, orelse) };
     }
     /// 用于 Python 3.10 中 entry 块同时包含初始化语句和 while 条件的场景。
     /// </summary>
@@ -4854,6 +4918,228 @@ public class AstBuilder
         return lastIns != default && JumpHelper.IsTerminal(lastIns.Opcode);
     }
 
+    private bool IsElseTarget(BasicBlock afterBranch, BasicBlock header, BasicBlock bodyBranch, List<Stmt>? bodyStmts = null)
+    {
+        if (afterBranch == null || header == null) return false;
+
+        if (IsIfElseTarget(afterBranch, header, bodyBranch, bodyStmts))
+            return true;
+
+        if (IsLoopElseTarget(afterBranch, header, bodyBranch))
+            return true;
+
+        if (IsTryElseTarget(afterBranch, header, bodyBranch))
+            return true;
+
+        return false;
+    }
+
+    private bool IsIfElseTarget(BasicBlock afterBranch, BasicBlock header, BasicBlock bodyBranch, List<Stmt>? bodyStmts = null)
+    {
+        if (afterBranch == null || header == null) return false;
+
+        bool isConditionBlock = afterBranch.Instructions.Any(i =>
+            i.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
+                or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38);
+
+        bool bodyEndsWithTerminal = bodyStmts != null && bodyStmts.Count > 0
+            && bodyStmts[^1] is Return or Raise or Break or Continue;
+
+        var lastHeaderInstr = header.Instructions.LastOrDefault();
+        bool isFalseJump = lastHeaderInstr != default && 
+            lastHeaderInstr.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_FALSE_PY38;
+        bool isTrueJump = lastHeaderInstr != default &&
+            lastHeaderInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_TRUE_PY38;
+
+        if (bodyEndsWithTerminal && !isConditionBlock && isFalseJump)
+            return true;
+
+        if (bodyBranch != null)
+        {
+            if (afterBranch.Predecessors.Count == 1
+                && afterBranch.Predecessors.Contains(header))
+            {
+                if (!isConditionBlock)
+                    return true;
+            }
+        }
+
+        if (isFalseJump || isTrueJump)
+        {
+            bool bodyEndsWithJump = false;
+            if (bodyBranch != null)
+            {
+                var lastBodyInstr = bodyBranch.Instructions.LastOrDefault();
+                bodyEndsWithJump = lastBodyInstr != default &&
+                    (lastBodyInstr.Opcode is Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE);
+            }
+
+            bool afterIsReachableFromBody = false;
+            if (bodyBranch != null)
+            {
+                foreach (var succ in bodyBranch.Successors)
+                {
+                    if (succ == afterBranch || succ.StartOffset == afterBranch.StartOffset)
+                    {
+                        afterIsReachableFromBody = true;
+                        break;
+                    }
+                }
+            }
+
+            
+
+            if (bodyEndsWithJump && afterIsReachableFromBody && !isConditionBlock)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool IsLoopElseTarget(BasicBlock afterBranch, BasicBlock header, BasicBlock bodyBranch)
+    {
+        if (afterBranch == null || header == null) return false;
+
+        bool isForLoop = header.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
+        bool isWhileLoop = header.Instructions.Any(i =>
+            i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+            && header.Flags.HasFlag(BlockFlags.LoopHeader);
+
+        if (!isForLoop && !isWhileLoop)
+            return false;
+
+        if (isForLoop)
+        {
+            var forIterInstr = header.Instructions.FirstOrDefault(i => i.Opcode == Opcode.FOR_ITER);
+            if (forIterInstr != default && forIterInstr.Argument.HasValue)
+            {
+                int instrLen = 2;
+                var jumpTargetOffset = forIterInstr.Offset + instrLen + forIterInstr.Argument.Value;
+                if (afterBranch.StartOffset != jumpTargetOffset)
+                    return false;
+
+                var allBlocks = _blockByOffset.Values.OrderBy(b => b.StartOffset).ToList();
+                int targetIndex = allBlocks.FindIndex(b => b.StartOffset == jumpTargetOffset);
+
+                if (targetIndex >= 0 && targetIndex < allBlocks.Count - 1)
+                {
+                    bool hasNonEmptyNextBlock = false;
+                    for (int i = targetIndex + 1; i < allBlocks.Count; i++)
+                    {
+                        if (allBlocks[i].Instructions.Count > 0)
+                        {
+                            hasNonEmptyNextBlock = true;
+                            break;
+                        }
+                    }
+                    if (hasNonEmptyNextBlock)
+                        return true;
+                }
+
+                if (afterBranch.Flags.HasFlag(BlockFlags.Exit))
+                {
+                    var firstInstr = afterBranch.Instructions.FirstOrDefault();
+                    if (firstInstr != default && firstInstr.Opcode == Opcode.LOAD_CONST)
+                    {
+                        var secondInstr = afterBranch.Instructions.Skip(1).FirstOrDefault();
+                        if (secondInstr != default && secondInstr.Opcode == Opcode.RETURN_VALUE)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+            return false;
+        }
+
+        if (isWhileLoop)
+        {
+            bool hasJumpToAfter = false;
+            var lastInstr = header.Instructions.LastOrDefault();
+            if (lastInstr != default && lastInstr.Argument.HasValue)
+            {
+                var jumpTargetOffset = lastInstr.Argument.Value;
+                if (afterBranch.StartOffset == jumpTargetOffset)
+                    hasJumpToAfter = true;
+            }
+            if (!hasJumpToAfter)
+                return false;
+
+            bool hasBackEdge = false;
+            if (bodyBranch != null)
+            {
+                hasBackEdge = bodyBranch.Successors.Any(s => 
+                    s.StartOffset == header.StartOffset || s == header);
+            }
+            if (!hasBackEdge)
+                return false;
+
+            var allBlocks = _blockByOffset.Values.OrderBy(b => b.StartOffset).ToList();
+            int targetIndex = allBlocks.FindIndex(b => b.StartOffset == afterBranch.StartOffset);
+
+            if (targetIndex >= 0 && targetIndex < allBlocks.Count - 1)
+            {
+                bool hasNonEmptyNextBlock = false;
+                for (int i = targetIndex + 1; i < allBlocks.Count; i++)
+                {
+                    if (allBlocks[i].Instructions.Count > 0)
+                    {
+                        hasNonEmptyNextBlock = true;
+                        break;
+                    }
+                }
+                if (hasNonEmptyNextBlock)
+                    return true;
+            }
+
+            if (afterBranch.Flags.HasFlag(BlockFlags.Exit))
+            {
+                var firstInstr = afterBranch.Instructions.FirstOrDefault();
+                if (firstInstr != default && firstInstr.Opcode == Opcode.LOAD_CONST)
+                {
+                    var secondInstr = afterBranch.Instructions.Skip(1).FirstOrDefault();
+                    if (secondInstr != default && secondInstr.Opcode == Opcode.RETURN_VALUE)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private bool IsTryElseTarget(BasicBlock afterBranch, BasicBlock header, BasicBlock bodyBranch)
+    {
+        if (afterBranch == null || header == null) return false;
+
+        bool hasTrySetup = header.Instructions.Any(i => IsTrySetupOpcode(i.Opcode));
+        if (!hasTrySetup)
+            return false;
+
+        bool hasJumpForwardToElse = false;
+        foreach (var instr in header.Instructions)
+        {
+            if (instr.Opcode == Opcode.JUMP_FORWARD && instr.Argument.HasValue)
+            {
+                var targetOffset = instr.Offset + 2 + instr.Argument.Value;
+                if (afterBranch.StartOffset == targetOffset)
+                {
+                    hasJumpForwardToElse = true;
+                    break;
+                }
+            }
+        }
+
+        return hasJumpForwardToElse;
+    }
+
     private List<Stmt> BuildIfElse(BasicBlock header, HashSet<BasicBlock> visited)
     {
         // 提取 header 块中条件之前的初始化语句（例如 `result = 0` 和 `if x0 > 0:` 在同一块时）
@@ -4873,7 +5159,7 @@ public class AstBuilder
             }
         }
 
-        var testExpr = ExtractCondition(header);
+        var (testExpr, condSideEffects) = ExtractConditionWithSideEffects(header);
         if (header.Instructions.Count == 0) return new List<Stmt>();
         var lastInstr = header.Instructions.Last();
         // 3.12+ wordcode
@@ -4883,11 +5169,13 @@ public class AstBuilder
         // 3.10 特殊处理：ParseInstructionsWordcode 已将 arg *2 转为绝对字节偏移
         // 3.11+ wordcode: arg 是相对字节偏移，需加上 current_offset + 2
         // 3.13+: PycReader 已解析为绝对字节偏移（见 PycReader.ParseInstructions311Plus）
+        // 3.6-3.9 wordcode: arg 已经是绝对字节偏移，不需要额外计算
         if (isWordcode
             && lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
                 or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
                 or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38
             && _codeObject.Version != PythonVersion.Py310
+            && _codeObject.Version >= PythonVersion.Py311
             && _codeObject.Version < PythonVersion.Py313)
         {
             targetOffset = lastInstr.Offset + 2 + targetOffset;
@@ -4904,6 +5192,7 @@ public class AstBuilder
         {
             afterBranch = _allBlocks.FirstOrDefault(b =>
                 b.StartOffset <= targetOffset && targetOffset < b.EndOffset + 2);
+            Console.Error.WriteLine($"[DEBUG_IFELSE] After fallback search, afterBranch={(afterBranch != null ? $"0x{afterBranch.StartOffset:X4}" : "null")}");
         }
         
         // 检测 OR 短接链: POP_JUMP_IF_TRUE + fallthrough 为条件分支
@@ -5088,26 +5377,7 @@ public class AstBuilder
             if (visited.Contains(afterBranch))
                 visited.Remove(afterBranch);
 
-            // 检测是否为 else 子句（非 elif 链）
-            // 条件：after 块的任意前驱是条件块（即通过条件跳转到达），
-            // 且 body 不以非条件跳转结尾
-            bool isElseClause = false;
-            if (bodyBranch != null && afterBranch != null)
-            {
-                // afterBranch 是 else 子句的条件：
-                // (1) body 以终端指令结尾（不能 fallthrough 到 afterBranch）
-                // (2) afterBranch 不含条件跳转指令（不是 elif 链的一部分）
-                // (3) 跳转方向必须是 POP_JUMP_IF_FALSE（跳转到 else）
-                //     POP_JUMP_IF_TRUE 的跳转目标是 if 体，永不视为 else
-                bool bodyEndsWithTerminal = bodyStmts.Count > 0
-                    && bodyStmts[^1] is Return or Raise or Break or Continue;
-                bool isConditionBlock = afterBranch.Instructions.Any(i =>
-                    i.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE
-                        or Opcode.JUMP_IF_TRUE_OR_POP or Opcode.JUMP_IF_FALSE_OR_POP
-                        or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38);
-                bool isFalseJump = lastInstr.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_FALSE_PY38;
-                isElseClause = bodyEndsWithTerminal && !isConditionBlock && isFalseJump;
-            }
+            bool isElseClause = IsElseTarget(afterBranch, header, bodyBranch, bodyStmts);
 
             if (isElseClause)
             {
@@ -5152,16 +5422,7 @@ public class AstBuilder
             }
             else
             {
-                // 非 If 语句：检测是否为 else 子句
-                // 条件：after 块的唯一前驱是条件块（POP_JUMP_IF_FALSE 目标）
-                // 且 body 链不以 RETURN/RAISE 结尾（否则不会 JUMP 跳过）
-                bool isElseClause = false;
-                if (afterBranch != null && bodyBranch != null)
-                {
-                    isElseClause = afterBranch.Predecessors.Count == 1
-                        && afterBranch.Predecessors.Contains(header)
-                        && !BodyEndsWithTerminal(bodyBranch);
-                }
+                bool isElseClause = IsElseTarget(afterBranch, header, bodyBranch, bodyStmts);
 
                 if (isElseClause)
                 {
@@ -5183,6 +5444,9 @@ public class AstBuilder
 
         var result = new List<Stmt>();
         result.AddRange(headerInitStmts);
+        // 当 headerInitStmts 未收集到副作用时，使用 ExtractCondition 的副作用
+        if (headerInitStmts.Count == 0 && condSideEffects.Count > 0)
+            result.AddRange(condSideEffects);
 
         // 优化: 条件为 Constant(true) 时跳过 If，直接内联 body
         if (testExpr is Constant { Value: bool tv } && tv)
@@ -5503,7 +5767,7 @@ public class AstBuilder
     /// </summary>
     private List<Stmt> BuildRestrictedIfElse(BasicBlock header, HashSet<BasicBlock> visited)
     {
-        var testExpr = ExtractCondition(header);
+        var (testExpr, condSideEffects) = ExtractConditionWithSideEffects(header);
         if (header.Instructions.Count == 0) return new List<Stmt>();
         var lastInstr = header.Instructions.Last();
         var targetOffset = lastInstr.Argument!.Value;
@@ -5618,36 +5882,35 @@ public class AstBuilder
 
     private Expr ExtractCondition(BasicBlock block)
     {
+        return ExtractConditionWithSideEffects(block).condition;
+    }
+
+    private (Expr condition, List<Stmt> sideEffects) ExtractConditionWithSideEffects(BasicBlock block)
+    {
+        var sideEffects = new List<Stmt>();
         if (block.Instructions.Count == 0)
-            return new Constant(true);
-            
+            return (new Constant(true), sideEffects);
+
         var conditionInstrs = block.Instructions
             .Take(block.Instructions.Count - 1)
             .ToList();
 
-        Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND block=0x{block.StartOffset:X4} conditionInstrs.Count={conditionInstrs.Count}");
-        foreach (var ins in conditionInstrs)
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND   instr={ins.Opcode} offset=0x{ins.Offset:X4}");
-
         // 如果当前块只有跳转指令，没有条件表达式，从前驱块中获取
         if (conditionInstrs.Count == 0)
         {
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND conditionInstrs is empty, checking predecessors");
             foreach (var pred in block.Predecessors)
             {
                 var predInstrs = pred.Instructions.ToList();
-                Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND   pred=0x{pred.StartOffset:X4} predInstrs.Count={predInstrs.Count}");
                 if (predInstrs.Count > 0 && !JumpHelper.IsConditionalJump(pred.Instructions.Last().Opcode))
                 {
                     conditionInstrs = predInstrs;
-                    Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND   using pred instructions");
                     break;
                 }
             }
         }
 
         var stackMachine = new StackMachine(_codeObject);
-        
+
         // 如果条件表达式以 STORE_FAST_LOAD_FAST_313 开头，需要先压入循环变量
         if (conditionInstrs.Count > 0 && conditionInstrs[0].Opcode == Opcode.STORE_FAST_LOAD_FAST_313)
         {
@@ -5655,23 +5918,22 @@ public class AstBuilder
             int storeIdx = sflfArg >> 4;
             var loopVarName = storeIdx < _codeObject.Varnames.Count ? _codeObject.Varnames[storeIdx] : $"v_{storeIdx}";
             stackMachine.PushExpr(new Name(loopVarName, ExpressionContext.Load));
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND pushed loop variable '{loopVarName}'");
         }
-        
-        foreach (var instr in conditionInstrs)
-            stackMachine.Execute(instr);
 
-        Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND stackMachine.ExprStackCount={stackMachine.ExprStackCount}");
+        foreach (var instr in conditionInstrs)
+        {
+            var s = stackMachine.Execute(instr);
+            if (s != null) sideEffects.Add(s);
+        }
+
         if (stackMachine.ExprStackCount > 0)
         {
-            var result = stackMachine.PopExpr();
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=EXTRACT_COND returning {result?.GetType().Name} value={result}");
-            return result;
+            return (stackMachine.PopExpr(), sideEffects);
         }
-            
+
         // elif 模式：COMPARE_OP 因缺少 subject（已在之前块中 COPY）而返回 null。
         // 从前驱块中复制 subject，用扩展指令列表重新构造比较表达式。
-        if (stackMachine.ExprStackCount == 0 && stackMachine.HasResults == false && conditionInstrs.Count > 0
+        if (stackMachine.ExprStackCount == 0 && sideEffects.Count == 0 && conditionInstrs.Count > 0
             && JumpHelper.IsConditionalJump(block.Instructions.Last().Opcode))
         {
             // 从前驱块中找到 LOAD_FAST（subject 变量）
@@ -5692,12 +5954,12 @@ public class AstBuilder
                     foreach (var ins in extendedInstrs)
                         sm2.Execute(ins);
                     if (sm2.ExprStackCount > 0)
-                        return sm2.PopExpr();
+                        return (sm2.PopExpr(), sideEffects);
                 }
             }
         }
-        
-        return stackMachine.HasResults ? stackMachine.PopResult() : new Constant(true);
+
+        return (stackMachine.HasResults ? stackMachine.PopResult() : new Constant(true), sideEffects);
     }
 
     /// <summary>
@@ -6084,12 +6346,19 @@ public class AstBuilder
         var worklist = new Queue<BasicBlock>();
         worklist.Enqueue(entry);
 
+        var exitSuccessors = new HashSet<BasicBlock>();
+        if (exitBlock != null)
+        {
+            foreach (var succ in exitBlock.Successors)
+                exitSuccessors.Add(succ);
+        }
+
         while (worklist.Count > 0)
         {
             var current = worklist.Dequeue();
             if (current == header || visited.Contains(current))
                 continue;
-            if (exitBlock != null && current == exitBlock)
+            if (exitBlock != null && (current == exitBlock || exitSuccessors.Contains(current)))
                 continue;
 
             bodyBlocks.Add(current);
@@ -6887,24 +7156,6 @@ public class AstBuilder
                     if (assign.Value is Call call)
                     {
                         // 调试信息
-                        if (targetName.Id == "EnumCheck")
-                        {
-                            System.IO.File.AppendAllText("/tmp/enum_debug.txt", 
-                                $"EnumCheck: assign.Value type={call.GetType().Name}, " +
-                                $"Func type={call.Func.GetType().Name}, " +
-                                $"Func value={call.Func}, " +
-                                $"Args count={call.Args.Count}\n");
-                            if (call.Args.Count > 0)
-                            {
-                                for (int i = 0; i < call.Args.Count; i++)
-                                {
-                                    var arg = call.Args[i];
-                                    System.IO.File.AppendAllText("/tmp/enum_debug.txt", 
-                                        $"  Arg[{i}]: type={arg.GetType().Name}, value={arg}\n");
-                                }
-                            }
-                        }
-                        
                         // 情况 2b: decorator(__build_class__(...))() — 装饰器结果被调用
                         if (call.Args.Count == 0 && call.Func is Call outerDecoratorCall)
                         {
@@ -7482,32 +7733,6 @@ public class AstBuilder
         // 2. 递归反编译函数体
         var body = DecompileChildCode(childCode);
         
-        // DEBUG: 输出 __new__ 方法的 body 内容
-        if (name.Contains("__new__"))
-        {
-            System.IO.File.WriteAllText("/tmp/debug_body.txt", 
-                $"name: {name}\n" +
-                $"body count: {body.Count}\n");
-            foreach (var stmt in body)
-            {
-                System.IO.File.AppendAllText("/tmp/debug_body.txt", 
-                    $"  type: {stmt.GetType().Name}\n");
-            }
-            
-            // DEBUG: 检查是否只有注释
-            bool hasNonCommentBefore = false;
-            foreach (var stmt in body)
-            {
-                if (stmt is not CommentBlock)
-                {
-                    hasNonCommentBefore = true;
-                    break;
-                }
-            }
-            System.IO.File.AppendAllText("/tmp/debug_body.txt", 
-                $"hasNonComment before fix: {hasNonCommentBefore}\n");
-        }
-
         // 2.5 隐式 docstring: Python 3.10+ 将 docstring 放在 co_consts[0]
         //    但不生成 LOAD_CONST 0 指令。需检测并插入。
         if (childCode.Constants.TryGetValue(0, out var const0) && const0 is string docstr)

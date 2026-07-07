@@ -16,4 +16,3 @@ versions = ['2.7', '3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
 results = {}
 versions
 exp_lines = {os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver): os.path.join(COMPILED_DIR, 'test_seq_clean.%s.pyc' % ver) for ver in versions if not os.path.exists(pyc) if match if i < len(exp_lines) if expected_ast == actual_ast if e != a}
-

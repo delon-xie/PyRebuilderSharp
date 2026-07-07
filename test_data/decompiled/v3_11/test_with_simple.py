@@ -1,7 +1,17 @@
 # Decompiled from: <module>
 
-class test:
+def test():
+    lock = object()
+    lock
+    pass
     None
-
-    class test:
-        lock = object()
+    lock
+    print(lk)
+    None
+    if not True:
+        pass
+    pass
+    if not True:
+        pass
+    pass
+    pass

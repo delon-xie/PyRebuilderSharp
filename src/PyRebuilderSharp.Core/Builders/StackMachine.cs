@@ -687,15 +687,7 @@ public class StackMachine
             case Opcode.INPLACE_FLOOR_DIVIDE: return HandleInplaceOp(Operator.FloorDiv);
             case Opcode.INPLACE_TRUE_DIVIDE: return HandleInplaceOp(Operator.Div);
             case Opcode.INPLACE_AND: return HandleInplaceOp(Operator.BitAnd);
-            case Opcode.INPLACE_OR: 
-            {
-                var result = HandleInplaceOp(Operator.BitOr);
-                if (_code.Name == "_make_class_unpicklable")
-                {
-                    System.IO.File.AppendAllText("/tmp/inplace_debug.txt", "INPLACE_OR called\n");
-                }
-                return result;
-            }
+            case Opcode.INPLACE_OR: return HandleInplaceOp(Operator.BitOr);
             case Opcode.INPLACE_XOR: return HandleInplaceOp(Operator.BitXor);
             case Opcode.INPLACE_LSHIFT: return HandleInplaceOp(Operator.LShift);
             case Opcode.INPLACE_RSHIFT: return HandleInplaceOp(Operator.RShift);
@@ -1116,36 +1108,6 @@ public class StackMachine
             case Opcode.COPY_FREE_VARS:
             {
                 int nfree = instr.Argument ?? 0;
-                
-                // Debug: show freevars info
-                if (_code.Name == "__iter__")
-                {
-                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] nfree={nfree}\n");
-                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] _code.Name={_code.Name}\n");
-                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] _code.Freevars.Count={_code.Freevars?.Count ?? 0}\n");
-                    if (_code.Freevars != null)
-                    {
-                        for (int i = 0; i < _code.Freevars.Count; i++)
-                            System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS]   freevar[{i}]={_code.Freevars[i]}\n");
-                    }
-                    System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] _code.Varnames.Count={_code.Varnames.Count}\n");
-                    if (_code.Varnames != null)
-                    {
-                        for (int i = 0; i < _code.Varnames.Count; i++)
-                            System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS]   varname[{i}]={_code.Varnames[i]}\n");
-                    }
-                    // Look ahead for the CodeObject on stack (the genexpr code)
-                    if (_exprStack.Count > 0 && _exprStack.Peek() is Constant c2 && c2.Value is CodeObject co2)
-                    {
-                        System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] Peek CodeObject.Name={co2.Name}\n");
-                        System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS] Peek CodeObject.Freevars.Count={co2.Freevars?.Count ?? 0}\n");
-                        if (co2.Freevars != null)
-                        {
-                            for (int i = 0; i < co2.Freevars.Count; i++)
-                                System.IO.File.AppendAllText("/tmp/freevars_debug.txt", $"[COPY_FREE_VARS]   peek_freevar[{i}]={co2.Freevars[i]}\n");
-                        }
-                    }
-                }
                 
                 // COPY_FREE_VARS n 从当前作用域复制 n 个自由变量的 cell 引用到栈上。
                 // 即使名字不精确，也必须推 n 个占位符，否则 BUILD_TUPLE 将消费
@@ -1997,13 +1959,7 @@ public class StackMachine
                         int flags = instr.Argument ?? 0;
                         var codeExpr = SafePop();                     // 必选：代码对象
                         
-                        if (codeExpr is Constant cTest && cTest.Value is CodeObject cod && cod.Name == "K")
-                        {
-                            if (Diag.Verbose)
-                            {
-                            Console.Error.WriteLine($"[MF_DEBUG] class body K: flags=0x{flags:X2} codeExpr={codeExpr} stackCount={_exprStack.Count} top3={string.Join(",", _exprStack.TakeLast(Math.Min(3, _exprStack.Count)).Reverse())}");
-                            }
-                        }
+                        
                         
                         Expr? closureExpr = (flags & 0x08) != 0 ? SafePop() : null;
                         Expr? annotations = (flags & 0x04) != 0 ? SafePop() : null;
@@ -2159,25 +2115,6 @@ public class StackMachine
                             if (looksLikeClosure)
                             {
                                 closureExpr = SafePop();
-                            }
-                        }
-
-                        // Debug: show what was popped
-                        if (_code.Name == "__iter__")
-                        {
-                            System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC] funcName={funcName}\n");
-                            System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC] closureExpr={closureExpr?.GetType().Name ?? "null"}\n");
-                            if (closureExpr is ListLiteral closureList2)
-                            {
-                                for (int i = 0; i < closureList2.Elts.Count; i++)
-                                {
-                                    var elt = closureList2.Elts[i];
-                                    System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]   closure[{i}] type={elt.GetType().Name}\n");
-                                    if (elt is Models.AST.Attribute attr)
-                                        System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     attr: {attr.Value?.GetType().Name}.{attr.Attr}\n");
-                                    else if (elt is Name n)
-                                        System.IO.File.AppendAllText("/tmp/make_func_debug.txt", $"[MAKE_FUNC]     name: {n.Id}\n");
-                                }
                             }
                         }
 

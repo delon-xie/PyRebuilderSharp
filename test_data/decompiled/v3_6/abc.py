@@ -110,8 +110,6 @@ class ABCMeta(type):
     even via super()).
 
     """
-    _abc_invalidation_counter = 0
-
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace, **kwargs)
         abstracts = {}
@@ -147,7 +145,6 @@ class ABCMeta(type):
         'Override for isinstance(instance, cls).'
         subtype = type(instance)
         subclass = instance.__class__
-        subclass = instance.__class__
         if subclass in cls._abc_cache:
             return True
         if (cls._abc_negative_cache_version == ABCMeta._abc_invalidation_counter) and (subclass in cls._abc_negative_cache):
@@ -174,7 +171,6 @@ class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
-    pass
 
 def get_cache_token():
     """Returns the current ABC cache token.

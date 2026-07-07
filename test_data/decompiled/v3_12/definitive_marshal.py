@@ -1,6 +1,28 @@
 # Decompiled from: <module>
 
-# [Block @0x01AA] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+'Definitive test: field alignment in marshal data'
+import struct
+import marshal
+import sys
+code = compile('a1 = None', '<test>', 'exec')
+m = bytes(marshal.dumps(code))
+print('Type of marshal bytes:', type(m))
+print('Length:', len(m))
+('Bytes:', ' '.join, ('02x' for b in m[:60]()))
+print()
+('Byte[0] = 0x', f"{m[0]}{'02x'} ({m[0]})")
+known = {'argcount': code.co_argcount, 'nlocals': code.co_nlocals, 'stacksize': code.co_stacksize, 'flags': code.co_flags}
+None
+print
+None
+print
+None
+print
+'Known values:'
+v
+k
+known.items()
+{}
 k = {print(f"Match: {code2.co_argcount == code.co_argcount}"): print(f"Match: {code2.co_argcount == code.co_argcount}") for start in range(0, 8) if start + 16 > len(m) if a0 == known['argcount'] if nl == known['nlocals']}
 vals = struct.unpack_from('<IIII', m, start)
 a0 = vals

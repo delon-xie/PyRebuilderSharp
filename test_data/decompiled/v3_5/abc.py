@@ -1,12 +1,7 @@
 # Decompiled from: <module>
 
 class ABC(ABCMeta):
-    'ABC'
-    __module__ = __name__
-    __qualname__ = 'ABC'
-    __doc__ = """Helper class that provides a standard way to create an ABC using
-    inheritance.
-    """
+    pass
 'Abstract Base Classes (ABCs) according to PEP 3119.'
 
 from _weakrefset import WeakSet
@@ -34,7 +29,7 @@ class abstractclassmethod(classmethod):
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
-    __doc__ = """
+    """
     A decorator indicating abstract classmethods.
 
     Similar to abstractmethod.
@@ -56,7 +51,7 @@ class abstractstaticmethod(staticmethod):
     def __init__(self, callable):
         callable.__isabstractmethod__ = True
         super().__init__(callable)
-    __doc__ = """
+    """
     A decorator indicating abstract staticmethods.
 
     Similar to abstractmethod.
@@ -113,7 +108,7 @@ class ABCMeta(type):
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
                 abstracts.add(name)
-    __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
+    """Metaclass for defining Abstract Base Classes (ABCs).
 
     Use this metaclass to create an ABC.  An ABC can be subclassed
     directly, and then acts as a mix-in class.  You can also register
@@ -126,7 +121,6 @@ class ABCMeta(type):
     even via super()).
 
     """
-    _abc_invalidation_counter = 0
     __new__ = 'ABCMeta.__new__'
 
     def register(cls, subclass):
@@ -152,8 +146,6 @@ class ABCMeta(type):
 
     def __instancecheck__(cls, instance):
         'Override for isinstance(instance, cls).'
-        subtype = type(instance)
-        subclass = instance.__class__
         subclass = instance.__class__
         if subclass in cls._abc_cache:
             return True
@@ -166,7 +158,6 @@ class ABCMeta(type):
 
     def __subclasscheck__(cls, subclass):
         'Override for issubclass(subclass, cls).'
-        ok = cls.__subclasshook__(subclass)
         if subclass in cls._abc_cache:
             return True
         if cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:

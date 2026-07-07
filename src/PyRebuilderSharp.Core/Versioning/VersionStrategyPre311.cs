@@ -37,6 +37,7 @@ public class VersionStrategyPre311 : VersionStrategyBase
         get
         {
             if (_is310) return PythonVersion.Py310;
+            if (_is38plus && !_is36 && !_is37) return PythonVersion.Py39;
             if (_is38plus) return PythonVersion.Py38;
             if (_is37) return PythonVersion.Py37;
             if (_is36) return PythonVersion.Py36;

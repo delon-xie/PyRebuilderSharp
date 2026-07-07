@@ -1,5 +1,18 @@
 # Decompiled from: <module>
 
+import marshal
+import sys
+open(sys.argv[1], 'rb')
+magic = f.read(4)
+f.read(8)
+code = marshal.load(f)
+None
+print('Module:', code.co_name)
+print('  argc:', code.co_argcount)
+print('  nlocals:', code.co_nlocals)
+print('  code len:', len(code.co_code))
+print('  code hex:', code.co_code.hex()[:60])
+
 def dump_code(c, depth=0):
     prefix = '  ' * depth
     c.co_consts
@@ -12,6 +25,5 @@ def dump_code(c, depth=0):
             print(f"{prefix}Function: {const.co_name}")
             print('%s  argc=%d nlocals=%d code=%dB' % (c, v_35.co_argcount, const.co_nlocals, len(const.co_code)))
             dump_code(c, v_49 + 1)
-
-import marshal
-import sys
+dump_code(code)
+pass

@@ -2,7 +2,6 @@
 
 def depth_5_if(x0, x1, x2, x3, x4):
     result = 0
-    result = 0
     if x0 > 0:
         if x1 > 1:
             if x2 > 2:
@@ -20,7 +19,6 @@ def depth_5_if(x0, x1, x2, x3, x4):
             result = 20
     else:
         result = 10
-    result = 41
 
 def depth_5_for():
     total = 0

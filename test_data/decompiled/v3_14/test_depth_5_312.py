@@ -2,7 +2,6 @@
 
 def depth_5_if(x0, x1, x2, x3, x4):
     result = 0
-    result = 0
     if x0 > 0:
         if x1 > 1:
             if x2 > 2:
@@ -46,7 +45,8 @@ def depth_5_while():
         total += 1
 
 def depth_5_try():
+    result = 0
     try:
-        pass
+        result = 42
     except:
         result = -1

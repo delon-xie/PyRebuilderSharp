@@ -2,7 +2,6 @@
 
 def mixed_1(n):
     result = 0
-    result = 0
     if n > 0:
         for i in range(n):
             j = 0
@@ -40,8 +39,6 @@ def mixed_2(n):
             pass
 
 def mixed_3(n):
-    total = 0
-    i = 0
     total = i = 0
     if i < n:
         i += 1

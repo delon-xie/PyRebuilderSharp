@@ -52,8 +52,6 @@ def _is_internal_class(cls_name, obj):
 def _is_private(cls_name, name):
     pattern = '_%s__' % (cls_name)
     pat_len = len(pattern)
-    pattern = '_%s__' % (cls_name)
-    pat_len = len(pattern)
     if (len(name) > pat_len) and name.startswith(pattern) and (name[-1] != '_') and (name[-2] != '_'):
         return True
 
@@ -77,7 +75,6 @@ def _make_class_unpicklable(obj):
 
 def _iter_bits_lsb(num):
     original = num
-    original = num
     if isinstance(num, Enum):
         num = num.value
     b = num & ~num + 1
@@ -98,8 +95,6 @@ def bin(num, max_bits):
     >>> bin(~10)   # ~10 is -11
     '0b1 0101'
     """
-    num = num.__index__()
-    ceiling = 2 ** num.bit_length()
     num = num.__index__()
     ceiling = 2 ** num.bit_length()
     if num >= 0:
@@ -168,9 +163,6 @@ class _proto_member:
         enum_member._name_ = member_name
         enum_member.__objclass__ = enum_class
         enum_member._sort_order_ = len(enum_class._member_names_)
-        enum_member = enum_class._new_member_(enum_class)
-        delattr(enum_class, member_name)
-        value = self.value
         delattr(enum_class, member_name)
         value = self.value
         if not isinstance(value, tuple):
@@ -238,7 +230,7 @@ class EnumDict(dict):
     def member_names(self):
         return list(self._member_names)
 
-    def update(self, members):
+    def update(self, members, **more_members):
         more_members.items()
         for (name, value) in more_members.items():
             pass
@@ -249,10 +241,7 @@ class EnumType(type):
     Metaclass for Enum
     """
     @classmethod
-    def __prepare__(metacls, cls, bases):
-        metacls._check_for_existing_members_(cls, bases)
-        enum_dict = EnumDict(cls)
-        (member_type) = metacls._get_mixins_(cls, bases)
+    def __prepare__(metacls, cls, bases, **kwds):
         metacls._check_for_existing_members_(cls, bases)
         enum_dict = EnumDict(cls)
         (member_type) = metacls._get_mixins_(cls, bases)
@@ -261,7 +250,7 @@ class EnumType(type):
             enum_dict
             getattr(first_enum, '_generate_next_value_', None)
 
-    def __new__(metacls, cls, bases, classdict, *, boundary, _simple):
+    def __new__(metacls, cls, bases, classdict, boundary, *, _simple, **kwds):
         p = classdict[n]
         value = classdict[name]
         classdict = dict(classdict.items())
@@ -304,7 +293,7 @@ class EnumType(type):
         """
         return True
 
-    def __call__(cls, value, names, *, module, qualname, type, start, boundary):
+    def __call__(cls, value, names, *values, module, qualname, type, start, boundary):
         """
         Either returns an existing member, or creates a new enum class.
 
@@ -401,7 +390,6 @@ class EnumType(type):
         resulting in an inconsistent Enumeration.
         """
         member_map = cls.__dict__.get('_member_map_', {})
-        member_map = cls.__dict__.get('_member_map_', {})
         if name in member_map:
             raise AttributeError('cannot reassign member %r' % (name))
 
@@ -420,10 +408,8 @@ class EnumType(type):
         (_) = cls._get_mixins_(class_name, bases)
         classdict = metacls.__prepare__(class_name, bases)
         metacls = cls.__class__
-        metacls = cls.__class__
         if type is None:
             pass
-        # [Block @0x0088] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         value = first_enum._generate_next_value_(name, start, count, last_values[:])
         last_values.append(value)
         names.append((name, value))
@@ -437,7 +423,6 @@ class EnumType(type):
         """
         Create a new Enum subclass that replaces a collection of global constants
         """
-        module_globals = sys.modules[module].__dict__
         module_globals = sys.modules[module].__dict__
         if source:
             source = source.__dict__
@@ -477,6 +462,7 @@ class EnumType(type):
                     _dataclass_repr
                     return
                 base.__dict__['__repr__']
+                return
 
     @classmethod
     def _find_data_type_(mcls, class_name, bases):
@@ -504,6 +490,8 @@ class EnumType(type):
                 chain.__mro__
                 if data_types:
                     return data_types.pop()
+                return None
+                return None
 
     @classmethod
     def _find_new_(mcls, classdict, member_type, first_enum):
@@ -569,7 +557,7 @@ class EnumType(type):
 
     @property
     def __signature__(cls):
-        from inspect import Parameter, Signature, Parameter, Signature
+        from inspect import Parameter, Signature
         if cls._member_names_:
             return Signature([Parameter('values', Parameter.VAR_POSITIONAL)])
 EnumMeta = EnumType
@@ -682,7 +670,6 @@ class Enum(metaclass=EnumType):
         """
         interesting.add(name)
         interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
-        interesting = set(('_generate_next_value_', '_missing_', '_add_alias_', '_add_value_alias_'))
         if self.__class__._member_type_ is not object:
             interesting = set(object.__dir__(self))
         name = [name for name in getattr(self, '__dict__', []) if (name[0] != '_') and (name not in self._member_map_) if name[0] != '_']
@@ -719,19 +706,17 @@ class ReprEnum(Enum):
     """
     Only changes the repr(), leaving str() and format() to the mixed-in type.
     """
-    pass
 
 class IntEnum(int, ReprEnum):
     """
     Enum where members are also (and must be) ints
     """
-    pass
 
 class StrEnum(str, ReprEnum):
     """
     Enum where members are also (and must be) strings
     """
-    def __new__(cls):
+    def __new__(cls, *values):
         'values must already be of type `str`'
         if len(values) > 3:
             raise TypeError('too many arguments for str(): %r' % (values))
@@ -826,7 +811,6 @@ class Flag(Enum, boundary=STRICT):
         flag_mask = [combined_value | m._value_ for m in cls._iter_member_(member_value)]
         members.append(m)
         combined_value |= m._value_
-        # [Block @0x01FE] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         members.append(pm)
         combined_value |= pm._value_
         pseudo_member._name_ = None
@@ -855,7 +839,6 @@ class Flag(Enum, boundary=STRICT):
 
     def __str__(self):
         cls_name = self.__class__.__name__
-        cls_name = self.__class__.__name__
         if self._name_ is None:
             return '%s(%r)' % (cls_name, self._value_)
 
@@ -869,7 +852,6 @@ class Flag(Enum, boundary=STRICT):
     def __or__(self, other):
         value = self._value_
         other_value = self._get_value(other)
-        other_value = self._get_value(other)
         if other_value is NotImplemented:
             return NotImplemented
         for flag in (self, other):
@@ -879,7 +861,6 @@ class Flag(Enum, boundary=STRICT):
     def __and__(self, other):
         value = self._value_
         other_value = self._get_value(other)
-        other_value = self._get_value(other)
         if other_value is NotImplemented:
             return NotImplemented
         for flag in (self, other):
@@ -888,7 +869,6 @@ class Flag(Enum, boundary=STRICT):
 
     def __xor__(self, other):
         value = self._value_
-        other_value = self._get_value(other)
         other_value = self._get_value(other)
         if other_value is NotImplemented:
             return NotImplemented
@@ -908,7 +888,6 @@ class IntFlag(int, ReprEnum, Flag, boundary=KEEP):
     """
     Support for integer-based Flags
     """
-    pass
 
 def _high_bit(value):
     """
@@ -922,7 +901,6 @@ def unique(enumeration):
     """
     duplicates = []
     enumeration.__members__.items()
-    # [Block @0x000E] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 
 def _dataclass_repr(self):
     return (self, ', '.join)
@@ -942,7 +920,6 @@ def global_flag_repr(self):
 
     the module is the last module in case of a multi-module name
     """
-    cls_name = self.__class__.__name__
     cls_name = self.__class__.__name__
     return (self._name_ is None) and ('%s.%s(%r)' % (module, cls_name, self._value_))
     name = [name.append('%s.%s' % (module, n)) for n in self._name_.split('|') if n[0].isdigit()]
@@ -992,11 +969,9 @@ def _simple_enum(etype, *, boundary, use_args):
         new_member = __new__.__func__
         __new__ = cls.__dict__.get('__new__')
         cls_name = cls.__name__
-        cls_name = cls.__name__
         if __new__ is None:
             __new__
             cls_name._use_args_
-        # [Block @0x0154] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         name = [gnv_last_values.append(value) for name in ('__repr__', '__str__', '__format__', '__reduce_ex__') if name not in body]
         setattr(enum_class, name, enum_method)
         gnv_last_values = []
@@ -1013,7 +988,6 @@ def _simple_enum(etype, *, boundary, use_args):
         member_names.append(name)
         single_bits |= value
         enum_class._iter_member_ = enum_class._iter_member_by_def_
-        # [Block @0x0432] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         value = value[0]
         contained = value2member_map.get(member._value_)
         contained = m
@@ -1044,7 +1018,7 @@ class verify:
     """
     Check an enumeration for various constraints. (see EnumCheck)
     """
-    def __init__(self):
+    def __init__(self, *checks):
         self.checks = checks
 
     def __call__(self, enumeration):
@@ -1055,16 +1029,12 @@ class verify:
         enum_type = 'enum'
         checks = self.checks
         cls_name = enumeration.__name__
-        checks = self.checks
-        cls_name = enumeration.__name__
         if (Flag is not None) and issubclass(enumeration, Flag):
             enum_type = 'flag'
-        # [Block @0x0040] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         enum_type = [i for i in range(_high_bit(low) + 1, _high_bit(high)) if 2 ** i not in values]
         missing.append(2 ** i)
         enum_type = [i for i in range(low + 1, high) if i not in values]
         missing.append(i)
-        # [Block @0x01D2] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         missing_value |= val
         alias = 'alias %s is missing' % missing_names[0]
         value = 'value 0x%x' % missing_value
@@ -1089,7 +1059,6 @@ def _test_simple_enum(checked_enum, simple_enum):
     If differences are found, a :exc:`TypeError` is raised.
     """
     failed = []
-    failed = []
     if checked_enum.__dict__ != simple_enum.__dict__:
         name = [simple_dict[key] for key in set(checked_keys + simple_keys) if key in ('__module__', '_member_map_', '_value2member_map_', '__doc__', '__static_attributes__', '__firstlineno__') if key in member_names if key not in simple_keys if key not in checked_keys if callable(checked_value) if key == '__doc__' if checked_value != simple_value if compressed_checked_value != compressed_simple_value]
     name = [[simple_member_dict[key] for key in set(checked_member_keys + simple_member_keys) if key in ('__module__', '__objclass__', '_inverted_') if key not in simple_member_keys if key not in checked_member_keys if checked_value != simple_value] for name in member_names if name not in simple_keys if name not in checked_keys if failed_member if checked_value != simple_value for name in member_names if name not in simple_keys if name not in checked_keys if failed_member if checked_method != simple_method]
@@ -1112,7 +1081,6 @@ def _old_convert_(etype, name, module, filter, source, *, boundary):
     """
     Create a new Enum subclass that replaces a collection of global constants
     """
-    module_globals = sys.modules[module].__dict__
     module_globals = sys.modules[module].__dict__
     if source:
         source = source.__dict__

@@ -1,13 +1,5 @@
 # Decompiled from: <module>
 
-bytecode = data[pos:pos + length]
-pos += length
-print(f"Bytecode length={length}")
-print(f"Bytecode hex: {bytecode.hex()}")
-HAVE_ARGUMENT = 90
-offset = 0
-instructions = []
-pos += 1
 import struct
 path = '/Users/admin/codes/Tools/PyRebuilderSharp/tests/PyRebuilderSharp.Tests/TestData/compiled/test_expr_basic.2.7.pyc'
 data = open(path, 'rb').read()
@@ -68,7 +60,6 @@ else:
             pass
         else:
             1
-            # [Block @0x0260] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 opcodes_27 = {130: 'RAISE_VARARGS', 131: 'CALL_FUNCTION', 132: 'MAKE_FUNCTION', 133: 'BUILD_SLICE', 134: 'MAKE_CLOSURE', 135: 'LOAD_CLOSURE', 136: 'LOAD_DEREF', 137: 'STORE_DEREF', 140: 'CALL_FUNCTION_VAR', 141: 'CALL_FUNCTION_KW', 142: 'CALL_FUNCTION_VAR_KW', 143: 'SETUP_WITH', 145: 'EXTENDED_ARG', 146: 'SET_ADD', 147: 'MAP_ADD'}
 op = bytecode[offset]
 offset += 1

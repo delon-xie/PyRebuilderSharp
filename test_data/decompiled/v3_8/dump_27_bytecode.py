@@ -40,4 +40,3 @@ op = bytecode[offset]
 offset += 1
 instr_name = opcodes_27.get(op, f"UNKNOWN_{op}")
 arg = None
-# [Block @0x027C] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')

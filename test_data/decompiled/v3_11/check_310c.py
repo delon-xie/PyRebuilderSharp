@@ -11,9 +11,9 @@ raw = f.read()
 code = marshal.loads(raw)
 
 def dump_bytecode(c, depth=0):
-    f""
     p = '  ' * depth
     c.co_consts
+    p = '  ' * depth
     if c.co_consts:
         if hasattr(const, 'co_code') and isinstance(const, types.CodeType):
             print(f"{p}--- {const.co_name} ---")
@@ -37,27 +37,4 @@ def dump_bytecode(c, depth=0):
                     None
         None
         None
-    for const in c.co_consts:
-        if hasattr(const, 'co_code') and isinstance(const, types.CodeType):
-            print(f"{p}--- {const.co_name} ---")
-            et = getattr(const, 'co_exceptiontable', None)
-            if et:
-                pass
-            else:
-                '(none)'
-                f""
-                if et:
-                    range(0, len(et), 8)
-                else:
-                    dis
-                    const
-                    dump_bytecode(const, depth + 1)
-                    None
-        None
-        None
-        s = int.from_bytes(et[i:i + 2], 'little')
-        e = int.from_bytes(et[i + 2:i + 4], 'little')
-        t = int.from_bytes(et[i + 4:i + 6], 'little')
-        dl = int.from_bytes(et[i + 6:i + 8], 'little')
-        print(f"{p}  [{s},{e}) -> {t} depth={dl & 3}")
 dump_bytecode(code)

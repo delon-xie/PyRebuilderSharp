@@ -8,4 +8,3 @@ for i in range(10):
         pass
     else:
         a = i
-a = i

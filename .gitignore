@@ -41,5 +41,4 @@ PublishProfiles/
 
 ## 测试结果
 TestResults/
-
-&1test_data/decompiled/
+test_data/decompiled/

@@ -2,13 +2,13 @@
 
 ## 环境要求
 
-| 依赖 | 最低版本 | 备注 |
-|:-----|:---------|:----|
-| [.NET SDK](https://dotnet.microsoft.com/download) | 10.0 | 必须 .NET 10+（使用的 C# 13 特性） |
-| OS | — | macOS / Windows / Linux 均可 |
-| Git | 可选 | 用于克隆代码 |
+| 依赖                                                | 最低版本 | 备注                         |
+| :------------------------------------------------ | :--- | :------------------------- |
+| [.NET SDK](https://dotnet.microsoft.com/download) | 10.0 | 必须 .NET 10+（使用的 C# 13 特性）  |
+| OS                                                | —    | macOS / Windows / Linux 均可 |
+| Git                                               | 可选   | 用于克隆代码                     |
 
-**支持 Python 版本**：2.7, 3.5 ~ 3.14
+**支持 Python 版本**：2.7, 3.5 \~ 3.14
 
 ### 验证安装
 
@@ -17,7 +17,7 @@ dotnet --version
 # 应输出: 10.0.x
 ```
 
----
+***
 
 ## 克隆与构建
 
@@ -52,9 +52,9 @@ dotnet run --project src/PyRebuilderSharp.Cli -c Release -- input.pyc -o output.
 
 参数说明：
 
-| 参数 | 说明 |
-|:-----|:-----|
-| `input.pyc` | 要反编译的 .pyc 文件（必需） |
+| 参数                      | 说明                    |
+| :---------------------- | :-------------------- |
+| `input.pyc`             | 要反编译的 .pyc 文件（必需）     |
 | `-o`, `--output <file>` | 输出文件（可选，缺省输出到 stdout） |
 
 示例：
@@ -72,7 +72,7 @@ for f in *.pyc; do
 done
 ```
 
----
+***
 
 ## 运行测试
 
@@ -84,13 +84,13 @@ dotnet test tests/PyRebuilderSharp.Tests -c Release
 
 测试分类：
 
-| 分类 | 内容 | 当前通过 |
-|:-----|:-----|:--------:|
-| Lv0_Expressions | 算术/比较/逻辑表达式 | ✅ 7/7 |
-| Lv1_Sequential | 赋值/调用/返回 | ✅ 7/7 |
-| Lv2_ControlFlow | if/for/while/try/with | ✅ 7/7 |
-| Lv3_NestedDepth | 嵌套控制流混合 | ⏳ 0/7 |
-| VersionMatrix | 跨版本反编译矩阵 | ⏳ 部分 |
+| 分类               | 内容                    |  当前通过 |
+| :--------------- | :-------------------- | :---: |
+| Lv0\_Expressions | 算术/比较/逻辑表达式           | ✅ 7/7 |
+| Lv1\_Sequential  | 赋值/调用/返回              | ✅ 7/7 |
+| Lv2\_ControlFlow | if/for/while/try/with | ✅ 7/7 |
+| Lv3\_NestedDepth | 嵌套控制流混合               | ⏳ 0/7 |
+| VersionMatrix    | 跨版本反编译矩阵              |  ⏳ 部分 |
 
 ### 基准测试（全部 .pyc 文件）
 
@@ -101,7 +101,7 @@ dotnet run -c Release -- ../../test_data/compiled
 
 遍历 `test_data/compiled/` 下所有 .pyc 文件，输出每个文件的块数、失败数和耗时。
 
----
+***
 
 ## 使用 GUI 进行反编译
 
@@ -139,7 +139,7 @@ dotnet run -c Release -- ../../test_data/compiled
 - 反编译结果中的 **注释块**（`# ═══ [Block N Decompilation Failed] ═══`）表示该基本块反编译失败，已转为注释兜底。这是**正常行为**——其他块保持不变。
 - 状态栏显示成功/失败统计。如果有失败块，请参考下方「报告异常」章节。
 
----
+***
 
 ## 构建测试文件
 
@@ -163,7 +163,7 @@ pyenv shell 3.11.15
 python3 tools/compile_311.py
 ```
 
-### 使用 compile_pyc_matrix.py
+### 使用 compile\_pyc\_matrix.py
 
 ```bash
 # 编译全部版本（需安装对应 pyenv Python 版本）
@@ -172,7 +172,7 @@ python3 tests/PyRebuilderSharp.Tests/TestData/scripts/compile_pyc_matrix.py
 
 该脚本自动扫描本机安装的 Python 版本，编译全部 `test_data/input/*.py` 到 `test_data/compiled/*.{version}.pyc`。
 
----
+***
 
 ## 如何报告异常
 
@@ -220,21 +220,21 @@ cd tools/QuickBenchmark && dotnet run -c Release -- ../../test_data/compiled
 
 1. **查看注释块内容**：注释块中包含偏移范围、错误类型和原始字节码
 2. **确认 Python 版本**：3.11+/3.8-3.10/2.7 使用不同的操作码映射
-3. **检查已知问题**：参见 docs/summary_Phase3_plus.md 的「已知问题」章节
+3. **检查已知问题**：参见 docs/summary\_Phase3\_plus.md 的「已知问题」章节
 4. **提供 .pyc 文件**：最小的可复现文件最有用
 
----
+***
 
 ## 文档索引
 
-| 文档 | 说明 |
-|:-----|:------|
-| [Python反编译总体设计.md](docs/Python反编译总体设计.md) | 架构设计、核心原则、与 pycdc 对比 |
-| [Python反编译详细设计.md](docs/Python反编译详细设计.md) | 模块设计、数据模型、API 参考 |
-| [summary_Phase3_plus.md](docs/summary_Phase3_plus.md) | Phase 3 收敛计划、异常收集、已知问题、新版本支持流程 |
-| [README.md](README.md) | 项目概览与成就 |
+| 文档                                                      | 说明                             |
+| :------------------------------------------------------ | :----------------------------- |
+| [Python反编译总体设计.md](docs/Python反编译总体设计.md)               | 架构设计、核心原则、与 pycdc 对比           |
+| [Python反编译详细设计.md](docs/Python反编译详细设计.md)               | 模块设计、数据模型、API 参考               |
+| [summary\_Phase3\_plus.md](docs/summary_Phase3_plus.md) | Phase 3 收敛计划、异常收集、已知问题、新版本支持流程 |
+| [README.md](README.md)                                  | 项目概览与成就                        |
 
----
+***
 
 ## 安装依赖的参考命令
 
@@ -265,6 +265,7 @@ dotnet --version
 
 从 [dotnet.microsoft.com](https://dotnet.microsoft.com/download/dotnet/10.0) 下载 .NET 10 SDK 安装包，运行安装程序后重启终端。
 
----
+***
 
 > **开发建议**：开发时使用 `dotnet watch run --project src/PyRebuilderSharp.Gui` 实现热重载，修改代码后自动刷新 GUI。
+

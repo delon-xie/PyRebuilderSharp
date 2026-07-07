@@ -25,5 +25,3 @@ for start in range(0, 8):
             print(f"\nMATCH at offset {start}:")
             print(f"  argcount={a0} nlocals={nl} stacksize={ss} flags={hex(fl)}")
             print(f"  Bytes: {' '.join((b for b in m[start:start + 16]))}")
-vals = struct.unpack_from('<IIII', m, start)
-a0 = vals

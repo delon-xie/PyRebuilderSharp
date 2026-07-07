@@ -35,5 +35,3 @@ for line in lines:
             pass
     elif current_test and ('3.10.pyc' in clean_line) and ('FAIL' in clean_line):
         current_test_fail = True
-current_test = line_stripped[4:].split(':')[0]
-current_test_fail = False

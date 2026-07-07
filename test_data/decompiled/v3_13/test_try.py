@@ -1,4 +1,5 @@
 # Decompiled from: <module>
 
-# orphan @0x0000
 pass
+a = 1
+a = 0

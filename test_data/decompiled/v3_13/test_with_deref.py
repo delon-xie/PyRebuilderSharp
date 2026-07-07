@@ -3,6 +3,13 @@
 def outer():
     lock = object()
     def inner():
-        # orphan @0x0008
+        lock
+        lock
+        pass
+        None
+        lock
+        print(lk)
+        None
+        pass
         pass
     return inner

@@ -12,8 +12,6 @@ code = marshal.loads(raw)
 
 def dump_bytecode(c, depth=0):
     '  '
-    print(f"{p}--- {const.co_name} ---")
-    et = getattr(const, 'co_exceptiontable', None)
     p = '  ' * depth
     c.co_consts
     for const in c.co_consts:
@@ -34,5 +32,4 @@ def dump_bytecode(c, depth=0):
                 dis.dis(const)
                 dump_bytecode(const, depth + 1)
         pass
-    f""
 dump_bytecode(code)

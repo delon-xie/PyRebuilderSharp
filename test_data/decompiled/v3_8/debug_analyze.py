@@ -26,6 +26,5 @@ next_line = lines[j]
 version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
 j += 1
 debug_count += 1
-# [Block @0x015C] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 print(f"  Found version: {v} in: {line_text}")
 i += 1

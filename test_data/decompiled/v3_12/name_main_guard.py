@@ -2,8 +2,6 @@
 
 'Test file for __name__ == \'__main__\' guard'
 import sys
-'Test file for __name__ == \'__main__\' guard'
-import sys
 
 def main():
     print('Hello, world!')

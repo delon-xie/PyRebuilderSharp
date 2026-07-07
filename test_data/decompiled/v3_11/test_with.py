@@ -1,4 +1,9 @@
 # Decompiled from: <module>
 
-class Class_0000:
-    lock = object()
+lock = object()
+lock
+print('hello')
+None
+if not True:
+    pass
+pass

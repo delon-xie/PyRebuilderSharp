@@ -40,9 +40,9 @@ def pformat(object, indent=1, width=80, depth=None, *, compact=False, expand=Fal
     'Format a Python object into a pretty-printed representation.'
     return PrettyPrinter(indent=indent, width=width, depth=depth, compact=compact, expand=expand, sort_dicts=sort_dicts, underscore_numbers=underscore_numbers).pformat(object)
 
-def pp(object, *, sort_dicts=False):
+def pp(object, *args, sort_dicts=False, **kwargs):
     'Pretty-print a Python object'
-    pprint(object, args, **kwargs)
+    pprint(object, *args, **kwargs)
 
 def saferepr(object):
     'Version of repr() which can handle recursive data structures.'
@@ -71,206 +71,15 @@ class _safe_key:
         self.obj = obj
 
     def __lt__(self, other):
-        # orphan @0x0000
         pass
+        self.obj < other.obj
+        (str(type(self.obj)), id(self.obj)) < (str(type(other.obj)), id(other.obj))
 
 def _safe_tuple(t):
     'Helper function for comparing 2-tuples'
     return (_safe_key(t[0]), _safe_key(t[1]))
 
 class PrettyPrinter:
-    def __init__(self, indent, width, depth, stream, *, compact, expand, sort_dicts, underscore_numbers):
-        """Handle pretty printing operations onto a stream using a set of
-    configured parameters.
-
-    indent
-    Number of spaces to indent for each level of nesting.
-
-    width
-    Attempted maximum number of columns in the output.
-
-    depth
-    The maximum depth to print out nested structures.
-
-    stream
-    The desired output stream.  If omitted (or false), the standard
-    output stream available at construction will be used.
-
-    compact
-    If true, several items will be combined in one line.
-    Incompatible with expand mode.
-
-    expand
-    If true, the output will be formatted similar to
-    pretty-printed json.dumps() when ``indent`` is supplied.
-    Incompatible with compact mode.
-
-    sort_dicts
-    If true, dict keys are sorted.
-
-    underscore_numbers
-    If true, digit groups are separated with underscores.
-
-"""
-        indent = int(indent)
-        width = int(width)
-        indent = int(indent)
-        width = int(width)
-        if indent < 0:
-            raise ValueError('indent must be >= 0')
-        raise
-        self._depth = depth
-        self._indent_per_level = indent
-        self._width = width
-        if stream:
-            self._stream = stream
-            self._stream = _sys.stdout
-        self._compact = bool(compact)
-        self._expand = bool(expand)
-        self._sort_dicts = sort_dicts
-        self._underscore_numbers = underscore_numbers
-        if depth <= 0:
-            raise ValueError('depth must be > 0')
-        if not width:
-            raise ValueError('width must be != 0')
-        if compact and expand:
-            ValueError('compact and expand are incompatible')
-        # [WARN] 1 instructions not decompiled
-        #   @0x0054: POP_JUMP_IF_NONE arg=126
-
-    def pprint(self, object):
-        if self._stream:
-            self._format(object, self._stream, 0, 0, {}, 0)
-            self._stream.write("""
-""")
-
-    def pformat(self, object):
-        sio = _StringIO()
-        self._format(object, sio, 0, 0, {}, 0)
-        return sio.getvalue()
-
-    def isrecursive(self, object):
-        return self.format(object, {}, 0, 0)[2]
-
-    def isreadable(self, object):
-        return readable and not recursive
-
-    def _format(self, object, stream, indent, allowance, context, level):
-        rep = self._repr(object, context, level)
-        max_width = self._width - indent - allowance
-        objid = id(object)
-        objid = id(object)
-        if objid in context:
-            stream.write(_recursion(object))
-            self._recursive = True
-            self._readable = False
-            return None
-        rep = self._repr(object, context, level)
-        max_width = self._width - indent - allowance
-        if len(rep) > max_width:
-            p = self._dispatch.get(type(object).__repr__, None)
-            from dataclasses import is_dataclass
-            if p:
-                p(self, object, stream, indent, allowance, context, level + 1)
-                return None
-            pass
-            rep
-            stream.write
-            return None
-        rep
-        stream.write
-        # [WARN] 1 instructions not decompiled
-        #   @0x015C: POP_JUMP_IF_NONE arg=406
-
-    def _format_block_start(self, start_str, indent):
-        """
-"""
-        return self._expand and f"{start_str}\n{' ' * indent}"
-
-    def _format_block_end(self, end_str, indent):
-        """
-"""
-        return self._expand and f"\n{' ' * indent}{end_str}"
-
-    def _child_indent(self, indent, prefix_len):
-        return self._expand and indent
-
-    def _write_indent_padding(self, write):
-        if self._expand:
-            return (self._indent_per_level > 0) and None
-        return (self._indent_per_level > 1) and None
-
-    def _pprint_dataclass(self, object, stream, indent, allowance, context, level):
-        indent += self._indent_per_level
-        from dataclasses import fields as dataclass_fields
-        cls_name = object.__class__.__name__
-        items = [f for f in dataclass_fields(object) if f.repr]
-
-    def _pprint_dict(self, object, stream, indent, allowance, context, level):
-        '{'
-        write = stream.write
-        write(self._format_block_start('{', indent))
-        self._write_indent_padding(write)
-        length = len(object)
-        write = stream.write
-        write(self._format_block_start('{', indent))
-        self._write_indent_padding(write)
-        length = len(object)
-        if length and self._sort_dicts:
-            items = sorted(object.items(), key=_safe_tuple)
-        else:
-            items = object.items()
-            self._format_dict_items(items, stream, indent, allowance + 1, context, level)
-            write(self._format_block_end('}', indent))
-        write(self._format_block_end('}', indent))
-
-    def _pprint_frozendict(self, object, stream, indent, allowance, context, level):
-        write(self._format_block_start(cls.__name__ + '({', indent))
-        self._write_indent_padding(write)
-        write = stream.write
-        cls = object.__class__
-        write = stream.write
-        cls = object.__class__
-        if not len(object):
-            write(repr(object))
-            return None
-        write(self._format_block_start(cls.__name__ + '({', indent))
-        self._write_indent_padding(write)
-        if self._sort_dicts:
-            items = sorted(object.items(), key=_safe_tuple)
-        else:
-            items = object.items()
-            self._format_dict_items(items, stream, self._child_indent(indent, len(cls.__name__) + 1), allowance + 2, context, level)
-            write(self._format_block_end('})', indent))
-
-    def _pprint_ordered_dict(self, object, stream, indent, allowance, context, level):
-        return len(object) or None
-
-    def _pprint_dict_view(self, object, stream, indent, allowance, context, level):
-        'Pretty print dict views (keys, values, items).'
-        write = stream.write
-        write(self._format_block_start(object.__class__.__name__ + '([', indent))
-        if isinstance(object, self._dict_items_view):
-            key = _safe_tuple
-        else:
-            key = _safe_key
-            write = stream.write
-            write(self._format_block_start(object.__class__.__name__ + '([', indent))
-            if len(object) and self._sort_dicts:
-                entries = sorted(object, key=key)
-            else:
-                entries = object
-                self._format_items(entries, stream, indent, allowance + 2, context, level)
-                write(self._format_block_end('])', indent))
-            write(self._format_block_end('])', indent))
-
-    def _pprint_mapping_abc_view(self, object, stream, indent, allowance, context, level):
-        'Pretty print mapping views from collections.abc.'
-        write = stream.write
-        write(object.__class__.__name__ + '(')
-        self._format(object._mapping, stream, indent, allowance, context, level)
-        write(')')
-
     def _pprint_list(self, object, stream, indent, allowance, context, level):
         '['
         stream.write(self._format_block_start('[', indent))
@@ -280,7 +89,6 @@ class PrettyPrinter:
     def _pprint_tuple(self, object, stream, indent, allowance, context, level):
         '('
         stream.write(self._format_block_start('(', indent))
-        stream.write(self._format_block_start('(', indent))
         if (len(object) == 1) and not self._expand:
             endchar = ',)'
         endchar = ')'
@@ -289,7 +97,6 @@ class PrettyPrinter:
         endchar = ')'
 
     def _pprint_set(self, object, stream, indent, allowance, context, level):
-        typ = object.__class__
         if not len(object):
             stream.write(repr(object))
             return None
@@ -305,13 +112,8 @@ class PrettyPrinter:
             object = sorted(object, key=_safe_key)
             self._format_items(object, stream, indent, allowance + len(endchar), context, level)
             stream.write(self._format_block_end(endchar, indent))
-        stream.write(self._format_block_start(typ.__name__ + '({', indent))
-        endchar = '})'
 
     def _pprint_str(self, object, stream, indent, allowance, context, level):
-        chunks = []
-        lines = object.splitlines(True)
-        write = stream.write
         write = stream.write
         if not len(object):
             write(repr(object))
@@ -324,15 +126,9 @@ class PrettyPrinter:
             indent += 1
             allowance += 1
             enumerate(lines)
-            # [Block @0x0142] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
         enumerate(lines)
-        import re
-        parts = re.findall('\\S*\\s*', line)
-        # [Block @0x047A] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 
     def _pprint_bytes(self, object, stream, indent, allowance, context, level):
-        parens = level == 1
-        write = stream.write
         write = stream.write
         if len(object) <= 4:
             write(repr(object))
@@ -359,8 +155,6 @@ class PrettyPrinter:
 
     def _pprint_bytearray(self, object, stream, indent, allowance, context, level):
         'bytearray('
-        write = stream.write
-        write(self._format_block_start('bytearray(', indent))
         write = stream.write
         write(self._format_block_start('bytearray(', indent))
         if self._expand:
@@ -417,7 +211,6 @@ class PrettyPrinter:
                     pass
                 else:
                     write(',')
-        context(level)
 
     def _format_namespace_items(self, items, stream, indent, allowance, context, level):
         """,
@@ -448,6 +241,14 @@ class PrettyPrinter:
     def _format_items(self, items, stream, indent, allowance, context, level):
         """,
 """
+        write = stream.write
+        indent += self._indent_per_level
+        self._write_indent_padding(write)
+        delimnl = """,
+""" + ' ' * indent
+        delim = ''
+        it = iter(items)
+        last = False
         while last:
             ent = next_ent
             next_ent = next(it)
@@ -458,9 +259,11 @@ class PrettyPrinter:
                     width = max_width
                     if delim:
                         delim = delimnl
-        write(delim)
-        delim = delimnl
-        self(v_86)
+                    elif width >= w:
+                        width -= w
+                        write(delim)
+                        delim = ', '
+                        write(rep)
 
     def _repr(self, object, context, level):
         if not readable:
@@ -476,8 +279,6 @@ class PrettyPrinter:
         return self._safe_repr(object, context, maxlevels, level)
 
     def _pprint_default_dict(self, object, stream, indent, allowance, context, level):
-        rdf = self._repr(object.default_factory, context, level)
-        cls = object.__class__
         if not len(object):
             stream.write(repr(object))
             return None
@@ -495,8 +296,6 @@ class PrettyPrinter:
         return len(object) or None
 
     def _pprint_chain_map(self, object, stream, indent, allowance, context, level):
-        cls = object.__class__
-        stream.write(self._format_block_start(cls.__name__ + '(', indent + self._indent_per_level))
         if not len(object.maps):
             stream.write(repr(object))
             return None
@@ -519,8 +318,6 @@ class PrettyPrinter:
 """ + ' ' * indent)
 
     def _pprint_deque(self, object, stream, indent, allowance, context, level):
-        cls = object.__class__
-        stream.write(self._format_block_start(cls.__name__ + '([', indent))
         if not len(object):
             stream.write(repr(object))
             return None
@@ -531,8 +328,7 @@ class PrettyPrinter:
         elif object.maxlen:
             self._format_items(object, stream, indent, allowance + 2, context, level)
             stream.write(self._format_block_end('])', indent))
-        else:
-            pass
+            return None
 
     def _pprint_user_dict(self, object, stream, indent, allowance, context, level):
         self._format(object.data, stream, indent, allowance, context, level - 1)
@@ -544,7 +340,6 @@ class PrettyPrinter:
         self._format(object.data, stream, indent, allowance, context, level - 1)
 
     def _pprint_template(self, object, stream, indent, allowance, context, level):
-        cls_name = object.__class__.__name__
         cls_name = object.__class__.__name__
         if self._expand:
             indent += self._indent_per_level
@@ -558,17 +353,9 @@ class PrettyPrinter:
     def _pprint_interpolation(self, object, stream, indent, allowance, context, level):
         'value'
         cls_name = object.__class__.__name__
-        cls_name = object.__class__.__name__
         return self._expand and None
 
     def _safe_repr(self, object, context, maxlevels, level):
-        readable = True
-        recursive = False
-        components = []
-        append = components.append
-        level += 1
-        r = getattr(typ, '__repr__', None)
-        typ = type(object)
         typ = type(object)
         if typ in _builtin_scalars:
             return (repr(object), True, False)
@@ -596,10 +383,192 @@ class PrettyPrinter:
             pass
         elif issubclass(typ, _collections.abc.MappingView):
             pass
+
+    def __init__(self, indent=1, width=80, depth=None, stream=None, *, compact=False, expand=False, sort_dicts=True, underscore_numbers=False):
+        """Handle pretty printing operations onto a stream using a set of
+    configured parameters.
+
+    indent
+    Number of spaces to indent for each level of nesting.
+
+    width
+    Attempted maximum number of columns in the output.
+
+    depth
+    The maximum depth to print out nested structures.
+
+    stream
+    The desired output stream.  If omitted (or false), the standard
+    output stream available at construction will be used.
+
+    compact
+    If true, several items will be combined in one line.
+    Incompatible with expand mode.
+
+    expand
+    If true, the output will be formatted similar to
+    pretty-printed json.dumps() when ``indent`` is supplied.
+    Incompatible with compact mode.
+
+    sort_dicts
+    If true, dict keys are sorted.
+
+    underscore_numbers
+    If true, digit groups are separated with underscores.
+
+"""
+        indent = int(indent)
+        width = int(width)
+        if indent < 0:
+            raise ValueError('indent must be >= 0')
+        raise
+        self._depth = depth
+        self._indent_per_level = indent
+        self._width = width
+        if stream:
+            self._stream = stream
+            self._stream = _sys.stdout
+        self._compact = bool(compact)
+        self._expand = bool(expand)
+        self._sort_dicts = sort_dicts
+        self._underscore_numbers = underscore_numbers
+        if depth <= 0:
+            raise ValueError('depth must be > 0')
+        if not width:
+            raise ValueError('width must be != 0')
+        if compact and expand:
+            ValueError('compact and expand are incompatible')
+
+    def pprint(self, object):
+        if self._stream:
+            self._format(object, self._stream, 0, 0, {}, 0)
+            self._stream.write("""
+""")
+            return None
+
+    def pformat(self, object):
+        sio = _StringIO()
+        self._format(object, sio, 0, 0, {}, 0)
+        return sio.getvalue()
+
+    def isrecursive(self, object):
+        return self.format(object, {}, 0, 0)[2]
+
+    def isreadable(self, object):
+        return readable and not recursive
+
+    def _format(self, object, stream, indent, allowance, context, level):
         objid = id(object)
-        key = _safe_key
-        rep = repr(object)
+        if objid in context:
+            stream.write(_recursion(object))
+            self._recursive = True
+            self._readable = False
+            return None
+        rep = self._repr(object, context, level)
+        max_width = self._width - indent - allowance
+        if len(rep) > max_width:
+            p = self._dispatch.get(type(object).__repr__, None)
+            from dataclasses import is_dataclass
+            if p:
+                p(self, object, stream, indent, allowance, context, level + 1)
+                return None
+            pass
+        rep
+        stream.write
+
+    def _format_block_start(self, start_str, indent):
+        """
+"""
+        return self._expand and f"{start_str}\n{' ' * indent}"
+
+    def _format_block_end(self, end_str, indent):
+        """
+"""
+        return self._expand and f"\n{' ' * indent}{end_str}"
+
+    def _child_indent(self, indent, prefix_len):
+        return self._expand and indent
+
+    def _write_indent_padding(self, write):
+        if self._expand:
+            return (self._indent_per_level > 0) and None
+        return (self._indent_per_level > 1) and None
+
+    def _pprint_dataclass(self, object, stream, indent, allowance, context, level):
+        from dataclasses import fields as dataclass_fields
+        cls_name = object.__class__.__name__
+        if self._expand:
+            indent += self._indent_per_level
+        else:
+            indent += len(cls_name) + 1
+            f
+            dataclass_fields(object)
+            []
+            items = [f for f in dataclass_fields(object) if f.repr]
+    _dispatch = {}
+
+    def _pprint_dict(self, object, stream, indent, allowance, context, level):
+        '{'
+        write = stream.write
+        write(self._format_block_start('{', indent))
+        self._write_indent_padding(write)
+        length = len(object)
+        if length and self._sort_dicts:
+            items = sorted(object.items(), key=_safe_tuple)
+        else:
+            items = object.items()
+            self._format_dict_items(items, stream, indent, allowance + 1, context, level)
+            write(self._format_block_end('}', indent))
+        write(self._format_block_end('}', indent))
+
+    def _pprint_frozendict(self, object, stream, indent, allowance, context, level):
+        write = stream.write
+        cls = object.__class__
+        if not len(object):
+            write(repr(object))
+            return None
+        write(self._format_block_start(cls.__name__ + '({', indent))
+        self._write_indent_padding(write)
+        if self._sort_dicts:
+            items = sorted(object.items(), key=_safe_tuple)
+        else:
+            items = object.items()
+            self._format_dict_items(items, stream, self._child_indent(indent, len(cls.__name__) + 1), allowance + 2, context, level)
+            write(self._format_block_end('})', indent))
+
+    def _pprint_ordered_dict(self, object, stream, indent, allowance, context, level):
+        return len(object) or None
+
+    def _pprint_dict_view(self, object, stream, indent, allowance, context, level):
+        'Pretty print dict views (keys, values, items).'
+        if isinstance(object, self._dict_items_view):
+            key = _safe_tuple
+        else:
+            key = _safe_key
+            write = stream.write
+            write(self._format_block_start(object.__class__.__name__ + '([', indent))
+            if len(object) and self._sort_dicts:
+                entries = sorted(object, key=key)
+            else:
+                entries = object
+                self._format_items(entries, stream, indent, allowance + 2, context, level)
+                write(self._format_block_end('])', indent))
+            write(self._format_block_end('])', indent))
+
+    def _pprint_mapping_abc_view(self, object, stream, indent, allowance, context, level):
+        'Pretty print mapping views from collections.abc.'
+        write = stream.write
+        write(object.__class__.__name__ + '(')
+        self._format(object._mapping, stream, indent, allowance, context, level)
+        write(')')
+    _dict_keys_view = type({}.keys())
+    _dict_values_view = type({}.values())
+    _dict_items_view = type({}.items())
+    cls
+    (_dict_keys_view, _dict_values_view, _dict_items_view, _collections.abc.MappingView)
+    {}
     cls = {(_dict_keys_view, _dict_values_view, _dict_items_view, _collections.abc.MappingView) for cls in (_dict_keys_view, _dict_values_view, _dict_items_view, _collections.abc.MappingView)}
+    raise
 _builtin_scalars = frozenset({str, bytes, bytearray, float, complex, bool, type(None)})
 
 def _recursion(object):
@@ -614,3 +583,5 @@ def _wrap_bytes_repr(object, width, allowance):
         candidate = current + part
         if i == last:
             width -= allowance
+        elif (len(repr(candidate)) > width) and current:
+            pass

@@ -11,7 +11,6 @@ def recursive_repr(fillvalue):
     def decorating_function(user_function):
         def wrapper(self):
             key = (id(self), get_ident())
-            key = (id(self), get_ident())
             return (key in key) and self
         wrapper.__module__ = getattr(user_function, '__module__')
         wrapper.__doc__ = getattr(user_function, '__doc__')
@@ -45,9 +44,6 @@ class Repr:
         return self.repr1(x, self.maxlevel)
 
     def repr1(self, x, level):
-        method = getattr(self, 'repr_' + typename, None)
-        cls = type(x)
-        typename = cls.__name__
         cls = type(x)
         typename = cls.__name__
         if ' ' in typename:
@@ -60,10 +56,8 @@ class Repr:
             module = getattr(cls, '__module__', None)
             return (module == self._lookup[typename]) and method(x, level)
         return self.repr_instance(x, level)
-        module = getattr(cls, '__module__', None)
 
     def _join(self, pieces, level):
-        indent = self.indent
         if self.indent is None:
             return ', '.join(pieces)
         if not pieces:
@@ -72,7 +66,6 @@ class Repr:
 """ + (self.maxlevel - level + 1) * indent
 
     def _repr_iterable(self, x, level, left, right, maxiter, trail):
-        n = len(x)
         n = len(x)
         if (level <= 0) and n:
             s = self.fillvalue
@@ -93,7 +86,6 @@ class Repr:
         if n == 1:
             pass
         return '%s%s%s' % (left, s, right)
-        s = self._join(pieces, level)
 
     def repr_tuple(self, x, level):
         return self._repr_iterable(x, level, '(', ')', self.maxtuple, ',')
@@ -115,7 +107,6 @@ class Repr:
 
     def repr_dict(self, x, level):
         n = len(x)
-        n = len(x)
         if n == 0:
             return '{}'
         if level <= 0:
@@ -126,7 +117,6 @@ class Repr:
         islice(_possibly_sorted(x), self.maxdict)
 
     def repr_str(self, x, level):
-        s = builtins.repr(x[:self.maxstring])
         s = builtins.repr(x[:self.maxstring])
         if len(s) > self.maxstring:
             i = max(0, (self.maxstring - 3) // 2)

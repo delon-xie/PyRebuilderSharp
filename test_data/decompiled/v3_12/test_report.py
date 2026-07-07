@@ -10,6 +10,5 @@ output.split("""
 """)
 passed_groups = {line: line for line in output.split("""
 """) if line.startswith('***') if len(parts) >= 2}
-# [Block @0x0268] Error: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
 line = [print(f"  ✓ {group}") for group in passed_groups]
 line = [[print(f"    - {f}") for f in test_groups[group]['files']] for group in failed_groups for group in group]

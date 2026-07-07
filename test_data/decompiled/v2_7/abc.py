@@ -1,36 +1,10 @@
 # Decompiled from: <module>
 
 class _C:
-    __module__ = __name__
+    pass
 
 class abstractproperty:
     """A decorator indicating abstract properties.
-
-    Requires that the metaclass is ABCMeta or derived from it.  A
-    class that has a metaclass derived from ABCMeta cannot be
-    instantiated unless all of its abstract properties are overridden.
-    The abstract properties can be called using any of the normal
-    'super' call mechanisms.
-
-    Usage:
-
-        class C:
-            __metaclass__ = ABCMeta
-            @abstractproperty
-            def my_abstract_property(self):
-                ...
-
-    This defines a read-only property; you can also define a read-write
-    abstract property using the 'long' form of property declaration:
-
-        class C:
-            __metaclass__ = ABCMeta
-            def getx(self): ...
-            def setx(self, value): ...
-            x = abstractproperty(getx, setx)
-    """
-    __module__ = __name__
-    __doc__ = """A decorator indicating abstract properties.
 
     Requires that the metaclass is ABCMeta or derived from it.  A
     class that has a metaclass derived from ABCMeta cannot be
@@ -71,22 +45,6 @@ class ABCMeta:
     even via super()).
 
     """
-    __module__ = __name__
-    __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
-
-    Use this metaclass to create an ABC.  An ABC can be subclassed
-    directly, and then acts as a mix-in class.  You can also register
-    unrelated concrete classes (even built-in classes) and unrelated
-    ABCs as 'virtual subclasses' -- these and their descendants will
-    be considered subclasses of the registering ABC by the built-in
-    issubclass() function, but the registering ABC won't show up in
-    their MRO (Method Resolution Order) nor will method
-    implementations defined by the registering ABC be callable (not
-    even via super()).
-
-    """
-    _abc_invalidation_counter = 0
-
     def __new__(mcls, name, bases, namespace):
         cls = super(ABCMeta, mcls).__new__(mcls, name, bases, namespace)
         abstracts = set(((name, value) for (name, value) in namespace.items()))
@@ -101,12 +59,11 @@ class ABCMeta:
         if not isinstance(subclass, (type, types.ClassType)):
             raise TypeError('Can only register classes')
         if issubclass(subclass, cls):
-            pass
-        else:
-            if issubclass(cls, subclass):
-                raise RuntimeError('Refusing to create an inheritance cycle')
-            cls._abc_registry.add(subclass)
-            ABCMeta._abc_invalidation_counter = ABCMeta._abc_invalidation_counter + 1
+            return None
+        if issubclass(cls, subclass):
+            raise RuntimeError('Refusing to create an inheritance cycle')
+        cls._abc_registry.add(subclass)
+        ABCMeta._abc_invalidation_counter = ABCMeta._abc_invalidation_counter + 1
 
     def _dump_registry(cls, file):
         'Debug helper to print the ABC registry.'
@@ -117,8 +74,6 @@ class ABCMeta:
 
     def __instancecheck__(cls, instance):
         'Override for isinstance(instance, cls).'
-        subtype = type(instance)
-        subclass = getattr(instance, '__class__', None)
         subclass = getattr(instance, '__class__', None)
         if (subclass is not None) and (subclass in cls._abc_cache):
             return True
@@ -131,7 +86,6 @@ class ABCMeta:
 
     def __subclasscheck__(cls, subclass):
         'Override for issubclass(subclass, cls).'
-        ok = cls.__subclasshook__(subclass)
         if subclass in cls._abc_cache:
             return True
         if cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:

@@ -33,7 +33,6 @@ with open('/tmp/test_full.txt', 'r') as f:
                                         next_line = lines[j]
                                         if next_line.startswith('***'):
                                             pass
-                                    # [Block @0x0142] Error: ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
                                 elif found_versions:
                                     pass
                             else:
@@ -4549,5 +4548,3 @@ with open('/tmp/test_full.txt', 'r') as f:
         # [Recursion limit]
     print(f"Total tests with versions found: {debug_count}")
 next_line = lines[j]
-version_match = re.search('\\.(\\d+\\.\\d+)\\.pyc', next_line)
-i += 1

@@ -2,8 +2,6 @@
 
 x = 1
 y = 2
-x = 1
-y = 2
 if x < y:
     z = x
 elif x > y:
