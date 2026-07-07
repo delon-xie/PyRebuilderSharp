@@ -1,0 +1,151 @@
+# Level 6 Baseline Test Report
+
+**Level**: 6 — 推导式、async、yield、generator
+**Date**: 2026-07-07 23:39
+**Source files**: 7
+**Unique files in test**: 7
+**Versions**: 11 (2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12, 3.13, 3.14)
+**Engine**: PyRebuilderSharp (f516463)
+**Total time**: 6.4s
+
+---
+
+## 1. Executive Summary
+
+| Metric | Value | Status |
+|:-------|:-----:|:------:|
+| Source files | 7 | |
+| Unique decompiled results | 7 | |
+| Total (file × version) | 59 | |
+| Compile OK | 59 | ✅ |
+| Compile FAIL (syntax inc.) | 18 | ⚠️ |
+| Decompile OK | 59 | ✅ |
+| Decompile FAIL | 0 | ❌ |
+| **A class (≤3% diff)** | **0** | ✅ |
+| **B class (≤15% diff)** | **3** | ✅ |
+| C class (≤40% diff) | 0 | ⚠️ |
+| D class (>40% diff) | 56 | ⚠️ |
+| **A+B acceptable** | **3 (5%)** | |
+| Total orphan blocks | 0 | ⚠️ |
+| Total diff lines | 1150 | |
+
+---
+
+## 2. Per-Version Breakdown
+
+| Version | OK | Fail | A | B | C | D | A+B% | Orphans |
+|:-------:|:--:|:----:|:-:|:-:|:-:|:-:|:----:|:-------:|
+| 2.7 | 0 | 0 | 0 | 0 | 0 | 0 | 0% | — |
+| 3.5 | 0 | 0 | 0 | 0 | 0 | 0 | 0% | — |
+| 3.6 | 6 | 0 | 0 | 0 | 0 | 6 | 0% | — |
+| 3.7 | 6 | 0 | 0 | 0 | 0 | 6 | 0% | — |
+| 3.8 | 6 | 0 | 0 | 1 | 0 | 5 | 17% | — |
+| 3.9 | 6 | 0 | 0 | 1 | 0 | 5 | 17% | — |
+| 3.10 | 7 | 0 | 0 | 1 | 0 | 6 | 14% | — |
+| 3.11 | 7 | 0 | 0 | 0 | 0 | 7 | 0% | — |
+| 3.12 | 7 | 0 | 0 | 0 | 0 | 7 | 0% | — |
+| 3.13 | 7 | 0 | 0 | 0 | 0 | 7 | 0% | — |
+| 3.14 | 7 | 0 | 0 | 0 | 0 | 7 | 0% | — |
+
+
+---
+
+## 3. File-Level Detail
+
+| File | #Ver | Best | Worst | Orphans | Detail |
+|:-----|:----:|:----:|:-----:|:-------:|:-------|
+| l6_advanced.py | 5 | 🔴D | 🔴D | 0 | 3.10:D(+24/-49), 3.11:D(+46/-66), 3.12:D(+73/-70), 3.13:D(+60/-73), 3.14:D(+65/-70) |
+| test_async.py | 9 | 🟡B | 🔴D | 0 | 3.6:D(+5/-4), 3.7:D(+5/-4), 3.8:B(+1/-0), 3.9:B(+1/-0), 3.10:B(+1/-0)… |
+| test_nested_comp.py | 9 | 🔴D | 🔴D | 0 | 3.6:D(+24/-19), 3.7:D(+24/-19), 3.8:D(+6/-17), 3.9:D(+6/-17), 3.10:D(+6/-17)… |
+| test_yield_gen.py | 9 | 🔴D | 🔴D | 0 | 3.6:D(+1/-1), 3.7:D(+1/-1), 3.8:D(+1/-1), 3.9:D(+1/-1), 3.10:D(+1/-1)… |
+| test_comp.py | 9 | 🔴D | 🔴D | 0 | 3.6:D(+3/-2), 3.7:D(+3/-2), 3.8:D(+3/-2), 3.9:D(+3/-2), 3.10:D(+3/-2)… |
+| test_simple_comp.py | 9 | 🔴D | 🔴D | 0 | 3.6:D(+13/-4), 3.7:D(+13/-4), 3.8:D(+4/-3), 3.9:D(+4/-3), 3.10:D(+4/-3)… |
+| test_yield_simple.py | 9 | 🔴D | 🔴D | 0 | 3.6:D(+1/-0), 3.7:D(+1/-0), 3.8:D(+1/-0), 3.9:D(+1/-0), 3.10:D(+1/-0)… |
+
+
+---
+
+## 4. Hardest Files (C/D class)
+
+| File | Version | Diff Lines | Ratio | Orphans | Core Issue |
+|:-----|:-------:|:----------:|:-----:|:-------:|:-----------|
+| l6_advanced.py | 3.12 | +73/-70 | 94.1% | 0 | (see displus) |
+| l6_advanced.py | 3.14 | +65/-70 | 88.8% | 0 | (see displus) |
+| l6_advanced.py | 3.13 | +60/-73 | 87.5% | 0 | (see displus) |
+| l6_advanced.py | 3.11 | +46/-66 | 73.7% | 0 | (see displus) |
+| l6_advanced.py | 3.10 | +24/-49 | 48.0% | 0 | (see displus) |
+| test_nested_comp.py | 3.6 | +24/-19 | 215.0% | 0 | (see displus) |
+| test_nested_comp.py | 3.7 | +24/-19 | 215.0% | 0 | (see displus) |
+| test_nested_comp.py | 3.12 | +12/-19 | 155.0% | 0 | (see displus) |
+| test_nested_comp.py | 3.14 | +13/-18 | 155.0% | 0 | (see displus) |
+| test_nested_comp.py | 3.11 | +8/-19 | 135.0% | 0 | (see displus) |
+
+
+---
+
+## 5. Improvement Analysis
+
+### 5.1 Orphan Block Analysis
+✅ 无 orphan 块
+
+### 5.2 跨版本一致问题（7 个文件在大多数版本中为 D 类）
+
+| File | Affected Versions |
+|:-----|:-----------------|
+| l6_advanced.py | 3.10, 3.14, 3.11, 3.12, 3.13 |
+| test_async.py | 3.7, 3.13, 3.6, 3.12, 3.11, 3.14 |
+| test_comp.py | 3.6, 3.7, 3.8, 3.13, 3.12, 3.9, 3.11, 3.14, 3.10 |
+| test_nested_comp.py | 3.8, 3.9, 3.6, 3.12, 3.7, 3.13, 3.10, 3.14, 3.11 |
+| test_simple_comp.py | 3.13, 3.12, 3.9, 3.11, 3.10, 3.14, 3.8, 3.7, 3.6 |
+| test_yield_gen.py | 3.9, 3.12, 3.13, 3.8, 3.7, 3.6, 3.10, 3.14, 3.11 |
+| test_yield_simple.py | 3.13, 3.12, 3.8, 3.11, 3.9, 3.10, 3.14, 3.6, 3.7 |
+
+这些文件在所有版本中表现一致，说明是**反编译器固有缺陷**而非版本特定问题。
+查阅 displus 输出找共性 pattern。
+
+
+### 5.3 按版本降级检查
+
+| Version | C+D Ratio | Assessment |
+|:-------:|:---------:|:-----------|
+| 2.7 | 0% | ✅ 良好 |
+| 3.5 | 0% | ✅ 良好 |
+| 3.6 | 100% | 🔴 突出问题 |
+| 3.7 | 100% | 🔴 突出问题 |
+| 3.8 | 83% | 🔴 突出问题 |
+| 3.9 | 83% | 🔴 突出问题 |
+| 3.10 | 86% | 🔴 突出问题 |
+| 3.11 | 100% | 🔴 突出问题 |
+| 3.12 | 100% | 🔴 突出问题 |
+| 3.13 | 100% | 🔴 突出问题 |
+| 3.14 | 100% | 🔴 突出问题 |
+
+
+### 5.4 推荐修复优先级
+
+| Priority | Issue | Level Impact | Suggested Approach |
+|:--------:|:------|:------------:|:-------------------|
+| P2 | 解决 7 个跨版本 D 类文件的共性问题 | 7 files | 对比 displus 输出定位共性 pattern |
+
+
+---
+
+## 6. Sample: Worst File at Displus Detail
+
+See `test_data/displus/level6/` for full per-file per-version pyc2displus dumps.
+These contain complete bytecode, exception tables, lnotab, and code object details.
+
+---
+
+## 7. Next Steps
+
+| Priority | Action |
+|:--------:|:-------|
+| P0 | Fix hardest file(s) in this level |
+| P1 | Run test again to verify fix |
+| P2 | Move to next level |
+| P3 | Track per-level convergence across iterations |
+
+---
+
+*Report generated by `tools/test_by_level.py` on 2026-07-07 23:39*

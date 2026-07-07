@@ -59,7 +59,9 @@ public class BlockScanner : IBlockScanner
                     leaders.Add(target.Value);
             }
             // SETUP_FINALLY: 异常处理器入口也要标记为 leader
-            else if (instr.Opcode == Opcode.SETUP_FINALLY || instr.Opcode == Opcode.SETUP_EXCEPT)
+            // 仅限 SETUP_FINALLY，不含 SETUP_EXCEPT（3.8-3.10 中 opcode 121 为 JUMP_IF_NOT_EXC_MATCH，
+            // 其 argument 是跳转距离而非 handler 偏移）
+            else if (instr.Opcode == Opcode.SETUP_FINALLY)
             {
                 if (instr.Argument.HasValue)
                 {
@@ -284,12 +286,18 @@ public class BlockScanner : IBlockScanner
                     break;
 
                 default:
-                    if (i + 1 < blocks.Count)
+                    // 终端指令（RETURN_VALUE, RAISE_VARARGS 等）不产生后继
+                    // 参考 CPython 3.12: Python/ceval.c — 终端指令后代码不可达
+                    if (!JumpHelper.IsTerminal(lastInstr.Opcode))
                     {
-                        AddSuccessor(block, blocks[i + 1]);
-                        if (block.StartOffset == 0)
+                        if (i + 1 < blocks.Count)
                         {
-                            Console.Error.WriteLine($"[BLOCK_LINK] Entry block 0x{block.StartOffset:X4} has {block.Instructions.Count} instructions, last opcode={block.Instructions.Last().Opcode}, added successor 0x{blocks[i + 1].StartOffset:X4}");
+                            AddSuccessor(block, blocks[i + 1]);
+                            if (block.StartOffset == 0)
+                            {
+                                Console.Error.WriteLine(
+                                    $"[BLOCK_LINK] Entry block 0x{block.StartOffset:X4} has {block.Instructions.Count} instructions, last opcode={lastInstr.Opcode}, added successor 0x{blocks[i + 1].StartOffset:X4}");
+                            }
                         }
                     }
                     break;

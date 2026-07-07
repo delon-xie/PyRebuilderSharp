@@ -134,6 +134,12 @@ public class ControlFlowScanner : IControlFlowScanner
                     // 自循环（pred == block）也是合法的循环
                     if (pred.StartOffset < block.StartOffset) continue;
                     
+                    // 如果 block 已在已有循环的 body 中（非自身 header），
+                    // 且该循环不是 for 循环，则此回边是内部 if-break 而非嵌套循环。
+                    // for 循环需要独立检测（嵌套推导式依赖多层循环结构）。
+                    if (loops.Any(l => l.BodyBlocks.Contains(block) && l.Header != block && l.Type != LoopType.For))
+                        continue;
+                    
                     if (processedHeaders.Contains(block)) continue;
                     processedHeaders.Add(block);
 
@@ -182,7 +188,7 @@ public class ControlFlowScanner : IControlFlowScanner
                         BackEdge: pred,
                         ElseBlock: elseBlock,
                         Type: type
-                    );
+                    ) { BodyBlocks = loopBody };
                     loops.Add(loop);
 
                     foreach (var bodyBlock in loopBody)

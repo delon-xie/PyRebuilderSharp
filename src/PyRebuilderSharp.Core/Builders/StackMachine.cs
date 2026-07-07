@@ -832,6 +832,8 @@ public class StackMachine
             {
                 var top = SafePeek();
                 if (top != null) _exprStack.Push(top);
+                // 为 walrus (:=) 检测设置标记：DUP_TOP 后跟 STORE_FAST/STORE_NAME 形成 walrus
+                _pendingCopyDepth = 0;
                 return null;
             }
  
@@ -1020,7 +1022,11 @@ public class StackMachine
                 }
                 else if (hasArgs && argsExpr != null)
                 {
-                    keywords.Add(new Keyword(null, argsExpr, IsStarArg: true));
+                    // 非字面量 args tuple → *args 位置参数展开
+                    if (argsExpr is Name)
+                        args.Add(new Starred(argsExpr, ExpressionContext.Load));
+                    else
+                        keywords.Add(new Keyword(null, argsExpr, IsStarArg: true));
                 }
                 
                 if (hasKwargs && kwargsExpr != null)
@@ -1145,11 +1151,38 @@ public class StackMachine
             case Opcode.LOAD_CLOSURE:
             {
                 int cellIdx = instr.Argument ?? 0;
-                string cellName = "_cell";
-                if (_code.Cellvars != null && cellIdx < _code.Cellvars.Count)
-                    cellName = _code.Cellvars[cellIdx];
-                else if (_code.Varnames != null && cellIdx < _code.Varnames.Count)
-                    cellName = _code.Varnames[cellIdx];
+                string cellName;
+                if (_code.Version < PythonVersion.Py311)
+                {
+                    // 3.10-: [cellvars | freevars]（同 LOAD_DEREF 布局）
+                    // 参考 CPython 3.10: Python/ceval.c TARGET(LOAD_CLOSURE)
+                    if (cellIdx < _code.Cellvars.Count)
+                        cellName = _code.Cellvars[cellIdx] ?? "_cell";
+                    else
+                    {
+                        cellIdx -= _code.Cellvars.Count;
+                        cellName = cellIdx >= 0 && cellIdx < _code.Freevars.Count
+                            ? _code.Freevars[cellIdx] ?? "_cell" : "_cell";
+                    }
+                }
+                else
+                {
+                    // 3.11+: localsplus 布局 [varnames | cellvars | freevars]
+                    if (cellIdx < _code.Varnames.Count)
+                        cellName = _code.Varnames[cellIdx] ?? "_cell";
+                    else
+                    {
+                        cellIdx -= _code.Varnames.Count;
+                        if (cellIdx < _code.Cellvars.Count)
+                            cellName = _code.Cellvars[cellIdx] ?? "_cell";
+                        else
+                        {
+                            cellIdx -= _code.Cellvars.Count;
+                            cellName = cellIdx < _code.Freevars.Count
+                                ? _code.Freevars[cellIdx] ?? "_cell" : "_cell";
+                        }
+                    }
+                }
                 _exprStack.Push(new Name(cellName, ExpressionContext.Load));
                 return null;
             }
@@ -1760,10 +1793,21 @@ public class StackMachine
             case Opcode.YIELD_FROM:
             {
                 // Python 3.5-3.10: YIELD_FROM
+                // 在 async def 函数中，YIELD_FROM 用于 await 表达式而非 yield from
+                // 参考 CPython 3.10: Python/ceval.c — GET_AWAITABLE 后跟 LOAD_CONST None + YIELD_FROM 实现 await
                 var initialSend = SafePop();  // 丢弃
                 var iterExpr = SafePop();
                 if (iterExpr != null)
+                {
+                    if (_code.IsCoroutine)
+                    {
+                        // await 是表达式，其结果需要被 STORE_FAST 等消费
+                        // 推入 _exprStack 而非返回语句，以便后续赋值
+                        _exprStack.Push(new Await(iterExpr));
+                        return null;
+                    }
                     return new YieldFrom(iterExpr);
+                }
                 return null;
             }
 
@@ -1825,6 +1869,13 @@ public class StackMachine
                 // 异常处理结束后，for 循环上下文已结束
                 // 防止 handler 中的 POP_TOP 被误判为 loop break
                 _isForLoop = false;
+                return null;
+            // Python 3.8-3.10: JUMP_IF_NOT_EXC_MATCH
+            // 异常匹配：弹出异常值 + 异常类型，比较结果由控制流处理
+            // 参考 CPython 3.10: Python/ceval.c TARGET(JUMP_IF_NOT_EXC_MATCH)
+            case Opcode.JUMP_IF_NOT_EXC_MATCH:
+                SafePop(); // exception value
+                SafePop(); // exception type/class
                 return null;
             case Opcode.SETUP_FINALLY:
             case Opcode.BEFORE_WITH:
@@ -2315,6 +2366,7 @@ public class StackMachine
                 return null;
 
             // ---- 3.11+ LIST_APPEND: TOS → append to list at stack[-depth-1] ----
+            case Opcode.LIST_APPEND:
             case Opcode.LIST_APPEND_313:
             {
                 var depth = instr.Argument ?? 0;
@@ -2529,47 +2581,68 @@ public class StackMachine
     private string GetDerefVarname(Instruction instr)
     {
         var idx = instr.Argument ?? 0;
-        // Python 3.11+ localsplus 布局：varnames 和 cellvars 可能重叠
-        // 如果变量同时在 varnames 和 cellvars 中，只占用一个槽
-        // 布局：[varnames + (cellvars - overlapping_with_varnames) | freevars]
-        
-        if (idx < _code.Varnames.Count)
+
+        // Python 3.10-: DEREF 空间 = [cellvars | freevars]，varnames 完全独立
+        // Python 3.11+: localsplus 布局 = [varnames | (cellvars - overlapping) | freevars]
+        // 参考 CPython 3.10: Python/ceval.c LOAD_DEREF — nBytes = locals + cells
+        //     CPython 3.11+: Objects/frameobject.c _PyFrame_GetCode — localsplus
+        bool isOldLayout = _code.Version < PythonVersion.Py311;
+
+        if (isOldLayout)
         {
-            var name = _code.Varnames[idx];
-            if (!string.IsNullOrEmpty(name)) return name;
+            // 3.10-: [cellvars | freevars]
+            if (idx < _code.Cellvars.Count)
+            {
+                var name = _code.Cellvars[idx];
+                if (!string.IsNullOrEmpty(name)) return name;
+            }
+            idx -= _code.Cellvars.Count;
+            if (idx >= 0 && idx < _code.Freevars.Count)
+            {
+                var name = _code.Freevars[idx];
+                if (!string.IsNullOrEmpty(name)) return name;
+            }
         }
         else
         {
-            idx -= _code.Varnames.Count;
-            // 计算 cellvars 中不与 varnames 重叠的部分
-            int nonOverlappingCellCount = 0;
-            foreach (var cellName in _code.Cellvars)
+            // 3.11+: [varnames | (cellvars - overlapping) | freevars]
+            if (idx < _code.Varnames.Count)
             {
-                if (!_code.Varnames.Contains(cellName))
-                    nonOverlappingCellCount++;
-            }
-            
-            if (idx < nonOverlappingCellCount)
-            {
-                // 找到第 idx 个不重叠的 cellvar
-                int count = 0;
-                foreach (var cellName in _code.Cellvars)
-                {
-                    if (!_code.Varnames.Contains(cellName))
-                    {
-                        if (count == idx)
-                            return cellName;
-                        count++;
-                    }
-                }
+                var name = _code.Varnames[idx];
+                if (!string.IsNullOrEmpty(name)) return name;
             }
             else
             {
-                idx -= nonOverlappingCellCount;
-                if (idx < _code.Freevars.Count)
+                idx -= _code.Varnames.Count;
+                // 计算 cellvars 中不与 varnames 重叠的部分
+                int nonOverlappingCellCount = 0;
+                foreach (var cellName in _code.Cellvars)
                 {
-                    var name = _code.Freevars[idx];
-                    if (!string.IsNullOrEmpty(name)) return name;
+                    if (!_code.Varnames.Contains(cellName))
+                        nonOverlappingCellCount++;
+                }
+
+                if (idx < nonOverlappingCellCount)
+                {
+                    int count = 0;
+                    foreach (var cellName in _code.Cellvars)
+                    {
+                        if (!_code.Varnames.Contains(cellName))
+                        {
+                            if (count == idx)
+                                return cellName;
+                            count++;
+                        }
+                    }
+                }
+                else
+                {
+                    idx -= nonOverlappingCellCount;
+                    if (idx < _code.Freevars.Count)
+                    {
+                        var name = _code.Freevars[idx];
+                        if (!string.IsNullOrEmpty(name)) return name;
+                    }
                 }
             }
         }

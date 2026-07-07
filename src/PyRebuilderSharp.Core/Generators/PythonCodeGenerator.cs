@@ -255,6 +255,17 @@ public class PythonCodeGenerator : ICodeGenerator
                 _output.Append(" := ");
                 Visit(ne.Value);
                 break;
+            case IfExp ifExp:
+                Visit(ifExp.Body);
+                _output.Append(" if ");
+                Visit(ifExp.Test);
+                _output.Append(" else ");
+                Visit(ifExp.Orelse);
+                break;
+            case Await awaitExpr:
+                _output.Append("await ");
+                Visit(awaitExpr.Value);
+                break;
             case FormattedValue fv:
                 Visit(fv.Value);
                 if (fv.Conversion > 0)

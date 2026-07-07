@@ -91,3 +91,5 @@ public record FunctionRef(Bytecode.CodeObject? Code, string Name) : Expr
 
 // --- Walrus (NamedExpr) ---
 public record NamedExpr(Expr Target, Expr Value) : Expr;
+public record IfExp(Expr Test, Expr Body, Expr Orelse) : Expr;
+public record Await(Expr Value) : Expr;

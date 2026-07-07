@@ -668,10 +668,10 @@ public class AstBuilder
         // 即使 LoopHeader 标志未设置
         bool hasForIter = block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
         // Python 3.13+ 内联列表推导式：检查是否存在 LIST_APPEND_313（可能在 body 块中）
-        bool hasListAppend313 = block.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
+        bool hasListAppend313 = block.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND || i.Opcode == Opcode.LIST_APPEND_313);
         if (!hasListAppend313)
         {
-            hasListAppend313 = block.Successors.Any(s => s.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313));
+            hasListAppend313 = block.Successors.Any(s => s.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND || i.Opcode == Opcode.LIST_APPEND_313));
         }
         
         if (_options.VerboseErrors)
@@ -791,14 +791,8 @@ public class AstBuilder
                 var withStmts2 = BuildWithFromBlock(block, visited);
                 if (withStmts2 != null)
                 {
-                    // _blockResults 中的语句是完整的（含 with 体），
-                    // 但 BuildWithFromBlock 消耗了前置独立语句。
-                    // 重建：用 GetBlockStmts 获取所有语句，只取 with 体
-                    var allStmts = GetBlockStmts(block);
-                    var preStatements = allStmts
-                        .Where(s => !(s is With) && !(s is CommentBlock))
-                        .ToList();
-                    stmts.AddRange(preStatements);
+                    // BuildWithFromBlock 已包含完整 with 结构（含上下文表达式和体），
+                    // 不用再重复提取前置语句（GetBlockStmts 会重复反编译相同指令）。
                     stmts.AddRange(withStmts2);
                     // 标记 handler 块为 visited
                     var setupIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
@@ -1326,10 +1320,10 @@ public class AstBuilder
             Console.Error.WriteLine($"[BUILD_FOR_LOOP_DEBUG] effectiveElseOffset=0x{(effectiveElseOffset.HasValue ? effectiveElseOffset.Value.ToString("X4") : "NULL")} bodyVisited count={bodyVisited.Count}");
             CollectBodyBlocks(bodyEntry, actualHeader, bodyBlocks, bodyVisited, exitBlock, effectiveElseOffset);
         }
-        bool isInlineComp = actualHeader.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313);
+        bool isInlineComp = actualHeader.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND || i.Opcode == Opcode.LIST_APPEND_313);
         if (!isInlineComp)
         {
-            isInlineComp = bodyBlocks.Any(b => b.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313));
+            isInlineComp = bodyBlocks.Any(b => b.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND || i.Opcode == Opcode.LIST_APPEND_313));
         }
         if (isInlineComp && bodyBlocks.Count == 0)
         {
@@ -1529,7 +1523,7 @@ public class AstBuilder
         
         foreach (var ins in header.Instructions)
         {
-            if (ins.Opcode == Opcode.LIST_APPEND_313)
+            if (ins.Opcode == Opcode.LIST_APPEND || ins.Opcode == Opcode.LIST_APPEND_313)
             {
                 hasListAppend = true;
                 break;
@@ -1552,7 +1546,7 @@ public class AstBuilder
             {
                 foreach (var ins in block.Instructions)
                 {
-                    if (ins.Opcode == Opcode.LIST_APPEND_313)
+                    if (ins.Opcode == Opcode.LIST_APPEND || ins.Opcode == Opcode.LIST_APPEND_313)
                     {
                         hasListAppend = true;
                         break;
@@ -1678,7 +1672,7 @@ public class AstBuilder
         
         Expr? elt = null;
         Expr? keyElt = null;
-        Opcode appendOpcode = hasListAppend ? Opcode.LIST_APPEND_313 : (hasSetAdd ? Opcode.SET_ADD_313 : Opcode.MAP_ADD_313);
+        Opcode appendOpcode = hasListAppend ? (bodyBlocks.Any(b => b.Instructions.Any(i => i.Opcode == Opcode.LIST_APPEND_313)) ? Opcode.LIST_APPEND_313 : Opcode.LIST_APPEND) : (hasSetAdd ? Opcode.SET_ADD_313 : Opcode.MAP_ADD_313);
         bool isListAppend = hasListAppend;
         bool isMap = hasMapAdd;
         
@@ -1764,6 +1758,16 @@ public class AstBuilder
                             {
                             Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT executing opcode={ins.Opcode} offset=0x{ins.Offset:X4} arg={ins.Argument}");
                             }
+                            // 在模拟器中，POP_JUMP_IF_FALSE/POP_JUMP_IF_TRUE 需要模拟弹栈
+                            // （正常 StackMachine 中这些跳转由 BlockDecompiler 的块分割处理，不弹栈）
+                            if (ins.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+                                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+                            {
+                                sm.PopExpr();
+                                if (_options.VerboseErrors)
+                                { Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT simulated POP_JUMP_IF_FALSE pop, stack_size={sm.ExprStackCount}"); }
+                                continue;
+                            }
                             sm.Execute(ins);
                             Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT stack_size={sm.ExprStackCount} after opcode={ins.Opcode}");
                         }
@@ -1782,11 +1786,18 @@ public class AstBuilder
                         }
                         else if (sm.ExprStackCount >= 2)
                         {
-                            var listObj = sm.PopExpr();
-                            elt = sm.PopExpr();
+                            // 栈顶可能是 [iterExpr, target, elt] 或 [list, elt]
+                            // 取栈顶作为 elt（真正的元素表达式是栈顶或栈顶-1）
+                            var top = sm.PopExpr();
+                            var second = sm.PopExpr();
+                            // BinOp 更可能是元素表达式而非列表容器
+                            if (top is BinOp || second is ListLiteral || second is DictLiteral)
+                                elt = top;
+                            else
+                                elt = second;
                             if (_options.VerboseErrors)
                             {
-                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT extracted_elt={elt?.GetType().Name} (popped list: {listObj?.GetType().Name})");
+                            Console.Error.WriteLine($"[DECOMP_TRACE] stage=ELT_EXTRACT extracted_elt={elt?.GetType().Name} (top={top?.GetType().Name} second={second?.GetType().Name})");
                             }
                         }
                         else if (sm.ExprStackCount > 0)
@@ -1990,7 +2001,7 @@ public class AstBuilder
                             
                             foreach (var ins in bb.Instructions)
                             {
-                                if (ins.Opcode == Opcode.LIST_APPEND_313)
+                                if (ins.Opcode == Opcode.LIST_APPEND || ins.Opcode == Opcode.LIST_APPEND_313)
                                 {
                                     hasListAppendAfter = true;
                                     break;
@@ -4135,10 +4146,44 @@ public class AstBuilder
             }
         }
 
+        // 当 handler 在同一个块中时（如 3.8-3.10 整函数单块），从当前块的指令中提取 handler
+        bool handlerIsInline = handlerBlocks.Count == 0 && handlerAbs > block.StartOffset && handlerAbs < block.EndOffset;
+
         // 提取 handler body 语句
         var handlerInstrs = new List<Instruction>();
         bool handlerFound = false, seenBody = false, isFinally = false;
-        foreach (var hb in handlerBlocks)
+        if (handlerIsInline)
+        {
+            // 直接在当前块的指令列表中扫描 handler（从 handlerAbs 开始）
+            foreach (var ins in block.Instructions.Where(i => i.Offset >= handlerAbs))
+            {
+                if (ins.Opcode == Opcode.POP_EXCEPT)
+                {
+                    handlerFound = true;
+                    continue; // POP_EXCEPT 后继续提取（如后续的 LOAD_FAST + RETURN_VALUE）
+                }
+                if (ins.Opcode == Opcode.END_FINALLY)
+                {
+                    if (seenBody) { handlerFound = true; break; }
+                    continue;
+                }
+                if (!seenBody && ins.Opcode is Opcode.DUP_TOP) continue;
+                if (!seenBody && ins.Opcode is Opcode.JUMP_IF_NOT_EXC_MATCH) continue;
+                if (!seenBody && ins.Opcode is Opcode.RERAISE) continue;
+                if (!seenBody && (ins.Opcode is Opcode.LOAD_NAME or Opcode.LOAD_GLOBAL or Opcode.LOAD_FAST)) continue;
+                if (!seenBody && ins.Opcode is Opcode.POP_TOP) continue;
+                seenBody = true;
+                if (ins.Opcode is Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE) continue;
+                // 在 POP_EXCEPT (handlerFound) 之后，跳过 final LOAD + RETURN 对
+                // 这些是 try 体成功路径和 handler 路径的共享结尾，不属 handler 特有
+                if (handlerFound && (ins.Opcode is Opcode.RETURN_VALUE 
+                    or Opcode.LOAD_FAST or Opcode.LOAD_NAME or Opcode.LOAD_DEREF
+                    or Opcode.RAISE_VARARGS))
+                    continue;
+                handlerInstrs.Add(ins);
+            }
+        }
+        else foreach (var hb in handlerBlocks)
         {
             if (handlerFound) break;
             foreach (var ins in hb.Instructions)
@@ -4146,7 +4191,7 @@ public class AstBuilder
                 if (ins.Opcode == Opcode.POP_EXCEPT)
                 {
                     handlerFound = true;
-                    break;
+                    continue; // POP_EXCEPT 后继续提取（如后续的 LOAD_FAST + RETURN_VALUE）
                 }
                 if (ins.Opcode == Opcode.END_FINALLY)
                 {
@@ -4166,8 +4211,7 @@ public class AstBuilder
                 if (!seenBody && ins.Opcode is Opcode.POP_TOP)
                     continue;
                 seenBody = true;
-                if (ins.Opcode is Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE)
-                    continue;
+                if (ins.Opcode is Opcode.JUMP_FORWARD or Opcode.JUMP_ABSOLUTE) continue;
                 handlerInstrs.Add(ins);
             }
         }
@@ -4188,7 +4232,17 @@ public class AstBuilder
         // 检测 handler 类型：except（以 DUP_TOP 或 POP_TOP×3 开头）还是 finally（无两者）
         bool isExceptHandler = false;
         int topCount = 0;
-        foreach (var hb in handlerBlocks)
+        if (handlerIsInline)
+        {
+            foreach (var ins in block.Instructions.Where(i => i.Offset >= handlerAbs))
+            {
+                if (ins.Opcode == Opcode.DUP_TOP) { isExceptHandler = true; break; }
+                if (ins.Opcode == Opcode.POP_TOP) { topCount++; if (topCount >= 2) { isExceptHandler = true; break; } }
+                if (ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_GLOBAL
+                    || ins.Opcode == Opcode.LOAD_FAST) break;
+            }
+        }
+        else foreach (var hb in handlerBlocks)
         {
             foreach (var ins in hb.Instructions)
             {
@@ -4209,7 +4263,29 @@ public class AstBuilder
             // === except handler ===
             // 检测 except 异常类型
             Expr? exceptType = null;
-            foreach (var hb in handlerBlocks)
+            if (handlerIsInline)
+            {
+                bool foundType = false;
+                foreach (var ins in block.Instructions.Where(i => i.Offset >= handlerAbs))
+                {
+                    if (ins.Opcode == Opcode.LOAD_NAME || ins.Opcode == Opcode.LOAD_GLOBAL)
+                    {
+                        if (exceptType == null)
+                        {
+                            var typeName = _codeObject.Names.Count > (ins.Argument ?? 0)
+                                ? _codeObject.Names[ins.Argument!.Value] : null;
+                            if (typeName != null && typeName != "__doc__" && !typeName.StartsWith("__"))
+                                exceptType = new Name(typeName, ExpressionContext.Load);
+                        }
+                    }
+                    else if (ins.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH && exceptType != null)
+                    {
+                        foundType = true;
+                        break;
+                    }
+                }
+            }
+            else foreach (var hb in handlerBlocks)
             {
                 bool foundType = false;
                 foreach (var ins in hb.Instructions)
@@ -7029,10 +7105,8 @@ public class AstBuilder
 
         // Decompile the comprehension body
         var body = DecompileChildCode(compRef.Code);
-
-
+        
         // Expected body structure: [For(target, iter, body, null)] or similar
-        // The body may have BUILD_SET/BUILD_LIST/BUILD_MAP as a statement
         // followed by the for-loop. Find the for-loop in body.
         For? forStmt = null;
         foreach (var stmt in body)
@@ -7048,10 +7122,10 @@ public class AstBuilder
         {
             // Some comprehension bodies (set/dict via SET_ADD/MAP_ADD) don't have a For loop.
             // Use fallback: extract iterable, target, and element from the body.
-            Console.Error.WriteLine($"[COMP_FALLBACK] kind={kind}, body.Count={body.Count}, first_types={string.Join(",", body.Take(4).Select(s => s.GetType().Name))}");
             return BuildComprehensionFallback(body, kind, compCall);
         }
 
+        // Build comprehension generators
         // Build comprehension generators: find the For loop and its filters
         var generators = new List<Comprehension>();
 
@@ -7088,6 +7162,9 @@ public class AstBuilder
             var actualIter = cur.Iter;
             if (actualIter is Name dotName && dotName.Id.StartsWith(".") && int.TryParse(dotName.Id.AsSpan(1), out int di) && di < compCall.Args.Count)
                 actualIter = compCall.Args[di];
+            // 若迭代器回退到 "iterable"（ExtractIterExpression 无法提取），用 call 参数覆盖
+            if (actualIter is Name fallbackName && fallbackName.Id == "iterable" && compCall.Args.Count > 0)
+                actualIter = compCall.Args[0];
             // Replace .0/.1/.2 in filters with actual call args
             var replacedIfs = genIfs.Select(ifExpr => ReplaceDotParamInExpr(ifExpr, compCall)).ToList();
             generators.Add(new Comprehension(cur.Target, actualIter, replacedIfs));
@@ -7101,6 +7178,40 @@ public class AstBuilder
         // Element expression: the last non-for, non-continue statement in innermost body
         Expr? elt = null;
         Expr? keyElt = null;
+        
+        // For list/dict/set comprehensions where MAP_ADD/SET_ADD/LIST_APPEND consumed the body,
+        // the innermostFor.Body is empty. Extract key/value from the loop target.
+        if (innermostFor.Body.Count == 0 && innermostFor.Target != null)
+        {
+            if (kind == CompKind.Dict && innermostFor.Target is ListLiteral tup && tup.Elts.Count >= 2)
+            {
+                // dict: target=(k, v), use Name(k), Name(v) as key/value
+                keyElt = tup.Elts[0];
+                elt = tup.Elts[1];
+            }
+            else if (kind == CompKind.Dict && innermostFor.Target is ListLiteral tup2)
+            {
+                elt = innermostFor.Target;
+            }
+            else
+            {
+                // set/list/generator: use target as element (or extract from child code for nested)
+                if (kind is CompKind.List or CompKind.Set && compRef.Code?.Instructions != null)
+                {
+                    var childInstrs = compRef.Code.Instructions;
+                    // Check for LOAD_DEREF (cell vars from outer scope → nested comprehension)
+                    bool hasCellVar = childInstrs.Any(i => i.Opcode is Opcode.LOAD_DEREF or Opcode.LOAD_CLOSURE);
+                    if (hasCellVar)
+                    {
+                        // Try to simulate element extraction from raw instructions
+                        Expr? simElt = SimulateNestedElt(childInstrs, innermostFor.Target);
+                        if (simElt != null)
+                            elt = simElt;
+                    }
+                }
+                elt ??= innermostFor.Target;
+            }
+        }
         
         // For dict comprehensions, we need to find both key and value
         // The order in bytecode is: push key, push value, MAP_ADD
@@ -7146,6 +7257,7 @@ public class AstBuilder
             {
                 var s = innermostFor.Body[i];
                 if (s is ExprStmt es) { elt = es.Value; break; }
+                if (s is Yield yieldStmt) { elt = yieldStmt.Value; break; }
                 if (s is Assign aa) { elt = aa.Value; break; }
             }
         }
@@ -7240,6 +7352,7 @@ public class AstBuilder
         Expr? elt = null;
         Expr? keyElt = null;
         Expr? target = null;
+        Expr? iter = null;
         List<Expr> ifs = new List<Expr>();
 
         foreach (var stmt in body)
@@ -7259,6 +7372,10 @@ public class AstBuilder
             }
             else if (stmt is Assign a && a.Targets.Count == 1 && a.Targets[0] is Name n && n.Id != "?")
             {
+                // 如果 Assign 的值已经是推导式 AST（ListComp/SetComp/DictComp），直接使用它
+                if (a.Value is ListComp lc) { elt = lc.Elt; target = lc.Generators.Count > 0 ? lc.Generators[0].Target : n; if (lc.Generators.Count > 0) { iter = lc.Generators[0].Iter; ifs = new List<Expr>(lc.Generators[0].Ifs); } break; }
+                if (a.Value is SetComp sc) { elt = sc.Elt; target = sc.Generators.Count > 0 ? sc.Generators[0].Target : n; if (sc.Generators.Count > 0) { iter = sc.Generators[0].Iter; ifs = new List<Expr>(sc.Generators[0].Ifs); } break; }
+                if (a.Value is GeneratorExp ge) { elt = ge.Elt; target = ge.Generators.Count > 0 ? ge.Generators[0].Target : n; if (ge.Generators.Count > 0) { iter = ge.Generators[0].Iter; ifs = new List<Expr>(ge.Generators[0].Ifs); } break; }
                 target = n;
             }
             else if (stmt is If ifStmt)
@@ -7274,8 +7391,9 @@ public class AstBuilder
             }
         }
 
-        // Determine iterable from call args
-        Expr? iter = compCall.Args.Count > 0 ? compCall.Args[0] : null;
+        // Determine iterable from call args (override inner iter with outer call args)
+        if (compCall.Args.Count > 0)
+            iter = compCall.Args[0];
         // Elt fallback: use child code's last ExprStmt value (after .0 is excluded)
         if (target == null)
         {
@@ -7352,6 +7470,46 @@ public class AstBuilder
                 if (ContainsInvalidCall(arg)) return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// 模拟嵌套推导式的元素提取。当 For 体为空（MAP_ADD/SET_ADD/LIST_APPEND 消耗了表达式栈），
+    /// 从原始子代码指令中提取元素表达式。
+    /// 处理需要 LOAD_DEREF（外部 cell 变量）的嵌套推导式。
+    /// </summary>
+    private Expr? SimulateNestedElt(List<Instruction> childInstrs, Expr? loopTarget)
+    {
+        int storeIdx = -1;
+        for (int i = 0; i < childInstrs.Count; i++)
+        {
+            if (childInstrs[i].Opcode == Opcode.STORE_FAST)
+            {
+                storeIdx = i;
+                break;
+            }
+        }
+        if (storeIdx < 0 || storeIdx >= childInstrs.Count - 1) return null;
+        
+        var simMachine = new StackMachine(new CodeObject());
+        simMachine.PushExpr(loopTarget ?? new Name("?", ExpressionContext.Load));
+        
+        for (int i = storeIdx + 1; i < childInstrs.Count; i++)
+        {
+            var ins = childInstrs[i];
+            if (ins.Opcode is Opcode.LIST_APPEND or Opcode.LIST_APPEND_313 or Opcode.SET_ADD_313)
+                break;
+            if (ins.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38)
+            {
+                if (simMachine.ExprStackCount > 0) simMachine.PopExpr();
+                continue;
+            }
+            try { simMachine.Execute(ins); } catch { return null; }
+        }
+        
+        if (simMachine.ExprStackCount > 0)
+            return simMachine.PopExpr();
+        return null;
     }
 
     /// <summary>
@@ -8312,8 +8470,14 @@ public class AstBuilder
         if (args.Count == 0 && !childCode.IsGenerator && !childCode.IsCoroutine && !childCode.IsAsyncGenerator
             && isLikelyClassBody && !shouldBeFunction)
         {
-            CleanClassBody(body);
-            return new ClassDef(cleanName, new List<Expr>(), body);
+            // 即使看起来像类体，如果有 With/For/While/Try/Raise/With 等控制流语句，也应视为函数
+            // 类体一般不包含控制流语句（除了函数/类嵌套）
+            bool hasControlFlow = body.Any(s => s is With or For or While or Try or Raise or Assert);
+            if (!hasControlFlow)
+            {
+                CleanClassBody(body);
+                return new ClassDef(cleanName, new List<Expr>(), body);
+            }
         }
 
 

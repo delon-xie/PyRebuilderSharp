@@ -280,6 +280,7 @@ public enum Opcode
     RETURN_GENERATOR_313 = 233,
     STORE_SLICE_313 = 234,
     GET_AWAITABLE_313 = 235,
+    LIST_APPEND = 145,      // Python 3.10 (was 18 in 3.5-3.9, moved to 145 in 3.10; 3.13+ = 236)
     LIST_APPEND_313 = 236,
     MAP_ADD_313 = 237,
     MATCH_CLASS_313 = 238,
