@@ -129,12 +129,12 @@ public class TryControlStructure : ISequentialControlStructure
 {
     public ControlStructureType Type => ControlStructureType.Try;
     public SequentialBlock Header { get; set; } = null!;
-    public List<(SequentialBlock Handler, string? ExceptionType)> ExceptHandlers { get; } = new();
+    public List<(SequentialBlock Handler, string? ExceptionType, string? ExceptionVar)> ExceptHandlers { get; } = new();
     public SequentialBlock? ElseBlock { get; set; }
     public SequentialBlock? FinallyBlock { get; set; }
     public List<SequentialBlock> BodyBlocks { get; } = new();
 
-    public TryControlStructure(SequentialBlock header, List<(SequentialBlock Handler, string? ExceptionType)> exceptHandlers, SequentialBlock? elseBlock, SequentialBlock? finallyBlock, List<SequentialBlock> bodyBlocks)
+    public TryControlStructure(SequentialBlock header, List<(SequentialBlock Handler, string? ExceptionType, string? ExceptionVar)> exceptHandlers, SequentialBlock? elseBlock, SequentialBlock? finallyBlock, List<SequentialBlock> bodyBlocks)
     {
         Header = header;
         ExceptHandlers = exceptHandlers;

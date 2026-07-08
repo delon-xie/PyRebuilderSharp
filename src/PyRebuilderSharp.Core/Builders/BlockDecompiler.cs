@@ -37,6 +37,14 @@ public class BlockDecompiler
 
             foreach (var instr in instructions)
             {
+                if (instr.Opcode == Opcode.PUSH_EXC_INFO_312 || 
+                    instr.Opcode == Opcode.PUSH_EXC_INFO ||
+                    instr.Opcode == Opcode.CHECK_EXC_MATCH ||
+                    instr.Opcode == Opcode.CHECK_EG_MATCH ||
+                    instr.Opcode == Opcode.POP_EXCEPT ||
+                    instr.Opcode == Opcode.END_FINALLY)
+                    continue;
+                
                 var result = stackMachine.Execute(instr);
                 if (result is Stmt stmt)
                 {

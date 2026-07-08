@@ -86,8 +86,7 @@ public class SequentialBlockBuilder
             if (current.EndOffset > seqBlock.EndOffset)
                 seqBlock.EndOffset = current.EndOffset;
             
-            Console.Error.WriteLine($"[SEQ_BUILD] Adding block {current.Id}: offset 0x{current.StartOffset:X4}-0x{current.EndOffset:X4}, {current.Instructions.Count} instructions");
-            Console.Error.WriteLine($"[SEQ_BUILD]   SeqBlock now: 0x{seqBlock.StartOffset:X4}-0x{seqBlock.EndOffset:X4}, {seqBlock.Instructions.Count} instructions");
+            
 
             bool containsWithHeaderStart = false;
             int withHeaderStartIdx = -1;
@@ -105,7 +104,6 @@ public class SequentialBlockBuilder
             
             if (containsWithHeaderStart && withHeaderStartIdx > 0)
             {
-                Console.Error.WriteLine($"[SEQ_BUILD] Found WITH header start at instruction {withHeaderStartIdx}, breaking at block {current.Id}");
                 break;
             }
             
@@ -127,7 +125,6 @@ public class SequentialBlockBuilder
                 
                 if (hasCompleteWithPattern)
                 {
-                    Console.Error.WriteLine($"[SEQ_BUILD] Found complete WITH pattern in WITH header block, breaking at block {current.Id}");
                     break;
                 }
             }
@@ -177,7 +174,20 @@ public class SequentialBlockBuilder
         
         if (succHasWithInstruction)
         {
-            Console.Error.WriteLine($"[SEQ_BUILD] Next block has WITH instruction, breaking at block {current.Id}");
+            break;
+        }
+
+        bool succHasExcInfo = false;
+        if (current.Successors.Count == 1)
+        {
+            var succBlock = current.Successors.First();
+            succHasExcInfo = succBlock.Instructions.Any(i => 
+                i.Opcode == Opcode.PUSH_EXC_INFO_312 || 
+                i.Opcode == Opcode.PUSH_EXC_INFO);
+        }
+        
+        if (succHasExcInfo)
+        {
             break;
         }
 

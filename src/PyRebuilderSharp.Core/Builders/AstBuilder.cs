@@ -9976,14 +9976,63 @@ public class AstBuilder
             }
         }
 
+        var allEtEntries = new List<ExceptionTableEntry>();
+        var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
+
+        foreach (var seqBlock in seqBlocks)
+        {
+            foreach (var et in seqBlock.ExceptionTableEntries)
+            {
+                if (et.IsExcept || et.IsFinally)
+                {
+                    if (!allEtEntries.Contains(et))
+                        allEtEntries.Add(et);
+                }
+            }
+        }
+
+        if (allEtEntries.Count > 0)
+        {
+            var tryEtEntries = allEtEntries.Where(et => et.IsExcept && !et.Lasti).ToList();
+            if (tryEtEntries.Count > 0)
+            {
+                int tryStartOffset = tryEtEntries.Select(et => et.StartOffset).Min();
+                int tryEndOffset = tryEtEntries.Select(et => et.EndOffset).Max();
+
+                var headerBlock = seqBlocks.FirstOrDefault(sb => 
+                    sb.StartOffset <= tryStartOffset && sb.EndOffset > tryStartOffset);
+
+                if (headerBlock != null && !visited.Contains(headerBlock.Id))
+                {
+                    var tryStructure = ParseTryStructure(headerBlock, seqBlocks);
+                    if (tryStructure != null)
+                    {
+                        structures.Add(tryStructure);
+                        visited.Add(headerBlock.Id);
+                        foreach (var bodyBlock in tryStructure.BodyBlocks)
+                            visited.Add(bodyBlock.Id);
+                        if (tryStructure is TryControlStructure tryStruct)
+                        {
+                            foreach (var handler in tryStruct.ExceptHandlers)
+                                visited.Add(handler.Handler.Id);
+                            if (tryStruct.FinallyBlock != null)
+                                visited.Add(tryStruct.FinallyBlock.Id);
+                        }
+                    }
+                }
+            }
+        }
+
         foreach (var seqBlock in seqBlocks)
         {
             if (visited.Contains(seqBlock.Id))
                 continue;
 
-            if (seqBlock.Instructions.Any(i => 
+            bool hasSetupOpcode = seqBlock.Instructions.Any(i => 
                 i.Opcode == Opcode.SETUP_FINALLY ||
-                i.Opcode == Opcode.SETUP_EXCEPT))
+                i.Opcode == Opcode.SETUP_EXCEPT);
+            
+            if (hasSetupOpcode)
             {
                 var tryStructure = ParseTryStructure(seqBlock, seqBlocks);
                 if (tryStructure != null)
@@ -10042,18 +10091,48 @@ public class AstBuilder
         bool isWithExceptionHandler = header.Instructions.Any(i => 
             i.Opcode == Opcode.WITH_EXCEPT_START || 
             i.Opcode == Opcode.WITH_EXCEPT_START_312 ||
-            i.Opcode == Opcode.PUSH_EXC_INFO_312);
+            i.Opcode == Opcode.PUSH_EXC_INFO_312 ||
+            i.Opcode == Opcode.PUSH_EXC_INFO);
             
         if (isWithExceptionHandler)
             return null;
+            
+        bool isTryExceptHandler = header.Instructions.Any(i => 
+            i.Opcode == Opcode.CHECK_EXC_MATCH ||
+            i.Opcode == Opcode.POP_EXCEPT ||
+            i.Opcode == Opcode.RERAISE);
+            
+        if (isTryExceptHandler)
+            return null;
 
         bool isForLoop = header.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
-        bool isWhileLoop = header.Instructions.Any(i =>
+        bool hasJumpOp = header.Instructions.Any(i =>
             i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
                 or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38);
 
-        if (!isForLoop && !isWhileLoop)
+        if (!isForLoop && !hasJumpOp)
             return null;
+            
+        if (!isForLoop)
+        {
+            bool hasBackEdge = false;
+            foreach (var sourceBlock in header.SourceBlocks)
+            {
+                foreach (var succ in sourceBlock.Successors)
+                {
+                    if (succ.StartOffset <= header.StartOffset)
+                    {
+                        hasBackEdge = true;
+                        break;
+                    }
+                }
+                if (hasBackEdge)
+                    break;
+            }
+            
+            if (!hasBackEdge)
+                return null;
+        }
 
         var bodyBlocks = new List<SequentialBlock>();
         SequentialBlock? backEdge = null;
@@ -10429,71 +10508,375 @@ public class AstBuilder
 
     private ISequentialControlStructure? ParseTryStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
     {
-        var exceptHandlers = new List<(SequentialBlock Handler, string? ExceptionType)>();
+        var exceptHandlers = new List<(SequentialBlock Handler, string? ExceptionType, string? ExceptionVar)>();
         SequentialBlock? elseBlock = null;
         SequentialBlock? finallyBlock = null;
         var bodyBlocks = new List<SequentialBlock>();
 
         var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
 
-        foreach (var et in header.ExceptionTableEntries)
+        bool hasSetupOpcode = header.Instructions.Any(i => 
+            i.Opcode == Opcode.SETUP_FINALLY ||
+            i.Opcode == Opcode.SETUP_EXCEPT);
+
+        if (hasSetupOpcode)
         {
-            if (blockByOffset.TryGetValue(et.TargetOffset, out var targetBlock))
+            foreach (var et in header.ExceptionTableEntries)
             {
-                if (targetBlock.Instructions.Any(i => i.Opcode == Opcode.END_FINALLY))
+                if (blockByOffset.TryGetValue(et.TargetOffset, out var targetBlock))
                 {
-                    finallyBlock = targetBlock;
+                    if (targetBlock.Instructions.Any(i => i.Opcode == Opcode.END_FINALLY))
+                    {
+                        finallyBlock = targetBlock;
+                    }
+                    else
+                    {
+                        exceptHandlers.Add((targetBlock, null, null));
+                    }
                 }
-                else
+            }
+
+            var handlerOffsets = exceptHandlers.Select(h => h.Handler.StartOffset).ToList();
+            if (finallyBlock != null)
+                handlerOffsets.Add(finallyBlock.StartOffset);
+
+            var visited = new HashSet<int> { header.Id };
+            var worklist = new Queue<SequentialBlock>();
+
+            foreach (var sourceBlock in header.SourceBlocks)
+            {
+                foreach (var succ in sourceBlock.Successors)
                 {
-                    exceptHandlers.Add((targetBlock, null));
+                    var targetSeqBlock = blockByOffset.Values
+                        .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
+                    if (targetSeqBlock != null && !visited.Contains(targetSeqBlock.Id))
+                    {
+                        visited.Add(targetSeqBlock.Id);
+                        worklist.Enqueue(targetSeqBlock);
+                    }
+                }
+            }
+
+            while (worklist.Count > 0)
+            {
+                var current = worklist.Dequeue();
+
+                if (handlerOffsets.Contains(current.StartOffset))
+                    continue;
+
+                bodyBlocks.Add(current);
+
+                foreach (var succ in current.Successors)
+                {
+                    if (!visited.Contains(succ.Id) && !handlerOffsets.Contains(succ.StartOffset))
+                    {
+                        visited.Add(succ.Id);
+                        worklist.Enqueue(succ);
+                    }
                 }
             }
         }
-
-        var handlerOffsets = exceptHandlers.Select(h => h.Handler.StartOffset).ToList();
-        if (finallyBlock != null)
-            handlerOffsets.Add(finallyBlock.StartOffset);
-
-        var visited = new HashSet<int> { header.Id };
-        var worklist = new Queue<SequentialBlock>();
-
-        foreach (var sourceBlock in header.SourceBlocks)
+        else
         {
-            foreach (var succ in sourceBlock.Successors)
+            var allEtEntries = new List<ExceptionTableEntry>();
+            foreach (var seqBlock in seqBlocks)
             {
-                var targetSeqBlock = blockByOffset.Values
-                    .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
-                if (targetSeqBlock != null && !visited.Contains(targetSeqBlock.Id))
+                foreach (var et in seqBlock.ExceptionTableEntries)
                 {
-                    visited.Add(targetSeqBlock.Id);
-                    worklist.Enqueue(targetSeqBlock);
+                    if (et.IsExcept || et.IsFinally)
+                    {
+                        if (!allEtEntries.Contains(et))
+                            allEtEntries.Add(et);
+                    }
                 }
             }
-        }
 
-        while (worklist.Count > 0)
-        {
-            var current = worklist.Dequeue();
+            if (allEtEntries.Count == 0)
+                return null;
 
-            if (handlerOffsets.Contains(current.StartOffset))
-                continue;
+            var primaryExceptEntry = allEtEntries.FirstOrDefault(et => 
+                et.Depth == 0 && !et.Lasti && et.StartOffset == header.StartOffset);
 
-            bodyBlocks.Add(current);
+            if (primaryExceptEntry == null)
+                return null;
 
-            foreach (var succ in current.Successors)
+            int tryStartOffset = primaryExceptEntry.StartOffset;
+            int tryEndOffset = primaryExceptEntry.EndOffset;
+            var handlerOffsets = new HashSet<int>();
+
+            SequentialBlock? pushExcInfoBlock = null;
+            foreach (var seqBlock in seqBlocks)
             {
-                if (!visited.Contains(succ.Id) && !handlerOffsets.Contains(succ.StartOffset))
+                if (seqBlock.Instructions.Any(i => i.Opcode == Opcode.PUSH_EXC_INFO_312 || i.Opcode == Opcode.PUSH_EXC_INFO))
                 {
-                    visited.Add(succ.Id);
-                    worklist.Enqueue(succ);
+                    pushExcInfoBlock = seqBlock;
+                    break;
+                }
+            }
+            
+            if (pushExcInfoBlock != null)
+            {
+                string? exceptType = null;
+                string? exceptVar = null;
+                
+                var allHandlerInstrs = new List<Instruction>();
+                allHandlerInstrs.AddRange(pushExcInfoBlock.Instructions);
+                
+                int exceptStart = pushExcInfoBlock.StartOffset;
+                int exceptEnd = pushExcInfoBlock.EndOffset;
+                bool foundPopExcept = false;
+                
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.StartOffset >= exceptStart)
+                    {
+                        bool hasPopExcept = seqBlock.Instructions.Any(i => i.Opcode == Opcode.POP_EXCEPT);
+                        bool hasReturn = seqBlock.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE);
+                        
+                        if (hasPopExcept)
+                        {
+                            exceptEnd = seqBlock.EndOffset;
+                            foundPopExcept = true;
+                            break;
+                        }
+                        
+                        if (hasReturn)
+                        {
+                            exceptEnd = seqBlock.StartOffset;
+                            break;
+                        }
+                        
+                        exceptEnd = seqBlock.EndOffset;
+                    }
+                }
+                
+                if (!foundPopExcept)
+                {
+                    exceptEnd = pushExcInfoBlock.EndOffset;
+                }
+                
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.StartOffset > exceptStart && seqBlock.StartOffset < exceptEnd)
+                    {
+                        handlerOffsets.Add(seqBlock.StartOffset);
+                        allHandlerInstrs.AddRange(seqBlock.Instructions);
+                    }
+                }
+                
+                for (int i = 0; i < allHandlerInstrs.Count; i++)
+                {
+                    if (allHandlerInstrs[i].Opcode == Opcode.LOAD_GLOBAL)
+                    {
+                        var nameIdx = allHandlerInstrs[i].Argument ?? 0;
+                        if (nameIdx < _codeObject.Names.Count)
+                            exceptType = _codeObject.Names[nameIdx];
+                        break;
+                    }
+                    else if (allHandlerInstrs[i].Opcode == Opcode.CHECK_EXC_MATCH || 
+                             allHandlerInstrs[i].Opcode == Opcode.CHECK_EG_MATCH)
+                    {
+                        break;
+                    }
+                }
+                
+                for (int i = 0; i < allHandlerInstrs.Count; i++)
+                {
+                    if (allHandlerInstrs[i].Opcode == Opcode.STORE_FAST)
+                    {
+                        var nameIdx = allHandlerInstrs[i].Argument ?? 0;
+                        if (nameIdx < _codeObject.Varnames.Count)
+                            exceptVar = _codeObject.Varnames[nameIdx];
+                        break;
+                    }
+                }
+                
+                var mergedHandlerBlock = new SequentialBlock();
+                mergedHandlerBlock.StartOffset = exceptStart;
+                mergedHandlerBlock.EndOffset = exceptEnd;
+                mergedHandlerBlock.Instructions.AddRange(allHandlerInstrs);
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.StartOffset >= exceptStart && seqBlock.StartOffset < exceptEnd)
+                    {
+                        mergedHandlerBlock.SourceBlocks.AddRange(seqBlock.SourceBlocks);
+                        handlerOffsets.Add(seqBlock.StartOffset);
+                    }
+                }
+                
+                exceptHandlers.Add((mergedHandlerBlock, exceptType, exceptVar));
+            }
+
+            foreach (var seqBlock in seqBlocks)
+            {
+                if (handlerOffsets.Contains(seqBlock.StartOffset))
+                    continue;
+
+                bool hasExcInfo = seqBlock.Instructions.Any(i => 
+                    i.Opcode == Opcode.PUSH_EXC_INFO_312 || 
+                    i.Opcode == Opcode.PUSH_EXC_INFO);
+                if (hasExcInfo && seqBlock != exceptHandlers[0].Handler)
+                    continue;
+
+                bool hasExcMatch = seqBlock.Instructions.Any(i =>
+                    i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH);
+                if (hasExcMatch && seqBlock != exceptHandlers[0].Handler)
+                    continue;
+
+                if (seqBlock.StartOffset >= tryStartOffset && seqBlock.StartOffset < tryEndOffset)
+                {
+                    if (!bodyBlocks.Contains(seqBlock))
+                        bodyBlocks.Add(seqBlock);
+                }
+            }
+
+            var finallyEtEntry = allEtEntries.Where(et => et.IsFinally).LastOrDefault();
+            if (finallyEtEntry != null)
+            {
+                int finallyStart = finallyEtEntry.StartOffset;
+                
+                SequentialBlock? foundFinallyBlock = null;
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.StartOffset >= finallyStart && 
+                        seqBlock.Instructions.Any(i => i.Opcode == Opcode.PUSH_EXC_INFO_312 || i.Opcode == Opcode.PUSH_EXC_INFO))
+                    {
+                        foundFinallyBlock = seqBlock;
+                        break;
+                    }
+                }
+                
+                if (foundFinallyBlock != null)
+                {
+                    finallyStart = foundFinallyBlock.StartOffset;
+                    
+                    SequentialBlock? foundElseBlock = null;
+                    int elseStart = -1;
+                    int elseEnd = -1;
+                    
+                    if (exceptHandlers.Count > 0)
+                    {
+                        var lastHandler = exceptHandlers[0].Handler;
+                        int handlerEnd = lastHandler.EndOffset;
+                        
+                        int tryBodyEnd = tryEndOffset;
+                        
+                        foreach (var seqBlock in seqBlocks)
+                        {
+                            if (seqBlock.StartOffset >= tryBodyEnd && seqBlock.StartOffset < finallyStart)
+                            {
+                                bool hasPopExcept = seqBlock.Instructions.Any(i => i.Opcode == Opcode.POP_EXCEPT);
+                                bool hasReraise = seqBlock.Instructions.Any(i => i.Opcode == Opcode.RERAISE);
+                                bool hasCopy = seqBlock.Instructions.Any(i => i.Opcode == Opcode.COPY);
+                                bool hasExcInfo = seqBlock.Instructions.Any(i => i.Opcode == Opcode.PUSH_EXC_INFO_312 || i.Opcode == Opcode.PUSH_EXC_INFO);
+                                bool hasDeleteFast = seqBlock.Instructions.Any(i => i.Opcode == Opcode.DELETE_FAST);
+                                bool hasStoreFast = seqBlock.Instructions.Any(i => i.Opcode == Opcode.STORE_FAST);
+                                bool hasReturn = seqBlock.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE);
+                                
+                                bool isCleanup = hasPopExcept || hasReraise || hasCopy || hasExcInfo || 
+                                                hasDeleteFast || hasStoreFast;
+                                
+                                if (!isCleanup)
+                                {
+                                    if (elseStart < 0)
+                                        elseStart = seqBlock.StartOffset;
+                                       
+                                    if (hasReturn)
+                                    {
+                                        elseEnd = seqBlock.StartOffset;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        elseEnd = seqBlock.EndOffset;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if (elseStart >= 0 && elseEnd >= 0 && elseStart < finallyStart)
+                        {
+                            foreach (var seqBlock in seqBlocks)
+                            {
+                                if (seqBlock.StartOffset >= elseStart && seqBlock.StartOffset < finallyStart)
+                                {
+                                    if (foundElseBlock == null)
+                                        foundElseBlock = seqBlock;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (foundElseBlock != null && elseStart >= 0 && elseEnd >= 0)
+                    {
+                        var allElseInstrs = new List<Instruction>();
+                        foreach (var sb in seqBlocks)
+                        {
+                            if (sb.StartOffset >= elseStart && sb.StartOffset < elseEnd)
+                            {
+                                allElseInstrs.AddRange(sb.Instructions);
+                                handlerOffsets.Add(sb.StartOffset);
+                            }
+                        }
+                        
+                        var mergedElseBlock = new SequentialBlock();
+                        mergedElseBlock.StartOffset = elseStart;
+                        mergedElseBlock.EndOffset = elseEnd;
+                        mergedElseBlock.Instructions.AddRange(allElseInstrs);
+                        foreach (var sb in seqBlocks)
+                        {
+                            if (sb.StartOffset >= elseStart && sb.StartOffset < elseEnd)
+                            {
+                                mergedElseBlock.SourceBlocks.AddRange(sb.SourceBlocks);
+                            }
+                        }
+                        
+                        elseBlock = mergedElseBlock;
+                    }
+                    
+                    int finallyEnd = finallyStart;
+                    foreach (var seqBlock in seqBlocks)
+                    {
+                        if (seqBlock.StartOffset >= finallyStart)
+                        {
+                            bool hasReturn = seqBlock.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE);
+                            if (hasReturn)
+                            {
+                                finallyEnd = seqBlock.EndOffset;
+                                break;
+                            }
+                            finallyEnd = seqBlock.EndOffset;
+                        }
+                    }
+                    
+                    var allFinallyInstrs = new List<Instruction>();
+                    foreach (var sb in seqBlocks)
+                    {
+                        if (sb.StartOffset >= finallyStart && sb.StartOffset <= finallyEnd)
+                        {
+                            allFinallyInstrs.AddRange(sb.Instructions);
+                            handlerOffsets.Add(sb.StartOffset);
+                        }
+                    }
+                    
+                    var mergedFinallyBlock = new SequentialBlock();
+                    mergedFinallyBlock.StartOffset = finallyStart;
+                    mergedFinallyBlock.EndOffset = finallyEnd;
+                    mergedFinallyBlock.Instructions.AddRange(allFinallyInstrs);
+                    foreach (var sb in seqBlocks)
+                    {
+                        if (sb.StartOffset >= finallyStart && sb.StartOffset <= finallyEnd)
+                        {
+                            mergedFinallyBlock.SourceBlocks.AddRange(sb.SourceBlocks);
+                        }
+                    }
+                    
+                    finallyBlock = mergedFinallyBlock;
                 }
             }
         }
 
         bodyBlocks.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
-
-        Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found TRY statement at 0x{header.StartOffset:X4}, body blocks: {bodyBlocks.Count}, handlers: {exceptHandlers.Count}, finally: {(finallyBlock != null ? $"0x{finallyBlock.StartOffset:X4}" : "none")}");
 
         if (exceptHandlers.Count > 0 || finallyBlock != null)
         {
@@ -10505,6 +10888,16 @@ public class AstBuilder
 
     private ISequentialControlStructure? ParseIfElseStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
     {
+        var hasExcInfo = header.Instructions.Any(i => 
+            i.Opcode == Opcode.PUSH_EXC_INFO_312 || 
+            i.Opcode == Opcode.PUSH_EXC_INFO);
+        var hasExcMatch = header.Instructions.Any(i => 
+            i.Opcode == Opcode.CHECK_EXC_MATCH || 
+            i.Opcode == Opcode.CHECK_EG_MATCH);
+        
+        if (hasExcInfo || hasExcMatch)
+            return null;
+
         SequentialBlock? trueBranch = null;
         SequentialBlock? falseBranch = null;
         SequentialBlock? mergePoint = null;
@@ -10623,14 +11016,62 @@ public class AstBuilder
 
             if (structure is TryControlStructure tryStruct)
             {
-                foreach (var (handler, _) in tryStruct.ExceptHandlers)
+                foreach (var (handler, _, __) in tryStruct.ExceptHandlers)
                 {
                     handler.ParentStructure = structure;
+                    foreach (var sb in seqBlocks)
+                    {
+                        if (sb.StartOffset >= handler.StartOffset && sb.StartOffset < handler.EndOffset)
+                        {
+                            sb.ParentStructure = structure;
+                        }
+                    }
                 }
                 if (tryStruct.ElseBlock != null)
                     tryStruct.ElseBlock.ParentStructure = structure;
                 if (tryStruct.FinallyBlock != null)
+                {
                     tryStruct.FinallyBlock.ParentStructure = structure;
+                    foreach (var sb in seqBlocks)
+                    {
+                        if (sb.StartOffset >= tryStruct.FinallyBlock.StartOffset && sb.StartOffset <= tryStruct.FinallyBlock.EndOffset)
+                        {
+                            sb.ParentStructure = structure;
+                        }
+                    }
+                }
+                
+                foreach (var bodyBlock in tryStruct.BodyBlocks)
+                {
+                    bodyBlock.ParentStructure = structure;
+                    foreach (var sb in seqBlocks)
+                    {
+                        if (sb.StartOffset == bodyBlock.StartOffset)
+                        {
+                            sb.ParentStructure = structure;
+                        }
+                    }
+                }
+                
+                foreach (var sb in seqBlocks)
+                {
+                    if (sb.StartOffset >= tryStruct.Header.StartOffset && sb.ParentStructure == null)
+                    {
+                        bool hasExcInfo = sb.Instructions.Any(i => 
+                            i.Opcode == Opcode.PUSH_EXC_INFO_312 || 
+                            i.Opcode == Opcode.PUSH_EXC_INFO);
+                        bool hasReraise = sb.Instructions.Any(i => i.Opcode == Opcode.RERAISE);
+                        bool hasPopExcept = sb.Instructions.Any(i => i.Opcode == Opcode.POP_EXCEPT);
+                        bool hasCopy = sb.Instructions.Any(i => i.Opcode == Opcode.COPY);
+                        bool hasPrint = sb.Instructions.Any(i => i.Opcode == Opcode.CALL);
+                        
+                        if (hasExcInfo || hasReraise || hasPopExcept || hasCopy || hasPrint)
+                        {
+                            sb.ParentStructure = structure;
+                            Console.Error.WriteLine($"[LINK_CONTROL] Marked seqBlock Id={sb.Id}, Start=0x{sb.StartOffset:X4} as TryControlStructure");
+                        }
+                    }
+                }
             }
 
             if (structure is IfElseControlStructure ifStruct)
@@ -10707,7 +11148,7 @@ public class AstBuilder
 
             if (structure is TryControlStructure tryStruct)
             {
-                foreach (var (handler, _) in tryStruct.ExceptHandlers)
+                foreach (var (handler, _, __) in tryStruct.ExceptHandlers)
                     processed.Add(handler.Id);
                 if (tryStruct.ElseBlock != null)
                     processed.Add(tryStruct.ElseBlock.Id);
@@ -10764,6 +11205,16 @@ public class AstBuilder
             }
         }
 
+        Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Total seqBlocks: {seqBlocks.Count}");
+        foreach (var sb in seqBlocks.OrderBy(b => b.StartOffset))
+        {
+            Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] SeqBlock Id={sb.Id}, Start=0x{sb.StartOffset:X4}, End=0x{sb.EndOffset:X4}, ParentStructure={(sb.ParentStructure != null ? sb.ParentStructure.GetType().Name : "null")}");
+            foreach (var instr in sb.Instructions)
+            {
+                Console.Error.WriteLine($"[SEQ_BUILD_HYBRID]   Instr: {instr.Opcode}");
+            }
+        }
+
         var seqBlockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
         var startSeqBlock = seqBlockByOffset.GetValueOrDefault(cfg.Entry.StartOffset);
 
@@ -10776,6 +11227,8 @@ public class AstBuilder
         {
             if (processedSeqBlocks.Contains(seqBlock.Id))
                 continue;
+            
+            Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Second loop: seqBlock Id={seqBlock.Id}, Start=0x{seqBlock.StartOffset:X4}, ParentStructure={(seqBlock.ParentStructure != null ? seqBlock.ParentStructure.GetType().Name : "null")}");
 
             if (structureHeaders.Contains(seqBlock.Id))
             {
@@ -10784,32 +11237,56 @@ public class AstBuilder
                 {
                     var structureStmts = BuildStructureStatements(structure);
                     stmts.AddRange(structureStmts);
-                    MarkStructureBlocksProcessed(structure, processedSeqBlocks);
+                    MarkStructureBlocksProcessed(structure, processedSeqBlocks, seqBlocks);
                     foreach (var sb in structure.Header.SourceBlocks)
-                        processedBasicBlocks.Add(sb.Id);
+                        { processedBasicBlocks.Add(sb.Id); _processedBlockIds.Add(sb.Id); }
                     foreach (var bb in structure.BodyBlocks)
                     {
                         foreach (var sb in bb.SourceBlocks)
-                            processedBasicBlocks.Add(sb.Id);
+                            { processedBasicBlocks.Add(sb.Id); _processedBlockIds.Add(sb.Id); }
                     }
+
+                    if (structure is TryControlStructure tryStruct)
+                    {
+                        foreach (var (handler, _, __) in tryStruct.ExceptHandlers)
+                        {
+                            foreach (var sb in handler.SourceBlocks)
+                                { processedBasicBlocks.Add(sb.Id); _processedBlockIds.Add(sb.Id); }
+                        }
+                        if (tryStruct.ElseBlock != null)
+                        {
+                            foreach (var sb in tryStruct.ElseBlock.SourceBlocks)
+                                { processedBasicBlocks.Add(sb.Id); _processedBlockIds.Add(sb.Id); }
+                        }
+                        if (tryStruct.FinallyBlock != null)
+                        {
+                            foreach (var sb in tryStruct.FinallyBlock.SourceBlocks)
+                                { processedBasicBlocks.Add(sb.Id); _processedBlockIds.Add(sb.Id); }
+                        }
+                    }
+                    
+                    return stmts;
+                }
+            }
+            else if (seqBlock.ParentStructure != null)
+            {
+                processedSeqBlocks.Add(seqBlock.Id);
+                foreach (var sourceBlock in seqBlock.SourceBlocks)
+                {
+                    processedBasicBlocks.Add(sourceBlock.Id);
+                    _processedBlockIds.Add(sourceBlock.Id);
                 }
             }
             else if (seqBlock.ParentStructure == null)
             {
+                if (seqBlock.Statements != null)
+                {
+                    stmts.AddRange(seqBlock.Statements);
+                }
                 foreach (var sourceBlock in seqBlock.SourceBlocks)
                 {
-                    if (!processedBasicBlocks.Contains(sourceBlock.Id))
-                    {
-                        processedBasicBlocks.Add(sourceBlock.Id);
-                        if (sourceBlock.Instructions.Count > 0)
-                        {
-                            var blockResult = _blockDecompiler.DecompileBlock(sourceBlock.Instructions, _codeObject, sourceBlock.Id);
-                            if (blockResult.IsSuccess)
-                            {
-                                stmts.AddRange(blockResult.Statements);
-                            }
-                        }
-                    }
+                    processedBasicBlocks.Add(sourceBlock.Id);
+                    _processedBlockIds.Add(sourceBlock.Id);
                 }
             }
             processedSeqBlocks.Add(seqBlock.Id);
@@ -10837,50 +11314,90 @@ public class AstBuilder
                 var structureStmts = BuildStructureStatements(structure);
                 stmts.AddRange(structureStmts);
 
-                MarkStructureBlocksProcessed(structure, processedSeqBlocks);
+                MarkStructureBlocksProcessed(structure, processedSeqBlocks, seqBlocks);
 
                 foreach (var sourceBlock in structure.Header.SourceBlocks)
                 {
                     processedBasicBlocks.Add(sourceBlock.Id);
+                    _processedBlockIds.Add(sourceBlock.Id);
                 }
                 foreach (var bodyBlock in structure.BodyBlocks)
                 {
                     foreach (var sourceBlock in bodyBlock.SourceBlocks)
                     {
                         processedBasicBlocks.Add(sourceBlock.Id);
+                        _processedBlockIds.Add(sourceBlock.Id);
                     }
                 }
 
-                var mergePoint = FindMergePoint(structure, seqBlocks);
-                if (mergePoint != null && !processedSeqBlocks.Contains(mergePoint.Id))
+                if (structure is TryControlStructure tryStruct)
                 {
-                    stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(mergePoint, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks, structureHeaders));
-                }
-            }
-        }
-        else if (seqBlock.ParentStructure == null)
-        {
-            foreach (var sourceBlock in seqBlock.SourceBlocks)
-            {
-                if (!processedBasicBlocks.Contains(sourceBlock.Id))
-                {
-                    processedBasicBlocks.Add(sourceBlock.Id);
-                    _processedBlockIds.Add(sourceBlock.Id);
-                    if (sourceBlock.Instructions.Count > 0)
+                    foreach (var (handler, _, __) in tryStruct.ExceptHandlers)
                     {
-                        var blockResult = _blockDecompiler.DecompileBlock(sourceBlock.Instructions, _codeObject, sourceBlock.Id);
-                        if (blockResult.IsSuccess)
+                        foreach (var sourceBlock in handler.SourceBlocks)
                         {
-                            stmts.AddRange(blockResult.Statements);
+                            processedBasicBlocks.Add(sourceBlock.Id);
+                            _processedBlockIds.Add(sourceBlock.Id);
+                        }
+                    }
+                    if (tryStruct.ElseBlock != null)
+                    {
+                        foreach (var sourceBlock in tryStruct.ElseBlock.SourceBlocks)
+                        {
+                            processedBasicBlocks.Add(sourceBlock.Id);
+                            _processedBlockIds.Add(sourceBlock.Id);
+                        }
+                    }
+                    if (tryStruct.FinallyBlock != null)
+                    {
+                        foreach (var sourceBlock in tryStruct.FinallyBlock.SourceBlocks)
+                        {
+                            processedBasicBlocks.Add(sourceBlock.Id);
+                            _processedBlockIds.Add(sourceBlock.Id);
                         }
                     }
                 }
+
+                if (!(structure is TryControlStructure))
+                {
+                    var mergePoint = FindMergePoint(structure, seqBlocks);
+                    if (mergePoint != null && !processedSeqBlocks.Contains(mergePoint.Id))
+                    {
+                        stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(mergePoint, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks, structureHeaders));
+                    }
+                }
+                else
+                {
+                    return stmts;
+                }
+            }
+        }
+        else if (seqBlock.ParentStructure != null)
+        {
+            return stmts;
+        }
+        else if (seqBlock.ParentStructure == null)
+        {
+            if (seqBlock.Statements != null)
+            {
+                Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Adding statements from seqBlock Id={seqBlock.Id}, Start=0x{seqBlock.StartOffset:X4}, count={seqBlock.Statements.Count}");
+                foreach (var stmt in seqBlock.Statements)
+                {
+                    Console.Error.WriteLine($"[SEQ_BUILD_HYBRID]   Stmt: {stmt}");
+                }
+                stmts.AddRange(seqBlock.Statements);
+            }
+            foreach (var sourceBlock in seqBlock.SourceBlocks)
+            {
+                processedBasicBlocks.Add(sourceBlock.Id);
+                _processedBlockIds.Add(sourceBlock.Id);
             }
 
             foreach (var succ in seqBlock.Successors)
             {
                 if (!processedSeqBlocks.Contains(succ.Id))
                 {
+                    Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Processing successor: Id={succ.Id}, Start=0x{succ.StartOffset:X4}");
                     stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(succ, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks, structureHeaders));
                 }
             }
@@ -10889,7 +11406,7 @@ public class AstBuilder
         return stmts;
     }
 
-    private void MarkStructureBlocksProcessed(ISequentialControlStructure structure, HashSet<int> processed)
+    private void MarkStructureBlocksProcessed(ISequentialControlStructure structure, HashSet<int> processed, List<SequentialBlock> seqBlocks)
     {
         processed.Add(structure.Header.Id);
         foreach (var bodyBlock in structure.BodyBlocks)
@@ -10900,12 +11417,57 @@ public class AstBuilder
 
         if (structure is TryControlStructure tryStruct)
         {
-            foreach (var (handler, _) in tryStruct.ExceptHandlers)
+            foreach (var (handler, _, __) in tryStruct.ExceptHandlers)
+            {
                 processed.Add(handler.Id);
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.StartOffset >= handler.StartOffset && seqBlock.StartOffset < handler.EndOffset)
+                    {
+                        processed.Add(seqBlock.Id);
+                    }
+                }
+            }
             if (tryStruct.ElseBlock != null)
                 processed.Add(tryStruct.ElseBlock.Id);
+            
+            int? tryEndOffset = null;
             if (tryStruct.FinallyBlock != null)
+            {
+                tryEndOffset = tryStruct.FinallyBlock.EndOffset;
+            }
+            else if (tryStruct.ExceptHandlers.Count > 0)
+            {
+                tryEndOffset = tryStruct.ExceptHandlers.Last().Handler.EndOffset;
+            }
+            
+            if (tryEndOffset.HasValue)
+            {
+                Console.Error.WriteLine($"[MARK_STRUCT] Try structure: Header=0x{tryStruct.Header.StartOffset:X4}, End=0x{tryEndOffset.Value:X4}");
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.StartOffset >= tryStruct.Header.StartOffset && 
+                        seqBlock.StartOffset <= tryEndOffset.Value)
+                    {
+                        processed.Add(seqBlock.Id);
+                        Console.Error.WriteLine($"[MARK_STRUCT] Marked seqBlock Id={seqBlock.Id}, Start=0x{seqBlock.StartOffset:X4}, End=0x{seqBlock.EndOffset:X4}");
+                    }
+                }
+            }
+            
+            if (tryStruct.FinallyBlock != null)
+            {
                 processed.Add(tryStruct.FinallyBlock.Id);
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.StartOffset >= tryStruct.FinallyBlock.StartOffset && 
+                        seqBlock.StartOffset <= tryStruct.FinallyBlock.EndOffset)
+                    {
+                        processed.Add(seqBlock.Id);
+                        Console.Error.WriteLine($"[MARK_STRUCT] Marked finally seqBlock Id={seqBlock.Id}, Start=0x{seqBlock.StartOffset:X4}");
+                    }
+                }
+            }
         }
 
         if (structure is IfElseControlStructure ifStruct)
@@ -10960,6 +11522,31 @@ public class AstBuilder
                 }
             }
             return ifStruct.MergePoint;
+        }
+
+        if (structure is TryControlStructure tryStruct)
+        {
+            foreach (var (handler, _, __) in tryStruct.ExceptHandlers)
+            {
+                foreach (var succ in handler.Successors)
+                {
+                    allSuccessors.Add(succ);
+                }
+            }
+            if (tryStruct.ElseBlock != null)
+            {
+                foreach (var succ in tryStruct.ElseBlock.Successors)
+                {
+                    allSuccessors.Add(succ);
+                }
+            }
+            if (tryStruct.FinallyBlock != null)
+            {
+                foreach (var succ in tryStruct.FinallyBlock.Successors)
+                {
+                    allSuccessors.Add(succ);
+                }
+            }
         }
 
         foreach (var succ in allSuccessors)
@@ -11274,19 +11861,166 @@ public class AstBuilder
                 continue;
             }
             
-            if (bodyBlock.Statements != null)
-                bodyStmts.AddRange(bodyBlock.Statements);
+            var allInstrs = bodyBlock.Instructions;
+            var sm = new StackMachine(_codeObject);
+            foreach (var instr in allInstrs)
+            {
+                if (instr.Opcode == Opcode.POP_BLOCK || 
+                    instr.Opcode == Opcode.JUMP_FORWARD ||
+                    instr.Opcode == Opcode.JUMP_ABSOLUTE)
+                    break;
+                var result = sm.Execute(instr);
+                if (result is Stmt stmt)
+                    bodyStmts.Add(stmt);
+            }
+            while (sm.HasResults)
+                bodyStmts.Add(new ExprStmt(sm.PopResult()));
         }
 
         var handlers = new List<ExceptHandler>();
-        foreach (var (handlerBlock, _) in tryStmt.ExceptHandlers)
+        foreach (var (handlerBlock, exceptType, exceptVar) in tryStmt.ExceptHandlers)
         {
-            var handlerStmts = handlerBlock.Statements ?? new List<Stmt>();
-            handlers.Add(new ExceptHandler(null, null, handlerStmts));
+            var handlerInstrs = handlerBlock.Instructions;
+            
+            int bodyStartIdx = 0;
+            bool seenCheckExcMatch = false;
+            
+            for (int i = 0; i < handlerInstrs.Count; i++)
+            {
+                if (handlerInstrs[i].Opcode == Opcode.CHECK_EXC_MATCH || 
+                    handlerInstrs[i].Opcode == Opcode.CHECK_EG_MATCH)
+                {
+                    seenCheckExcMatch = true;
+                }
+                else if (seenCheckExcMatch && handlerInstrs[i].Opcode == Opcode.STORE_FAST)
+                {
+                    bodyStartIdx = i + 1;
+                    break;
+                }
+                else if (seenCheckExcMatch && 
+                         handlerInstrs[i].Opcode != Opcode.PUSH_EXC_INFO_312 && 
+                         handlerInstrs[i].Opcode != Opcode.PUSH_EXC_INFO &&
+                         handlerInstrs[i].Opcode != Opcode.LOAD_GLOBAL &&
+                         handlerInstrs[i].Opcode != Opcode.COPY)
+                {
+                    bodyStartIdx = i;
+                    break;
+                }
+            }
+            
+            if (bodyStartIdx >= handlerInstrs.Count)
+                bodyStartIdx = 0;
+            
+            var bodyInstrs = handlerInstrs.Skip(bodyStartIdx).ToList();
+            
+            var sm = new StackMachine(_codeObject);
+            var handlerStmts = new List<Stmt>();
+            foreach (var instr in bodyInstrs)
+            {
+                if (instr.Opcode == Opcode.POP_EXCEPT || 
+                    instr.Opcode == Opcode.END_FINALLY ||
+                    instr.Opcode == Opcode.RERAISE ||
+                    instr.Opcode == Opcode.JUMP_FORWARD ||
+                    instr.Opcode == Opcode.JUMP_ABSOLUTE ||
+                    instr.Opcode == Opcode.PUSH_EXC_INFO_312 ||
+                    instr.Opcode == Opcode.PUSH_EXC_INFO)
+                {
+                    break;
+                }
+                
+                var result = sm.Execute(instr);
+                if (result is Stmt stmt)
+                    handlerStmts.Add(stmt);
+            }
+            while (sm.HasResults)
+            {
+                handlerStmts.Add(new ExprStmt(sm.PopResult()));
+            }
+            
+            Expr? typeExpr = null;
+            if (!string.IsNullOrEmpty(exceptType))
+                typeExpr = new Name(exceptType);
+            
+            handlers.Add(new ExceptHandler(typeExpr, exceptVar, handlerStmts));
         }
 
-        var elseStmts = tryStmt.ElseBlock?.Statements;
-        var finallyStmts = tryStmt.FinallyBlock?.Statements;
+        List<Stmt>? elseStmts = null;
+        if (tryStmt.ElseBlock != null)
+        {
+            var elseInstrs = tryStmt.ElseBlock.Instructions;
+            var sm = new StackMachine(_codeObject);
+            elseStmts = new List<Stmt>();
+            bool seenNop = false;
+            
+            for (int i = 0; i < elseInstrs.Count; i++)
+            {
+                var instr = elseInstrs[i];
+                
+                if (instr.Opcode == Opcode.NOP)
+                {
+                    seenNop = true;
+                    continue;
+                }
+                
+                if (instr.Opcode == Opcode.RETURN_VALUE ||
+                    instr.Opcode == Opcode.JUMP_FORWARD ||
+                    instr.Opcode == Opcode.JUMP_ABSOLUTE)
+                {
+                    break;
+                }
+                
+                var result = sm.Execute(instr);
+                if (result is Stmt stmt)
+                    elseStmts.Add(stmt);
+            }
+            while (sm.HasResults)
+                elseStmts.Add(new ExprStmt(sm.PopResult()));
+        }
+        
+        List<Stmt>? finallyStmts = null;
+        if (tryStmt.FinallyBlock != null)
+        {
+            var finallyInstrs = tryStmt.FinallyBlock.Instructions;
+            
+            var sm = new StackMachine(_codeObject);
+            finallyStmts = new List<Stmt>();
+            
+            int startIdx = 0;
+            for (int i = 0; i < finallyInstrs.Count; i++)
+            {
+                if (finallyInstrs[i].Opcode == Opcode.PUSH_EXC_INFO_312 || 
+                    finallyInstrs[i].Opcode == Opcode.PUSH_EXC_INFO)
+                {
+                    startIdx = i + 1;
+                }
+            }
+            
+            int endIdx = finallyInstrs.Count;
+            for (int i = startIdx; i < finallyInstrs.Count; i++)
+            {
+                if (finallyInstrs[i].Opcode == Opcode.RERAISE ||
+                    finallyInstrs[i].Opcode == Opcode.END_FINALLY ||
+                    finallyInstrs[i].Opcode == Opcode.POP_EXCEPT)
+                {
+                    endIdx = i;
+                    break;
+                }
+            }
+            
+            for (int i = startIdx; i < endIdx; i++)
+            {
+                var instr = finallyInstrs[i];
+                
+                if (instr.Opcode == Opcode.NOP)
+                    continue;
+                
+                var result = sm.Execute(instr);
+                if (result is Stmt stmt)
+                    finallyStmts.Add(stmt);
+            }
+            while (sm.HasResults)
+                finallyStmts.Add(new ExprStmt(sm.PopResult()));
+        }
 
         return new List<Stmt> { new Try(bodyStmts, handlers, elseStmts, finallyStmts) };
     }
