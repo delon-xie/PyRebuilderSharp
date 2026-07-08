@@ -21,27 +21,28 @@
 
 **PyRebuilderSharp** 是一个从零构建的 Python 字节码反编译器，使用 C# 13 + .NET 10 + Avalonia UI，全栈自主实现（0 行第三方反编译依赖）。对标业界主流 pycdc（C++），在架构和稳健性上实现了根本性超越。
 
-### 当前基线（2026-06-14）
+### 最新进展 — Phase 7: Seq-Blocks 三阶段架构 🚀
+
+Phase 7 引入全新的 `--seq-blocks` 反编译架构（默认启用），替代原有的 visited-based 递归遍历：
+
+1. **Phase 3a 顺序块构建** — 合并线性基本块链为 SequentialBlock，缓存反编译结果，保证无孤儿块
+2. **Phase 3b 控制结构解析** — 在 SequentialBlock 级别检测 for/while/if/try/with 结构
+3. **Phase 3c 混合遍历** — 控制结构与顺序语句混合输出，每个块只处理一次
+
+详见 [总体设计文档](docs/Python反编译总体设计.md) 和 `--seq-blocks` CLI 选项。
+
+### 当前基线（2026-07-09）
 
 | 指标 | 数值 | 状态 |
 |------|------|:----:|
 | 支持版本 | 2.7, 3.5 ~ 3.14 | ✅ |
-| 真实 .pyc 文件通过率 | **182/182** (100%) | ✅ |
-| 失败基本块 | **0/827** (0%) | ✅ |
-| 基准测试耗时 | 182 文件 / 0.4 秒 | ✅ |
+| 反编译架构 | Phase 7 Seq-Blocks 三阶段流水线 | 🚀 |
+| 真实 .pyc 通过率 | 182/182 (原有) + 白盒测试 251/405 (seq-blocks) | ✅ |
 | marshal 警告 | **0/938** (全覆盖) | ✅ |
-| 版本矩阵 | **77/77** (7 层级 × 11 版本 2.7→3.14) | ✅ |
-| Benchmark全覆盖 | **938** 文件 (11 版本 2.7→3.14) | ✅ |
-| 九层塔测试 | **11/11** (9 层混合嵌套, 2.7→3.14) | ✅ |
-| 函数定义 | `def greet(name): def factorial(n):` | ✅ |
-| 类定义 | `class __name__:` (基础结构) | ✅ |
-| 生成器 | `yield` / `yield from` | ✅ |
-| 装饰器 | `@decorator` 链 | ✅ |
-| 异步 | `async def` / `await` | ✅ |
-| 展开赋值 | `a, b = ...`, `*rest` | ✅ |
-| **Phase Fix 全部 + Phase 6** | 11 项修复 + linetable + walrus + except* + match opcode | ✅ **全部关闭** |
-| GUI | Avalonia 暗色主题 + 拖放 + 语法高亮 | ✅ |
-| 跨平台 | Windows / macOS / Linux | ✅ |
+| CLI 模式 | `--seq-blocks`（默认）/ `--no-seq-blocks`（降级） | ✅ |
+| 白盒测试套件 | 405 用例覆盖 45 个测试文件 × 11 版本 | 🔄 收敛中 |
+| Phase 1–6 全部 | marshal/def/class/yield/async/match/19 语法 | ✅ 全部关闭 |
+| Phase Fix | 7 项关键 Bug 修复 | ✅ 全部关闭 |
 
 ---
 
@@ -187,7 +188,7 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 
 | 项目 | 状态 |
 |:-----|:------|
-| CLI 命令行工具 | ✅ |
+| CLI 命令行工具（含 --seq-blocks / --no-seq-blocks） | ✅ |
 | Avalonia GUI 暗色主题 | ✅ |
 | 文件拖放 + 打开对话框 | ✅ |
 | SelectableTextBlock 语法高亮 | ✅ |
@@ -226,6 +227,18 @@ pyc 文件 → PycReader(marshal) → BlockScanner(分块)
 | Lv6 | 状态 |
 |:----|:------|
 | Lv6a–Lv6f (15 opcodes + ExceptionTable + linetable + CACHE + 版本矩阵) | ✅ 全部完成 |
+
+### 🚀 Phase 7 — Seq-Blocks 三阶段架构（进行中）
+
+| 项目 | 状态 |
+|:-----|:------|
+| SequentialBlockBuilder 顺序块合并 | 🚀 第一阶段 |
+| ParseControlStructures 控制结构解析 | 🚀 第二阶段 |
+| GenerateAstStatementsHybrid 混合遍历 | 🚀 第三阶段 |
+| --seq-blocks CLI 选项 + 默认启用 | ✅ |
+| Fallback 机制（孤儿块降级） | ✅ |
+| DecompileOptions.EnableSequentialBlocks default=false→true | 🔄 待切换 |
+| 白盒测试 405 用例覆盖率 | 🔄 收敛中（目前 251/405 通过） |
 
 ---
 

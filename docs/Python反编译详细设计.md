@@ -3,10 +3,10 @@
 
 ## Python字节码反编译器详细设计
 
-**版本**: v2.5
-**日期**: 2026-06-14
+**版本**: v2.6
+**日期**: 2026-07-09
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ + Phase Fix ✅ 全部关闭 · Phase 7 计划就绪 🚀
+**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 Seq-Blocks 架构重构 🚀
 
 ---
 
@@ -474,9 +474,141 @@ foreach (var bodyBlock in bodyBlocks)
 
 ---
 
-## 7. PythonCodeGenerator — 代码生成
+## 7. SequentialBlockBuilder — 顺序块构建（Phase 7 新架构）
 
-### 7.1 访问者模式实现
+### 7.1 职责
+
+SequentialBlockBuilder 是 Phase 7 新架构的核心组件，负责将 `ControlFlowGraph.BasicBlock[]` 合并为 **SequentialBlock**（顺序块）列表。每个 SequentialBlock 代表一段不含控制流分支的线性指令序列。
+
+### 7.2 MergeLinearChain — 线性链合并算法
+
+```csharp
+private SequentialBlock MergeLinearChain(BasicBlock start, List<BasicBlock> allBlocks, HashSet<int> processed)
+{
+    var seqBlock = new SequentialBlock();
+    var current = start;
+
+    while (current != null && !processed.Contains(current.Id))
+    {
+        // 终止条件（满足任一即停止合并）：
+        // 1. 当前块以跳转指令结尾（JUMP/FOR_ITER/等）
+        // 2. 当前块有多个后继（分支点）
+        // 3. 下一块有多个前驱（汇聚点）
+        // 4. 下一块以 with/try 头开始（控制结构边界）
+        // 5. 检测到 with 清除模式（LOAD_CONST×3 + CALL + POP_TOP）
+        // 6. 模块入口（StartOffset==0）无 LOAD_SPECIAL/SETUP_WITH
+
+        processed.Add(current.Id);
+        seqBlock.Instructions.AddRange(current.Instructions);
+
+        if (IsJump(current) || current.Successors.Count != 1) break;
+
+        var next = current.Successors.First();
+        if (next.Predecessors.Count != 1 || processed.Contains(next.Id)) break;
+        if (StartsWithControlHeader(next)) break;
+
+        current = next;
+    }
+    return seqBlock;
+}
+```
+
+### 7.3 AnnotateSequentialBlock — 块标注
+
+每个 SequentialBlock 构建后，会扫描其指令序列标注属性：
+- `IsLoopHeader` — 包含 FOR_ITER 或 POP_JUMP_IF_* 指令
+- `HasSetupWith / HasBeforeWith / HasLoadSpecial` — with 语句相关
+- `HasSetupFinally / HasSetupExcept` — try 语句相关
+- `IsConditionHeader` — JUMP_IF_FALSE_OR_POP / JUMP_IF_TRUE_OR_POP
+- `ExceptionTableEntries` — 从 CodeObject.ExceptionTable 匹配落入本块的条目
+
+### 7.4 SequentialBlock 后继图构建
+
+`BuildSequentialBlockGraph` 根据 SourceBlocks 的 CFG succ/pred 关系，将 BasicBlock 级别的边映射为 SequentialBlock 级别的边。
+
+### 7.5 VerifyNoOrphanBlocks — 无孤儿块校验
+
+```csharp
+public bool VerifyNoOrphanBlocks(List<SequentialBlock> seqBlocks, ControlFlowGraph cfg)
+{
+    var allIds = cfg.Blocks.Where(b => b.Instructions.Count > 0).Select(b => b.Id);
+    var processedIds = seqBlocks.SelectMany(sb => sb.SourceBlocks).Select(b => b.Id);
+    return allIds.Except(processedIds).Count() == 0;
+}
+```
+
+如果返回 false，则 `BuildWithSequentialBlocks` 自动降级到 BuildFallback。
+
+---
+
+## 8. ControlStructure Parser — 控制结构解析（Phase 3b）
+
+### 8.1 ParseControlStructures 执行顺序
+
+解析必须按特定顺序进行，否则会误判：
+
+1. **循环结构优先**（ParseLoopStructure）— 逆序扫描（内层优先）
+   - 检测 FOR_ITER → ForLoop
+   - 检测 POP_JUMP_IF_* + 回边 → WhileLoop
+2. **with 结构**（ParseWithStructure）— SETUP_WITH / BEFORE_WITH / LOAD_SPECIAL
+3. **try 结构**（ParseTryStructure）— 先 ExceptionTable（3.11+）再 SETUP_FINALLY（3.10-）
+4. **if/else 结构**（ParseIfElseStructure）— POP_JUMP_IF_*（无回边）
+
+### 8.2 ParseTryStructure — ExceptionTable 模式
+
+3.11+ 版本通过 ExceptionTable 解析 try/except/finally。ParseTryStructure 处理流程：
+
+```csharp
+// 1. 从 seqBlock.ExceptionTableEntries 筛选 IsExcept 且非 Lasti 的条目
+// 2. 对每组相邻条目，确定 try body 范围
+// 3. 按 Depth 归类 except handler
+// 4. 对于有最后一条 IsFinally 的组 → Try(handlers, finally-block)
+// 5. 否则 → Try(handlers, orelse-block)
+```
+
+### 8.3 LinkControlStructures — 结构链接
+
+将解析出的控制结构链接回 SequentialBlock 列表：
+- `structure.Header.ParentStructure = structure`
+- 对所有 `structure.BodyBlocks` 设置 ParentStructure
+- 对 Try 的 handler/else/finally 子块递归设置
+- 对 IfElse 的 true/false branch 设置
+- 对 try 结构范围内未被覆盖的 seqBlock（包含 PUSH_EXC_INFO / RERAISE / POP_EXCEPT 等指令的）也设置为 try 的所属
+
+---
+
+## 9. GenerateAstStatementsHybrid — 混合遍历（Phase 3c）
+
+### 9.1 遍历策略
+
+Hybrid 遍历分为两个阶段：
+
+**第一阶段（主 DFS 遍历）**：
+1. 从入口顺序块（cfg.Entry 映射的 SequentialBlock）出发
+2. 对每个顺序块：
+   - 如果 `structureHeaders.Contains(seqBlock.Id)` → 调用 `BuildStructureStatements()`
+   - 否则如果 `seqBlock.ParentStructure != null` → 跳过（属于某个控制结构的 body）
+   - 否则 → 直接输出 `seqBlock.Statements`（缓存的反编译结果）
+3. 递归后继，用 processedSeqBlocks HashSet 防重复
+
+**第二阶段（补齐扫描）**：
+遍历所有顺序块，处理第一阶段未被处理的情况：
+- 结构头未被 DFS 覆盖 → 调用 BuildStructureStatements
+- 未归属结构的块 → 直接输出缓存语句
+
+### 9.2 标记机制
+
+`MarkStructureBlocksProcessed` 将整个结构的块（header + body + handler + else + finally）标记为已处理，防止后续重复输出。
+
+### 9.3 Try 结构的 Merge Point 处理
+
+try 结构在 Hybrid 遍历中不继续后继遍历（return stmts），因为 try 的后续由 ExceptionTable 的出口偏移确定，而非 CFG succ 边。For/While/IfElse 结构会通过 FindMergePoint 找到 merge point 并继续后继遍历。
+
+---
+
+## 10. PythonCodeGenerator — 代码生成
+
+### 10.1 访问者模式实现
 
 ```csharp
 public class PythonCodeGenerator
@@ -516,7 +648,7 @@ public class PythonCodeGenerator
 }
 ```
 
-### 7.2 缩进管理
+### 10.2 缩进管理
 
 ```csharp
 private void WriteLine(string text = "")
@@ -532,7 +664,7 @@ private IDisposable Indent()
 }
 ```
 
-### 7.3 注释块输出
+### 10.3 注释块输出
 
 ```csharp
 private void EmitComment(string text)
@@ -550,7 +682,7 @@ private void EmitComment(string text)
 
 ---
 
-## 8. Decompiler 主入口
+## 11. Decompiler 主入口
 
 ```csharp
 public class Decompiler
@@ -580,9 +712,9 @@ public class Decompiler
 
 ---
 
-## 9. 版本矩阵读差异
+## 12. 版本矩阵读差异
 
-### 9.1 .pyc 头部格式
+### 12.1 .pyc 头部格式
 
 | 版本 | 头部大小 | 字段 |
 |------|---------|------|
@@ -600,7 +732,7 @@ else if (isPre37) // skip 12B header
 else  // skip 16B header (flags + hash)
 ```
 
-### 9.2 pre-3.8 ref_index
+### 12.2 pre-3.8 ref_index
 
 Python 3.8 之前的 marshal 格式中，`TYPE_CODE` 之后有一个 `ref_index` 字段：
 ```csharp
@@ -608,7 +740,7 @@ if (version < 3.8)
     br.ReadInt32();  // 跳过 ref_index
 ```
 
-### 9.3 3.11+ Marshal 格式变化
+### 12.3 3.11+ Marshal 格式变化
 
 Python 3.11+ 在 marshal 格式上有重大变更：
 
@@ -670,9 +802,9 @@ TYPE_CODE (99):
 
 ---
 
-## 10. 测试体系
+## 13. 测试体系
 
-### 10.1 版本矩阵测试
+### 13.1 版本矩阵测试
 
 ```csharp
 // 7 层级 × 11 版本 = 77 测试 (2.7 → 3.14 全覆盖)
@@ -704,7 +836,7 @@ public void Lv3_NestedMixed(string version)    // 5 层混合类型嵌套
 public void Lv3_NestedMatrix(string version)   // 12 对偶 + 8 三重组合
 ```
 
-### 10.2 比较方案
+### 13.2 比较方案
 
 **方案 A：AST 语义比较（首选）**
 ```bash
@@ -718,7 +850,7 @@ python3 -c "import ast; print(ast.dump(ast.parse(open('out.py').read()), indent=
 - 比较 token 序列（去除 INDENT/OUTDENT/ENDLINE）
 - 用于 pycdc 测试套件中的 pre-tokenized 文件
 
-### 10.3 测试文件编译
+### 13.3 测试文件编译
 
 `compile_pyc_matrix.py` 使用 pyenv 管理多版本：
 ```bash
@@ -731,40 +863,40 @@ done
 
 ---
 
-## 11. 常见问题与故障排除
+## 14. 常见问题与故障排除
 
-### 11.1 NullReferenceException — 12 字节 header
+### 14.1 NullReferenceException — 12 字节 header
 
 **症状**：Python 3.5/3.6 pyc 反编译时空引用异常。
 **原因**：3.5/3.6 使用 12 字节头部，误读为 16 字节导致数据偏移 4 字节。
 **修复**：根据 magic number 判断 header 大小。
 
-### 11.2 FOR_ITER 后 body 为空
+### 14.2 FOR_ITER 后 body 为空
 
 **症状**：for 循环体为空。
 **原因**：`FindLastIndex` 获取了最后一个 LOAD 指令而非第一个；
 `CollectBodyBlocks` 污染了 `visited`。
 **修复**：改为 `FindIndex`（找第一个）；嵌套循环改用 `visited.Remove(bb)`。
 
-### 11.3 无限递归/StackOverflow — 嵌套循环
+### 14.3 无限递归/StackOverflow — 嵌套循环
 
 **症状**：嵌套 while 循环导致 StackOverflow。
 **原因**：每个 `BuildWhileLoop` 创建独立 `bodyVisited`，嵌套后 body 块被重复处理。
 **修复**：移除 body 块从 visited，用同一 visited 直传（详见 6.3 节）。
 
-### 11.4 `else :` 有额外空格
+### 14.4 `else :` 有额外空格
 
 **症状**：生成的 `else :` 而非 `else:`。
 **原因**：`PythonCodeGenerator.cs` 中字面量为 `"else :"`。
 **修复**：改为 `"else:"`，同理 `try:`、`finally:`。
 
-### 11.5 POP_TOP 在 for 循环体中不生效
+### 14.5 POP_TOP 在 for 循环体中不生效
 
 **症状**：for 循环中的 break 被忽略。
 **原因**：FOR_ITER 不压栈，POP_TOP 的 SafePop() 返回 null。
 **修复**：添加 `_isForLoop` 标志，POP_TOP 在 for 体中返回 `Break()`。
 
-### 11.6 v2.7 names 偏少 / strref_N 异常
+### 14.6 v2.7 names 偏少 / strref_N 异常
 
 **症状**：模块 names 数量不对，或输出 `strref_N`。
 **原因**：误将 TYPE_STRINGREF(0x52) 当作 TYPE_INTERNAL_REF 处理，查了错误的 ref 列表。
@@ -772,9 +904,9 @@ done
 
 ---
 
-## 12. Lv3 嵌套控制块测试设计
+## 15. Lv3 嵌套控制块测试设计
 
-### 12.1 设计目标
+### 15.1 设计目标
 
 Lv3 的核心目标是验证 **AstBuilder 在大量嵌套控制块时的稳定性**。通过对偶矩阵（depth 2）、三重/四重组合（depth 3-4）、同类型 5 层深嵌套（depth 5）的全面覆盖，确保：
 
@@ -784,7 +916,7 @@ Lv3 的核心目标是验证 **AstBuilder 在大量嵌套控制块时的稳定�
 4. try 的 body 收集在嵌套场景下不吞掉内层块
 5. 空体（pass）在深层嵌套中正确生成
 
-### 12.2 三层测试架构
+### 15.2 三层测试架构
 
 #### 文件 A: `test_nested_depth_5.py` — 同类型 5 层深度压力
 
@@ -850,7 +982,7 @@ mixed_4():     try > if > for > while > try
   quad_while_if_for_try     while > if > for > try
 ```
 
-### 12.3 覆盖矩阵总览
+### 15.3 覆盖矩阵总览
 
 | 维度 | 计算 | 数量 |
 |------|------|------|
@@ -861,7 +993,7 @@ mixed_4():     try > if > for > while > try
 | 四重组合 | 4 种类型各 1 × 2 排列 | 2 函数 |
 | **总计** | | **30 函数** |
 
-### 12.4 预期通过条件
+### 15.4 预期通过条件
 
 - 每个函数的反编译输出经 `ast.dump()` 比较与原 .py 源一致
 - 无 StackOverflow 异常
@@ -871,9 +1003,9 @@ mixed_4():     try > if > for > while > try
 
 ---
 
-## 13. Phase 4〜8 阶段开发详情
+## 16. Phase 4〜8 阶段开发详情
 
-### 13.1 Phase 4 — 函数/类/生成器（P0）
+### 16.1 Phase 4 — 函数/类/生成器（P0）
 
 #### Lv4a: lambda 表达式修复
 
@@ -955,7 +1087,7 @@ def gen():
 - `YIELD_FROM` (opcode=72 in 3.5-3.9 / 72 in 3.10) → `YieldFrom(expr)`
 - StackMachine 需处理 YIELD_VALUE 不设置返回值
 
-### 13.2 Phase 5 — 异常/流程增强（P1）
+### 16.2 Phase 5 — 异常/流程增强（P1）
 
 | 子项 | 内容 | 检测方式 |
 |------|------|---------|
@@ -965,7 +1097,7 @@ def gen():
 | **assert** | `LOAD_ASSERT...` | 反解为 `Assert(test, msg)` |
 | **AugAssign 增强** | 所有复合运算符 | `i += 1` / `s *= 2` / `x |= y` |
 
-### 13.3 Phase 6 — v3.11+ 反编译（P2）
+### 16.3 Phase 6 — v3.11+ 反编译（P2）
 
 | 子项 | 内容 | 难点 |
 |------|------|------|
@@ -975,7 +1107,7 @@ def gen():
 | linetable | 替换 lnotab | 新行号编码格式（per-statement） |
 | CACHE 条目 | 指令对齐 | 导致字节码阵列变长，读取时需跳过 |
 
-### 13.4 Phase 7 — 代码查看器增强 + 反编译质量评价（P1）
+### 16.4 Phase 7 — 代码查看器增强 + 反编译质量评价（P1）
 
 | 子项 | 内容 | 优先级 | 状态 |
 |------|------|--------|:----:|
@@ -990,7 +1122,7 @@ def gen():
 
 详见 `docs/plan_phase7.md`。
 
-### 13.5 Phase 8 — 持续完善（长期）
+### 16.5 Phase 8 — 持续完善（长期）
 
 - AST 语义比较 CI 自动化
 - 性能优化（大文件/多代码对象）

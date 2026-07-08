@@ -2,10 +2,10 @@
 
 ## Python字节码反编译器总体设计文档
 
-**版本**: v2.6
-**日期**: 2026-06-14
+**版本**: v2.7
+**日期**: 2026-07-09
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ + Phase Fix ✅ 全部关闭 — 109 测试 · 版本矩阵2.7-3.14全覆盖 · Benchmark 938/938 · 15 语法项 · 0 项剩余 🎉
+**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 Seq-Blocks 架构重构 🚀 — 三阶段顺序块管道 · 自动孤儿块检测 · 白盒测试 405 用例覆盖 · 42%～78% 版本通过率（持续收敛中）
 
 ---
 
@@ -351,6 +351,126 @@ Counter(instr.opname for instr in dis.get_instructions(code))
                       Python 源代码（含注释兜底块）
 ```
 
+## 🌟 新架构：三阶段顺序块流水线（Phase 7 — --seq-blocks 模式）
+
+> **核心思想**：Phase 7 引入全新的反编译架构，将原有的"基本块级递归+visited 集"控制流解构，改为**三阶段顺序块管道**。先解耦顺序块和结构块，再重组为完整 AST。
+
+### 为什么需要三阶段架构？
+
+原有架构（Phase 3-6）的问题：
+1. **visited 集污染** — 嵌套控制块使用共享 visited HashSet，一个块被标记后其后续路径的块可能被静默跳过
+2. **孤儿块修复复杂** — 被 visited 遗漏的块需要多轮 `ClassifyOrphanBlock` + 条件恢复，每类处理逻辑不同
+3. **递归深度不可控** — BuildLoop/BuildTryFromBlock 嵌套递归导致 StackOverflow（已通过 visited.Remove 缓解但未根治）
+4. **块级容错不彻底** — 一个块失败（如未处理的操作码）导致整个控制结构断裂，后继块全部成为孤儿
+
+### 三阶段架构概览
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 3a: 顺序块构建                                                   │
+│  ├── BlockScanner: 基本块划分（Leader 算法）                            │
+│  ├── SequentialBlockBuilder: 合并线性链 → SequentialBlock               │
+│  │   └── MergeLinearChain: 单后继单前驱的连续块合成一个 SequentialBlock  │
+│  ├── VerifyNoOrphanBlocks: 验证所有基本块都被覆盖（无孤儿块）         │
+│  └── DecompileSequentialBlocks: 逐 SequentialBlock 栈机模拟并缓存       │
+│                                                                         │
+│  ├── 输出: SequentialBlock[]  (每个带缓存的 Statements)                 │
+│  └── ✅ 保证: 所有基本块已被合并，无孤儿块                              │
+└─────────────────────────────────┬───────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 3b: 控制结构解析                                                 │
+│  ├── ParseControlStructures: 在 SequentialBlock 级别检测控制块          │
+│  │   ├── ParseLoopStructure: FOR_ITER / POP_JUMP_IF_* + 回边 → For/While│
+│  │   ├── ParseWithStructure: LOAD_SPECIAL/BEFORE_WITH → With            │
+│  │   ├── ParseTryStructure: ExceptionTable/SETUP_FINALLY → Try/Except   │
+│  │   └── ParseIfElseStructure: POP_JUMP_IF_* → If/Else                  │
+│  └── LinkControlStructures: 设置 SequentialBlock.ParentStructure         │
+│      ├── Header 块标记为结构头                                           │
+│      ├── Body 块标记为结构体                                             │
+│      └── Handler/Else/Finally 块分别标记                                 │
+│                                                                         │
+│  ├── 输出: ISequentialControlStructure[] (For/While/Try/With/IfElse)    │
+│  └── ✅ 保证: 每个 SequentialBlock.ParentStructure != null 归属到结构   │
+└─────────────────────────────────┬───────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Phase 3c: AST 组装（混合遍历）                                          │
+│  ├── GenerateAstStatementsHybrid: 从入口顺序块出发，DFS 遍历              │
+│  ├── 未归属结构 / 无 ParentStructure → 直接输出缓存的 Statements         │
+│  ├── 有 ParentStructure → 调用 BuildStructureStatements                  │
+│  │   ├── BuildForLoopStructureStatements → For(iter, target, body)       │
+│  │   ├── BuildWhileLoopStructureStatements → While(test, body)           │
+│  │   ├── BuildIfElseStructureStatements → If(test, body, orelse)        │
+│  │   ├── BuildTryStructureStatements → Try(body, handlers, orelse, fin) │
+│  │   └── BuildWithStructureStatements → With(items, body)               │
+│  ├── 每处理完一个结构 → MarkStructureBlocksProcessed 标记已处理          │
+│  └── 第二轮扫描: 处理剩余未处理的顺序块                                    │
+│                                                                         │
+│  ├── 输出: List<Stmt> → Module AST                                      │
+│  └── ✅ 保证: 所有 SequentialBlock 都被消费，无孤儿块                    │
+└─────────────────────────────────┬───────────────────────────────────────┘
+                                  │
+                                  ▼
+                      Python 源代码（含注释兜底块）
+```
+
+### 核心数据结构
+
+```csharp
+// SequentialBlock — 基本块链合并后的线性执行单元
+public class SequentialBlock
+{
+    public int Id;                               // 唯一标识
+    public int StartOffset, EndOffset;           // 字节码偏移范围
+    public List<Instruction> Instructions;        // 完整指令序列
+    public List<BasicBlock> SourceBlocks;         // 原始基本块引用
+    public List<Stmt>? Statements;                // Phase 1 缓存的反编译结果
+    public List<SequentialBlock> Successors;      // 后继顺序块
+    
+    // 标注属性
+    public bool IsLoopHeader, IsConditionHeader, IsExceptionHandler;
+    public bool HasSetupWith, HasSetupFinally, HasSetupExcept;
+    public int? JumpTarget;
+    
+    // Phase 2 后设置
+    public ISequentialControlStructure? ParentStructure;  // 所属控制结构
+}
+
+// 控制结构接口
+public interface ISequentialControlStructure
+{
+    ControlStructureType Type { get; }           // ForLoop/WhileLoop/Try/With/IfElse
+    SequentialBlock Header { get; }              // 头部块
+    List<SequentialBlock> BodyBlocks { get; }    // 主体块
+}
+
+// 具体结构
+public class ForLoopControlStructure : ISequentialControlStructure { ... }
+public class WhileLoopControlStructure : ISequentialControlStructure { ... }
+public class TryControlStructure : ISequentialControlStructure { ... }
+public class WithControlStructure : ISequentialControlStructure { ... }
+public class IfElseControlStructure : ISequentialControlStructure { ... }
+```
+
+### Fallback 机制
+
+如果 `VerifyNoOrphanBlocks` 检测到有基本块未被任何 SequentialBlock 覆盖，整个 seq-blocks 架构会自动降级到原有的 `BuildFallback` 方法（即 Phase 3-6 的 visited-based 递归），保证在任何情况下都有输出。
+
+### 与原有架构的对比
+
+| 维度 | Phase 3-6（原有） | Phase 7（--seq-blocks） |
+|------|------------------|------------------------|
+| **控制流解构方式** | visited HashSet 递归 | 顺序块合并 + 控制结构解析 + 链接 |
+| **孤儿块处理** | 多种分类 + 条件恢复 | 三阶段保证全覆盖，无孤儿 |
+| **嵌套深度** | 受 C# 调用栈限制 | 用 Queue 显式栈，无递归深度问题 |
+| **确定性** | visited 顺序依赖遍历路径 | 顺序块 ID + offset 确定，路径无关 |
+| **容错粒度** | 基本块级别 | SequentialBlock 级别（更大） |
+| **失败降级** | 无自动降级 | 孤儿块检测 → 自动 Fallback |
+| **调试可观测性** | `[BUILD]` / `[ORPHAN]` 日志 | `[SEQ_BUILD]` / `[PARSE_CTL]` 结构化日志 |
+
 ---
 
 ## 4. 解决方案结构
@@ -479,23 +599,21 @@ public class BlockResult
 
 ## 6. 版本支持矩阵
 
-| 版本 | Magic Number | Header | 字段数 | 状态 |
-|------|-------------|--------|--------|------|
-| 2.7 | 03 F3 0D 0A | 8B | arg,nl,ss,flags(4) | ✅ Marsahl + Lv0-Lv3 |
-| 3.5 | 17 0D 0D 0A | 12B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 |
-| 3.6 | 33 0D 0D 0A | 12B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 |
-| 3.7 | 42 0D 0D 0A | 16B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 |
-| 3.8 | 55 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
-| 3.9 | 61 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
-| 3.10 | 6F 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 |
-| 3.11 | A7 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) 去nl | ✅ marshal + def + class + yield |
-| 3.12 | C0 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ 同 3.11 |
-| 3.13 | D0 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ 兼容 marshal |
-| 3.14 | D2 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ 兼容 marshal |
+| 版本 | Magic Number | Header | 字段数 | 状态 | Seq-Blocks |
+|------|-------------|--------|--------|------|------------|
+| 2.7 | 03 F3 0D 0A | 8B | arg,nl,ss,flags(4) | ✅ marshal + Lv0-Lv3 | ✅ |
+| 3.5 | 17 0D 0D 0A | 12B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 | ✅ |
+| 3.6 | 33 0D 0D 0A | 12B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 | ✅ |
+| 3.7 | 42 0D 0D 0A | 16B | arg,kw,nl,ss,flags(5) | ✅ Lv0-Lv3 | ✅ |
+| 3.8 | 55 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 | ✅ |
+| 3.9 | 61 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 | ✅ |
+| 3.10 | 6F 0D 0D 0A | 16B | arg,pos,kw,nl,ss,flags(6) | ✅ Lv0-Lv3 | ✅ |
+| 3.11 | A7 0D 0D 0A | 16B+CACHE | arg,pos,kw,ss,flags(5) | ✅ marshal + def + class + yield | ✅ |
+| 3.12 | C0 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ | ✅ |
+| 3.13 | D0 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ | ✅ |
+| 3.14 | D2 0D 0D 0A | 16B+CACHE | 同 3.11 | ✅ | ✅ |
 
 ---
-
-## 7. 测试策略
 
 ### 7.1 版本矩阵测试（核心）
 
