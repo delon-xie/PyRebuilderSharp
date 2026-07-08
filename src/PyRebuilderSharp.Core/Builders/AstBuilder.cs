@@ -675,33 +675,34 @@ public class AstBuilder
 
         var setupWithIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH
             || i.Opcode == Opcode.BEFORE_WITH || i.Opcode == Opcode.BEFORE_WITH_312
-            || i.Opcode == Opcode.BEFORE_WITH_313);
+            || i.Opcode == Opcode.BEFORE_WITH_313 || i.Opcode == Opcode.LOAD_SPECIAL);
         
-        if (_options.VerboseErrors)
+        Console.Error.WriteLine($"[BUILD_STMT_INTERNAL] block=0x{block.StartOffset:X4} setupWithIdx={setupWithIdx}");
+        if (setupWithIdx >= 0)
         {
-            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL] block=0x{block.StartOffset:X4} setupWithIdx={setupWithIdx}");
-            if (setupWithIdx >= 0)
+            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   FOUND WITH opcode at index={setupWithIdx}: {block.Instructions[setupWithIdx].Opcode}");
+        }
+        else
+        {
+            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   No WITH opcode found in this block");
+            for (int i = 0; i < block.Instructions.Count; i++)
             {
-                Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   FOUND WITH opcode at index={setupWithIdx}: {block.Instructions[setupWithIdx].Opcode}");
+                Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   instr[{i}] = {block.Instructions[i].Opcode}");
             }
         }
         
         if (setupWithIdx >= 0)
         {
-            var br = _blockResults.GetValueOrDefault(block.Id);
-            if (br?.Statements != null && br.Statements.Count > 0)
+            var withStmts2 = BuildWithFromBlock(block, visited);
+            if (withStmts2 != null)
             {
-                var withStmts2 = BuildWithFromBlock(block, visited);
-                if (withStmts2 != null)
+                stmts.AddRange(withStmts2);
+                foreach (var succ in block.Successors)
                 {
-                    stmts.AddRange(withStmts2);
-                    foreach (var succ in block.Successors)
-                    {
-                        if (!visited.Contains(succ))
-                            stmts.AddRange(BuildStatements(succ, visited));
-                    }
-                    return stmts;
+                    if (!visited.Contains(succ))
+                        stmts.AddRange(BuildStatements(succ, visited));
                 }
+                return stmts;
             }
         }
         
@@ -4757,11 +4758,17 @@ public class AstBuilder
         var beforeWithIdx = instrs.FindIndex(i =>
             i.Opcode == Opcode.BEFORE_WITH_313 || i.Opcode == Opcode.BEFORE_WITH
             || i.Opcode == Opcode.BEFORE_WITH_312);
+        var loadSpecialIdx = instrs.FindIndex(i => i.Opcode == Opcode.LOAD_SPECIAL);
         var withIdx = setupIdx >= 0 ? setupIdx : beforeWithIdx;
+        
+        Console.Error.WriteLine($"[BUILD_WITH_DEBUG] block=0x{block.StartOffset:X4} setupIdx={setupIdx} beforeWithIdx={beforeWithIdx} loadSpecialIdx={loadSpecialIdx} withIdx={withIdx}");
         
         if (_options.VerboseErrors)
         {
-            Console.Error.WriteLine($"[BUILD_WITH_DEBUG] block=0x{block.StartOffset:X4} setupIdx={setupIdx} beforeWithIdx={beforeWithIdx} withIdx={withIdx}");
+            for (int i = 0; i < instrs.Count; i++)
+            {
+                Console.Error.WriteLine($"[BUILD_WITH_DEBUG]   instr[{i}] = {instrs[i].Opcode}");
+            }
         }
         
         bool isSetupWith = setupIdx >= 0;
@@ -4792,15 +4799,27 @@ public class AstBuilder
             {
                 for (int i = 0; i < instrs.Count - 6; i++)
                 {
-                    if (instrs[i].Opcode == Opcode.CALL && 
-                        instrs[i + 1].Opcode == Opcode.COPY && 
-                        instrs[i + 2].Opcode == Opcode.LOAD_SPECIAL_314 && 
-                        instrs[i + 3].Opcode == Opcode.SWAP && 
-                        instrs[i + 4].Opcode == Opcode.SWAP && 
-                        instrs[i + 5].Opcode == Opcode.LOAD_SPECIAL_314 && 
-                        instrs[i + 6].Opcode == Opcode.CALL)
+                    if (instrs[i].Opcode == Opcode.LOAD_SPECIAL && 
+                        instrs[i + 1].Opcode == Opcode.SWAP && 
+                        instrs[i + 2].Opcode == Opcode.SWAP && 
+                        instrs[i + 3].Opcode == Opcode.LOAD_SPECIAL && 
+                        instrs[i + 4].Opcode == Opcode.CALL)
                     {
-                        withIdx = i;
+                        if (_options.VerboseErrors)
+                        {
+                            Console.Error.WriteLine($"[BUILD_WITH_DEBUG] Found LOAD_SPECIAL pattern at index {i}");
+                            Console.Error.WriteLine($"[BUILD_WITH_DEBUG]  instr[{i-2}] = {instrs[i-2].Opcode}");
+                            Console.Error.WriteLine($"[BUILD_WITH_DEBUG]  instr[{i-1}] = {instrs[i-1].Opcode}");
+                            Console.Error.WriteLine($"[BUILD_WITH_DEBUG]  instr[{i}] = {instrs[i].Opcode}");
+                        }
+                        if (i > 0 && instrs[i - 1].Opcode == Opcode.COPY)
+                        {
+                            withIdx = i - 2;
+                        }
+                        else
+                        {
+                            withIdx = i;
+                        }
                         break;
                     }
                 }
@@ -4915,29 +4934,55 @@ public class AstBuilder
         // 2. 提取可选的 as 变量
         Expr? optionalVar = null;
         
-        for (int i = withIdx + 1; i < instrs.Count; i++)
+        bool isPy314Style = instrs.Any(i => i.Opcode == Opcode.LOAD_SPECIAL);
+        
+        if (isPy314Style)
         {
-            var op = instrs[i].Opcode;
-            if (op == Opcode.BEFORE_WITH || op == Opcode.BEFORE_WITH_313
-                || op == Opcode.BEFORE_WITH_312
-                || op == Opcode.SETUP_WITH || op == Opcode.WITH_EXCEPT_START)
-                continue;
-            if (op == Opcode.POP_TOP)
-                break;
-            if ((op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
-                && instrs[i].Argument.HasValue)
+            int callCount = 0;
+            for (int i = 0; i < instrs.Count; i++)
             {
-                var idx = instrs[i].Argument.Value;
-                string varName = op == Opcode.STORE_FAST
-                    ? (idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}")
-                    : (idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}");
-                optionalVar = new Name(varName, ExpressionContext.Store);
+                if (instrs[i].Opcode == Opcode.CALL)
+                {
+                    callCount++;
+                    if (callCount == 2 && i + 1 < instrs.Count)
+                    {
+                        if (instrs[i + 1].Opcode == Opcode.STORE_FAST && instrs[i + 1].Argument.HasValue)
+                        {
+                            var idx = instrs[i + 1].Argument.Value;
+                            string varName = idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}";
+                            optionalVar = new Name(varName, ExpressionContext.Store);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int i = withIdx + 1; i < instrs.Count; i++)
+            {
+                var op = instrs[i].Opcode;
+                if (op == Opcode.BEFORE_WITH || op == Opcode.BEFORE_WITH_313
+                    || op == Opcode.BEFORE_WITH_312
+                    || op == Opcode.SETUP_WITH || op == Opcode.WITH_EXCEPT_START)
+                    continue;
+                if (op == Opcode.POP_TOP)
+                    break;
+                if ((op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
+                    && instrs[i].Argument.HasValue)
+                {
+                    var idx = instrs[i].Argument.Value;
+                    string varName = op == Opcode.STORE_FAST
+                        ? (idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}")
+                        : (idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}");
+                    optionalVar = new Name(varName, ExpressionContext.Store);
+                    break;
+                }
                 break;
             }
-            break;
         }
         
-        if (optionalVar == null && !isSetupWith)
+        if (optionalVar == null && !isSetupWith && !isPy314Style)
         {
             foreach (var succ in block.Successors)
             {
@@ -5052,7 +5097,31 @@ public class AstBuilder
         // 4. 跳过变量赋值找到 body 起始
         int bodyStart = withIdx + 1;
         
-        if (!isSetupWith && beforeWithIdx < 0 && withIdx >= 0 && instrs[withIdx].Opcode == Opcode.CALL)
+        if (isPy314Style)
+        {
+            int callCount = 0;
+            for (int i = 0; i < instrs.Count; i++)
+            {
+                if (instrs[i].Opcode == Opcode.CALL)
+                {
+                    callCount++;
+                    if (callCount == 2)
+                    {
+                        bodyStart = i + 1;
+                        break;
+                    }
+                }
+            }
+            
+            for (; bodyStart < instrs.Count; bodyStart++)
+            {
+                var op = instrs[bodyStart].Opcode;
+                if (op == Opcode.POP_TOP || op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
+                    continue;
+                break;
+            }
+        }
+        else if (!isSetupWith && beforeWithIdx < 0 && withIdx >= 0 && instrs[withIdx].Opcode == Opcode.CALL)
         {
             for (int i = withIdx + 1; i < instrs.Count; i++)
             {
@@ -5062,18 +5131,32 @@ public class AstBuilder
                     break;
                 }
             }
+            
+            for (; bodyStart < instrs.Count; bodyStart++)
+            {
+                var op = instrs[bodyStart].Opcode;
+                if (op == Opcode.BEFORE_WITH || op == Opcode.BEFORE_WITH_313
+                    || op == Opcode.BEFORE_WITH_312
+                    || op == Opcode.WITH_EXCEPT_START)
+                    continue;
+                if (op == Opcode.POP_TOP || op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
+                    continue;
+                break;
+            }
         }
-        
-        for (; bodyStart < instrs.Count; bodyStart++)
+        else
         {
-            var op = instrs[bodyStart].Opcode;
-            if (op == Opcode.BEFORE_WITH || op == Opcode.BEFORE_WITH_313
-                || op == Opcode.BEFORE_WITH_312
-                || op == Opcode.WITH_EXCEPT_START)
-                continue;
-            if (op == Opcode.POP_TOP || op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
-                continue;
-            break;
+            for (; bodyStart < instrs.Count; bodyStart++)
+            {
+                var op = instrs[bodyStart].Opcode;
+                if (op == Opcode.BEFORE_WITH || op == Opcode.BEFORE_WITH_313
+                    || op == Opcode.BEFORE_WITH_312
+                    || op == Opcode.WITH_EXCEPT_START)
+                    continue;
+                if (op == Opcode.POP_TOP || op == Opcode.STORE_FAST || op == Opcode.STORE_NAME)
+                    continue;
+                break;
+            }
         }
 
         // 5. 处理当前块内的 body 指令
@@ -9730,6 +9813,19 @@ public class AstBuilder
 
         var seqBlocks = seqBuilder.BuildSequentialBlocks(cfg);
         Console.Error.WriteLine($"[SEQ_BUILD] Phase 1: {seqBlocks.Count} sequential blocks created");
+        foreach (var sb in seqBlocks)
+        {
+            bool hasLoadSpecial = sb.Instructions.Any(i => i.Opcode == Opcode.LOAD_SPECIAL);
+            Console.Error.WriteLine($"[SEQ_BUILD]   SeqBlock 0x{sb.StartOffset:X4}-0x{sb.EndOffset:X4}, {sb.Instructions.Count} instructions, hasLoadSpecial={hasLoadSpecial}");
+            if (hasLoadSpecial)
+            {
+                for (int i = 0; i < sb.Instructions.Count; i++)
+                {
+                    Console.Error.WriteLine($"[SEQ_BUILD]     instr[{i}] = {sb.Instructions[i].Opcode}");
+                }
+                Console.Error.WriteLine($"[SEQ_BUILD]     Has exception table entries: {sb.ExceptionTableEntries.Count}");
+            }
+        }
 
         if (!seqBuilder.VerifyNoOrphanBlocks(seqBlocks, cfg))
         {
@@ -9848,17 +9944,25 @@ public class AstBuilder
             }
         }
 
-        foreach (var seqBlock in seqBlocks)
+        
+
+        foreach (var seqBlock in seqBlocks.OrderBy(b => b.StartOffset))
         {
             if (visited.Contains(seqBlock.Id))
                 continue;
 
-            if (seqBlock.Instructions.Any(i => 
+            bool hasWithOpcode = seqBlock.Instructions.Any(i => 
                 i.Opcode == Opcode.SETUP_WITH || 
                 i.Opcode == Opcode.BEFORE_WITH ||
                 i.Opcode == Opcode.BEFORE_WITH_312 ||
-                i.Opcode == Opcode.BEFORE_WITH_313))
+                i.Opcode == Opcode.BEFORE_WITH_313 ||
+                i.Opcode == Opcode.LOAD_SPECIAL);
+            
+            Console.Error.WriteLine($"[PARSE_CTL] SeqBlock 0x{seqBlock.StartOffset:X4}, hasWithOpcode={hasWithOpcode}, visited={visited.Contains(seqBlock.Id)}");
+            
+            if (hasWithOpcode)
             {
+                Console.Error.WriteLine($"[PARSE_CTL]   Calling ParseWithStructure");
                 var withStructure = ParseWithStructure(seqBlock, seqBlocks);
                 if (withStructure != null)
                 {
@@ -9929,9 +10033,18 @@ public class AstBuilder
             i.Opcode == Opcode.SETUP_WITH || 
             i.Opcode == Opcode.BEFORE_WITH ||
             i.Opcode == Opcode.BEFORE_WITH_312 ||
-            i.Opcode == Opcode.BEFORE_WITH_313);
+            i.Opcode == Opcode.BEFORE_WITH_313 ||
+            i.Opcode == Opcode.LOAD_SPECIAL);
 
         if (isWithStatement)
+            return null;
+            
+        bool isWithExceptionHandler = header.Instructions.Any(i => 
+            i.Opcode == Opcode.WITH_EXCEPT_START || 
+            i.Opcode == Opcode.WITH_EXCEPT_START_312 ||
+            i.Opcode == Opcode.PUSH_EXC_INFO_312);
+            
+        if (isWithExceptionHandler)
             return null;
 
         bool isForLoop = header.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
@@ -10090,38 +10203,168 @@ public class AstBuilder
             }
         }
 
-        var visited = new HashSet<int> { header.Id };
-        var worklist = new Queue<SequentialBlock>();
+        bool isPy314Style = header.Instructions.Any(i => i.Opcode == Opcode.LOAD_SPECIAL);
+        bool isBeforeWithStyle = header.Instructions.Any(i => 
+            i.Opcode == Opcode.BEFORE_WITH || 
+            i.Opcode == Opcode.BEFORE_WITH_312 || 
+            i.Opcode == Opcode.BEFORE_WITH_313);
 
-        foreach (var sourceBlock in header.SourceBlocks)
-        {
-            foreach (var succ in sourceBlock.Successors)
+            if (isPy314Style)
             {
-                var targetSeqBlock = blockByOffset.Values
-                    .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
-                if (targetSeqBlock != null && targetSeqBlock != handlerBlock && !visited.Contains(targetSeqBlock.Id))
+                int? cleanupStartOffset = null;
+                foreach (var seqBlock in seqBlocks)
                 {
-                    visited.Add(targetSeqBlock.Id);
-                    worklist.Enqueue(targetSeqBlock);
+                    if (seqBlock == header)
+                        continue;
+                    if (seqBlock.StartOffset > header.EndOffset && IsWithCleanupBlock(seqBlock))
+                    {
+                        cleanupStartOffset = seqBlock.StartOffset;
+                        Console.Error.WriteLine($"[PARSE_WITH] Found cleanup block at 0x{seqBlock.StartOffset:X4} after header 0x{header.EndOffset:X4}");
+                        break;
+                    }
+                }
+            
+            foreach (var seqBlock in seqBlocks)
+            {
+                if (seqBlock == header)
+                    continue;
+                if (handlerBlock != null)
+                {
+                    if (seqBlock == handlerBlock)
+                        continue;
+                    if (seqBlock.StartOffset > header.EndOffset && seqBlock.StartOffset < handlerBlock.StartOffset)
+                    {
+                        bool isCleanupBlock = IsWithCleanupBlock(seqBlock);
+                        bool isAnotherWithHeader = false;
+                        for (int i = 0; i < seqBlock.Instructions.Count - 6; i++)
+                        {
+                            if (seqBlock.Instructions[i].Opcode == Opcode.LOAD_FAST_BORROW_314 &&
+                                seqBlock.Instructions[i + 1].Opcode == Opcode.COPY &&
+                                seqBlock.Instructions[i + 2].Opcode == Opcode.LOAD_SPECIAL &&
+                                seqBlock.Instructions[i + 3].Opcode == Opcode.SWAP &&
+                                seqBlock.Instructions[i + 4].Opcode == Opcode.SWAP &&
+                                seqBlock.Instructions[i + 5].Opcode == Opcode.LOAD_SPECIAL &&
+                                seqBlock.Instructions[i + 6].Opcode == Opcode.CALL)
+                            {
+                                isAnotherWithHeader = true;
+                                break;
+                            }
+                        }
+                        if (!isCleanupBlock && !isAnotherWithHeader)
+                        {
+                            bodyBlocks.Add(seqBlock);
+                        }
+                    }
+                }
+                else if (cleanupStartOffset.HasValue)
+                {
+                    if (seqBlock.StartOffset > header.EndOffset && seqBlock.StartOffset < cleanupStartOffset.Value)
+                    {
+                        bool isAnotherWithHeader = false;
+                        for (int i = 0; i < seqBlock.Instructions.Count - 6; i++)
+                        {
+                            if (seqBlock.Instructions[i].Opcode == Opcode.LOAD_FAST_BORROW_314 &&
+                                seqBlock.Instructions[i + 1].Opcode == Opcode.COPY &&
+                                seqBlock.Instructions[i + 2].Opcode == Opcode.LOAD_SPECIAL &&
+                                seqBlock.Instructions[i + 3].Opcode == Opcode.SWAP &&
+                                seqBlock.Instructions[i + 4].Opcode == Opcode.SWAP &&
+                                seqBlock.Instructions[i + 5].Opcode == Opcode.LOAD_SPECIAL &&
+                                seqBlock.Instructions[i + 6].Opcode == Opcode.CALL)
+                            {
+                                isAnotherWithHeader = true;
+                                break;
+                            }
+                        }
+                        if (!isAnotherWithHeader)
+                        {
+                            bodyBlocks.Add(seqBlock);
+                        }
+                    }
+                }
+                else
+                {
+                    if (seqBlock.StartOffset > header.EndOffset)
+                    {
+                        bool isAnotherWithHeader = false;
+                        for (int i = 0; i < seqBlock.Instructions.Count - 6; i++)
+                        {
+                            if (seqBlock.Instructions[i].Opcode == Opcode.LOAD_FAST_BORROW_314 &&
+                                seqBlock.Instructions[i + 1].Opcode == Opcode.COPY &&
+                                seqBlock.Instructions[i + 2].Opcode == Opcode.LOAD_SPECIAL &&
+                                seqBlock.Instructions[i + 3].Opcode == Opcode.SWAP &&
+                                seqBlock.Instructions[i + 4].Opcode == Opcode.SWAP &&
+                                seqBlock.Instructions[i + 5].Opcode == Opcode.LOAD_SPECIAL &&
+                                seqBlock.Instructions[i + 6].Opcode == Opcode.CALL)
+                            {
+                                isAnotherWithHeader = true;
+                                break;
+                            }
+                        }
+                        if (!isAnotherWithHeader)
+                        {
+                            bodyBlocks.Add(seqBlock);
+                        }
+                    }
                 }
             }
         }
-
-        while (worklist.Count > 0)
+        else if (isBeforeWithStyle && handlerBlock != null)
         {
-            var current = worklist.Dequeue();
-
-            if (current == handlerBlock)
-                continue;
-
-            bodyBlocks.Add(current);
-
-            foreach (var succ in current.Successors)
+            foreach (var seqBlock in seqBlocks)
             {
-                if (!visited.Contains(succ.Id) && succ != handlerBlock)
+                if (seqBlock == header || seqBlock == handlerBlock)
+                    continue;
+                if (seqBlock.StartOffset > header.EndOffset && seqBlock.StartOffset < handlerBlock.StartOffset)
                 {
-                    visited.Add(succ.Id);
-                    worklist.Enqueue(succ);
+                    bodyBlocks.Add(seqBlock);
+                }
+            }
+        }
+        else
+        {
+            var visited = new HashSet<int> { header.Id };
+            var worklist = new Queue<SequentialBlock>();
+
+            foreach (var sourceBlock in header.SourceBlocks)
+            {
+                foreach (var succ in sourceBlock.Successors)
+                {
+                    var targetSeqBlock = blockByOffset.Values
+                        .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
+                    if (targetSeqBlock != null && targetSeqBlock != handlerBlock && !visited.Contains(targetSeqBlock.Id))
+                    {
+                        visited.Add(targetSeqBlock.Id);
+                        worklist.Enqueue(targetSeqBlock);
+                    }
+                }
+            }
+
+            while (worklist.Count > 0)
+            {
+                var current = worklist.Dequeue();
+
+                if (current == handlerBlock)
+                    continue;
+
+                bool isCleanupCode = current.Instructions.Any(i => 
+                    i.Opcode == Opcode.LOAD_CONST && 
+                    current.Instructions.IndexOf(i) == 0 &&
+                    current.Instructions.Count >= 3 &&
+                    current.Instructions[1].Opcode == Opcode.LOAD_CONST &&
+                    current.Instructions[2].Opcode == Opcode.LOAD_CONST);
+
+                if (isCleanupCode)
+                    continue;
+
+                bodyBlocks.Add(current);
+
+                foreach (var succ in current.Successors)
+                {
+                    if (!visited.Contains(succ.Id) && succ != handlerBlock)
+                    {
+                        visited.Add(succ.Id);
+                        worklist.Enqueue(succ);
+                    }
                 }
             }
         }
@@ -10131,6 +10374,57 @@ public class AstBuilder
         Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found WITH statement at 0x{header.StartOffset:X4}, body blocks: {bodyBlocks.Count}, handler: {(handlerBlock != null ? $"0x{handlerBlock.StartOffset:X4}" : "none")}");
 
         return new WithControlStructure(header, handlerBlock, bodyBlocks);
+    }
+
+    private bool IsWithCleanupBlock(SequentialBlock block)
+    {
+        var instrs = block.Instructions;
+        if (instrs.Count < 3)
+            return false;
+
+        bool isWithHeader = false;
+        for (int i = 0; i < instrs.Count - 6; i++)
+        {
+            if (instrs[i].Opcode == Opcode.LOAD_FAST_BORROW_314 &&
+                instrs[i + 1].Opcode == Opcode.COPY &&
+                instrs[i + 2].Opcode == Opcode.LOAD_SPECIAL &&
+                instrs[i + 3].Opcode == Opcode.SWAP &&
+                instrs[i + 4].Opcode == Opcode.SWAP &&
+                instrs[i + 5].Opcode == Opcode.LOAD_SPECIAL &&
+                instrs[i + 6].Opcode == Opcode.CALL)
+            {
+                isWithHeader = true;
+                break;
+            }
+        }
+        
+        if (isWithHeader)
+            return false;
+
+        if (instrs.Count >= 4)
+        {
+            int startIdx = 0;
+            if (instrs[0].Opcode == Opcode.NOP)
+                startIdx = 1;
+            
+            if (instrs.Count >= startIdx + 4 &&
+                instrs[startIdx].Opcode == Opcode.LOAD_CONST &&
+                instrs[startIdx + 1].Opcode == Opcode.LOAD_CONST &&
+                instrs[startIdx + 2].Opcode == Opcode.LOAD_CONST &&
+                instrs[startIdx + 3].Opcode == Opcode.CALL &&
+                instrs[startIdx + 3].Argument == 3)
+            {
+                return true;
+            }
+        }
+
+        if (instrs.Any(i => i.Opcode == Opcode.POP_EXCEPT || 
+                           i.Opcode == Opcode.RERAISE))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private ISequentialControlStructure? ParseTryStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
@@ -10767,11 +11061,163 @@ public class AstBuilder
         var headerInstrs = withStmt.Header.Instructions;
         var sm = new StackMachine(_codeObject);
 
+        
+
+        bool isPy314Style = headerInstrs.Any(i => i.Opcode == Opcode.LOAD_SPECIAL);
+
+        if (isPy314Style)
+        {
+            int withPatternStartIdx = -1;
+            for (int i = 0; i < headerInstrs.Count - 6; i++)
+            {
+                if (headerInstrs[i].Opcode == Opcode.LOAD_FAST_BORROW_314 &&
+                    headerInstrs[i + 1].Opcode == Opcode.COPY &&
+                    headerInstrs[i + 2].Opcode == Opcode.LOAD_SPECIAL &&
+                    headerInstrs[i + 3].Opcode == Opcode.SWAP &&
+                    headerInstrs[i + 4].Opcode == Opcode.SWAP &&
+                    headerInstrs[i + 5].Opcode == Opcode.LOAD_SPECIAL &&
+                    headerInstrs[i + 6].Opcode == Opcode.CALL)
+                {
+                    withPatternStartIdx = i;
+                    break;
+                }
+            }
+            
+            if (withPatternStartIdx < 0)
+                return new List<Stmt>();
+
+            var preWithStmts = new List<Stmt>();
+            if (withPatternStartIdx > 0)
+            {
+                var preMachine = new StackMachine(_codeObject);
+                for (int i = 0; i < withPatternStartIdx; i++)
+                {
+                    var stmt = preMachine.Execute(headerInstrs[i]);
+                    if (stmt != null)
+                        preWithStmts.Add(stmt);
+                }
+                while (preMachine.HasResults)
+                    preWithStmts.Add(new ExprStmt(preMachine.PopResult()));
+            }
+
+            for (int i = withPatternStartIdx; i <= withPatternStartIdx; i++)
+            {
+                sm.Execute(headerInstrs[i]);
+            }
+
+            Expr? py314ContextExpr = sm.ExprStackCount > 0 ? sm.PopExpr() : null;
+            if (py314ContextExpr == null)
+                return preWithStmts;
+
+            Expr? py314OptionalVar = null;
+            int headerEndIdx = headerInstrs.Count;
+            
+            for (int i = 0; i < headerInstrs.Count - 6; i++)
+            {
+                if (headerInstrs[i].Opcode == Opcode.LOAD_FAST_BORROW_314 &&
+                    headerInstrs[i + 1].Opcode == Opcode.COPY &&
+                    headerInstrs[i + 2].Opcode == Opcode.LOAD_SPECIAL &&
+                    headerInstrs[i + 3].Opcode == Opcode.SWAP &&
+                    headerInstrs[i + 4].Opcode == Opcode.SWAP &&
+                    headerInstrs[i + 5].Opcode == Opcode.LOAD_SPECIAL &&
+                    headerInstrs[i + 6].Opcode == Opcode.CALL)
+                {
+                    if (i + 7 < headerInstrs.Count && 
+                        headerInstrs[i + 7].Opcode == Opcode.STORE_FAST && 
+                        headerInstrs[i + 7].Argument.HasValue)
+                    {
+                        var idx = headerInstrs[i + 7].Argument.Value;
+                        string varName = idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}";
+                        py314OptionalVar = new Name(varName, ExpressionContext.Store);
+                        headerEndIdx = i + 8;
+                    }
+                    else
+                    {
+                        headerEndIdx = i + 7;
+                    }
+                    break;
+                }
+            }
+            
+            if (py314OptionalVar == null && withStmt.BodyBlocks.Count > 0)
+            {
+                var firstBodyBlock = withStmt.BodyBlocks[0];
+                if (firstBodyBlock.Instructions.Count > 0 && 
+                    firstBodyBlock.Instructions[0].Opcode == Opcode.STORE_FAST && 
+                    firstBodyBlock.Instructions[0].Argument.HasValue)
+                {
+                    var idx = firstBodyBlock.Instructions[0].Argument.Value;
+                    string varName = idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}";
+                    py314OptionalVar = new Name(varName, ExpressionContext.Store);
+                    
+                }
+            }
+
+            var py314BodyStmts = new List<Stmt>();
+            
+            if (headerEndIdx < headerInstrs.Count)
+            {
+                var bodyMachine = new StackMachine(_codeObject);
+                for (int i = headerEndIdx; i < headerInstrs.Count; i++)
+                {
+                    var stmt = bodyMachine.Execute(headerInstrs[i]);
+                    if (stmt != null)
+                        py314BodyStmts.Add(stmt);
+                }
+                while (bodyMachine.HasResults)
+                    py314BodyStmts.Add(new ExprStmt(bodyMachine.PopResult()));
+            }
+
+            foreach (var bodyBlock in withStmt.BodyBlocks)
+            {
+                if (bodyBlock.ParentStructure != null && bodyBlock.ParentStructure != withStmt)
+                {
+                    var nestedStmts = BuildStructureStatements(bodyBlock.ParentStructure);
+                    py314BodyStmts.AddRange(nestedStmts);
+                    continue;
+                }
+                
+                if (bodyBlock.Statements != null)
+                {
+                    bool skipFirstStmt = false;
+                    if (py314OptionalVar == null && bodyBlock.Statements.Count > 0)
+                    {
+                        var firstStmt = bodyBlock.Statements[0];
+                        if (firstStmt is Assign assignStmt && assignStmt.Targets.Count == 1 && assignStmt.Targets[0] is Name nameTarget)
+                        {
+                            py314OptionalVar = nameTarget;
+                            skipFirstStmt = true;
+                        }
+                    }
+                    else if (py314OptionalVar != null && bodyBlock.Statements.Count > 0)
+                    {
+                        var firstStmt = bodyBlock.Statements[0];
+                        if (firstStmt is Assign assignStmt && assignStmt.Targets.Count == 1 && assignStmt.Targets[0] is Name nameTarget)
+                        {
+                            if (nameTarget.Id == ((Name)py314OptionalVar).Id)
+                            {
+                                skipFirstStmt = true;
+                            }
+                        }
+                    }
+                    
+                    if (skipFirstStmt)
+                        py314BodyStmts.AddRange(bodyBlock.Statements.Skip(1));
+                    else
+                        py314BodyStmts.AddRange(bodyBlock.Statements);
+                }
+            }
+
+            preWithStmts.Add(new With(new List<WithItem> { new WithItem(py314ContextExpr, py314OptionalVar) }, py314BodyStmts));
+            return preWithStmts;
+        }
+
         int endIdx = headerInstrs.FindIndex(i => 
             i.Opcode == Opcode.SETUP_WITH || 
             i.Opcode == Opcode.BEFORE_WITH || 
             i.Opcode == Opcode.BEFORE_WITH_312 || 
-            i.Opcode == Opcode.BEFORE_WITH_313);
+            i.Opcode == Opcode.BEFORE_WITH_313 ||
+            i.Opcode == Opcode.LOAD_SPECIAL);
 
         if (endIdx < 0)
             endIdx = headerInstrs.Count;

@@ -58,6 +58,20 @@ public class SequentialBlockBuilder
 
         while (current != null && !processedBlockIds.Contains(current.Id))
         {
+            bool currentStartsWithWithHeader = false;
+            if (current.Instructions.Count >= 3)
+            {
+                currentStartsWithWithHeader = current.Instructions[0].Opcode == Opcode.LOAD_FAST_BORROW_314 && 
+                    current.Instructions[1].Opcode == Opcode.COPY && 
+                    current.Instructions[2].Opcode == Opcode.LOAD_SPECIAL;
+            }
+            
+            if (currentStartsWithWithHeader && seqBlock.Instructions.Count > 0)
+            {
+                Console.Error.WriteLine($"[SEQ_BUILD] Next block starts with WITH header, breaking at block {current.Id}");
+                break;
+            }
+
             processedBlockIds.Add(current.Id);
             seqBlock.SourceBlocks.Add(current);
 
@@ -71,6 +85,52 @@ public class SequentialBlockBuilder
 
             if (current.EndOffset > seqBlock.EndOffset)
                 seqBlock.EndOffset = current.EndOffset;
+            
+            Console.Error.WriteLine($"[SEQ_BUILD] Adding block {current.Id}: offset 0x{current.StartOffset:X4}-0x{current.EndOffset:X4}, {current.Instructions.Count} instructions");
+            Console.Error.WriteLine($"[SEQ_BUILD]   SeqBlock now: 0x{seqBlock.StartOffset:X4}-0x{seqBlock.EndOffset:X4}, {seqBlock.Instructions.Count} instructions");
+
+            bool containsWithHeaderStart = false;
+            int withHeaderStartIdx = -1;
+            for (int i = 0; i < seqBlock.Instructions.Count - 2; i++)
+            {
+                if (seqBlock.Instructions[i].Opcode == Opcode.LOAD_FAST_BORROW_314 && 
+                    seqBlock.Instructions[i + 1].Opcode == Opcode.COPY && 
+                    seqBlock.Instructions[i + 2].Opcode == Opcode.LOAD_SPECIAL)
+                {
+                    containsWithHeaderStart = true;
+                    withHeaderStartIdx = i;
+                    break;
+                }
+            }
+            
+            if (containsWithHeaderStart && withHeaderStartIdx > 0)
+            {
+                Console.Error.WriteLine($"[SEQ_BUILD] Found WITH header start at instruction {withHeaderStartIdx}, breaking at block {current.Id}");
+                break;
+            }
+            
+            if (containsWithHeaderStart && withHeaderStartIdx == 0)
+            {
+                bool hasCompleteWithPattern = false;
+                for (int i = 0; i < seqBlock.Instructions.Count - 4; i++)
+                {
+                    if (seqBlock.Instructions[i].Opcode == Opcode.LOAD_SPECIAL && 
+                        seqBlock.Instructions[i + 1].Opcode == Opcode.SWAP && 
+                        seqBlock.Instructions[i + 2].Opcode == Opcode.SWAP && 
+                        seqBlock.Instructions[i + 3].Opcode == Opcode.LOAD_SPECIAL && 
+                        seqBlock.Instructions[i + 4].Opcode == Opcode.CALL)
+                    {
+                        hasCompleteWithPattern = true;
+                        break;
+                    }
+                }
+                
+                if (hasCompleteWithPattern)
+                {
+                    Console.Error.WriteLine($"[SEQ_BUILD] Found complete WITH pattern in WITH header block, breaking at block {current.Id}");
+                    break;
+                }
+            }
 
             var lastInstr = current.Instructions.LastOrDefault();
             if (lastInstr != null && JumpHelper.IsJump(lastInstr.Opcode))
@@ -79,6 +139,47 @@ public class SequentialBlockBuilder
                 seqBlock.JumpTarget = lastInstr.Argument;
                 break;
             }
+
+            bool hasWithCleanup = false;
+            for (int i = 0; i < current.Instructions.Count - 4; i++)
+            {
+                if (current.Instructions[i].Opcode == Opcode.LOAD_CONST && 
+                    current.Instructions[i + 1].Opcode == Opcode.LOAD_CONST && 
+                    current.Instructions[i + 2].Opcode == Opcode.LOAD_CONST && 
+                    current.Instructions[i + 3].Opcode == Opcode.CALL && 
+                    current.Instructions[i + 4].Opcode == Opcode.POP_TOP)
+                {
+                    hasWithCleanup = true;
+                    break;
+                }
+            }
+            
+            if (hasWithCleanup)
+                break;
+            
+            if (seqBlock.StartOffset == 0 && seqBlock.Instructions.Count > 0 && !current.Instructions.Any(i => 
+                i.Opcode == Opcode.LOAD_SPECIAL || 
+                i.Opcode == Opcode.SETUP_WITH ||
+                i.Opcode is Opcode.BEFORE_WITH or Opcode.BEFORE_WITH_312 or Opcode.BEFORE_WITH_313))
+            {
+                break;
+            }
+            
+            bool succHasWithInstruction = false;
+        if (current.Successors.Count == 1)
+        {
+            var succBlock = current.Successors.First();
+            succHasWithInstruction = succBlock.Instructions.Any(i => 
+                i.Opcode == Opcode.LOAD_SPECIAL || 
+                i.Opcode == Opcode.SETUP_WITH ||
+                i.Opcode is Opcode.BEFORE_WITH or Opcode.BEFORE_WITH_312 or Opcode.BEFORE_WITH_313);
+        }
+        
+        if (succHasWithInstruction)
+        {
+            Console.Error.WriteLine($"[SEQ_BUILD] Next block has WITH instruction, breaking at block {current.Id}");
+            break;
+        }
 
             if (current.Successors.Count != 1)
                 break;
@@ -108,6 +209,9 @@ public class SequentialBlockBuilder
 
         seqBlock.HasBeforeWith = seqBlock.Instructions.Any(i => 
             i.Opcode is Opcode.BEFORE_WITH or Opcode.BEFORE_WITH_312 or Opcode.BEFORE_WITH_313);
+
+        seqBlock.HasLoadSpecial = seqBlock.Instructions.Any(i => 
+            i.Opcode == Opcode.LOAD_SPECIAL);
 
         seqBlock.HasSetupFinally = seqBlock.Instructions.Any(i => 
             i.Opcode == Opcode.SETUP_FINALLY);

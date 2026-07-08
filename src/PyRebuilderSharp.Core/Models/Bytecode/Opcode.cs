@@ -312,5 +312,6 @@ public enum Opcode
     LOAD_COMMON_CONSTANT_314 = 259,  // 3.14 raw=81: 加载常见常量（None/True/False/Ellipsis）
     BUILD_INTERPOLATION_314 = 260,   // 3.14 raw=45: build interpolation for f-string
     BINARY_OP_INPLACE_ADD_UNICODE_314 = 261, // 3.14 raw=3
-    LOAD_SPECIAL_314 = 262,          // 3.14 raw=95
+    LOAD_SPECIAL = 262,              // 3.14+: 加载特殊方法 (__enter__, __exit__)
+    LOAD_SPECIAL_314 = 263,          // 3.14 raw=95（用于映射，实际使用 LOAD_SPECIAL）
 }

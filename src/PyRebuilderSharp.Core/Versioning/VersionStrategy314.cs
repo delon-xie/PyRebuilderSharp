@@ -127,7 +127,7 @@ public class VersionStrategy314 : VersionStrategyBase
             92 => Models.Bytecode.Opcode.LOAD_GLOBAL,
             93 => Models.Bytecode.Opcode.LOAD_NAME,
             94 => Models.Bytecode.Opcode.LOAD_SMALL_INT_314,
-            95 => Models.Bytecode.Opcode.LOAD_SPECIAL_314,
+            95 => Models.Bytecode.Opcode.LOAD_SPECIAL,
             96 => Models.Bytecode.Opcode.LOAD_SUPER_ATTR,
             97 => Models.Bytecode.Opcode.MAKE_CELL_313,          // 3.14: MAKE_CELL
             98 => Models.Bytecode.Opcode.MAP_ADD_313,            // 3.14: MAP_ADD

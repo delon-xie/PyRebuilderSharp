@@ -167,6 +167,9 @@ public class ControlFlowScanner : IControlFlowScanner
                     Console.Error.WriteLine($"[DECOMP_TRACE] stage=CFG loop_type={type} header_has_foriter={block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER)}");
                     }
                     
+                    if (type == LoopType.None)
+                        continue;
+                    
                     BasicBlock actualHeader = block;
                     if (type == LoopType.For && !block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
                     {
@@ -258,6 +261,17 @@ public class ControlFlowScanner : IControlFlowScanner
 
     private LoopType DetermineLoopType(BasicBlock header, List<BasicBlock> loopBody)
     {
+        bool hasWithPattern = loopBody.Any(b => b.Instructions.Any(i =>
+            i.Opcode == Opcode.SETUP_WITH ||
+            i.Opcode == Opcode.BEFORE_WITH ||
+            i.Opcode == Opcode.BEFORE_WITH_312 ||
+            i.Opcode == Opcode.BEFORE_WITH_313 ||
+            i.Opcode == Opcode.LOAD_SPECIAL ||
+            i.Opcode == Opcode.WITH_EXCEPT_START ||
+            i.Opcode == Opcode.WITH_EXCEPT_START_312 ||
+            i.Opcode == Opcode.PUSH_EXC_INFO_312));
+        if (hasWithPattern) return LoopType.None;
+
         bool hasForPattern = loopBody.Any(b => b.Instructions.Any(i =>
             i.Opcode == Opcode.GET_ITER || i.Opcode == Opcode.FOR_ITER));
         if (hasForPattern) return LoopType.For;

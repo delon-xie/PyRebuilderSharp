@@ -28,7 +28,7 @@ public record LoopStructure(
     LoopType Type
 ) : ControlStructure;
 
-public enum LoopType { For, While, DoWhile, Infinite }
+public enum LoopType { None, For, While, DoWhile, Infinite }
 
 public record TryStructure(
     BasicBlock Header,

@@ -25,6 +25,8 @@ public class SequentialBlock
     
     public bool HasBeforeWith { get; set; }
     
+    public bool HasLoadSpecial { get; set; }
+    
     public bool EndsWithJump { get; set; }
     
     public int? JumpTarget { get; set; }
