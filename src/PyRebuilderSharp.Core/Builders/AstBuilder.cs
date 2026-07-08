@@ -664,6 +664,64 @@ public class AstBuilder
             return stmts;
         }
 
+        // 检测 with 语句 (SETUP_WITH / BEFORE_WITH 模式)
+        // 必须在 for-loop 检测之前，因为入口块的后继可能是 for 循环头
+
+        var setupWithIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH
+            || i.Opcode == Opcode.BEFORE_WITH || i.Opcode == Opcode.BEFORE_WITH_312
+            || i.Opcode == Opcode.BEFORE_WITH_313);
+        
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[BUILD_STMT_INTERNAL] block=0x{block.StartOffset:X4} setupWithIdx={setupWithIdx}");
+            if (setupWithIdx >= 0)
+            {
+                Console.Error.WriteLine($"[BUILD_STMT_INTERNAL]   FOUND WITH opcode at index={setupWithIdx}: {block.Instructions[setupWithIdx].Opcode}");
+            }
+        }
+        
+        if (setupWithIdx >= 0)
+        {
+            var br = _blockResults.GetValueOrDefault(block.Id);
+            if (br?.Statements != null && br.Statements.Count > 0)
+            {
+                var withStmts2 = BuildWithFromBlock(block, visited);
+                if (withStmts2 != null)
+                {
+                    stmts.AddRange(withStmts2);
+                    foreach (var succ in block.Successors)
+                    {
+                        if (!visited.Contains(succ))
+                            stmts.AddRange(BuildStatements(succ, visited));
+                    }
+                    return stmts;
+                }
+            }
+        }
+        
+        var withStmts = BuildWithFromBlock(block, visited);
+        
+        if (withStmts != null)
+        {
+            stmts.AddRange(withStmts);
+            var setupIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
+            if (setupIdx >= 0 && block.Instructions[setupIdx].Argument.HasValue)
+            {
+                var handlerAbs = block.Instructions[setupIdx].Offset + 2
+                    + block.Instructions[setupIdx].Argument.Value;
+                var handlerBlocks = new List<BasicBlock>();
+                FindBlocksFromOffset(handlerAbs, handlerBlocks);
+                foreach (var hb in handlerBlocks)
+                    visited.Add(hb);
+            }
+            foreach (var succ in block.Successors)
+            {
+                if (!visited.Contains(succ))
+                    stmts.AddRange(BuildStatements(succ, visited));
+            }
+            return stmts;
+        }
+
         // 检测 for-loop 头：FOR_ITER 是条件跳转但不是 if/else，
         // 即使 LoopHeader 标志未设置
         bool hasForIter = block.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
@@ -774,67 +832,6 @@ public class AstBuilder
                     return stmts;
                 }
             }
-        }
-
-        // 检测 with 语句 (SETUP_WITH / BEFORE_WITH 模式)
-        // 但需先处理 before-with 的独立语句（函数定义、print 等）
-        var setupWithIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH
-            || i.Opcode == Opcode.BEFORE_WITH || i.Opcode == Opcode.BEFORE_WITH_312
-            || i.Opcode == Opcode.BEFORE_WITH_313);
-        if (setupWithIdx > 0)
-        {
-            // 先产出独立语句：从 _blockResults 获取完整语句列表，
-            // 只取 SETUP_WITH 之前的语句（函数定义、print 等）
-            var br = _blockResults.GetValueOrDefault(block.Id);
-            if (br?.Statements != null && br.Statements.Count > 0)
-            {
-                var withStmts2 = BuildWithFromBlock(block, visited);
-                if (withStmts2 != null)
-                {
-                    // BuildWithFromBlock 已包含完整 with 结构（含上下文表达式和体），
-                    // 不用再重复提取前置语句（GetBlockStmts 会重复反编译相同指令）。
-                    stmts.AddRange(withStmts2);
-                    // 标记 handler 块为 visited
-                    var setupIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
-                    if (setupIdx >= 0 && block.Instructions[setupIdx].Argument.HasValue)
-                    {
-                        var handlerAbs = block.Instructions[setupIdx].Offset + 2
-                            + block.Instructions[setupIdx].Argument.Value;
-                        var handlerBlocks = new List<BasicBlock>();
-                        FindBlocksFromOffset(handlerAbs, handlerBlocks);
-                        foreach (var hb in handlerBlocks)
-                            visited.Add(hb);
-                    }
-                    foreach (var succ in block.Successors)
-                    {
-                        if (!visited.Contains(succ))
-                            stmts.AddRange(BuildStatements(succ, visited));
-                    }
-                    return stmts;
-                }
-            }
-        }
-        var withStmts = BuildWithFromBlock(block, visited);
-        if (withStmts != null)
-        {
-            stmts.AddRange(withStmts);
-            // 标记 SETUP_WITH 的 handler 块为 visited
-            var setupIdx = block.Instructions.FindIndex(i => i.Opcode == Opcode.SETUP_WITH);
-            if (setupIdx >= 0 && block.Instructions[setupIdx].Argument.HasValue)
-            {
-                var handlerAbs = block.Instructions[setupIdx].Offset + 2
-                    + block.Instructions[setupIdx].Argument.Value;
-                var handlerBlocks = new List<BasicBlock>();
-                FindBlocksFromOffset(handlerAbs, handlerBlocks);
-                foreach (var hb in handlerBlocks)
-                    visited.Add(hb);
-            }
-            foreach (var succ in block.Successors)
-            {
-                if (!visited.Contains(succ))
-                    stmts.AddRange(BuildStatements(succ, visited));
-            }
-            return stmts;
         }
 
         // 检测 try/except (SETUP_FINALLY 模式)
@@ -1621,24 +1618,31 @@ public class AstBuilder
         var visitedBlocks = new HashSet<BasicBlock>();
         var searchQueue = new Queue<BasicBlock>();
         searchQueue.Enqueue(header);
-        foreach (var pred in header.Predecessors) searchQueue.Enqueue(pred);
         
-        while (searchQueue.Count > 0 && containerKind == null)
+        int searchDepth = 0;
+        int maxSearchDepth = 3;
+        
+        while (searchQueue.Count > 0 && containerKind == null && searchDepth < maxSearchDepth)
         {
-            var chk = searchQueue.Dequeue();
-            if (!visitedBlocks.Add(chk)) continue;
-            
-            foreach (var ins in chk.Instructions)
+            int queueSize = searchQueue.Count;
+            for (int q = 0; q < queueSize && containerKind == null; q++)
             {
-                if (ins.Opcode == Opcode.BUILD_LIST && ins.Argument == 0) containerKind = "list";
-                else if (ins.Opcode == Opcode.BUILD_SET && ins.Argument == 0) containerKind = "set";
-                else if (ins.Opcode == Opcode.BUILD_MAP && ins.Argument == 0) containerKind = "dict";
-                if (containerKind != null) break;
+                var chk = searchQueue.Dequeue();
+                if (!visitedBlocks.Add(chk)) continue;
+                
+                foreach (var ins in chk.Instructions)
+                {
+                    if (ins.Opcode == Opcode.BUILD_LIST && ins.Argument == 0) containerKind = "list";
+                    else if (ins.Opcode == Opcode.BUILD_SET && ins.Argument == 0) containerKind = "set";
+                    else if (ins.Opcode == Opcode.BUILD_MAP && ins.Argument == 0) containerKind = "dict";
+                    if (containerKind != null) break;
+                }
+                
+                if (containerKind == null)
+                    foreach (var pred in chk.Predecessors)
+                        if (!visitedBlocks.Contains(pred)) searchQueue.Enqueue(pred);
             }
-            
-            if (containerKind == null)
-                foreach (var pred in chk.Predecessors)
-                    if (!visitedBlocks.Contains(pred)) searchQueue.Enqueue(pred);
+            searchDepth++;
         }
         
         if (hasListAppend && containerKind == "set")
@@ -1661,12 +1665,17 @@ public class AstBuilder
             return null;
         }
         
-        if (!hasListAppend && !hasSetAdd && !hasMapAdd && !hasIf && bodyStmts.Count == 0) 
+        if (!hasListAppend && !hasSetAdd && !hasMapAdd)
         {
-            if (_options.VerboseErrors)
-            {
-            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no LIST_APPEND/SET_ADD/MAP_ADD, no If, empty body)");
-            }
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (no LIST_APPEND/SET_ADD/MAP_ADD - requires both container and append for comprehension)");
+            return null;
+        }
+        
+        bool hasComplexStmt = bodyStmts.Any(s => 
+            s is Try || s is With || s is For || s is While);
+        if (hasComplexStmt)
+        {
+            Console.Error.WriteLine($"[DECOMP_TRACE] stage=COMP_DETECT DECISION: REJECTED (body contains Try/With/For/While, not a comprehension)");
             return null;
         }
         
@@ -3382,17 +3391,36 @@ public class AstBuilder
             isFinally = true;
         }
 
-        // 跳过 with 语句的隐式 ET 条目：BEFORE_WITH 在 entry 范围内
-        // 注意：ET 条目的 start 是 with 体的开始，BEFORE_WITH 可能在 start 之前 2 字节
-        var beforeWithRangeStart = Math.Max(0, matchingEntry.StartOffset - 6);
+        // 跳过 with 语句的隐式 ET 条目：BEFORE_WITH 在 entry 范围内或附近
+        // 注意：ET 条目的 start 是 with 体的开始，BEFORE_WITH 可能在 start 之前
+        var beforeWithRangeStart = Math.Max(0, matchingEntry.StartOffset - 30);
         var hasBeforeWith = _codeObject.Instructions
             .Any(i => (i.Opcode == Opcode.BEFORE_WITH
                        || i.Opcode == Opcode.BEFORE_WITH_312
                        || i.Opcode == Opcode.BEFORE_WITH_313)
                 && i.Offset >= beforeWithRangeStart
                 && i.Offset < matchingEntry.EndOffset);
+        
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[TRY_FROM_ET] ET entry: start=0x{matchingEntry.StartOffset:X4}, end=0x{matchingEntry.EndOffset:X4}, target=0x{matchingEntry.TargetOffset:X4}");
+            Console.Error.WriteLine($"[TRY_FROM_ET] beforeWithRange: [0x{beforeWithRangeStart:X4}, 0x{matchingEntry.EndOffset:X4})");
+            foreach (var i in _codeObject.Instructions)
+            {
+                if (i.Opcode == Opcode.BEFORE_WITH || i.Opcode == Opcode.BEFORE_WITH_312 || i.Opcode == Opcode.BEFORE_WITH_313)
+                {
+                    Console.Error.WriteLine($"[TRY_FROM_ET] FOUND BEFORE_WITH at offset=0x{i.Offset:X4}");
+                }
+            }
+            Console.Error.WriteLine($"[TRY_FROM_ET] hasBeforeWith={hasBeforeWith}");
+        }
+        
         if (hasBeforeWith)
         {
+            if (_options.VerboseErrors)
+            {
+                Console.Error.WriteLine($"[TRY_FROM_ET] SKIP: with statement ET entry (BEFORE_WITH found)");
+            }
             return null;
         }
 
@@ -3675,42 +3703,49 @@ public class AstBuilder
             }
         }
 
-        // 对于 try/finally 模式，提取内联 finally 块
+        // 对于 try/finally 模式，提取 finally 体
         var afterFinallyStmts = new List<Stmt>();
         List<Stmt>? inlineFinalBody = null;
         
         if (isFinally && tryBody.Count > 0)
         {
-            var inlineFinallyBlocks = _sortedBlocks
-                .Where(b => b.EndOffset > matchingEntry.EndOffset   // overlaps the range
-                    && b.StartOffset < matchingEntry.TargetOffset)  // starts before or within
-                .OrderBy(b => b.StartOffset)
-                .ToList();
-            if (inlineFinallyBlocks.Count > 0)
+            bool hasExceptHandler = _codeObject.ExceptionTable.Any(e => 
+                e.StartOffset >= matchingEntry.StartOffset && e.StartOffset < matchingEntry.EndOffset
+                && e != matchingEntry);
+            
+            if (!hasExceptHandler)
             {
-                foreach (var inlineBlock in inlineFinallyBlocks)
-                {
-                    visited.Add(inlineBlock);
-                    _processedBlockIds.Add(inlineBlock.Id);
-                }
-                
-                var lastInlineBlock = inlineFinallyBlocks.OrderByDescending(b => b.StartOffset).First();
-                var lastInlineResult = _blockResults.GetValueOrDefault(lastInlineBlock.Id);
-                if (lastInlineResult?.Statements != null)
-                {
-                    var returnStmts = lastInlineResult.Statements.Where(s => s is Return).ToList();
-                    if (returnStmts.Count > 0)
-                        afterFinallyStmts.AddRange(returnStmts);
-                }
-                
-                inlineFinalBody = inlineFinallyBlocks
-                    .SelectMany(b => {
-                        var r = _blockResults.GetValueOrDefault(b.Id);
-                        var stmts = r?.Statements?.Where(s => s is not Raise and not CommentBlock and not Pass)
-                            ?? Enumerable.Empty<Stmt>();
-                        return stmts;
-                    })
+                var inlineFinallyBlocks = _sortedBlocks
+                    .Where(b => b.EndOffset > matchingEntry.EndOffset
+                        && b.StartOffset < matchingEntry.TargetOffset)
+                    .OrderBy(b => b.StartOffset)
                     .ToList();
+                if (inlineFinallyBlocks.Count > 0)
+                {
+                    foreach (var inlineBlock in inlineFinallyBlocks)
+                    {
+                        visited.Add(inlineBlock);
+                        _processedBlockIds.Add(inlineBlock.Id);
+                    }
+                    
+                    var lastInlineBlock = inlineFinallyBlocks.OrderByDescending(b => b.StartOffset).First();
+                    var lastInlineResult = _blockResults.GetValueOrDefault(lastInlineBlock.Id);
+                    if (lastInlineResult?.Statements != null)
+                    {
+                        var returnStmts = lastInlineResult.Statements.Where(s => s is Return).ToList();
+                        if (returnStmts.Count > 0)
+                            afterFinallyStmts.AddRange(returnStmts);
+                    }
+                    
+                    inlineFinalBody = inlineFinallyBlocks
+                        .SelectMany(b => {
+                            var r = _blockResults.GetValueOrDefault(b.Id);
+                            var stmts = r?.Statements?.Where(s => s is not Raise and not CommentBlock and not Pass)
+                                ?? Enumerable.Empty<Stmt>();
+                            return stmts;
+                        })
+                        .ToList();
+                }
             }
             
             // try/finally: handler 是无 CHECK_EXC_MATCH 的 finally 体
@@ -3799,63 +3834,53 @@ public class AstBuilder
                 exceptName = _codeObject.Names.ElementAtOrDefault(ins.Argument ?? 0);
         }
 
-        // try/except/finally: 提取内联 finally 体中的语句
-        // 内联 finally 块位于 [handlerEnd, handlerET.TargetOffset) 之间
-        // 用 BuildStatements(freshVisited) 提取语句
+        // try/except/finally: 提取 finally 体中的语句
         List<Stmt>? tryExceptFinalBody = null;
-        if (!isFinally && handlerET != null && handlerET.TargetOffset > handlerEnd)
+        if (!isFinally)
         {
-            var inlineFinallyBlocks = _sortedBlocks
-                .Where(b => b.EndOffset > handlerEnd
-                    && b.StartOffset < handlerET.TargetOffset)
-                .OrderBy(b => b.StartOffset)
-                .ToList();
-            // 排除 cleanup handler 块（RERAISE 或 Depth=1, Lasti=True 的 ET 条目的目标）
-            var cleanupTargets = _codeObject.ExceptionTable
-                .Where(e => e.Depth == 1 && e.Lasti)
-                .Select(e => e.TargetOffset)
-                .ToHashSet();
-            inlineFinallyBlocks = inlineFinallyBlocks
-                .Where(b => !cleanupTargets.Contains(b.StartOffset))
-                .ToList();
-            // 特殊处理：当 handlerEnd 处有 Depth=0 的嵌套 ET 条目时（如 l2_5），使用该条目的范围（+4 字节以包含 RETURN_VALUE）
-            var nestedEntry = _codeObject.ExceptionTable
-                .FirstOrDefault(e => e.StartOffset >= handlerEnd && e.StartOffset < handlerEnd + 4
-                    && e.Depth == 0);
-            if (nestedEntry != null)
+            var finallyET = _codeObject.ExceptionTable
+                .FirstOrDefault(e => e.StartOffset >= matchingEntry.StartOffset 
+                    && e.StartOffset < matchingEntry.EndOffset
+                    && e.TargetOffset > matchingEntry.TargetOffset
+                    && !_codeObject.Instructions.Any(i => 
+                        i.Offset >= e.TargetOffset 
+                        && i.Offset < e.TargetOffset + 10
+                        && (i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH)));
+            
+            if (finallyET != null)
             {
-                inlineFinallyBlocks = _sortedBlocks
-                    .Where(b => b.EndOffset > nestedEntry.StartOffset
-                        && b.StartOffset < nestedEntry.EndOffset + 4
-                        && !cleanupTargets.Contains(b.StartOffset))
+                var inlineFinallyBlocks = _sortedBlocks
+                    .Where(b => b.StartOffset >= finallyET.TargetOffset
+                        && b.StartOffset < finallyET.EndOffset)
                     .OrderBy(b => b.StartOffset)
                     .ToList();
-            }
-            if (inlineFinallyBlocks.Count > 0)
-            {
-                var freshVisited = new HashSet<BasicBlock>();
-                var allStmts = new List<Stmt>();
-                foreach (var b in inlineFinallyBlocks)
+                
+                if (inlineFinallyBlocks.Count > 0)
                 {
-                    allStmts.AddRange(BuildStatements(b, freshVisited));
-                }
-                var filteredStmts = allStmts
-                    .Where(s => s is not Raise and not CommentBlock and not Pass)
-                    .ToList();
-                if (filteredStmts.Count > 0)
-                {
-                    var handlerContent = new HashSet<string>(
-                        handlerBody.Where(s => s is not Pass and not Raise)
-                            .Select(s => s.ToString()));
-                    bool hasNewContent = filteredStmts
-                        .Any(s => !handlerContent.Contains(s.ToString()));
-                    if (hasNewContent)
+                    var freshVisited = new HashSet<BasicBlock>();
+                    var allStmts = new List<Stmt>();
+                    foreach (var b in inlineFinallyBlocks)
                     {
-                        tryExceptFinalBody = filteredStmts;
-                        foreach (var b in inlineFinallyBlocks)
+                        allStmts.AddRange(BuildStatements(b, freshVisited));
+                    }
+                    var filteredStmts = allStmts
+                        .Where(s => s is not Raise and not CommentBlock and not Pass)
+                        .ToList();
+                    if (filteredStmts.Count > 0)
+                    {
+                        var handlerContent = new HashSet<string>(
+                            handlerBody.Where(s => s is not Pass and not Raise)
+                                .Select(s => s.ToString()));
+                        bool hasNewContent = filteredStmts
+                            .Any(s => !handlerContent.Contains(s.ToString()));
+                        if (hasNewContent)
                         {
-                            visited.Add(b);
-                            _processedBlockIds.Add(b.Id);
+                            tryExceptFinalBody = filteredStmts;
+                            foreach (var b in inlineFinallyBlocks)
+                            {
+                                visited.Add(b);
+                                _processedBlockIds.Add(b.Id);
+                            }
                         }
                     }
                 }
@@ -4727,21 +4752,163 @@ public class AstBuilder
             i.Opcode == Opcode.BEFORE_WITH_313 || i.Opcode == Opcode.BEFORE_WITH
             || i.Opcode == Opcode.BEFORE_WITH_312);
         var withIdx = setupIdx >= 0 ? setupIdx : beforeWithIdx;
-        if (withIdx < 0) return null;
+        
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[BUILD_WITH_DEBUG] block=0x{block.StartOffset:X4} setupIdx={setupIdx} beforeWithIdx={beforeWithIdx} withIdx={withIdx}");
+        }
+        
         bool isSetupWith = setupIdx >= 0;
+        
+        if (withIdx < 0 && !isSetupWith)
+        {
+            if (_codeObject.ExceptionTable != null)
+            {
+                foreach (var et in _codeObject.ExceptionTable)
+                {
+                    var targetBlock = FindBlockByOffset(et.TargetOffset);
+                    if (targetBlock != null && targetBlock.Instructions.Any(i => i.Opcode == Opcode.WITH_EXCEPT_START))
+                    {
+                        if (et.StartOffset == block.StartOffset)
+                        {
+                            if (_options.VerboseErrors)
+                            {
+                                Console.Error.WriteLine($"[BUILD_WITH_DEBUG] Found WITH via ET entry starting at block offset");
+                            }
+                            withIdx = instrs.Count - 1;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (withIdx < 0)
+            {
+                for (int i = 0; i < instrs.Count - 6; i++)
+                {
+                    if (instrs[i].Opcode == Opcode.CALL && 
+                        instrs[i + 1].Opcode == Opcode.COPY && 
+                        instrs[i + 2].Opcode == Opcode.LOAD_SPECIAL_314 && 
+                        instrs[i + 3].Opcode == Opcode.SWAP && 
+                        instrs[i + 4].Opcode == Opcode.SWAP && 
+                        instrs[i + 5].Opcode == Opcode.LOAD_SPECIAL_314 && 
+                        instrs[i + 6].Opcode == Opcode.CALL)
+                    {
+                        withIdx = i;
+                        break;
+                    }
+                }
+            }
+            
+            if (withIdx < 0)
+            {
+                if (_options.VerboseErrors) Console.Error.WriteLine($"[BUILD_WITH_DEBUG] RETURN NULL: no WITH opcode found");
+                return null;
+            }
+        }
 
         // 1. 提取 with 之前的上下文表达式
         var preMachine = new StackMachine(_codeObject);
-        for (int i = 0; i < withIdx; i++)
+        
+        int effectiveWithIdx = withIdx;
+        if (!isSetupWith && beforeWithIdx < 0)
+        {
+            if (withIdx >= 0 && withIdx < instrs.Count && instrs[withIdx].Opcode == Opcode.CALL)
+            {
+                effectiveWithIdx = withIdx;
+            }
+            else
+            {
+                for (int i = instrs.Count - 1; i >= 0; i--)
+                {
+                    if (instrs[i].Opcode == Opcode.CALL && i > 0 && instrs[i - 1].Opcode == Opcode.LOAD_NAME && i > 1 && instrs[i - 2].Opcode == Opcode.PUSH_NULL)
+                    {
+                        effectiveWithIdx = i;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        for (int i = 0; i <= effectiveWithIdx; i++)
         {
             var stmt = preMachine.Execute(instrs[i]);
         }
 
         Expr? contextExpr = preMachine.ExprStackCount > 0 ? preMachine.PopExpr() : null;
-        if (contextExpr == null) return null;
+        
+        if (!isSetupWith && beforeWithIdx < 0)
+        {
+            foreach (var pred in block.Predecessors)
+            {
+                if (_options.VerboseErrors)
+                {
+                    Console.Error.WriteLine($"[BUILD_WITH_DEBUG] Checking predecessor block=0x{pred.StartOffset:X4}");
+                }
+                
+                for (int i = pred.Instructions.Count - 1; i >= 0; i--)
+                {
+                    if (pred.Instructions[i].Opcode == Opcode.CALL && i > 0 && pred.Instructions[i - 1].Opcode == Opcode.LOAD_NAME && i > 1 && pred.Instructions[i - 2].Opcode == Opcode.PUSH_NULL)
+                    {
+                        bool isFollowedBySpecial = false;
+                        for (int j = i + 1; j < pred.Instructions.Count; j++)
+                        {
+                            if (pred.Instructions[j].Opcode == Opcode.COPY || pred.Instructions[j].Opcode == Opcode.SWAP || pred.Instructions[j].Opcode == Opcode.LOAD_SPECIAL_314)
+                            {
+                                isFollowedBySpecial = true;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        
+                        if (_options.VerboseErrors)
+                        {
+                            Console.Error.WriteLine($"[BUILD_WITH_DEBUG] Found CALL at index={i} isFollowedBySpecial={isFollowedBySpecial}");
+                        }
+                        
+                        if (isFollowedBySpecial)
+                        {
+                            var predMachine = new StackMachine(_codeObject);
+                            for (int j = i - 3; j <= i; j++)
+                            {
+                                if (j >= 0)
+                                {
+                                    var stmt = predMachine.Execute(pred.Instructions[j]);
+                                }
+                            }
+                            if (predMachine.ExprStackCount > 0)
+                            {
+                                contextExpr = predMachine.PopExpr();
+                                if (_options.VerboseErrors)
+                                {
+                                    Console.Error.WriteLine($"[BUILD_WITH_DEBUG] contextExpr from pred={contextExpr?.GetType().Name}");
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (contextExpr != null)
+                    break;
+            }
+        }
+        
+        if (_options.VerboseErrors)
+        {
+            Console.Error.WriteLine($"[BUILD_WITH_DEBUG] contextExpr={contextExpr?.GetType().Name} stackCount={preMachine.ExprStackCount}");
+        }
+        
+        if (contextExpr == null) 
+        {
+            if (_options.VerboseErrors) Console.Error.WriteLine($"[BUILD_WITH_DEBUG] RETURN NULL: contextExpr is null");
+            return null;
+        }
 
         // 2. 提取可选的 as 变量
         Expr? optionalVar = null;
+        
         for (int i = withIdx + 1; i < instrs.Count; i++)
         {
             var op = instrs[i].Opcode;
@@ -4763,14 +4930,64 @@ public class AstBuilder
             }
             break;
         }
+        
+        if (optionalVar == null && !isSetupWith)
+        {
+            foreach (var succ in block.Successors)
+            {
+                foreach (var instr in succ.Instructions)
+                {
+                    if (instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME)
+                    {
+                        var idx = instr.Argument.Value;
+                        string varName = instr.Opcode == Opcode.STORE_FAST
+                            ? (idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}")
+                            : (idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}");
+                        optionalVar = new Name(varName, ExpressionContext.Store);
+                        break;
+                    }
+                    if (instr.Opcode == Opcode.POP_TOP)
+                        break;
+                }
+                if (optionalVar != null)
+                    break;
+            }
+            
+            if (optionalVar == null)
+            {
+                foreach (var instr in instrs)
+                {
+                    if (instr.Opcode == Opcode.STORE_FAST || instr.Opcode == Opcode.STORE_NAME)
+                    {
+                        var idx = instr.Argument.Value;
+                        string varName = instr.Opcode == Opcode.STORE_FAST
+                            ? (idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}")
+                            : (idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}");
+                        optionalVar = new Name(varName, ExpressionContext.Store);
+                        break;
+                    }
+                }
+            }
+        }
 
         // 3. 确定 handler 起始偏移和 body 范围
         int handlerAbs;
+        int bodyEndOffset = -1;
         if (isSetupWith)
         {
-            // pre-3.11: SETUP_WITH arg = handler offset (in wordcode units)
             var handlerRel = instrs[setupIdx].Argument ?? 0;
             handlerAbs = instrs[setupIdx].Offset + 2 + handlerRel * 2;
+            bodyEndOffset = -1;
+            for (int i = setupIdx + 1; i < instrs.Count; i++)
+            {
+                if (instrs[i].Opcode == Opcode.POP_BLOCK)
+                {
+                    bodyEndOffset = instrs[i].Offset;
+                    break;
+                }
+            }
+            if (bodyEndOffset < 0)
+                bodyEndOffset = handlerAbs;
         }
         else
         {
@@ -4778,19 +4995,69 @@ public class AstBuilder
             handlerAbs = -1;
             if (_codeObject.ExceptionTable != null)
             {
-                var blockStart = instrs[0].Offset;
-                var blockEnd = instrs[^1].Offset;
-                var withET = _codeObject.ExceptionTable
-                    .FirstOrDefault(e => e.TargetOffset > blockStart
-                        && e.TargetOffset < blockEnd + 4);
-                if (withET != null)
-                    handlerAbs = withET.TargetOffset;
+                var beforeWithOffset = instrs[withIdx].Offset;
+                foreach (var et in _codeObject.ExceptionTable)
+                {
+
+                    var targetBlock = FindBlockByOffset(et.TargetOffset);
+                    if (targetBlock != null)
+                    {
+                        bool isWithHandler = targetBlock.Instructions.Any(i => 
+                            i.Opcode == Opcode.WITH_EXCEPT_START || 
+                            i.Opcode == Opcode.WITH_EXCEPT_START_312 ||
+                            i.Opcode == Opcode.PUSH_EXC_INFO_312);
+                        if (isWithHandler)
+                        {
+                            if (et.StartOffset <= beforeWithOffset + 4 && et.EndOffset > beforeWithOffset)
+                            {
+                                handlerAbs = et.TargetOffset;
+                                bodyEndOffset = et.EndOffset;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (handlerAbs < 0)
+                {
+                    foreach (var et in _codeObject.ExceptionTable)
+                    {
+                        var targetBlock = FindBlockByOffset(et.TargetOffset);
+                        if (targetBlock != null)
+                        {
+                            foreach (var instr in targetBlock.Instructions)
+                            {
+                                if (instr.Opcode == Opcode.WITH_EXCEPT_START || instr.Opcode == Opcode.WITH_EXCEPT_START_312)
+                                {
+                                    handlerAbs = et.TargetOffset;
+                                    bodyEndOffset = et.EndOffset;
+                                    break;
+                                }
+                            }
+                        }
+                        if (handlerAbs >= 0) break;
+                    }
+                }
             }
-            if (handlerAbs < 0) return null; // no ET entry found
+            if (handlerAbs < 0) 
+                return null;
         }
 
         // 4. 跳过变量赋值找到 body 起始
         int bodyStart = withIdx + 1;
+        
+        if (!isSetupWith && beforeWithIdx < 0 && withIdx >= 0 && instrs[withIdx].Opcode == Opcode.CALL)
+        {
+            for (int i = withIdx + 1; i < instrs.Count; i++)
+            {
+                if (instrs[i].Opcode == Opcode.CALL)
+                {
+                    bodyStart = i + 1;
+                    break;
+                }
+            }
+        }
+        
         for (; bodyStart < instrs.Count; bodyStart++)
         {
             var op = instrs[bodyStart].Opcode;
@@ -4806,29 +5073,36 @@ public class AstBuilder
         // 5. 处理当前块内的 body 指令
         var bodyStmts = new List<Stmt>();
         var bodyMachine = new StackMachine(_codeObject);
+        int bodyEndForCurrentBlock = bodyEndOffset > 0 ? bodyEndOffset : handlerAbs;
         for (int i = bodyStart; i < instrs.Count; i++)
         {
-            if (isSetupWith && instrs[i].Opcode == Opcode.POP_BLOCK)
-                break;
-            if (!isSetupWith)
+            if (isSetupWith)
             {
-                // 3.11+: 遇到 handler 起始或 cleanup 前停止
+                if (instrs[i].Opcode == Opcode.POP_BLOCK) break;
+                if (instrs[i].Opcode == Opcode.SETUP_FINALLY || instrs[i].Opcode == Opcode.SETUP_EXCEPT) break;
+            }
+            else
+            {
                 if (instrs[i].Opcode == Opcode.WITH_EXCEPT_START) break;
-                if (instrs[i].Offset >= handlerAbs && handlerAbs > 0) break;
+                if (instrs[i].Offset >= bodyEndForCurrentBlock && bodyEndForCurrentBlock > 0) break;
             }
             var stmt = bodyMachine.Execute(instrs[i]);
             if (stmt != null) bodyStmts.Add(stmt);
         }
         while (bodyMachine.HasResults)
             bodyStmts.Add(new ExprStmt(bodyMachine.PopResult()));
+        
 
-        // 6. 收集后继块作为 body
+
         var bodyBlocks = new List<BasicBlock>();
         var bodyCollector = new HashSet<BasicBlock> { block };
         var blockQueue = new Queue<BasicBlock>();
+        
+        int effectiveBodyEnd = bodyEndOffset > 0 ? bodyEndOffset : handlerAbs;
+        
         foreach (var succ in block.Successors.OrderBy(s => s.StartOffset))
         {
-            if (succ == null || succ.StartOffset >= handlerAbs || bodyCollector.Contains(succ))
+            if (succ == null || succ.StartOffset >= effectiveBodyEnd || bodyCollector.Contains(succ))
                 continue;
             if (succ.StartOffset < instrs[withIdx].Offset + 2) continue;
             blockQueue.Enqueue(succ);
@@ -4837,12 +5111,12 @@ public class AstBuilder
         {
             var current = blockQueue.Dequeue();
             if (current == null || bodyCollector.Contains(current)) continue;
-            if (current.StartOffset >= handlerAbs) continue;
+            if (current.StartOffset >= effectiveBodyEnd) continue;
             bodyCollector.Add(current);
             bodyBlocks.Add(current);
             foreach (var succ in current.Successors)
             {
-                if (succ != null && !bodyCollector.Contains(succ) && succ.StartOffset < handlerAbs)
+                if (succ != null && !bodyCollector.Contains(succ) && succ.StartOffset < effectiveBodyEnd)
                     blockQueue.Enqueue(succ);
             }
         }
@@ -4852,7 +5126,6 @@ public class AstBuilder
         foreach (var bodyBlock in bodyBlocks)
             bodyStmts.AddRange(GetStructuredBlockStmts(bodyBlock, visited));
 
-        // 标记 handler 块为 visited
         var hbList = new List<BasicBlock>();
         FindBlocksFromOffset(handlerAbs, hbList);
         foreach (var hb in hbList)
@@ -9396,5 +9669,24 @@ public class AstBuilder
         }
         
         return otherCount == 0 && assignCount > 0;
+    }
+
+    private bool IsExceptionHandlerBlock(BasicBlock block)
+    {
+        if (block == null) return false;
+        var instrs = block.Instructions;
+        if (instrs.Count == 0) return false;
+        var firstInstr = instrs[0];
+        if (firstInstr.Opcode == Opcode.SETUP_FINALLY || firstInstr.Opcode == Opcode.SETUP_EXCEPT)
+            return true;
+        if (_codeObject.Version >= PythonVersion.Py311 && _codeObject.ExceptionTable != null)
+        {
+            foreach (var et in _codeObject.ExceptionTable)
+            {
+                if (et.TargetOffset == block.StartOffset)
+                    return true;
+            }
+        }
+        return false;
     }
 }

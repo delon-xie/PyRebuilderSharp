@@ -33,7 +33,7 @@ public class VersionStrategy314 : VersionStrategyBase
             // 对照 CPython 3.14 opcode.py opmap
             0 => Models.Bytecode.Opcode.NOP,               // CACHE (解析器已跳过 raw 0)
             1 => Models.Bytecode.Opcode.BINARY_SLICE_313,
-            2 => Models.Bytecode.Opcode.BUILD_INTERPOLATION_314,  // BUILD_TEMPLATE
+            2 => Models.Bytecode.Opcode.BEFORE_WITH_313,          // BEFORE_WITH (shared with 3.13)
             4 => Models.Bytecode.Opcode.CALL_FUNCTION_EX,
             5 => Models.Bytecode.Opcode.CHECK_EG_MATCH,
             6 => Models.Bytecode.Opcode.CHECK_EXC_MATCH,
