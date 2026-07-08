@@ -98,12 +98,13 @@ public class WhileLoopControlStructure : ISequentialControlStructure
     public SequentialBlock? ElseBlock { get; set; }
     public List<SequentialBlock> BodyBlocks { get; } = new();
 
-    public WhileLoopControlStructure(SequentialBlock header, SequentialBlock? bodyEntry, SequentialBlock? backEdge, SequentialBlock? elseBlock)
+    public WhileLoopControlStructure(SequentialBlock header, SequentialBlock? bodyEntry, SequentialBlock? backEdge, SequentialBlock? elseBlock, List<SequentialBlock> bodyBlocks)
     {
         Header = header;
         BodyEntry = bodyEntry;
         BackEdge = backEdge;
         ElseBlock = elseBlock;
+        BodyBlocks.AddRange(bodyBlocks);
     }
 }
 
@@ -114,10 +115,11 @@ public class WithControlStructure : ISequentialControlStructure
     public SequentialBlock? HandlerBlock { get; set; }
     public List<SequentialBlock> BodyBlocks { get; } = new();
 
-    public WithControlStructure(SequentialBlock header, SequentialBlock handlerBlock)
+    public WithControlStructure(SequentialBlock header, SequentialBlock? handlerBlock, List<SequentialBlock> bodyBlocks)
     {
         Header = header;
         HandlerBlock = handlerBlock;
+        BodyBlocks.AddRange(bodyBlocks);
     }
 }
 
@@ -130,12 +132,13 @@ public class TryControlStructure : ISequentialControlStructure
     public SequentialBlock? FinallyBlock { get; set; }
     public List<SequentialBlock> BodyBlocks { get; } = new();
 
-    public TryControlStructure(SequentialBlock header, List<(SequentialBlock Handler, string? ExceptionType)> exceptHandlers, SequentialBlock? elseBlock, SequentialBlock? finallyBlock)
+    public TryControlStructure(SequentialBlock header, List<(SequentialBlock Handler, string? ExceptionType)> exceptHandlers, SequentialBlock? elseBlock, SequentialBlock? finallyBlock, List<SequentialBlock> bodyBlocks)
     {
         Header = header;
         ExceptHandlers = exceptHandlers;
         ElseBlock = elseBlock;
         FinallyBlock = finallyBlock;
+        BodyBlocks.AddRange(bodyBlocks);
     }
 }
 
@@ -148,11 +151,12 @@ public class IfElseControlStructure : ISequentialControlStructure
     public SequentialBlock? MergePoint { get; set; }
     public List<SequentialBlock> BodyBlocks { get; } = new();
 
-    public IfElseControlStructure(SequentialBlock header, SequentialBlock? trueBranch, SequentialBlock? falseBranch, SequentialBlock? mergePoint)
+    public IfElseControlStructure(SequentialBlock header, SequentialBlock? trueBranch, SequentialBlock? falseBranch, SequentialBlock? mergePoint, List<SequentialBlock> bodyBlocks)
     {
         Header = header;
         TrueBranch = trueBranch;
         FalseBranch = falseBranch;
         MergePoint = mergePoint;
+        BodyBlocks.AddRange(bodyBlocks);
     }
 }

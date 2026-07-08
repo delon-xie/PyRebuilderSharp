@@ -593,7 +593,7 @@ public class MainViewModel : ViewModelBase
             CurrentFileName = Path.GetFileName(filePath);
 
             var pycData = await File.ReadAllBytesAsync(filePath);
-            var decompiler = new Decompiler();
+            var decompiler = new Decompiler(new DecompileOptions { EnableSequentialBlocks = true });
 
             // 带超时的反编译（防止无限循环挂死 GUI）
             var decompileTask = Task.Run(() => decompiler.DecompileWithStats(pycData), cts.Token);

@@ -9822,23 +9822,100 @@ public class AstBuilder
         var structures = new List<ISequentialControlStructure>();
         var visited = new HashSet<int>();
 
+        var loopHeaders = seqBlocks
+            .Where(b => b.IsLoopHeader && 
+                (b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER) ||
+                 b.Instructions.Any(i => i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE)))
+            .OrderByDescending(b => b.StartOffset)
+            .ToList();
+
+        foreach (var seqBlock in loopHeaders)
+        {
+            if (visited.Contains(seqBlock.Id))
+                continue;
+
+            var loopStructure = ParseLoopStructure(seqBlock, seqBlocks);
+            if (loopStructure != null)
+            {
+                structures.Add(loopStructure);
+                visited.Add(seqBlock.Id);
+                foreach (var bodyBlock in loopStructure.BodyBlocks)
+                    visited.Add(bodyBlock.Id);
+                if (loopStructure is ForLoopControlStructure forStruct && forStruct.ElseBlock != null)
+                    visited.Add(forStruct.ElseBlock.Id);
+                if (loopStructure is WhileLoopControlStructure whileStruct && whileStruct.ElseBlock != null)
+                    visited.Add(whileStruct.ElseBlock.Id);
+            }
+        }
+
         foreach (var seqBlock in seqBlocks)
         {
             if (visited.Contains(seqBlock.Id))
                 continue;
 
-            if (seqBlock.IsLoopHeader && seqBlock.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+            if (seqBlock.Instructions.Any(i => 
+                i.Opcode == Opcode.SETUP_WITH || 
+                i.Opcode == Opcode.BEFORE_WITH ||
+                i.Opcode == Opcode.BEFORE_WITH_312 ||
+                i.Opcode == Opcode.BEFORE_WITH_313))
             {
-                var loopStructure = ParseLoopStructure(seqBlock, seqBlocks);
-                if (loopStructure != null)
+                var withStructure = ParseWithStructure(seqBlock, seqBlocks);
+                if (withStructure != null)
                 {
-                    Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found FOR loop at 0x{seqBlock.StartOffset:X4}, body blocks: {loopStructure.BodyBlocks.Count}");
-                    structures.Add(loopStructure);
+                    structures.Add(withStructure);
                     visited.Add(seqBlock.Id);
-                    foreach (var bodyBlock in loopStructure.BodyBlocks)
+                    foreach (var bodyBlock in withStructure.BodyBlocks)
                         visited.Add(bodyBlock.Id);
-                    if (loopStructure is ForLoopControlStructure forStruct && forStruct.ElseBlock != null)
-                        visited.Add(forStruct.ElseBlock.Id);
+                    if (withStructure is WithControlStructure withStruct && withStruct.HandlerBlock != null)
+                        visited.Add(withStruct.HandlerBlock.Id);
+                }
+            }
+        }
+
+        foreach (var seqBlock in seqBlocks)
+        {
+            if (visited.Contains(seqBlock.Id))
+                continue;
+
+            if (seqBlock.Instructions.Any(i => 
+                i.Opcode == Opcode.SETUP_FINALLY ||
+                i.Opcode == Opcode.SETUP_EXCEPT))
+            {
+                var tryStructure = ParseTryStructure(seqBlock, seqBlocks);
+                if (tryStructure != null)
+                {
+                    structures.Add(tryStructure);
+                    visited.Add(seqBlock.Id);
+                    foreach (var bodyBlock in tryStructure.BodyBlocks)
+                        visited.Add(bodyBlock.Id);
+                    if (tryStructure is TryControlStructure tryStruct)
+                    {
+                        foreach (var handler in tryStruct.ExceptHandlers)
+                            visited.Add(handler.Handler.Id);
+                        if (tryStruct.FinallyBlock != null)
+                            visited.Add(tryStruct.FinallyBlock.Id);
+                    }
+                }
+            }
+        }
+
+        foreach (var seqBlock in seqBlocks)
+        {
+            if (visited.Contains(seqBlock.Id))
+                continue;
+
+            if (seqBlock.Instructions.Any(i => 
+                i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+                    or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38
+                    or Opcode.JUMP_IF_FALSE_OR_POP or Opcode.JUMP_IF_TRUE_OR_POP))
+            {
+                var ifElseStructure = ParseIfElseStructure(seqBlock, seqBlocks);
+                if (ifElseStructure != null)
+                {
+                    structures.Add(ifElseStructure);
+                    visited.Add(seqBlock.Id);
+                    foreach (var bodyBlock in ifElseStructure.BodyBlocks)
+                        visited.Add(bodyBlock.Id);
                 }
             }
         }
@@ -9848,6 +9925,15 @@ public class AstBuilder
 
     private ISequentialControlStructure? ParseLoopStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
     {
+        bool isWithStatement = header.Instructions.Any(i => 
+            i.Opcode == Opcode.SETUP_WITH || 
+            i.Opcode == Opcode.BEFORE_WITH ||
+            i.Opcode == Opcode.BEFORE_WITH_312 ||
+            i.Opcode == Opcode.BEFORE_WITH_313);
+
+        if (isWithStatement)
+            return null;
+
         bool isForLoop = header.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
         bool isWhileLoop = header.Instructions.Any(i =>
             i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
@@ -9865,12 +9951,20 @@ public class AstBuilder
 
         if (header.JumpTarget.HasValue)
         {
-            if (blockByOffset.TryGetValue(header.JumpTarget.Value, out var targetBlock))
+            var jumpTarget = header.JumpTarget.Value;
+            var targetBlock = blockByOffset.Values
+                .FirstOrDefault(sb => sb.StartOffset <= jumpTarget && sb.EndOffset >= jumpTarget);
+            if (targetBlock != null && targetBlock.StartOffset > header.StartOffset)
             {
                 elseBlock = targetBlock;
                 Console.Error.WriteLine($"[SEQ_BUILD_PARSE] FOR loop at 0x{header.StartOffset:X4}: else/exit block at 0x{targetBlock.StartOffset:X4}");
             }
         }
+
+        var loopBodyStart = header.EndOffset + 1;
+        var loopBodyEnd = elseBlock?.StartOffset ?? int.MaxValue;
+
+        Console.Error.WriteLine($"[SEQ_BUILD_PARSE] FOR loop at 0x{header.StartOffset:X4}: body range 0x{loopBodyStart:X4}-0x{loopBodyEnd:X4}");
 
         var worklist = new Queue<SequentialBlock>();
         Console.Error.WriteLine($"[SEQ_BUILD_PARSE] FOR loop header at 0x{header.StartOffset:X4}: {header.SourceBlocks.Count} source blocks");
@@ -9889,9 +9983,16 @@ public class AstBuilder
                     {
                         if (targetSeqBlock.StartOffset != header.StartOffset)
                         {
-                            worklist.Enqueue(targetSeqBlock);
-                            visited.Add(targetSeqBlock.Id);
-                            Console.Error.WriteLine($"[SEQ_BUILD_PARSE]     -> Added to worklist");
+                            if (targetSeqBlock.StartOffset >= loopBodyStart && targetSeqBlock.StartOffset < loopBodyEnd)
+                            {
+                                worklist.Enqueue(targetSeqBlock);
+                                visited.Add(targetSeqBlock.Id);
+                                Console.Error.WriteLine($"[SEQ_BUILD_PARSE]     -> Added to worklist (in body range)");
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine($"[SEQ_BUILD_PARSE]     -> Skipped (outside body range)");
+                            }
                         }
                         else
                         {
@@ -9916,12 +10017,6 @@ public class AstBuilder
         {
             var current = worklist.Dequeue();
 
-            if (current.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
-            {
-                Console.Error.WriteLine($"[SEQ_BUILD_PARSE]   Skipping nested FOR loop at 0x{current.StartOffset:X4}");
-                continue;
-            }
-
             bodyBlocks.Add(current);
 
             foreach (var succ in current.Successors)
@@ -9934,9 +10029,9 @@ public class AstBuilder
                         continue;
                     }
 
-                    if (succ.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+                    if (succ.StartOffset < loopBodyStart || succ.StartOffset >= loopBodyEnd)
                     {
-                        Console.Error.WriteLine($"[SEQ_BUILD_PARSE]   Skipping nested FOR loop at 0x{succ.StartOffset:X4}");
+                        Console.Error.WriteLine($"[SEQ_BUILD_PARSE]   Skipping block at 0x{succ.StartOffset:X4} (outside body range)");
                         continue;
                     }
 
@@ -9963,11 +10058,13 @@ public class AstBuilder
 
         if (isForLoop)
         {
+            Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found FOR loop at 0x{header.StartOffset:X4}, body blocks: {bodyBlocks.Count}");
             return new ForLoopControlStructure(header, bodyBlocks.FirstOrDefault(), backEdge, elseBlock, bodyBlocks);
         }
         else
         {
-            return new WhileLoopControlStructure(header, bodyBlocks.FirstOrDefault()!, backEdge, elseBlock);
+            Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found WHILE loop at 0x{header.StartOffset:X4}, body blocks: {bodyBlocks.Count}");
+            return new WhileLoopControlStructure(header, bodyBlocks.FirstOrDefault(), backEdge, elseBlock, bodyBlocks);
         }
     }
 
@@ -9993,25 +10090,47 @@ public class AstBuilder
             }
         }
 
+        var visited = new HashSet<int> { header.Id };
+        var worklist = new Queue<SequentialBlock>();
+
         foreach (var sourceBlock in header.SourceBlocks)
         {
             foreach (var succ in sourceBlock.Successors)
             {
                 var targetSeqBlock = blockByOffset.Values
                     .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
-                if (targetSeqBlock != null && targetSeqBlock != handlerBlock)
+                if (targetSeqBlock != null && targetSeqBlock != handlerBlock && !visited.Contains(targetSeqBlock.Id))
                 {
-                    bodyBlocks.Add(targetSeqBlock);
+                    visited.Add(targetSeqBlock.Id);
+                    worklist.Enqueue(targetSeqBlock);
                 }
             }
         }
 
-        if (handlerBlock != null)
+        while (worklist.Count > 0)
         {
-            return new WithControlStructure(header, handlerBlock);
+            var current = worklist.Dequeue();
+
+            if (current == handlerBlock)
+                continue;
+
+            bodyBlocks.Add(current);
+
+            foreach (var succ in current.Successors)
+            {
+                if (!visited.Contains(succ.Id) && succ != handlerBlock)
+                {
+                    visited.Add(succ.Id);
+                    worklist.Enqueue(succ);
+                }
+            }
         }
 
-        return null;
+        bodyBlocks.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+
+        Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found WITH statement at 0x{header.StartOffset:X4}, body blocks: {bodyBlocks.Count}, handler: {(handlerBlock != null ? $"0x{handlerBlock.StartOffset:X4}" : "none")}");
+
+        return new WithControlStructure(header, handlerBlock, bodyBlocks);
     }
 
     private ISequentialControlStructure? ParseTryStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
@@ -10019,6 +10138,7 @@ public class AstBuilder
         var exceptHandlers = new List<(SequentialBlock Handler, string? ExceptionType)>();
         SequentialBlock? elseBlock = null;
         SequentialBlock? finallyBlock = null;
+        var bodyBlocks = new List<SequentialBlock>();
 
         var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
 
@@ -10026,9 +10146,23 @@ public class AstBuilder
         {
             if (blockByOffset.TryGetValue(et.TargetOffset, out var targetBlock))
             {
-                exceptHandlers.Add((targetBlock, null));
+                if (targetBlock.Instructions.Any(i => i.Opcode == Opcode.END_FINALLY))
+                {
+                    finallyBlock = targetBlock;
+                }
+                else
+                {
+                    exceptHandlers.Add((targetBlock, null));
+                }
             }
         }
+
+        var handlerOffsets = exceptHandlers.Select(h => h.Handler.StartOffset).ToList();
+        if (finallyBlock != null)
+            handlerOffsets.Add(finallyBlock.StartOffset);
+
+        var visited = new HashSet<int> { header.Id };
+        var worklist = new Queue<SequentialBlock>();
 
         foreach (var sourceBlock in header.SourceBlocks)
         {
@@ -10036,19 +10170,40 @@ public class AstBuilder
             {
                 var targetSeqBlock = blockByOffset.Values
                     .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
-                if (targetSeqBlock != null)
+                if (targetSeqBlock != null && !visited.Contains(targetSeqBlock.Id))
                 {
-                    if (targetSeqBlock.Instructions.Any(i => i.Opcode == Opcode.END_FINALLY))
-                    {
-                        finallyBlock = targetSeqBlock;
-                    }
+                    visited.Add(targetSeqBlock.Id);
+                    worklist.Enqueue(targetSeqBlock);
                 }
             }
         }
 
+        while (worklist.Count > 0)
+        {
+            var current = worklist.Dequeue();
+
+            if (handlerOffsets.Contains(current.StartOffset))
+                continue;
+
+            bodyBlocks.Add(current);
+
+            foreach (var succ in current.Successors)
+            {
+                if (!visited.Contains(succ.Id) && !handlerOffsets.Contains(succ.StartOffset))
+                {
+                    visited.Add(succ.Id);
+                    worklist.Enqueue(succ);
+                }
+            }
+        }
+
+        bodyBlocks.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+
+        Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found TRY statement at 0x{header.StartOffset:X4}, body blocks: {bodyBlocks.Count}, handlers: {exceptHandlers.Count}, finally: {(finallyBlock != null ? $"0x{finallyBlock.StartOffset:X4}" : "none")}");
+
         if (exceptHandlers.Count > 0 || finallyBlock != null)
         {
-            return new TryControlStructure(header, exceptHandlers, elseBlock, finallyBlock);
+            return new TryControlStructure(header, exceptHandlers, elseBlock, finallyBlock, bodyBlocks);
         }
 
         return null;
@@ -10059,6 +10214,7 @@ public class AstBuilder
         SequentialBlock? trueBranch = null;
         SequentialBlock? falseBranch = null;
         SequentialBlock? mergePoint = null;
+        var bodyBlocks = new List<SequentialBlock>();
 
         var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
 
@@ -10101,7 +10257,59 @@ public class AstBuilder
             }
         }
 
-        return new IfElseControlStructure(header, trueBranch, falseBranch, mergePoint);
+        if (trueBranch != null)
+        {
+            var visited = new HashSet<int> { header.Id };
+            var worklist = new Queue<SequentialBlock>();
+            visited.Add(trueBranch.Id);
+            worklist.Enqueue(trueBranch);
+
+            while (worklist.Count > 0)
+            {
+                var current = worklist.Dequeue();
+                if (current == mergePoint)
+                    continue;
+                bodyBlocks.Add(current);
+                foreach (var succ in current.Successors)
+                {
+                    if (!visited.Contains(succ.Id) && succ != mergePoint)
+                    {
+                        visited.Add(succ.Id);
+                        worklist.Enqueue(succ);
+                    }
+                }
+            }
+        }
+
+        if (falseBranch != null && falseBranch != trueBranch)
+        {
+            var visited = new HashSet<int> { header.Id };
+            var worklist = new Queue<SequentialBlock>();
+            visited.Add(falseBranch.Id);
+            worklist.Enqueue(falseBranch);
+
+            while (worklist.Count > 0)
+            {
+                var current = worklist.Dequeue();
+                if (current == mergePoint)
+                    continue;
+                bodyBlocks.Add(current);
+                foreach (var succ in current.Successors)
+                {
+                    if (!visited.Contains(succ.Id) && succ != mergePoint)
+                    {
+                        visited.Add(succ.Id);
+                        worklist.Enqueue(succ);
+                    }
+                }
+            }
+        }
+
+        bodyBlocks.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+
+        Console.Error.WriteLine($"[SEQ_BUILD_PARSE] Found IF/ELSE at 0x{header.StartOffset:X4}, body blocks: {bodyBlocks.Count}, true: {(trueBranch != null ? $"0x{trueBranch.StartOffset:X4}" : "none")}, false: {(falseBranch != null ? $"0x{falseBranch.StartOffset:X4}" : "none")}");
+
+        return new IfElseControlStructure(header, trueBranch, falseBranch, mergePoint, bodyBlocks);
     }
 
     private void LinkControlStructures(List<ISequentialControlStructure> structures, List<SequentialBlock> seqBlocks)
@@ -10253,12 +10461,21 @@ public class AstBuilder
         var processedSeqBlocks = new HashSet<int>();
         var processedBasicBlocks = new HashSet<int>();
 
+        var structureHeaders = new HashSet<int>();
+        foreach (var sb in seqBlocks)
+        {
+            if (sb.ParentStructure != null)
+            {
+                structureHeaders.Add(sb.ParentStructure.Header.Id);
+            }
+        }
+
         var seqBlockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
         var startSeqBlock = seqBlockByOffset.GetValueOrDefault(cfg.Entry.StartOffset);
 
         if (startSeqBlock != null)
         {
-            stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(startSeqBlock, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks));
+            stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(startSeqBlock, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks, structureHeaders));
         }
 
         foreach (var seqBlock in seqBlocks.OrderBy(b => b.StartOffset))
@@ -10266,13 +10483,24 @@ public class AstBuilder
             if (processedSeqBlocks.Contains(seqBlock.Id))
                 continue;
 
-            if (seqBlock.ParentStructure != null)
+            if (structureHeaders.Contains(seqBlock.Id))
             {
-                var structureStmts = BuildStructureStatements(seqBlock.ParentStructure);
-                stmts.AddRange(structureStmts);
-                MarkStructureBlocksProcessed(seqBlock.ParentStructure, processedSeqBlocks);
+                var structure = seqBlock.ParentStructure;
+                if (structure != null)
+                {
+                    var structureStmts = BuildStructureStatements(structure);
+                    stmts.AddRange(structureStmts);
+                    MarkStructureBlocksProcessed(structure, processedSeqBlocks);
+                    foreach (var sb in structure.Header.SourceBlocks)
+                        processedBasicBlocks.Add(sb.Id);
+                    foreach (var bb in structure.BodyBlocks)
+                    {
+                        foreach (var sb in bb.SourceBlocks)
+                            processedBasicBlocks.Add(sb.Id);
+                    }
+                }
             }
-            else
+            else if (seqBlock.ParentStructure == null)
             {
                 foreach (var sourceBlock in seqBlock.SourceBlocks)
                 {
@@ -10296,7 +10524,7 @@ public class AstBuilder
         return stmts;
     }
 
-    private List<Stmt> GenerateStatementsFromSeqBlockHybrid(SequentialBlock seqBlock, List<SequentialBlock> seqBlocks, ControlFlowGraph cfg, HashSet<int> processedSeqBlocks, HashSet<int> processedBasicBlocks)
+    private List<Stmt> GenerateStatementsFromSeqBlockHybrid(SequentialBlock seqBlock, List<SequentialBlock> seqBlocks, ControlFlowGraph cfg, HashSet<int> processedSeqBlocks, HashSet<int> processedBasicBlocks, HashSet<int> structureHeaders)
     {
         var stmts = new List<Stmt>();
 
@@ -10305,35 +10533,38 @@ public class AstBuilder
 
         processedSeqBlocks.Add(seqBlock.Id);
 
-        if (seqBlock.ParentStructure != null)
+        if (structureHeaders.Contains(seqBlock.Id))
         {
             var structure = seqBlock.ParentStructure;
-            Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Processing control structure: {structure.Type} at 0x{seqBlock.StartOffset:X4}");
-
-            var structureStmts = BuildStructureStatements(structure);
-            stmts.AddRange(structureStmts);
-
-            MarkStructureBlocksProcessed(structure, processedSeqBlocks);
-
-            foreach (var sourceBlock in structure.Header.SourceBlocks)
+            if (structure != null)
             {
-                processedBasicBlocks.Add(sourceBlock.Id);
-            }
-            foreach (var bodyBlock in structure.BodyBlocks)
-            {
-                foreach (var sourceBlock in bodyBlock.SourceBlocks)
+                Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Processing control structure: {structure.Type} at 0x{seqBlock.StartOffset:X4}");
+
+                var structureStmts = BuildStructureStatements(structure);
+                stmts.AddRange(structureStmts);
+
+                MarkStructureBlocksProcessed(structure, processedSeqBlocks);
+
+                foreach (var sourceBlock in structure.Header.SourceBlocks)
                 {
                     processedBasicBlocks.Add(sourceBlock.Id);
                 }
-            }
+                foreach (var bodyBlock in structure.BodyBlocks)
+                {
+                    foreach (var sourceBlock in bodyBlock.SourceBlocks)
+                    {
+                        processedBasicBlocks.Add(sourceBlock.Id);
+                    }
+                }
 
-            var mergePoint = FindMergePoint(structure, seqBlocks);
-            if (mergePoint != null && !processedSeqBlocks.Contains(mergePoint.Id))
-            {
-                stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(mergePoint, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks));
+                var mergePoint = FindMergePoint(structure, seqBlocks);
+                if (mergePoint != null && !processedSeqBlocks.Contains(mergePoint.Id))
+                {
+                    stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(mergePoint, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks, structureHeaders));
+                }
             }
         }
-        else
+        else if (seqBlock.ParentStructure == null)
         {
             foreach (var sourceBlock in seqBlock.SourceBlocks)
             {
@@ -10356,7 +10587,7 @@ public class AstBuilder
             {
                 if (!processedSeqBlocks.Contains(succ.Id))
                 {
-                    stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(succ, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks));
+                    stmts.AddRange(GenerateStatementsFromSeqBlockHybrid(succ, seqBlocks, cfg, processedSeqBlocks, processedBasicBlocks, structureHeaders));
                 }
             }
         }
@@ -10481,7 +10712,16 @@ public class AstBuilder
         var bodyStmts = new List<Stmt>();
         foreach (var bodyBlock in forLoop.BodyBlocks)
         {
-            Console.Error.WriteLine($"[SEQ_BUILD_FOR]     Body block 0x{bodyBlock.StartOffset:X4}: {bodyBlock.Instructions.Count} instrs, {bodyBlock.Statements?.Count ?? 0} stmts");
+            Console.Error.WriteLine($"[SEQ_BUILD_FOR]     Body block 0x{bodyBlock.StartOffset:X4}: {bodyBlock.Instructions.Count} instrs, {bodyBlock.Statements?.Count ?? 0} stmts, ParentStructure={bodyBlock.ParentStructure?.Type}");
+            
+            if (bodyBlock.ParentStructure != null && bodyBlock.ParentStructure != forLoop)
+            {
+                Console.Error.WriteLine($"[SEQ_BUILD_FOR]       Inserting nested {bodyBlock.ParentStructure.Type}");
+                var nestedStmts = BuildStructureStatements(bodyBlock.ParentStructure);
+                bodyStmts.AddRange(nestedStmts);
+                continue;
+            }
+            
             if (bodyBlock.Statements != null)
             {
                 foreach (var stmt in bodyBlock.Statements)
@@ -10506,6 +10746,13 @@ public class AstBuilder
         var bodyStmts = new List<Stmt>();
         foreach (var bodyBlock in whileLoop.BodyBlocks)
         {
+            if (bodyBlock.ParentStructure != null && bodyBlock.ParentStructure != whileLoop)
+            {
+                var nestedStmts = BuildStructureStatements(bodyBlock.ParentStructure);
+                bodyStmts.AddRange(nestedStmts);
+                continue;
+            }
+            
             if (bodyBlock.Statements != null)
                 bodyStmts.AddRange(bodyBlock.Statements);
         }
@@ -10555,6 +10802,13 @@ public class AstBuilder
         var bodyStmts = new List<Stmt>();
         foreach (var bodyBlock in withStmt.BodyBlocks)
         {
+            if (bodyBlock.ParentStructure != null && bodyBlock.ParentStructure != withStmt)
+            {
+                var nestedStmts = BuildStructureStatements(bodyBlock.ParentStructure);
+                bodyStmts.AddRange(nestedStmts);
+                continue;
+            }
+            
             if (bodyBlock.Statements != null)
                 bodyStmts.AddRange(bodyBlock.Statements);
         }
@@ -10567,6 +10821,13 @@ public class AstBuilder
         var bodyStmts = new List<Stmt>();
         foreach (var bodyBlock in tryStmt.BodyBlocks)
         {
+            if (bodyBlock.ParentStructure != null && bodyBlock.ParentStructure != tryStmt)
+            {
+                var nestedStmts = BuildStructureStatements(bodyBlock.ParentStructure);
+                bodyStmts.AddRange(nestedStmts);
+                continue;
+            }
+            
             if (bodyBlock.Statements != null)
                 bodyStmts.AddRange(bodyBlock.Statements);
         }
@@ -10588,7 +10849,20 @@ public class AstBuilder
     {
         var testExpr = ExtractCondition(ifElse.Header.SourceBlocks[0]);
 
-        var bodyStmts = ifElse.TrueBranch?.Statements ?? new List<Stmt>();
+        var bodyStmts = new List<Stmt>();
+        foreach (var bodyBlock in ifElse.BodyBlocks)
+        {
+            if (bodyBlock.ParentStructure != null && bodyBlock.ParentStructure != ifElse)
+            {
+                var nestedStmts = BuildStructureStatements(bodyBlock.ParentStructure);
+                bodyStmts.AddRange(nestedStmts);
+                continue;
+            }
+            
+            if (bodyBlock.Statements != null)
+                bodyStmts.AddRange(bodyBlock.Statements);
+        }
+
         var elseStmts = ifElse.FalseBranch?.Statements;
 
         return new List<Stmt> { new If(testExpr, bodyStmts, elseStmts) };
