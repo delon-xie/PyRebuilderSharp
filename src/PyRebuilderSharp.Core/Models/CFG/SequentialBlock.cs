@@ -79,12 +79,13 @@ public class ForLoopControlStructure : ISequentialControlStructure
     public SequentialBlock? ElseBlock { get; set; }
     public List<SequentialBlock> BodyBlocks { get; } = new();
 
-    public ForLoopControlStructure(SequentialBlock header, SequentialBlock? bodyEntry, SequentialBlock? backEdge, SequentialBlock? elseBlock)
+    public ForLoopControlStructure(SequentialBlock header, SequentialBlock? bodyEntry, SequentialBlock? backEdge, SequentialBlock? elseBlock, List<SequentialBlock> bodyBlocks)
     {
         Header = header;
         BodyEntry = bodyEntry;
         BackEdge = backEdge;
         ElseBlock = elseBlock;
+        BodyBlocks.AddRange(bodyBlocks);
     }
 }
 
