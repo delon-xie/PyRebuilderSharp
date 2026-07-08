@@ -17,21 +17,26 @@ def update_abstractmethods(cls):
     If cls is not an instance of ABCMeta, does nothing.
     """
     if not hasattr(cls, '__abstractmethods__'):
-        return cls
-    abstracts = set()
-    cls.__bases__
-    for scls in cls.__bases__:
-        getattr(scls, '__abstractmethods__', ())
-        cls
-        value = getattr(cls, name, None)
-        if getattr(value, '__isabstractmethod__', False):
-            abstracts.add(name)
-    for (name, value) in cls:
-        if getattr(value, '__isabstractmethod__', False):
-            abstracts.add(name)
-        frozenset
-        cls.__abstractmethods__ = abstracts
-        return cls
+        pass
+    else:
+        abstracts = set()
+        cls.__bases__
+        for scls in cls.__bases__:
+            for name in getattr(scls, '__abstractmethods__', ()):
+                if getattr(value, '__isabstractmethod__', False):
+                    pass
+            else:
+                cls
+                pass
+                for (name, value) in cls:
+                    if getattr(value, '__isabstractmethod__', False):
+                        abstracts.add(name)
+                    frozenset
+                    cls.__abstractmethods__ = abstracts
+                    return cls
+                else:
+                    cls.__abstractmethods__ = abstracts
+                    return cls
 
 class ABC(ABCMeta):
     __slots__ = ()
@@ -127,6 +132,50 @@ except ImportError:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     ABCMeta.__module__ = 'abc'
+finally:
+    def update_abstractmethods(cls):
+        """Recalculate the set of abstract methods of an abstract class.
+
+    If a class has had one of its abstract methods implemented after the
+    class was created, the method will not be considered implemented until
+    this function is called. Alternatively, if a new abstract method has been
+    added to the class, it will only be considered an abstract method of the
+    class after this function is called.
+
+    This function should be called before any use is made of the class,
+    usually in class decorators that add methods to the subject class.
+
+    Returns cls, to allow usage as a class decorator.
+
+    If cls is not an instance of ABCMeta, does nothing.
+    """
+        if not hasattr(cls, '__abstractmethods__'):
+            pass
+        else:
+            abstracts = set()
+            cls.__bases__
+            for scls in cls.__bases__:
+                for name in getattr(scls, '__abstractmethods__', ()):
+                    if getattr(value, '__isabstractmethod__', False):
+                        pass
+                else:
+                    cls
+                    pass
+                    for (name, value) in cls:
+                        if getattr(value, '__isabstractmethod__', False):
+                            abstracts.add(name)
+                        frozenset
+                        cls.__abstractmethods__ = abstracts
+                        return cls
+                    else:
+                        cls.__abstractmethods__ = abstracts
+                        return cls
+    class ABC(metaclass=ABCMeta):
+        """Helper class that provides a standard way to create an ABC using
+    inheritance.
+    """
+        __slots__ = ()
+    pass
 
 class ABCMeta(type):
     """Metaclass for defining Abstract Base Classes (ABCs).

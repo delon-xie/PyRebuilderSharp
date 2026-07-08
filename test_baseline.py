@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-test_baseline.py — 全量白盒测试（基于 baseline_evaluate_all.py 改进版）
+test_baseline.py — 全 Level 分层基线测试（基于 baseline_evaluate_all.py 改进版）
+支持 Level 0-9 分层测试 + 全部 Python 版本 + 深度差异对比
 """
 
 import os, sys, subprocess, shutil, tempfile, collections, time, json, re, py_compile
@@ -8,26 +9,38 @@ from datetime import datetime
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).parent
-CLI_PROJECT = str(PROJECT_DIR / "src/PyRebuilderSharp.CLI/PyRebuilderSharp.CLI.csproj")
 INPUT_DIR = PROJECT_DIR / "test_data/input"
 COMPILED_DIR = PROJECT_DIR / "test_data/compiled"
 DECOMPILED_DIR = PROJECT_DIR / "test_data/decompiled"
 REPORTS_DIR = PROJECT_DIR / "docs"
 REPORTS_DIR.mkdir(exist_ok=True)
 
-REPORT_DATE = "20260706_2"
+REPORT_DATE = datetime.now().strftime("%Y%m%d_%H%M")
 REPORT_PATH = str(REPORTS_DIR / f"baseline_evaluate_report_{REPORT_DATE}.md")
-RESULTS_PATH = str(REPORTS_DIR / "baseline_results.json")
+RESULTS_PATH = str(REPORTS_DIR / f"baseline_results_{REPORT_DATE}.json")
 
 VERSIONS = ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+LEVELS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+LEVEL_NAMES = {
+    "0": "基本表达式",
+    "1": "基础控制块",
+    "2": "异常处理",
+    "3": "Lambda 与匿名函数",
+    "4": "函数定义与嵌套",
+    "5": "类定义与面向对象",
+    "6": "高级特性",
+    "7": "边界情况与极端场景",
+    "8": "复杂综合",
+    "9": "终极挑战"
+}
 KEY_FILES = ["abc.py", "ast.py", "enum.py", "re.py", "functools.py", "contextlib.py", "pprint.py", "dataclasses.py", "reprlib.py"]
 
 KNOWN_PATTERNS = {
     "orphan_raise": re.compile(r"(?<!\n)^\s*raise(?!\s+)", re.MULTILINE),
     "bare_elem": re.compile(r"(?<!\w)\belem\b(?!\s*=)", re.MULTILINE),
     "bare_list": re.compile(r"^\s*\[\]\s*$", re.MULTILINE),
-    "empty_try": re.compile(r"try:\s*\n\s*(?:pass\s*\n)?\s*(?=\n|$)", re.MULTILINE),
-    "try_no_except_finally": re.compile(r"(?<![a-zA-Z])try:\s*\n(?:(?!except|finally).)*?(?=\n\s*return|\n\s*def|\Z)", re.DOTALL),
+    "empty_try": re.compile(r"try:\s*\n\s*(?:pass\s*\n)?\s*(?=\n\s*(?:def|class|\Z))", re.DOTALL),
+    "try_no_except_finally": re.compile(r"(?<![a-zA-Z])try:\s*\n(?:(?!except|finally).)*?(?=\n\s*(?:def|class|\Z))", re.DOTALL),
     "for_empty": re.compile(r"for\s+\w+\s+in\s+\[\]:", re.MULTILINE),
     "stray_pass": re.compile(r"(?<!\n)\s*pass\s*(?=\n\s*(?:if|for|while|return|def))", re.MULTILINE),
 }
@@ -40,6 +53,13 @@ def load_original(filename):
     if path.exists():
         with open(path) as f:
             return f.read()
+    for level in LEVELS:
+        level_dir = INPUT_DIR / f"level{level}"
+        if level_dir.exists():
+            level_path = level_dir / filename
+            if level_path.exists():
+                with open(level_path) as f:
+                    return f.read()
     return None
 
 def strip_known_diffs(text):
@@ -100,15 +120,26 @@ def check_import(file_path):
         if parent_path in sys.path:
             sys.path.remove(parent_path)
 
-def scan_patterns(content):
+def scan_patterns(content, source_file, ver):
     issues = []
     for pattern_name, pattern in KNOWN_PATTERNS.items():
-        matches = pattern.findall(content)
+        matches = []
+        for m in pattern.finditer(content):
+            start = max(0, m.start() - 50)
+            end = min(len(content), m.end() + 50)
+            context = content[start:end].replace('\n', ' ')
+            matches.append({
+                "match": m.group(0),
+                "context": context[:100],
+                "line": content[:m.start()].count('\n') + 1
+            })
         if matches:
             issues.append({
                 "type": pattern_name,
                 "count": len(matches),
-                "examples": matches[:3]
+                "examples": matches[:3],
+                "source_file": source_file,
+                "version": ver
             })
     return issues
 
@@ -125,8 +156,15 @@ def classify_error(syntax_ok, runtime_ok, patterns):
         return "runtime_error"
     return "ok"
 
+def get_level_for_file(source_file):
+    for level in LEVELS:
+        level_dir = INPUT_DIR / f"level{level}"
+        if level_dir.exists() and (level_dir / source_file).exists():
+            return level
+    return "misc"
+
 def main():
-    print(f"PyRebuilderSharp 全量白盒测试")
+    print(f"PyRebuilderSharp 全 Level 分层基线测试")
     print(f"工作目录: {PROJECT_DIR}")
     print()
 
@@ -142,7 +180,7 @@ def main():
     batch_out = DECOMPILED_DIR / "_batch"
     batch_out.mkdir()
     t0 = time.time()
-    cli_dll = str(PROJECT_DIR / "src/PyRebuilderSharp.Cli/bin/Release/net10.0/PyRebuilderSharp.CLI.dll")
+    cli_dll = str(PROJECT_DIR / "src/PyRebuilderSharp.Cli/bin/Release/net10.0/PyRebuilderSharp.Cli.dll")
     r = subprocess.run(
         ["dotnet", "exec", cli_dll,
          "-d", str(COMPILED_DIR), "-o", str(batch_out)],
@@ -150,8 +188,17 @@ def main():
     )
     elapsed = time.time() - t0
     print(f"  {elapsed:.1f}s — 批量反编译完成")
+    if r.returncode != 0:
+        print(f"  ⚠ 反编译命令返回非零: {r.returncode}")
+        print(f"  stderr: {r.stderr[:500]}")
 
     all_results = {}
+    all_level_results = {level: {ver: {'total': 0, 'ok': 0, 'syntax_error': 0, 'runtime_error': 0,
+                                         'control_block_anomaly': 0, 'orphan_block': 0, 'decompile_failure': 0,
+                                         'orphans': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'files': []}
+                              for ver in VERSIONS} 
+                     for level in LEVELS + ["misc"]}
+    
     for fname in sorted(os.listdir(str(COMPILED_DIR))):
         if not fname.endswith('.pyc'):
             continue
@@ -166,6 +213,7 @@ def main():
             print(f"  ⚠ Unknown format: {fname}")
             continue
         source_file = base + '.py'
+        level = get_level_for_file(source_file)
         rel = os.path.relpath(os.path.join(str(COMPILED_DIR), fname), str(PROJECT_DIR))
         batch_py = str(batch_out / (os.path.splitext(rel)[0] + '.py'))
         dest = str(DECOMPILED_DIR / ver_tag(ver) / source_file)
@@ -177,13 +225,8 @@ def main():
             orphans = count_orphans(source)
             syntax_ok, syntax_err = check_syntax(dest)
             runtime_ok, runtime_err = check_import(dest) if syntax_ok else (False, "Syntax error")
-            patterns = scan_patterns(source)
+            patterns = scan_patterns(source, source_file, ver)
             error_category = classify_error(syntax_ok, runtime_ok, patterns)
-            for p in patterns:
-                if p["type"] == "try_no_except_finally":
-                    print(f"  ⚠ try_no_except_finally in {source_file} (Py {ver})")
-                    for ex in p["examples"]:
-                        print(f"    Example: {repr(ex[:100])}")
         else:
             orphans = 0
             syntax_ok = False
@@ -196,12 +239,24 @@ def main():
             all_results[base] = {}
         all_results[base][ver] = {
             'source_file': source_file, 'dest': dest if success else None,
-            'success': success, 'orphans': orphans,
+            'success': success, 'orphans': orphans, 'level': level,
             'lines': len(open(dest).read().split('\n')) if success else 0,
             'syntax_ok': syntax_ok, 'syntax_error': syntax_err,
             'runtime_ok': runtime_ok, 'runtime_error': runtime_err,
             'patterns': patterns, 'error_category': error_category
         }
+        if ver not in all_level_results[level]:
+            all_level_results[level][ver] = {
+                'total': 0, 'ok': 0, 'syntax_error': 0, 'runtime_error': 0,
+                'control_block_anomaly': 0, 'orphan_block': 0, 'decompile_failure': 0,
+                'orphans': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0,
+                'files': []
+            }
+        all_level_results[level][ver]['total'] += 1
+        all_level_results[level][ver][error_category] += 1
+        if success:
+            all_level_results[level][ver]['orphans'] += orphans
+            all_level_results[level][ver]['files'].append(source_file)
 
     unique_files = len(all_results)
     shutil.rmtree(batch_out)
@@ -211,6 +266,7 @@ def main():
     print(f"{'='*60}")
     diffs = {v: {'ok': 0, 'fail': 0} for v in VERSIONS}
     cats = {v: {'A': 0, 'B': 0, 'C': 0, 'D': 0} for v in VERSIONS}
+    level_cats = {level: {v: {'A': 0, 'B': 0, 'C': 0, 'D': 0} for v in VERSIONS} for level in LEVELS + ["misc"]}
     key_diffs = {}
     total_orphans = 0
     total_diff_lines = 0
@@ -227,6 +283,7 @@ def main():
             if ver not in all_results[base]:
                 continue
             r = all_results[base][ver]
+            level = r['level']
             total_orphans += r.get('orphans', 0)
             if not r['success'] or r['dest'] is None:
                 diffs[ver]['fail'] += 1
@@ -249,6 +306,7 @@ def main():
             diff_ratio = (added + removed) / max(orig_lines, 1)
             cat = classify(diff_ratio)
             cats[ver][cat] = cats[ver].get(cat, 0) + 1
+            level_cats[level][ver][cat] = level_cats[level][ver].get(cat, 0) + 1
             diffs[ver]['ok'] += 1
 
             if sf in KEY_FILES:
@@ -276,6 +334,7 @@ def main():
     orphans_by_ver = {}
     orphan_files_by_ver = {}
     pattern_counts_by_ver = {}
+    pattern_details = {}
     for base in all_results:
         for ver in VERSIONS:
             if ver in all_results[base] and all_results[base][ver].get('success'):
@@ -290,6 +349,13 @@ def main():
                     pattern_counts_by_ver[ver] = {}
                 for p in patterns:
                     pattern_counts_by_ver[ver][p['type']] = pattern_counts_by_ver[ver].get(p['type'], 0) + p['count']
+                    key = f"{p['type']}_{ver}"
+                    if key not in pattern_details:
+                        pattern_details[key] = []
+                    pattern_details[key].append({
+                        'file': p['source_file'],
+                        'examples': p['examples']
+                    })
 
     file_orphans = []
     for base in all_results:
@@ -357,11 +423,12 @@ def main():
     total_files_count = sum(version_error_counts[v]['total'] for v in VERSIONS)
 
     with open(REPORT_PATH, 'w') as f:
-        f.write(f"""# PyRebuilderSharp 全量白盒测试报告
+        f.write(f"""# PyRebuilderSharp 全 Level 分层基线测试报告
 
 **生成时间**: {now}
 **测试文件总数**: {total_files_count}
 **Python 版本范围**: {', '.join(VERSIONS)}
+**测试层级**: Level 0-9
 **Commit**: `{git_commit}`
 
 ---
@@ -399,9 +466,58 @@ def main():
 
 ---
 
-## 二、按优先级分类的问题分析
+## 二、按 Level 分层测试结果
 
-### 2.1 控制块异常（最高优先级）
+### 2.1 各 Level 概览
+
+| Level | 名称 | 文件数 | A | B | C | D | A+B% | Orphans |
+|:-----:|------|:------:|:---:|:---:|:---:|:---:|:-----:|:-------:|
+""")
+        for level in LEVELS:
+            level_name = LEVEL_NAMES.get(level, f"Level {level}")
+            total = 0
+            a = b = c = d = orphans = 0
+            for ver in VERSIONS:
+                total += all_level_results[level][ver]['total']
+                a += level_cats[level][ver].get('A', 0)
+                b += level_cats[level][ver].get('B', 0)
+                c += level_cats[level][ver].get('C', 0)
+                d += level_cats[level][ver].get('D', 0)
+                orphans += all_level_results[level][ver]['orphans']
+            ab = a + b
+            f.write(f"| {level} | {level_name} | {total} | {a} | {b} | {c} | {d} | {ab/max(total,1)*100:.0f}% | {orphans} |\n")
+
+        f.write(f"""
+### 2.2 各 Level 详细分析
+
+""")
+        for level in LEVELS:
+            level_name = LEVEL_NAMES.get(level, f"Level {level}")
+            f.write(f"""
+#### Level {level}: {level_name}
+
+| Python 版本 | 文件数 | A | B | C | D | A+B% | Orphans | 控制块异常 | 孤儿块 |
+|:-----------:|:------:|:---:|:---:|:---:|:---:|:-----:|:-------:|:----------:|:------:|
+""")
+            for ver in VERSIONS:
+                stats = all_level_results[level][ver]
+                a = level_cats[level][ver].get('A', 0)
+                b = level_cats[level][ver].get('B', 0)
+                c = level_cats[level][ver].get('C', 0)
+                d = level_cats[level][ver].get('D', 0)
+                ab = a + b
+                f.write(f"| {ver} | {stats['total']} | {a} | {b} | {c} | {d} | {ab/max(stats['total'],1)*100:.0f}% | {stats['orphans']} | {stats['control_block_anomaly']} | {stats['orphan_block']} |\n")
+            
+            f.write(f"""
+**测试文件**: {', '.join(sorted({f for ver in VERSIONS for f in all_level_results[level][ver]['files']}))}
+""")
+
+        f.write(f"""
+---
+
+## 三、按优先级分类的问题分析
+
+### 3.1 控制块异常（最高优先级）
 
 **影响文件数**: {control_block_anomaly_count}
 
@@ -415,8 +531,20 @@ def main():
                         f.write(f"| {pattern_type} (Py {ver}) | {count} |\n")
 
         f.write(f"""
+#### 控制块异常详细示例
 
-### 2.2 指令缺失
+""")
+        for key in sorted(pattern_details.keys()):
+            if any(t in key for t in ["try_no_except_finally", "for_empty", "empty_try"]):
+                f.write(f"##### {key}\n")
+                for detail in pattern_details[key][:3]:
+                    f.write(f"- **文件**: {detail['file']}\n")
+                    for ex in detail['examples']:
+                        f.write(f"  - 行 {ex['line']}: {repr(ex['context'][:80])}\n")
+                f.write(f"\n")
+
+        f.write(f"""
+### 3.2 指令缺失
 
 **影响文件数**: {orphan_block_count}
 
@@ -430,8 +558,7 @@ def main():
                         f.write(f"| {pattern_type} (Py {ver}) | {count} |\n")
 
         f.write(f"""
-
-### 2.3 孤儿块
+### 3.3 孤儿块
 
 **影响文件数**: {orphan_block_count}
 
@@ -445,21 +572,20 @@ def main():
                         f.write(f"| {pattern_type} (Py {ver}) | {count} |\n")
 
         f.write(f"""
-
-### 2.4 语法错误
+### 3.4 语法错误
 
 **影响文件数**: {syntax_error_count}
 
-### 2.5 运行时错误
+### 3.5 运行时错误
 
 **影响文件数**: {runtime_error_count}
 
 ---
 
-## 三、关键文件深度分析
+## 四、关键文件深度分析
 
-| 文件 | 版本 | ± lines | 类别 | Orphans | 语法 | 运行 |
-|------|------|---------|------|---------|------|------|
+| 文件 | 版本 | ± lines | 类别 | Orphans |
+|------|------|---------|------|---------|
 """)
         for fname in KEY_FILES:
             if fname not in key_diffs: continue
@@ -468,13 +594,12 @@ def main():
                 d = key_diffs[fname][ver]
                 tc = d['added'] + d['removed']
                 emoji = {'A': '🟢', 'B': '🟡', 'C': '🟠', 'D': '🔴'}.get(d['cat'], '⚪')
-                f.write(f"| {fname} | {ver} | +{d['added']}/−{d['removed']} | {emoji} {d['cat']} | {d['orphans']} | - | - |\n")
+                f.write(f"| {fname} | {ver} | +{d['added']}/−{d['removed']} | {emoji} {d['cat']} | {d['orphans']} |\n")
 
         f.write(f"""
-
 ---
 
-## 四、Orphan 块分析
+## 五、Orphan 块分析
 
 ### 按版本统计
 
@@ -486,7 +611,6 @@ def main():
             f.write(f"| {ver} | {o} |\n")
 
         f.write(f"""
-
 ### 按文件统计（Top 10）
 
 | 文件 | Total Orphans |
@@ -496,10 +620,58 @@ def main():
             f.write(f"| {fn} | {count} |\n")
 
         f.write(f"""
+---
+
+## 六、D-Class 文件（高差异）
+
+| 文件 | 版本 | Diff Lines |
+|:-----|:-------:|:----------:|
+""")
+        for fn, ver, dc in dclass:
+            f.write(f"| {fn} | {ver} | {dc} |\n")
+
+        f.write(f"""
+---
+
+## 七、已知问题总结
+
+### 7.1 已修复问题
+
+1. **循环 else 识别** (Level 1): for-else 和 while-else 结构已正确识别，包括空循环体的 else 处理
+2. **if-elif-else 链** (Level 1): elif 链已正确识别，不会被误判为 else
+3. **版本检测** (全局): Python 3.9 字节码 (magic `610d0d0a`) 已正确识别
+
+### 7.2 待修复问题
+
+| Priority | Issue | 影响范围 | 建议修复方案 |
+|:--------:|-------|----------|--------------|
+| P0 | Python 3.13/3.14 列表推导式和 for 循环重构 | Level 0-6 | 完善 `LOAD_FAST_AND_CLEAR` 和超级指令处理 |
+| P0 | try 块无 except/finally 问题 | Level 2 | 完善异常表解析和控制流图重建 |
+| P1 | CFG handler→class edge 误分类 | Level 4-5 | 重写 BlockScanner 后继处理逻辑 |
+| P1 | for 循环空迭代器问题 | Level 1 | 修复列表推导式重构失败导致的 `for _ in []:` |
+| P2 | 孤儿 raise 语句 | Level 2 | 完善异常处理块重构 |
+| P2 | 裸表达式 (`elem`, `[]`) | Level 0-6 | 修复栈机状态管理问题 |
+| P3 | 减少 orphan blocks ({total_orphans}) | 全局 | 加强 `_processedBlockIds` 处理 |
+| P3 | 移除调试噪声 (`# orphan @` / `# [SUMMARY]`) | 全局 | 改为 CLI 可选参数 |
+| P4 | Docstring 格式优化 (`'text'` -&gt; triple-quote) | 全局 | 在生成器中检测 docstring 模式 |
+
+### 7.3 各版本特性兼容性
+
+| Feature | 2.7 | 3.5 | 3.6 | 3.7 | 3.8 | 3.9 | 3.10 | 3.11 | 3.12 | 3.13 | 3.14 |
+|:--------|:---:|:---:|:---:|:---:|:---:|:---:|:----:|:----:|:----:|:----:|:----:|
+| PEP 552 (hash .pyc) | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| PEP 570 (posonlyargs) | — | — | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Wordcode jumparg | — | — | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | — | — |
+| Exception table | — | — | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ |
+| CACHE entries | — | — | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ |
+| MAKE_FUNCTION qualname | — | — | — | — | — | — | — | ✅ | ✅ | ✅ | ✅ |
+| PUSH_NULL | — | — | — | — | — | — | — | — | ✅ | ✅ | ✅ |
+| RETURN_CONST | — | — | — | — | — | — | — | — | ✅ | ✅ | ✅ |
+| 3.13+ opcode renumber | — | — | — | — | — | — | — | — | — | ✅ | ✅ |
 
 ---
 
-## 五、修复计划
+## 八、修复计划
 
 ### P0 - 紧急修复（影响面大）
 
@@ -542,7 +714,7 @@ def main():
 9. **移除调试噪声** (`# orphan @` / `# [SUMMARY]`)
    - 改为 CLI 可选参数
 
-10. **Docstring 格式优化** (`'text'` -> `\"\"\"text\"\"\"`)
+10. **Docstring 格式优化** (`'text'` -&gt; triple-quote)
 
 ---
 
@@ -550,6 +722,7 @@ def main():
 """)
 
     print(f"✅ 报告已生成: {REPORT_PATH}")
+    
     print(f"\n{'='*60}")
     print(f"FINAL")
     print(f"{'='*60}")

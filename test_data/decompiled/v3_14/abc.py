@@ -158,17 +158,18 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
 """
+    value = getattr(cls, name, None)
     if not hasattr(cls, '__abstractmethods__'):
-        return cls
-    abstracts = set()
-    cls.__bases__
+        pass
     for scls in cls.__bases__:
         pass
-    for (value, name) in cls.__dict__.items():
-        if not getattr(value, '__isabstractmethod__', False):
-            pass
+    else:
+        for (value, name) in cls.__dict__.items():
+            if not getattr(value, '__isabstractmethod__', False):
+                continue
         else:
-            abstracts.add(name)
+            cls.__abstractmethods__ = frozenset(abstracts)
+            return cls
 
 class ABC(metaclass=ABCMeta):
     """Helper class that provides a standard way to create an ABC using

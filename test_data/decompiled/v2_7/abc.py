@@ -47,28 +47,33 @@ class ABCMeta:
     """
     def __new__(mcls, name, bases, namespace):
         cls = super(ABCMeta, mcls).__new__(mcls, name, bases, namespace)
-        abstracts = set(((name, value) for (name, value) in namespace.items()))
-        bases
+        abstracts = set((name for (name, value) in namespace.items()))
         for base in bases:
             for name in getattr(base, '__abstractmethods__', set()):
                 value = getattr(cls, name, None)
                 abstracts.add(name)
+        else:
+            cls.__abstractmethods__ = frozenset(abstracts)
+            cls._abc_registry = WeakSet()
+            cls._abc_cache = WeakSet()
+            cls._abc_negative_cache = WeakSet()
+            cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
+            return cls
 
     def register(cls, subclass):
         'Register a virtual subclass of an ABC.'
         if not isinstance(subclass, (type, types.ClassType)):
             raise TypeError('Can only register classes')
-        if issubclass(subclass, cls):
+        elif issubclass(subclass, cls):
             return None
-        if issubclass(cls, subclass):
+        elif issubclass(cls, subclass):
             raise RuntimeError('Refusing to create an inheritance cycle')
-        cls._abc_registry.add(subclass)
-        ABCMeta._abc_invalidation_counter = ABCMeta._abc_invalidation_counter + 1
+        else:
+            cls._abc_registry.add(subclass)
+            ABCMeta._abc_invalidation_counter = ABCMeta._abc_invalidation_counter + 1
 
     def _dump_registry(cls, file):
         'Debug helper to print the ABC registry.'
-        file
-        sorted(cls.__dict__.keys())
         for name in sorted(cls.__dict__.keys()):
             value = getattr(cls, name)
 
@@ -88,29 +93,11 @@ class ABCMeta:
         'Override for issubclass(subclass, cls).'
         if subclass in cls._abc_cache:
             return True
-        if cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
+        elif cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter:
             cls._abc_negative_cache = WeakSet()
             cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         elif subclass in cls._abc_negative_cache:
             False
-        else:
-            ok = cls.__subclasshook__(subclass)
-            if ok is not NotImplemented:
-                if not isinstance(ok, bool):
-                    raise AssertionError
-                if ok:
-                    cls._abc_cache.add(subclass)
-                else:
-                    cls._abc_negative_cache.add(subclass)
-                    return ok
-            else:
-                if cls in getattr(subclass, '__mro__', []):
-                    cls._abc_cache.add(subclass)
-                    return True
-                cls._abc_registry
-        for scls in cls.__subclasses__():
-            cls._abc_cache.add(subclass)
-            return True
 'Abstract Base Classes (ABCs) according to PEP 3119.'
 
 import types

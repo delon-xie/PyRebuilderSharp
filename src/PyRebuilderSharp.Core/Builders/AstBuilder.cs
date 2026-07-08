@@ -5092,12 +5092,93 @@ public class AstBuilder
                 isWhileElse = !elseIsExitOnly && elseHasUsefulCode;
             }
             if (isWhileElse && bodyBlocks.Count > 0)
-            {
-                var resultStmts = new List<Stmt>();
-                var bodyVisited = new HashSet<BasicBlock>();
-                var bodyBlockSet = new HashSet<BasicBlock>(bodyBlocks);
-                
-                foreach (var bb in bodyBlocks.OrderBy(b => b.StartOffset))
+                {
+                    var resultStmts = new List<Stmt>();
+                    var bodyVisited = new HashSet<BasicBlock>();
+                    var bodyBlockSet = new HashSet<BasicBlock>(bodyBlocks);
+                    
+                    if (IsConditionBranch(header))
+                    {
+                        var (testExpr, _) = ExtractConditionWithSideEffects(header);
+                        if (testExpr != null)
+                        {
+                            var lastInstr = header.Instructions.LastOrDefault();
+                            if (lastInstr != default && lastInstr.Argument.HasValue)
+                            {
+                                bool isJumpIfTrue = lastInstr.Opcode is Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_TRUE_PY38;
+                                if (isJumpIfTrue)
+                                    testExpr = new UnaryOp(UnaryOperator.Not, testExpr);
+                                
+                                var bodyBranch = FindFallthrough(header);
+                                var afterBranch = FindBlockByOffset(lastInstr.Argument.Value);
+                                
+                                var ifBodyStmts = new List<Stmt>();
+                                List<Stmt>? orelse = null;
+                                
+                                bool afterIsBreak = false;
+                                if (afterBranch != null && !bodyBlockSet.Contains(afterBranch))
+                                {
+                                    afterIsBreak = afterBranch.Instructions.Count == 1 &&
+                                        afterBranch.Instructions[0].Opcode == Opcode.JUMP_ABSOLUTE &&
+                                        afterBranch.Instructions[0].Argument.HasValue;
+                                    if (afterIsBreak)
+                                    {
+                                        ifBodyStmts.Add(new Break());
+                                        bodyVisited.Add(afterBranch);
+                                    }
+                                }
+                                
+                                if (bodyBranch != null && bodyBlockSet.Contains(bodyBranch))
+                                    {
+                                        var branchStmts = BuildBlockOnly(bodyBranch, bodyVisited);
+                                        bodyVisited.Add(bodyBranch);
+                                        
+                                        if (afterIsBreak)
+                                        {
+                                            orelse = branchStmts;
+                                        }
+                                        else
+                                        {
+                                            bool isFallthrough = bodyBranch != null && bodyBranch.Successors.Contains(afterBranch);
+                                            if (isFallthrough)
+                                            {
+                                                foreach (var stmt in branchStmts)
+                                                {
+                                                    ifBodyStmts.Add(stmt);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                orelse = branchStmts;
+                                            }
+                                        }
+                                    }
+                                
+                                if (!afterIsBreak && afterBranch != null && bodyBlockSet.Contains(afterBranch))
+                                {
+                                    var afterStmts = BuildBlockOnly(afterBranch, bodyVisited);
+                                    bool isFallthrough = bodyBranch != null && bodyBranch.Successors.Contains(afterBranch);
+                                    if (isFallthrough)
+                                    {
+                                        foreach (var stmt in afterStmts)
+                                        {
+                                            ifBodyStmts.Add(stmt);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        orelse = afterStmts;
+                                    }
+                                    bodyVisited.Add(afterBranch);
+                                }
+                                
+                                resultStmts.Add(new If(testExpr, ifBodyStmts, orelse));
+                                bodyVisited.Add(header);
+                            }
+                        }
+                    }
+                    
+                    foreach (var bb in bodyBlocks.OrderBy(b => b.StartOffset))
                 {
                     if (bodyVisited.Contains(bb))
                         continue;
