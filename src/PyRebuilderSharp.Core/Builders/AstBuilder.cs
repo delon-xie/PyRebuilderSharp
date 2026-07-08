@@ -3254,17 +3254,10 @@ public class AstBuilder
             return null;
         }
 
-        // 检查：如果 ET 条目覆盖模块入口块（offset ≈ 0）且 handler 中无 CHECK_EXC_MATCH，则是模块级清理条目
-        // CPython 3.14 会为整个模块生成一个 ET 清理条目，不应被当作 try/except 处理。
-        // 注意：CHECK_EXC_MATCH 可能在 handler 中（TargetOffset 之后），不在 entry 的范围内
-        // 模块级清理条目标志：起始 ≈ 0，覆盖范围覆盖几乎所有代码，无 CHECK_EXC_MATCH
-        bool isLargeRange = (matchingEntry.EndOffset - matchingEntry.StartOffset) > _codeObject.Instructions.Count * 0.6;
-        bool isModuleCleanup = matchingEntry.StartOffset <= 4
-            && isLargeRange
+        bool isModuleCleanup = matchingEntry.StartOffset == 0
             && !_codeObject.Instructions.Any(i =>
                 (i.Opcode == Opcode.CHECK_EXC_MATCH || i.Opcode == Opcode.CHECK_EG_MATCH)
                 && i.Offset >= matchingEntry.TargetOffset);
-
         if (isModuleCleanup)
         {
             if (_options.VerboseErrors)
@@ -3310,6 +3303,14 @@ public class AstBuilder
         // 3.12+ finally-only/cleanup 条目：handler 不包含 CHECK_EXC_MATCH 或 CHECK_EG_MATCH，
         // 这些是 finally 体、清理代码等，不是 try/except 结构。
         var handlerBlock = FindBlockByOffset(matchingEntry.TargetOffset);
+        // 某些版本（3.11+）的 ET TargetOffset 可能指向 handler 中间（跳过 PUSH_EXC_INFO）
+        // 退一步：搜索包含 target 的块
+        if (handlerBlock == null)
+        {
+            handlerBlock = _sortedBlocks.FirstOrDefault(b =>
+                b.StartOffset < matchingEntry.TargetOffset
+                && b.EndOffset > matchingEntry.TargetOffset);
+        }
         if (handlerBlock == null || visited.Contains(handlerBlock))
         {
             return null;
@@ -3348,11 +3349,17 @@ public class AstBuilder
         Console.Error.WriteLine($"[TRY_DBG] handlerBlock#{handlerBlock.Id} offset={handlerBlock.StartOffset:X4} ops=[{string.Join(",", handlerBlock.Instructions.Select(i => $"{i.Opcode}({i.Opcode:D})"))}] hasExcMatch={hasExcMatch}");
         }
         // 检测 bare except（无 CHECK_EXC_MATCH）：PUSH_EXC_INFO + POP_TOP → 裸 except:
+        // 注意：try/finally 的 cleanup 处理器也有 PUSH_EXC_INFO + POP_TOP，
+        // 但它的后继包含 COPY/POP_EXCEPT/RERAISE 清理指令。bare except 没有这些。
         bool isBareExcept = !hasExcMatch && handlerBlock.Instructions.Count >= 2
             && handlerBlock.Instructions[0].Opcode == Opcode.PUSH_EXC_INFO_312
             && (handlerBlock.Instructions[1].Opcode == Opcode.POP_TOP
                 || handlerBlock.Instructions[1].Opcode == Opcode.POP_EXCEPT
-                || handlerBlock.Instructions[1].Opcode == Opcode.STORE_NAME);
+                || handlerBlock.Instructions[1].Opcode == Opcode.STORE_NAME)
+            // 检查后继：如果不是 cleanup（无 COPY/RERAISE），才是真正的 bare except
+            && !handlerBlock.Successors.Any(succ =>
+                succ.Instructions.Any(i => i.Opcode == Opcode.COPY)
+                || succ.Instructions.Any(i => i.Opcode == Opcode.RERAISE));
         if (!hasExcMatch && !isBareExcept)
         {
             // 无 CHECK_EXC_MATCH = try/finally or cleanup entry.
@@ -3543,7 +3550,7 @@ public class AstBuilder
             // 对于 orphan handler block，Successors 可能为空，
             // 需要也排除 handler ET 范围内的块
             var handlerRangeBlockSet = new HashSet<BasicBlock>(
-                _sortedBlocks.Where(b => b.StartOffset >= handlerBlock.StartOffset && b.StartOffset < handlerEnd));
+                _sortedBlocks.Where(b => b.StartOffset >= handlerBlock.StartOffset && b.StartOffset < handlerEnd + 4));
             var elseCandidates = _sortedBlocks
                 .Where(b => b.StartOffset > scanStart
                     && b.EndOffset < scanEnd
@@ -3644,118 +3651,74 @@ public class AstBuilder
                 }
 
                 var succResult = _blockResults.GetValueOrDefault(succ.Id);
-                bool hasValidStatements = succResult?.Statements != null && succResult.Statements.Any(s => s is not Raise and not CommentBlock);
-                if (hasValidStatements)
+                // 对于 handler 后继，优先尝试用 _blockResults 提取语句
+                // 若失败（orphan 块的 Pass 占位符），直接用 BuildStatements 处理
+                var succStmts = succResult?.Statements
+                    ?.Where(s => s is not Pass and not Raise and not CommentBlock)
+                    .ToList();
+                if (succStmts != null && succStmts.Count > 0)
                 {
-                    handlerBody.AddRange(succResult.Statements
-                        .Where(s => s is not Raise and not CommentBlock and not Pass));
+                    handlerBody.AddRange(succStmts);
                 }
                 else if (handlerBlock.StartOffset < succStart && succStart < handlerEnd + 2)
                 {
-                    try
-                    {
-                        // 创建一个新 StackMachine 模拟 handler 前缀 + 后继
-                        var tempSM = new StackMachine(_codeObject);
-                        // 执行 handler 前缀，仅执行非条件跳转指令
-                        bool seenPopJump = false;
-                        foreach (var hi in handlerBlock.Instructions)
-                        {
-                            if (hi.Opcode == Opcode.POP_JUMP_IF_FALSE
-                                || hi.Opcode == Opcode.POP_JUMP_IF_TRUE)
-                            {
-                                tempSM.PopExpr(); // 消耗条件值
-                                seenPopJump = true;
-                                break; // 停止执行 handler 前缀（条件跳转后是不同路径）
-                            }
-                            if (hi.Opcode == Opcode.CHECK_EXC_MATCH || hi.Opcode == Opcode.CHECK_EG_MATCH)
-                            {
-                                tempSM.PopExpr();
-                                continue;
-                            }
-                            if (hi.Opcode == Opcode.PUSH_EXC_INFO || hi.Opcode == Opcode.PUSH_EXC_INFO_312
-                                || hi.Opcode == Opcode.PUSH_EXC_HANDLER_312)
-                            {
-                                // PUSH_EXC_INFO 在 3.11+ 中推向内部异常栈，模拟时不处理
-                                continue;
-                            }
-                            tempSM.Execute(hi);
-                        }
-                        // 执行后继指令
-                        var handlerSuccStmts = new List<Stmt>();
-                        foreach (var si in succ.Instructions)
-                        {
-                            var result = tempSM.Execute(si);
-                            if (result is Return && si.Opcode == Opcode.JUMP_FORWARD)
-                                break;
-                            if (result != null && result is not Raise and not CommentBlock and not Pass)
-                                handlerSuccStmts.Add(result);
-                        }
-                        if (handlerSuccStmts.Count > 0)
-                            handlerBody.AddRange(handlerSuccStmts);
-                    }
-                    catch (Exception exSim)
-                    {
-                        if (_options.VerboseErrors)
-                            Console.Error.WriteLine($"[TRY_FROM_ET] succ_sim_error: {exSim.GetType().Name}: {exSim.Message}");
-                    }
+                    // 直接 BuildStatements 提取后继语句，绕过脆弱的 StackMachine 模拟
+                    var directStmts = BuildStatements(succ, visited);
+                    var filteredStmts = directStmts
+                        .Where(s => s is not Pass and not Raise and not CommentBlock)
+                        .ToList();
+                    if (filteredStmts.Count > 0)
+                        handlerBody.AddRange(filteredStmts);
                 }
                 visited.Add(succ);
                 _processedBlockIds.Add(succ.Id);
             }
         }
 
-        if (isFinally)
+        // 对于 try/finally 模式，提取内联 finally 块
+        var afterFinallyStmts = new List<Stmt>();
+        List<Stmt>? inlineFinalBody = null;
+        
+        if (isFinally && tryBody.Count > 0)
         {
-            // try/finally: handler 是无 CHECK_EXC_MATCH 的 finally 体
-            // 使用 handlerBody（已包含 handlerBlock 和其后继块的语句）
-            if (_options.VerboseErrors)
-            {
-            Console.Error.WriteLine($"[TRY_FROM_ET] isFinally=True, handlerBody={handlerBody.Count}, tryBody={tryBody.Count}");
-            }
-            if (_options.VerboseErrors && handlerBody.Count > 0)
-            {
-                Console.Error.WriteLine($"[TRY_FROM_ET]   handlerBody types={string.Join(",", handlerBody.Select(s => s.GetType().Name))}");
-            }
-            if (tryBody.Count > 0)
-            {
-                if (_options.VerboseErrors)
-                {
-                Console.Error.WriteLine($"[TRY_FROM_ET]   tryBody types={string.Join(",", tryBody.Select(s => s.GetType().Name))}");
-                }
-            }
-            var finalBody = handlerBody;
-            visited.Add(handlerBlock);
-            _processedBlockIds.Add(handlerBlock.Id);
-            
-            // 在 Python 3.11+ 字节码中，finally 体被复制了：
-            // - 内联 finally 块：位于 [EndOffset, TargetOffset) 范围内，是正常路径上的 finally 代码
-            // - handler 块：是异常路径上的 finally 代码（带有 PUSH_EXC_INFO/RERAISE）
-            // 我们使用 handler 作为 finally 体，但需要处理内联 finally 块：
-            // 1. 标记所有内联 finally 块为 visited，防止重复输出
-            // 2. 从最后一个内联 finally 块中提取 Return 语句作为 try/finally 之后的代码
-            var afterFinallyStmts = new List<Stmt>();
-            
-            var inlineFinallyBlocks = GetBlocksInRange(matchingEntry.EndOffset, matchingEntry.TargetOffset);
-            foreach (var inlineBlock in inlineFinallyBlocks)
-            {
-                visited.Add(inlineBlock);
-                _processedBlockIds.Add(inlineBlock.Id);
-            }
-            
+            var inlineFinallyBlocks = _sortedBlocks
+                .Where(b => b.EndOffset > matchingEntry.EndOffset   // overlaps the range
+                    && b.StartOffset < matchingEntry.TargetOffset)  // starts before or within
+                .OrderBy(b => b.StartOffset)
+                .ToList();
             if (inlineFinallyBlocks.Count > 0)
             {
+                foreach (var inlineBlock in inlineFinallyBlocks)
+                {
+                    visited.Add(inlineBlock);
+                    _processedBlockIds.Add(inlineBlock.Id);
+                }
+                
                 var lastInlineBlock = inlineFinallyBlocks.OrderByDescending(b => b.StartOffset).First();
                 var lastInlineResult = _blockResults.GetValueOrDefault(lastInlineBlock.Id);
                 if (lastInlineResult?.Statements != null)
                 {
                     var returnStmts = lastInlineResult.Statements.Where(s => s is Return).ToList();
                     if (returnStmts.Count > 0)
-                    {
                         afterFinallyStmts.AddRange(returnStmts);
-                    }
                 }
+                
+                inlineFinalBody = inlineFinallyBlocks
+                    .SelectMany(b => {
+                        var r = _blockResults.GetValueOrDefault(b.Id);
+                        var stmts = r?.Statements?.Where(s => s is not Raise and not CommentBlock and not Pass)
+                            ?? Enumerable.Empty<Stmt>();
+                        return stmts;
+                    })
+                    .ToList();
             }
             
+            // try/finally: handler 是无 CHECK_EXC_MATCH 的 finally 体
+            // 优先使用内联 finally 体（有实际的 finally 代码），
+            // 回退到 handler 体（可能只有 RERAISE 清理代码）
+            var finalBody = (inlineFinalBody != null && inlineFinalBody.Count > 0)
+                ? inlineFinalBody
+                : handlerBody;
             if (afterFinallyStmts.Count == 0)
             {
                 var handlerEndOffset = handlerEnd;
@@ -3781,7 +3744,6 @@ public class AstBuilder
                 }
             }
             
-            // 跳过空的 finally 体（生成器 cleanup 条目：无实际语义）
             var resultList = new List<Stmt>();
             bool finalBodyIsEmpty = finalBody == null || finalBody.Count == 0 || 
                 (finalBody.Count == 1 && finalBody[0] is Pass);
@@ -3792,11 +3754,15 @@ public class AstBuilder
                 resultList.Add(new Try(tryBody, new List<ExceptHandler>(), elseBody, finalBody));
             if (afterFinallyStmts.Count > 0)
             {
-                resultList.AddRange(afterFinallyStmts);
+                // 如果 afterFinallyStmts 包含 Return/Raise 等终止语句，
+                // 不追加到 try/finally 之后（不可达代码）
+                if (afterFinallyStmts.All(s => s is Return or Raise))
+                    ; // skip — already captured in handler body
+                else
+                    resultList.AddRange(afterFinallyStmts);
             }
             return resultList;
         }
-
         bool isGroup = handlerBlock.Instructions.Any(i => i.Opcode == Opcode.CHECK_EG_MATCH);
 
         Expr? exceptType = null;
@@ -3833,6 +3799,69 @@ public class AstBuilder
                 exceptName = _codeObject.Names.ElementAtOrDefault(ins.Argument ?? 0);
         }
 
+        // try/except/finally: 提取内联 finally 体中的语句
+        // 内联 finally 块位于 [handlerEnd, handlerET.TargetOffset) 之间
+        // 用 BuildStatements(freshVisited) 提取语句
+        List<Stmt>? tryExceptFinalBody = null;
+        if (!isFinally && handlerET != null && handlerET.TargetOffset > handlerEnd)
+        {
+            var inlineFinallyBlocks = _sortedBlocks
+                .Where(b => b.EndOffset > handlerEnd
+                    && b.StartOffset < handlerET.TargetOffset)
+                .OrderBy(b => b.StartOffset)
+                .ToList();
+            // 排除 cleanup handler 块（RERAISE 或 Depth=1, Lasti=True 的 ET 条目的目标）
+            var cleanupTargets = _codeObject.ExceptionTable
+                .Where(e => e.Depth == 1 && e.Lasti)
+                .Select(e => e.TargetOffset)
+                .ToHashSet();
+            inlineFinallyBlocks = inlineFinallyBlocks
+                .Where(b => !cleanupTargets.Contains(b.StartOffset))
+                .ToList();
+            // 特殊处理：当 handlerEnd 处有 Depth=0 的嵌套 ET 条目时（如 l2_5），使用该条目的范围（+4 字节以包含 RETURN_VALUE）
+            var nestedEntry = _codeObject.ExceptionTable
+                .FirstOrDefault(e => e.StartOffset >= handlerEnd && e.StartOffset < handlerEnd + 4
+                    && e.Depth == 0);
+            if (nestedEntry != null)
+            {
+                inlineFinallyBlocks = _sortedBlocks
+                    .Where(b => b.EndOffset > nestedEntry.StartOffset
+                        && b.StartOffset < nestedEntry.EndOffset + 4
+                        && !cleanupTargets.Contains(b.StartOffset))
+                    .OrderBy(b => b.StartOffset)
+                    .ToList();
+            }
+            if (inlineFinallyBlocks.Count > 0)
+            {
+                var freshVisited = new HashSet<BasicBlock>();
+                var allStmts = new List<Stmt>();
+                foreach (var b in inlineFinallyBlocks)
+                {
+                    allStmts.AddRange(BuildStatements(b, freshVisited));
+                }
+                var filteredStmts = allStmts
+                    .Where(s => s is not Raise and not CommentBlock and not Pass)
+                    .ToList();
+                if (filteredStmts.Count > 0)
+                {
+                    var handlerContent = new HashSet<string>(
+                        handlerBody.Where(s => s is not Pass and not Raise)
+                            .Select(s => s.ToString()));
+                    bool hasNewContent = filteredStmts
+                        .Any(s => !handlerContent.Contains(s.ToString()));
+                    if (hasNewContent)
+                    {
+                        tryExceptFinalBody = filteredStmts;
+                        foreach (var b in inlineFinallyBlocks)
+                        {
+                            visited.Add(b);
+                            _processedBlockIds.Add(b.Id);
+                        }
+                    }
+                }
+            }
+        }
+
         if (handlerBody.Count == 0 || (handlerBody.Count == 1 && handlerBody[0] is Pass))
         {
             // handlerBody 为空或只有 Pass = handler 没有实质性语句（例如只有 RERAISE 的清理条目）。
@@ -3846,7 +3875,7 @@ public class AstBuilder
         {
             new ExceptHandler(exceptType, exceptName, handlerBody, isGroup)
         };
-        return new List<Stmt> { new Try(tryBody, handlers, elseBody) };
+        return new List<Stmt> { new Try(tryBody, handlers, elseBody, tryExceptFinalBody) };
         }
         finally
         {
@@ -8190,21 +8219,27 @@ public class AstBuilder
 
         // 先单独应用规则 0: 展开 if+else 中 body 以 return/raise 结尾的无效 else
         // 当 if body 以不可达终止符结尾时，else 体可以安全提升为顺序代码。
-        // 此规则放在主循环前独立扫描，因为主循环从 Count-2 开始（配对需要），
-        // 会错过位于最后的 If 节点。
-        for (int ri = stmts.Count - 1; ri >= 0; ri--)
-        {
-            if (stmts[ri] is If ifStmt0
-                && ifStmt0.Orelse is { Count: > 0 }
-                && ifStmt0.Body.Count > 0
-                && ifStmt0.Body[^1] is Return or Raise or Continue or Break)
-            {
-                var inlined = new List<Stmt> { new If(ifStmt0.Test, ifStmt0.Body, null) };
-                inlined.AddRange(ifStmt0.Orelse);
-                stmts.RemoveAt(ri);
-                stmts.InsertRange(ri, inlined);
-            }
-        }
+        // ⚠️ 此规则在源码反编译中正确，但在字节码反编译中错误！
+        // 字节码中 POP_JUMP_IF_FALSE 条件分支的 else 体 isElseClause=True 判定
+        // 正是基于 body 以不可达终止符结尾（bodyEndsWithTerminal=True）。
+        // 此时 else 体 NOT 是"无效的"——字节码结构要求必须保留 else 关键字。
+        // 参考 CPython: if-else 的 POP_JUMP_IF_FALSE → body(Return) → else 分支。
+        // 如果去除 else，else 体被输出为顺序代码，导致结构塌陷。
+        // 参见测试用例 l1_basic/if_else.py: test_if_else_simple。
+        // 此规则已禁用。如需恢复，仅在源码反编译（非字节码）上下文中启用。
+        //for (int ri = stmts.Count - 1; ri >= 0; ri--)
+        //{
+        //    if (stmts[ri] is If ifStmt0
+        //        && ifStmt0.Orelse is { Count: > 0 }
+        //        && ifStmt0.Body.Count > 0
+        //        && ifStmt0.Body[^1] is Return or Raise or Continue or Break)
+        //    {
+        //        var inlined = new List<Stmt> { new If(ifStmt0.Test, ifStmt0.Body, null) };
+        //        inlined.AddRange(ifStmt0.Orelse);
+        //        stmts.RemoveAt(ri);
+        //        stmts.InsertRange(ri, inlined);
+        //    }
+        //}
 
         // 从后向前扫描可折叠模式（保证删除不影响前向索引）
         for (int i = stmts.Count - 2; i >= 0; i--)
