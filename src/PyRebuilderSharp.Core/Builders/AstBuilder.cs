@@ -52,6 +52,12 @@ public class AstBuilder
     {
         Console.Error.WriteLine($"[BUILD] AstBuilder.Build called for {_codeObject.Name}");
         var cfg = structuredCFG.RawCFG;
+
+        if (_options.EnableSequentialBlocks)
+        {
+            return BuildWithSequentialBlocks(cfg);
+        }
+
         _blockResults = _blockDecompiler.DecompileBlocks(cfg.Blocks, _codeObject);
         _allBlocks = cfg.Blocks;
         _sortedBlocks = cfg.Blocks
@@ -9688,5 +9694,639 @@ public class AstBuilder
             }
         }
         return false;
+    }
+
+    private AstNode BuildWithSequentialBlocks(ControlFlowGraph cfg)
+    {
+        Console.Error.WriteLine($"[SEQ_BUILD] Starting three-phase sequential block architecture");
+
+        _blockResults = _blockDecompiler.DecompileBlocks(cfg.Blocks, _codeObject);
+        _allBlocks = cfg.Blocks;
+        _sortedBlocks = cfg.Blocks
+            .Where(b => b.Instructions.Count > 0)
+            .OrderBy(b => b.Instructions[0].Offset)
+            .ToList();
+        _sortedExceptionTable = _codeObject.ExceptionTable
+            .OrderBy(e => e.StartOffset)
+            .ToList();
+
+        TotalBlockCount = _blockResults.Count;
+        FailedBlockCount = _blockResults.Values.Count(r => !r.IsSuccess);
+
+        _blockByOffset.Clear();
+        foreach (var b in cfg.Blocks)
+            _blockByOffset[b.StartOffset] = b;
+
+        _loopHeaderOffsets.Clear();
+        foreach (var b in cfg.Blocks)
+        {
+            if (b.Flags.HasFlag(BlockFlags.LoopHeader))
+            {
+                _loopHeaderOffsets.Add(b.StartOffset);
+            }
+        }
+
+        var seqBuilder = new SequentialBlockBuilder(_codeObject);
+
+        var seqBlocks = seqBuilder.BuildSequentialBlocks(cfg);
+        Console.Error.WriteLine($"[SEQ_BUILD] Phase 1: {seqBlocks.Count} sequential blocks created");
+
+        if (!seqBuilder.VerifyNoOrphanBlocks(seqBlocks, cfg))
+        {
+            Console.Error.WriteLine($"[SEQ_BUILD] ERROR: Orphan blocks detected, falling back to original method");
+            return BuildFallback(cfg);
+        }
+
+        Console.Error.WriteLine($"[SEQ_BUILD] Phase 1: All basic blocks merged into sequential blocks");
+
+        var stmts = new List<Stmt>();
+        var visited = new HashSet<BasicBlock>();
+        stmts.AddRange(BuildStatements(cfg.Entry, visited));
+
+        var unvisited = cfg.Blocks
+            .Where(b => !_processedBlockIds.Contains(b.Id))
+            .OrderBy(b => b.StartOffset)
+            .ToList();
+
+        foreach (var orphan in unvisited)
+        {
+            if (orphan.Instructions.Count == 0)
+                continue;
+            var blockResult = _blockDecompiler.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
+            if (blockResult.IsSuccess)
+            {
+                stmts.AddRange(blockResult.Statements);
+            }
+        }
+
+        stmts = PostProcessFunctionDefs(stmts);
+        stmts = ConvertChildCodesToFunctionDefs(stmts);
+        stmts = ConvertComprehensionCalls(stmts);
+        stmts = ConvertAugAssign(stmts);
+        FixEmptyFunctionBodies(stmts);
+
+        return new Module(stmts, _codeObject.Name);
+    }
+
+    private AstNode BuildFallback(ControlFlowGraph cfg)
+    {
+        var structuredCFG = new StructuredCFG { RawCFG = cfg };
+        _blockResults = _blockDecompiler.DecompileBlocks(cfg.Blocks, _codeObject);
+        _allBlocks = cfg.Blocks;
+        _sortedBlocks = cfg.Blocks
+            .Where(b => b.Instructions.Count > 0)
+            .OrderBy(b => b.Instructions[0].Offset)
+            .ToList();
+        _sortedExceptionTable = _codeObject.ExceptionTable
+            .OrderBy(e => e.StartOffset)
+            .ToList();
+
+        var stmts = new List<Stmt>();
+        var visited = new HashSet<BasicBlock>();
+        stmts.AddRange(BuildStatements(cfg.Entry, visited));
+
+        var unvisited = cfg.Blocks
+            .Where(b => !_processedBlockIds.Contains(b.Id))
+            .OrderBy(b => b.StartOffset)
+            .ToList();
+
+        foreach (var orphan in unvisited)
+        {
+            if (orphan.Instructions.Count == 0)
+                continue;
+            var blockResult = _blockDecompiler.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
+            if (blockResult.IsSuccess)
+            {
+                stmts.AddRange(blockResult.Statements);
+            }
+        }
+
+        stmts = PostProcessFunctionDefs(stmts);
+        stmts = ConvertChildCodesToFunctionDefs(stmts);
+        stmts = ConvertComprehensionCalls(stmts);
+        stmts = ConvertAugAssign(stmts);
+        FixEmptyFunctionBodies(stmts);
+
+        return new Module(stmts, _codeObject.Name);
+    }
+
+    private List<ISequentialControlStructure> ParseControlStructures(List<SequentialBlock> seqBlocks)
+    {
+        var structures = new List<ISequentialControlStructure>();
+        var visited = new HashSet<int>();
+
+        foreach (var seqBlock in seqBlocks)
+        {
+            if (visited.Contains(seqBlock.Id))
+                continue;
+
+            if (seqBlock.IsLoopHeader)
+            {
+                var loopStructure = ParseLoopStructure(seqBlock, seqBlocks);
+                if (loopStructure != null)
+                {
+                    structures.Add(loopStructure);
+                    visited.Add(seqBlock.Id);
+                    foreach (var bodyBlock in loopStructure.BodyBlocks)
+                        visited.Add(bodyBlock.Id);
+                }
+            }
+            else if (seqBlock.HasSetupWith || seqBlock.HasBeforeWith)
+            {
+                var withStructure = ParseWithStructure(seqBlock, seqBlocks);
+                if (withStructure != null)
+                {
+                    structures.Add(withStructure);
+                    visited.Add(seqBlock.Id);
+                    foreach (var bodyBlock in withStructure.BodyBlocks)
+                        visited.Add(bodyBlock.Id);
+                }
+            }
+            else if (seqBlock.HasSetupFinally || seqBlock.HasSetupExcept || seqBlock.ExceptionTableEntries.Count > 0)
+            {
+                var tryStructure = ParseTryStructure(seqBlock, seqBlocks);
+                if (tryStructure != null)
+                {
+                    structures.Add(tryStructure);
+                    visited.Add(seqBlock.Id);
+                    foreach (var bodyBlock in tryStructure.BodyBlocks)
+                        visited.Add(bodyBlock.Id);
+                }
+            }
+            else if (seqBlock.IsConditionHeader || seqBlock.EndsWithJump)
+            {
+                var ifStructure = ParseIfElseStructure(seqBlock, seqBlocks);
+                if (ifStructure != null)
+                {
+                    structures.Add(ifStructure);
+                    visited.Add(seqBlock.Id);
+                }
+            }
+        }
+
+        return structures;
+    }
+
+    private ISequentialControlStructure? ParseLoopStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
+    {
+        bool isForLoop = header.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER);
+        bool isWhileLoop = header.Instructions.Any(i =>
+            i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+                or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38);
+
+        if (!isForLoop && !isWhileLoop)
+            return null;
+
+        var bodyBlocks = new List<SequentialBlock>();
+        SequentialBlock? backEdge = null;
+        SequentialBlock? elseBlock = null;
+
+        var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
+        var visited = new HashSet<int> { header.Id };
+
+        if (header.JumpTarget.HasValue)
+        {
+            if (blockByOffset.TryGetValue(header.JumpTarget.Value, out var targetBlock))
+            {
+                if (targetBlock.StartOffset < header.StartOffset)
+                {
+                    backEdge = targetBlock;
+                }
+                else
+                {
+                    elseBlock = targetBlock;
+                }
+            }
+        }
+
+        foreach (var sourceBlock in header.SourceBlocks)
+        {
+            foreach (var succ in sourceBlock.Successors)
+            {
+                var targetSeqBlock = blockByOffset.Values
+                    .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
+                if (targetSeqBlock != null && !visited.Contains(targetSeqBlock.Id))
+                {
+                    if (targetSeqBlock.StartOffset != header.StartOffset)
+                    {
+                        bodyBlocks.Add(targetSeqBlock);
+                        visited.Add(targetSeqBlock.Id);
+                    }
+                }
+            }
+        }
+
+        if (isForLoop)
+        {
+            return new ForLoopControlStructure(header, bodyBlocks.FirstOrDefault()!, backEdge, elseBlock);
+        }
+        else
+        {
+            return new WhileLoopControlStructure(header, bodyBlocks.FirstOrDefault()!, backEdge, elseBlock);
+        }
+    }
+
+    private ISequentialControlStructure? ParseWithStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
+    {
+        var bodyBlocks = new List<SequentialBlock>();
+        SequentialBlock? handlerBlock = null;
+
+        var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
+
+        foreach (var et in header.ExceptionTableEntries)
+        {
+            if (blockByOffset.TryGetValue(et.TargetOffset, out var targetBlock))
+            {
+                if (targetBlock.Instructions.Any(i => 
+                    i.Opcode == Opcode.WITH_EXCEPT_START || 
+                    i.Opcode == Opcode.WITH_EXCEPT_START_312 ||
+                    i.Opcode == Opcode.PUSH_EXC_INFO_312))
+                {
+                    handlerBlock = targetBlock;
+                    break;
+                }
+            }
+        }
+
+        foreach (var sourceBlock in header.SourceBlocks)
+        {
+            foreach (var succ in sourceBlock.Successors)
+            {
+                var targetSeqBlock = blockByOffset.Values
+                    .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
+                if (targetSeqBlock != null && targetSeqBlock != handlerBlock)
+                {
+                    bodyBlocks.Add(targetSeqBlock);
+                }
+            }
+        }
+
+        if (handlerBlock != null)
+        {
+            return new WithControlStructure(header, handlerBlock);
+        }
+
+        return null;
+    }
+
+    private ISequentialControlStructure? ParseTryStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
+    {
+        var exceptHandlers = new List<(SequentialBlock Handler, string? ExceptionType)>();
+        SequentialBlock? elseBlock = null;
+        SequentialBlock? finallyBlock = null;
+
+        var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
+
+        foreach (var et in header.ExceptionTableEntries)
+        {
+            if (blockByOffset.TryGetValue(et.TargetOffset, out var targetBlock))
+            {
+                exceptHandlers.Add((targetBlock, null));
+            }
+        }
+
+        foreach (var sourceBlock in header.SourceBlocks)
+        {
+            foreach (var succ in sourceBlock.Successors)
+            {
+                var targetSeqBlock = blockByOffset.Values
+                    .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
+                if (targetSeqBlock != null)
+                {
+                    if (targetSeqBlock.Instructions.Any(i => i.Opcode == Opcode.END_FINALLY))
+                    {
+                        finallyBlock = targetSeqBlock;
+                    }
+                }
+            }
+        }
+
+        if (exceptHandlers.Count > 0 || finallyBlock != null)
+        {
+            return new TryControlStructure(header, exceptHandlers, elseBlock, finallyBlock);
+        }
+
+        return null;
+    }
+
+    private ISequentialControlStructure? ParseIfElseStructure(SequentialBlock header, List<SequentialBlock> seqBlocks)
+    {
+        SequentialBlock? trueBranch = null;
+        SequentialBlock? falseBranch = null;
+        SequentialBlock? mergePoint = null;
+
+        var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
+
+        foreach (var sourceBlock in header.SourceBlocks)
+        {
+            foreach (var succ in sourceBlock.Successors)
+            {
+                var targetSeqBlock = blockByOffset.Values
+                    .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
+                if (targetSeqBlock != null)
+                {
+                    if (trueBranch == null)
+                        trueBranch = targetSeqBlock;
+                    else
+                        falseBranch = targetSeqBlock;
+                }
+            }
+        }
+
+        if (header.JumpTarget.HasValue && blockByOffset.TryGetValue(header.JumpTarget.Value, out var jumpTarget))
+        {
+            falseBranch = jumpTarget;
+        }
+
+        if (trueBranch != null)
+        {
+            foreach (var sourceBlock in trueBranch.SourceBlocks)
+            {
+                foreach (var succ in sourceBlock.Successors)
+                {
+                    var targetSeqBlock = blockByOffset.Values
+                        .FirstOrDefault(sb => sb.StartOffset <= succ.StartOffset && sb.EndOffset >= succ.StartOffset);
+                    if (targetSeqBlock != null && targetSeqBlock != header)
+                    {
+                        mergePoint = targetSeqBlock;
+                        break;
+                    }
+                }
+                if (mergePoint != null) break;
+            }
+        }
+
+        return new IfElseControlStructure(header, trueBranch, falseBranch, mergePoint);
+    }
+
+    private void LinkControlStructures(List<ISequentialControlStructure> structures, List<SequentialBlock> seqBlocks)
+    {
+        foreach (var structure in structures)
+        {
+            structure.Header.ParentStructure = structure;
+            foreach (var bodyBlock in structure.BodyBlocks)
+            {
+                bodyBlock.ParentStructure = structure;
+            }
+
+            if (structure is WithControlStructure withStruct && withStruct.HandlerBlock != null)
+            {
+                withStruct.HandlerBlock.ParentStructure = structure;
+            }
+
+            if (structure is TryControlStructure tryStruct)
+            {
+                foreach (var (handler, _) in tryStruct.ExceptHandlers)
+                {
+                    handler.ParentStructure = structure;
+                }
+                if (tryStruct.ElseBlock != null)
+                    tryStruct.ElseBlock.ParentStructure = structure;
+                if (tryStruct.FinallyBlock != null)
+                    tryStruct.FinallyBlock.ParentStructure = structure;
+            }
+
+            if (structure is IfElseControlStructure ifStruct)
+            {
+                if (ifStruct.TrueBranch != null)
+                    ifStruct.TrueBranch.ParentStructure = structure;
+                if (ifStruct.FalseBranch != null)
+                    ifStruct.FalseBranch.ParentStructure = structure;
+            }
+
+            if (structure is ForLoopControlStructure forStruct)
+            {
+                if (forStruct.ElseBlock != null)
+                    forStruct.ElseBlock.ParentStructure = structure;
+            }
+
+            if (structure is WhileLoopControlStructure whileStruct)
+            {
+                if (whileStruct.ElseBlock != null)
+                    whileStruct.ElseBlock.ParentStructure = structure;
+            }
+        }
+    }
+
+    private List<Stmt> GenerateAstStatements(List<SequentialBlock> seqBlocks, ControlFlowGraph cfg)
+    {
+        var stmts = new List<Stmt>();
+        var processed = new HashSet<int>();
+
+        var seqBlockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
+        var startSeqBlock = seqBlockByOffset.GetValueOrDefault(cfg.Entry.StartOffset);
+
+        if (startSeqBlock != null)
+        {
+            stmts.AddRange(GenerateStatementsFromSeqBlock(startSeqBlock, seqBlocks, processed));
+        }
+
+        foreach (var seqBlock in seqBlocks.OrderBy(b => b.StartOffset))
+        {
+            if (processed.Contains(seqBlock.Id))
+                continue;
+
+            if (seqBlock.Statements != null && seqBlock.Statements.Count > 0)
+            {
+                stmts.AddRange(seqBlock.Statements);
+                processed.Add(seqBlock.Id);
+            }
+        }
+
+        return stmts;
+    }
+
+    private List<Stmt> GenerateStatementsFromSeqBlock(SequentialBlock seqBlock, List<SequentialBlock> seqBlocks, HashSet<int> processed)
+    {
+        var stmts = new List<Stmt>();
+
+        if (processed.Contains(seqBlock.Id))
+            return stmts;
+
+        processed.Add(seqBlock.Id);
+
+        if (seqBlock.ParentStructure != null)
+        {
+            var structure = seqBlock.ParentStructure;
+            var structureStmts = BuildStructureStatements(structure);
+            stmts.AddRange(structureStmts);
+
+            processed.Add(structure.Header.Id);
+            foreach (var bodyBlock in structure.BodyBlocks)
+                processed.Add(bodyBlock.Id);
+
+            if (structure is WithControlStructure withStruct && withStruct.HandlerBlock != null)
+                processed.Add(withStruct.HandlerBlock.Id);
+
+            if (structure is TryControlStructure tryStruct)
+            {
+                foreach (var (handler, _) in tryStruct.ExceptHandlers)
+                    processed.Add(handler.Id);
+                if (tryStruct.ElseBlock != null)
+                    processed.Add(tryStruct.ElseBlock.Id);
+                if (tryStruct.FinallyBlock != null)
+                    processed.Add(tryStruct.FinallyBlock.Id);
+            }
+
+            if (structure is IfElseControlStructure ifStruct)
+            {
+                if (ifStruct.TrueBranch != null)
+                    processed.Add(ifStruct.TrueBranch.Id);
+                if (ifStruct.FalseBranch != null)
+                    processed.Add(ifStruct.FalseBranch.Id);
+            }
+
+            if (structure is ForLoopControlStructure forStruct && forStruct.ElseBlock != null)
+                processed.Add(forStruct.ElseBlock.Id);
+
+            if (structure is WhileLoopControlStructure whileStruct && whileStruct.ElseBlock != null)
+                processed.Add(whileStruct.ElseBlock.Id);
+
+            foreach (var succ in structure.Header.Successors)
+            {
+                if (!processed.Contains(succ.Id))
+                    stmts.AddRange(GenerateStatementsFromSeqBlock(succ, seqBlocks, processed));
+            }
+        }
+        else if (seqBlock.Statements != null)
+        {
+            stmts.AddRange(seqBlock.Statements);
+
+            foreach (var succ in seqBlock.Successors)
+            {
+                if (!processed.Contains(succ.Id))
+                    stmts.AddRange(GenerateStatementsFromSeqBlock(succ, seqBlocks, processed));
+            }
+        }
+
+        return stmts;
+    }
+
+    private List<Stmt> BuildStructureStatements(ISequentialControlStructure structure)
+    {
+        return structure switch
+        {
+            ForLoopControlStructure forLoop => BuildForLoopStructureStatements(forLoop),
+            WhileLoopControlStructure whileLoop => BuildWhileLoopStructureStatements(whileLoop),
+            WithControlStructure withStmt => BuildWithStructureStatements(withStmt),
+            TryControlStructure tryStmt => BuildTryStructureStatements(tryStmt),
+            IfElseControlStructure ifElse => BuildIfElseStructureStatements(ifElse),
+            _ => new List<Stmt>()
+        };
+    }
+
+    private List<Stmt> BuildForLoopStructureStatements(ForLoopControlStructure forLoop)
+    {
+        var headerInstrs = forLoop.Header.Instructions;
+        var forIterIdx = headerInstrs.FindIndex(i => i.Opcode == Opcode.FOR_ITER);
+
+        var iterExpr = ExtractIterExpression(forLoop.Header.SourceBlocks[0]);
+        var loopVar = ExtractLoopVariable(forLoop.Header.SourceBlocks[0], forLoop.Header.SourceBlocks.ToList());
+
+        var bodyStmts = new List<Stmt>();
+        foreach (var bodyBlock in forLoop.BodyBlocks)
+        {
+            if (bodyBlock.Statements != null)
+                bodyStmts.AddRange(bodyBlock.Statements);
+        }
+
+        var elseStmts = forLoop.ElseBlock?.Statements;
+
+        return new List<Stmt> { new For(loopVar, iterExpr, bodyStmts, elseStmts) };
+    }
+
+    private List<Stmt> BuildWhileLoopStructureStatements(WhileLoopControlStructure whileLoop)
+    {
+        var testExpr = ExtractCondition(whileLoop.Header.SourceBlocks[0]);
+
+        var bodyStmts = new List<Stmt>();
+        foreach (var bodyBlock in whileLoop.BodyBlocks)
+        {
+            if (bodyBlock.Statements != null)
+                bodyStmts.AddRange(bodyBlock.Statements);
+        }
+
+        var elseStmts = whileLoop.ElseBlock?.Statements;
+
+        return new List<Stmt> { new While(testExpr, bodyStmts, elseStmts) };
+    }
+
+    private List<Stmt> BuildWithStructureStatements(WithControlStructure withStmt)
+    {
+        var headerInstrs = withStmt.Header.Instructions;
+        var sm = new StackMachine(_codeObject);
+
+        int endIdx = headerInstrs.FindIndex(i => 
+            i.Opcode == Opcode.SETUP_WITH || 
+            i.Opcode == Opcode.BEFORE_WITH || 
+            i.Opcode == Opcode.BEFORE_WITH_312 || 
+            i.Opcode == Opcode.BEFORE_WITH_313);
+
+        if (endIdx < 0)
+            endIdx = headerInstrs.Count;
+
+        for (int i = 0; i < endIdx; i++)
+        {
+            sm.Execute(headerInstrs[i]);
+        }
+
+        Expr? contextExpr = sm.ExprStackCount > 0 ? sm.PopExpr() : null;
+        if (contextExpr == null)
+            return new List<Stmt>();
+
+        Expr? optionalVar = null;
+        for (int i = endIdx + 1; i < headerInstrs.Count; i++)
+        {
+            if (headerInstrs[i].Opcode is Opcode.STORE_FAST or Opcode.STORE_NAME && headerInstrs[i].Argument.HasValue)
+            {
+                var idx = headerInstrs[i].Argument.Value;
+                string varName = headerInstrs[i].Opcode == Opcode.STORE_FAST
+                    ? (idx < _codeObject.Varnames.Count ? _codeObject.Varnames[idx] : $"v_{idx}")
+                    : (idx < _codeObject.Names.Count ? _codeObject.Names[idx] : $"n_{idx}");
+                optionalVar = new Name(varName, ExpressionContext.Store);
+                break;
+            }
+        }
+
+        var bodyStmts = new List<Stmt>();
+        foreach (var bodyBlock in withStmt.BodyBlocks)
+        {
+            if (bodyBlock.Statements != null)
+                bodyStmts.AddRange(bodyBlock.Statements);
+        }
+
+        return new List<Stmt> { new With(new List<WithItem> { new WithItem(contextExpr, optionalVar) }, bodyStmts) };
+    }
+
+    private List<Stmt> BuildTryStructureStatements(TryControlStructure tryStmt)
+    {
+        var bodyStmts = new List<Stmt>();
+        foreach (var bodyBlock in tryStmt.BodyBlocks)
+        {
+            if (bodyBlock.Statements != null)
+                bodyStmts.AddRange(bodyBlock.Statements);
+        }
+
+        var handlers = new List<ExceptHandler>();
+        foreach (var (handlerBlock, _) in tryStmt.ExceptHandlers)
+        {
+            var handlerStmts = handlerBlock.Statements ?? new List<Stmt>();
+            handlers.Add(new ExceptHandler(null, null, handlerStmts));
+        }
+
+        var elseStmts = tryStmt.ElseBlock?.Statements;
+        var finallyStmts = tryStmt.FinallyBlock?.Statements;
+
+        return new List<Stmt> { new Try(bodyStmts, handlers, elseStmts, finallyStmts) };
+    }
+
+    private List<Stmt> BuildIfElseStructureStatements(IfElseControlStructure ifElse)
+    {
+        var testExpr = ExtractCondition(ifElse.Header.SourceBlocks[0]);
+
+        var bodyStmts = ifElse.TrueBranch?.Statements ?? new List<Stmt>();
+        var elseStmts = ifElse.FalseBranch?.Statements;
+
+        return new List<Stmt> { new If(testExpr, bodyStmts, elseStmts) };
     }
 }

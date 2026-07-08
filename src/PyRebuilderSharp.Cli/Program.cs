@@ -27,6 +27,7 @@ class Program
         bool noSummary = false;
         bool noOrphans = false;
         bool useDebug = false;
+        bool useSeqBlocks = false;
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -55,6 +56,7 @@ class Program
             if (args[i] is "--no-summary") { noSummary = true; continue; }
             if (args[i] is "--no-orphans") { noOrphans = true; continue; }
             if (args[i] is "--debug") { useDebug = true; continue; }
+            if (args[i] is "--seq-blocks") { useSeqBlocks = true; continue; }
             // Treat as input file
             if (File.Exists(args[i]))
                 inputFiles.Add(args[i]);
@@ -85,7 +87,8 @@ class Program
             ShowHeader = !noHeader,
             ShowSummary = useDebug,
             ShowOrphanBlocks = useDebug,
-            VerboseErrors = useDebug  // 仅在调试模式下启动诊断输出
+            VerboseErrors = useDebug,
+            EnableSequentialBlocks = useSeqBlocks
         };
         if (inputFiles.Count > 1 || batchMode)
             RunBatch(inputFiles, outputDir, statsOnly, opts);
@@ -106,6 +109,7 @@ class Program
         Console.Error.WriteLine("  --no-summary         Suppress '# [SUMMARY]' footer");
         Console.Error.WriteLine("  --no-orphans         Suppress orphan block output");
         Console.Error.WriteLine("  --debug              Enable debug output ([SUMMARY], orphan blocks)");
+        Console.Error.WriteLine("  --seq-blocks         Enable sequential block decompilation architecture");
     }
 
     static void RunSingle(string inputFile, string? outputFile, DecompileOptions opts)

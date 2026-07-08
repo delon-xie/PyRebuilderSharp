@@ -17,4 +17,7 @@ public class DecompileOptions
     
     /// <summary>是否输出 # Decompiled from: 头部注释。默认为 false（抑制）。</summary>
     public bool ShowHeader { get; set; } = false;
+    
+    /// <summary>是否启用顺序块三阶段架构。默认为 false（使用原有逻辑）。</summary>
+    public bool EnableSequentialBlocks { get; set; } = false;
 }
