@@ -17,4 +17,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PyRebuilderSharp.Core\PyRebuilderSharp.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\test_data\**\*" Link="TestData\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

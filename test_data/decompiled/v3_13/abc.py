@@ -1,6 +1,87 @@
 # Decompiled from: <module>
 
+class ABCMeta(type):
+    def __new__(mcls, name, bases, namespace, /, **kwargs):
+        cls = None
+        _abc_init(cls)
+        return cls
+
+    def register(cls, subclass):
+        """Register a virtual subclass of an ABC.
+
+    Returns the subclass, to allow usage as a class decorator.
+"""
+        return _abc_register(cls, subclass)
+
+    def __instancecheck__(cls, instance):
+        'Override for isinstance(instance, cls).'
+        return _abc_instancecheck(cls, instance)
+
+    def __subclasscheck__(cls, subclass):
+        'Override for issubclass(subclass, cls).'
+        return _abc_subclasscheck(cls, subclass)
+
+    def _dump_registry(cls, file=None):
+        'Debug helper to print the ABC registry.'
+        print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
+        print(f"Inv. counter: {get_cache_token()}", file=file)
+        print(f"_abc_registry: {_abc_registry}", file=file)
+        print(f"_abc_cache: {_abc_cache}", file=file)
+        print(f"_abc_negative_cache: {_abc_negative_cache}", file=file)
+        print(f"_abc_negative_cache_version: {_abc_negative_cache_version}", file=file)
+
+    def _abc_registry_clear(cls):
+        'Clear the registry (for debugging or testing).'
+        _reset_registry(cls)
+
+    def _abc_caches_clear(cls):
+        'Clear the caches (for debugging or testing).'
+        _reset_caches(cls)
+
+def update_abstractmethods(cls):
+    """Recalculate the set of abstract methods of an abstract class.
+
+    If a class has had one of its abstract methods implemented after the
+    class was created, the method will not be considered implemented until
+    this function is called. Alternatively, if a new abstract method has been
+    added to the class, it will only be considered an abstract method of the
+    class after this function is called.
+
+    This function should be called before any use is made of the class,
+    usually in class decorators that add methods to the subject class.
+
+    Returns cls, to allow usage as a class decorator.
+
+    If cls is not an instance of ABCMeta, does nothing.
+"""
+    if hasattr(cls, '__abstractmethods__'):
+        return cls
+        abstracts = set()
+        cls.__bases__
+        getattr(scls, '__abstractmethods__', ())
+        value = getattr(cls, name, None)
+        getattr(value, '__isabstractmethod__', False)
+        abstracts.add(name)
+        cls.__dict__.items()
+        getattr(value, '__isabstractmethod__', False)
+        abstracts.add(name)
+        cls.__abstractmethods__ = frozenset(abstracts)
+        return cls
+    else:
+        abstracts = set()
+        cls.__bases__
+
+def ABC():
+    'ABC'
+    __module__ = __name__
+    __qualname__ = 'ABC'
+    __firstlineno__ = 205
+    __doc__ = """Helper class that provides a standard way to create an ABC using
+inheritance.
+"""
+    __slots__ = __static_attributes__ = ()
 'Abstract Base Classes (ABCs) according to PEP 3119.'
+
 def abstractmethod(funcobj):
     """A decorator indicating abstract methods.
 
@@ -87,13 +168,13 @@ class abstractproperty(property):
         super().__init__(self, v_18, self, v_52)
 try:
     from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
-except ImportError:
+except:
     from _py_abc import ABCMeta
     from _py_abc import get_cache_token
     ABCMeta.__module__ = 'abc'
-
-class ABCMeta(type):
-    """Metaclass for defining Abstract Base Classes (ABCs).
+else:
+    class ABCMeta(type):
+        """Metaclass for defining Abstract Base Classes (ABCs).
 
     Use this metaclass to create an ABC.  An ABC can be subclassed
     directly, and then acts as a mix-in class.  You can also register
@@ -105,45 +186,44 @@ class ABCMeta(type):
     implementations defined by the registering ABC be callable (not
     even via super()).
 """
-    def __new__(mcls, name, bases, namespace, /, **kwargs):
-        cls = None
-        _abc_init(cls)
-        return cls
+        def __new__(mcls, name, bases, namespace, /, **kwargs):
+            cls = None
+            _abc_init(cls)
+            return cls
 
-    def register(cls, subclass):
-        """Register a virtual subclass of an ABC.
+        def register(cls, subclass):
+            """Register a virtual subclass of an ABC.
 
     Returns the subclass, to allow usage as a class decorator.
 """
-        return _abc_register(cls, subclass)
+            return _abc_register(cls, subclass)
 
-    def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
-        return _abc_instancecheck(cls, instance)
+        def __instancecheck__(cls, instance):
+            'Override for isinstance(instance, cls).'
+            return _abc_instancecheck(cls, instance)
 
-    def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
-        return _abc_subclasscheck(cls, subclass)
+        def __subclasscheck__(cls, subclass):
+            'Override for issubclass(subclass, cls).'
+            return _abc_subclasscheck(cls, subclass)
 
-    def _dump_registry(cls, file=None):
-        'Debug helper to print the ABC registry.'
-        print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
-        print(f"Inv. counter: {get_cache_token()}", file=file)
-        print(f"_abc_registry: {_abc_registry}", file=file)
-        print(f"_abc_cache: {_abc_cache}", file=file)
-        print(f"_abc_negative_cache: {_abc_negative_cache}", file=file)
-        print(f"_abc_negative_cache_version: {_abc_negative_cache_version}", file=file)
+        def _dump_registry(cls, file=None):
+            'Debug helper to print the ABC registry.'
+            print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
+            print(f"Inv. counter: {get_cache_token()}", file=file)
+            print(f"_abc_registry: {_abc_registry}", file=file)
+            print(f"_abc_cache: {_abc_cache}", file=file)
+            print(f"_abc_negative_cache: {_abc_negative_cache}", file=file)
+            print(f"_abc_negative_cache_version: {_abc_negative_cache_version}", file=file)
 
-    def _abc_registry_clear(cls):
-        'Clear the registry (for debugging or testing).'
-        _reset_registry(cls)
+        def _abc_registry_clear(cls):
+            'Clear the registry (for debugging or testing).'
+            _reset_registry(cls)
 
-    def _abc_caches_clear(cls):
-        'Clear the caches (for debugging or testing).'
-        _reset_caches(cls)
-
-def update_abstractmethods(cls):
-    """Recalculate the set of abstract methods of an abstract class.
+        def _abc_caches_clear(cls):
+            'Clear the caches (for debugging or testing).'
+            _reset_caches(cls)
+    def update_abstractmethods(cls):
+        """Recalculate the set of abstract methods of an abstract class.
 
     If a class has had one of its abstract methods implemented after the
     class was created, the method will not be considered implemented until
@@ -158,21 +238,25 @@ def update_abstractmethods(cls):
 
     If cls is not an instance of ABCMeta, does nothing.
 """
-    value = getattr(cls, name, None)
-    if not hasattr(cls, '__abstractmethods__'):
-        pass
-    for scls in cls.__bases__:
-        pass
-    else:
-        for (value, name) in cls.__dict__.items():
-            if not getattr(value, '__isabstractmethod__', False):
-                continue
-        else:
+        if hasattr(cls, '__abstractmethods__'):
+            return cls
+            abstracts = set()
+            cls.__bases__
+            getattr(scls, '__abstractmethods__', ())
+            value = getattr(cls, name, None)
+            getattr(value, '__isabstractmethod__', False)
+            abstracts.add(name)
+            cls.__dict__.items()
+            getattr(value, '__isabstractmethod__', False)
+            abstracts.add(name)
             cls.__abstractmethods__ = frozenset(abstracts)
             return cls
-
-class ABC(metaclass=ABCMeta):
-    """Helper class that provides a standard way to create an ABC using
+        else:
+            abstracts = set()
+            cls.__bases__
+    class ABC(metaclass=ABCMeta):
+        """Helper class that provides a standard way to create an ABC using
     inheritance.
 """
-    __slots__ = __static_attributes__ = ()
+        __slots__ = __static_attributes__ = ()
+    pass

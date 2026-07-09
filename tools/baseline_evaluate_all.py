@@ -11,8 +11,8 @@ CLI_PROJECT = os.path.join(PROJECT_DIR, "src/PyRebuilderSharp.Cli")
 INPUT_DIR = os.path.join(PROJECT_DIR, "test_data/input")
 COMPILED_DIR = os.path.join(PROJECT_DIR, "test_data/compiled")
 DECOMPILED_DIR = os.path.join(PROJECT_DIR, "test_data/decompiled")
-REPORT_DATE = datetime.now().strftime("%Y%m%d")
-REPORT_PATH = os.path.join(PROJECT_DIR, f"docs/baseline_evaluate_report_{REPORT_DATE}_1.md")
+REPORT_DATE = datetime.now().strftime("%Y%m%d_%H%M%S")
+REPORT_PATH = os.path.join(PROJECT_DIR, f"docs/baseline_evaluate_report_{REPORT_DATE}.md")
 
 VERSIONS = ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 KEY_FILES = ["abc.py", "ast.py", "enum.py", "re.py", "functools.py", "contextlib.py", "pprint.py", "dataclasses.py", "reprlib.py"]
@@ -83,16 +83,18 @@ def main():
     batch_out = os.path.join(DECOMPILED_DIR, "_batch")
     os.makedirs(batch_out)
     t0 = time.time()
+    # Batch decompile
     r = subprocess.run(
-        ["dotnet", "exec", os.path.join(PROJECT_DIR, "bin/release/PyRebuilderSharp.Cli.dll"),
-         "-d", COMPILED_DIR, "-o", batch_out],
+        ["dotnet", "run", "--project", CLI_PROJECT, "-c", "Release", "--",
+         "--seq-blocks", "-d", COMPILED_DIR, "-o", batch_out],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-        timeout=300, cwd=PROJECT_DIR
+        timeout=600, cwd=PROJECT_DIR
     )
     elapsed = time.time() - t0
-    # Batch creates subdirectory matching input dir name
+    # Find all .py files recursively (batch mode creates subdirs)
     import glob as _glob
-    success_count = len(_glob.glob(os.path.join(batch_out, "**/*.py"), recursive=True))
+    all_py_files = _glob.glob(os.path.join(batch_out, "**/*.py"), recursive=True)
+    success_count = len(all_py_files)
     print(f"  {elapsed:.1f}s — {success_count} files decompiled")
 
     # Organize by version
@@ -113,13 +115,22 @@ def main():
         source_file = base + '.py'
         rel = os.path.relpath(os.path.join(COMPILED_DIR, fname), PROJECT_DIR)
         batch_py = os.path.join(batch_out, os.path.basename(COMPILED_DIR), os.path.splitext(fname)[0] + '.py')
+        if not os.path.exists(batch_py):
+            # Fallback: search recursively
+            import glob as _g2
+            matches = _g2.glob(os.path.join(batch_out, "**", os.path.splitext(fname)[0] + ".py"), recursive=True)
+            batch_py = matches[0] if matches else batch_py
         dest = os.path.join(DECOMPILED_DIR, ver_tag(ver), source_file)
         success = os.path.exists(batch_py)
         if success:
             shutil.copy2(batch_py, dest)
-            with open(dest) as f:
-                source = f.read()
-            orphans = count_orphans(source)
+            if os.path.getsize(dest) > 0:
+                with open(dest) as f:
+                    source = f.read()
+                orphans = count_orphans(source)
+            else:
+                orphans = 0
+                success = False
         else:
             orphans = 0
         if base not in all_results:

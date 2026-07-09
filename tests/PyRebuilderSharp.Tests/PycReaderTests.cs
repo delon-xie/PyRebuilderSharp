@@ -13,7 +13,7 @@ public class PycReaderTests
     public void Read_SimpleConst38_ReturnsValidCodeObject()
     {
         var reader = new PycReader();
-        var pycPath = Path.Combine(TestDataDir, "compiled", "simple_const.3.8.pyc");
+        var pycPath = Path.Combine(TestDataDir, "compiled", "simple_funcs.3.8.pyc");
         var data = File.ReadAllBytes(pycPath);
         var code = reader.Read(data);
 
@@ -27,7 +27,7 @@ public class PycReaderTests
     {
         var reader = new PycReader();
         var data = File.ReadAllBytes(
-            Path.Combine(TestDataDir, "compiled", "simple_const.3.8.pyc"));
+            Path.Combine(TestDataDir, "compiled", "simple_funcs.3.8.pyc"));
         var code = reader.Read(data);
 
         code.Instructions.Should().AllSatisfy(i =>
@@ -41,7 +41,7 @@ public class PycReaderTests
     {
         var reader = new PycReader();
         var data = File.ReadAllBytes(
-            Path.Combine(TestDataDir, "compiled", "simple_const.3.8.pyc"));
+            Path.Combine(TestDataDir, "compiled", "simple_funcs.3.8.pyc"));
         var code = reader.Read(data);
 
         code.Constants.Should().NotBeEmpty();
@@ -52,7 +52,7 @@ public class PycReaderTests
     {
         var reader = new PycReader();
         var data = File.ReadAllBytes(
-            Path.Combine(TestDataDir, "compiled", "test_functions_py3.38.pyc"));
+            Path.Combine(TestDataDir, "compiled", "test_simple_py27.3.8.pyc"));
         var code = reader.Read(data);
 
         code.Should().NotBeNull();

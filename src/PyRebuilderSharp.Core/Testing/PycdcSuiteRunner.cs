@@ -62,29 +62,37 @@ public class PycdcSuiteRunner
     }
 
     /// <summary>
-    /// 从程序集路径向上查找 TestData 目录。
+    /// 从程序集路径向上查找测试数据目录。
     /// 查找顺序：程序集目录 → /bin/ 上级 → /tests/ 上级 → 解决方案根
+    /// 支持 TestData 和 test_data 两种目录名。
     /// </summary>
     private static string ResolveTestDataDir()
     {
-        // 尝试从当前程序集位置向上查找
         var assemblyPath = typeof(PycdcSuiteRunner).Assembly.Location;
         var dir = Path.GetDirectoryName(assemblyPath)!;
 
-        // 最多向上找 5 层
         for (int i = 0; i < 5; i++)
         {
-            var candidate = Path.Combine(dir, "TestData");
-            if (Directory.Exists(candidate))
-                return candidate;
+            var candidate1 = Path.Combine(dir, "TestData");
+            if (Directory.Exists(candidate1))
+                return candidate1;
+            
+            var candidate2 = Path.Combine(dir, "test_data");
+            if (Directory.Exists(candidate2))
+                return candidate2;
+            
             var parent = Path.GetDirectoryName(dir);
             if (parent == null) break;
             dir = parent;
         }
 
-        // 兜底：解决方案根目录
-        return Path.Combine(
-            Environment.CurrentDirectory, "..", "..", "..", "..", "TestData");
+        var solutionDir = Path.GetFullPath(Path.Combine(
+            Environment.CurrentDirectory, "..", "..", ".."));
+        var candidate3 = Path.Combine(solutionDir, "test_data");
+        if (Directory.Exists(candidate3))
+            return candidate3;
+
+        return Path.Combine(solutionDir, "TestData");
     }
 
     private void LoadManifest()
