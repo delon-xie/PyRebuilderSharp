@@ -26,6 +26,7 @@ public class StackMachine
     private List<Expr>? _pendingUnpackTargets; // 待处理的元组解包目标列表
     private object? _kwNames; // 3.11+ KW_NAMES 存储的关键词名元组，由 CALL 消费
     private Operator? _pendingInplaceOp; // 待处理的原地操作（用于增强赋值）
+    private bool _pendingAwait; // 标记 await 模式中的 LOAD_CONST None
 
     public StackMachine(CodeObject code)
     {
@@ -117,6 +118,11 @@ public class StackMachine
             // ---- 常量加载 ----
             case Opcode.LOAD_CONST:
                 var value = _code.Constants.TryGetValue(instr.Argument ?? 0, out var v) ? v : null;
+                if (_pendingAwait && value == null)
+                {
+                    _pendingAwait = false;
+                    return null;
+                }
                 _exprStack.Push(new Constant(value));
                 return null;
 
@@ -802,10 +808,8 @@ public class StackMachine
             }
             case Opcode.RETURN_GENERATOR_313:
             {
-                var retValue = SafePop();
-                if (retValue is Starred starred && starred.Ctx == ExpressionContext.Load)
-                    retValue = starred.Value;
-                return new Return(retValue);
+                SafePop();
+                return null;
             }
 
             // ---- 栈操作 ----
@@ -1695,15 +1699,61 @@ public class StackMachine
                 return null;
             }
 
-            // ---- 3.11+ SEND: generator send ----
+            // ---- GET_AWAITABLE: await 的第一步 ----
+            case Opcode.GET_AWAITABLE:
+            case Opcode.GET_AWAITABLE_313:
+            {
+                if (_code.IsCoroutine)
+                {
+                    var awaitExpr = SafePop();
+                    if (awaitExpr != null)
+                    {
+                        _exprStack.Push(new Await(awaitExpr));
+                        _pendingAwait = true;
+                    }
+                }
+                else
+                {
+                    SafePop();
+                }
+                return null;
+            }
+
+            // ---- END_SEND: await 的结束 ----
+            case Opcode.END_SEND:
+            case Opcode.END_SEND_313:
+            {
+                return null;
+            }
+
+            // ---- 3.11+ SEND: generator send / await ----
             case Opcode.SEND:
             {
                 // SEND pops two: generator, send_value
                 // For AST: treat like yield from
+                // In coroutines (async def), SEND is used for await
+                // Pattern: GET_AWAITABLE -> LOAD_CONST None -> SEND
+                // GET_AWAITABLE already created Await expression
                 var sendValue = SafePop();
                 var genExpr = SafePop();
-                if (genExpr != null)
-                    _exprStack.Push(genExpr);  // SEND pushes result; keep gen for now
+                
+                if (_code.IsCoroutine)
+                {
+                    if (!(sendValue is Constant constExpr && constExpr.Value == null))
+                    {
+                        if (genExpr != null)
+                        {
+                            _exprStack.Push(new Await(genExpr));
+                        }
+                    }
+                }
+                else
+                {
+                    if (genExpr != null)
+                    {
+                        _exprStack.Push(genExpr);
+                    }
+                }
                 return null;
             }
 
@@ -2244,6 +2294,10 @@ public class StackMachine
             case Opcode.YIELD_VALUE:
             {
                 var yielded = SafePop();
+                if (_code.IsCoroutine)
+                {
+                    return null;
+                }
                 return new Yield(yielded);
             }
 

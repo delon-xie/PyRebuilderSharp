@@ -112,6 +112,9 @@ public class VersionStrategy312 : VersionStrategyBase
             152 => Models.Bytecode.Opcode.MATCH_CLASS_312,
             49 => Models.Bytecode.Opcode.WITH_EXCEPT_START_312,
             53 => Models.Bytecode.Opcode.BEFORE_WITH_312,
+            75 => Models.Bytecode.Opcode.RETURN_GENERATOR_313,
+            131 => Models.Bytecode.Opcode.GET_AWAITABLE,
+            150 => Models.Bytecode.Opcode.YIELD_VALUE_313,
 
             // 推导式操作码（3.12 原始值不同于 3.13+ 的重新编号）
             // CPython 3.12 Include/opcode.h: SET_ADD=17, LIST_APPEND=18, MAP_ADD=19

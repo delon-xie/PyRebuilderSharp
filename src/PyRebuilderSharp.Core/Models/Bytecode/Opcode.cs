@@ -252,6 +252,10 @@ public enum Opcode
     MATCH_CLASS_312 = 183,     // 3.12+ (raw byte 152)
     BEFORE_WITH_312 = 199,     // 3.12+ (was 153 in 3.7-3.10, raw byte 53)
     WITH_EXCEPT_START_312 = 188, // 3.12+ (was 154 in 3.7-3.10, raw byte 49)
+    
+    // async/await 操作码
+    GET_AWAITABLE = 184,       // 3.12+: await 的第一步（raw byte 46）
+    END_SEND = 185,            // 3.12+: await 的结束（raw byte 60）
 
     // ==================== Python 3.13+ 操作码 ====================
     // 3.13 重新编号了几乎所有操作码，以下别名对应 3.13 的原始字节值。
