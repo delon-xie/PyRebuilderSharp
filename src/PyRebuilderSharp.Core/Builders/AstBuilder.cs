@@ -686,6 +686,13 @@ public class AstBuilder
                 stmts.RemoveAll(s => s is Raise { Exc: null, Cause: null });
         }
 
+        // 移除 handler cleanup 泄漏：从非空体中移除多余的 x = None（异常变量清理）
+        int cleanupCount = stmts.Count(s => s is Assign a && a.Targets.Count == 1
+            && a.Value is Constant { Value: null });
+        if (cleanupCount > 0 && stmts.Count > cleanupCount)
+            stmts.RemoveAll(s => s is Assign a && a.Targets.Count == 1
+                && a.Value is Constant { Value: null });
+
         // 递归处理子结构
         for (int i = 0; i < stmts.Count; i++)
         {
@@ -10121,63 +10128,41 @@ public class AstBuilder
             }
         }
 
-        var allEtEntries = new List<ExceptionTableEntry>();
         var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
 
+        // Try structures — per ExceptionTable 条目迭代
+        // 收集所有 Depth==0 的 ET 条目的 start offset（每个 try 唯一）
+        var tryStartOffsets = new HashSet<int>();
         foreach (var seqBlock in seqBlocks)
         {
             foreach (var et in seqBlock.ExceptionTableEntries)
             {
-                if (et.IsExcept || et.IsFinally)
-                {
-                    if (!allEtEntries.Contains(et))
-                        allEtEntries.Add(et);
-                }
+                if (et.Depth == 0 && !et.Lasti && (et.IsExcept || et.IsFinally))
+                    tryStartOffsets.Add(et.StartOffset);
             }
         }
 
-        if (allEtEntries.Count > 0)
+        var tryHeaders = new HashSet<SequentialBlock>();
+        foreach (var tryStart in tryStartOffsets.OrderBy(x => x))
         {
-            var tryEtEntries = allEtEntries.Where(et => et.IsExcept && !et.Lasti).ToList();
-            if (tryEtEntries.Count > 0)
-            {
-                int tryStartOffset = tryEtEntries.Select(et => et.StartOffset).Min();
-                int tryEndOffset = tryEtEntries.Select(et => et.EndOffset).Max();
-
-                var headerBlock = seqBlocks.FirstOrDefault(sb => 
-                    sb.StartOffset <= tryStartOffset && sb.EndOffset > tryStartOffset);
-
-                if (headerBlock != null && !visited.Contains(headerBlock.Id))
-                {
-                    var tryStructure = ParseTryStructure(headerBlock, seqBlocks);
-                    if (tryStructure != null)
-                    {
-                        structures.Add(tryStructure);
-                        visited.Add(headerBlock.Id);
-                        foreach (var bodyBlock in tryStructure.BodyBlocks)
-                            visited.Add(bodyBlock.Id);
-                        if (tryStructure is TryControlStructure tryStruct)
-                        {
-                            foreach (var handler in tryStruct.ExceptHandlers)
-                                visited.Add(handler.Handler.Id);
-                            if (tryStruct.FinallyBlock != null)
-                                visited.Add(tryStruct.FinallyBlock.Id);
-                        }
-                    }
-                }
-            }
+            var headerBlock = seqBlocks.FirstOrDefault(sb =>
+                sb.StartOffset <= tryStart && sb.EndOffset > tryStart);
+            if (headerBlock != null && !visited.Contains(headerBlock.Id))
+                tryHeaders.Add(headerBlock);
         }
 
-        foreach (var seqBlock in seqBlocks)
+        foreach (var seqBlock in seqBlocks.OrderBy(b => b.StartOffset))
         {
             if (visited.Contains(seqBlock.Id))
                 continue;
 
-            bool hasSetupOpcode = seqBlock.Instructions.Any(i => 
+            bool hasSetupOpcode = seqBlock.Instructions.Any(i =>
                 i.Opcode == Opcode.SETUP_FINALLY ||
                 i.Opcode == Opcode.SETUP_EXCEPT);
-            
-            if (hasSetupOpcode)
+
+            bool isEtTryHeader = tryHeaders.Contains(seqBlock);
+
+            if (hasSetupOpcode || isEtTryHeader)
             {
                 var tryStructure = ParseTryStructure(seqBlock, seqBlocks);
                 if (tryStructure != null)
@@ -10776,16 +10761,38 @@ public class AstBuilder
 
         if (hasSetupOpcode)
         {
-            foreach (var et in header.ExceptionTableEntries)
+            if (header.ExceptionTableEntries.Count > 0)
             {
-                if (blockByOffset.TryGetValue(et.TargetOffset, out var targetBlock))
+                // 3.11+ ExceptionTable path
+                foreach (var et in header.ExceptionTableEntries)
                 {
-                    if (targetBlock.Instructions.Any(i => i.Opcode == Opcode.END_FINALLY))
+                    if (blockByOffset.TryGetValue(et.TargetOffset, out var targetBlock))
                     {
-                        finallyBlock = targetBlock;
+                        if (targetBlock.Instructions.Any(i => i.Opcode == Opcode.END_FINALLY))
+                        {
+                            finallyBlock = targetBlock;
+                        }
+                        else
+                        {
+                            exceptHandlers.Add((targetBlock, null, null));
+                        }
                     }
-                    else
+                }
+            }
+            else
+            {
+                // 3.10- SETUP_FINALLY path: use instruction argument (jump target)
+                var setupInstr = header.Instructions.FirstOrDefault(i =>
+                    i.Opcode == Opcode.SETUP_FINALLY ||
+                    i.Opcode == Opcode.SETUP_EXCEPT);
+                if (setupInstr.Argument.HasValue)
+                {
+                    int handlerTarget = setupInstr.Argument.Value;
+                    var targetBlock = blockByOffset.Values
+                        .FirstOrDefault(sb => sb.StartOffset <= handlerTarget && sb.EndOffset >= handlerTarget);
+                    if (targetBlock != null)
                     {
+                        // SETUP_FINALLY can target either an except handler or a finally block
                         exceptHandlers.Add((targetBlock, null, null));
                     }
                 }
@@ -10811,6 +10818,9 @@ public class AstBuilder
                     }
                 }
             }
+
+            // 将 header 本身加入 bodyBlocks（header 包含 try body 的指令）
+            bodyBlocks.Add(header);
 
             while (worklist.Count > 0)
             {
@@ -10851,6 +10861,17 @@ public class AstBuilder
 
             var primaryExceptEntry = allEtEntries.FirstOrDefault(et => 
                 et.Depth == 0 && !et.Lasti && et.StartOffset == header.StartOffset);
+
+            // 如果精确匹配失败（seqBlock 可能包含 try 之前的代码），
+            // 找 header 范围内 StartOffset 最小的 ET 条目
+            if (primaryExceptEntry == null)
+            {
+                primaryExceptEntry = allEtEntries
+                    .Where(et => et.Depth == 0 && !et.Lasti &&
+                        et.StartOffset >= header.StartOffset && et.StartOffset < header.EndOffset)
+                    .OrderBy(et => et.StartOffset)
+                    .FirstOrDefault();
+            }
 
             if (primaryExceptEntry == null)
                 return null;
@@ -11162,12 +11183,26 @@ public class AstBuilder
                 if (hasExcMatch && seqBlock != exceptHandlers[0].Handler)
                     continue;
 
-                if (seqBlock.StartOffset >= tryStartOffset && seqBlock.StartOffset < tryEndOffset)
+                if (seqBlock.EndOffset > tryStartOffset && seqBlock.StartOffset < tryEndOffset)
                 {
                     if (finallyStart >= 0 && seqBlock.StartOffset >= finallyStart)
                         continue;
                     if (!bodyBlocks.Contains(seqBlock))
                         bodyBlocks.Add(seqBlock);
+                }
+            }
+
+            // ET路径：如果 bodyBlocks 为空但存在 handler，从 offset 范围推导 body
+            if (bodyBlocks.Count == 0 && exceptHandlers.Count > 0)
+            {
+                int firstHandlerStart = exceptHandlers.Min(h => h.Handler.StartOffset);
+                foreach (var seqBlock in seqBlocks)
+                {
+                    if (seqBlock.EndOffset > tryStartOffset && seqBlock.StartOffset < firstHandlerStart
+                        && !handlerOffsets.Contains(seqBlock.StartOffset))
+                    {
+                        bodyBlocks.Add(seqBlock);
+                    }
                 }
             }
         }

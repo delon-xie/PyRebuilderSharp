@@ -3,10 +3,10 @@
 
 ## Python字节码反编译器详细设计
 
-**版本**: v2.6
+**版本**: v2.7
 **日期**: 2026-07-09
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 Seq-Blocks 架构重构 🚀
+**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 标注优先顺序块流水线 🚀 — 4 阶段标注链路 · 逐 ET 条目标注 · 回边标注 · 统一链接
 
 ---
 
@@ -541,32 +541,200 @@ public bool VerifyNoOrphanBlocks(List<SequentialBlock> seqBlocks, ControlFlowGra
 
 ---
 
-## 8. ControlStructure Parser — 控制结构解析（Phase 3b）
+## 8. ControlStructure Parser — 标注优先的解析架构（Phase 3b）
 
-### 8.1 ParseControlStructures 执行顺序
+### 8.1 标注优先原则
 
-解析必须按特定顺序进行，否则会误判：
+Phase 7 的 ControlStructure Parser 遵循**标注优先**原则：先多轮扫描收集标注信息，再统一链接组装。整个流程分为四个子阶段：
 
-1. **循环结构优先**（ParseLoopStructure）— 逆序扫描（内层优先）
-   - 检测 FOR_ITER → ForLoop
-   - 检测 POP_JUMP_IF_* + 回边 → WhileLoop
-2. **with 结构**（ParseWithStructure）— SETUP_WITH / BEFORE_WITH / LOAD_SPECIAL
-3. **try 结构**（ParseTryStructure）— 先 ExceptionTable（3.11+）再 SETUP_FINALLY（3.10-）
-4. **if/else 结构**（ParseIfElseStructure）— POP_JUMP_IF_*（无回边）
-
-### 8.2 ParseTryStructure — ExceptionTable 模式
-
-3.11+ 版本通过 ExceptionTable 解析 try/except/finally。ParseTryStructure 处理流程：
-
-```csharp
-// 1. 从 seqBlock.ExceptionTableEntries 筛选 IsExcept 且非 Lasti 的条目
-// 2. 对每组相邻条目，确定 try body 范围
-// 3. 按 Depth 归类 except handler
-// 4. 对于有最后一条 IsFinally 的组 → Try(handlers, finally-block)
-// 5. 否则 → Try(handlers, orelse-block)
+```
+Phase 2:  ExceptionTable 标注扫描
+    ↓
+Phase 3:  控制块起始标注扫描
+    ↓
+Phase 4:  回边标注扫描
+    ↓
+Phase 5:  统一链接（基于所有标注信息）
+    ↓
+Phase 3c: 混合遍历 AST 组装
 ```
 
-### 8.3 LinkControlStructures — 结构链接
+### 8.2 Phase 2: ExceptionTable 标注扫描
+
+**适用范围**: Python 3.11+（ExceptionTable 机制）
+
+逐个遍历所有 SequentialBlock 的 `ExceptionTableEntries` 属性，为每个符合 `Depth == 0 && !Lasti && (IsExcept || IsFinally)` 的条目对应的 SequentialBlock 设置标注：
+
+```csharp
+// 扫描所有 ET 条目，收集唯一 try 起始偏移
+var tryStartOffsets = new HashSet<int>();
+foreach (var seqBlock in seqBlocks)
+{
+    foreach (var et in seqBlock.ExceptionTableEntries)
+    {
+        if (et.Depth == 0 && !et.Lasti && (et.IsExcept || et.IsFinally))
+            tryStartOffsets.Add(et.StartOffset);
+    }
+}
+
+// 为每个 try 找到对应的 header seqBlock
+var tryHeaders = new HashSet<SequentialBlock>();
+foreach (var tryStart in tryStartOffsets.OrderBy(x => x))
+{
+    var headerBlock = seqBlocks.FirstOrDefault(sb =>
+        sb.StartOffset <= tryStart && sb.EndOffset > tryStart);
+    if (headerBlock != null && tryHeaders.Add(headerBlock))
+    {
+        headerBlock.IsTryHeader = true;
+        headerBlock.ExceptionTryStartOffset = tryStart;
+        // 从 ET 条目推导 try body 结束偏移
+        var primaryEntry = seqBlock.ExceptionTableEntries
+            .FirstOrDefault(et => et.StartOffset == tryStart);
+        if (primaryEntry != null)
+            headerBlock.ExceptionTryEndOffset = primaryEntry.EndOffset;
+    }
+}
+```
+
+**关键**: 逐 ET 条目标注，而非全局合并。避免将多个 try/except 合并为一个。
+
+### 8.3 Phase 3: 控制块起始标注扫描
+
+遍历所有 SequentialBlock，扫描指令流，为控制块起始设置标注：
+
+| 指令模式 | 标注 | 说明 |
+|---------|------|------|
+| `FOR_ITER` | `IsLoopHeader = true` | for 循环头 |
+| `POP_JUMP_IF_*` + 回边 | `IsLoopHeader = true` | while 循环头 |
+| `SETUP_FINALLY` / `SETUP_EXCEPT` | `IsTryHeader = true` | try 头（3.10-） |
+| ET StartOffset 匹配 | `IsTryHeader = true` | try 头（3.11+） |
+| `SETUP_WITH` / `BEFORE_WITH` / `LOAD_SPECIAL` | `IsWithHeader = true` | with 头 |
+| `POP_JUMP_IF_*`（无回边） | `IsConditionHeader = true` | if/else 头 |
+| `JUMP_IF_FALSE_OR_POP` / `JUMP_IF_TRUE_OR_POP` | `IsConditionHeader = true` | if/else 头（3.11+） |
+
+**标注顺序**: 循环头优先标注（逆序，内层优先），然后是 try/with/if 头。
+
+### 8.4 Phase 4: 回边标注扫描
+
+遍历所有 SequentialBlock 的指令，识别回边和循环体：
+
+```csharp
+// 回边检测: JUMP_ABSOLUTE → 目标偏移指向已标注的 IsLoopHeader
+foreach (var seqBlock in seqBlocks)
+{
+    foreach (var instr in seqBlock.Instructions)
+    {
+        if (instr.Opcode == Opcode.JUMP_ABSOLUTE && instr.Argument.HasValue)
+        {
+            var targetOffset = instr.Argument.Value;
+            var target = seqBlocks.FirstOrDefault(sb =>
+                sb.StartOffset <= targetOffset && sb.EndOffset >= targetOffset);
+            if (target != null && target.IsLoopHeader)
+            {
+                seqBlock.IsBackEdgeTarget = true;  // 回边块
+                target.IsLoopBody = true;           // 目标 → 循环体
+            }
+        }
+    }
+}
+
+// FOR_ITER 的 JumpTarget 指向 else/exit 块
+foreach (var seqBlock in seqBlocks.Where(b => b.IsLoopHeader))
+{
+    var forIter = seqBlock.Instructions.FirstOrDefault(i => i.Opcode == Opcode.FOR_ITER);
+    if (forIter.Argument.HasValue)
+    {
+        // FOR_ITER 的目标 = 循环 else/exit 入口
+        var forTarget = findSeqBlockByOffset(forIter.Argument.Value);
+        if (forTarget != null)
+            forTarget.IsForIterElseBlock = true;
+    }
+}
+```
+
+### 8.5 Phase 5: 统一链接
+
+基于所有标注信息，统一创建控制结构对象：
+
+```csharp
+var structures = new List<ISequentialControlStructure>();
+
+// 1. 先链接 Try 结构（ExceptionTable 定义了严格的 offset 边界）
+foreach (var seqBlock in seqBlocks.Where(b => b.IsTryHeader && !visited.Contains(b.Id)))
+{
+    var tryStructure = BuildTryStructure(seqBlock, seqBlocks);
+    if (tryStructure != null)
+    {
+        structures.Add(tryStructure);
+        MarkStructureVisited(tryStructure);
+    }
+}
+
+// 2. 然后链接 Loop 结构（可能嵌套在 Try 的 body 中）
+foreach (var seqBlock in seqBlocks.Where(b => b.IsLoopHeader && !visited.Contains(b.Id)))
+{
+    var loopStructure = BuildLoopStructure(seqBlock, seqBlocks);
+    if (loopStructure != null)
+    {
+        structures.Add(loopStructure);
+        MarkStructureVisited(loopStructure);
+    }
+}
+
+// 3. 再链接 With 结构
+foreach (var seqBlock in seqBlocks.Where(b => b.IsWithHeader && !visited.Contains(b.Id)))
+{
+    var withStructure = BuildWithStructure(seqBlock, seqBlocks);
+    if (withStructure != null)
+    {
+        structures.Add(withStructure);
+        MarkStructureVisited(withStructure);
+    }
+}
+
+// 4. 最后链接 IfElse 结构（最灵活，不与其他结构冲突）
+foreach (var seqBlock in seqBlocks.Where(b => b.IsConditionHeader && !visited.Contains(b.Id)))
+{
+    var ifElseStructure = BuildIfElseStructure(seqBlock, seqBlocks);
+    if (ifElseStructure != null)
+    {
+        structures.Add(ifElseStructure);
+        MarkStructureVisited(ifElseStructure);
+    }
+}
+```
+
+**链接优先级**: Try > Loop > With > IfElse。Try 先用 ExceptionTable 的严格 offset 边界约束，然后是 Loop（可能嵌套在 Try body 中），With 和 IfElse 最后。
+
+### 8.6 BuildTryStructure — ExceptionTable 模式（3.11+）
+
+核心流程：
+
+```csharp
+// 1. 从 seqBlock.ExceptionTableEntries 筛选与 header.StartOffset 匹配的条目
+// 2. 按 Depth 分组 handler
+// 3. 收集 try body 块（使用 overlap check: body end > tryStart && body start < tryEnd）
+//    注意: 必须用 EndOffset > StartOffset 的重叠检查而非 >= 检查，
+//    因为 header seqBlock 可能包含 try 之前的代码（MergeLinearChain 合并了前缀）
+// 4. 对每个 handler 块，检查 PUSH_EXC_INFO/CHECK_EXC_MATCH/STORE_FAST
+// 5. 如果有 IsFinally 条目 → 构建 finally-block
+// 6. 否则如果 handler 后有 else 范围的 seqBlock → 构建 else-block
+```
+
+### 8.7 BuildTryStructure — SETUP_FINALLY 模式（3.10-）
+
+核心流程：
+
+```csharp
+// 1. 从 header.Instructions 中找到 SETUP_FINALLY/SETUP_EXCEPT
+// 2. 读取指令的 Argument（handler 偏移量）
+// 3. 通过 offset 找到 handler 的 seqBlock
+// 4. 将 header 本身加入 bodyBlocks（header 包含 try body 的指令）
+// 5. BFS 遍历后继块，跳过 handler 偏移量
+// 6. 构建 try 结构
+```
+
+### 8.8 LinkControlStructures — 结构链接
 
 将解析出的控制结构链接回 SequentialBlock 列表：
 - `structure.Header.ParentStructure = structure`

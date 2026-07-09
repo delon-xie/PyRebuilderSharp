@@ -21,13 +21,21 @@
 
 **PyRebuilderSharp** 是一个从零构建的 Python 字节码反编译器，使用 C# 13 + .NET 10 + Avalonia UI，全栈自主实现（0 行第三方反编译依赖）。对标业界主流 pycdc（C++），在架构和稳健性上实现了根本性超越。
 
-### 最新进展 — Phase 7: Seq-Blocks 三阶段架构 🚀
+### 最新进展 — Phase 7: 标注优先的五阶段顺序块流水线 🚀
 
-Phase 7 引入全新的 `--seq-blocks` 反编译架构（默认启用），替代原有的 visited-based 递归遍历：
+Phase 7 引入全新的 `--seq-blocks` 反编译架构（默认启用），以**标注优先**为原则——先多轮扫描收集标注信息，再统一链接组装：
 
-1. **Phase 3a 顺序块构建** — 合并线性基本块链为 SequentialBlock，缓存反编译结果，保证无孤儿块
-2. **Phase 3b 控制结构解析** — 在 SequentialBlock 级别检测 for/while/if/try/with 结构
-3. **Phase 3c 混合遍历** — 控制结构与顺序语句混合输出，每个块只处理一次
+1. **Phase 1 顺序块构建** — 合并线性基本块链为 SequentialBlock，缓存反编译结果
+2. **Phase 2 ExceptionTable 标注** — 逐 ET 条目标注 IsExceptBlock 和 try 边界
+3. **Phase 3 控制块起始标注** — 检测 FOR_ITER/SETUP_FINALLY/POP_JUMP 等起始指令
+4. **Phase 4 回边标注** — 识别 JUMP_ABSOLUTE 回边和循环体
+5. **Phase 5 统一链接** — 基于所有标注信息按 Try→Loop→With→IfElse 顺序链接
+
+| 关键指标 | 数值 | 状态 |
+|---------|------|:----:|
+| 孤儿块 | **0**（全覆盖） | ✅ |
+| 运行时崩溃 | **0/1325** 文件 | ✅ |
+| 基线测试 100% 成功 | 1325 文件全部反编译 | ✅ |
 
 详见 [总体设计文档](docs/Python反编译总体设计.md) 和 `--seq-blocks` CLI 选项。
 
@@ -36,13 +44,12 @@ Phase 7 引入全新的 `--seq-blocks` 反编译架构（默认启用），替�
 | 指标 | 数值 | 状态 |
 |------|------|:----:|
 | 支持版本 | 2.7, 3.5 ~ 3.14 | ✅ |
-| 反编译架构 | Phase 7 Seq-Blocks 三阶段流水线 | 🚀 |
-| 真实 .pyc 通过率 | 182/182 (原有) + 白盒测试 251/405 (seq-blocks) | ✅ |
-| marshal 警告 | **0/938** (全覆盖) | ✅ |
+| 反编译架构 | Phase 7 标注优先五阶段流水线 | 🚀 |
+| 真实 .pyc 通过率 | 1325/1325 (100%)，0 崩溃 | ✅ |
 | CLI 模式 | `--seq-blocks`（默认）/ `--no-seq-blocks`（降级） | ✅ |
-| 白盒测试套件 | 405 用例覆盖 45 个测试文件 × 11 版本 | 🔄 收敛中 |
-| Phase 1–6 全部 | marshal/def/class/yield/async/match/19 语法 | ✅ 全部关闭 |
-| Phase Fix | 7 项关键 Bug 修复 | ✅ 全部关闭 |
+| 白盒测试通过率 | 287/405 (70%) | 🔄 收敛中 |
+| 测试报告 | `test_data/whitebox_report_*.md`（逐次） | ✅ |
+| 基线测试 | `docs/baseline_evaluate_report_20260709.md` | ✅ |
 
 ---
 

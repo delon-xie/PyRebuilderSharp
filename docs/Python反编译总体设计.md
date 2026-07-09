@@ -2,10 +2,10 @@
 
 ## Python字节码反编译器总体设计文档
 
-**版本**: v2.7
+**版本**: v2.8
 **日期**: 2026-07-09
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 Seq-Blocks 架构重构 🚀 — 三阶段顺序块管道 · 自动孤儿块检测 · 白盒测试 405 用例覆盖 · 42%～78% 版本通过率（持续收敛中）
+**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 标注优先顺序块流水线 🚀 — 5 阶段标注链路 · 0 孤儿块 · 0 崩溃 · 70% 白盒通过率（持续收敛中）
 
 ---
 
@@ -351,11 +351,11 @@ Counter(instr.opname for instr in dis.get_instructions(code))
                       Python 源代码（含注释兜底块）
 ```
 
-## 🌟 新架构：三阶段顺序块流水线（Phase 7 — --seq-blocks 模式）
+## 🌟 新架构：标注优先的五阶段顺序块流水线（Phase 7 — --seq-blocks 模式）
 
-> **核心思想**：Phase 7 引入全新的反编译架构，将原有的"基本块级递归+visited 集"控制流解构，改为**三阶段顺序块管道**。先解耦顺序块和结构块，再重组为完整 AST。
+> **核心思想**：Phase 7 引入全新的反编译架构，以**标注优先**为原则——先扫描获取所有信息（标注阶段），再统一链接和组装（组装阶段）。整个流水线遵循"标注→链接→组装"的递进式哲学。
 
-### 为什么需要三阶段架构？
+### 为什么需要标注优先架构？
 
 原有架构（Phase 3-6）的问题：
 1. **visited 集污染** — 嵌套控制块使用共享 visited HashSet，一个块被标记后其后续路径的块可能被静默跳过
@@ -363,64 +363,117 @@ Counter(instr.opname for instr in dis.get_instructions(code))
 3. **递归深度不可控** — BuildLoop/BuildTryFromBlock 嵌套递归导致 StackOverflow（已通过 visited.Remove 缓解但未根治）
 4. **块级容错不彻底** — 一个块失败（如未处理的操作码）导致整个控制结构断裂，后继块全部成为孤儿
 
-### 三阶段架构概览
+**改进后的架构解决**：
+1. **标注先于链接** — 在链接之前收集所有必需信息，避免孤儿块（2026-07-09 实测 0 孤儿块）
+2. **多轮标注链路** — ExceptionTable → IsExceptBlock → 控制块起始 → 回边 → 最终链接，每轮添加新标注
+3. **链接失效时可恢复** — 标注信息独立于链接结果，链接失败可以重新调整策略而不丢失标注
+
+### 五阶段标注架构概览
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 3a: 顺序块构建                                                   │
-│  ├── BlockScanner: 基本块划分（Leader 算法）                            │
-│  ├── SequentialBlockBuilder: 合并线性链 → SequentialBlock               │
-│  │   └── MergeLinearChain: 单后继单前驱的连续块合成一个 SequentialBlock  │
-│  ├── VerifyNoOrphanBlocks: 验证所有基本块都被覆盖（无孤儿块）         │
-│  └── DecompileSequentialBlocks: 逐 SequentialBlock 栈机模拟并缓存       │
-│                                                                         │
-│  ├── 输出: SequentialBlock[]  (每个带缓存的 Statements)                 │
-│  └── ✅ 保证: 所有基本块已被合并，无孤儿块                              │
-└─────────────────────────────────┬───────────────────────────────────────┘
-                                  │
-                                  ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 3b: 控制结构解析                                                 │
-│  ├── ParseControlStructures: 在 SequentialBlock 级别检测控制块          │
-│  │   ├── ParseLoopStructure: FOR_ITER / POP_JUMP_IF_* + 回边 → For/While│
-│  │   ├── ParseWithStructure: LOAD_SPECIAL/BEFORE_WITH → With            │
-│  │   ├── ParseTryStructure: ExceptionTable/SETUP_FINALLY → Try/Except   │
-│  │   └── ParseIfElseStructure: POP_JUMP_IF_* → If/Else                  │
-│  └── LinkControlStructures: 设置 SequentialBlock.ParentStructure         │
-│      ├── Header 块标记为结构头                                           │
-│      ├── Body 块标记为结构体                                             │
-│      └── Handler/Else/Finally 块分别标记                                 │
-│                                                                         │
-│  ├── 输出: ISequentialControlStructure[] (For/While/Try/With/IfElse)    │
-│  └── ✅ 保证: 每个 SequentialBlock.ParentStructure != null 归属到结构   │
-└─────────────────────────────────┬───────────────────────────────────────┘
-                                  │
-                                  ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│  Phase 3c: AST 组装（混合遍历）                                          │
-│  ├── GenerateAstStatementsHybrid: 从入口顺序块出发，DFS 遍历              │
-│  ├── 未归属结构 / 无 ParentStructure → 直接输出缓存的 Statements         │
-│  ├── 有 ParentStructure → 调用 BuildStructureStatements                  │
-│  │   ├── BuildForLoopStructureStatements → For(iter, target, body)       │
-│  │   ├── BuildWhileLoopStructureStatements → While(test, body)           │
-│  │   ├── BuildIfElseStructureStatements → If(test, body, orelse)        │
-│  │   ├── BuildTryStructureStatements → Try(body, handlers, orelse, fin) │
-│  │   └── BuildWithStructureStatements → With(items, body)               │
-│  ├── 每处理完一个结构 → MarkStructureBlocksProcessed 标记已处理          │
-│  └── 第二轮扫描: 处理剩余未处理的顺序块                                    │
-│                                                                         │
-│  ├── 输出: List<Stmt> → Module AST                                      │
-│  └── ✅ 保证: 所有 SequentialBlock 都被消费，无孤儿块                    │
-└─────────────────────────────────┬───────────────────────────────────────┘
+Phase 1: 顺序块构建 + DecompileStatements 缓存
+│
+▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 2: ExceptionTable 标注扫描                                             │
+│  ├── 遍历所有 ExceptionTable 条目（如果是 3.11+）                              │
+│  ├── 为每个条目对应的 SequentialBlock 设置：                                    │
+│  │   ├── IsExceptBlock = true      —— 该 block 是异常处理器                     │
+│  │   ├── ExceptionTryStartOffset    —— try body 起始偏移                        │
+│  │   └── ExceptionTryEndOffset      —— try body 结束偏移                        │
+│  └── 输出: 所有 IsExceptBlock 已标注的 SeqBlock 列表                            │
+└──────────────────────────┬───────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 3: 控制块起始标注扫描                                                    │
+│  ├── 遍历所有 SequentialBlock，检测控制块起始指令：                              │
+│  │   ├── FOR_ITER → IsLoopHeader = true                                        │
+│  │   ├── SETUP_FINALLY / SETUP_EXCEPT → IsTryHeader = true                    │
+│  │   ├── SETUP_WITH / BEFORE_WITH / LOAD_SPECIAL → IsWithHeader = true        │
+│  │   ├── POP_JUMP_IF_* / JUMP_IF_* → IsConditionHeader = true                │
+│  │   └── 如果 Block 的 StartOffset 匹配 ET 的 StartOffset → IsTryHeader = true│
+│  └── 输出: 所有控制块起始已标注的 SeqBlock 列表                                 │
+└──────────────────────────┬───────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 4: 回边标注扫描                                                         │
+│  ├── 遍历所有 SequentialBlock 的指令，检查 JUMP_ABSOLUTE 目标：                 │
+│  │   ├── 目标指向已标记为 IsLoopHeader 的块 → 标记回边块                        │
+│  │   └── 目标指向 POP_JUMP_IF_* 的 Fallthrough（跳过循环体）→ else 块          │
+│  ├── FOR_ITER 的 JumpTarget 指向的块 → IsForIterBlock                          │
+│  ├── 循环体入口块标记为 IsLoopBody                                            │
+│  └── 输出: 所有回边和循环体已标注的 SeqBlock 列表                               │
+└──────────────────────────┬───────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 5: 统一链接和组装                                                       │
+│  ├── 基于所有标注信息，逐结构创建控制结构对象：                                  │
+│  │   ├── 循环结构: Header + Body + Else 通过 LoopHeader + 回边 + 后继推断      │
+│  │   ├── Try 结构: Header + Body + Handler + Else + Finally                   │
+│  │   ├── With 结构: Header + Body + Handler                                   │
+│  │   ├── IfElse 结构: Header + TrueBranch + FalseBranch                        │
+│  │   └── 设置 SequentialBlock.ParentStructure 归属                             │
+│  ├── 先链接 Try 结构（ExceptionTable 定义了严格的 offset 边界）               │
+│  ├── 然后链接 Loop 结构（可能嵌套在 Try 的 body 中）                           │
+│  ├── 再链接 With 结构                                                         │
+│  └── 最后链接 IfElse 结构（最灵活，不与其他结构冲突）                         │
+│                                                                               │
+│  └── 输出: ISequentialControlStructure[] 列表                                  │
+└──────────────────────────┬───────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  后续新增标注步骤（可扩展设计）                                                  │
+│  ├── 未来需要增加新标注时，只需插入新的 Phase (如 Match 结构标注扫描)           │
+│  ├── 原有 Phases 不受影响，新增标注自动被 Phase 5 的链接逻辑消费                │
+│  └── 示例: Match 标注 → MATCH_KEYS/MATCH_CLASS → 新增 Phase 2b                │
+└──────────────────────────────────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 3c: AST 组装（混合遍历）                                                │
+│  ├── GenerateAstStatementsHybrid: 从入口顺序块出发，DFS 遍历                    │
+│  ├── 未归属结构 / 无 ParentStructure → 直接输出缓存的 Statements                │
+│  ├── 有 ParentStructure → 调用 BuildStructureStatements                        │
+│  │   ├── BuildForLoopStructureStatements → For(iter, target, body)            │
+│  │   ├── BuildWhileLoopStructureStatements → While(test, body)               │
+│  │   ├── BuildIfElseStructureStatements → If(test, body, orelse)             │
+│  │   ├── BuildTryStructureStatements → Try(body, handlers, orelse, fin)      │
+│  │   └── BuildWithStructureStatements → With(items, body)                    │
+│  ├── 每处理完一个结构 → MarkStructureBlocksProcessed 标记已处理                │
+│  └── 第二轮扫描: 处理剩余未处理的顺序块                                       │
+│                                                                               │
+│  ├── 输出: List<Stmt> → Module AST                                            │
+│  └── ✅ 保证: 所有 SequentialBlock 都被消费，无孤儿块                          │
+└─────────────────────────────────┬───────────────────────────────────────────┘
                                   │
                                   ▼
                       Python 源代码（含注释兜底块）
 ```
 
+### 标注优先的设计哲学
+
+```
+传统方法: 扫描  →  解析  →  递归构建
+              ↓
+标注优先: 多轮扫描（获取全部信息） →  统一链接（基于标注） →  混合组装
+
+标注优先的优势:
+  ┌─────────────────────────────────────────────────────┐
+  │ 1. 信息完整性: 链接前就已知道所有 try 边界和循环回边   │
+  │ 2. 无孤儿块: 链接失败时不丢失块，保留在 orphan 恢复   │
+  │ 3. 可扩展: 新增结构类型只需增加扫描 phase            │
+  │ 4. 可调试: 每个 phase 的输出独立可检查               │
+  └─────────────────────────────────────────────────────┘
+```
+
+### 效果验证（2026-07-09）
+
+- **0 孤儿块** — 三阶段标注 + 链接保证全覆盖
+- **0 运行时崩溃** — 1325 个文件全部反编译成功（1325/1325 = 100%）
+- try/except 结构从全局合并修复为**逐 ET 条目标注**后，EMPTY_TRY 从 163 降至 54
+
 ### 核心数据结构
 
 ```csharp
-// SequentialBlock — 基本块链合并后的线性执行单元
 public class SequentialBlock
 {
     public int Id;                               // 唯一标识
@@ -430,24 +483,41 @@ public class SequentialBlock
     public List<Stmt>? Statements;                // Phase 1 缓存的反编译结果
     public List<SequentialBlock> Successors;      // 后继顺序块
     
-    // 标注属性
-    public bool IsLoopHeader, IsConditionHeader, IsExceptionHandler;
-    public bool HasSetupWith, HasSetupFinally, HasSetupExcept;
-    public int? JumpTarget;
+    // Phase 2 标注: ExceptionTable 相关
+    public bool IsExceptBlock;                    // 是异常处理器
+    public int ExceptionTryStartOffset;           // try body 起始 (from ET)
+    public int ExceptionTryEndOffset;             // try body 结束 (from ET)
     
-    // Phase 2 后设置
+    // Phase 3 标注: 控制块起始识别
+    public bool IsLoopHeader;                    // FOR_ITER / 回边 POP_JUMP
+    public bool IsTryHeader;                     // SETUP_FINALLY / ET StartOffset
+    public bool IsWithHeader;                    // SETUP_WITH / BEFORE_WITH
+    public bool IsConditionHeader;               // POP_JUMP_IF_* / JUMP_IF_*
+    public bool HasSetupFinally, HasSetupExcept;
+    public bool HasSetupWith, HasBeforeWith, HasLoadSpecial;
+    
+    // Phase 4 标注: 回边与循环体
+    public bool IsLoopBody;                      // 在循环体内
+    public bool IsBackEdgeTarget;                // 跳转目标指向循环头
+    public int? JumpTarget;                      // 跳转目标偏移
+    
+    // Phase 5 链接
     public ISequentialControlStructure? ParentStructure;  // 所属控制结构
 }
+```
 
-// 控制结构接口
+### 控制结构接口
+
+```csharp
 public interface ISequentialControlStructure
 {
-    ControlStructureType Type { get; }           // ForLoop/WhileLoop/Try/With/IfElse
-    SequentialBlock Header { get; }              // 头部块
-    List<SequentialBlock> BodyBlocks { get; }    // 主体块
+    ControlStructureType Type { get; }
+    SequentialBlock Header { get; }
+    List<SequentialBlock> BodyBlocks { get; }
 }
 
-// 具体结构
+public enum ControlStructureType { Unknown, ForLoop, WhileLoop, Try, With, IfElse }
+
 public class ForLoopControlStructure : ISequentialControlStructure { ... }
 public class WhileLoopControlStructure : ISequentialControlStructure { ... }
 public class TryControlStructure : ISequentialControlStructure { ... }
@@ -463,12 +533,13 @@ public class IfElseControlStructure : ISequentialControlStructure { ... }
 
 | 维度 | Phase 3-6（原有） | Phase 7（--seq-blocks） |
 |------|------------------|------------------------|
-| **控制流解构方式** | visited HashSet 递归 | 顺序块合并 + 控制结构解析 + 链接 |
-| **孤儿块处理** | 多种分类 + 条件恢复 | 三阶段保证全覆盖，无孤儿 |
+| **控制流解构方式** | visited HashSet 递归 | 多轮标注 + 统一链接 |
+| **孤儿块处理** | 多种分类 + 条件恢复 | 三阶段标注保证全覆盖 |
 | **嵌套深度** | 受 C# 调用栈限制 | 用 Queue 显式栈，无递归深度问题 |
-| **确定性** | visited 顺序依赖遍历路径 | 顺序块 ID + offset 确定，路径无关 |
+| **确定性** | visited 顺序依赖遍历路径 | 标注信息无关顺序 |
 | **容错粒度** | 基本块级别 | SequentialBlock 级别（更大） |
 | **失败降级** | 无自动降级 | 孤儿块检测 → 自动 Fallback |
+| **可扩展性** | 新结构类型需改遍历逻辑 | 新增标注 Phase 即可 |
 | **调试可观测性** | `[BUILD]` / `[ORPHAN]` 日志 | `[SEQ_BUILD]` / `[PARSE_CTL]` 结构化日志 |
 
 ---
