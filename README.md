@@ -729,6 +729,20 @@ See [quick_start.md](quick_start.md) for detailed instructions.
 
 ---
 
+## Documentation
+
+| Document | Description |
+|:---------|:------------|
+| [Overall Design](docs/Python反编译总体设计.md) | v2.6 — Architecture, core principles (Chinese) |
+| [Detailed Design](docs/Python反编译详细设计.md) | v2.5 — Module design, API reference (Chinese) |
+| [Testing Baseline](docs/TESTING_BASELINE.md) | v2.1 — Test benchmarks & version matrix |
+| [Control Block Patterns](docs/control-block-patterns.md) | 7 categories, 28 sub-patterns |
+| [pyc Format Reference](docs/pyc-format-reference.md) | Python marshal format reference |
+| [Benchmark Report](docs/deepseek_v4_benchmark_report.md) | 🤖 Cross-tool comparison: uncompyle6 / decompyle3 / pycdc |
+| [Quick Start](quick_start.md) | Build, run, and test instructions |
+
+---
+
 > **PyRebuilderSharp** — Block-by-block Python bytecode decompiler.
 >
 > Fault tolerance at every block. One block's failure never silences the entire file.
