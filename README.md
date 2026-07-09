@@ -13,9 +13,12 @@
 
 # 🇨🇳 中文
 
-> 一个 Python 字节码反编译器 —— 基于 .NET 10 + Avalonia UI · Python 3.5 ~ 3.14 · 跨平台
+> 一个 Python 字节码反编译器 —— 基于 .NET 10 + Avalonia UI · Python 2.7 ~ 3.14 · 跨平台
 
 ---
+
+![PyRebuilderSharp GUI 截图](docs/images/screen.png)
+*GUI 界面：左侧文件树 → 中侧字节码（语法高亮）→ 右侧源码（VS Code 风格配色 + 双向滚动锁定）*
 
 ## 我们的成果
 
