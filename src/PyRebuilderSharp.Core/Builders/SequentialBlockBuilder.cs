@@ -66,9 +66,36 @@ public class SequentialBlockBuilder
                     current.Instructions[2].Opcode == Opcode.LOAD_SPECIAL;
             }
             
-            if (currentStartsWithWithHeader && seqBlock.Instructions.Count > 0)
+            bool currentStartsWithBeforeWith = current.Instructions.Count > 0 && 
+                (current.Instructions[0].Opcode == Opcode.BEFORE_WITH ||
+                 current.Instructions[0].Opcode == Opcode.BEFORE_WITH_312 ||
+                 current.Instructions[0].Opcode == Opcode.BEFORE_WITH_313);
+            
+            if ((currentStartsWithWithHeader || currentStartsWithBeforeWith) && seqBlock.Instructions.Count > 0)
             {
-                Console.Error.WriteLine($"[SEQ_BUILD] Next block starts with WITH header, breaking at block {current.Id}");
+                break;
+            }
+
+            bool prevBlockEndsWithBeforeWith = seqBlock.Instructions.Count > 0 &&
+                (seqBlock.Instructions.Last().Opcode == Opcode.BEFORE_WITH ||
+                 seqBlock.Instructions.Last().Opcode == Opcode.BEFORE_WITH_312 ||
+                 seqBlock.Instructions.Last().Opcode == Opcode.BEFORE_WITH_313);
+            bool currentStartsWithStoreFast = current.Instructions.Count > 0 &&
+                current.Instructions[0].Opcode == Opcode.STORE_FAST;
+            
+            if (prevBlockEndsWithBeforeWith && currentStartsWithStoreFast)
+            {
+                seqBlock.Instructions.Add(current.Instructions[0]);
+                seqBlock.SourceBlocks.Add(current);
+                
+                if (seqBlock.StartOffset == 0 || current.StartOffset < seqBlock.StartOffset)
+                    seqBlock.StartOffset = current.StartOffset;
+                
+                int newEndOffset = current.Instructions[0].Offset + 2;
+                if (newEndOffset > seqBlock.EndOffset)
+                    seqBlock.EndOffset = newEndOffset;
+                
+                
                 break;
             }
 
@@ -162,7 +189,42 @@ public class SequentialBlockBuilder
                 break;
             }
             
-            bool succHasWithInstruction = false;
+            bool seqBlockHasBeforeWith = seqBlock.Instructions.Any(i => 
+                i.Opcode == Opcode.BEFORE_WITH ||
+                i.Opcode == Opcode.BEFORE_WITH_312 ||
+                i.Opcode == Opcode.BEFORE_WITH_313);
+            
+            if (seqBlockHasBeforeWith)
+            {
+                int lastIdx = seqBlock.Instructions.Count - 1;
+                if (seqBlock.Instructions[lastIdx].Opcode == Opcode.STORE_FAST)
+                {
+                    break;
+                }
+                if (seqBlock.Instructions[lastIdx].Opcode == Opcode.BEFORE_WITH ||
+                    seqBlock.Instructions[lastIdx].Opcode == Opcode.BEFORE_WITH_312 ||
+                    seqBlock.Instructions[lastIdx].Opcode == Opcode.BEFORE_WITH_313)
+                {
+                    bool nextBlockHasStoreFast = false;
+                    if (current.Successors.Count == 1)
+                    {
+                        var succBlock = current.Successors.First();
+                        nextBlockHasStoreFast = succBlock.Instructions.Count > 0 && 
+                            succBlock.Instructions[0].Opcode == Opcode.STORE_FAST;
+                    }
+                    
+                    if (!nextBlockHasStoreFast)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+        
+        bool succHasWithInstruction = false;
         if (current.Successors.Count == 1)
         {
             var succBlock = current.Successors.First();
