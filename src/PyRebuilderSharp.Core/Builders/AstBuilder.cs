@@ -593,22 +593,12 @@ public class AstBuilder
     {
         if (stmts == null || stmts.Count == 0) return;
 
-        // 1. 合并连续 pass
-        for (int i = stmts.Count - 1; i > 0; i--)
-        {
-            if (stmts[i] is Pass && stmts[i - 1] is Pass)
-                stmts.RemoveAt(i);
-        }
+        // 1. 从 ANY 体中移除所有 pass（无论是否有非 pass 语句）
+        //    空的 pass 堆积是 FixEmptyFunctionBodies 和指令处理的累积结果
+        //    移除后若体为空，下文会自动补一个 pass
+        stmts.RemoveAll(s => s is Pass);
 
-        // 2. 从非空体中移除多余的 pass
-        if (stmts.Count > 1)
-        {
-            bool hasNonPass = stmts.Any(s => s is not Pass);
-            if (hasNonPass)
-                stmts.RemoveAll(s => s is Pass);
-        }
-
-        // 3. 递归进入子结构
+        // 2. 递归进入子结构（先处理子结构，再判断父体是否为空）
         foreach (var stmt in stmts)
         {
             switch (stmt)
@@ -637,6 +627,29 @@ public class AstBuilder
                         CollapseRedundantPasses(h.Body);
                     if (tryStmt.Orelse != null) CollapseRedundantPasses(tryStmt.Orelse);
                     if (tryStmt.Finalbody != null) CollapseRedundantPasses(tryStmt.Finalbody);
+                    break;
+            }
+        }
+
+        // 3. 为空体添加一个 pass（保持 Python 语法有效）
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            switch (stmts[i])
+            {
+                case FunctionDef fd when fd.Body.Count == 0:
+                    fd.Body.Add(new Pass());
+                    break;
+                case ClassDef cd when cd.Body.Count == 0:
+                    cd.Body.Add(new Pass());
+                    break;
+                case For f when f.Body.Count == 0:
+                    f.Body.Add(new Pass());
+                    break;
+                case While w when w.Body.Count == 0:
+                    w.Body.Add(new Pass());
+                    break;
+                case If iff when iff.Body.Count == 0:
+                    iff.Body.Add(new Pass());
                     break;
             }
         }
