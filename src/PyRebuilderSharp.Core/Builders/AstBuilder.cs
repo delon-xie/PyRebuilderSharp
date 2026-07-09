@@ -433,8 +433,9 @@ public class AstBuilder
         
         // 全局修复：遍历所有语句，修复空函数体
         FixEmptyFunctionBodies(stmts);
-        
-        // 修复顶层空函数体：如果模块体为空或只有注释，添加 pass 语句
+        CollapseRedundantPasses(stmts);
+
+        // 修复顶层空函数体
         bool hasNonComment = false;
         foreach (var stmt in stmts)
         {
@@ -586,6 +587,138 @@ public class AstBuilder
                 if (tryStmt.Finalbody != null) FixEmptyFunctionBodies(tryStmt.Finalbody);
             }
         }
+    }
+
+    private void CollapseRedundantPasses(List<Stmt> stmts)
+    {
+        if (stmts == null || stmts.Count == 0) return;
+
+        // 1. 合并连续 pass
+        for (int i = stmts.Count - 1; i > 0; i--)
+        {
+            if (stmts[i] is Pass && stmts[i - 1] is Pass)
+                stmts.RemoveAt(i);
+        }
+
+        // 2. 从非空体中移除多余的 pass
+        if (stmts.Count > 1)
+        {
+            bool hasNonPass = stmts.Any(s => s is not Pass);
+            if (hasNonPass)
+                stmts.RemoveAll(s => s is Pass);
+        }
+
+        // 3. 递归进入子结构
+        foreach (var stmt in stmts)
+        {
+            switch (stmt)
+            {
+                case FunctionDef fd:
+                    CollapseRedundantPasses(fd.Body);
+                    break;
+                case ClassDef cd:
+                    CollapseRedundantPasses(cd.Body);
+                    break;
+                case If ifStmt:
+                    CollapseRedundantPasses(ifStmt.Body);
+                    if (ifStmt.Orelse != null) CollapseRedundantPasses(ifStmt.Orelse);
+                    break;
+                case While whileStmt:
+                    CollapseRedundantPasses(whileStmt.Body);
+                    if (whileStmt.Orelse != null) CollapseRedundantPasses(whileStmt.Orelse);
+                    break;
+                case For forStmt:
+                    CollapseRedundantPasses(forStmt.Body);
+                    if (forStmt.Orelse != null) CollapseRedundantPasses(forStmt.Orelse);
+                    break;
+                case Try tryStmt:
+                    CollapseRedundantPasses(tryStmt.Body);
+                    foreach (var h in tryStmt.Handlers)
+                        CollapseRedundantPasses(h.Body);
+                    if (tryStmt.Orelse != null) CollapseRedundantPasses(tryStmt.Orelse);
+                    if (tryStmt.Finalbody != null) CollapseRedundantPasses(tryStmt.Finalbody);
+                    break;
+            }
+        }
+    }
+
+    private List<Stmt> TrimPostTerminalDeadCode(List<Stmt> stmts)
+    {
+        if (stmts == null || stmts.Count == 0) return stmts;
+
+        // 找到最后一个终端语句（Return/Raise）的索引，去掉后面的死代码
+        int lastTerminal = -1;
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            if (stmts[i] is Return || stmts[i] is Raise)
+                lastTerminal = i;
+        }
+        if (lastTerminal >= 0 && lastTerminal < stmts.Count - 1)
+            stmts = stmts.Take(lastTerminal + 1).ToList();
+
+        // 合并连续 return None
+        for (int i = stmts.Count - 1; i > 0; i--)
+        {
+            if (stmts[i] is Return && stmts[i - 1] is Return
+                && stmts[i] is Return r1 && r1.Value is Constant { Value: null }
+                && stmts[i - 1] is Return r2 && r2.Value is Constant { Value: null })
+                stmts.RemoveAt(i);
+        }
+
+        // 移除所有非最后一个的 return None（只保留一个）
+        List<int> returnNoneIdxs = new List<int>();
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            if (stmts[i] is Return r && r.Value is Constant { Value: null })
+                returnNoneIdxs.Add(i);
+        }
+        if (returnNoneIdxs.Count > 1)
+        {
+            for (int i = returnNoneIdxs.Count - 2; i >= 0; i--)
+                stmts.RemoveAt(returnNoneIdxs[i]);
+        }
+
+        // 从非空体中移除多余的 bare raise（有 Return/Raise 时去掉裸 Raise）
+        if (stmts.Count > 1)
+        {
+            bool hasNonRaise = stmts.Any(s => s is not Raise);
+            if (hasNonRaise)
+                stmts.RemoveAll(s => s is Raise { Exc: null, Cause: null });
+        }
+
+        // 递归处理子结构
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            stmts[i] = stmts[i] switch
+            {
+                FunctionDef fd => fd with { Body = TrimPostTerminalDeadCode(fd.Body) },
+                ClassDef cd => cd with { Body = TrimPostTerminalDeadCode(cd.Body) },
+                If ifStmt => ifStmt with
+                {
+                    Body = TrimPostTerminalDeadCode(ifStmt.Body),
+                    Orelse = ifStmt.Orelse != null ? TrimPostTerminalDeadCode(ifStmt.Orelse) : null
+                },
+                While whileStmt => whileStmt with
+                {
+                    Body = TrimPostTerminalDeadCode(whileStmt.Body),
+                    Orelse = whileStmt.Orelse != null ? TrimPostTerminalDeadCode(whileStmt.Orelse) : null
+                },
+                For forStmt => forStmt with
+                {
+                    Body = TrimPostTerminalDeadCode(forStmt.Body),
+                    Orelse = forStmt.Orelse != null ? TrimPostTerminalDeadCode(forStmt.Orelse) : null
+                },
+                Try tryStmt => tryStmt with
+                {
+                    Body = TrimPostTerminalDeadCode(tryStmt.Body),
+                    Handlers = tryStmt.Handlers.Select(h => h with { Body = TrimPostTerminalDeadCode(h.Body) }).ToList(),
+                    Orelse = tryStmt.Orelse != null ? TrimPostTerminalDeadCode(tryStmt.Orelse) : null,
+                    Finalbody = tryStmt.Finalbody != null ? TrimPostTerminalDeadCode(tryStmt.Finalbody) : null
+                },
+                _ => stmts[i]
+            };
+        }
+        return stmts;
     }
 
     /// <summary>
@@ -9855,6 +9988,14 @@ public class AstBuilder
         {
             if (orphan.Instructions.Count == 0)
                 continue;
+            // 对孤儿块分类，跳过程序处理 preamble/cleanup 块（handler_pre）
+            var classification = ClassifyOrphanBlock(orphan);
+            bool hasHandlerPreamble = classification == "handler_pre" || classification == "handler_chain";
+            if (hasHandlerPreamble)
+            {
+                _processedBlockIds.Add(orphan.Id);
+                continue;
+            }
             var blockResult = _blockDecompiler.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
             if (blockResult.IsSuccess)
             {
@@ -9867,6 +10008,8 @@ public class AstBuilder
         stmts = ConvertComprehensionCalls(stmts);
         stmts = ConvertAugAssign(stmts);
         FixEmptyFunctionBodies(stmts);
+        CollapseRedundantPasses(stmts);
+        stmts = TrimPostTerminalDeadCode(stmts);
 
         return new Module(stmts, _codeObject.Name);
     }
@@ -9909,6 +10052,8 @@ public class AstBuilder
         stmts = ConvertComprehensionCalls(stmts);
         stmts = ConvertAugAssign(stmts);
         FixEmptyFunctionBodies(stmts);
+        CollapseRedundantPasses(stmts);
+        stmts = TrimPostTerminalDeadCode(stmts);
 
         return new Module(stmts, _codeObject.Name);
     }
@@ -10116,20 +10261,17 @@ public class AstBuilder
         if (!isForLoop)
         {
             bool hasBackEdge = false;
-            foreach (var sourceBlock in header.SourceBlocks)
+            // 使用 SequentialBlock 级别的后继检测回边（Phase 3a 已构建 Successors）
+            // 回边来自 body 中跳回 header 的块，而非 header 自己的基本块后继
+            foreach (var sb in seqBlocks)
             {
-                foreach (var succ in sourceBlock.Successors)
+                if (sb.StartOffset > header.StartOffset && sb.Successors.Contains(header))
                 {
-                    if (succ.StartOffset <= header.StartOffset)
-                    {
-                        hasBackEdge = true;
-                        break;
-                    }
-                }
-                if (hasBackEdge)
+                    hasBackEdge = true;
                     break;
+                }
             }
-            
+
             if (!hasBackEdge)
                 return null;
         }
@@ -10141,15 +10283,30 @@ public class AstBuilder
         var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
         var visited = new HashSet<int> { header.Id };
 
-        if (header.JumpTarget.HasValue)
+        // 使用 SequentialBlock 级别的后继确定 else/exit 块
+        // 对于 FOR_ITER 和条件跳转，header 有两个后继：body（fall-through）和 else（jump target）
+        // body 入口是 offset 较小的后继（紧接着 header 之后），else 是 offset 较大的后继
+        var bodyCandidates = header.Successors
+            .Where(s => s.StartOffset > header.StartOffset && !visited.Contains(s.Id))
+            .OrderBy(s => s.StartOffset)
+            .ToList();
+        
+        if (bodyCandidates.Count >= 2)
         {
+            // 有 body 和 else 两个后继：第一个是 body 入口，第二个是 else/exit
+            elseBlock = bodyCandidates.Last();
+            Console.Error.WriteLine($"[SEQ_BUILD_PARSE] FOR loop at 0x{header.StartOffset:X4}: else/exit block at 0x{elseBlock.StartOffset:X4} (via successors)");
+        }
+        else if (header.JumpTarget.HasValue)
+        {
+            // Fallback: 使用 JumpTarget 查找（兼容无条件跳转的循环）
             var jumpTarget = header.JumpTarget.Value;
             var targetBlock = blockByOffset.Values
                 .FirstOrDefault(sb => sb.StartOffset <= jumpTarget && sb.EndOffset >= jumpTarget);
             if (targetBlock != null && targetBlock.StartOffset > header.StartOffset)
             {
                 elseBlock = targetBlock;
-                Console.Error.WriteLine($"[SEQ_BUILD_PARSE] FOR loop at 0x{header.StartOffset:X4}: else/exit block at 0x{targetBlock.StartOffset:X4}");
+                Console.Error.WriteLine($"[SEQ_BUILD_PARSE] FOR loop at 0x{header.StartOffset:X4}: else/exit block at 0x{targetBlock.StartOffset:X4} (via JumpTarget)");
             }
         }
 
@@ -10839,8 +10996,10 @@ public class AstBuilder
                     {
                         if (seqBlock.StartOffset >= finallyStart)
                         {
-                            bool hasReturn = seqBlock.Instructions.Any(i => i.Opcode == Opcode.RETURN_VALUE);
-                            if (hasReturn)
+                            bool hasReraise = seqBlock.Instructions.Any(i => 
+                                i.Opcode == Opcode.RERAISE || 
+                                i.Opcode == Opcode.END_FINALLY);
+                            if (hasReraise)
                             {
                                 finallyEnd = seqBlock.EndOffset;
                                 break;
@@ -11209,10 +11368,6 @@ public class AstBuilder
         foreach (var sb in seqBlocks.OrderBy(b => b.StartOffset))
         {
             Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] SeqBlock Id={sb.Id}, Start=0x{sb.StartOffset:X4}, End=0x{sb.EndOffset:X4}, ParentStructure={(sb.ParentStructure != null ? sb.ParentStructure.GetType().Name : "null")}");
-            foreach (var instr in sb.Instructions)
-            {
-                Console.Error.WriteLine($"[SEQ_BUILD_HYBRID]   Instr: {instr.Opcode}");
-            }
         }
 
         var seqBlockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
@@ -11279,7 +11434,12 @@ public class AstBuilder
             }
             else if (seqBlock.ParentStructure == null)
             {
-                if (seqBlock.Statements != null)
+                // 第二循环：跳过已被控制结构消费的前缀块（仅含中间表达式）
+                bool hasStructureHeaderSuccessor = seqBlock.Successors.Any(s => structureHeaders.Contains(s.Id));
+                bool hasOnlyIntermediateExprs = seqBlock.Statements != null &&
+                    seqBlock.Statements.All(s => s is ExprStmt);
+
+                if (!(hasStructureHeaderSuccessor && hasOnlyIntermediateExprs) && seqBlock.Statements != null)
                 {
                     stmts.AddRange(seqBlock.Statements);
                 }
@@ -11378,14 +11538,27 @@ public class AstBuilder
         }
         else if (seqBlock.ParentStructure == null)
         {
-            if (seqBlock.Statements != null)
+            // 如果后继包含控制结构头，且本块的语句都是中间表达式（非 Assign/Return/If 等），
+            // 则跳过输出——这些语句是控制结构的前缀指令，由 BuildStructureStatements 处理
+            bool hasStructureHeaderSuccessor = seqBlock.Successors.Any(s => structureHeaders.Contains(s.Id));
+            bool hasOnlyIntermediateExprs = seqBlock.Statements != null && 
+                seqBlock.Statements.All(s => s is ExprStmt);
+
+            if (hasStructureHeaderSuccessor && hasOnlyIntermediateExprs)
             {
-                Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Adding statements from seqBlock Id={seqBlock.Id}, Start=0x{seqBlock.StartOffset:X4}, count={seqBlock.Statements.Count}");
-                foreach (var stmt in seqBlock.Statements)
+                Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Skipping prefix seqBlock Id={seqBlock.Id}, Start=0x{seqBlock.StartOffset:X4} (consumed by structure)");
+            }
+            else if (seqBlock.Statements != null)
+            {
+                // 混合块（含有效语句 + 中间表达式）：保留有效语句，去掉尾部 ExprStmt（中间表达式）
+                var filteredStmts = seqBlock.Statements;
+                if (hasStructureHeaderSuccessor && filteredStmts.Count > 0 && filteredStmts.Last() is ExprStmt)
                 {
-                    Console.Error.WriteLine($"[SEQ_BUILD_HYBRID]   Stmt: {stmt}");
+                    Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Trimming trailing ExprStmt from seqBlock Id={seqBlock.Id}");
+                    filteredStmts = filteredStmts.Take(filteredStmts.Count - 1).ToList();
                 }
-                stmts.AddRange(seqBlock.Statements);
+                Console.Error.WriteLine($"[SEQ_BUILD_HYBRID] Adding statements from seqBlock Id={seqBlock.Id}, Start=0x{seqBlock.StartOffset:X4}, count={filteredStmts.Count}");
+                stmts.AddRange(filteredStmts);
             }
             foreach (var sourceBlock in seqBlock.SourceBlocks)
             {
@@ -11605,10 +11778,6 @@ public class AstBuilder
             
             if (bodyBlock.Statements != null)
             {
-                foreach (var stmt in bodyBlock.Statements)
-                {
-                    Console.Error.WriteLine($"[SEQ_BUILD_FOR]       Stmt: {stmt}");
-                }
                 bodyStmts.AddRange(bodyBlock.Statements);
             }
         }

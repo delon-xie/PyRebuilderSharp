@@ -1921,6 +1921,8 @@ public class StackMachine
                 return null;
 
             case Opcode.FOR_ITER:
+                // 弹出迭代器（GET_ITER 已推回），FOR_ITER 消费迭代器
+                SafePop();
                 return null;
 
             // ---- Import ----
