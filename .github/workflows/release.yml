@@ -47,7 +47,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          quality: 'preview'
+          dotnet-quality: 'preview'
 
       - name: Verify SDK
         run: dotnet --list-sdks
@@ -61,7 +61,16 @@ jobs:
           -p:PublishSingleFile=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -p:TreatWarningsAsErrors=false
-          -p:NoWarn="IL3000;IL3002;CS0618;CS0219;CS8600;CS8602;CS8603;CS8604;CS8629;CA2022"
+          -p:NoWarn=IL3000
+          -p:NoWarn=IL3002
+          -p:NoWarn=CS0618
+          -p:NoWarn=CS0219
+          -p:NoWarn=CS8600
+          -p:NoWarn=CS8602
+          -p:NoWarn=CS8603
+          -p:NoWarn=CS8604
+          -p:NoWarn=CS8629
+          -p:NoWarn=CA2022
           -o publish/cli/${{ matrix.rid }}
 
       - name: Build GUI (${{ matrix.rid }})
@@ -73,7 +82,16 @@ jobs:
           -p:PublishSingleFile=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -p:TreatWarningsAsErrors=false
-          -p:NoWarn="IL3000;IL3002;CS0618;CS0219;CS8600;CS8602;CS8603;CS8604;CS8629;CA2022"
+          -p:NoWarn=IL3000
+          -p:NoWarn=IL3002
+          -p:NoWarn=CS0618
+          -p:NoWarn=CS0219
+          -p:NoWarn=CS8600
+          -p:NoWarn=CS8602
+          -p:NoWarn=CS8603
+          -p:NoWarn=CS8604
+          -p:NoWarn=CS8629
+          -p:NoWarn=CA2022
           -o publish/gui/${{ matrix.rid }}
 
       - name: Package (Windows)
