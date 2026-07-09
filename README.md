@@ -47,6 +47,70 @@ ParseControlStructures():               ← Phase 5 模式目录驱动链接
 └── IfElse (IsConditionHeader)          → 模式 I1-I4
 ```
 
+```mermaid
+flowchart TB
+    subgraph Input["输入"]
+        A[".pyc 字节码"]
+    end
+
+    subgraph Build["BuildSequentialBlocks() — 多轮标注"]
+        direction TB
+        B1["MergeLinearChain<br/><i>Phase 1 — 顺序块合并</i>"]
+        B2["AnnotateExceptionTableBlocks<br/><i>Phase 2 — ExceptionTable 标注</i>"]
+        B2a["AnnotateMatchBlocks<br/><i>Phase 2a — Match/Case 细分</i>"]
+        B2b["AnnotateForWhileSubtypes<br/><i>Phase 2b — For/While 细分</i>"]
+        B2c["AnnotateHandlerDepths<br/><i>Phase 2c — Handler 深度</i>"]
+        B3["AnnotateSequentialBlock<br/><i>Phase 3 — 控制块起始标注</i>"]
+        B3b["AnnotateMergePointsAndExits<br/><i>Phase 3b — 汇聚点/出口</i>"]
+        B3c["BuildSequentialBlockGraph<br/><i>后继图构建</i>"]
+        B4["AnnotateBackEdges<br/><i>Phase 4 — 回边标注</i>"]
+        
+        B1 --> B2 --> B2a --> B2b --> B2c --> B3 --> B3b --> B3c --> B4
+    end
+
+    subgraph Parse["ParseControlStructures() — 模式目录驱动"]
+        direction TB
+        P1["IsTryHeader<br/>(模式 T1~T7)"]
+        P2["IsForLoopHeader<br/>(模式 F1~F4)"]
+        P3["IsWhileLoopHeader<br/>(模式 W1~W4)"]
+        P4["IsWithHeader<br/>(模式 S1~S4)"]
+        P5["IsConditionHeader<br/>(模式 I1~I4)"]
+    end
+
+    subgraph Output["输出"]
+        O["AST 语句<br/>Python 源码"]
+    end
+
+    A --> B1
+    B4 --> P1
+    B4 --> P2
+    B4 --> P3
+    B4 --> P4
+    B4 --> P5
+    P1 --> O
+    P2 --> O
+    P3 --> O
+    P4 --> O
+    P5 --> O
+
+    style A fill:#2d2d2d,stroke:#569CD6,color:#d4d4d4
+    style O fill:#2d2d2d,stroke:#4EC9B0,color:#d4d4d4
+    style B1 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2a fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2b fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2c fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B3 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B3b fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B3c fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B4 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style P1 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P2 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P3 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P4 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P5 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+```
+
 | 关键指标 | 数值 | 状态 |
 |---------|------|:----:|
 | 孤儿块 | **0**（全覆盖） | ✅ |
@@ -404,24 +468,120 @@ PyRebuilderSharp.slnx
 
 ## Overview
 
-**PyRebuilderSharp** is a from-scratch Python bytecode decompiler in C# 13 (.NET 10) with zero third-party decompiler dependencies. It surpasses industry-standard pycdc (C++) in architecture and robustness through block-level fault tolerance.
+**PyRebuilderSharp** is a from-scratch Python bytecode decompiler in C# 13 (.NET 10) with zero third-party decompiler dependencies. It surpasses industry-standard pycdc (C++) in architecture and robustness through an annotation-first sequential-block pipeline and block-level fault tolerance.
 
-### Baseline (2026-06-14)
+### Phase 7 — Annotation-First Pipeline with Control Block Pattern Catalog 🚀
 
-| Metric | Value | Status |
-|--------|-------|:------:|
-| Python versions | 2.7, 3.5 ~ 3.14 | ✅ |
-| Real .pyc files | **182/182** (100%) | ✅ |
-| Marshal warnings | **0/182** | ✅ |
-| Failed blocks | **0/827** (0%) | ✅ |
-| Benchmark | 182 files / 0.4 sec | ✅ |
-| xUnit tests | **102/109 passed** | ✅ |
-| Version matrix | **77/77** (7 levels × 11 versions 2.7→3.14) | ✅ |
-| 9-layer pagoda test | **11/11** (9-level mixed nesting) | ✅ |
-| Function def output | `def factorial(n):` correct | ✅ |
-| CrashCollector | JSON crash records | ✅ |
-| GUI | Avalonia dark theme + drag-drop + syntax highlight | ✅ |
-| Cross-platform | Windows / macOS / Linux | ✅ |
+Phase 7 introduces the `--seq-blocks` architecture based on **annotation-first + pattern-catalog-driven** principles. Multiple scan passes collect annotations first, then the pattern catalog links control structures in deterministic order:
+
+```
+BuildSequentialBlocks():
+├── MergeLinearChain                    ← Phase 1: sequential block merging
+├── AnnotateExceptionTableBlocks        ← Phase 2: ExceptionTable annotation
+├── AnnotateMatchBlocks                 ← Phase 2a: Match/Case annotation
+├── AnnotateForWhileSubtypes            ← Phase 2b: For/While subtype annotation
+├── AnnotateHandlerDepths               ← Phase 2c: Handler depth annotation
+├── AnnotateSequentialBlock             ← Phase 3: Control structure markers
+├── AnnotateMergePointsAndExits         ← Phase 3b: Merge point / exit annotation
+├── BuildSequentialBlockGraph           ← Successor graph
+└── AnnotateBackEdges                   ← Phase 4: Back-edge annotation
+
+ParseControlStructures():               ← Phase 5: Pattern-catalog-driven linking
+├── Try  (IsTryHeader)                  → Patterns T1-T7
+├── Loop (IsForLoopHeader/IsWhileLoopHeader) → Patterns F1-F4 / W1-W4
+├── With (IsWithHeader)                 → Patterns S1-S4
+└── IfElse (IsConditionHeader)          → Patterns I1-I4
+```
+
+```mermaid
+flowchart TB
+    subgraph Input["Input"]
+        A[".pyc bytecode"]
+    end
+
+    subgraph Build["BuildSequentialBlocks() — Multi-pass annotation"]
+        direction TB
+        B1["MergeLinearChain<br/><i>Phase 1 — Sequential block merging</i>"]
+        B2["AnnotateExceptionTableBlocks<br/><i>Phase 2 — ExceptionTable annotation</i>"]
+        B2a["AnnotateMatchBlocks<br/><i>Phase 2a — Match/Case subtype</i>"]
+        B2b["AnnotateForWhileSubtypes<br/><i>Phase 2b — For/While subtype</i>"]
+        B2c["AnnotateHandlerDepths<br/><i>Phase 2c — Handler depth</i>"]
+        B3["AnnotateSequentialBlock<br/><i>Phase 3 — Control structure markers</i>"]
+        B3b["AnnotateMergePointsAndExits<br/><i>Phase 3b — Merge points / exits</i>"]
+        B3c["BuildSequentialBlockGraph<br/><i>Successor graph</i>"]
+        B4["AnnotateBackEdges<br/><i>Phase 4 — Back-edge annotation</i>"]
+        
+        B1 --> B2 --> B2a --> B2b --> B2c --> B3 --> B3b --> B3c --> B4
+    end
+
+    subgraph Parse["ParseControlStructures() — Pattern-catalog-driven"]
+        direction TB
+        P1["IsTryHeader<br/>(Patterns T1~T7)"]
+        P2["IsForLoopHeader<br/>(Patterns F1~F4)"]
+        P3["IsWhileLoopHeader<br/>(Patterns W1~W4)"]
+        P4["IsWithHeader<br/>(Patterns S1~S4)"]
+        P5["IsConditionHeader<br/>(Patterns I1~I4)"]
+    end
+
+    subgraph Output["Output"]
+        O["AST statements<br/>Python source"]
+    end
+
+    A --> B1
+    B4 --> P1
+    B4 --> P2
+    B4 --> P3
+    B4 --> P4
+    B4 --> P5
+    P1 --> O
+    P2 --> O
+    P3 --> O
+    P4 --> O
+    P5 --> O
+
+    style A fill:#2d2d2d,stroke:#569CD6,color:#d4d4d4
+    style O fill:#2d2d2d,stroke:#4EC9B0,color:#d4d4d4
+    style B1 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2a fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2b fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B2c fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B3 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B3b fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B3c fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style B4 fill:#1e3a5f,stroke:#569CD6,color:#d4d4d4
+    style P1 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P2 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P3 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P4 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+    style P5 fill:#3a2d1e,stroke:#DCDCAA,color:#d4d4d4
+```
+
+| Key Metric | Value | Status |
+|------------|-------|:------:|
+| Python versions | **2.7, 3.5 ~ 3.14** | ✅ |
+| Decompilation architecture | Phase 7 annotation-first + pattern-catalog | 🚀 |
+| Full baseline | **1325/1325** (100%), 0 crashes, 0 orphans | ✅ |
+| CLI | `--seq-blocks` (default) / `--no-seq-blocks` (fallback) | ✅ |
+| **Whitebox pass rate** | **298/405 (73%)** | 🔄 |
+| Test report | `test_data/whitebox_report_*.md` (per-run) | ✅ |
+| Design docs | Overall v2.8 / Detailed v2.7 / Pattern catalog v1.0 | 📖 |
+| GUI | Avalonia dark + drag-drop + syntax highlight + .py comparison | ✅ |
+| Cross-platform | Windows / macOS / Linux (via GitHub Actions) | ✅ |
+
+### Remaining Issues (Priority-Ordered)
+
+| Priority | Issue | Count | Root Cause | Target |
+|----------|-------|-------|------------|--------|
+| **P0** | EMPTY_TRY | 56 | Try body range calculation, SETUP_FINALLY handler shares seqBlock | ↓30 |
+| **P0** | TRY_NO_HANDLER | 19 | Handler preamble detection incomplete (POP_TOP×3 pattern) | ↓10 |
+| **P1** | BARE_EXPR | 83 | Intermediate expression leakage (comprehension variables, class attrs, match patterns) | ↓50 |
+| **P2** | REDUNDANT_PASS/RAISE/RETURN | 68 | Post-processing filter incomplete | ↓40 |
+| **P2** | SYNTAX_ERROR | 14 | 3.5-3.7 comprehension differences, large file boundaries | ↓10 |
+| **P3** | CLEANUP_LEAK | 7 | Handler cleanup `e = None` leakage | ↓5 |
+| **Total** | | **258** | | **+40~+60 expected** |
+
+See [overall design](docs/Python反编译总体设计.md), [detailed design](docs/Python反编译详细设计.md), and [control block patterns](docs/control-block-patterns.md) for details.
 
 ---
 
