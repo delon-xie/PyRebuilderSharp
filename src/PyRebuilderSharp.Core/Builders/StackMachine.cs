@@ -936,7 +936,17 @@ public class StackMachine
                 while (func is Starred starredFunc && starredFunc.Ctx == ExpressionContext.Load)
                     func = starredFunc.Value;
                 
-                _exprStack.Push(new Call(func, processedArgs, new List<Keyword>()));
+                // Python 3.11 协程中的特殊情况：CALL_FUNCTION 0 在协程中是获取 awaitable 的操作
+                // 模式：CALL -> CALL_FUNCTION 0 -> LOAD_CONST None -> SEND
+                // CALL_FUNCTION 0 不应该创建新的 Call，而是保留栈顶的值（CALL 的结果）
+                if (_code.IsCoroutine && argCount == 0 && processedArgs.Count == 0)
+                {
+                    _exprStack.Push(func);
+                }
+                else
+                {
+                    _exprStack.Push(new Call(func, processedArgs, new List<Keyword>()));
+                }
                 return null;
             }
 
@@ -1423,6 +1433,7 @@ public class StackMachine
                 // For 3.11: CALL_311 arg = same, PRECALL_311 handled separately
                 var args = new List<Expr>();
                 var keywords = new List<Keyword>();
+                
 
                 // 3.13+ CALL_KW: 关键词名元组在栈顶
                 if (instr.Opcode == Opcode.CALL_KW_313)
@@ -1746,21 +1757,7 @@ public class StackMachine
                         {
                             if (!(genExpr is Await))
                             {
-                                if (genExpr is Call callExpr && callExpr.Args.Count == 0)
-                                {
-                                    if (callExpr.Func is PyRebuilderSharp.Core.Models.AST.Attribute attr && attr.Attr == "__await__")
-                                    {
-                                        _exprStack.Push(new Await(attr.Value));
-                                    }
-                                    else
-                                    {
-                                        _exprStack.Push(new Await(callExpr.Func));
-                                    }
-                                }
-                                else
-                                {
-                                    _exprStack.Push(new Await(genExpr));
-                                }
+                                _exprStack.Push(new Await(genExpr));
                             }
                             else
                             {
@@ -2329,6 +2326,13 @@ public class StackMachine
                 var yielded = SafePop();
                 if (_code.IsCoroutine)
                 {
+                    // 在协程中，YIELD_VALUE 是 await 表达式的一部分
+                    // 它不产生 yield 语句，而是应该将 await 表达式保留在栈上
+                    // 作为表达式语句输出
+                    if (yielded != null)
+                    {
+                        _exprStack.Push(yielded);
+                    }
                     return null;
                 }
                 return new Yield(yielded);

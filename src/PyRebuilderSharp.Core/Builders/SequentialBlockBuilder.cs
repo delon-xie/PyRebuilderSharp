@@ -186,7 +186,10 @@ public class SequentialBlockBuilder
                 i.Opcode == Opcode.SETUP_WITH ||
                 i.Opcode is Opcode.BEFORE_WITH or Opcode.BEFORE_WITH_312 or Opcode.BEFORE_WITH_313))
             {
-                break;
+                if (!_codeObject.IsCoroutine)
+                {
+                    break;
+                }
             }
             
             bool seqBlockHasBeforeWith = seqBlock.Instructions.Any(i => 
@@ -256,14 +259,28 @@ public class SequentialBlockBuilder
             if (current.Successors.Count != 1)
                 break;
 
-            var nextBlock = current.Successors.First();
-            if (nextBlock.Predecessors.Count != 1)
+            var nextSuccBlock = current.Successors.First();
+            if (processedBlockIds.Contains(nextSuccBlock.Id))
                 break;
 
-            if (processedBlockIds.Contains(nextBlock.Id))
+            bool isAwaitPattern = false;
+            if (_codeObject.IsCoroutine && nextSuccBlock.Instructions.Count >= 2)
+            {
+                bool startsWithLoadConstNone = nextSuccBlock.Instructions[0].Opcode == Opcode.LOAD_CONST;
+                if (startsWithLoadConstNone)
+                {
+                    var constVal = _codeObject.Constants.TryGetValue(nextSuccBlock.Instructions[0].Argument ?? 0, out var v) ? v : null;
+                    if (constVal == null && nextSuccBlock.Instructions[1].Opcode == Opcode.SEND)
+                    {
+                        isAwaitPattern = true;
+                    }
+                }
+            }
+
+            if (!isAwaitPattern && nextSuccBlock.Predecessors.Count != 1)
                 break;
 
-            current = nextBlock;
+            current = nextSuccBlock;
         }
 
         return seqBlock;
