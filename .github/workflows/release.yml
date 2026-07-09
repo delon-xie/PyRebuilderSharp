@@ -10,7 +10,6 @@ env:
   PROJECT_CLI: src/PyRebuilderSharp.Cli/PyRebuilderSharp.Cli.csproj
   PROJECT_GUI: src/PyRebuilderSharp.Gui/PyRebuilderSharp.Gui.csproj
   CONFIGURATION: Release
-  # PublishSingleFile IL 警告为 error，降级为 warning 避免阻断编译
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_NOLOGO: 'true'
 
@@ -18,6 +17,8 @@ jobs:
   build:
     name: Build ${{ matrix.rid }}
     runs-on: ${{ matrix.os }}
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     strategy:
       matrix:
         include:
@@ -35,7 +36,12 @@ jobs:
             suffix: ''
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        env:
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+        with:
+          fetch-depth: 1
 
       - name: Setup .NET 10 Preview
         uses: actions/setup-dotnet@v4
@@ -47,12 +53,28 @@ jobs:
         run: dotnet --list-sdks
 
       - name: Build CLI (${{ matrix.rid }})
-        run: |
-          dotnet publish ${{ env.PROJECT_CLI }} -c ${{ env.CONFIGURATION }} -r ${{ matrix.rid }} --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:TreatWarningsAsErrors=false -p:NoWarn=IL3000,IL3002,CS0618,CS0219,CS8600,CS8602,CS8603,CS8604,CS8629,CA2022 -o publish/cli/${{ matrix.rid }}
+        run: >-
+          dotnet publish ${{ env.PROJECT_CLI }}
+          -c ${{ env.CONFIGURATION }}
+          -r ${{ matrix.rid }}
+          --self-contained
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:TreatWarningsAsErrors=false
+          -p:NoWarn="IL3000;IL3002;CS0618;CS0219;CS8600;CS8602;CS8603;CS8604;CS8629;CA2022"
+          -o publish/cli/${{ matrix.rid }}
 
       - name: Build GUI (${{ matrix.rid }})
-        run: |
-          dotnet publish ${{ env.PROJECT_GUI }} -c ${{ env.CONFIGURATION }} -r ${{ matrix.rid }} --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:TreatWarningsAsErrors=false -p:NoWarn=IL3000,IL3002,CS0618,CS0219,CS8600,CS8602,CS8603,CS8604,CS8629,CA2022 -o publish/gui/${{ matrix.rid }}
+        run: >-
+          dotnet publish ${{ env.PROJECT_GUI }}
+          -c ${{ env.CONFIGURATION }}
+          -r ${{ matrix.rid }}
+          --self-contained
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:TreatWarningsAsErrors=false
+          -p:NoWarn="IL3000;IL3002;CS0618;CS0219;CS8600;CS8602;CS8603;CS8604;CS8629;CA2022"
+          -o publish/gui/${{ matrix.rid }}
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
