@@ -190,10 +190,14 @@ def analyze_output(source, filename, version):
                         issues.append(("ELSE_CONTAINS_FINALLY", f"else 块(行{i+1})可能包含 finally 代码"))
                         break
 
-    # 4. 检测 }} 等格式错误
+    # 4. 检测 }} 等格式错误（在 f-string 外部时）
     for i, l in enumerate(lines):
         if '}}' in l or '{{' in l:
-            issues.append(("FORMAT_ERROR", f"格式错误(行{i+1}): {l.strip()}"))
+            stripped = l.strip()
+            # f-string 中的 {{/}} 是合法转义（如 return f"{{{s}}}"），跳过
+            if 'f"' in stripped or "f'" in stripped:
+                continue
+            issues.append(("FORMAT_ERROR", f"格式错误(行{i+1}): {stripped}"))
 
     # 5. 检测未闭合的字符串
     for i, l in enumerate(lines):

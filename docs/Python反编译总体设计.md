@@ -5,7 +5,7 @@
 **版本**: v2.8
 **日期**: 2026-07-09
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 标注优先顺序块流水线 🚀 — 5 阶段标注链路 · 0 孤儿块 · 0 崩溃 · 70% 白盒通过率（持续收敛中）
+**状态**: Phase 1–6 ✅ + Phase 7 标注优先流水线 🚀 — 8 阶段标注链路 · 7 类 28 子模式目录 · 0 孤儿块 · 0 崩溃 · 71% 白盒通过率（持续收敛中）
 
 ---
 
@@ -400,32 +400,78 @@ Phase 1: 顺序块构建 + DecompileStatements 缓存
 │  ├── 遍历所有 SequentialBlock 的指令，检查 JUMP_ABSOLUTE 目标：                 │
 │  │   ├── 目标指向已标记为 IsLoopHeader 的块 → 标记回边块                        │
 │  │   └── 目标指向 POP_JUMP_IF_* 的 Fallthrough（跳过循环体）→ else 块          │
-│  ├── FOR_ITER 的 JumpTarget 指向的块 → IsForIterBlock                          │
+│  ├── FOR_ITER 的 JumpTarget 指向的块 → ForIterExitTarget                       │
 │  ├── 循环体入口块标记为 IsLoopBody                                            │
+│  ├── break 目标（跳出到循环后）→ IsBreakTarget                                │
+│  ├── continue 目标（回到循环头）→ IsContinueTarget                            │
 │  └── 输出: 所有回边和循环体已标注的 SeqBlock 列表                               │
 └──────────────────────────┬───────────────────────────────────────────────────┘
                            ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  Phase 5: 统一链接和组装                                                       │
-│  ├── 基于所有标注信息，逐结构创建控制结构对象：                                  │
-│  │   ├── 循环结构: Header + Body + Else 通过 LoopHeader + 回边 + 后继推断      │
-│  │   ├── Try 结构: Header + Body + Handler + Else + Finally                   │
-│  │   ├── With 结构: Header + Body + Handler                                   │
-│  │   ├── IfElse 结构: Header + TrueBranch + FalseBranch                        │
-│  │   └── 设置 SequentialBlock.ParentStructure 归属                             │
-│  ├── 先链接 Try 结构（ExceptionTable 定义了严格的 offset 边界）               │
-│  ├── 然后链接 Loop 结构（可能嵌套在 Try 的 body 中）                           │
-│  ├── 再链接 With 结构                                                         │
-│  └── 最后链接 IfElse 结构（最灵活，不与其他结构冲突）                         │
-│                                                                               │
-│  └── 输出: ISequentialControlStructure[] 列表                                  │
+│  Phase 2a: Match/Case 标注扫描                                                 │
+│  ├── MATCH_KEYS / MATCH_CLASS / MATCH_MAPPING → IsMatchHeader = true          │
+│  ├── JUMP_IF_NOT_EXC_MATCH 目标块 → IsCaseEntry = true                       │
+│  ├── match body 内联指令标注 → IsMatchBody = true                             │
+│  └── 输出: match 和 case 已标注的 SeqBlock 列表                                │
 └──────────────────────────┬───────────────────────────────────────────────────┘
                            ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  后续新增标注步骤（可扩展设计）                                                  │
-│  ├── 未来需要增加新标注时，只需插入新的 Phase (如 Match 结构标注扫描)           │
-│  ├── 原有 Phases 不受影响，新增标注自动被 Phase 5 的链接逻辑消费                │
-│  └── 示例: Match 标注 → MATCH_KEYS/MATCH_CLASS → 新增 Phase 2b                │
+│  Phase 2b: For/While 细分标注                                                   │
+│  ├── FOR_ITER 存在 → IsForLoopHeader = true                                    │
+│  ├── POP_JUMP_IF_* + 回边（IsBackEdgeTarget）→ IsWhileLoopHeader = true       │
+│  ├── FOR_ITER 的 Argument（循环出口）→ ForIterExitTarget                      │
+│  ├── FOR_ITER 的后继（第一个 body 块）→ IsForIterBody = true                  │
+│  └── 输出: For/While 区分标注的 SeqBlock 列表                                  │
+└──────────────────────────┬───────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 2c: Handler 深度标注                                                     │
+│  ├── ExceptionTable Depth → HandlerDepth = et.Depth（标注到 seqBlock）        │
+│  ├── IsFinally 条目 → IsFinallyBlock = true                                   │
+│  ├── handler 后、finally 前的候选块 → IsTryElseBlock = true                   │
+│  └── 输出: handler/else/finally 分类的 SeqBlock 列表                           │
+└──────────────────────────┬───────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 3b: 汇聚点/出口标注扫描                                                   │
+│  ├── 条件分支的后继块汇聚点 → IsMergePoint = true                              │
+│  ├── break 目标（循环后第一条指令）→ IsBreakTarget                            │
+│  ├── continue 目标（循环头）→ IsContinueTarget                                │
+│  ├── 控制结构的后继出口偏移 → StructureExitOffset                             │
+│  └── 不可达块（RETURN/RAISE 后）→ IsDeadCodeBlock = true                     │
+└──────────────────────────┬───────────────────────────────────────────────────┘
+                           ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Phase 5: 统一链接 — 基于控制块模式目录的确定性链接                             │
+│                                                                               │
+│  链接使用 4 阶段顺序，每阶段只处理一种控制块类型，避免歧义：                      │
+│                                                                               │
+│  ① Try 结构 —— 优先级最高，ExceptionTable 定义了严格的 offset 边界               │
+│     模式目录 T1-T7: SETUP_FINALLY/ExceptionTable → IsTryHeader               │
+│     链接条件: seqBlock.IsTryHeader == true                                    │
+│                                                                               │
+│  ② Loop 结构 —— 逆序（内层优先），可嵌套在 Try body 中                           │
+│     模式目录 F1-F4 / W1-W4: FOR_ITER → IsForLoopHeader                       │
+│                            POP_JUMP_IF_* + 回边 → IsWhileLoopHeader          │
+│     链接条件: seqBlock.IsForLoopHeader || seqBlock.IsWhileLoopHeader          │
+│     F/W 歧义通过 Phase 2b 的 For/While 细分标注消除                             │
+│                                                                               │
+│  ③ With 结构 —— SETUP_WITH / LOAD_SPECIAL 7 模式                              │
+│     模式目录 S1-S4                                                            │
+│     链接条件: seqBlock.IsWithHeader || HasBeforeWith || HasLoadSpecial        │
+│                                                                               │
+│  ④ IfElse 结构 —— 最灵活，最后链接                                              │
+│     模式目录 I1-I4: POP_JUMP_IF_* + 无回边 → if    │
+│     链接条件: IsConditionHeader (pop_jump_if_*, 跳过已在 visited 的块)         │
+│                                                                               │
+│  ⚠️ 歧义处理规则（详见 docs/control-block-patterns.md）：                      │
+│    - POP_JUMP_IF_FALSE + 回边 → while（Loop 阶段处理）                        │
+│    - POP_JUMP_IF_FALSE + 无回边 → if（IfElse 阶段处理）                       │
+│    - SETUP_FINALLY → v3.10- try header（Try 阶段处理）                        │
+│    - FOR_ITER → for loop（Loop 阶段处理）                                      │
+│    - 链接失败的块（visited 未命中）在下一阶段自动重试                            │
+│                                                                               │
+│  ├── 输出: ISequentialControlStructure[] 列表                                  │
 └──────────────────────────────────────────────────────────────────────────────┘
                            ▼
 ┌──────────────────────────────────────────────────────────────────────────────┐

@@ -37,6 +37,55 @@ public class SequentialBlock
     
     public bool IsExceptionHandler { get; set; }
     
+    // Phase 2: ExceptionTable 标注
+    public bool IsTryHeader { get; set; }
+    
+    public bool IsExceptBlock { get; set; }
+    
+    public int ExceptionTryStartOffset { get; set; }
+    
+    public int ExceptionTryEndOffset { get; set; }
+    
+    // Phase 3: 控制块起始标注
+    public bool IsWithHeader { get; set; }
+    
+    // Phase 4: 回边标注
+    public bool IsBackEdgeTarget { get; set; }
+    
+    public bool IsLoopBody { get; set; }
+    
+    // Phase 2a: Match/Case 标注
+    public bool IsMatchHeader { get; set; }
+    
+    public bool IsCaseEntry { get; set; }
+    
+    // Phase 2b: For/While 细分标注
+    public bool IsForLoopHeader { get; set; }
+    
+    public bool IsWhileLoopHeader { get; set; }
+    
+    public int ForIterExitTarget { get; set; }
+    
+    public bool IsForIterBody { get; set; }
+    
+    // Phase 2c: Handler 深度标注
+    public int HandlerDepth { get; set; } = -1;
+    
+    public bool IsFinallyBlock { get; set; }
+    
+    public bool IsTryElseBlock { get; set; }
+    
+    // Phase 3b: 汇聚点/出口标注
+    public bool IsMergePoint { get; set; }
+    
+    public bool IsBreakTarget { get; set; }
+    
+    public bool IsContinueTarget { get; set; }
+    
+    public int StructureExitOffset { get; set; }
+    
+    public bool IsDeadCodeBlock { get; set; }
+    
     public int PredecessorCount { get; set; }
     
     public int SuccessorCount { get; set; }

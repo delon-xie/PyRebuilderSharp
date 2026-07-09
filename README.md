@@ -21,35 +21,62 @@
 
 **PyRebuilderSharp** 是一个从零构建的 Python 字节码反编译器，使用 C# 13 + .NET 10 + Avalonia UI，全栈自主实现（0 行第三方反编译依赖）。对标业界主流 pycdc（C++），在架构和稳健性上实现了根本性超越。
 
-### 最新进展 — Phase 7: 标注优先的五阶段顺序块流水线 🚀
+### 最新进展 — Phase 7: 标注优先 + 控制块模式目录 🚀
 
-Phase 7 引入全新的 `--seq-blocks` 反编译架构（默认启用），以**标注优先**为原则——先多轮扫描收集标注信息，再统一链接组装：
+Phase 7 引入全新的 `--seq-blocks` 反编译架构，以**标注优先 + 模式目录驱动**为原则。先多轮扫描收集标注信息，再按模式目录的确定性顺序统一链接：
 
-1. **Phase 1 顺序块构建** — 合并线性基本块链为 SequentialBlock，缓存反编译结果
-2. **Phase 2 ExceptionTable 标注** — 逐 ET 条目标注 IsExceptBlock 和 try 边界
-3. **Phase 3 控制块起始标注** — 检测 FOR_ITER/SETUP_FINALLY/POP_JUMP 等起始指令
-4. **Phase 4 回边标注** — 识别 JUMP_ABSOLUTE 回边和循环体
-5. **Phase 5 统一链接** — 基于所有标注信息按 Try→Loop→With→IfElse 顺序链接
+```
+BuildSequentialBlocks():
+├── MergeLinearChain                    ← Phase 1 顺序块构建
+├── AnnotateSequentialBlock             ← Phase 3 控制块起始标注
+├── AnnotateExceptionTableBlocks        ← Phase 2 ExceptionTable 标注
+├── AnnotateMatchBlocks                 ← Phase 2a Match/Case 标注
+├── AnnotateForWhileSubtypes            ← Phase 2b For/While 细分
+├── AnnotateHandlerDepths               ← Phase 2c Handler 深度
+├── BuildSequentialBlockGraph           ← 后继图
+├── AnnotateMergePointsAndExits         ← Phase 3b 汇聚点/出口
+└── AnnotateBackEdges                   ← Phase 4 回边
+
+ParseControlStructures():               ← Phase 5 模式目录驱动链接
+├── Try  (IsTryHeader)                  → 模式 T1-T7
+├── Loop (IsForLoopHeader/IsWhileLoopHeader) → 模式 F1-F4/W1-W4
+├── With (IsWithHeader)                 → 模式 S1-S4
+└── IfElse (IsConditionHeader)          → 模式 I1-I4
+```
 
 | 关键指标 | 数值 | 状态 |
 |---------|------|:----:|
 | 孤儿块 | **0**（全覆盖） | ✅ |
 | 运行时崩溃 | **0/1325** 文件 | ✅ |
-| 基线测试 100% 成功 | 1325 文件全部反编译 | ✅ |
+| 全量基线 100% 成功 | 1325 文件全部反编译 | ✅ |
+| **控制块模式目录** | **7 大类 28 子模式** 已分类 | 📖 `docs/control-block-patterns.md` |
 
-详见 [总体设计文档](docs/Python反编译总体设计.md) 和 `--seq-blocks` CLI 选项。
+详见 [总体设计文档](docs/Python反编译总体设计.md)、[详细设计文档](docs/Python反编译详细设计.md)、[控制块模式目录](docs/control-block-patterns.md) 和 `--seq-blocks` CLI 选项。
 
 ### 当前基线（2026-07-09）
 
 | 指标 | 数值 | 状态 |
 |------|------|:----:|
 | 支持版本 | 2.7, 3.5 ~ 3.14 | ✅ |
-| 反编译架构 | Phase 7 标注优先五阶段流水线 | 🚀 |
-| 真实 .pyc 通过率 | 1325/1325 (100%)，0 崩溃 | ✅ |
+| 反编译架构 | Phase 7 标注优先 + 模式目录驱动 | 🚀 |
+| 全量基线 | 1325/1325 (100%)，0 崩溃，0 孤儿块 | ✅ |
 | CLI 模式 | `--seq-blocks`（默认）/ `--no-seq-blocks`（降级） | ✅ |
-| 白盒测试通过率 | 287/405 (70%) | 🔄 收敛中 |
+| **白盒测试通过率** | **291/405 (71%)** | 🔄 |
 | 测试报告 | `test_data/whitebox_report_*.md`（逐次） | ✅ |
-| 基线测试 | `docs/baseline_evaluate_report_20260709.md` | ✅ |
+| 设计文档 | 总体 v2.8 / 详细 v2.7 / 模式目录 v1.0 | ✅ |
+
+### 现存问题（按优先级排序）
+
+| 优先级 | 问题 | 数量 | 根因 | 目标 |
+|--------|------|------|------|------|
+| **P0** | EMPTY_TRY | 56 | try body 范围计算不精确，SETUP_FINALLY handler 与 body 在同一 seqBlock | ↓30 |
+| **P0** | TRY_NO_HANDLER | 19 | handler preamble 检测不完整（POP_TOP×3 模式需增强） | ↓10 |
+| **P1** | BARE_EXPR | 83 | 中间表达式泄漏（comprehension 变量、class 属性、match pattern） | ↓50 |
+| **P2** | REDUNDANT_PASS/RAISE/RETURN | 68 | 后处理过滤不完全，空函数体 pass 堆积 | ↓40 |
+| **P2** | SYNTAX_ERROR | 14 | 3.5-3.7 comprehension 差异、大文件边界 | ↓10 |
+| **P3** | ELSE_CONTAINS_FINALLY | 11 | 测试脚本伪阳性（else 块代码被判定含 finally） | ↓11 |
+| **P3** | CLEANUP_LEAK | 8 | handler cleanup `e = None` 泄漏 | ↓5 |
+| **P4** | FORMAT_ERROR | 3 | reprlib f-string 双花括号转义 | ↓3 |
 
 ---
 

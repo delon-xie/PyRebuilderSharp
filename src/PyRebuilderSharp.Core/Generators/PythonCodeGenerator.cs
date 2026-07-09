@@ -1825,6 +1825,8 @@ public class PythonCodeGenerator : ICodeGenerator
                 case '\t': sb.Append("\\t"); break;
                 case '\\': sb.Append("\\\\"); break;
                 case '"': sb.Append("\\\""); break;
+                case '{': sb.Append("{{"); break;   // f-string 转义
+                case '}': sb.Append("}}"); break;   // f-string 转义
                 default:
                     if (c < 0x20 || c == 0x7F)
                         sb.Append($"\\x{(int)c:x2}");

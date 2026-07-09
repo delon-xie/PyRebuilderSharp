@@ -686,12 +686,10 @@ public class AstBuilder
                 stmts.RemoveAll(s => s is Raise { Exc: null, Cause: null });
         }
 
-        // 移除 handler cleanup 泄漏：从非空体中移除多余的 x = None（异常变量清理）
-        int cleanupCount = stmts.Count(s => s is Assign a && a.Targets.Count == 1
+        // 移除 handler cleanup 泄漏：从体中移除所有 x = None（异常变量清理）
+        // 即使 body 只有 cleanup 也移除（CLEANUP_LEAK：enum 3.12 等）
+        stmts.RemoveAll(s => s is Assign a && a.Targets.Count == 1
             && a.Value is Constant { Value: null });
-        if (cleanupCount > 0 && stmts.Count > cleanupCount)
-            stmts.RemoveAll(s => s is Assign a && a.Targets.Count == 1
-                && a.Value is Constant { Value: null });
 
         // 递归处理子结构
         for (int i = 0; i < stmts.Count; i++)
@@ -10067,17 +10065,42 @@ public class AstBuilder
 
     private List<ISequentialControlStructure> ParseControlStructures(List<SequentialBlock> seqBlocks)
     {
+        // Phase 5: 统一链接 — 基于 Phase 2/3/4 的标注信息
+        // 链接顺序: Try → Loop → With → IfElse (模式目录第 7 节)
         var structures = new List<ISequentialControlStructure>();
         var visited = new HashSet<int>();
 
-        var loopHeaders = seqBlocks
-            .Where(b => b.IsLoopHeader && 
-                (b.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER) ||
-                 b.Instructions.Any(i => i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE)))
-            .OrderByDescending(b => b.StartOffset)
-            .ToList();
+        // 1. Try 结构（ExceptionTable 定义了严格的 offset 边界）
+        foreach (var seqBlock in seqBlocks.OrderBy(b => b.StartOffset))
+        {
+            if (visited.Contains(seqBlock.Id))
+                continue;
+            if (!seqBlock.IsTryHeader)
+                continue;
 
-        foreach (var seqBlock in loopHeaders)
+            var tryStructure = ParseTryStructure(seqBlock, seqBlocks);
+            if (tryStructure != null)
+            {
+                structures.Add(tryStructure);
+                visited.Add(seqBlock.Id);
+                foreach (var bodyBlock in tryStructure.BodyBlocks)
+                    visited.Add(bodyBlock.Id);
+                if (tryStructure is TryControlStructure tryStruct)
+                {
+                    foreach (var handler in tryStruct.ExceptHandlers)
+                        visited.Add(handler.Handler.Id);
+                    if (tryStruct.FinallyBlock != null)
+                        visited.Add(tryStruct.FinallyBlock.Id);
+                    if (tryStruct.ElseBlock != null)
+                        visited.Add(tryStruct.ElseBlock.Id);
+                }
+            }
+        }
+
+        // 2. Loop 结构（逆序——内层优先，可嵌套在 Try body 中）
+        foreach (var seqBlock in seqBlocks
+            .Where(b => b.IsForLoopHeader || b.IsWhileLoopHeader)
+            .OrderByDescending(b => b.StartOffset))
         {
             if (visited.Contains(seqBlock.Id))
                 continue;
@@ -10096,110 +10119,50 @@ public class AstBuilder
             }
         }
 
-        
-
+        // 3. With 结构
         foreach (var seqBlock in seqBlocks.OrderBy(b => b.StartOffset))
         {
             if (visited.Contains(seqBlock.Id))
                 continue;
+            if (!seqBlock.IsWithHeader && !seqBlock.HasBeforeWith && !seqBlock.HasLoadSpecial)
+                continue;
 
-            bool hasWithOpcode = seqBlock.Instructions.Any(i => 
-                i.Opcode == Opcode.SETUP_WITH || 
-                i.Opcode == Opcode.BEFORE_WITH ||
-                i.Opcode == Opcode.BEFORE_WITH_312 ||
-                i.Opcode == Opcode.BEFORE_WITH_313 ||
-                i.Opcode == Opcode.LOAD_SPECIAL);
-            
-            Console.Error.WriteLine($"[PARSE_CTL] SeqBlock 0x{seqBlock.StartOffset:X4}, hasWithOpcode={hasWithOpcode}, visited={visited.Contains(seqBlock.Id)}");
-            
-            if (hasWithOpcode)
+            Console.Error.WriteLine($"[PARSE_CTL] SeqBlock 0x{seqBlock.StartOffset:X4}, IsWithHeader={seqBlock.IsWithHeader}, visited={visited.Contains(seqBlock.Id)}");
+            Console.Error.WriteLine($"[PARSE_CTL]   Calling ParseWithStructure");
+            var withStructure = ParseWithStructure(seqBlock, seqBlocks);
+            if (withStructure != null)
             {
-                Console.Error.WriteLine($"[PARSE_CTL]   Calling ParseWithStructure");
-                var withStructure = ParseWithStructure(seqBlock, seqBlocks);
-                if (withStructure != null)
-                {
-                    structures.Add(withStructure);
-                    visited.Add(seqBlock.Id);
-                    foreach (var bodyBlock in withStructure.BodyBlocks)
-                        visited.Add(bodyBlock.Id);
-                    if (withStructure is WithControlStructure withStruct && withStruct.HandlerBlock != null)
-                        visited.Add(withStruct.HandlerBlock.Id);
-                }
+                structures.Add(withStructure);
+                visited.Add(seqBlock.Id);
+                foreach (var bodyBlock in withStructure.BodyBlocks)
+                    visited.Add(bodyBlock.Id);
+                if (withStructure is WithControlStructure withStruct && withStruct.HandlerBlock != null)
+                    visited.Add(withStruct.HandlerBlock.Id);
             }
         }
 
-        var blockByOffset = seqBlocks.ToDictionary(b => b.StartOffset);
-
-        // Try structures — per ExceptionTable 条目迭代
-        // 收集所有 Depth==0 的 ET 条目的 start offset（每个 try 唯一）
-        var tryStartOffsets = new HashSet<int>();
-        foreach (var seqBlock in seqBlocks)
-        {
-            foreach (var et in seqBlock.ExceptionTableEntries)
-            {
-                if (et.Depth == 0 && !et.Lasti && (et.IsExcept || et.IsFinally))
-                    tryStartOffsets.Add(et.StartOffset);
-            }
-        }
-
-        var tryHeaders = new HashSet<SequentialBlock>();
-        foreach (var tryStart in tryStartOffsets.OrderBy(x => x))
-        {
-            var headerBlock = seqBlocks.FirstOrDefault(sb =>
-                sb.StartOffset <= tryStart && sb.EndOffset > tryStart);
-            if (headerBlock != null && !visited.Contains(headerBlock.Id))
-                tryHeaders.Add(headerBlock);
-        }
-
+        // 4. IfElse 结构（最灵活，最后链接）
+        // 模式目录 I1-I4: POP_JUMP_IF_* + 无回边 → if
+        // while 已有 IsWhileLoopHeader 标注，在此跳过
         foreach (var seqBlock in seqBlocks.OrderBy(b => b.StartOffset))
         {
             if (visited.Contains(seqBlock.Id))
                 continue;
-
-            bool hasSetupOpcode = seqBlock.Instructions.Any(i =>
-                i.Opcode == Opcode.SETUP_FINALLY ||
-                i.Opcode == Opcode.SETUP_EXCEPT);
-
-            bool isEtTryHeader = tryHeaders.Contains(seqBlock);
-
-            if (hasSetupOpcode || isEtTryHeader)
-            {
-                var tryStructure = ParseTryStructure(seqBlock, seqBlocks);
-                if (tryStructure != null)
-                {
-                    structures.Add(tryStructure);
-                    visited.Add(seqBlock.Id);
-                    foreach (var bodyBlock in tryStructure.BodyBlocks)
-                        visited.Add(bodyBlock.Id);
-                    if (tryStructure is TryControlStructure tryStruct)
-                    {
-                        foreach (var handler in tryStruct.ExceptHandlers)
-                            visited.Add(handler.Handler.Id);
-                        if (tryStruct.FinallyBlock != null)
-                            visited.Add(tryStruct.FinallyBlock.Id);
-                    }
-                }
-            }
-        }
-
-        foreach (var seqBlock in seqBlocks)
-        {
-            if (visited.Contains(seqBlock.Id))
+            // visited 已排除已链接的结构，但 IsLoopHeader 的块即使链接失败也应尝试 IfElse
+            if (!seqBlock.IsConditionHeader &&
+                !seqBlock.Instructions.Any(i =>
+                    i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
+                        or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38
+                        or Opcode.JUMP_IF_FALSE_OR_POP or Opcode.JUMP_IF_TRUE_OR_POP))
                 continue;
 
-            if (seqBlock.Instructions.Any(i => 
-                i.Opcode is Opcode.POP_JUMP_IF_FALSE or Opcode.POP_JUMP_IF_TRUE
-                    or Opcode.POP_JUMP_IF_FALSE_PY38 or Opcode.POP_JUMP_IF_TRUE_PY38
-                    or Opcode.JUMP_IF_FALSE_OR_POP or Opcode.JUMP_IF_TRUE_OR_POP))
+            var ifElseStructure = ParseIfElseStructure(seqBlock, seqBlocks);
+            if (ifElseStructure != null)
             {
-                var ifElseStructure = ParseIfElseStructure(seqBlock, seqBlocks);
-                if (ifElseStructure != null)
-                {
-                    structures.Add(ifElseStructure);
-                    visited.Add(seqBlock.Id);
-                    foreach (var bodyBlock in ifElseStructure.BodyBlocks)
-                        visited.Add(bodyBlock.Id);
-                }
+                structures.Add(ifElseStructure);
+                visited.Add(seqBlock.Id);
+                foreach (var bodyBlock in ifElseStructure.BodyBlocks)
+                    visited.Add(bodyBlock.Id);
             }
         }
 
@@ -10788,6 +10751,19 @@ public class AstBuilder
                 if (setupInstr.Argument.HasValue)
                 {
                     int handlerTarget = setupInstr.Argument.Value;
+                    // 3.6-3.10 wordcode: arg 是半字符数，需转为绝对字节偏移
+                    // PycReader 不转换 SETUP_FINALLY 的 arg（非传统跳转指令）
+                    bool isWordcodeWithHalfword = _codeObject.Version switch
+                    {
+                        PythonVersion.Py36 or PythonVersion.Py37 or
+                        PythonVersion.Py38 or PythonVersion.Py39 or
+                        PythonVersion.Py310 => true,
+                        _ => false
+                    };
+                    if (isWordcodeWithHalfword && handlerTarget < 0x1000)
+                    {
+                        handlerTarget = setupInstr.Offset + 2 + handlerTarget * 2;
+                    }
                     var targetBlock = blockByOffset.Values
                         .FirstOrDefault(sb => sb.StartOffset <= handlerTarget && sb.EndOffset >= handlerTarget);
                     if (targetBlock != null)
@@ -12216,8 +12192,7 @@ public class AstBuilder
             var sm = new StackMachine(_codeObject);
             foreach (var instr in allInstrs)
             {
-                if (instr.Opcode == Opcode.POP_BLOCK || 
-                    instr.Opcode == Opcode.JUMP_FORWARD ||
+                if (instr.Opcode == Opcode.JUMP_FORWARD ||
                     instr.Opcode == Opcode.JUMP_ABSOLUTE ||
                     instr.Opcode == Opcode.POP_EXCEPT ||
                     instr.Opcode == Opcode.RERAISE ||

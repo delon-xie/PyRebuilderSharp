@@ -6,7 +6,7 @@
 **版本**: v2.7
 **日期**: 2026-07-09
 **项目**: PyRebuilderSharp
-**状态**: Phase 1–6 ✅ + Phase Fix ✅ + Phase 7 标注优先顺序块流水线 🚀 — 4 阶段标注链路 · 逐 ET 条目标注 · 回边标注 · 统一链接
+**状态**: Phase 1–6 ✅ + Phase 7 标注优先流水线 🚀 — 8 阶段标注链路 · 7 类 28 子模式目录 · 0 孤儿块 · 0 崩溃 · 71% 白盒通过率（持续收敛中）
 
 ---
 
@@ -548,15 +548,23 @@ public bool VerifyNoOrphanBlocks(List<SequentialBlock> seqBlocks, ControlFlowGra
 Phase 7 的 ControlStructure Parser 遵循**标注优先**原则：先多轮扫描收集标注信息，再统一链接组装。整个流程分为四个子阶段：
 
 ```
-Phase 2:  ExceptionTable 标注扫描
+Phase 1:    顺序块构建 + DecompileStatements 缓存
+Phase 3:    控制块起始标注扫描 (Phase 1 中)
+Phase 2:    ExceptionTable 标注扫描 (Phase 1 中)
+Phase 2a:   Match/Case 标注扫描 (Phase 1 中)
+Phase 2b:   For/While 细分标注 (Phase 1 中)
+Phase 2c:   Handler 深度标注 (Phase 1 中)
+    ↓ (BuildSequentialBlockGraph)
+Phase 3b:   汇聚点/出口标注扫描 (Phase 1 中)
+Phase 4:   回边标注扫描 (Phase 1 中)
     ↓
-Phase 3:  控制块起始标注扫描
+Phase 5:   统一链接 — 基于模式目录的 4 阶段顺序
+    ├── ① Try 结构（IsTryHeader）→ 模式 T1-T7
+    ├── ② Loop 结构（IsForLoopHeader/IsWhileLoopHeader）→ 模式 F1-F4/W1-W4
+    ├── ③ With 结构（IsWithHeader）→ 模式 S1-S4
+    └── ④ IfElse 结构（IsConditionHeader）→ 模式 I1-I4
     ↓
-Phase 4:  回边标注扫描
-    ↓
-Phase 5:  统一链接（基于所有标注信息）
-    ↓
-Phase 3c: 混合遍历 AST 组装
+Phase 3c:  混合遍历 AST 组装
 ```
 
 ### 8.2 Phase 2: ExceptionTable 标注扫描
@@ -704,9 +712,214 @@ foreach (var seqBlock in seqBlocks.Where(b => b.IsConditionHeader && !visited.Co
 }
 ```
 
-**链接优先级**: Try > Loop > With > IfElse。Try 先用 ExceptionTable 的严格 offset 边界约束，然后是 Loop（可能嵌套在 Try body 中），With 和 IfElse 最后。
+**链接优先级**: Try > Loop > Match > With > IfElse。Try 先用 ExceptionTable 的严格 offset 边界约束，然后是 Loop（可能嵌套在 Try body 中），Match 和 With 随后，IfElse 最后。
 
-### 8.6 BuildTryStructure — ExceptionTable 模式（3.11+）
+### 8.6 Phase 2a: Match/Case 标注扫描
+
+**适用范围**: Python 3.10+（`MATCH_KEYS`, `MATCH_CLASS`, `MATCH_MAPPING` 操作码）
+
+遍历所有 SequentialBlock，扫描 Match 相关操作码：
+
+| 指令 | 标注 | 说明 |
+|------|------|------|
+| `MATCH_KEYS` / `MATCH_CLASS` / `MATCH_MAPPING` | `IsMatchHeader = true` | match 语句头 |
+| `JUMP_IF_NOT_EXC_MATCH` 目标块 | `IsCaseEntry = true` | case 分支入口 |
+| match 头到 case 入口之间的块 | `IsMatchBody = true` | match subject 表达式范围 |
+
+```csharp
+foreach (var seqBlock in seqBlocks)
+{
+    if (seqBlock.Instructions.Any(i => IsMatchOpcode(i.Opcode)))
+    {
+        seqBlock.IsMatchHeader = true;
+        // 第一个 JUMP_IF_NOT_EXC_MATCH 的目标是第一个 case
+        foreach (var instr in seqBlock.Instructions)
+        {
+            if (instr.Opcode == Opcode.JUMP_IF_NOT_EXC_MATCH && instr.Argument.HasValue)
+            {
+                var caseBlock = FindSeqBlockByOffset(seqBlocks, instr.Argument.Value);
+                if (caseBlock != null)
+                    caseBlock.IsCaseEntry = true;
+            }
+        }
+    }
+}
+```
+
+### 8.7 Phase 2b: For/While 细分标注
+
+将 `IsLoopHeader` 细分为 `IsForLoopHeader` 和 `IsWhileLoopHeader`：
+
+```csharp
+// 遍历所有标记为 IsLoopHeader 的块
+foreach (var seqBlock in seqBlocks.Where(b => b.IsLoopHeader))
+{
+    if (seqBlock.Instructions.Any(i => i.Opcode == Opcode.FOR_ITER))
+    {
+        seqBlock.IsForLoopHeader = true;
+        // FOR_ITER Argument = 循环出口偏移
+        var forIter = seqBlock.Instructions.First(i => i.Opcode == Opcode.FOR_ITER);
+        if (forIter.Argument.HasValue)
+            seqBlock.ForIterExitTarget = forIter.Argument.Value;
+        // FOR_ITER 的后继 = 第一个 body 块
+        if (seqBlock.Successors.Count > 0)
+            seqBlock.Successors[0].IsForIterBody = true;
+    }
+    else if (seqBlock.IsBackEdgeTarget)
+    {
+        seqBlock.IsWhileLoopHeader = true;
+    }
+}
+```
+
+### 8.8 Phase 2c: Handler 深度标注
+
+针对 3.11+ 的 ExceptionTable，将 handler 的 Depth、IsFinally 标注入 seqBlock：
+
+```csharp
+foreach (var seqBlock in seqBlocks)
+{
+    foreach (var et in seqBlock.ExceptionTableEntries)
+    {
+        if (et.IsExcept || et.IsFinally)
+        {
+            seqBlock.HandlerDepth = et.Depth;
+            if (et.IsFinally)
+                seqBlock.IsFinallyBlock = true;
+        }
+    }
+}
+
+// 标注 else 候选块: handler 后、finally 前的 seqBlock
+foreach (var tryHeader in seqBlocks.Where(b => b.IsTryHeader))
+{
+    int firstHandlerStart = tryHeader.ExceptionTableEntries
+        .Where(et => et.IsExcept)
+        .Select(et => et.TargetOffset)
+        .DefaultIfEmpty(-1)
+        .Min();
+    int finallyStart = tryHeader.ExceptionTableEntries
+        .Where(et => et.IsFinally)
+        .Select(et => et.TargetOffset)
+        .DefaultIfEmpty(-1)
+        .FirstOrDefault();
+
+    if (finallyStart > 0)
+    {
+        // handler 结束到 finally 开始之间 = else 候选
+        int lastHandlerEnd = tryHeader.ExceptionTableEntries
+            .Where(et => et.IsExcept)
+            .Select(et => et.EndOffset)
+            .DefaultIfEmpty(-1)
+            .Max();
+
+        foreach (var sb in seqBlocks)
+        {
+            if (sb.StartOffset >= lastHandlerEnd && sb.StartOffset < finallyStart)
+                sb.IsTryElseBlock = true;
+        }
+    }
+}
+```
+
+### 8.9 Phase 3b: 汇聚点/出口标注扫描
+
+标注条件分支的汇聚点、break/continue 目标、和不可达块：
+
+```csharp
+// 汇聚点: 有多个前驱的块（条件分支合并点）
+foreach (var seqBlock in seqBlocks)
+{
+    if (seqBlock.Successors.Count > 1)
+        continue;  // 分支点，不是汇聚点
+    if (seqBlock.PredecessorCount > 1)
+        seqBlock.IsMergePoint = true;
+}
+
+// break 目标: 循环头后继中，超出 ForIterExitTarget 的块
+foreach (var header in seqBlocks.Where(b => b.IsForLoopHeader))
+{
+    if (header.ForIterExitTarget > 0)
+    {
+        var exitBlock = FindSeqBlockByOffset(seqBlocks, header.ForIterExitTarget);
+        if (exitBlock != null)
+            exitBlock.IsBreakTarget = true;
+    }
+}
+
+// continue 目标: 循环头本身
+foreach (var header in seqBlocks.Where(b => b.IsForLoopHeader || b.IsWhileLoopHeader))
+{
+    header.IsContinueTarget = true;
+}
+
+// 不可达块: RETURN_VALUE/RAISE_VARARGS 后的块
+foreach (var seqBlock in seqBlocks)
+{
+    bool hasTerminal = seqBlock.Instructions.Any(i =>
+        i.Opcode == Opcode.RETURN_VALUE ||
+        i.Opcode == Opcode.RAISE_VARARGS);
+    if (hasTerminal && seqBlock.Successors.Count > 0)
+    {
+        foreach (var succ in seqBlock.Successors)
+            succ.IsDeadCodeBlock = true;
+    }
+}
+```
+
+### 8.10 Phase 5: 更新后的链接顺序
+
+Phase 5 的链接顺序由模式目录（`docs/control-block-patterns.md`）驱动，遵循 **Try → Loop → With → IfElse** 优先级。每阶段基于标注信息筛选候选块，利用 `visited` 集防重复。
+
+```csharp
+var structures = new List<ISequentialControlStructure>();
+var visited = new HashSet<int>();
+
+// 1. Try 结构（模式 T1-T7，优先用 ExceptionTable 边界约束）
+foreach (var seqBlock in seqBlocks.Where(b => b.IsTryHeader && !visited.Contains(b.Id)))
+{
+    var tryStructure = BuildTryStructure(seqBlock, seqBlocks);
+    if (tryStructure != null)
+    {
+        structures.Add(tryStructure);
+        MarkStructureVisited(tryStructure);
+    }
+}
+
+// 2. Loop 结构（模式 F1-F4/W1-W4，逆序内层优先）
+foreach (var seqBlock in seqBlocks
+    .Where(b => (b.IsForLoopHeader || b.IsWhileLoopHeader) && !visited.Contains(b.Id))
+    .OrderByDescending(b => b.StartOffset))
+{
+    var loopStructure = BuildLoopStructure(seqBlock, seqBlocks);
+    if (loopStructure != null) { structures.Add(loopStructure); MarkVisited(loopStructure); }
+}
+
+// 3. With 结构（模式 S1-S4）
+foreach (var seqBlock in seqBlocks.Where(b => b.IsWithHeader && !visited.Contains(b.Id)))
+{
+    var withStructure = BuildWithStructure(seqBlock, seqBlocks);
+    if (withStructure != null) { structures.Add(withStructure); MarkVisited(withStructure); }
+}
+
+// 4. IfElse 结构（模式 I1-I4，最后链接，visited 已排除其他结构）
+foreach (var seqBlock in seqBlocks.Where(b => b.IsConditionHeader && !visited.Contains(b.Id)))
+{
+    var ifElseStructure = BuildIfElseStructure(seqBlock, seqBlocks);
+    if (ifElseStructure != null) { structures.Add(ifElseStructure); MarkVisited(ifElseStructure); }
+}
+```
+
+### 歧义处理规则（对应模式目录第 7 节）
+
+| 歧义场景 | 优先规则 | 确认标注组合 |
+|---------|---------|------------|
+| POP_JUMP_IF_FALSE → while vs if | **回边优先** | IsBackEdgeTarget → WhileLoop; 否则 → IfElse |
+| SETUP_FINALLY → except vs finally | **handler preamble 优先** | POP_TOP×3 → except; 直接 body → finally |
+| 多个 POP_JUMP_IF_* → elif vs 独立 if | **连续优先** | false-body 首指令也是 IsConditionHeader → elif |
+| POP_BLOCK 后 → else vs exit | **handler 跳转** | handler 的 JUMP_FORWARD 目标 = exit, else-body 在 exit 前 |
+
+### 8.11 BuildTryStructure — ExceptionTable 模式（3.11+）
 
 核心流程：
 
