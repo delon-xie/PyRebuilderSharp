@@ -37,18 +37,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install .NET 10 SDK (Windows)
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile "dotnet-install.ps1"
-          & ./dotnet-install.ps1 -Channel 10.0 -Quality preview
-
-      - name: Install .NET 10 SDK (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          curl -sSL https://dot.net/v1/dotnet-install.sh -o dotnet-install.sh
-          chmod +x dotnet-install.sh
-          ./dotnet-install.sh --channel 10.0 --quality preview
+      - name: Setup .NET 10 Preview
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          quality: 'preview'
 
       - name: Verify SDK
         run: dotnet --list-sdks
