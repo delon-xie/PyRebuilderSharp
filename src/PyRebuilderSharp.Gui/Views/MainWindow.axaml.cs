@@ -15,6 +15,26 @@ public partial class MainWindow : Window
     /// <summary>防 Ping-Pong 锁：双向滚动同步时防止互相触发。</summary>
     private bool _isSyncingScroll;
 
+    /// <summary>语法高亮调试日志开关（设为 true 启用）</summary>
+    private static bool EnableHighlightLog => false;
+
+    /// <summary>语法高亮调试日志路径（与 GUI 程序同目录）</summary>
+    private static readonly string HighlightLogPath = Path.Combine(
+        AppContext.BaseDirectory, "PyRebuilder_highlight_log.txt");
+
+    /// <summary>写入调试日志（同步追加，线程安全）</summary>
+    private static void Log(string msg)
+    {
+        if (!EnableHighlightLog) return;
+        try
+        {
+            var line = $"[{DateTime.Now:HH:mm:ss.fff}] {msg}";
+            System.Console.Error.WriteLine(line);
+            File.AppendAllText(HighlightLogPath, line + "\n");
+        }
+        catch { }
+    }
+
     public MainWindow()
     {
         InitializeComponent();
@@ -58,78 +78,84 @@ public partial class MainWindow : Window
             // 源码面板：Highlight 在后台线程构建 InlineCollection，UI 线程仅赋值
             vm.OnCodeChanged += code =>
             {
-                if (SourceBlock == null) return;
+                if (SourceBlock == null) { Log("[HL] SourceBlock null in OnCodeChanged"); return; }
+                Log($"[HL] OnCodeChanged fired, code length={code?.Length ?? 0}");
                 if (string.IsNullOrEmpty(code))
                 {
-                    SourceBlock.Inlines = null;
+                    SourceBlock.Text = "";
+                    SourceBlock.Inlines = new Avalonia.Controls.Documents.InlineCollection();
+                    Log("[HL] Cleared (empty code)");
                     return;
                 }
                 var captured = code;
-                Task.Run(() =>
+                // Run 对象必须在 UI 线程创建，所以高亮在 UI 线程同步执行
+                try
                 {
-                    try
-                    {
-                        var inlines = PythonSyntaxHighlight.Highlight(captured);
-                        Dispatcher.UIThread.Post(() =>
-                        {
-                            if (SourceBlock != null)
-                                SourceBlock.Inlines = inlines;
-                        });
-                    }
-                    catch (System.Exception ex)
-                    {
-                        System.Console.Error.WriteLine($"[WARN] Background source highlight failed: {ex.Message}");
-                        // 退化：纯文本
-                        Dispatcher.UIThread.Post(() =>
-                        {
-                            if (SourceBlock != null)
-                            {
-                                var fallback = new Avalonia.Controls.Documents.InlineCollection();
-                                fallback.Add(new Avalonia.Controls.Documents.Run(captured)
-                                    { Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Colors.White) });
-                                SourceBlock.Inlines = fallback;
-                            }
-                        });
-                    }
-                });
+                    Log("[HL] Starting highlight...");
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+                    var segments = PythonSyntaxHighlight.Highlight(captured);
+                    sw.Stop();
+                    Log($"[HL] Highlight parse complete: {segments.Count} segs, {sw.ElapsedMilliseconds}ms");
+                    var inlines = new Avalonia.Controls.Documents.InlineCollection();
+                    foreach (var (text, color) in segments)
+                        inlines.Add(new Avalonia.Controls.Documents.Run(text)
+                            { Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse(color)) });
+                    SourceBlock.Text = "";
+                    SourceBlock.Inlines = inlines;
+                    Log($"[HL] Inlines set! {inlines.Count} runs");
+                }
+                catch (System.Exception ex)
+                {
+                    Log($"[HL] Error: {ex.GetType().Name}: {ex.Message}");
+                    var fallback = new Avalonia.Controls.Documents.InlineCollection();
+                    fallback.Add(new Avalonia.Controls.Documents.Run(captured)
+                        { Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Colors.White) });
+                    SourceBlock.Inlines = fallback;
+                }
             };
 
             // 字节码面板：同上
             vm.OnDisasmChanged += code =>
             {
-                if (DisasmBlock == null) return;
+                if (DisasmBlock == null) { Log("[HL] DisasmBlock null in OnDisasmChanged"); return; }
+                Log($"[HL] OnDisasmChanged fired, code length={code?.Length ?? 0}");
                 if (string.IsNullOrEmpty(code))
                 {
-                    DisasmBlock.Inlines = null;
+                    DisasmBlock.Text = "";
+                    DisasmBlock.Inlines = new Avalonia.Controls.Documents.InlineCollection();
+                    Log("[HL] Disasm cleared (empty code)");
                     return;
                 }
                 var captured = code;
-                Task.Run(() =>
+                try
                 {
-                    try
-                    {
-                        var inlines = DisasmSyntaxHighlight.Highlight(captured);
-                        Dispatcher.UIThread.Post(() =>
-                        {
-                            if (DisasmBlock != null)
-                                DisasmBlock.Inlines = inlines;
-                        });
-                    }
-                    catch (System.Exception ex)
-                    {
-                        System.Console.Error.WriteLine($"[WARN] Background disasm highlight failed: {ex.Message}");
-                        Dispatcher.UIThread.Post(() =>
-                        {
-                            if (DisasmBlock != null)
-                            {
-                                var fallback = new Avalonia.Controls.Documents.InlineCollection();
-                                fallback.Add(new Avalonia.Controls.Documents.Run(captured)
-                                    { Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Colors.White) });
-                                DisasmBlock.Inlines = fallback;
-                            }
-                        });
-                    }
-                });
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+                    var segments = DisasmSyntaxHighlight.Highlight(captured);
+                    sw.Stop();
+                    Log($"[HL] Disasm highlight parse: {segments.Count} segs, {sw.ElapsedMilliseconds}ms");
+                    var inlines = new Avalonia.Controls.Documents.InlineCollection();
+                    foreach (var (text, color) in segments)
+                        inlines.Add(new Avalonia.Controls.Documents.Run(text)
+                            { Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse(color)) });
+                    DisasmBlock.Text = "";
+                    DisasmBlock.Inlines = inlines;
+                    Log($"[HL] Disasm Inlines set! {inlines.Count} runs");
+                }
+                catch (System.Exception ex)
+                {
+                    Log($"[HL] Disasm error: {ex.GetType().Name}: {ex.Message}");
+                    var fallback = new Avalonia.Controls.Documents.InlineCollection();
+                    fallback.Add(new Avalonia.Controls.Documents.Run(captured)
+                        { Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Colors.White) });
+                    DisasmBlock.Inlines = fallback;
+                }
+            };
+
+            // 附加日志到 ViewModel 的事件
+            vm.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.DecompiledCode))
+                    Log($"[HL] ViewModel.DecompiledCode changed");
             };
         };
     }

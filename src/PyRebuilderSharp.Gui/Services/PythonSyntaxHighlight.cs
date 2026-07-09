@@ -20,18 +20,31 @@ namespace PyRebuilderSharp.Gui.Services;
 /// </summary>
 public static class PythonSyntaxHighlight
 {
-    private static readonly SolidColorBrush
-        ControlKeyword = new(Color.Parse("#C586C0")),  // def, class, async, await
-        BlueKeyword    = new(Color.Parse("#569CD6")),  // if, for, import, return
-        StringCol      = new(Color.Parse("#CE9178")),
-        NumberCol      = new(Color.Parse("#B5CEA8")),
-        CommentCol     = new(Color.Parse("#6A9955")),
-        FunctionCol    = new(Color.Parse("#DCDCAA")),  // 函数名
-        ClassCol       = new(Color.Parse("#4EC9B0")),  // 类名
-        ConstantCol    = new(Color.Parse("#4EC9B0")),  // True/False/None
-        BuiltinCol     = new(Color.Parse("#DCDCAA")),  // print, len 等
-        DecoratorCol   = new(Color.Parse("#DCDCAA")),
-        DefaultCol     = new(Color.Parse("#D4D4D4"));
+    // 惰性初始化 — 避免在后台线程静态度量时 Avalonia Color.Parse 崩溃
+    private static readonly Lazy<SolidColorBrush> _controlKeyword = new(() => new(Color.Parse("#C586C0")));
+    private static readonly Lazy<SolidColorBrush> _blueKeyword = new(() => new(Color.Parse("#569CD6")));
+    private static readonly Lazy<SolidColorBrush> _stringCol = new(() => new(Color.Parse("#CE9178")));
+    private static readonly Lazy<SolidColorBrush> _numberCol = new(() => new(Color.Parse("#B5CEA8")));
+    private static readonly Lazy<SolidColorBrush> _commentCol = new(() => new(Color.Parse("#6A9955")));
+    private static readonly Lazy<SolidColorBrush> _functionCol = new(() => new(Color.Parse("#DCDCAA")));
+    private static readonly Lazy<SolidColorBrush> _classCol = new(() => new(Color.Parse("#4EC9B0")));
+    private static readonly Lazy<SolidColorBrush> _constantCol = new(() => new(Color.Parse("#4EC9B0")));
+    private static readonly Lazy<SolidColorBrush> _builtinCol = new(() => new(Color.Parse("#DCDCAA")));
+    private static readonly Lazy<SolidColorBrush> _decoratorCol = new(() => new(Color.Parse("#DCDCAA")));
+    private static readonly Lazy<SolidColorBrush> _defaultCol = new(() => new(Color.Parse("#D4D4D4")));
+
+    // 缩写属性
+    private static SolidColorBrush ControlKeyword => _controlKeyword.Value;
+    private static SolidColorBrush BlueKeyword => _blueKeyword.Value;
+    private static SolidColorBrush StringCol => _stringCol.Value;
+    private static SolidColorBrush NumberCol => _numberCol.Value;
+    private static SolidColorBrush CommentCol => _commentCol.Value;
+    private static SolidColorBrush FunctionCol => _functionCol.Value;
+    private static SolidColorBrush ClassCol => _classCol.Value;
+    private static SolidColorBrush ConstantCol => _constantCol.Value;
+    private static SolidColorBrush BuiltinCol => _builtinCol.Value;
+    private static SolidColorBrush DecoratorCol => _decoratorCol.Value;
+    private static SolidColorBrush DefaultCol => _defaultCol.Value;
 
     // 紫色控制关键字
     private static readonly HashSet<string> ControlKeywords = new()
@@ -55,28 +68,31 @@ public static class PythonSyntaxHighlight
       "reversed", "round", "set", "setattr", "slice", "sorted", "staticmethod",
       "str", "sum", "super", "tuple", "type", "vars", "zip", "__import__" };
 
-    public static InlineCollection Highlight(string source)
+    /// <summary>
+    /// 返回颜色化后的文本段列表（不创建 Avalonia 对象，安全地从后台线程调用）
+    /// </summary>
+    public static List<(string Text, string Color)> Highlight(string source)
     {
-        var inlines = new InlineCollection();
-        if (string.IsNullOrEmpty(source)) return inlines;
+        var result = new List<(string Text, string Color)>();
+        if (string.IsNullOrEmpty(source)) return result;
 
         var lines = source.Split('\n');
         for (int li = 0; li < lines.Length; li++)
         {
-            if (li > 0) inlines.Add(new Run("\n"));
-            ParseLine(lines[li], inlines);
+            if (li > 0) result.Add(("\n", "#D4D4D4"));
+            ParseLine(lines[li], result);
         }
-        return inlines;
+        return result;
     }
 
-    private static void ParseLine(string line, InlineCollection inlines)
+    private static void ParseLine(string line, List<(string Text, string Color)> result)
     {
         int i = 0;
         while (i < line.Length)
         {
             if (line[i] == '#')
             {
-                inlines.Add(new Run(line[i..]) { Foreground = CommentCol });
+                result.Add((line[i..], "#6A9955"));
                 return;
             }
 
@@ -84,7 +100,7 @@ public static class PythonSyntaxHighlight
             {
                 int end = FindStringEnd(line, i, line[i]);
                 var s = end > 0 ? line[i..(end + 1)] : line[i..];
-                inlines.Add(new Run(s) { Foreground = StringCol });
+                result.Add((s, "#CE9178"));
                 i = end > 0 ? end + 1 : line.Length;
                 continue;
             }
@@ -94,7 +110,7 @@ public static class PythonSyntaxHighlight
                 int s = i; i++;
                 while (i < line.Length && IsDigitPart(line[i]) && line[i] != '#' && line[i] != '\'' && line[i] != '"')
                     i++;
-                inlines.Add(new Run(line[s..i]) { Foreground = NumberCol });
+                result.Add((line[s..i], "#B5CEA8"));
                 continue;
             }
 
@@ -107,33 +123,29 @@ public static class PythonSyntaxHighlight
 
                 if (s > 0 && line[s - 1] == '@')
                 {
-                    inlines.Add(new Run(word) { Foreground = DecoratorCol });
+                    result.Add((word, "#DCDCAA"));
                 }
                 else if (ControlKeywords.Contains(word))
                 {
-                    inlines.Add(new Run(word) { Foreground = ControlKeyword, FontWeight = FontWeight.Bold });
+                    result.Add((word, "#C586C0"));
                 }
                 else if (BlueKeywords.Contains(word))
                 {
-                    var color = ("TrueFalseNone".Contains(word) && word.Length > 2)
-                        ? ConstantCol : BlueKeyword;
-                    // True/False/None → 青色, 其他关键字 → 蓝色
-                    color = word is "True" or "False" or "None" ? ConstantCol : BlueKeyword;
-                    var fw = word is "True" or "False" or "None" ? FontWeight.Normal : FontWeight.Normal;
-                    inlines.Add(new Run(word) { Foreground = color, FontWeight = fw });
+                    var color = word is "True" or "False" or "None" ? "#4EC9B0" : "#569CD6";
+                    result.Add((word, color));
                 }
                 else if (Builtins.Contains(word))
                 {
-                    inlines.Add(new Run(word) { Foreground = BuiltinCol });
+                    result.Add((word, "#DCDCAA"));
                 }
                 else
                 {
-                    inlines.Add(new Run(word) { Foreground = DefaultCol });
+                    result.Add((word, "#D4D4D4"));
                 }
                 continue;
             }
 
-            inlines.Add(new Run(line[i].ToString()) { Foreground = DefaultCol });
+            result.Add((line[i].ToString(), "#D4D4D4"));
             i++;
         }
     }

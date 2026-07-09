@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'   # v1.0, v2.0-beta1, etc.
+  workflow_dispatch:       # 也可手动触发
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  PROJECT_CLI: src/PyRebuilderSharp.Cli/PyRebuilderSharp.Cli.csproj
+  PROJECT_GUI: src/PyRebuilderSharp.Gui/PyRebuilderSharp.Gui.csproj
+  CONFIGURATION: Release
+
+jobs:
+  build:
+    name: Build ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - rid: win-x64
+            os: windows-latest
+            suffix: .exe
+          - rid: osx-x64
+            os: macos-latest
+            suffix: ''
+          - rid: osx-arm64
+            os: macos-latest
+            suffix: ''
+          - rid: linux-x64
+            os: ubuntu-latest
+            suffix: ''
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build CLI (${{ matrix.rid }})
+        run: |
+          dotnet publish ${{ env.PROJECT_CLI }} \
+            -c ${{ env.CONFIGURATION }} \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -o publish/cli/${{ matrix.rid }}
+
+      - name: Build GUI (${{ matrix.rid }})
+        run: |
+          dotnet publish ${{ env.PROJECT_GUI }} \
+            -c ${{ env.CONFIGURATION }} \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -o publish/gui/${{ matrix.rid }}
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path publish/cli/${{ matrix.rid }}/* -DestinationPath PyRebuilderSharp_CLI_${{ matrix.rid }}.zip
+          Compress-Archive -Path publish/gui/${{ matrix.rid }}/* -DestinationPath PyRebuilderSharp_GUI_${{ matrix.rid }}.zip
+
+      - name: Package (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          tar czf PyRebuilderSharp_CLI_${{ matrix.rid }}.tar.gz -C publish/cli/${{ matrix.rid }} .
+          tar czf PyRebuilderSharp_GUI_${{ matrix.rid }}.tar.gz -C publish/gui/${{ matrix.rid }} .
+
+      - name: Upload CLI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.rid }}
+          path: PyRebuilderSharp_CLI_${{ matrix.rid }}.*
+
+      - name: Upload GUI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gui-${{ matrix.rid }}
+          path: PyRebuilderSharp_GUI_${{ matrix.rid }}.*
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: List artifacts
+        run: ls -laR
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            cli-*/*.zip
+            cli-*/*.tar.gz
+            gui-*/*.zip
+            gui-*/*.tar.gz
+          generate_release_notes: true

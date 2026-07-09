@@ -248,6 +248,7 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> ShowCrashLogCommand { get; }
     public ReactiveCommand<Unit, Unit> ClearCrashLogCommand { get; }
     public ReactiveCommand<Unit, Unit> CloseCrashLogCommand { get; }
+    public ReactiveCommand<Unit, Unit> ShowPyComparisonCommand { get; }
 
     // -- 顶层窗口引用（由View设置） --
     public Window? TopLevel { get; set; }
@@ -260,6 +261,12 @@ public class MainViewModel : ViewModelBase
         ShowCrashLogCommand = ReactiveCommand.Create(() => { LoadCrashLog(); return System.Reactive.Unit.Default; });
         ClearCrashLogCommand = ReactiveCommand.Create(() => { ClearCrashLog(); return System.Reactive.Unit.Default; });
         CloseCrashLogCommand = ReactiveCommand.Create(() => { ShowCrashLog = false; return System.Reactive.Unit.Default; });
+        ShowPyComparisonCommand = ReactiveCommand.Create(() =>
+        {
+            if (PySourceContent == null) return System.Reactive.Unit.Default;
+            ShowPyComparison = !ShowPyComparison;
+            return System.Reactive.Unit.Default;
+        });
         PythonVersion = "🔍 选择 .pyc 文件开始反编译";
     }
 
@@ -591,6 +598,9 @@ public class MainViewModel : ViewModelBase
             var pyVersion = DetectPythonVersion(filePath);
             PythonVersion = $"🐍 {pyVersion}";
             CurrentFileName = Path.GetFileName(filePath);
+            
+            // 自动查找匹配的 .py 源文件
+            FindPySource(filePath);
 
             var pycData = await File.ReadAllBytesAsync(filePath);
             var decompiler = new Decompiler(new DecompileOptions { EnableSequentialBlocks = true });
@@ -706,6 +716,79 @@ public class MainViewModel : ViewModelBase
     {
         get => _disasmText;
         set => SetProperty(ref _disasmText, value);
+    }
+
+    // -- .py 源码对照 --
+    /// <summary>匹配的 .py 源文件路径（自动按文件名查找）</summary>
+    private string? _pySourcePath;
+    
+    private string? _pySourceContent;
+    public string? PySourceContent
+    {
+        get => _pySourceContent;
+        set => SetProperty(ref _pySourceContent, value);
+    }
+    
+    private bool _showPyComparison;
+    /// <summary>是否显示 .py 源码对照（替代反编译结果）</summary>
+    public bool ShowPyComparison
+    {
+        get => _showPyComparison;
+        set
+        {
+            if (SetProperty(ref _showPyComparison, value))
+            {
+                // 切换显示源
+                if (value && _pySourceContent != null)
+                {
+                    OnCodeChanged?.Invoke(_pySourceContent);
+                }
+                else if (!value)
+                {
+                    OnCodeChanged?.Invoke(_sourceCodeText);
+                }
+            }
+        }
+    }
+    
+    public string PyComparisonLabel => _pySourcePath != null 
+        ? $"📄 {Path.GetFileName(_pySourcePath)}" 
+        : "未找到 .py 源文件";
+
+    private void FindPySource(string pycPath)
+    {
+        _pySourcePath = null;
+        PySourceContent = null;
+        ShowPyComparison = false;
+        
+        // 查找同名 .py 文件
+        var pyPath = Path.ChangeExtension(pycPath, ".py");
+        if (File.Exists(pyPath))
+        {
+            _pySourcePath = pyPath;
+            PySourceContent = File.ReadAllText(pyPath);
+            OnPropertyChanged(nameof(PyComparisonLabel));
+            StatusText = $"📄 已找到匹配源文件: {Path.GetFileName(pyPath)}";
+            return;
+        }
+        
+        // 在上级目录找（对于 compiled/ 目录下的文件）
+        var dir = Path.GetDirectoryName(pycPath);
+        while (dir != null)
+        {
+            var parentPy = Path.Combine(Path.GetDirectoryName(dir) ?? "", Path.ChangeExtension(Path.GetFileName(pycPath), ".py"));
+            if (File.Exists(parentPy))
+            {
+                _pySourcePath = parentPy;
+                PySourceContent = File.ReadAllText(parentPy);
+                OnPropertyChanged(nameof(PyComparisonLabel));
+                StatusText = $"📄 已找到匹配源文件: {Path.GetFileName(parentPy)}";
+                return;
+            }
+            dir = Path.GetDirectoryName(dir);
+        }
+        
+        StatusText = "⚠️ 未找到对应的 .py 源文件";
     }
 
     private async Task SaveResultAsync()

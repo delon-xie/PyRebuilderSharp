@@ -37,6 +37,14 @@
         <CheckBox IsChecked="{Binding ShowSummary}" Content="#summary" 
                   VerticalAlignment="Center" FontSize="11" Foreground="#bbb"
                   Background="Transparent" BorderBrush="#555" />
+        <Separator Width="1" Background="#3c3c3c" Margin="6,2" />
+        <Button Command="{Binding ShowPyComparisonCommand}" Padding="8,4" Background="#2d2d2d"
+                BorderBrush="#3c3c3c" Foreground="#ccc" BorderThickness="1" CornerRadius="2" Cursor="Hand">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock Text="📄" />
+            <TextBlock Text="{Binding PyComparisonLabel}" />
+          </StackPanel>
+        </Button>
       </StackPanel>
     </Border>
 
