@@ -267,41 +267,43 @@ def generate_report(results, stats, version_stats, total, skipped):
 
     # 1. 总体统计
     report.append("## 1. 总体统计")
-    report.append(f"- 测试用例总数: {total}")
-    report.append(f"- 跳过(无 pyc): {skipped}")
-    report.append(f"- 通过: {stats['PASS']} ({stats['PASS']*100//max(total,1)}%)")
-    report.append(f"- 失败: {stats['FAIL']} ({stats['FAIL']*100//max(total,1)}%)")
+    report.append("| 统计项 | 数值 |")
+    report.append("|--------|------|")
+    report.append(f"| 测试用例总数 | {total} |")
+    report.append(f"| 跳过(无 pyc) | {skipped} |")
+    report.append(f"| 通过 | {stats['PASS']} ({stats['PASS']*100//max(total,1)}%) |")
+    report.append(f"| 失败 | {stats['FAIL']} ({stats['FAIL']*100//max(total,1)}%) |")
     report.append("")
 
     # 2. 各版本通过率
     report.append("## 2. 各版本通过率")
-    report.append(f"{'版本':<10} {'通过':>6} {'失败':>6} {'通过率':>8}")
-    report.append("-" * 35)
+    report.append("| 版本 | 通过 | 失败 | 通过率 |")
+    report.append("|------|------|------|--------|")
     for ver in VERSIONS:
         p = version_stats[ver]['PASS']
         f = version_stats[ver]['FAIL']
         t = p + f
         rate = f"{p*100//max(t,1)}%" if t > 0 else "N/A"
-        report.append(f"{ver:<10} {p:>6} {f:>6} {rate:>8}")
+        report.append(f"| {ver} | {p} | {f} | {rate} |")
     report.append("")
 
     # 3. 问题分类统计
     report.append("## 3. 问题分类统计")
-    report.append(f"{'问题类型':<30} {'数量':>6}")
-    report.append("-" * 40)
+    report.append("| 问题类型 | 数量 |")
+    report.append("|----------|------|")
     issue_types = [(k, v) for k, v in sorted(stats.items()) if k not in ('PASS', 'FAIL')]
     for itype, count in sorted(issue_types, key=lambda x: -x[1]):
-        report.append(f"{itype:<30} {count:>6}")
+        report.append(f"| {itype} | {count} |")
     report.append("")
 
     # 4. 失败用例详情
     report.append("## 4. 失败用例详情")
-    report.append(f"{'文件':<25} {'版本':<8} {'问题类型':<25} {'详情'}")
-    report.append("-" * 90)
+    report.append("| 文件 | 版本 | 问题类型 | 详情 |")
+    report.append("|------|------|----------|------|")
     for (fname, ver), data in sorted(results.items()):
         if data['issues']:
             for itype, detail in data['issues']:
-                report.append(f"{fname:<25} {ver:<8} {itype:<25} {detail[:50]}")
+                report.append(f"| {fname} | {ver} | {itype} | {detail[:50]} |")
     report.append("")
 
     # 5. 代表性输出
