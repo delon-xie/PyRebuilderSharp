@@ -438,6 +438,7 @@ PyRebuilderSharp.slnx
 | [TESTING_BASELINE.md](docs/TESTING_BASELINE.md) | v2.1 — 测试基准与版本矩阵 |
 | [pyc-format-reference.md](docs/pyc-format-reference.md) | Python marshal 格式参考 |
 | [quick_start.md](quick_start.md) | 快速入门（构建+运行+测试） |
+| [deepseek_v4_benchmark_report.md](docs/deepseek_v4_benchmark_report.md) | 🤖 横向评测 — 与 uncompyle6/decompyle3/pycdc 对比 |
 
 ---
 
