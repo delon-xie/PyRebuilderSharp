@@ -11,7 +11,6 @@ public static class JumpHelper
     public static bool IsTerminal(Opcode op) => op switch
     {
         Opcode.RETURN_VALUE or Opcode.RAISE_VARARGS
-            or Opcode.RETURN_GENERATOR_313
             or Opcode.INTERPRETER_EXIT => true,
         _ => false
     };

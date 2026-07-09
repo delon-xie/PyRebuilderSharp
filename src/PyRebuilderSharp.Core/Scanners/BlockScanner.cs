@@ -36,10 +36,10 @@ public class BlockScanner : IBlockScanner
         var leaders = new SortedSet<int> { 0 };
 
         for (int i = 0; i < instructions.Count; i++)
-        {
-            var instr = instructions[i];
+            {
+                var instr = instructions[i];
 
-            if (JumpHelper.IsTerminal(instr.Opcode))
+                if (JumpHelper.IsTerminal(instr.Opcode))
             {
                 if (i + 1 < instructions.Count)
                     leaders.Add(instructions[i + 1].Offset);
@@ -74,16 +74,17 @@ public class BlockScanner : IBlockScanner
         // 3.11+: ExceptionTable 条目定义 try/except/finally/match handler 入口
         // 同时拆块于 try 体起始/结束边界，使块边界与异常条目对齐
         if (exceptionTable != null)
-        {
-            foreach (var entry in exceptionTable)
             {
-                leaders.Add(entry.TargetOffset);               // handler 入口
-                leaders.Add(entry.StartOffset);                // try 体起始
-                leaders.Add(entry.EndOffset);                  // try 体结束（独占）
+                foreach (var entry in exceptionTable)
+                {
+                    leaders.Add(entry.TargetOffset);               // handler 入口
+                    leaders.Add(entry.StartOffset);                // try 体起始
+                    leaders.Add(entry.EndOffset);                  // try 体结束（独占）
+                    
+                }
             }
-        }
 
-        Console.Error.WriteLine($"[BLOCK_DEBUG] Final leaders: {string.Join(", ", leaders)}");
+            Console.Error.WriteLine($"[BLOCK_DEBUG] Final leaders: {string.Join(", ", leaders)}");
         return leaders;
     }
 
@@ -143,7 +144,7 @@ public class BlockScanner : IBlockScanner
                 + (hasCaches && instr.Opcode == Opcode.FOR_ITER ? 2 : 0),
             // 参考 CPython 3.12: Include/internal/pycore_opcode.h
             //     FOR_ITER 的 cache 偏移 = FOR_ITER_CACHE_ENTRIES * 2 = 2
-            Opcode.JUMP_BACKWARD => instr.Offset + 2 - instr.Argument.Value,
+            Opcode.JUMP_BACKWARD or Opcode.JUMP_BACKWARD_NO_INTERRUPT => instr.Offset + 2 - instr.Argument.Value,
             // 3.12+ wordcode: 条件跳转参数是相对字节偏移，需加上当前指令+2
             // 3.6-3.9 wordcode: 参数已为绝对字节偏移
             Opcode.POP_JUMP_IF_TRUE or Opcode.POP_JUMP_IF_FALSE

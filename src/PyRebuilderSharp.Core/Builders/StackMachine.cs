@@ -1732,26 +1732,59 @@ public class StackMachine
                 // SEND pops two: generator, send_value
                 // For AST: treat like yield from
                 // In coroutines (async def), SEND is used for await
-                // Pattern: GET_AWAITABLE -> LOAD_CONST None -> SEND
+                // Pattern: GET_AWAITABLE -> LOAD_CONST None -> SEND (3.12+)
+                // Pattern: CALL -> CALL_FUNCTION -> LOAD_CONST None -> SEND (3.11)
                 // GET_AWAITABLE already created Await expression
                 var sendValue = SafePop();
                 var genExpr = SafePop();
                 
                 if (_code.IsCoroutine)
                 {
-                    if (!(sendValue is Constant constExpr && constExpr.Value == null))
+                    if (sendValue is Constant constExpr && constExpr.Value == null)
                     {
                         if (genExpr != null)
                         {
-                            _exprStack.Push(new Await(genExpr));
+                            if (!(genExpr is Await))
+                            {
+                                if (genExpr is Call callExpr && callExpr.Args.Count == 0)
+                                {
+                                    if (callExpr.Func is PyRebuilderSharp.Core.Models.AST.Attribute attr && attr.Attr == "__await__")
+                                    {
+                                        _exprStack.Push(new Await(attr.Value));
+                                    }
+                                    else
+                                    {
+                                        _exprStack.Push(new Await(callExpr.Func));
+                                    }
+                                }
+                                else
+                                {
+                                    _exprStack.Push(new Await(genExpr));
+                                }
+                            }
+                            else
+                            {
+                                _exprStack.Push(genExpr);
+                            }
                         }
+                    }
+                    else if (genExpr != null)
+                    {
+                        _exprStack.Push(genExpr);
                     }
                 }
                 else
                 {
                     if (genExpr != null)
                     {
-                        _exprStack.Push(genExpr);
+                        if (sendValue != null)
+                        {
+                            _exprStack.Push(new Call(genExpr, new List<Expr> { sendValue }, null));
+                        }
+                        else
+                        {
+                            _exprStack.Push(genExpr);
+                        }
                     }
                 }
                 return null;
