@@ -939,7 +939,10 @@ public class StackMachine
                 // Python 3.11 协程中的特殊情况：CALL_FUNCTION 0 在协程中是获取 awaitable 的操作
                 // 模式：CALL -> CALL_FUNCTION 0 -> LOAD_CONST None -> SEND
                 // CALL_FUNCTION 0 不应该创建新的 Call，而是保留栈顶的值（CALL 的结果）
-                if (_code.IsCoroutine && argCount == 0 && processedArgs.Count == 0)
+                // 注意：Python 3.9/3.10 使用 CALL_FUNCTION 0 -> GET_AWAITABLE -> YIELD_FROM
+                // 那里 CALL_FUNCTION 0 应该创建 Call
+                if (_code.IsCoroutine && argCount == 0 && processedArgs.Count == 0 
+                    && _code.Version is PythonVersion.Py311 or PythonVersion.Py312 or PythonVersion.Py313 or PythonVersion.Py314)
                 {
                     _exprStack.Push(func);
                 }
