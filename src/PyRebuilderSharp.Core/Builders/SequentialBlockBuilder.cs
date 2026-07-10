@@ -409,7 +409,7 @@ public class SequentialBlockBuilder
         }
 
         // Step A: 防止过度链接 — 清除 handler 块范围内所有嵌套块的 IsTryHeader
-        // 使用严格包含检查（fully-contained），防止误清除外部 try header
+        // 使用全包含检查（包含 handler body 内的所有 seqBlock）
         var handlerBlocks = new List<SequentialBlock>();
         foreach (var tryHeader in seqBlocks.Where(b => b.IsTryHeader))
         {

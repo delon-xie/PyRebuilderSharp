@@ -147,7 +147,5 @@ try:
     """
         __isabstractmethod__ = True
     from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
-    from _py_abc import ABCMeta, get_cache_token
-    ABCMeta.__module__ = 'abc'
 except:
     pass

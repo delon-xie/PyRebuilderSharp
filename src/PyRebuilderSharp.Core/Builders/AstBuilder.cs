@@ -450,6 +450,9 @@ public class AstBuilder
         // Phase 8 Step 3: BARE_EXPR 清理 — 删除编译器生成的中间表达式残留
         stmts = CleanupBareExpr(stmts);
 
+        // Phase 9-03: 语法错误修复 — 检测并修复常见的无效语法模式
+        stmts = FixSyntaxErrors(stmts);
+
         // Phase 8 Step 3: 装饰器折叠 — TODO: 需要更仔细的设计（Args 中 FunctionRef→FunctionDef 映射）
         // stmts = FoldDecoratorCalls(stmts);
 
@@ -10075,6 +10078,7 @@ public class AstBuilder
         CollapseRedundantPasses(stmts);
         stmts = TrimPostTerminalDeadCode(stmts);
         stmts = CleanupBareExpr(stmts);
+        stmts = FixSyntaxErrors(stmts);
         // stmts = DecompileNestedCodeObjects(stmts, _codeObject); // disabled
 
         return new Module(stmts, _codeObject.Name);
@@ -10113,6 +10117,7 @@ public class AstBuilder
         CollapseRedundantPasses(stmts);
         stmts = TrimPostTerminalDeadCode(stmts);
         stmts = CleanupBareExpr(stmts);
+        stmts = FixSyntaxErrors(stmts);
         // stmts = DecompileNestedCodeObjects(stmts, _codeObject); // disabled
 
         return new Module(stmts, _codeObject.Name);
@@ -10857,6 +10862,10 @@ public class AstBuilder
             {
                 var current = worklist.Dequeue();
 
+                // Phase 9-04: 跳过 handler preamble 块（不会产生有效语句）
+                if (IsHandlerPreambleBlock(current))
+                    continue;
+
                 if (handlerOffsets.Contains(current.StartOffset))
                     continue;
 
@@ -11239,6 +11248,15 @@ public class AstBuilder
         }
 
         bodyBlocks.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+
+        // Phase 9-04: 如果 body 只有 handler preamble 块，不创建空 try
+        bodyBlocks.RemoveAll(b => IsHandlerPreambleBlock(b));
+        if (bodyBlocks.Count == 0)
+        {
+            Console.Error.WriteLine(
+                $"[TRY_PARSE] Skipped empty try @0x{header.StartOffset:X4} (no real body)");
+            return null;
+        }
 
         if (exceptHandlers.Count > 0 || finallyBlock != null)
         {
@@ -12414,6 +12432,18 @@ public class AstBuilder
                 finallyStmts.Add(new ExprStmt(sm.PopResult()));
         }
 
+        // Phase 9-04: 空的 try body（只有 pass）→ 直接返回 body
+        // 先移除 body 中的 pass（与 CollapseRedundantPasses 同逻辑）
+        bodyStmts.RemoveAll(s => s is Pass);
+        if (bodyStmts.Count == 0
+            && (elseStmts == null || elseStmts.Count == 0)
+            && (finallyStmts == null || finallyStmts.Count == 0))
+        {
+            Console.Error.WriteLine(
+                $"[TRY_FIX] Suppressed empty try (stripped to body statements)");
+            return bodyStmts; // 返回空 body 或 pass — 下游 CollapseRedundantPasses 会处理
+        }
+
         return new List<Stmt> { new Try(bodyStmts, handlers, elseStmts, finallyStmts) };
     }
 
@@ -12710,6 +12740,134 @@ public class AstBuilder
         return false;
     }
 
+    // ---- Phase 9-03: 语法错误修复 ----
+
+    /// <summary>
+    /// 检测并修复反编译输出中的语法错误模式。
+    /// 
+    /// 处理三类常见的无效语法：
+    /// 1. 无效函数名（如 `def 5(x):`）→ 3.5-3.7 推导式误转为函数定义
+    /// 2. yield from 在类体/函数体外 → 替换为 pass
+    /// 3. continue/break 在循环体外 → 替换为 pass
+    /// </summary>
+    private static List<Stmt> FixSyntaxErrors(List<Stmt> stmts)
+    {
+        if (stmts == null || stmts.Count == 0)
+            return stmts ?? new List<Stmt>();
+
+        var result = new List<Stmt>(stmts.Count);
+
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            var stmt = stmts[i];
+
+            // 规则 1: FunctionDef 名称为无效 Python 标识符 → 删除
+            // 3.5-3.7 推导式中编译器中间代码对象以数字为名称
+            if (stmt is FunctionDef fd && !IsValidPythonIdentifier(fd.Name))
+            {
+                Console.Error.WriteLine(
+                    $"[SYNTAX_FIX] Removed FunctionDef with invalid name: '{fd.Name}'");
+                continue;
+            }
+
+            // 规则 2: yield / yield from / await 在非函数体内 → pass
+            if (IsInvalidYieldUsage(stmt))
+            {
+                Console.Error.WriteLine("[SYNTAX_FIX] Replaced invalid yield/await with pass");
+                result.Add(new Pass());
+                continue;
+            }
+
+            // 规则 3: continue/break 在循环体外 → pass
+            if (stmt is Continue or Break)
+            {
+                Console.Error.WriteLine(
+                    $"[SYNTAX_FIX] Replaced '{stmt.GetType().Name}' outside loop with pass");
+                result.Add(new Pass());
+                continue;
+            }
+
+            // 递归处理容器结构的子 body
+            var processed = FixSyntaxErrorsRecursive(stmt);
+            if (processed != null)
+            {
+                result.Add(processed);
+                continue;
+            }
+
+            result.Add(stmt);
+        }
+
+        return result;
+    }
+
+    /// <summary>递归处理嵌套结构中的语法错误。</summary>
+    private static Stmt? FixSyntaxErrorsRecursive(Stmt stmt)
+    {
+        switch (stmt)
+        {
+            case FunctionDef fd:
+                return fd with { Body = FixSyntaxErrors(fd.Body) };
+            case ClassDef cd:
+                return cd with { Body = FixSyntaxErrors(cd.Body) };
+            case If ifStmt:
+                return ifStmt with
+                {
+                    Body = FixSyntaxErrors(ifStmt.Body),
+                    Orelse = ifStmt.Orelse != null ? FixSyntaxErrors(ifStmt.Orelse) : null
+                };
+            case While whileStmt:
+                return whileStmt with
+                {
+                    Body = FixSyntaxErrors(whileStmt.Body),
+                    Orelse = whileStmt.Orelse != null ? FixSyntaxErrors(whileStmt.Orelse) : null
+                };
+            case For forStmt:
+                return forStmt with
+                {
+                    Body = FixSyntaxErrors(forStmt.Body),
+                    Orelse = forStmt.Orelse != null ? FixSyntaxErrors(forStmt.Orelse) : null
+                };
+            case Try tryStmt:
+                return tryStmt with
+                {
+                    Body = FixSyntaxErrors(tryStmt.Body),
+                    Handlers = tryStmt.Handlers.Select(h =>
+                        h with { Body = FixSyntaxErrors(h.Body) }).ToList(),
+                    Orelse = tryStmt.Orelse != null ? FixSyntaxErrors(tryStmt.Orelse) : null,
+                    Finalbody = tryStmt.Finalbody != null ? FixSyntaxErrors(tryStmt.Finalbody) : null
+                };
+            case With withStmt:
+                return withStmt with { Body = FixSyntaxErrors(withStmt.Body) };
+            default:
+                return null; // 非容器节点，交由上层处理
+        }
+    }
+
+    /// <summary>检查函数名是否是有效的 Python 标识符。</summary>
+    private static bool IsValidPythonIdentifier(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return false;
+
+        // Python 标识符: 字母或下划线开头，后跟字母数字或下划线
+        if (!char.IsLetter(name[0]) && name[0] != '_')
+            return false;
+
+        for (int j = 1; j < name.Length; j++)
+        {
+            if (!char.IsLetterOrDigit(name[j]) && name[j] != '_')
+                return false;
+        }
+        return true;
+    }
+
+    /// <summary>检查语句是否为无效的 yield/await 用法（在函数体/类体外）。</summary>
+    private static bool IsInvalidYieldUsage(Stmt stmt)
+    {
+        // Yield, YieldFrom 是独立的 Stmt 类型，直接出现在语句列表中
+        return stmt is Yield or YieldFrom;
+    }
+
     /// <summary>判断表达式是否为装饰器（保留为预备代码）。TODO: 实现 FoldDecoratorCalls。</summary>
     private static bool IsDecoratorExpression(Expr expr)
     {
@@ -12832,5 +12990,48 @@ public class AstBuilder
             return m.Body;
 
         return new List<Stmt>();
+    }
+
+    // ---- Phase 9-04: Handler preamble 检测工具 ----
+
+    /// <summary>
+    /// 检测 seqBlock 是否为 handler preamble 块（包含 handler 入口指令）。
+    /// 3.11+: PUSH_EXC_INFO / CHECK_EXC_MATCH
+    /// 3.10-: 连续的 POP_TOP ×3（bare except handler 入口）
+    /// 
+    /// 检查条件：
+    /// - 3.11+: block 包含 PUSH_EXC_INFO 或 CHECK_EXC_MATCH
+    /// - 3.10-: block 以 POP_TOP 开头，且至少有 3 条 POP_TOP 指令
+    /// </summary>
+    private static bool IsHandlerPreambleBlock(SequentialBlock block)
+    {
+        if (block.Instructions.Count == 0) return false;
+
+        // 3.11+: PUSH_EXC_INFO / CHECK_EXC_MATCH → 显式 handler 入口标志
+        if (block.Instructions.Any(i =>
+            i.Opcode == Opcode.PUSH_EXC_INFO_312 ||
+            i.Opcode == Opcode.PUSH_EXC_INFO ||
+            i.Opcode == Opcode.CHECK_EXC_MATCH))
+            return true;
+
+        // 3.10-: block 以 POP_TOP 开头且有 ≥3 条 POP_TOP（bare except handler）
+        if (block.Instructions[0].Opcode == Opcode.POP_TOP)
+        {
+            int popTopCount = block.Instructions.Count(i => i.Opcode == Opcode.POP_TOP);
+            if (popTopCount >= 3)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 判断 seqBlock 是否为 handler body 的最后一块（包含 POP_EXCEPT）。
+    /// </summary>
+    private static bool IsHandlerEndBlock(SequentialBlock block)
+    {
+        return block.Instructions.Any(i =>
+            i.Opcode == Opcode.POP_EXCEPT ||
+            i.Opcode == Opcode.RERAISE);
     }
 }
