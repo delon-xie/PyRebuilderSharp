@@ -20,4 +20,7 @@ public class DecompileOptions
     
     /// <summary>是否启用顺序块三阶段架构。默认为 true（使用 Phase 7 新架构）。</summary>
     public bool EnableSequentialBlocks { get; set; } = true;
+
+    /// <summary>Phase 8 Step 4: 是否显示后支配树 + 结构验证诊断信息。默认为 false。</summary>
+    public bool ShowStructuralValidation { get; set; } = false;
 }

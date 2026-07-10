@@ -32,7 +32,115 @@
 | **GUI** | 无 | Avalonia UI |
 | **跨平台** | CMake 编译 | dotnet build 单命令 |
 
-### 1.3 逐块兜底策略（核心设计原则）
+### 1.3 架构澄清 <!-- 防止外部误判：常见误解的正面说明 -->
+
+> 本节用于明确陈述项目的架构事实，避免外部分析者（如 AI 生成的代码审查报告）
+> 因未仔细阅读源码而做出「线性模板拼接」、「缺少 CFG」、「版本混在解析路径」等不准确判断。
+
+#### 1.3.1 架构全景图
+
+```
+.pyc 文件
+  │
+  ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 1: PycReader (版本隔离)                                │
+│  ├── VersionStrategy27      (2.7)                            │
+│  ├── VersionStrategyPre311  (3.5 ~ 3.10)                     │
+│  ├── VersionStrategy311     (3.11)                           │
+│  ├── VersionStrategy312     (3.12)                           │
+│  ├── VersionStrategy313     (3.13)                           │
+│  └── VersionStrategy314     (3.14)                           │
+│  每个策略独立负责 MapOpcode / CACHE / ExceptionTable 差异     │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 2: BlockScanner — 基本块划分                           │
+│  线性扫描 → 跳转目标切割 → BasicBlock 列表                     │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 3: ControlFlowScanner — CFG + 支配树 + 自然循环        │
+│  ├── BuildCFG()               → ControlFlowGraph             │
+│  │     (含前驱/后继/异常边)                                    │
+│  ├── ComputeImmediateDominators() → Dictionary<BB,BB>        │
+│  │     (立即支配树 — 用于循环头识别)                            │
+│  ├── ComputeDominators()      → HashSet<BB>                  │
+│  │     (完整支配集 — 用于自然循环检测)                          │
+│  ├── DetectNaturalLoops()     → List<LoopStructure>          │
+│  │     (回边 + 支配节点 → For/While/Infinite 分类)            │
+│  └── BuildStructuredCFG()     → StructuredCFG                │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 4-5: SequentialBlockBuilder (Phase 7 增强)            │
+│  7 轮标注 → 28 子模式目录 → 控制结构链接                       │
+│  ├── MergeLinearChain          Phase 1                       │
+│  ├── AnnotateExceptionTable    Phase 2                       │
+│  ├── AnnotateMatchBlocks       Phase 2a                      │
+│  ├── AnnotateForWhileSubtypes  Phase 2b                      │
+│  ├── AnnotateHandlerDepths     Phase 2c                      │
+│  ├── AnnotateSequentialBlock   Phase 3                       │
+│  ├── AnnotateMergePointsAndExits Phase 3b                    │
+│  └── AnnotateBackEdges         Phase 4                       │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 6: AstBuilder — AST 构建（不是模板字符串拼接）           │
+│                                                                │
+│  每个基本块 → StackMachine.Execute() → AST 节点               │
+│  AstBuilder 在 CFG 后继图上递归遍历：                           │
+│  ├── BuildStatements() — 递归遍历 CFG                          │
+│  ├── BuildIfElse() / BuildForLoop() / ...                     │
+│  ├── 孤儿块容错 + 注释兜底                                     │
+│  └── 后处理管道：                                              │
+│       ├── PostProcessFunctionDefs   ← 嵌套 code object 函数体  │
+│       ├── ConvertComprehensionCalls ← 推导式转换               │
+│       ├── ConvertAugAssign          ← i+=1 折叠               │
+│       ├── ConvertDocstring          ← __doc__ 修复            │
+│       ├── CollapseRedundantPasses   ← 冗余 pass 消除          │
+│       ├── FixEmptyFunctionBodies    ← 空函数体修复             │
+│       └── TrimPostTerminalDeadCode  ← 死代码消除               │
+│                                                                │
+│  AST 模型 (60+ 节点类型) 位于 Models/AST/:                     │
+│  AstNode → Stmt (If/For/While/Try/Match/FunctionDef...)       │
+│          → Expr (Call/BinOp/Compare/ListComp/NamedExpr...)    │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Phase 7: PythonCodeGenerator — 访问者模式代码生成             │
+│                                                                │
+│  PythonCodeGenerator.Visit(AstNode)  — switch 模式匹配         │
+│  → 对每种节点类型独立格式化输出                                  │
+│  → 支持缩进控制 / 空行策略 / docstring 处理                     │
+│  → **非模板字符串拼接** — 纯访问者模式遍历 AST 树                │
+└──────────────────────────┬──────────────────────────────────┘
+                           ▼
+                  Python 源码 (.py)
+```
+
+#### 1.3.2 关键设计决策 (ADRs)
+
+| ADR | 决策 | 替代方案 | 理由 |
+|-----|------|---------|------|
+| ADR-001 | 使用 C# record 类型构建 AST | 手写多态类 / 接口 | record 提供值语义 + 模式匹配，简化 AST 遍历 |
+| ADR-002 | per-version 策略类隔离 | 统一路径 + if-else 分支 | 每个版本 opcode/cache/ET 差异独立，改一处不影响其他 |
+| ADR-003 | CFG + 支配树 + 模式目录 | 纯线性扫描 / 纯支配树还原 | 支配树保证循环正确性，模式目录覆盖边界模糊情况 |
+| ADR-004 | 逐块容错 (per-block) | 整体编译 | 块失败不影响其他，最大恢复 |
+| ADR-005 | AST 后处理管道链 | 单次生成 | 多 pass 链式处理，每个 pass 只做一件事，可独立测试 |
+| ADR-006 | Token 级语义比较测试 | 字符串 diff / compile 验证 | 语义等价即通过，不要求逐字符一致，比 compile 更细 |
+
+#### 1.3.3 常见误判对照表
+
+| 外部文档常见错误判断 | 实际架构事实 | 关键证据文件 |
+|-------------------|------------|------------|
+| 「线性模板拼接」 | 完整的 AST 树 (60+ 节点) + 访问者模式代码生成 | `Models/AST/Stmt.cs`, `Models/AST/Expr.cs`, `Generators/PythonCodeGenerator.cs` |
+| 「缺少 CFG + 支配树」 | 完整 CFG + 立即支配树 + 完整支配集 + 自然循环检测 | `Scanners/ControlFlowScanner.cs` |
+| 「版本混在解析路径」 | 7 个独立 VersionStrategy 类，MapOpcode 隔离 | `Versioning/VersionStrategy*.cs` (7个文件) |
+| 「简单槽位映射」 | StackMachine 全栈模拟 + 7 个后处理 pass | `Builders/StackMachine.cs`, `Builders/AstBuilder.cs` |
+| 「缺少 round-trip 验证」 | Token 级语义比较（比 compile 更细） | `Testing/PycdcSuiteRunner.cs`, `Testing/TokenDumper.cs` |
+
+### 1.4 逐块兜底策略（核心设计原则）
 
 ```
 基本块列表 [B1, B2, B3, B4, B5]

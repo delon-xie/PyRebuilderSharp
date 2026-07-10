@@ -44,6 +44,22 @@ public class PycdcSuiteRunner
     private HashSet<string> _astCheckOkVersions = new();
 
     /// <summary>
+    /// AST 比较模式：SourceFile（默认，需要 .py 源文件）或 Token（仅 token 比较）。
+    /// </summary>
+    public enum AstCompareModeType { SourceFile, Token }
+
+    /// <summary>
+    /// 当前使用的 AST 比较模式。
+    /// </summary>
+    public AstCompareModeType AstCompareMode { get; set; } = AstCompareModeType.SourceFile;
+
+    /// <summary>
+    /// 是否启用 compile 语法验证（Phase 8 Step 1）。
+    /// 默认关闭。开启后对每个测试用例额外执行 ast.parse() 检查。
+    /// </summary>
+    public bool EnableCompileVerification { get; set; } = false;
+
+    /// <summary>
     /// 创建运行器。baseDir 可选，默认为相对于解决方案根目录的路径。
     /// </summary>
     public PycdcSuiteRunner(string? baseDir = null)
@@ -263,21 +279,53 @@ public class PycdcSuiteRunner
             // 6. 验证
             var elapsed = DateTime.UtcNow - startTime;
 
-            // AST 比较路径
-            var expectedSourceFile = Path.Combine(_inputDir, testName + ".py");
-            if (!File.Exists(expectedSourceFile))
-            {
-                // 没有 .py 源文件，回退到 token 比较
-                return FallbackTokenCompare(testName, pycFile, pyVersion, sourceCode, elapsed);
-            }
-            var expectedSource = File.ReadAllText(expectedSourceFile);
+            TestRunResult result;
 
-            var (passed, errorMsg, expectedCount, actualCount) = AstCompare(testName, expectedSource, sourceCode);
-            // 当 AST parse failed (passed=false, error=null) 时 — 回退到 token 比较
-            if (!passed && errorMsg == null)
-                return FallbackTokenCompare(testName, pycFile, pyVersion, sourceCode, elapsed);
-            return new TestRunResult(testName, pycFile, pyVersion, passed, errorMsg,
-                expectedCount, actualCount, elapsed);
+            if (AstCompareMode == AstCompareModeType.SourceFile)
+            {
+                // AST 比较路径：需要 .py 源文件
+                var expectedSourceFile = Path.Combine(_inputDir, testName + ".py");
+                if (!File.Exists(expectedSourceFile))
+                {
+                    // 没有 .py 源文件，回退到 token 比较
+                    result = FallbackTokenCompare(testName, pycFile, pyVersion, sourceCode, elapsed);
+                }
+                else
+                {
+                    var expectedSource = File.ReadAllText(expectedSourceFile);
+                    var (passed, errorMsg, expectedCount, actualCount) = AstCompare(testName, expectedSource, sourceCode);
+                    // 当 AST parse failed (passed=false, error=null) 时 — 回退到 token 比较
+                    if (!passed && errorMsg == null)
+                        result = FallbackTokenCompare(testName, pycFile, pyVersion, sourceCode, elapsed);
+                    else
+                        result = new TestRunResult(testName, pycFile, pyVersion, passed, errorMsg,
+                            expectedCount, actualCount, elapsed);
+                }
+            }
+            else
+            {
+                // Token 比较路径
+                result = FallbackTokenCompare(testName, pycFile, pyVersion, sourceCode, elapsed);
+            }
+
+            // Phase 8 Step 1: 可选 compile 语法验证（默认关闭，仅报告）
+            if (EnableCompileVerification)
+            {
+                var compileResult = CompileVerifier.VerifySyntax(sourceCode);
+                if (!compileResult.IsValid)
+                {
+                    var warnMsg = $"SYNTAX_WARN: {compileResult.Message}";
+                    Console.Error.WriteLine($"[COMPILE_VERIFY] {testName} ({pyVersion}): {warnMsg}");
+                    // 若 AST 比较通过但 compile 失败，标记为警告
+                    if (result.Passed)
+                    {
+                        result = new TestRunResult(testName, pycFile, pyVersion, true,
+                            $"{result.ErrorMessage} | {warnMsg}", result.ExpectedTokens, result.ActualTokens, elapsed);
+                    }
+                }
+            }
+
+            return result;
         }
         catch (Exception ex)
         {

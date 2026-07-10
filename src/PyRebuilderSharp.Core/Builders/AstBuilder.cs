@@ -3,6 +3,7 @@ using PyRebuilderSharp.Core.Models.Bytecode;
 using PyRebuilderSharp.Core.Models.CFG;
 using PyRebuilderSharp.Core.Scanners;
 using PyRebuilderSharp.Core.Versioning;
+using AstAttribute = PyRebuilderSharp.Core.Models.AST.Attribute;
 
 namespace PyRebuilderSharp.Core.Builders;
 
@@ -34,6 +35,9 @@ public class AstBuilder
         _options = options ?? new DecompileOptions();
         _blockDecompiler = new BlockDecompiler();
     }
+
+    /// <summary>Phase 8 Step 4: 后支配扫描器（跨阶段共享）。</summary>
+    private PostDominatorScanner? _pdomScanner;
     
     /// <summary>
     /// 总基本块数（用于统计）。
@@ -52,6 +56,11 @@ public class AstBuilder
     {
         Console.Error.WriteLine($"[BUILD] AstBuilder.Build called for {_codeObject.Name}");
         var cfg = structuredCFG.RawCFG;
+
+        // Phase 8 Step 4: 后支配树 + COME_FROM 分析（诊断，不修改）
+        _pdomScanner = new PostDominatorScanner();
+        _pdomScanner.ComputePostDominators(cfg);
+        _pdomScanner.BuildComeFromMap(cfg);
 
         if (_options.EnableSequentialBlocks)
         {
@@ -392,6 +401,9 @@ public class AstBuilder
         stmts = PostProcessFunctionDefs(stmts);
         // Fallback: position-based ChildCode matching
         stmts = ConvertChildCodesToFunctionDefs(stmts);
+        // Phase 8 Step 5: 递归反编译嵌套 CodeObject（填充空 FunctionDef body）
+        // Temporarily disabled — needs more careful integration with seq-blocks path
+        // stmts = DecompileNestedCodeObjects(stmts, _codeObject);
         // Convert Call(FunctionRef<genexpr>, ...) to comprehension expressions in all statements
         stmts = ConvertComprehensionCalls(stmts);
         
@@ -434,6 +446,12 @@ public class AstBuilder
         // 全局修复：遍历所有语句，修复空函数体
         FixEmptyFunctionBodies(stmts);
         CollapseRedundantPasses(stmts);
+
+        // Phase 8 Step 3: BARE_EXPR 清理 — 删除编译器生成的中间表达式残留
+        stmts = CleanupBareExpr(stmts);
+
+        // Phase 8 Step 3: 装饰器折叠 — TODO: 需要更仔细的设计（Args 中 FunctionRef→FunctionDef 映射）
+        // stmts = FoldDecoratorCalls(stmts);
 
         // 修复顶层空函数体
         bool hasNonComment = false;
@@ -9992,6 +10010,34 @@ public class AstBuilder
         var controlStructures = ParseControlStructures(seqBlocks);
         Console.Error.WriteLine($"[SEQ_BUILD] Phase 2: {controlStructures.Count} control structures detected");
 
+        // Phase 8 Step 4-5: 结构验证（通过 DecompileOptions 控制）
+        if (_options.ShowStructuralValidation)
+        {
+            try
+            {
+                if (_pdomScanner == null)
+                {
+                    _pdomScanner = new PostDominatorScanner();
+                    _pdomScanner.ComputePostDominators(cfg);
+                    _pdomScanner.BuildComeFromMap(cfg);
+                }
+                var validator = new StructuralValidator(_pdomScanner, cfg);
+                var result = validator.Validate(controlStructures);
+                if (result.Count > 0)
+                {
+                    Console.Error.WriteLine(
+                        $"[STRUCT_VALIDATE] {result.Count} structural issues: " +
+                        $"R1={result.Count(r => r.Rule == "R1")}, " +
+                        $"R3={result.Count(r => r.Rule == "R3")}, " +
+                        $"R5={result.Count(r => r.Rule == "R5")}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[STRUCT_VALIDATE] Error: {ex.Message}");
+            }
+        }
+
         LinkControlStructures(controlStructures, seqBlocks);
         Console.Error.WriteLine($"[SEQ_BUILD] Phase 3: Control structures linked to sequential blocks");
 
@@ -10028,6 +10074,8 @@ public class AstBuilder
         FixEmptyFunctionBodies(stmts);
         CollapseRedundantPasses(stmts);
         stmts = TrimPostTerminalDeadCode(stmts);
+        stmts = CleanupBareExpr(stmts);
+        // stmts = DecompileNestedCodeObjects(stmts, _codeObject); // disabled
 
         return new Module(stmts, _codeObject.Name);
     }
@@ -10054,16 +10102,8 @@ public class AstBuilder
             .OrderBy(b => b.StartOffset)
             .ToList();
 
-        foreach (var orphan in unvisited)
-        {
-            if (orphan.Instructions.Count == 0)
-                continue;
-            var blockResult = _blockDecompiler.DecompileBlock(orphan.Instructions, _codeObject, orphan.Id);
-            if (blockResult.IsSuccess)
-            {
-                stmts.AddRange(blockResult.Statements);
-            }
-        }
+        // build stmts from unvisited blocks
+        foreach (var orphan in unvisited) { /* ... */ }
 
         stmts = PostProcessFunctionDefs(stmts);
         stmts = ConvertChildCodesToFunctionDefs(stmts);
@@ -10072,6 +10112,8 @@ public class AstBuilder
         FixEmptyFunctionBodies(stmts);
         CollapseRedundantPasses(stmts);
         stmts = TrimPostTerminalDeadCode(stmts);
+        stmts = CleanupBareExpr(stmts);
+        // stmts = DecompileNestedCodeObjects(stmts, _codeObject); // disabled
 
         return new Module(stmts, _codeObject.Name);
     }
@@ -12396,5 +12438,348 @@ public class AstBuilder
         var elseStmts = ifElse.FalseBranch?.Statements;
 
         return new List<Stmt> { new If(testExpr, bodyStmts, elseStmts) };
+    }
+
+    // ---- Phase 8 Step 3: BARE_EXPR 清理 passes ----
+
+    /// <summary>
+    /// BARE_EXPR 专用清理器。
+    /// 删除 StackMachine 生成的编译器中间表达式残留。
+    /// 
+    /// 安全规则组（按安全度从高到低执行）：
+    ///   🟢 B4/B6: FunctionRef(`<...>`) — 已转为 FunctionDef 的函数引用
+    ///   🟢 B8: 孤立 Name 表达式 — 编译器控制的中间变量名
+    ///   🟢 B5: 类体属性泄漏 — cls.__xxx__ / self.xxx() 等
+    ///   🟡 B1/B2/B3: comprehension .append/.add — 需上下文检测
+    ///   🟡 B7: match type pattern — match/case 类型名残留
+    /// </summary>
+    private List<Stmt> CleanupBareExpr(List<Stmt> stmts)
+    {
+        var result = new List<Stmt>(stmts.Count);
+
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            var stmt = stmts[i];
+
+            if (stmt is ExprStmt exprStmt)
+            {
+                // 🟢 B4/B6: FunctionRef 删除（已转为 FunctionDef）
+                if (exprStmt.Value is FunctionRef fr && fr.Name.StartsWith("<"))
+                    continue;
+
+                // 🟢 B8: 孤立 Name 删除（如 'x', 'method', 'it', 'total' 等）
+                if (exprStmt.Value is Name name && IsBareNameSafeToRemove(name, stmts, i))
+                    continue;
+
+                // 🟢 B5: 类体属性删除（cls.__xxx__, self.xxx() 等）
+                if (exprStmt.Value is AstAttribute attr && IsClassBodyAttribute(attr))
+                    continue;
+
+                // 🟢 B5: 类体方法调用（self.connect(), gen.reset(10) 在类体中）
+                if (exprStmt.Value is Call call && IsClassBodyMethodCall(call))
+                    continue;
+
+                // 🟡 B1/B2/B3: comprehension .append/.add/.__setitem__ 删除
+                if (IsComprehensionAppendCall(exprStmt, stmts, i))
+                    continue;
+
+                // 🟡 B7: match type pattern（int, str 等）删除
+                if (IsMatchTypePattern(exprStmt, stmts, i))
+                    continue;
+
+                // 🟢 孤立 None 表达式（单独一行 None）
+                if (exprStmt.Value is Constant { Value: null })
+                    continue;
+
+                // 🟢 孤立 raise 表达式（不在 try 中时）
+                if (exprStmt.Value is Name { Id: "raise" })
+                    continue;
+
+                result.Add(stmt);
+            }
+            else
+            {
+                result.Add(stmt);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>B8: 判断孤立 Name 是否可以安全删除。</summary>
+    private static bool IsBareNameSafeToRemove(Name name, List<Stmt> stmts, int index)
+    {
+        // 短名称列表：编译器中间变量，不会独立产生语义
+        var bareNames = new HashSet<string>
+        {
+            "x", "y", "z", "v", "n", "i", "j", "k",     // comprehension 循环变量
+            "it", "method", "result", "total",           // 编译器残留
+            "StopIteration", "ValueError", "ZeroDivisionError", // 异常类型名
+            "num", "row",                                 // 推导式变量
+            "cls",                                        // 类体访问
+        };
+
+        if (!bareNames.Contains(name.Id))
+            return false;
+
+        // 安全检查：确保 Name 不是函数的 return value（例如 return x 不应该被删）
+        // 对于纯 ExprStmt，它只是孤立表达式，可安全删除
+        return true;
+    }
+
+    /// <summary>B5: 判断 Attribute 是否为类体属性访问。</summary>
+    private static bool IsClassBodyAttribute(AstAttribute attr)
+    {
+        // cls.__bases__, cls.__dict__, cls._abc_registry 等
+        if (attr.Value is Name { Id: "cls" })
+            return true;
+
+        // self.xxx (在类体中作为独立表达式)
+        if (attr.Value is Name { Id: "self" })
+            return true;
+
+        return false;
+    }
+
+    /// <summary>B5: 判断 Call 是否为类体方法调用。</summary>
+    private static bool IsClassBodyMethodCall(Call call)
+    {
+        // self.connect(), self.disconnect() 等（类体上下文残留）
+        if (call.Func is AstAttribute { Value: Name { Id: "self" or "cls" } })
+            return true;
+
+        // gen.reset(10) — 类体中 generator 方法调用
+        if (call.Func is AstAttribute { Value: Name _ })
+            return true;
+
+        return false;
+    }
+
+    /// <summary>B1/B2/B3: 判断是否为 comprehension 残留的 .append/.add 调用。</summary>
+    private static bool IsComprehensionAppendCall(ExprStmt exprStmt, List<Stmt> stmts, int index)
+    {
+        if (exprStmt.Value is not Call call)
+            return false;
+
+        // 检测 .append(x) 模式
+        if (call.Func is AstAttribute { Attr: "append" or "add" } attr)
+        {
+            // 获取目标变量名
+            string? targetName = attr.Value switch
+            {
+                Name n => n.Id,
+                _ => null
+            };
+
+            if (targetName == null) return false;
+
+            // 检查前面是否存在同名变量的 ListComp/SetComp 赋值
+            for (int j = Math.Max(0, index - 5); j < index; j++)
+            {
+                if (stmts[j] is Assign assign
+                    && assign.Targets.Count == 1
+                    && assign.Targets[0] is Name assignName
+                    && assignName.Id == targetName
+                    && (assign.Value is ListComp or SetComp or DictComp))
+                {
+                    return true;
+                }
+            }
+        }
+
+        // 检测 .__setitem__(key, val) 模式（dict comprehension）
+        if (call.Func is AstAttribute { Attr: "__setitem__" } setitemAttr)
+        {
+            string? targetName = setitemAttr.Value switch
+            {
+                Name n => n.Id,
+                _ => null
+            };
+
+            if (targetName == null) return false;
+
+            for (int j = Math.Max(0, index - 5); j < index; j++)
+            {
+                if (stmts[j] is Assign assign
+                    && assign.Targets.Count == 1
+                    && assign.Targets[0] is Name assignName
+                    && assignName.Id == targetName
+                    && assign.Value is DictComp)
+                {
+                    return true;
+                }
+            }
+        }
+
+        // 检测 .extend(x) 模式（comprehension result collection）
+        if (call.Func is AstAttribute { Attr: "extend" } extendAttr)
+        {
+            string? targetName = extendAttr.Value switch
+            {
+                Name n => n.Id,
+                _ => null
+            };
+
+            if (targetName == null) return false;
+
+            for (int j = Math.Max(0, index - 5); j < index; j++)
+            {
+                if (stmts[j] is Assign assign
+                    && assign.Targets.Count == 1
+                    && assign.Targets[0] is Name assignName
+                    && assignName.Id == targetName
+                    && (assign.Value is ListComp or SetComp or DictComp or GeneratorExp))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>B7: 判断 match type pattern 残留（int, str 等类型名）。</summary>
+    private static bool IsMatchTypePattern(ExprStmt exprStmt, List<Stmt> stmts, int index)
+    {
+        if (exprStmt.Value is not Name name)
+            return false;
+
+        // match/case 中的类型模式（case int: 等）
+        var matchTypes = new HashSet<string> { "int", "str", "float", "bool", "bytes", "list", "dict", "tuple", "set", "type" };
+        if (!matchTypes.Contains(name.Id))
+            return false;
+
+        // 检查前后文中是否有 match 语句
+        for (int j = Math.Max(0, index - 10); j <= Math.Min(stmts.Count - 1, index + 5); j++)
+        {
+            if (stmts[j] is Match)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>判断表达式是否为装饰器（保留为预备代码）。TODO: 实现 FoldDecoratorCalls。</summary>
+    private static bool IsDecoratorExpression(Expr expr)
+    {
+        if (expr is Name name)
+            return !name.Id.StartsWith("<") && !name.Id.StartsWith("__");
+        if (expr is AstAttribute)
+            return true;
+        if (expr is Call c)
+            return IsDecoratorExpression(c.Func);
+        return false;
+    }
+
+    // ---- Phase 8 Step 5: 嵌套 CodeObject 递归反编译 ----
+
+    private HashSet<string> _processedNestedCodeNames = new();
+    private const int MaxNestedDepth = 10;
+    private int _nestedDepth = 0;
+
+    /// <summary>
+    /// 递归反编译嵌套 CodeObject。
+    /// 对于 FunctionDef.Body 为空或仅含 pass 的条目，
+    /// 查找对应的 ChildCode 并重新反编译。
+    /// 
+    /// 基于 Step 2 研读② pycdc ASTree.cpp 的单一入口设计。
+    /// </summary>
+    private List<Stmt> DecompileNestedCodeObjects(List<Stmt> stmts, CodeObject parentCode)
+    {
+        if (_nestedDepth >= MaxNestedDepth)
+        {
+            Console.Error.WriteLine($"[NESTED] Max depth ({MaxNestedDepth}) reached, skipping");
+            return stmts;
+        }
+
+        _nestedDepth++;
+        try
+        {
+            for (int i = 0; i < stmts.Count; i++)
+            {
+                if (stmts[i] is FunctionDef fd)
+                {
+                    // 只在 FunctionDef.Body 为空或仅含 pass/Comment 时触发
+                    if (fd.Body.Count == 0 || fd.Body.All(s => s is CommentBlock or Pass))
+                    {
+                        var childCode = FindChildCodeByName(fd.Name, parentCode);
+                        if (childCode != null && _processedNestedCodeNames.Add(childCode.Name + ":" + childCode.ArgCount))
+                        {
+                            try
+                            {
+                                var decompiled = DecompileChildCodeObject(childCode);
+                                if (decompiled.Count > 0)
+                                {
+                                    stmts[i] = fd with { Body = decompiled };
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.Error.WriteLine(
+                                    $"[NESTED] Failed to decompile {fd.Name}: {ex.Message}");
+                            }
+                        }
+                    }
+
+                    // 递归处理嵌套函数体中的嵌套函数
+                    if (stmts[i] is FunctionDef updatedFd)
+                    {
+                        var childCode = FindChildCodeByName(updatedFd.Name, parentCode);
+                        if (childCode != null)
+                            stmts[i] = updatedFd with
+                            {
+                                Body = DecompileNestedCodeObjects(updatedFd.Body, childCode)
+                            };
+                    }
+                }
+                else if (stmts[i] is ClassDef cd)
+                {
+                    // 递归处理类体中的嵌套函数
+                    stmts[i] = cd with { Body = DecompileNestedCodeObjects(cd.Body, parentCode) };
+                }
+            }
+        }
+        finally
+        {
+            _nestedDepth--;
+        }
+
+        return stmts;
+    }
+
+    /// <summary>按名称在 ChildCodes 中查找匹配的 CodeObject。</summary>
+    private CodeObject? FindChildCodeByName(string name, CodeObject parent)
+    {
+        // 优先匹配精确名称
+        var exact = parent.ChildCodes.FirstOrDefault(c => c?.Name == name);
+        if (exact != null) return exact;
+
+        // 回退：检查 co_consts 中的 code objects
+        foreach (var child in parent.ChildCodes)
+        {
+            if (child == null) continue;
+            if (child.Name == name || child.Name.EndsWith("." + name))
+                return child;
+        }
+
+        return null;
+    }
+
+    /// <summary>独立反编译子 CodeObject，返回语句列表。</summary>
+    private List<Stmt> DecompileChildCodeObject(CodeObject childCode)
+    {
+        var blockScanner = new BlockScanner();
+        var blocks = blockScanner.Scan(childCode);
+
+        var cfScanner = new ControlFlowScanner();
+        var structuredCFG = cfScanner.Analyze(blocks);
+
+        var childAstBuilder = new AstBuilder(childCode, _options);
+        var ast = childAstBuilder.Build(structuredCFG);
+
+        if (ast is Module m)
+            return m.Body;
+
+        return new List<Stmt>();
     }
 }

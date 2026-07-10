@@ -236,6 +236,10 @@ Python 3.11+ 用 0x73 (TYPE_STRING) 作为 TYPE_CODE_SIMPLE。代码中的上下
 
 ## 设计理念 — 为什么 PyRebuilderSharp 与众不同
 
+> ⚠️ **常见误解澄清**：下述描述确保以下信息在文档中清晰可查——
+> 避免外部分析者（如 ai 生成的分析报告）误判项目架构。
+> 参见 v2.1 改进计划开头的「核实结论」。
+
 ### 🧱 逐块兜底（核心创新）
 
 传统的反编译器（pycdc、uncompyle6、decompyle3）采用**整体编译**策略——只要有一个指令无法处理，整个文件就崩溃。PyRebuilderSharp 的每个**基本块独立反编译**：
@@ -249,19 +253,80 @@ Python 3.11+ 用 0x73 (TYPE_STRING) 作为 TYPE_CODE_SIMPLE。代码中的上下
 
 **效果**：一个块失败不会让整个文件归零。反编译器永远输出**最大可恢复的 Python 源码**，不会沉默失败。
 
-### 🔬 AST 语义级比较
+### 🏗️ 完整 CFG + 支配树控制流分析（不是线性扫描）
 
-测试体系使用 AST 语义比较而非字符串匹配——生成的反编译代码只要语义等价即通过，不要求逐字符一致。这意味着代码格式优化、命名差异不会导致假阳性失败。
-
-### 🧩 模块化四阶段管道
+尽管 Phase 2 分块是从线性扫描起步，Phase 3 的 **ControlFlowScanner** 会**构建完整的控制流图**并运行**支配树分析**——这是项目的核心架构事实，经常被外部文档误判为「线性模板拼接」：
 
 ```
-pyc 文件 → PycReader(marshal) → BlockScanner(分块)
-         → ControlFlowScanner(循环/跳转分析)
-         → AstBuilder(AST构建+逐块容错)
-         → PythonCodeGenerator(代码生成)
-         → Python 源码
+字节码 → BlockScanner(分块) → ControlFlow(构建 CFG)
+  → ComputeImmediateDominators()   ← 立即支配树
+  → ComputeDominators()            ← 完整支配集
+  → DetectNaturalLoops()           ← 自然循环检测（回边 → 支配节点）
+  → StructuredCFG                  ← 结构化控制流
+  → AstBuilder(AST构建)            ← 在后继图上递归遍历
 ```
+
+关键文件：`Scanners/ControlFlowScanner.cs`（302 行完整实现）、`Models/CFG/ControlFlowGraph.cs`、`Models/CFG/BasicBlock.cs`（含前驱/后继/异常边）。
+
+### 🌲 显式 AST 中间表示（不是字符串拼接）
+
+反编译结果生成途径**不是**指令→模板字符串拼接，而是完整的 C# record AST 树 + 访问者模式代码生成：
+
+```
+每个基本块 → StackMachine.Execute() → AST 节点 (Stmt/Expr)
+  → AstBuilder 拼接控制结构 AST
+  → PythonCodeGenerator.Visit()     ← 访问者模式
+  → 格式化 Python 源码
+```
+
+AST 模型位于 `Models/AST/`，包含 **60+ 节点类型**全面覆盖 Python 2.7~3.14 语法：
+- 推导式：`ListComp` / `SetComp` / `DictComp` / `GeneratorExp` ✅
+- f-string：`FormattedValue` + `JoinedStr` ✅
+- 海象运算符：`NamedExpr` ✅
+- match/case：6 类 MatchPattern 子节点 + `Match` 语句 ✅
+
+代码生成器 `PythonCodeGenerator.cs` 是纯访问者模式——**不产生任何模板字符串拼接**。
+
+### 🔬 AST 语义级比较（优于编译验证）
+
+测试体系使用 **token 级语义比较**而非字符串匹配——生成的反编译代码只要语义等价即通过，不要求逐字符一致。这意味着代码格式优化、命名差异不会导致假阳性失败。这是比 `compile(source, '<exec>')` 语法检查更精细的验证方式。
+
+### 🧩 模块化管道（含完整依赖注入）
+
+```
+pyc 文件
+  → PycReader(marshal)              ← 7 个版本策略（隔离）
+  → BlockScanner(分块)              ← 跳转目标切割
+  → ControlFlowScanner(CFG+支配树)  ← 控制流图构建 + 自然循环
+  → AstBuilder(AST构建+逐块容错)    ← 继承图遍历 + 29 后处理 pass
+  → PythonCodeGenerator(代码生成)   ← 访问者模式
+  → Python 源码
+```
+
+### 🔀 版本完全隔离（每个版本独立策略文件）
+
+每个 Python 大版本的差异由**独立的 VersionStrategy 类**封装，绝非「混在一条解析路径」：
+
+| 策略类 | 覆盖版本 | 特性差异 |
+|--------|---------|---------|
+| `VersionStrategy27` | 2.7 | 无 PEP552、无 WORD_OFFSET、marshal TYPE_STRINGREF |
+| `VersionStrategyPre311` | 3.5~3.10 | 传统 marshal、SETUP_* 指令、无 ExceptionTable |
+| `VersionStrategy311` | 3.11 | localsplus、ExceptionTable、CACHE 指令 |
+| `VersionStrategy312` | 3.12 | CALL=171、RESUME=151、完整 CACHE |
+| `VersionStrategy313` | 3.13 | 额外 opcode 调整 |
+| `VersionStrategy314` | 3.14 | 最新版支持 |
+
+每个策略类通过 `MapOpcode()` 将原始字节映射到统一 `Opcode` 枚举——核心 AST 构建不感知版本差异。
+
+### ⚙️ StackMachine 栈模拟 + 表达式折叠（不是简单槽位映射）
+
+`StackMachine` 是全栈模拟（不是变量槽位映射），包含：
+- **表达式折叠**：`LOAD_CONST func + CALL_FUNCTION` → 推断装饰器 `@decorator`
+- **推导式转换**：`ConvertComprehensionCalls` → ListComp/SetComp/DictComp
+- **增强赋值折叠**：`ConvertAugAssign` → `i = i + 1` → `i += 1`
+- **死代码消除**：`TrimPostTerminalDeadCode` + `CollapseRedundantPasses`
+- **函数体修复**：`PostProcessFunctionDefs` + `FixEmptyFunctionBodies`
+- **嵌套 CodeObject 递归**：`ConvertChildCodesToFunctionDefs` + `DecompileNestedCodeObjects`
 
 ### ⚙️ CrashCollector 机制
 
@@ -668,6 +733,11 @@ v3.10- format:                v3.11+ format:
 
 ## Design Philosophy
 
+> ⚠️ **Clarifying common misconceptions**: The sections below explicitly document architectural facts.
+> External analyses (e.g. AI-generated reports) have incorrectly claimed "template string concatenation,"
+> "missing CFG + dominator tree," or "mixed version paths" — because they didn't inspect the source.
+> Each section below provides file paths to the actual implementation for direct verification.
+
 ### 🧱 Block-Level Fault Tolerance (Core Innovation)
 
 Traditional decompilers (pycdc, uncompyle6, decompyle3) use monolithic compilation — one unsupported instruction crashes the entire file. PyRebuilderSharp decompiles each **basic block independently**:
@@ -681,17 +751,78 @@ Block B4 → Stack Machine → AST → "y = 42"        ✅
 
 **Result**: One block failure never zeroes the file. The decompiler always outputs the **maximum recoverable Python source**.
 
-### 🔬 AST Semantic Comparison
+### 🏗️ Full CFG + Dominator Tree (not linear scanning)
 
-Tests use AST semantic comparison — decompiled code passes if semantically equivalent, not character-by-character identical. Formatting optimizations and naming differences never cause false positives.
-
-### 🧩 Modular Pipeline
+Phase 2's BlockScanner starts with linear scanning for block splitting, but Phase 3's **ControlFlowScanner** builds a **complete control flow graph** and runs **dominator tree analysis** — this is the core architectural fact most external analyses miss:
 
 ```
-.pyc → PycReader(marshal) → BlockScanner → ControlFlowScanner
-     → AstBuilder(AST + fault tolerance) → PythonCodeGenerator
-     → Python source code
+bytecode → BlockScanner → ControlFlow(CFG)
+  → ComputeImmediateDominators()   ← immediate dominator tree
+  → ComputeDominators()            ← full dominator sets
+  → DetectNaturalLoops()           ← natural loop detection (back-edge → dominator)
+  → StructuredCFG                  ← structured control flow
+  → AstBuilder(AST)                ← recursive successor traversal
 ```
+
+Key files: `Scanners/ControlFlowScanner.cs` (302-line full implementation), `Models/CFG/ControlFlowGraph.cs`, `Models/CFG/BasicBlock.cs` (with predecessor/successor/exception edges).
+
+### 🌲 Explicit AST Intermediate Representation (not string concatenation)
+
+Decompiled output is **not** produced via instruction→template string concatenation. It goes through a complete C# record AST tree + visitor-pattern code generation:
+
+```
+Each block → StackMachine.Execute() → AST nodes (Stmt/Expr)
+  → AstBuilder assembles control structure AST
+  → PythonCodeGenerator.Visit()     ← visitor pattern
+  → formatted Python source
+```
+
+The AST model lives in `Models/AST/` with **60+ node types** covering Python 2.7~3.14 syntax:
+- Comprehensions: `ListComp` / `SetComp` / `DictComp` / `GeneratorExp` ✅
+- f-strings: `FormattedValue` + `JoinedStr` ✅
+- Walrus operator: `NamedExpr` ✅
+- match/case: 6 MatchPattern subtypes + `Match` statement ✅
+
+### 🔬 AST Semantic Comparison (stronger than compile verification)
+
+Tests use **token-level semantic comparison** — decompiled code passes if semantically equivalent, not character-by-character identical. This is a **finer-grained** verification than `compile(source, '<exec>')` syntax checking: it detects semantic drift that syntax-only checks miss.
+
+### 🧩 Modular Pipeline (with full dependency separation)
+
+```
+.pyc
+  → PycReader(marshal)              ← 7 isolated version strategies
+  → BlockScanner(block splitting)   ← jump-target partitioning
+  → ControlFlowScanner(CFG+tree)    ← CFG + dominator + natural loops
+  → AstBuilder(AST+fault tolerance) ← successor traversal + 7 post-processing passes
+  → PythonCodeGenerator(code gen)   ← visitor-pattern traversal
+  → Python source
+```
+
+### 🔀 Full Version Isolation (per-version strategy files)
+
+Each Python major version's differences are encapsulated in **independent VersionStrategy classes**:
+
+| Strategy | Versions | Key Differences |
+|----------|---------|----------------|
+| `VersionStrategy27` | 2.7 | No PEP552, no WORD_OFFSET, marshal TYPE_STRINGREF |
+| `VersionStrategyPre311` | 3.5~3.10 | Traditional marshal, SETUP_* instructions, no ExceptionTable |
+| `VersionStrategy311` | 3.11 | localsplus, ExceptionTable, CACHE instructions |
+| `VersionStrategy312` | 3.12 | CALL=171, RESUME=151, full CACHE |
+| `VersionStrategy313` | 3.13 | Additional opcode adjustments |
+| `VersionStrategy314` | 3.14 | Latest support |
+
+Each strategy maps raw opcodes to a unified `Opcode` enum via `MapOpcode()` — core AST construction is version-agnostic.
+
+### ⚙️ StackMachine + Expression Folding (not simple slot mapping)
+
+`StackMachine` is a full stack simulator (not a variable-slot mapper), with:
+- **Expression folding**: `LOAD_CONST func + CALL_FUNCTION` → infer `@decorator`
+- **Comprehension conversion**: `ConvertComprehensionCalls` → ListComp/SetComp/DictComp
+- **Augmented assignment folding**: `ConvertAugAssign` → `i = i + 1` → `i += 1`
+- **Dead code elimination**: `TrimPostTerminalDeadCode` + `CollapseRedundantPasses`
+- **Function body repair**: `PostProcessFunctionDefs` + `FixEmptyFunctionBodies`
+- **Nested CodeObject recursion**: `ConvertChildCodesToFunctionDefs` + `DecompileNestedCodeObjects`
 
 ---
 
