@@ -12441,7 +12441,18 @@ public class AstBuilder
         {
             Console.Error.WriteLine(
                 $"[TRY_FIX] Suppressed empty try (stripped to body statements)");
-            return bodyStmts; // 返回空 body 或 pass — 下游 CollapseRedundantPasses 会处理
+            return bodyStmts;
+        }
+
+        // Phase 9-2-03: 空的 except handler → 移除（产生 TRY_NO_HANDLER 伪影）
+        handlers.RemoveAll(h => h.Body == null || h.Body.Count == 0 || h.Body.All(s => s is Pass));
+        if (handlers.Count == 0
+            && (finallyStmts == null || finallyStmts.Count == 0)
+            && (elseStmts == null || elseStmts.Count == 0))
+        {
+            Console.Error.WriteLine(
+                $"[TRY_FIX] Suppressed try with no handlers and no finally");
+            return bodyStmts;
         }
 
         return new List<Stmt> { new Try(bodyStmts, handlers, elseStmts, finallyStmts) };
@@ -12544,10 +12555,20 @@ public class AstBuilder
                     && IsAstAttributeChainWithCls(attr2))
                     continue;
 
+                // 🟢 for 循环前的迭代器表达式（GET_ITER 泄漏）
+                // 如 `range(10)` 在 `for x in range(10):` 之前
+                if (exprStmt.Value is Call { Func: Name { Id: "range" or "iter" } }
+                    && i + 1 < stmts.Count && stmts[i + 1] is For)
+                    continue;
+
                 result.Add(stmt);
             }
             else
             {
+                // 🟢 裸 Raise 语句（无参数 — comprehension for-else 的 StopIteration 残留）
+                if (stmt is Raise { Exc: null, Cause: null })
+                    continue;
+
                 result.Add(stmt);
             }
         }

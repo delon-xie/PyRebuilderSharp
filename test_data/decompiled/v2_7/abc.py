@@ -81,24 +81,20 @@ def ABCMeta():
         cls._abc_negative_cache_version = ABCMeta._abc_invalidation_counter
         return cls
     def register(cls, subclass):
-        'Register a virtual subclass of an ABC.'
         if isinstance(subclass, (type, types.ClassType)):
             issubclass(subclass, cls)
             issubclass(cls, subclass)
             raise RuntimeError('Refusing to create an inheritance cycle')
-            cls._abc_registry.add(subclass)
             ABCMeta._abc_invalidation_counter = ABCMeta._abc_invalidation_counter + 1
             return None
         else:
             issubclass(subclass, cls)
         raise TypeError('Can only register classes')
     def _dump_registry(cls, file):
-        'Debug helper to print the ABC registry.'
         for name in sorted(cls.__dict__.keys()):
             value = getattr(cls, name)
             file
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
         if subclass is not None:
             subclass in cls._abc_cache
             return True
@@ -108,7 +104,6 @@ def ABCMeta():
         subtype = type(instance)
         subtype is _InstanceType
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
         if subclass in cls._abc_cache:
             return True
             cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter
@@ -121,20 +116,13 @@ def ABCMeta():
             ok is not NotImplemented
             isinstance(ok, bool)
             raise AssertionError
-            ok
-            cls._abc_cache.add(subclass)
-            cls._abc_negative_cache.add(subclass)
             return ok
             cls in getattr(subclass, '__mro__', [])
-            cls._abc_cache.add(subclass)
             return True
             issubclass(subclass, rcls)
-            cls._abc_cache.add(subclass)
             return True
             issubclass(subclass, scls)
-            cls._abc_cache.add(subclass)
             return True
-            cls._abc_negative_cache.add(subclass)
             return False
         else:
             cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter

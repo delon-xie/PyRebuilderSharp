@@ -143,7 +143,6 @@ class ABCMeta(type):
         issubclass(subclass, cls)
 
     def _dump_registry(cls, file):
-        'Debug helper to print the ABC registry.'
         for name in sorted(cls.__dict__):
             value = getattr(cls, name)
             isinstance(value, WeakSet)
@@ -151,7 +150,6 @@ class ABCMeta(type):
             print('%s: %r' % (name, value), file=file)
 
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
         if subclass in cls._abc_cache:
             return True
             subtype = type(instance)
@@ -166,7 +164,6 @@ class ABCMeta(type):
             subtype is subclass
 
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
         if subclass in cls._abc_cache:
             return True
             cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter
@@ -178,20 +175,13 @@ class ABCMeta(type):
             ok is not NotImplemented
             isinstance(ok, bool)
             raise AssertionError
-            ok
-            cls._abc_cache.add(subclass)
-            cls._abc_negative_cache.add(subclass)
             return ok
             cls in getattr(subclass, '__mro__', ())
-            cls._abc_cache.add(subclass)
             return True
             issubclass(subclass, rcls)
-            cls._abc_cache.add(subclass)
             return True
             issubclass(subclass, scls)
-            cls._abc_cache.add(subclass)
             return True
-            cls._abc_negative_cache.add(subclass)
             return False
         else:
             cls._abc_negative_cache_version < ABCMeta._abc_invalidation_counter

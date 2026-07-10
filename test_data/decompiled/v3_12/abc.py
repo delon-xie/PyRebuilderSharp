@@ -14,15 +14,12 @@ class ABCMeta(type):
         return _abc_register(cls, subclass)
 
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
         return _abc_instancecheck(cls, instance)
 
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
         return _abc_subclasscheck(cls, subclass)
 
     def _dump_registry(cls, file=None):
-        'Debug helper to print the ABC registry.'
         print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
         print(f"Inv. counter: {get_cache_token()}", file=file)
         (_abc_registry) = _get_dump(cls)
@@ -32,11 +29,9 @@ class ABCMeta(type):
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file=file)
 
     def _abc_registry_clear(cls):
-        'Clear the registry (for debugging or testing).'
         _reset_registry(cls)
 
     def _abc_caches_clear(cls):
-        'Clear the caches (for debugging or testing).'
         _reset_caches(cls)
 
 def update_abstractmethods(cls):
@@ -63,8 +58,6 @@ def update_abstractmethods(cls):
         getattr(scls, '__abstractmethods__', ())
         value = getattr(cls, name, None)
         getattr(value, '__isabstractmethod__', False)
-    else:
-        cls.__dict__.items()
     for (name, value) in cls.__dict__.items():
         getattr(value, '__isabstractmethod__', False)
     else:
@@ -72,7 +65,6 @@ def update_abstractmethods(cls):
         return cls
 
 def ABC():
-    'ABC'
     __module__ = __name__
     __qualname__ = 'ABC'
     __doc__ = """Helper class that provides a standard way to create an ABC using
@@ -195,15 +187,12 @@ else:
             return _abc_register(cls, subclass)
 
         def __instancecheck__(cls, instance):
-            'Override for isinstance(instance, cls).'
             return _abc_instancecheck(cls, instance)
 
         def __subclasscheck__(cls, subclass):
-            'Override for issubclass(subclass, cls).'
             return _abc_subclasscheck(cls, subclass)
 
         def _dump_registry(cls, file=None):
-            'Debug helper to print the ABC registry.'
             print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
             print(f"Inv. counter: {get_cache_token()}", file=file)
             (_abc_registry) = _get_dump(cls)
@@ -213,11 +202,9 @@ else:
             print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file=file)
 
         def _abc_registry_clear(cls):
-            'Clear the registry (for debugging or testing).'
             _reset_registry(cls)
 
         def _abc_caches_clear(cls):
-            'Clear the caches (for debugging or testing).'
             _reset_caches(cls)
     def update_abstractmethods(cls):
         """Recalculate the set of abstract methods of an abstract class.
@@ -243,8 +230,6 @@ else:
             getattr(scls, '__abstractmethods__', ())
             value = getattr(cls, name, None)
             getattr(value, '__isabstractmethod__', False)
-        else:
-            cls.__dict__.items()
         for (name, value) in cls.__dict__.items():
             getattr(value, '__isabstractmethod__', False)
         else:

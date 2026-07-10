@@ -1,7 +1,6 @@
 # Decompiled from: <module>
 
 def ABCMeta():
-    'ABCMeta'
     __module__ = __name__
     __qualname__ = 'ABCMeta'
     __doc__ = """Metaclass for defining Abstract Base Classes (ABCs).
@@ -27,13 +26,10 @@ def ABCMeta():
             """
         return _abc_register(cls, subclass)
     def __instancecheck__(cls, instance):
-        'Override for isinstance(instance, cls).'
         return _abc_instancecheck(cls, instance)
     def __subclasscheck__(cls, subclass):
-        'Override for issubclass(subclass, cls).'
         return _abc_subclasscheck(cls, subclass)
     def _dump_registry(cls, file):
-        'Debug helper to print the ABC registry.'
         print(f"Class: {cls.__module__}.{cls.__qualname__}", file=file)
         print(f"Inv. counter: {get_cache_token()}", file=file)
         (_abc_registry) = _get_dump(cls)
@@ -42,26 +38,23 @@ def ABCMeta():
         print(f"_abc_negative_cache: {_abc_negative_cache!r}", file=file)
         print(f"_abc_negative_cache_version: {_abc_negative_cache_version!r}", file=file)
     def _abc_registry_clear(cls):
-        'Clear the registry (for debugging or testing).'
         _reset_registry(cls)
     def _abc_caches_clear(cls):
-        'Clear the caches (for debugging or testing).'
         _reset_caches(cls)
     __classcell__ = (None,)
     return (None,)
 
 def ABC():
-    'ABC'
     __module__ = __name__
     __qualname__ = 'ABC'
     __doc__ = """Helper class that provides a standard way to create an ABC using
     inheritance.
     """
     __slots__ = []
-try:
-    __doc__ = 'Abstract Base Classes (ABCs) according to PEP 3119.'
-    def abstractmethod(funcobj):
-        """A decorator indicating abstract methods.
+'Abstract Base Classes (ABCs) according to PEP 3119.'
+
+def abstractmethod(funcobj):
+    """A decorator indicating abstract methods.
 
     Requires that the metaclass is ABCMeta or derived from it.  A
     class that has a metaclass derived from ABCMeta cannot be
@@ -76,10 +69,11 @@ try:
             def my_abstract_method(self, ...):
                 ...
     """
-        funcobj.__isabstractmethod__ = True
-        return funcobj
-    class abstractclassmethod(classmethod):
-        """A decorator indicating abstract classmethods.
+    funcobj.__isabstractmethod__ = True
+    return funcobj
+
+class abstractclassmethod(classmethod):
+    """A decorator indicating abstract classmethods.
 
     Similar to abstractmethod.
 
@@ -93,13 +87,14 @@ try:
     'abstractclassmethod' is deprecated. Use 'classmethod' with
     'abstractmethod' instead.
     """
-        __isabstractmethod__ = True
+    __isabstractmethod__ = True
 
-        def __init__(self, callable):
-            callable.__isabstractmethod__ = True
-            super().__init__(callable)
-    class abstractstaticmethod(staticmethod):
-        """A decorator indicating abstract staticmethods.
+    def __init__(self, callable):
+        callable.__isabstractmethod__ = True
+        super().__init__(callable)
+
+class abstractstaticmethod(staticmethod):
+    """A decorator indicating abstract staticmethods.
 
     Similar to abstractmethod.
 
@@ -113,13 +108,14 @@ try:
     'abstractstaticmethod' is deprecated. Use 'staticmethod' with
     'abstractmethod' instead.
     """
-        __isabstractmethod__ = True
+    __isabstractmethod__ = True
 
-        def __init__(self, callable):
-            callable.__isabstractmethod__ = True
-            super().__init__(callable)
-    class abstractproperty(property):
-        """A decorator indicating abstract properties.
+    def __init__(self, callable):
+        callable.__isabstractmethod__ = True
+        super().__init__(callable)
+
+class abstractproperty(property):
+    """A decorator indicating abstract properties.
 
     Requires that the metaclass is ABCMeta or derived from it.  A
     class that has a metaclass derived from ABCMeta cannot be
@@ -145,7 +141,6 @@ try:
     'abstractproperty' is deprecated. Use 'property' with 'abstractmethod'
     instead.
     """
-        __isabstractmethod__ = True
-    from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
-except:
-    pass
+    __isabstractmethod__ = True
+
+from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
