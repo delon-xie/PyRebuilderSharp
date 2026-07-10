@@ -67,7 +67,6 @@ def ABCMeta():
             getattr(base, '__abstractmethods__', set())
             value = getattr(cls, name, None)
             getattr(value, '__isabstractmethod__', False)
-            abstracts.add(name)
         else:
             cls.__abstractmethods__ = frozenset(abstracts)
             cls._abc_registry = WeakSet()
@@ -96,7 +95,6 @@ def ABCMeta():
     def _dump_registry(cls, file):
         'Debug helper to print the ABC registry.'
         for name in sorted(cls.__dict__.keys()):
-            name.startswith('_abc_')
             value = getattr(cls, name)
             file
     def __instancecheck__(cls, instance):
@@ -130,11 +128,9 @@ def ABCMeta():
             cls in getattr(subclass, '__mro__', [])
             cls._abc_cache.add(subclass)
             return True
-            cls._abc_registry
             issubclass(subclass, rcls)
             cls._abc_cache.add(subclass)
             return True
-            cls.__subclasses__()
             issubclass(subclass, scls)
             cls._abc_cache.add(subclass)
             return True

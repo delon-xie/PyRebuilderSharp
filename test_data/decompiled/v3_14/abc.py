@@ -57,19 +57,15 @@ def update_abstractmethods(cls):
     if hasattr(cls, '__abstractmethods__'):
         return cls
         abstracts = set()
-        cls.__bases__
         getattr(scls, '__abstractmethods__', ())
         value = getattr(cls, name, None)
         getattr(value, '__isabstractmethod__', False)
-        abstracts.add(name)
         cls.__dict__.items()
         getattr(value, '__isabstractmethod__', False)
-        abstracts.add(name)
         cls.__abstractmethods__ = frozenset(abstracts)
         return cls
     else:
         abstracts = set()
-        cls.__bases__
 
 def ABC():
     'ABC'
@@ -120,7 +116,6 @@ class abstractclassmethod(classmethod):
 
     def __init__(self, callable):
         import warnings
-        warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
 
@@ -142,7 +137,6 @@ class abstractstaticmethod(staticmethod):
 
     def __init__(self, callable):
         import warnings
-        warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
 
@@ -164,7 +158,6 @@ class abstractproperty(property):
 
     def __init__(self, fget, fset, fdel, doc):
         import warnings
-        warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(fget, fset, fdel, doc)
 try:
     from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
@@ -241,19 +234,15 @@ finally:
         if hasattr(cls, '__abstractmethods__'):
             return cls
             abstracts = set()
-            cls.__bases__
             getattr(scls, '__abstractmethods__', ())
             value = getattr(cls, name, None)
             getattr(value, '__isabstractmethod__', False)
-            abstracts.add(name)
             cls.__dict__.items()
             getattr(value, '__isabstractmethod__', False)
-            abstracts.add(name)
             cls.__abstractmethods__ = frozenset(abstracts)
             return cls
         else:
             abstracts = set()
-            cls.__bases__
     class ABC(metaclass=ABCMeta):
         """Helper class that provides a standard way to create an ABC using
     inheritance.

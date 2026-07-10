@@ -21,6 +21,10 @@ public class BlockScanner : IBlockScanner
         var leaders = MarkLeaders(instructions, codeObj.ExceptionTable, codeObj);
         var blocks = SplitAtLeaders(instructions, leaders);
         LinkBlocks(blocks, codeObj.ExceptionTable, codeObj);
+
+        // Phase 9-01: 清理 handler 块中错误连接到 class/func 定义的后继边
+        CleanHandlerSuccessors(blocks);
+
         MergeOrphanBlocks(blocks);
         MarkBlockProperties(blocks);
 
@@ -306,6 +310,7 @@ public class BlockScanner : IBlockScanner
         }
 
         // 3.11+: ExceptionTable handler 边 — try 体 → handler 块
+        // 注意：排除 class/func 定义块（Phase 9-01），防止 handler→class/func 错误边
         if (exceptionTable != null)
         {
             foreach (var entry in exceptionTable)
@@ -313,13 +318,18 @@ public class BlockScanner : IBlockScanner
                 var handlerBlock = FindBlockByOffset(blocks, entry.TargetOffset);
                 if (handlerBlock == null) continue;
 
+                // 标注 handler block 的 ExceptionHandler flag
+                handlerBlock.Flags |= BlockFlags.ExceptionHandler;
+
                 // 找出 try 体覆盖范围的最后一个块
                 for (int j = 0; j < blocks.Count; j++)
                 {
                     if (blocks[j].StartOffset >= entry.StartOffset
                         && blocks[j].EndOffset <= entry.EndOffset)
                     {
-                        AddSuccessor(blocks[j], handlerBlock);
+                        // Phase 9-01: 不将 class/func 定义块链接到 handler
+                        if (!IsClassOrFuncDefinition(blocks[j]))
+                            AddSuccessor(blocks[j], handlerBlock);
                     }
                     if (blocks[j].StartOffset > entry.EndOffset) break;
                 }
@@ -405,5 +415,115 @@ public class BlockScanner : IBlockScanner
                 // 0 前驱的块在 CFG 遍历中会被自然跳过。
             }
         }
+    }
+
+    // ---- Phase 9-01: 清理 handler→class/func 错误边 ----
+
+    /// <summary>
+    /// 清理 handler 块中错误连接到 class/func 定义的后继边。
+    /// 
+    /// 问题：BlockScanner.LinkBlocks 将 handler 后的所有 fallthrough 块无差别链接，
+    /// 当后续块是 class 定义（LOAD_BUILD_CLASS）或函数定义（MAKE_FUNCTION）时，
+    /// 这些定义被错误地作为 handler 的后继，导致反编译输出中 class/func 被嵌套在
+    /// try-except 的 handler 内。
+    /// 
+    /// 修复：检测 handler 块的 successors 中的 class/func 定义块，移除错误边后
+    /// 将被移除的块连接到最近的公共前驱。
+    /// </summary>
+    private void CleanHandlerSuccessors(List<BasicBlock> blocks)
+    {
+        // Step 1: 收集所有 handler 块的后继中属于 class/func 定义的块
+        var edgesToRemove = new List<(BasicBlock From, BasicBlock To)>();
+
+        // 检查所有可能是 handler 的块（标记了 ExceptionHandler flag，或位于 try 范围附近）
+        foreach (var block in blocks)
+        {
+            bool isHandler = block.Flags.HasFlag(BlockFlags.ExceptionHandler);
+
+            // 非 handler 块也检查：通过 HandlerDepth 标注或 SETUP_FINALLY 目标块
+            // 但 BlockScanner 可能尚未标注。通过 ExceptionTable 和目标块特征判断：
+            // handler 块的特征：包含 handler preamble opcodes 且不在 try body 范围内
+            if (!isHandler)
+            {
+                // 检查块是否包含 handler preamble 特有的 opcode
+                // PUSH_EXC_INFO / CHECK_EXC_MATCH → 3.11+ handler
+                // 连续的 POP_TOP (3次以上) → 3.10- bare handler
+                int popTopCount = block.Instructions.Count(i => i.Opcode == Opcode.POP_TOP);
+                bool hasPreamble = block.Instructions.Any(i =>
+                    i.Opcode == Opcode.PUSH_EXC_INFO_312 ||
+                    i.Opcode == Opcode.PUSH_EXC_INFO ||
+                    i.Opcode == Opcode.CHECK_EXC_MATCH)
+                    || popTopCount >= 3;
+                if (hasPreamble)
+                {
+                    isHandler = true;
+                    block.Flags |= BlockFlags.ExceptionHandler;
+                }
+            }
+
+            if (!isHandler) continue;
+
+            foreach (var succ in block.Successors.ToList())
+            {
+                if (IsClassOrFuncDefinition(succ))
+                {
+                    edgesToRemove.Add((block, succ));
+                }
+            }
+        }
+
+        if (edgesToRemove.Count == 0) return;
+
+        // Step 2: 移除错误边
+        foreach (var (from, to) in edgesToRemove)
+        {
+            from.Successors.Remove(to);
+            to.Predecessors.Remove(from);
+            Console.Error.WriteLine(
+                $"[CFG_CLEAN] Removed handler→class/func edge: 0x{from.StartOffset:X4} → 0x{to.StartOffset:X4}");
+        }
+
+        // Step 3: 确保被移除的 class/func block 有前面的 predecessor
+        foreach (var (_, to) in edgesToRemove)
+        {
+            if (to.Predecessors.Count == 0)
+            {
+                int idx = blocks.IndexOf(to);
+                for (int j = idx - 1; j >= 0; j--)
+                {
+                    if (!blocks[j].Flags.HasFlag(BlockFlags.ExceptionHandler)
+                        && blocks[j].Successors.Count > 0
+                        && !blocks[j].Successors.Contains(to))
+                    {
+                        AddSuccessor(blocks[j], to);
+                        Console.Error.WriteLine(
+                            $"[CFG_CLEAN] Reconnected class/func block 0x{to.StartOffset:X4} via predecessor 0x{blocks[j].StartOffset:X4}");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>检测 block 是否为 class 或 function 定义的开头。</summary>
+    private static bool IsClassOrFuncDefinition(BasicBlock block)
+    {
+        if (block.Instructions.Count == 0) return false;
+
+        var firstOp = block.Instructions[0].Opcode;
+
+        // class 定义: LOAD_BUILD_CLASS
+        if (firstOp == Opcode.LOAD_BUILD_CLASS)
+            return true;
+
+        // 函数定义: 块以 LOAD_CONST(code_object) 或 LOAD_CLOSURE 开头，后跟 MAKE_FUNCTION
+        if (firstOp == Opcode.LOAD_CONST || firstOp == Opcode.LOAD_CLOSURE)
+        {
+            return block.Instructions.Any(i =>
+                i.Opcode == Opcode.MAKE_FUNCTION ||
+                i.Opcode == Opcode.MAKE_CLOSURE);
+        }
+
+        return false;
     }
 }

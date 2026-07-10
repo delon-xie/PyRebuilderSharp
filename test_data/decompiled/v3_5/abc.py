@@ -111,12 +111,11 @@ class abstractproperty(property):
 class ABCMeta(type):
     def __new__(mcls, name, bases, namespace):
         cls = super().__new__(mcls, name, bases, namespace)
-        abstracts = {name for (name, value) in namespace.items()}
+        abstracts = {getattr(value, '__isabstractmethod__', False) for (name, value) in namespace.items()}
         for base in bases:
             getattr(base, '__abstractmethods__', set())
             value = getattr(cls, name, None)
             getattr(value, '__isabstractmethod__', False)
-            abstracts.add(name)
         else:
             cls.__abstractmethods__ = frozenset(abstracts)
             cls._abc_registry = WeakSet()
@@ -161,7 +160,6 @@ class ABCMeta(type):
     def _dump_registry(cls, file):
         'Debug helper to print the ABC registry.'
         for name in sorted(cls.__dict__.keys()):
-            name.startswith('_abc_')
             value = getattr(cls, name)
 
     def __instancecheck__(cls, instance):
@@ -199,11 +197,9 @@ class ABCMeta(type):
             cls in getattr(subclass, '__mro__', ())
             cls._abc_cache.add(subclass)
             return True
-            cls._abc_registry
             issubclass(subclass, rcls)
             cls._abc_cache.add(subclass)
             return True
-            cls.__subclasses__()
             issubclass(subclass, scls)
             cls._abc_cache.add(subclass)
             return True

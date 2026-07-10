@@ -63,12 +63,10 @@ def update_abstractmethods(cls):
         getattr(scls, '__abstractmethods__', ())
         value = getattr(cls, name, None)
         getattr(value, '__isabstractmethod__', False)
-        abstracts.add(name)
     else:
         cls.__dict__.items()
     for (name, value) in cls.__dict__.items():
         getattr(value, '__isabstractmethod__', False)
-        abstracts.add(name)
     else:
         cls.__abstractmethods__ = frozenset(abstracts)
         return cls
@@ -121,7 +119,6 @@ class abstractclassmethod(classmethod):
 
     def __init__(self, callable):
         import warnings
-        warnings._deprecated('abc.abstractclassmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
 
@@ -143,7 +140,6 @@ class abstractstaticmethod(staticmethod):
 
     def __init__(self, callable):
         import warnings
-        warnings._deprecated('abc.abstractstaticmethod', remove=(3, 21))
         callable.__isabstractmethod__ = True
         super().__init__(callable)
 
@@ -165,7 +161,6 @@ class abstractproperty(property):
 
     def __init__(self, fget=None, fset=None, fdel=None, doc=None):
         import warnings
-        warnings._deprecated('abc.abstractproperty', remove=(3, 21))
         super().__init__(fget, fset, fdel, doc)
 try:
     from _abc import get_cache_token, _abc_init, _abc_register, _abc_instancecheck, _abc_subclasscheck, _get_dump, _reset_registry, _reset_caches
@@ -248,12 +243,10 @@ else:
             getattr(scls, '__abstractmethods__', ())
             value = getattr(cls, name, None)
             getattr(value, '__isabstractmethod__', False)
-            abstracts.add(name)
         else:
             cls.__dict__.items()
         for (name, value) in cls.__dict__.items():
             getattr(value, '__isabstractmethod__', False)
-            abstracts.add(name)
         else:
             cls.__abstractmethods__ = frozenset(abstracts)
             return cls

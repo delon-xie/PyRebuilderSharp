@@ -12461,38 +12461,44 @@ public class AstBuilder
         {
             var stmt = stmts[i];
 
+            // 递归处理子结构（BARE_EXPR 可能嵌套在 if/for/while/try/with/func 体内）
+            var processed = ProcessChildBareExpr(stmt);
+            if (processed != null)
+            {
+                result.Add(processed);
+                continue;
+            }
+
             if (stmt is ExprStmt exprStmt)
             {
                 // 🟢 B4/B6: FunctionRef 删除（已转为 FunctionDef）
                 if (exprStmt.Value is FunctionRef fr && fr.Name.StartsWith("<"))
                     continue;
 
-                // 🟢 B8: 孤立 Name 删除（如 'x', 'method', 'it', 'total' 等）
+                // 🟢 B8: 孤立 Name 删除
                 if (exprStmt.Value is Name name && IsBareNameSafeToRemove(name, stmts, i))
                     continue;
 
-                // 🟢 B5: 类体属性删除（cls.__xxx__, self.xxx() 等）
+                // 🟢 B5: 类体属性删除
                 if (exprStmt.Value is AstAttribute attr && IsClassBodyAttribute(attr))
                     continue;
 
-                // 🟢 B5: 类体方法调用（self.connect(), gen.reset(10) 在类体中）
+                // 🟢 B5: 类体方法调用
                 if (exprStmt.Value is Call call && IsClassBodyMethodCall(call))
                     continue;
 
-                // 🟡 B1/B2/B3: comprehension .append/.add/.__setitem__ 删除
+                // 🟡 B1/B2/B3: comprehension .append/.add 删除
                 if (IsComprehensionAppendCall(exprStmt, stmts, i))
                     continue;
 
-                // 🟡 B7: match type pattern（int, str 等）删除
+                // 🟡 B7: match type pattern 删除
                 if (IsMatchTypePattern(exprStmt, stmts, i))
                     continue;
 
-                // 🟢 孤立 None 表达式（单独一行 None）
+                // 🟢 孤立 None / raise / return
                 if (exprStmt.Value is Constant { Value: null })
                     continue;
-
-                // 🟢 孤立 raise 表达式（不在 try 中时）
-                if (exprStmt.Value is Name { Id: "raise" })
+                if (exprStmt.Value is Name { Id: "raise" or "return" or "yield" })
                     continue;
 
                 result.Add(stmt);
@@ -12506,6 +12512,49 @@ public class AstBuilder
         return result;
     }
 
+    /// <summary>递归清理子结构的 BARE_EXPR。</summary>
+    private Stmt? ProcessChildBareExpr(Stmt stmt)
+    {
+        switch (stmt)
+        {
+            case FunctionDef fd:
+                return fd with { Body = CleanupBareExpr(fd.Body) };
+            case ClassDef cd:
+                return cd with { Body = CleanupBareExpr(cd.Body) };
+            case If ifStmt:
+                return ifStmt with
+                {
+                    Body = CleanupBareExpr(ifStmt.Body),
+                    Orelse = ifStmt.Orelse != null ? CleanupBareExpr(ifStmt.Orelse) : null
+                };
+            case While whileStmt:
+                return whileStmt with
+                {
+                    Body = CleanupBareExpr(whileStmt.Body),
+                    Orelse = whileStmt.Orelse != null ? CleanupBareExpr(whileStmt.Orelse) : null
+                };
+            case For forStmt:
+                return forStmt with
+                {
+                    Body = CleanupBareExpr(forStmt.Body),
+                    Orelse = forStmt.Orelse != null ? CleanupBareExpr(forStmt.Orelse) : null
+                };
+            case Try tryStmt:
+                return tryStmt with
+                {
+                    Body = CleanupBareExpr(tryStmt.Body),
+                    Handlers = tryStmt.Handlers.Select(h =>
+                        h with { Body = CleanupBareExpr(h.Body) }).ToList(),
+                    Orelse = tryStmt.Orelse != null ? CleanupBareExpr(tryStmt.Orelse) : null,
+                    Finalbody = tryStmt.Finalbody != null ? CleanupBareExpr(tryStmt.Finalbody) : null
+                };
+            case With withStmt:
+                return withStmt with { Body = CleanupBareExpr(withStmt.Body) };
+            default:
+                return null; // 非容器节点，交由上层处理
+        }
+    }
+
     /// <summary>B8: 判断孤立 Name 是否可以安全删除。</summary>
     private static bool IsBareNameSafeToRemove(Name name, List<Stmt> stmts, int index)
     {
@@ -12516,7 +12565,9 @@ public class AstBuilder
             "it", "method", "result", "total",           // 编译器残留
             "StopIteration", "ValueError", "ZeroDivisionError", // 异常类型名
             "num", "row",                                 // 推导式变量
-            "cls",                                        // 类体访问
+            "cls", "name",                                // 类体/枚举访问
+            "return", "yield",                            // 关键字残留
+            "raise",                                      // 关键字残留
         };
 
         if (!bareNames.Contains(name.Id))
