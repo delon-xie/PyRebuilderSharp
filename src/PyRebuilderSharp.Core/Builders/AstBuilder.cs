@@ -12531,6 +12531,19 @@ public class AstBuilder
                 if (exprStmt.Value is Name { Id: "raise" or "return" or "yield" })
                     continue;
 
+                // 🟢 短字符串常量（docstring/f-string 残留）
+                if (exprStmt.Value is Constant { Value: string s } && s.Length < 80)
+                    continue;
+
+                // 🟢 短 Name 或含特殊字符的 Name（f-string 片段残留）
+                if (exprStmt.Value is Name n && (n.Id.Length <= 2 || n.Id.Contains(".")))
+                    continue;
+
+                // 🟡 AstAttribute→Call 链（如 cls.__dict__.items()）
+                if (exprStmt.Value is Call { Func: AstAttribute attr2 }
+                    && IsAstAttributeChainWithCls(attr2))
+                    continue;
+
                 result.Add(stmt);
             }
             else
@@ -12622,6 +12635,18 @@ public class AstBuilder
         return false;
     }
 
+    /// <summary>判断 AstAttribute 链是否包含 cls（如 cls.__dict__.items()）。</summary>
+    private static bool IsAstAttributeChainWithCls(AstAttribute attr)
+    {
+        // 递归检查属性链的根源是否为 cls
+        Expr current = attr;
+        while (current is AstAttribute innerAttr)
+        {
+            current = innerAttr.Value;
+        }
+        return current is Name { Id: "cls" or "self" };
+    }
+
     /// <summary>B5: 判断 Call 是否为类体方法调用。</summary>
     private static bool IsClassBodyMethodCall(Call call)
     {
@@ -12654,7 +12679,7 @@ public class AstBuilder
 
             if (targetName == null) return false;
 
-            // 检查前面是否存在同名变量的 ListComp/SetComp 赋值
+            // 检查前面是否存在同名变量的 ListComp/SetComp/DictComp 赋值
             for (int j = Math.Max(0, index - 5); j < index; j++)
             {
                 if (stmts[j] is Assign assign
@@ -12662,6 +12687,14 @@ public class AstBuilder
                     && assign.Targets[0] is Name assignName
                     && assignName.Id == targetName
                     && (assign.Value is ListComp or SetComp or DictComp))
+                {
+                    return true;
+                }
+                // 或检查转换后的 For 循环（comprehension 已被 ConvertComprehensionCalls 处理）
+                if (stmts[j] is For forStmt
+                    && forStmt.Target is Name forName
+                    && forName.Id == targetName
+                    && (forStmt.Iter is not Name || !forStmt.Iter.ToString()!.Contains("iterable")))
                 {
                     return true;
                 }
