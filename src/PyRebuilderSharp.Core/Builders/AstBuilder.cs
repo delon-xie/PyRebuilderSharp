@@ -449,6 +449,10 @@ public class AstBuilder
 
         // Phase 8 Step 3: BARE_EXPR 清理 — 删除编译器生成的中间表达式残留
         stmts = CleanupBareExpr(stmts);
+        stmts = CleanForElseBareExprs(stmts);
+
+        // Phase 9-2-01: 清理 return/raise 后的死代码（abc 控制流分裂）
+        stmts = CleanDeadCodeAfterReturn(stmts);
 
         // Phase 9-03: 语法错误修复 — 检测并修复常见的无效语法模式
         stmts = FixSyntaxErrors(stmts);
@@ -471,6 +475,8 @@ public class AstBuilder
             stmts.Add(new Pass());
         }
         
+        // 最终检查：FunctionDef body 为空 → 补 pass
+        stmts = FinalFixFunctionBodies(stmts);
         return new Module(stmts, _codeObject.Name);
     }
 
@@ -608,6 +614,72 @@ public class AstBuilder
                 if (tryStmt.Finalbody != null) FixEmptyFunctionBodies(tryStmt.Finalbody);
             }
         }
+    }
+
+    /// <summary>最终检查：所有 FunctionDef/ClassDef body 为空 → 补 pass（修复 SyntaxError: expected indented block）。</summary>
+    private static List<Stmt> FinalFixFunctionBodies(List<Stmt> stmts)
+    {
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            switch (stmts[i])
+            {
+                case FunctionDef fd:
+                    if (fd.Body.Count == 0 || fd.Body.All(s => s is Pass or CommentBlock))
+                    {
+                        stmts[i] = fd with { Body = new List<Stmt> { new Pass() } };
+                    }
+                    else
+                    {
+                        stmts[i] = fd with { Body = FinalFixFunctionBodies(fd.Body) };
+                    }
+                    break;
+                case ClassDef cd:
+                    if (cd.Body.Count == 0 || cd.Body.All(s => s is Pass or CommentBlock))
+                    {
+                        stmts[i] = cd with { Body = new List<Stmt> { new Pass() } };
+                    }
+                    else
+                    {
+                        stmts[i] = cd with { Body = FinalFixFunctionBodies(cd.Body) };
+                    }
+                    break;
+                case If ifStmt:
+                    stmts[i] = ifStmt with
+                    {
+                        Body = FinalFixFunctionBodies(ifStmt.Body),
+                        Orelse = ifStmt.Orelse != null ? FinalFixFunctionBodies(ifStmt.Orelse) : null
+                    };
+                    break;
+                case For forStmt:
+                    stmts[i] = forStmt with
+                    {
+                        Body = FinalFixFunctionBodies(forStmt.Body),
+                        Orelse = forStmt.Orelse != null ? FinalFixFunctionBodies(forStmt.Orelse) : null
+                    };
+                    break;
+                case While whileStmt:
+                    stmts[i] = whileStmt with
+                    {
+                        Body = FinalFixFunctionBodies(whileStmt.Body),
+                        Orelse = whileStmt.Orelse != null ? FinalFixFunctionBodies(whileStmt.Orelse) : null
+                    };
+                    break;
+                case Try tryStmt:
+                    stmts[i] = tryStmt with
+                    {
+                        Body = FinalFixFunctionBodies(tryStmt.Body),
+                        Handlers = tryStmt.Handlers.Select(h =>
+                            h with { Body = FinalFixFunctionBodies(h.Body) }).ToList(),
+                        Orelse = tryStmt.Orelse != null ? FinalFixFunctionBodies(tryStmt.Orelse) : null,
+                        Finalbody = tryStmt.Finalbody != null ? FinalFixFunctionBodies(tryStmt.Finalbody) : null
+                    };
+                    break;
+                case With withStmt:
+                    stmts[i] = withStmt with { Body = FinalFixFunctionBodies(withStmt.Body) };
+                    break;
+            }
+        }
+        return stmts;
     }
 
     private void CollapseRedundantPasses(List<Stmt> stmts)
@@ -10078,9 +10150,15 @@ public class AstBuilder
         CollapseRedundantPasses(stmts);
         stmts = TrimPostTerminalDeadCode(stmts);
         stmts = CleanupBareExpr(stmts);
+        stmts = CleanForElseBareExprs(stmts);
+        stmts = CleanDeadCodeAfterReturn(stmts);
+        // BARE 清理后可能产生空的 FunctionDef body → 再次补 pass
+        FixEmptyFunctionBodies(stmts);
         stmts = FixSyntaxErrors(stmts);
         // stmts = DecompileNestedCodeObjects(stmts, _codeObject); // disabled
 
+        // 最终检查：FunctionDef body 为空 → 补 pass
+        stmts = FinalFixFunctionBodies(stmts);
         return new Module(stmts, _codeObject.Name);
     }
 
@@ -10117,9 +10195,14 @@ public class AstBuilder
         CollapseRedundantPasses(stmts);
         stmts = TrimPostTerminalDeadCode(stmts);
         stmts = CleanupBareExpr(stmts);
+        stmts = CleanForElseBareExprs(stmts);
+        stmts = CleanDeadCodeAfterReturn(stmts);
+        FixEmptyFunctionBodies(stmts);
         stmts = FixSyntaxErrors(stmts);
         // stmts = DecompileNestedCodeObjects(stmts, _codeObject); // disabled
 
+        // 最终检查：FunctionDef body 为空 → 补 pass
+        stmts = FinalFixFunctionBodies(stmts);
         return new Module(stmts, _codeObject.Name);
     }
 
@@ -12550,14 +12633,13 @@ public class AstBuilder
                 if (exprStmt.Value is Name n && (n.Id.Length <= 2 || n.Id.Contains(".")))
                     continue;
 
-                // 🟡 AstAttribute→Call 链（如 cls.__dict__.items()）
+                // 🟢 AstAttribute→Call 链（如 cls.__dict__.items()）
                 if (exprStmt.Value is Call { Func: AstAttribute attr2 }
                     && IsAstAttributeChainWithCls(attr2))
                     continue;
 
                 // 🟢 for 循环前的迭代器表达式（GET_ITER 泄漏）
-                // 如 `range(10)` 在 `for x in range(10):` 之前
-                if (exprStmt.Value is Call { Func: Name { Id: "range" or "iter" } }
+                if (exprStmt.Value is Call { Func: Name { Id: "range" or "iter" or "islice" } }
                     && i + 1 < stmts.Count && stmts[i + 1] is For)
                     continue;
 
@@ -12569,8 +12651,105 @@ public class AstBuilder
                 if (stmt is Raise { Exc: null, Cause: null })
                     continue;
 
+                // 🟢 编译器生成的 `var = None` 清理代码（try/except cleanup 泄漏）
+                if (stmt is Assign { Targets: [Name _], Value: Constant { Value: null } })
+                    continue;
+
                 result.Add(stmt);
             }
+        }
+
+        return result;
+    }
+
+    // ---- Phase 9-2-01: return/raise 后死代码清理 ----
+
+    /// <summary>
+    /// 删除 return/raise 之后的死代码（bare ExprStmt）。
+    /// abc.py 等文件中，if 分支以 return 结束后后续块的语句变成死代码。
+    /// 只删除 ExprStmt/Pass/Continue/Break — 不删除 Assign/FunctionDef/ClassDef/控制结构。
+    /// </summary>
+    private static List<Stmt> CleanDeadCodeAfterReturn(List<Stmt> stmts)
+    {
+        if (stmts == null || stmts.Count <= 1)
+            return stmts ?? new List<Stmt>();
+
+        var result = new List<Stmt>(stmts.Count);
+        bool dead = false;
+
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            var stmt = stmts[i];
+
+            switch (stmt)
+            {
+                case FunctionDef fd:
+                    result.Add(fd with { Body = CleanDeadCodeAfterReturn(fd.Body) });
+                    dead = false;
+                    continue;
+                case ClassDef cd:
+                    result.Add(cd with { Body = CleanDeadCodeAfterReturn(cd.Body) });
+                    dead = false;
+                    continue;
+                case If ifStmt:
+                    result.Add(ifStmt with
+                    {
+                        Body = CleanDeadCodeAfterReturn(ifStmt.Body),
+                        Orelse = ifStmt.Orelse != null
+                            ? CleanDeadCodeAfterReturn(ifStmt.Orelse) : null
+                    });
+                    dead = false;
+                    continue;
+                case While whileStmt:
+                    result.Add(whileStmt with
+                    {
+                        Body = CleanDeadCodeAfterReturn(whileStmt.Body),
+                        Orelse = whileStmt.Orelse != null
+                            ? CleanDeadCodeAfterReturn(whileStmt.Orelse) : null
+                    });
+                    dead = false;
+                    continue;
+                case For forStmt:
+                    result.Add(forStmt with
+                    {
+                        Body = CleanDeadCodeAfterReturn(forStmt.Body),
+                        Orelse = forStmt.Orelse != null
+                            ? CleanDeadCodeAfterReturn(forStmt.Orelse) : null
+                    });
+                    dead = false;
+                    continue;
+                case Try tryStmt:
+                    result.Add(tryStmt with
+                    {
+                        Body = CleanDeadCodeAfterReturn(tryStmt.Body),
+                        Handlers = tryStmt.Handlers.Select(h =>
+                            h with { Body = CleanDeadCodeAfterReturn(h.Body) }).ToList(),
+                        Orelse = tryStmt.Orelse != null
+                            ? CleanDeadCodeAfterReturn(tryStmt.Orelse) : null,
+                        Finalbody = tryStmt.Finalbody != null
+                            ? CleanDeadCodeAfterReturn(tryStmt.Finalbody) : null
+                    });
+                    dead = false;
+                    continue;
+                case With withStmt:
+                    result.Add(withStmt with { Body = CleanDeadCodeAfterReturn(withStmt.Body) });
+                    dead = false;
+                    continue;
+            }
+
+            if (dead)
+            {
+                if (stmt is ExprStmt or Pass or Continue or Break)
+                {
+                    continue;
+                }
+                dead = false;
+            }
+
+            if (stmt is Return || stmt is Raise or Yield)
+                dead = true;
+
+            result.Add(stmt);
         }
 
         return result;
@@ -12932,6 +13111,60 @@ public class AstBuilder
         if (expr is Call c)
             return IsDecoratorExpression(c.Func);
         return false;
+    }
+
+    // ---- Phase 9-3: for-else 变量泄漏清理 ----
+
+    /// <summary>
+    /// 清理 for-else 体中泄漏的循环变量。
+    /// 如 `for x in range(10): pass` 的 else 中出现裸 `x`。
+    /// </summary>
+    private static List<Stmt> CleanForElseBareExprs(List<Stmt> stmts)
+    {
+        for (int i = 0; i < stmts.Count; i++)
+        {
+            if (stmts[i] is For forStmt && forStmt.Orelse != null)
+            {
+                string? forTarget = forStmt.Target switch
+                {
+                    Name n => n.Id,
+                    _ => null
+                };
+                if (forTarget != null)
+                {
+                    var cleaned = new List<Stmt>(forStmt.Orelse.Count);
+                    foreach (var s in forStmt.Orelse)
+                    {
+                        if (s is ExprStmt { Value: Name n } && n.Id == forTarget)
+                            continue; // 删除裸循环变量
+                        cleaned.Add(s);
+                    }
+                    stmts[i] = forStmt with { Orelse = cleaned };
+                }
+
+                // 递归处理嵌套结构
+                var body = CleanForElseBareExprs(forStmt.Body);
+                var orelse = CleanForElseBareExprs(forStmt.Orelse);
+                stmts[i] = stmts[i] is For fs
+                    ? fs with { Body = body, Orelse = orelse }
+                    : stmts[i];
+            }
+            else if (stmts[i] is FunctionDef fd)
+            {
+                stmts[i] = fd with { Body = CleanForElseBareExprs(fd.Body) };
+            }
+            else if (stmts[i] is ClassDef cd)
+            {
+                stmts[i] = cd with { Body = CleanForElseBareExprs(cd.Body) };
+            }
+            else if (stmts[i] is If ifStmt)
+            {
+                var body = CleanForElseBareExprs(ifStmt.Body);
+                var orelse = ifStmt.Orelse != null ? CleanForElseBareExprs(ifStmt.Orelse) : null;
+                stmts[i] = ifStmt with { Body = body, Orelse = orelse };
+            }
+        }
+        return stmts;
     }
 
     // ---- Phase 8 Step 5: 嵌套 CodeObject 递归反编译 ----
