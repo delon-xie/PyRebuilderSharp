@@ -9792,7 +9792,33 @@ public class AstBuilder
                                         var baseName = _codeObject.Names.Count > next.Argument.Value
                                             ? _codeObject.Names[next.Argument.Value] : null;
                                         if (baseName != null && baseName != cd.Name && baseName != "__build_class__")
-                                            bases.Add(new Name(baseName, ExpressionContext.Load));
+                                        {
+                                            // Phase 9-4: 检查此 LOAD_NAME 后是否有 KW_NAMES tuple
+                                            // 如果有 → 这是 keyword arg value，不是 base class
+                                            bool isKeywordArg = false;
+                                            for (int kk = jj + 1; kk < _codeObject.Instructions.Count; kk++)
+                                            {
+                                                var next2 = _codeObject.Instructions[kk];
+                                                if (next2.Opcode == Opcode.LOAD_CONST)
+                                                    continue; // skip constants before CALL
+                                                if (next2.Opcode == Opcode.CALL || next2.Opcode == Opcode.CALL_311
+                                                    || next2.Opcode == Opcode.CALL_FUNCTION_KW
+                                                    || next2.Opcode == Opcode.CALL_KW_313)
+                                                    break; // reached CALL, this is base
+                                                if (next2.Opcode == Opcode.LOAD_NAME)
+                                                {
+                                                    // Two consecutive LOAD_NAME: this is a base, next is kwarg
+                                                    break;
+                                                }
+                                                if (next2.Opcode == Opcode.STORE_NAME)
+                                                    break;
+                                                // Any other opcode before CALL → this is kwarg value
+                                                isKeywordArg = true;
+                                                break;
+                                            }
+                                            if (!isKeywordArg)
+                                                bases.Add(new Name(baseName, ExpressionContext.Load));
+                                        }
                                     }
                                     else if (next.Opcode == Opcode.BUILD_TUPLE || next.Opcode == Opcode.BUILD_LIST)
                                     {
@@ -11339,6 +11365,22 @@ public class AstBuilder
             Console.Error.WriteLine(
                 $"[TRY_PARSE] Skipped empty try @0x{header.StartOffset:X4} (no real body)");
             return null;
+        }
+
+        // Phase 9-4: 检测模块级 try（header 在偏移 0 且 handler 足够远）
+        // abc.py 3.8-3.10 用模块级 `try: ... except NameError: pass` 包裹全部代码
+        if (header.StartOffset == 0 && exceptHandlers.Count > 0)
+        {
+            var lastHandler = exceptHandlers[^1].Handler;
+            bool coversMajority = lastHandler.StartOffset > 100
+                || (seqBlocks.Count > 0 && lastHandler.StartOffset > seqBlocks[^1].EndOffset * 0.85);
+            if (coversMajority)
+            {
+                Console.Error.WriteLine(
+                    $"[TRY_PARSE] Skipped module-level try @0x{header.StartOffset:X4} " +
+                    $"(handler at 0x{lastHandler.StartOffset:X4} wraps entire module)");
+                return null;
+            }
         }
 
         if (exceptHandlers.Count > 0 || finallyBlock != null)

@@ -425,6 +425,10 @@ public class SequentialBlockBuilder
         {
             foreach (var sb in seqBlocks)
             {
+                // Phase 9-4: 不清理模块级 try header（偏移 0）
+                // 也跳过 handler block 自身
+                if (sb.StartOffset == 0 || sb == hb)
+                    continue;
                 if (sb.StartOffset >= hb.StartOffset && sb.EndOffset <= hb.EndOffset)
                     sb.IsTryHeader = false;
             }
